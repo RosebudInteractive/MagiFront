@@ -1,0 +1,204 @@
+@import "./simple-controls"
+
+body
+html
+#root
+  margin 0
+  height 100%
+.app
+  font 12px sans-serif
+  display flex
+  flex-direction row
+  height 100%
+  div
+    box-sizing border-box
+  .left
+    width 20em
+    position relative
+  .tollbar
+    width 100%
+  .top-bar-size
+    height 5em
+  .logo-sidebar
+    text-align center
+    display block
+    top 0px
+    background-color #424b5f
+    height 100%
+    color #ffffff
+    font-size 2em
+    position relative
+    div
+      position absolute
+      top 50%
+      transform translate(50%, -50%)
+  .main-menu
+    height 100%
+    list-style none
+    padding-top 0.5em
+    .menu-item
+      position relative
+      background transparent
+      .link
+        display inline-block
+        width 100%
+        height 2.8571em
+        padding 0 1.25em
+        line-height 3em
+        font-size 14px
+        color #a7b3cb
+        transition .2s ease-out
+        &:hover
+          background #424b5f
+          text-decoration none
+          color #fff
+      .link.open
+        background #424b5f
+        text-decoration none
+        color #fff
+        &:after
+          border-left 4px solid #1ba8ed
+          content ''
+          display block
+          height 100%
+          left 0
+          position absolute
+          top 0
+  .bar-bgcolor
+    background-color #4f5a6e
+  .right
+    flex 1 1 100px
+  .right-container
+    width 100%
+    height 100%
+    display flex
+    flex-direction column
+  .right-top
+    flex none
+  .main-area
+    flex 1 1 100px
+    width 100%
+  .page
+    width 100%
+    height 100%
+    overflow-y auto
+    padding 1em
+    position relative
+  .action-bar
+    flex none
+    height 4em
+    width 100%
+  .episodes
+    width 100%
+    height 100%
+    .episodes-content
+      width 100%
+      height 100%
+      display flex
+      flex-direction column
+    .grid-container
+      flex 1 1 100px
+      width 100%
+      overflow-y auto
+    .grid
+      width 100%
+      height auto
+  .dlg
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    .dlg-bg
+      position absolute
+      float left
+      width 100%
+      height 100%
+      background #000000
+      opacity 0.6
+    .dlg-window
+      position: relative;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      top: 50%;
+      width: 300px;
+    .dlg-btn-bar
+      padding 1em
+      text-align right
+      .btn
+        margin-left 0.5em
+    .dlg-message
+      padding 1em 1em 0 1em
+      font-size 16px
+      font-weight 600
+
+/*  .data-grid
+    width 100%
+    border-collapse separate
+    thead
+      tr
+        background-color #a7b3cb
+        font-size 16px
+        color #f0f0f0
+    tbody
+      tr
+        &:nth-child(even)
+          background-color #f0fcff
+        &:last-child
+          td
+            border-bottom #c3c3c3 inset 1px
+    td
+      border-width 0px
+      padding 0.5em
+      border-right #c3c3c3 inset 1px
+      &:first-child
+        border-left #c3c3c3 outset 1px
+    .data-grid-menu
+      width 2em
+    td.menu-cell
+      >div
+        width 1em
+        height 1em
+        background-image url(../icons/menu-sign.svg)
+        background-repeat no-repeat
+        background-position center center
+        display list-item
+        list-style none
+        position relative
+        color black
+        >span
+          width 10em
+          background-color #4f5a6e
+          height auto
+          float right
+          position absolute
+          display none
+          z-index 2
+          transition .2s ease-out
+          opacity 0
+    .options-menu-item
+      background-color transparent
+      padding .25em
+      color #dadada
+      cursor default
+      transition .2s ease-out
+      padding 0.5em 0.75em 0.5em 0.75em
+      &:hover
+        background-color #424b5f
+        color #f2f2f2
+*/
+
+
+
+
+
+
+/************************************************/
+
+.user {
+  width: 20%;
+  vertical-align: top;
+}
+
