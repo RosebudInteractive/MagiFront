@@ -10,7 +10,7 @@ export default class Menu extends Component {
     onMenuItemClick(id) {
         console.log("onClick", this)
         if (this.props.selected != id)
-            this.props.setSelected(id, this.props.getEpisodes)
+            this.props.setSelected(id)
     }
 
     render() {
@@ -41,6 +41,5 @@ export default class Menu extends Component {
 Menu.propTypes = {
     selected: PropTypes.string.isRequired,
     items: PropTypes.array.isRequired,
-    setSelected: PropTypes.func.isRequired,
-    getEpisodes: PropTypes.func.isRequired
+    setSelected: PropTypes.func.isRequired
 }

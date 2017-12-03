@@ -3,31 +3,35 @@
  */
 
 import React, { Component } from 'react'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+
 import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog"
 import EpisodesForm from "../components/EpisodeForm"
+import * as episodesActions from "../actions/EpisodesActions"
 import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Episodes"
 
-export default class Episodes extends Component {
+class Episodes extends Component {
     onAddBtnClick() {
-        this.props.showEditDlg(EDIT_MODE_INSERT)
+        this.props.episodesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
-        this.props.showEditDlg(EDIT_MODE_EDIT)
+        this.props.episodesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
     deleteEpisode() {
-        this.props.delete(this.props.selected)
+        this.props.episodesActions.deleteEpisode(this.props.selected)
     }
 
     confirmDeleteEpisode() {
-        this.props.showDeleteDlg(this.props.selected)
+        this.props.episodesActions.showDeleteConfirmation(this.props.selected)
     }
 
     cancelDelete() {
-        this.props.hideDeleteDlg()
+        this.props.episodesActions.cancelDelete()
     }
 
     getCurrentEpisode() {
@@ -41,11 +45,15 @@ export default class Episodes extends Component {
     }
 
     saveEpisode(values) {
-        this.props.saveEpisode(values, this.props.editMode)
+        this.props.episodesActions.saveEpisode(values, this.props.editMode)
     }
 
     cancelEdit() {
-        this.props.hideEditDlg();
+        this.props.episodesActions.hideEditDialog();
+    }
+
+    select(id) {
+        this.props.episodesActions.selectEpisode(id);
     }
 
     render() {
@@ -54,7 +62,6 @@ export default class Episodes extends Component {
             fetching,
             hasError,
             message,
-            select,
             selected,
             deleteDlgShown,
             editDlgShown
@@ -76,16 +83,16 @@ export default class Episodes extends Component {
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
-                                    disabled={selected == null}
+                                    disabled={String(selected == null)}
                                 >Исправить...</button>
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteEpisode}
-                                    disabled={selected == null}
+                                    disabled={String(selected == null)}
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(select)} data={episodes} />
+                                <Webix ui={::this.getUI(::this.select)} data={episodes} />
                             </div>
                         </div>
             }
@@ -140,24 +147,39 @@ export default class Episodes extends Component {
         return fn(new Date(data));
     }
 
+    componentDidMount(){
+        this.props.episodesActions.getEpisodes();
+    }
 }
 
 
 Episodes.propTypes = {
     episodes: PropTypes.array.isRequired,
-    getEpisodes: PropTypes.func.isRequired,
     hasError: PropTypes.bool.isRequired,
     message: PropTypes.string,
     selected: PropTypes.number,
-    select: PropTypes.func.isRequired,
     deleteDlgShown: PropTypes.bool.isRequired,
     errorDlgShown: PropTypes.bool.isRequired,
-    showDeleteDlg: PropTypes.func.isRequired,
-    hideDeleteDlg: PropTypes.func.isRequired,
-    delete: PropTypes.func.isRequired,
     editDlgShown: PropTypes.bool.isRequired,
-    editMode: PropTypes.string.isRequired,
-    showEditDlg: PropTypes.func.isRequired,
-    hideEditDlg: PropTypes.func.isRequired,
-    saveEpisode: PropTypes.func.isRequired
+    editMode: PropTypes.string.isRequired
 }
+
+function mapStateToProps(state) {
+    return {
+        episodes: state.episodes.episodes,
+        hasError: state.episodes.hasError,
+        message: state.episodes.message,
+        selected: state.episodes.selected,
+        deleteDlgShown: state.episodes.deleteDlgShown,
+        errorDlgShown: state.episodes.errorDlgShown,
+        editDlgShown: state.episodes.editDlgShown,
+        editMode: state.episodes.editMode
+    }
+}
+function mapDispatchToProps(dispatch) {
+    return {
+        episodesActions: bindActionCreators(episodesActions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Episodes)

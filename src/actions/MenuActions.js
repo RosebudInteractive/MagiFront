@@ -2,9 +2,9 @@
  * Created by levan.kiknadze on 11/11/2017.
  */
 
-import { SELECT_ITEM, MENU_ITEM_EPISODES } from '../constants/Menu'
+import { SELECT_ITEM /*, MENU_ITEM_EPISODES*/ } from '../constants/Menu'
 
-export function setSelected(id, getEpisodes) {
+export function setSelected(id) {
     console.log("setSelected", this)
     return (dispatch) => {
         dispatch( {
@@ -12,9 +12,9 @@ export function setSelected(id, getEpisodes) {
             payload: id
         })
 
-        if (id == MENU_ITEM_EPISODES)
+        /*if (id == MENU_ITEM_EPISODES)
             setTimeout(() => {
                 getEpisodes()
-            })
+            })*/
     }
 }
