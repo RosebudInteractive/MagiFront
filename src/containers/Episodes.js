@@ -76,15 +76,14 @@ class Episodes extends Component {
                         :
                         <div className="episodes-content">
                             <div className="action-bar">
-                                <button c
-                                        className='btn'
+                                <button className='btn'
                                         onClick={::this.onAddBtnClick}
                                 >Добавить...</button>{' '}
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={String(selected == null)}
-                                >Исправить...</button>
+                                >Исправить...</button>{' '}
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteEpisode}

@@ -8,13 +8,37 @@ import Menu from "../components/Menu"
 import Episodes from "./Episodes"
 import * as pageActions from '../actions/PageActions'
 import * as menuActions from "../actions/MenuActions"
-import { MENU_ITEM_OTHER } from '../constants/Menu'
+import * as menuPages from '../constants/Menu'
+
+const pages = [
+    menuPages.MENU_ITEM_AUTHOR,
+    menuPages.MENU_ITEM_EPISODES,
+    menuPages.MENU_ITEM_OTHER,
+];
 
 class App extends Component {
+    _getPages() {
+        const {user, page, menu} = this.props;
+        const {getPhotos} = this.props.pageActions;
+
+        return pages.map(() => {
+            switch(menu.selected) {
+                case menuPages.MENU_ITEM_EPISODES:
+                    return <div className="page"><Episodes/></div>;
+                case menuPages.MENU_ITEM_OTHER:
+                    return <div>
+                        <Page photos={page.photos} year={page.year} getPhotos={getPhotos} fetching={page.fetching}/>
+                        < User name={user.name} />
+                    </div>
+            }
+        });
+    }
+
     render() {
-        const { user, page, menu } = this.props
-        const { getPhotos } = this.props.pageActions
-        const { setSelected } = this.props.menuActions
+        const { menu } = this.props;
+        // const {getPhotos} = this.props.pageActions;
+        const {setSelected} = this.props.menuActions;
+
         return <div className="app">
             <div className="left bar-bgcolor">
                 <div className="toolbar top-bar-size">
@@ -31,8 +55,9 @@ class App extends Component {
                         </div>
                     </div>
                     <div className="main-area">
-                        {
-                            menu.selected == MENU_ITEM_OTHER ?
+                        {this._getPages()}
+                        {/*{
+                           menu.selected == menuPages.MENU_ITEM_OTHER ?
                                 <div>
                                     <Page photos={page.photos} year={page.year} getPhotos={getPhotos} fetching={page.fetching}/>
                                     < User name={user.name} />
@@ -41,7 +66,7 @@ class App extends Component {
                                 <div className="page">
                                     <Episodes/>
                                 </div>
-                        }
+                        }*/}
                     </div>
                 </div>
             </div>
