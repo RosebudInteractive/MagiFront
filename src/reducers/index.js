@@ -1,4 +1,6 @@
 import { combineReducers } from 'redux'
+import { routerReducer } from 'react-router-redux';
+
 import page from "./page"
 import user from "./user"
 import menu from "./menu"
@@ -8,5 +10,6 @@ export default combineReducers({
     page,
     user,
     menu,
-    episodes
+    episodes,
+    routing: routerReducer
 })

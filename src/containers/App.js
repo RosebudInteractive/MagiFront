@@ -1,14 +1,17 @@
-
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+
+import { Switch, Route } from 'react-router-dom'
+
 import User from '../components/User'
 import Page from '../components/Page'
 import Menu from "../components/Menu"
+import Home from "../components/Home"
 import Episodes from "./Episodes"
+
 import * as pageActions from '../actions/PageActions'
 import * as menuActions from "../actions/MenuActions"
-import { MENU_ITEM_OTHER } from '../constants/Menu'
 
 class App extends Component {
     render() {
@@ -31,17 +34,20 @@ class App extends Component {
                         </div>
                     </div>
                     <div className="main-area">
-                        {
-                            menu.selected == MENU_ITEM_OTHER ?
+                        <Switch>
+                            <Route exact path='/' component={Home}/>
+                            <Route path='/photos' render={() => {
                                 <div>
                                     <Page photos={page.photos} year={page.year} getPhotos={getPhotos} fetching={page.fetching}/>
                                     < User name={user.name} />
                                 </div>
-                            :
+                            }}/>
+                            <Route path="/episodes" render={() => {
                                 <div className="page">
                                     <Episodes/>
                                 </div>
-                        }
+                            }}/>
+                        </Switch>
                     </div>
                 </div>
             </div>

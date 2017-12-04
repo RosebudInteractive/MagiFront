@@ -4,18 +4,19 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
+
 import { MENU_ITEM_EPISODES, MENU_ITEM_NONE } from "../constants/Menu"
 
 export default class Menu extends Component {
     onMenuItemClick(id) {
-        console.log("onClick", this)
         if (this.props.selected != id)
             this.props.setSelected(id)
     }
 
     render() {
         const { selected, items } = this.props
-        const that = this;
+        //const that = this;
         // if none of items is selected^ then call select action
         if (selected == MENU_ITEM_NONE) {
             setTimeout(() => {
@@ -26,9 +27,11 @@ export default class Menu extends Component {
             {
                 items.map(
                     function (item) {
-                        return <div className="menu-item" key={item.id} onClick={() => {::that.onMenuItemClick(item.id)}}>
+                        return <div className="menu-item" key={item.id}>
                             <div className={"link" + (selected == item.id ? " open" : "")}>
-                                {item.name}
+                                <Link to={{ pathname: item.url }} /*onClick={() => {::that.onMenuItemClick(item.id)}}*/>
+                                    {item.name}
+                                </Link>
                             </div>
                         </div>
                     }

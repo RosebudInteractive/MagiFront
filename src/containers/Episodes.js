@@ -76,19 +76,19 @@ class Episodes extends Component {
                         :
                         <div className="episodes-content">
                             <div className="action-bar">
-                                <button c
+                                <button
                                         className='btn'
                                         onClick={::this.onAddBtnClick}
                                 >Добавить...</button>{' '}
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
-                                    disabled={String(selected == null)}
+                                    disabled={selected == null}
                                 >Исправить...</button>
                                 <button
                                     className={'btn' + (selected == null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteEpisode}
-                                    disabled={String(selected == null)}
+                                    disabled={selected == null}
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
@@ -150,6 +150,7 @@ class Episodes extends Component {
     componentDidMount(){
         this.props.episodesActions.getEpisodes();
     }
+
 }
 
 
