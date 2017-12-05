@@ -8,11 +8,12 @@ import {
 import {
     SHOW_ERROR_DIALOG,
     // HIDE_ERROR_DIALOG,
-    // HIDE_DELETE_DLG,
+    SHOW_DELETE_DLG,
+    HIDE_DELETE_DLG,
     SHOW_EDIT_DLG,
     HIDE_EDIT_DLG,
     EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT
+    EDIT_MODE_EDIT,
 } from '../constants/Common';
 
 import 'whatwg-fetch';
@@ -58,6 +59,20 @@ export const hideEditDialog = () => {
     }
 
 };
+
+export function showDeleteConfirmation() {
+    return {
+        type: SHOW_DELETE_DLG,
+        payload: null
+    }
+}
+
+export const cancelDelete = () => {
+    return {
+        type: HIDE_DELETE_DLG,
+        payload: null
+    }
+}
 
 export const selectAuthor = (id) => {
     return {

@@ -17,9 +17,10 @@ import {
 import {
     // SHOW_ERROR_DIALOG,
     // HIDE_ERROR_DIALOG,
-    // HIDE_DELETE_DLG,
+    SHOW_DELETE_DLG,
+    HIDE_DELETE_DLG,
     SHOW_EDIT_DLG,
-    // HIDE_EDIT_DLG,
+    HIDE_EDIT_DLG,
     EDIT_MODE_INSERT,
 } from '../constants/Common'
 
@@ -50,10 +51,10 @@ export default function episodes(state = initialState, action) {
         case SELECT_AUTHOR:
             return {...state, selected: action.payload};
 
-        // case SHOW_DELETE_DLG:
-        //     return {...state, deleteDlgShown: true}
-        // case HIDE_DELETE_DLG:
-        //     return {...state, deleteDlgShown: false}
+        case SHOW_DELETE_DLG:
+            return {...state, deleteDlgShown: true}
+        case HIDE_DELETE_DLG:
+            return {...state, deleteDlgShown: false}
         //
         // case DELETE_EPISODE_SUCCESS:
         //     var newEpisodes = []
@@ -76,25 +77,30 @@ export default function episodes(state = initialState, action) {
         case SHOW_EDIT_DLG:
             return {...state, editDlgShown: true, editMode: action.payload};
 
-        // case HIDE_EDIT_DLG:
-        //     var newEpisodes2 = []
-        //     var replaced = false
-        //     for (var i2 in state.episodes) {
-        //         if (state.episodes[i2].id != action.payload.id)
-        //             newEpisodes2.push({...state.episodes[i2]})
-        //         else {
-        //             newEpisodes2.push(action.payload)
-        //             replaced = true
-        //         }
-        //     }
-        //     if (!replaced) {
-        //         newEpisodes2.push(action.payload)
-        //     }
-        //     return {...state,
-        //         episodes: newEpisodes2,
-        //         editDlgShown: false,
-        //         selected: replaced ? state.selected : action.payload.id
-        //     }
+        case HIDE_EDIT_DLG: {
+            let _authors = [];
+            let _replaced = false;
+            state.authors.forEach((author) => {
+                if (author.id !== action.payload.id) {
+                    _authors.push({...author})
+                } else {
+                    _authors.push(action.payload);
+                    _replaced = true;
+                }
+            });
+
+            if (!_replaced) {
+                _authors.push(action.payload)
+            }
+
+            return {
+                ...state,
+                authors: _authors,
+                editDlgShown: false,
+                selected: _replaced ? state.selected : action.payload.id
+            };
+        }
+
 
         default:
             return state;

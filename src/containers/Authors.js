@@ -28,11 +28,11 @@ class Authors extends React.Component {
     }
 
     confirmDeleteAuthor() {
-        // this.props.episodesActions.showDeleteConfirmation(this.props.selected)
+        this.props.authorsActions.showDeleteConfirmation(this.props.selected)
     }
 
     cancelDelete() {
-        // this.props.episodesActions.cancelDelete()
+        this.props.authorsActions.cancelDelete()
     }
 
     getCurrentAuthor() {
@@ -46,7 +46,7 @@ class Authors extends React.Component {
     }
 
     cancelEdit() {
-        // this.props.episodesActions.hideEditDialog();
+        this.props.authorsActions.hideEditDialog();
     }
 
     select(id) {
@@ -80,12 +80,12 @@ class Authors extends React.Component {
                                 <button
                                     className={'btn' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
-                                    disabled={String(selected === null)}
+                                    disabled={(selected === null)}
                                 >Исправить...</button>{' '}
                                 <button
                                     className={'btn' + (selected === null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteAuthor}
-                                    disabled={String(selected === null)}
+                                    disabled={(selected === null)}
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
@@ -96,9 +96,9 @@ class Authors extends React.Component {
             {
                 deleteDlgShown ?
                     <YesNoDialog
-                        yesAction={::this.deleteEpisode}
+                        yesAction={::this.deleteAuthor}
                         noAction={::this.cancelDelete}
-                        message="Удалить эпизод?"
+                        message="Удалить автора?"
                         data={selected}
                     />
                     :

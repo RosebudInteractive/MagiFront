@@ -105,8 +105,10 @@ exports.AuthorsService = class AuthorsService {
     //     });
     // }
     //
-    // update(id, data) {
-    //     return new Promise((resolve, reject) => {
+    update(id, data) {
+        return new Promise((resolve, reject) => {
+            console.log(id, data);
+            resolve(data);
     //         this._pool.getConnection()
     //             .then(connection => {
     //                 connection.query("update episode " +
@@ -131,9 +133,9 @@ exports.AuthorsService = class AuthorsService {
     //             .catch(err => {
     //                 reject(err);
     //             });
-    //     });
-    // }
-    //
+        });
+    }
+
     insert(data) {
         return new Promise((resolve, reject) => {
             console.log(data);
