@@ -9,6 +9,9 @@ import {
     SELECT_EPISODE,
     SHOW_DELETE_DLG,
     DELETE_EPISODE_SUCCESS,
+} from '../constants/Episodes'
+
+import {
     SHOW_ERROR_DIALOG,
     HIDE_ERROR_DIALOG,
     HIDE_DELETE_DLG,
@@ -16,7 +19,8 @@ import {
     HIDE_EDIT_DLG,
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT
-} from '../constants/Episodes'
+} from '../constants/Common';
+
 import 'whatwg-fetch'
 
 export function getEpisodes() {

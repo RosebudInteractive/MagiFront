@@ -1,15 +1,44 @@
-import  DatabasePool from './db_connection';
-import magisteryConfig from '../etc/config';
+var { DatabasePool } = require("./db_connection");
+var { magisteryConfig } = require("../etc/config")
 
+const authorRows = [
+    {
+        id : 1,
+        AccountId : 1,
+        LanguageId : 1,
+        Portrait : 'http://example.image1.ru',
+        FirstName : 'Петр',
+        LastName : 'Петров',
+        Description : 'Наш первый тестовый автор'
+    },
+    {
+        id : 2,
+        AccountId : 1,
+        LanguageId : 1,
+        Portrait : 'http://example.image2.ru',
+        FirstName : 'Сергей',
+        LastName : 'Сергеев',
+        Description : 'Наш второй тестовый автор'
+    },
+    {
+        id : 3,
+        AccountId : 1,
+        LanguageId : 1,
+        Portrait : 'http://example.image3.ru',
+        FirstName : 'Платон',
+        LastName : 'Кузнецов',
+        Description : 'Наш третий тестовый автор'
+    },
+];
 
-exports.EpisodesService = class EpisodesService {
+exports.AuthorsService = class AuthorsService {
     constructor() {
         this._pool = new DatabasePool(magisteryConfig);
     }
 
     getAll() {
         return new Promise((resolve, reject) => {
-            resolve();
+            resolve(authorRows);
             // this._pool.getConnection()
             //     .then(connection => {
             //         connection.query("SELECT " +
@@ -30,8 +59,9 @@ exports.EpisodesService = class EpisodesService {
         });
     }
 
-    // get(id) {
-    //     return new Promise((resolve, reject) => {
+    get(id) {
+        return new Promise((resolve, reject) => {
+            resolve(authorRows[0])
     //         this._pool.getConnection()
     //             .then(connection => {
     //                 connection.query("SELECT " +
@@ -48,8 +78,8 @@ exports.EpisodesService = class EpisodesService {
     //             .catch(err => {
     //                 reject(err);
     //             });
-    //     });
-    // }
+        });
+    }
     //
     // del(id) {
     //     return new Promise((resolve, reject) => {
@@ -104,8 +134,10 @@ exports.EpisodesService = class EpisodesService {
     //     });
     // }
     //
-    // insert(data) {
-    //     return new Promise((resolve, reject) => {
+    insert(data) {
+        return new Promise((resolve, reject) => {
+            console.log(data);
+            resolve(authorRows[0]);
     //         this._pool.getConnection()
     //             .then(connection => {
     //                 connection.query("insert into episode (code, name, active) " +
@@ -126,6 +158,6 @@ exports.EpisodesService = class EpisodesService {
     //             .catch(err => {
     //                 reject(err);
     //             });
-    //     });
-    // }
+        });
+    }
 }

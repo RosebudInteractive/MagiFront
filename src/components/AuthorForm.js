@@ -2,14 +2,14 @@ import React  from 'react'
 import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
 
-export default class EpisodeForm extends React.Component {
+export default class AuthorForm extends React.Component {
     render() {
-        const { episode, save, cancel } = this.props
+        const { author, save, cancel } = this.props;
         return <div className="dlg">
             <div className="dlg-bg">
             </div>
             <div className="dlg-window">
-                <Webix ui={::this.getUI(save, cancel)} data={episode} />
+                <Webix ui={::this.getUI(save, cancel)} data={author} />
             </div>
         </div>
     }
@@ -17,9 +17,12 @@ export default class EpisodeForm extends React.Component {
     getUI(save, cancel) {
         return {
             view:"form", width:400, elements:[
-                { view:"text", name:"code", label:"Идентификатор", placeholder:"Введите идентификатор"},
-                { view:"text", name:"name", label:"Описание", placeholder:"Введите описание"},
-                { view:"checkbox", name:"active", label:"Опубликован"},
+                // { view:"text", name:"AuthorId", label:"Идентификатор", placeholder:"Введите идентификатор"},
+                { view:"text", name:"AccountId", label:"Аккаунт", placeholder:"Введите аккаунт"},
+                { view:"text", name:"LanguageId", label:"Язык", placeholder:"Введите язык"},
+                { view:"text", name:"FirstName", label:"Имя", placeholder:"Введите имя"},
+                { view:"text", name:"LastName", label:"Фамилия", placeholder:"Введите фамилию"},
+                { view:"text", name:"Description", label:"Описание", placeholder:"Описание"},
                 { cols:[
                     {},
                     {
@@ -40,8 +43,8 @@ export default class EpisodeForm extends React.Component {
     }
 }
 
-EpisodeForm.propTypes = {
-    episode: PropTypes.object,
+AuthorForm.propTypes = {
+    author: PropTypes.object,
     save: PropTypes.func.isRequired,
     cancel: PropTypes.func.isRequired
 };

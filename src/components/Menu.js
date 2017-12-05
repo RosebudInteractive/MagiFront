@@ -4,7 +4,7 @@
 
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { MENU_ITEM_EPISODES, MENU_ITEM_NONE } from "../constants/Menu"
+// import { MENU_ITEM_EPISODES, MENU_ITEM_NONE } from "../constants/Menu"
 
 export default class Menu extends Component {
     onMenuItemClick(id) {
@@ -17,11 +17,11 @@ export default class Menu extends Component {
         const { selected, items } = this.props
         const that = this;
         // if none of items is selected^ then call select action
-        if (selected == MENU_ITEM_NONE) {
-            setTimeout(() => {
-                this.onMenuItemClick(MENU_ITEM_EPISODES)
-            }, 10)
-        }
+        // if (selected == MENU_ITEM_NONE) {
+        //     setTimeout(() => {
+        //         this.onMenuItemClick(MENU_ITEM_EPISODES)
+        //     }, 10)
+        // }
         return <div className='main-menu'>
             {
                 items.map(

@@ -1,39 +1,56 @@
-var { EpisodesService } = require("../database/episodes");
+let { AuthorsService } = require('./../database/authors');
 
-export default function setupAuthors(app) {
-    app.get('/api/authors', function(req, res, next) {
-        new EpisodesService().getAll().then(rows => {
-            res.send(rows);
-        }).catch(err => {
-            next(err);
-        });
+function setupAuthors(app) {
+    app.get('/api/authors', (req, res, next) => {
+        new AuthorsService()
+            .getAll()
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
     });
 
-    app.post('/api/episodes', function(req, res) {
-        new EpisodesService().insert(req.body).then(rows => {
-            res.send(rows);
-        }).catch(err => {
-            next(err);
-        });
+    app.get('/api/authors/:id', (req, res, next) => {
+        new AuthorsService()
+            .get(req.params.id)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
     });
 
-    app.get('/api/episodes/:id', function(req, res) {
-        res.send('This is not implemented now');
+    app.post('/api/authors', (req, res, next) => {
+        new AuthorsService()
+            .insert(req.body)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
     });
 
-    app.put('/api/episodes/:id', function (req, res){
-        new EpisodesService().update(req.params.id, req.body).then(rows => {
-            res.send(rows);
-        }).catch(err => {
-            next(err);
-        });
-    });
 
-    app.delete('/api/episodes/:id', function (req, res, next){
-        new EpisodesService().del(req.params.id).then(() => {
-            res.send({});
-        }).catch(err => {
-            next(err);
-        });
-    });
+
+    // app.put('/api/episodes/:id', function (req, res){
+    //     new EpisodesService().update(req.params.id, req.body).then(rows => {
+    //         res.send(rows);
+    //     }).catch(err => {
+    //         next(err);
+    //     });
+    // });
+
+    // app.delete('/api/episodes/:id', function (req, res, next){
+    //     new EpisodesService().del(req.params.id).then(() => {
+    //         res.send({});
+    //     }).catch(err => {
+    //         next(err);
+    //     });
+    // });
 }
+
+exports.setupAuthors = setupAuthors

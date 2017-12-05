@@ -15,41 +15,51 @@ var bld = new DatabaseBuilder(magisteryConfig)
 
 var log = require('./logger/log')(module);
 
-bld.initDatabase().then(() => {
-    log.info("Init Db succeded!")
-    // Prepare http server
+bld.initDatabase()
+    .then(() => {
+        log.info("Init Db succeded!")
+        // Prepare http server
 
-    // Prepare http server
-    var express = require('express');
-    var app = new express();
-    var port = magisteryConfig.http.port;
+        // Prepare http server
+        var express = require('express');
+        var app = new express();
+        var port = magisteryConfig.http.port;
 
-    var compiler = webpack(config);
-    app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
-    app.use(webpackHotMiddleware(compiler));
-
-    var { setupAPI } = require("./services/setup");
-    setupAPI(express, app);
-
-    app.get('/ErrorExample', function(req, res, next){
-        next(new Error('Random error!'));
-    });
-
-    app.get("/", function(req, res) {
-        res.sendFile(__dirname + '/index.html');
-    })
-
-    app.listen(port, function(error) {
-        if (error) {
-            console.error(error)
-        } else {
-            console.info("==> 🌎  Listening on port %s. Open up http://localhost:%s/ in your browser.", port, port)
+        var compiler = webpack(config);
+        try {
+            app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
+            app.use(webpackHotMiddleware(compiler));
         }
+        catch (e) {
+            console.log(e)
+        }
+
+
+        var {setupAPI} = require("./services/setup");
+        setupAPI(express, app);
+
+        app.get('/ErrorExample', function (req, res, next) {
+            next(new Error('Random error!'));
+        });
+
+        app.get("/", function (req, res) {
+            res.sendFile(__dirname + '/index.html');
+        })
+
+        app.listen(port, function (error) {
+            if (error) {
+                console.error(error)
+            } else {
+                console.info("==> 🌎  Listening on port %s. Open up http://localhost:%s/ in your browser.", port, port)
+            }
+        });
+
+
+    }, (err) => {
+        console.error("Server exited with error", err);
+        process.exit(1);
+    })
+    .catch((e)=> {
+        console.log(e)
     });
-
-
-}, (err) => {
-    console.error("Server exited with error", err);
-    process.exit(1);
-});
 

@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -6,6 +5,7 @@ import User from '../components/User'
 import Page from '../components/Page'
 import Menu from "../components/Menu"
 import Episodes from "./Episodes"
+import Authors from "./Authors"
 import * as pageActions from '../actions/PageActions'
 import * as menuActions from "../actions/MenuActions"
 import * as menuPages from '../constants/Menu'
@@ -21,12 +21,14 @@ class App extends Component {
         const {user, page, menu} = this.props;
         const {getPhotos} = this.props.pageActions;
 
-        return pages.map(() => {
+        return pages.map((elem, index) => {
             switch(menu.selected) {
+                case menuPages.MENU_ITEM_AUTHOR:
+                    return <div className="page" key={index}><Authors/></div>;
                 case menuPages.MENU_ITEM_EPISODES:
-                    return <div className="page"><Episodes/></div>;
+                    return <div className="page" key={index}><Episodes/></div>;
                 case menuPages.MENU_ITEM_OTHER:
-                    return <div>
+                    return <div key={index}>
                         <Page photos={page.photos} year={page.year} getPhotos={getPhotos} fetching={page.fetching}/>
                         < User name={user.name} />
                     </div>

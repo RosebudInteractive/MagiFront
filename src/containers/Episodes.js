@@ -11,7 +11,7 @@ import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog"
 import EpisodesForm from "../components/EpisodeForm"
 import * as episodesActions from "../actions/EpisodesActions"
-import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Episodes"
+import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common"
 
 class Episodes extends Component {
     onAddBtnClick() {
@@ -65,7 +65,7 @@ class Episodes extends Component {
             selected,
             deleteDlgShown,
             editDlgShown
-        } = this.props
+        } = this.props;
         return <div className="episodes">
             {
                 fetching ?
@@ -175,6 +175,7 @@ function mapStateToProps(state) {
         editMode: state.episodes.editMode
     }
 }
+
 function mapDispatchToProps(dispatch) {
     return {
         episodesActions: bindActionCreators(episodesActions, dispatch)
