@@ -35,7 +35,7 @@ bld.initDatabase().then(() => {
         next(new Error('Random error!'));
     });
 
-    app.get("/", function(req, res) {
+    app.get("/*", function(req, res) {
         res.sendFile(__dirname + '/index.html');
     })
 

@@ -11,5 +11,5 @@ export default combineReducers({
     user,
     menu,
     episodes,
-    routing: routerReducer
+    routing: routerReducer,
 })

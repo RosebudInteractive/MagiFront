@@ -13,6 +13,7 @@ import {
 const initialState = {
     selected: MENU_ITEM_NONE,
     items: [
+        {id: 'HOME', name: "Домой", url: "/"},
         {id: MENU_ITEM_EPISODES, name: "Эпизоды", url: "/episodes"},
         {id: MENU_ITEM_OTHER, name: "Что-то еще", url: "/photos"}
     ]

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, withRouter, } from 'react-router-dom'
 
 import User from '../components/User'
 import Page from '../components/Page'
@@ -42,11 +42,7 @@ class App extends Component {
                                     < User name={user.name} />
                                 </div>
                             }}/>
-                            <Route path="/episodes" render={() => {
-                                <div className="page">
-                                    <Episodes/>
-                                </div>
-                            }}/>
+                            <Route path="/episodes" component={Episodes} />
                         </Switch>
                     </div>
                 </div>
@@ -55,11 +51,12 @@ class App extends Component {
     }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         user: state.user,
         page: state.page,
-        menu: state.menu
+        menu: state.menu,
+        ownProps,
     }
 }
 function mapDispatchToProps(dispatch) {
@@ -69,4 +66,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
