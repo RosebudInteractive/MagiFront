@@ -105,8 +105,8 @@ class Authors extends React.Component {
             editable: false,
             columns: [
                 // {id: "AuthorId", header: "Идентификатор", width: 150},
-                {id: 'AccountId', header: 'Аккаунт', width: 150},
-                {id: 'LanguageId', header: 'Язык', width: 150},
+                // {id: 'AccountId', header: 'Аккаунт', width: 150},
+                // {id: 'LanguageId', header: 'Язык', width: 150},
                 {id: 'FirstName', header: 'Имя', width: 200},
                 {id: 'LastName', header: 'Фамилия', width: 300},
                 {id: "Description", header: "Описание", fillspace: true},
