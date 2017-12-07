@@ -1,8 +1,10 @@
-let { AuthorsService } = require('./../database/authors');
+//let { AuthorsService } = require('./../database/authors');
+let { AuthorsService } = require('./../database/db-author');
+let authorsService = null;
 
 function setupAuthors(app) {
     app.get('/api/authors', (req, res, next) => {
-        new AuthorsService()
+        (authorsService ? authorsService : authorsService = new AuthorsService())
             .getAll()
             .then(rows => {
                 res.send(rows);
@@ -13,7 +15,7 @@ function setupAuthors(app) {
     });
 
     app.get('/api/authors/:id', (req, res, next) => {
-        new AuthorsService()
+        (authorsService ? authorsService : authorsService = new AuthorsService())
             .get(req.params.id)
             .then(rows => {
                 res.send(rows);
@@ -24,7 +26,7 @@ function setupAuthors(app) {
     });
 
     app.post('/api/authors', (req, res, next) => {
-        new AuthorsService()
+        (authorsService ? authorsService : authorsService = new AuthorsService())
             .insert(req.body)
             .then(rows => {
                 res.send(rows);
@@ -37,7 +39,7 @@ function setupAuthors(app) {
 
 
     app.put('/api/authors/:id', (req, res, next) => {
-        new AuthorsService()
+        (authorsService ? authorsService : authorsService = new AuthorsService())
             .update(req.params.id, req.body)
             .then(rows => {
                 res.send(rows);
@@ -48,7 +50,7 @@ function setupAuthors(app) {
     });
 
     app.delete('/api/authors/:id', (req, res, next) => {
-        new AuthorsService()
+        (authorsService ? authorsService : authorsService = new AuthorsService())
             .del(req.params.id)
             .then(() => {
                 res.send({});

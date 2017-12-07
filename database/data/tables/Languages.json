@@ -1,0 +1,24 @@
+{
+    "$sys": {
+        "typeGuid": "36ce5c73-0976-4b9e-bbeb-caaefd13bad0"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "fd4b9b70-514e-4796-9a27-eb0adf8e7944"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "Code": "RU", 
+                    "Language": "Русский"
+                }, 
+                "collections": { }
+            }
+        ]
+    }
+}

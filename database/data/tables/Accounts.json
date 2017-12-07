@@ -1,0 +1,24 @@
+{
+    "$sys": {
+        "typeGuid": "3a19b68f-50fe-4fa9-923e-0f14d6272a72"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "81b276ee-a34a-4267-9f24-0fce75896c91"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "Domain": "pmt",
+                    "DefLangId": 1
+                }, 
+                "collections": { }
+            }
+        ]
+    }
+}
