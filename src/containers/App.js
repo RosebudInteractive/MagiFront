@@ -4,20 +4,21 @@ import { connect } from 'react-redux'
 
 import { Switch, Route, withRouter, } from 'react-router-dom'
 
-import User from '../components/User'
-import Page from '../components/Page'
 import Menu from "../components/Menu"
 import Home from "../components/Home"
 import Episodes from "./Episodes"
+import Authors from "./Authors"
+import AuthorForm from './../components/AuthorForm';
 
 import * as pageActions from '../actions/PageActions'
 import * as menuActions from "../actions/MenuActions"
 
 class App extends Component {
     render() {
-        const { user, page, menu } = this.props
-        const { getPhotos } = this.props.pageActions
-        const { setSelected } = this.props.menuActions
+        const {menu} = this.props;
+        // const {getPhotos} = this.props.pageActions;
+        const {setSelected} = this.props.menuActions;
+
         return <div className="app">
             <div className="left bar-bgcolor">
                 <div className="toolbar top-bar-size">
@@ -36,13 +37,10 @@ class App extends Component {
                     <div className="main-area">
                         <Switch>
                             <Route exact path='/' component={Home}/>
-                            <Route path='/photos' render={() => {
-                                <div>
-                                    <Page photos={page.photos} year={page.year} getPhotos={getPhotos} fetching={page.fetching}/>
-                                    < User name={user.name} />
-                                </div>
-                            }}/>
-                            <Route path="/episodes" component={Episodes} />
+                            <Route path="/episodes" component={Episodes}/>
+                            <Route path='/authors/new' component={AuthorForm}/>
+                            <Route path='/authors/edit' component={AuthorForm}/>
+                            <Route path='/authors' component={Authors}/>
                         </Switch>
                     </div>
                 </div>

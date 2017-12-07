@@ -16,20 +16,14 @@ export default class Menu extends Component {
 
     render() {
         const { selected, items } = this.props;
-        //const that = this;
-        // if none of items is selected^ then call select action
-        // if (selected == MENU_ITEM_NONE) {
-        //     setTimeout(() => {
-        //         this.onMenuItemClick(MENU_ITEM_EPISODES)
-        //     }, 10)
-        // }
+
         return <div className='main-menu'>
             {
                 items.map(
                     function (item) {
                         return <div className="menu-item" key={item.id}>
                             <div className={"link" + (selected === item.id ? " open" : "")}>
-                                <Link to={{ pathname: item.url }}>
+                                <Link to={{ pathname: item.url }} style={{textDecoration: 'none', color: '#333333'}}>
                                     {item.name}
                                 </Link>
                             </div>
@@ -45,4 +39,4 @@ Menu.propTypes = {
     selected: PropTypes.string.isRequired,
     items: PropTypes.array.isRequired,
     setSelected: PropTypes.func.isRequired
-}
+};

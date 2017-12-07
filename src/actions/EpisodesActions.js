@@ -7,19 +7,20 @@ import {
     GET_EPISODES_SUCCESS,
     GET_EPISODES_FAIL,
     SELECT_EPISODE,
-    SHOW_DELETE_DLG,
     DELETE_EPISODE_SUCCESS,
+    SHOW_EDIT_EPISODE_DLG,
+    HIDE_EDIT_EPISODE_DLG,
+} from '../constants/Episodes'
+
+import {
     SHOW_ERROR_DIALOG,
-    HIDE_ERROR_DIALOG,
-    HIDE_DELETE_DLG,
-    SHOW_EDIT_DLG,
-    HIDE_EDIT_DLG,
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT
-} from '../constants/Episodes'
+} from '../constants/Common';
+
 import 'whatwg-fetch'
 
-export function getEpisodes() {
+export const getEpisodes = () => {
 
     return (dispatch) => {
         dispatch({
@@ -44,35 +45,14 @@ export function getEpisodes() {
             });
 
     }
-}
-
-export function showDeleteConfirmation() {
-    return {
-        type: SHOW_DELETE_DLG,
-        payload: null
-    }
-}
+};
 
 export const selectEpisode = (id) => {
     return {
         type: SELECT_EPISODE,
         payload: id
     }
-}
-
-export const cancelDelete = () => {
-    return {
-        type: HIDE_DELETE_DLG,
-        payload: null
-    }
-}
-
-export const confirmError = () => {
-    return {
-        type: HIDE_ERROR_DIALOG,
-        payload: null
-    }
-}
+};
 
 export const deleteEpisode = (id) => {
     return (dispatch) => {
@@ -96,30 +76,30 @@ export const deleteEpisode = (id) => {
             });
 
     }
-}
+};
 
 export const showEditDialog = (mode) => {
     return {
-        type: SHOW_EDIT_DLG,
+        type: SHOW_EDIT_EPISODE_DLG,
         payload: mode
     }
 
-}
+};
 
 export const hideEditDialog = () => {
     return {
-        type: HIDE_EDIT_DLG,
+        type: HIDE_EDIT_EPISODE_DLG,
         payload: null
     }
 
-}
+};
 
 export const saveEpisode = (values, mode) => {
 
     return (dispatch) => {
-        var type = mode == EDIT_MODE_INSERT ? "POST" : "PUT"
-        var url = "/api/episodes"
-        if (mode == EDIT_MODE_EDIT) {
+        let type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
+        let url = "/api/episodes";
+        if (mode === EDIT_MODE_EDIT) {
             url += "/" + values.id
         }
         fetch(url,
@@ -134,7 +114,7 @@ export const saveEpisode = (values, mode) => {
             .then(parseJSON)
             .then((data) => {
                 dispatch({
-                    type: HIDE_EDIT_DLG,
+                    type: HIDE_EDIT_EPISODE_DLG,
                     payload: data
                 })
             })
@@ -146,14 +126,14 @@ export const saveEpisode = (values, mode) => {
             });
 
     }
-}
+};
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
         return response
     } else {
-        var error = new Error(response.statusText)
-        error.response = response
+        let error = new Error(response.statusText);
+        error.response = response;
         throw error
     }
 }
