@@ -14,6 +14,8 @@ var { magisteryConfig } = require("./etc/config")
 var bld = new DatabaseBuilder(magisteryConfig)
 
 var log = require('./logger/log')(module);
+const { DbEngineInit } = require("./database/dbengine-init");
+new DbEngineInit(magisteryConfig);
 
 bld.initDatabase().then(() => {
     log.info("Init Db succeded!")
