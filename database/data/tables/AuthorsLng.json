@@ -1,0 +1,58 @@
+{
+    "$sys": {
+        "typeGuid": "e306cc09-7c70-4dda-b428-a361eae7e1a2"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "2efeead7-684d-46fa-b11b-555ffb2da5a6"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "AuthorId": 1,
+                    "AccountId": 1,
+                    "LanguageId": 1,
+                    "FirstName": "Петр",
+                    "LastName": "Петров",
+                    "Description": "Наш первый тестовый автор"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "2efeead7-684d-46fa-b11b-555ffb2da5a6"
+                },
+                "fields": {
+                    "Id": 2,
+                    "AuthorId": 2,
+                    "AccountId": 2,
+                    "LanguageId": 1,
+                    "FirstName": "Сергей",
+                    "LastName": "Сергеев",
+                    "Description": "Наш второй тестовый автор"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "2efeead7-684d-46fa-b11b-555ffb2da5a6"
+                },
+                "fields": {
+                    "Id": 3,
+                    "AuthorId": 3,
+                    "AccountId": 1,
+                    "LanguageId": 1,
+                    "FirstName": "Платон",
+                    "LastName": "Кузнецов",
+                    "Description": "Наш третий тестовый автор"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}
