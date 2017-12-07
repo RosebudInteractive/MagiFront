@@ -8,14 +8,17 @@ import {
     GET_EPISODES_FAIL,
     SELECT_EPISODE,
     SHOW_DELETE_DLG,
-    SHOW_ERROR_DIALOG,
     DELETE_EPISODE_SUCCESS,
+} from '../constants/Episodes'
+
+import {
+    SHOW_ERROR_DIALOG,
     HIDE_ERROR_DIALOG,
     HIDE_DELETE_DLG,
     SHOW_EDIT_DLG,
     HIDE_EDIT_DLG,
-    EDIT_MODE_INSERT
-} from '../constants/Episodes'
+    EDIT_MODE_INSERT,
+} from './../constants/Common'
 
 const initialState = {
     episodes: [],

@@ -2,19 +2,13 @@
  * Created by levan.kiknadze on 11/11/2017.
  */
 
-import { SELECT_ITEM, MENU_ITEM_EPISODES } from '../constants/Menu'
+import { SELECT_ITEM } from '../constants/Menu'
 
-export function setSelected(id, getEpisodes) {
-    console.log("setSelected", this)
+export function setSelected(id) {
     return (dispatch) => {
         dispatch( {
             type: SELECT_ITEM,
             payload: id
         })
-
-        if (id == MENU_ITEM_EPISODES)
-            setTimeout(() => {
-                getEpisodes()
-            })
     }
 }
