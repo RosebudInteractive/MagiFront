@@ -19,11 +19,11 @@ const ACCOUNT_ID = 1;
 const LANGUAGE_ID = 1;
 
 const AUTHOR_MSSQL_ALL_REQ =
-    "select a.[Id], l.[FirstName], l.[LastName], a.[Portrait] from [Author] a\n" +
+    "select a.[Id], l.[FirstName], l.[LastName], a.[Portrait], l.[Description] from [Author] a\n" +
     "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and a.[AccountId] = <%= accountId %> and l.[LanguageId] = <%= languageId %>";
 
 const AUTHOR_MYSQL_ALL_REQ =
-    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait` from `Author` a\n" +
+    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, l.`Description` from `Author` a\n" +
     "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and a.`AccountId` = <%= accountId %> and l.`LanguageId` = <%= languageId %>";
 
 const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
