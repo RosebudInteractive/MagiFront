@@ -131,6 +131,8 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                             auth_lng_obj.firstName(inpFields["FirstName"]);
                         if (inpFields["LastName"])
                             auth_lng_obj.lastName(inpFields["LastName"]);
+                        if (inpFields["Description"])
+                            auth_lng_obj.description(inpFields["Description"]);
                         return auth_obj.save(opts);
                     })
                     .then(() => {
@@ -171,6 +173,8 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                             fields["FirstName"] = inpFields["FirstName"];    
                         if (inpFields["LastName"])
                             fields["LastName"] = inpFields["LastName"];    
+                        if (inpFields["Description"])
+                            fields["Description"] = inpFields["Description"];    
 
                         return root_lng.newObject({
                             fields: fields
