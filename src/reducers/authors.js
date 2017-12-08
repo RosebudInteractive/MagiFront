@@ -15,11 +15,7 @@ import {
 const initialState = {
     authors: [],
     fetching: false,
-    // hasError: false,
-    // message: null,
     selected: null,
-    // deleteDlgShown: false,
-    // errorDlgShown: false,
     editDlgShown: false,
     editMode: EDIT_MODE_INSERT
 };

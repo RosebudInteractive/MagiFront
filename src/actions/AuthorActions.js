@@ -16,6 +16,7 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
+// import authors from "../reducers/authors";
 
 export const getAuthors = ()=> {
     return (dispatch) => {
@@ -28,6 +29,8 @@ export const getAuthors = ()=> {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                data.forEach((author) => handleAuthor(author));
+
                 dispatch({
                     type: GET_AUTHORS_SUCCESS,
                     payload: data
@@ -143,4 +146,9 @@ const checkStatus = (response) => {
 
 const parseJSON = (response) => {
     return response.json()
+};
+
+const handleAuthor = (author) => {
+    author.id = author.Id;
+    return author;
 };
