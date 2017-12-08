@@ -4,7 +4,7 @@ let authorsService = null;
 
 function setupAuthors(app) {
     app.get('/api/authors', (req, res, next) => {
-        (authorsService ? authorsService : authorsService = new AuthorsService())
+        AuthorsService()
             .getAll()
             .then(rows => {
                 res.send(rows);
@@ -15,7 +15,7 @@ function setupAuthors(app) {
     });
 
     app.get('/api/authors/:id', (req, res, next) => {
-        (authorsService ? authorsService : authorsService = new AuthorsService())
+        AuthorsService()
             .get(req.params.id)
             .then(rows => {
                 res.send(rows);
@@ -26,7 +26,7 @@ function setupAuthors(app) {
     });
 
     app.post('/api/authors', (req, res, next) => {
-        (authorsService ? authorsService : authorsService = new AuthorsService())
+        AuthorsService()
             .insert(req.body)
             .then(rows => {
                 res.send(rows);
@@ -39,7 +39,7 @@ function setupAuthors(app) {
 
 
     app.put('/api/authors/:id', (req, res, next) => {
-        (authorsService ? authorsService : authorsService = new AuthorsService())
+        AuthorsService()
             .update(req.params.id, req.body)
             .then(rows => {
                 res.send(rows);
@@ -50,7 +50,7 @@ function setupAuthors(app) {
     });
 
     app.delete('/api/authors/:id', (req, res, next) => {
-        (authorsService ? authorsService : authorsService = new AuthorsService())
+        AuthorsService()
             .del(req.params.id)
             .then(() => {
                 res.send({});

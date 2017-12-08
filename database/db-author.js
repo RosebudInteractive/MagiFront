@@ -29,7 +29,7 @@ const AUTHOR_MYSQL_ALL_REQ =
 const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
 const AUTHOR_MYSQL_ID_REQ = AUTHOR_MYSQL_ALL_REQ + "\nwhere a.`Id` = <%= id %>";
 
-exports.AuthorsService = class DbAuthor extends DbObject {
+const DbAuthor = class DbAuthor extends DbObject {
 
     constructor(options) {
         super(options);
@@ -68,7 +68,7 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                     .then((result) => {
                         let author = {};
                         if (result && result.detail && (result.detail.length === 1))
-                            author = result.detail[0];    
+                            author = result.detail[0];
                         return author;
                     })
             );
@@ -97,6 +97,16 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                     .then(() => {
                         console.log("Author deleted: Id=" + id + ".");
                         return { result: "OK" };
+                    })
+                    .finally((isErr, res) => {
+                        if (root_obj)
+                            this._db._deleteRoot(root_obj.getRoot());
+                        if (isErr)
+                            if (res instanceof Error)
+                                throw res
+                            else
+                                throw new Error("Error: " + JSON.stringify(res));
+                        return res;
                     })
             );
         })
@@ -131,11 +141,23 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                             auth_lng_obj.firstName(inpFields["FirstName"]);
                         if (inpFields["LastName"])
                             auth_lng_obj.lastName(inpFields["LastName"]);
+                        if (inpFields["Description"])
+                            auth_lng_obj.description(inpFields["Description"]);
                         return auth_obj.save(opts);
                     })
                     .then(() => {
                         console.log("Author updated: Id=" + id + ".");
                         return { result: "OK" };
+                    })
+                    .finally((isErr, res) => {
+                        if (auth_obj)
+                            this._db._deleteRoot(auth_obj.getRoot());
+                        if (isErr)
+                            if (res instanceof Error)
+                                throw res
+                            else
+                                throw new Error("Error: " + JSON.stringify(res));
+                        return res;
                     })
             );
         })
@@ -152,11 +174,11 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                     .then((result) => {
                         root_obj = result;
                         return result.edit()
-                })
+                    })
                     .then(() => {
                         let fields = { AccountId: ACCOUNT_ID };
                         if (inpFields["Portrait"])
-                            fields["Portrait"] = inpFields["Portrait"];    
+                            fields["Portrait"] = inpFields["Portrait"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
@@ -168,9 +190,11 @@ exports.AuthorsService = class DbAuthor extends DbObject {
 
                         let fields = { LanguageId: LANGUAGE_ID };
                         if (inpFields["FirstName"])
-                            fields["FirstName"] = inpFields["FirstName"];    
+                            fields["FirstName"] = inpFields["FirstName"];
                         if (inpFields["LastName"])
-                            fields["LastName"] = inpFields["LastName"];    
+                            fields["LastName"] = inpFields["LastName"];
+                        if (inpFields["Description"])
+                            fields["Description"] = inpFields["Description"];
 
                         return root_lng.newObject({
                             fields: fields
@@ -183,7 +207,22 @@ exports.AuthorsService = class DbAuthor extends DbObject {
                         console.log("Author added: Id=" + newId + ".");
                         return { id: newId };
                     })
+                    .finally((isErr, res) => {
+                        if (root_obj)
+                            this._db._deleteRoot(root_obj.getRoot());
+                        if (isErr)
+                            if (res instanceof Error)
+                                throw res
+                            else
+                                throw new Error("Error: " + JSON.stringify(res));
+                        return res;
+                    })
             );
         })
     }
+};
+
+let dbAuthor = null;
+exports.AuthorsService = () => {
+    return dbAuthor ? dbAuthor : dbAuthor = new DbAuthor();
 }

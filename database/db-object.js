@@ -1,5 +1,6 @@
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
 exports.DbObject = class DbObject {
 
@@ -8,7 +9,7 @@ exports.DbObject = class DbObject {
     }
 
     _getObjById(id, expression) {
-        return new Promise((resolve) => {
+        return new MemDbPromise(this._db, (resolve) => {
             if (!expression)
                 throw new Error("DbObject::_getObjById: Invalid parameter \"expression\": " + JSON.stringify(expression));
             let exp_filtered = Object.assign({}, expression);

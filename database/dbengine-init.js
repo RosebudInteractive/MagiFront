@@ -218,7 +218,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         if (false) {
             const { AuthorsService } = require("./db-author");
-            let au = new AuthorsService();
+            let au = AuthorsService();
             let upd_id;
             au.insert({ FirstName: "Alex", LastName: "Pushkin", Portrait: "asdasd.jpg" })
                 .then(() => {
