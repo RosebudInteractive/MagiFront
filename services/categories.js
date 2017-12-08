@@ -1,4 +1,5 @@
-let { CategoriesService } = require('./../database/category');
+//let { CategoriesService } = require('./../database/category');
+let { CategoriesService } = require('./../database/db-category');
 
 function setupCategories(app) {
     app.get('/api/categories', (req, res, next) => {
