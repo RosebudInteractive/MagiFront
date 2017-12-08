@@ -2,28 +2,30 @@
  * Created by levan.kiknadze on 11/11/2017.
  */
 
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import React, { Component } from 'react';
+// import PropTypes from 'prop-types';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as menuActions from "../actions/MenuActions";
+import { Link } from 'react-router-dom';
 
-// import { MENU_ITEM_EPISODES, MENU_ITEM_NONE } from "../constants/Menu"
-
-export default class Menu extends Component {
+class Menu extends Component {
     onMenuItemClick(id) {
-        if (this.props.selected !== id)
-            this.props.setSelected(id)
+        if (this.props.selected !== id) {
+            this.props.setSelected(id);
+            // this.props.history.push(url);
+        }
     }
 
     render() {
-        const { selected, items } = this.props;
+        const {selected, items} = this.props;
 
         return <div className='main-menu'>
             {
-                items.map(
-                    function (item) {
-                        return <div className="menu-item" key={item.id}>
+                items.map((item) => {
+                        return <div className="menu-item" key={item.id} /*onClick={() => {this.onMenuItemClick(item.id, item.url)}}>*/>
                             <div className={"link" + (selected === item.id ? " open" : "")}>
-                                <Link to={{ pathname: item.url }} style={{textDecoration: 'none', color: '#333333'}}>
+                                <Link to={{pathname: item.url}} style={{textDecoration: 'none', color: '#333333'}}>
                                     {item.name}
                                 </Link>
                             </div>
@@ -35,8 +37,21 @@ export default class Menu extends Component {
     }
 }
 
-Menu.propTypes = {
-    selected: PropTypes.string.isRequired,
-    items: PropTypes.array.isRequired,
-    setSelected: PropTypes.func.isRequired
-};
+function mapStateToProps(state, ownProps) {
+    return {
+        items: state.menu.items,
+        selected: state.menu.selected,
+        ownProps
+    }
+}
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        menuActions: bindActionCreators(menuActions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menu)
+
+

@@ -8,6 +8,7 @@ import {
     MENU_ITEM_OTHER,
     MENU_ITEM_NONE,
     MENU_ITEM_AUTHOR,
+    MENU_ITEM_CATEGORIES,
 } from '../constants/Menu'
 
 
@@ -16,6 +17,7 @@ const initialState = {
     items: [
         {id: 'HOME', name: "Домой", url: "/"},
         {id: MENU_ITEM_AUTHOR, name: "Авторы", url:'/authors'},
+        {id: MENU_ITEM_CATEGORIES, name : 'Категории' , url : '/categories'},
         {id: MENU_ITEM_EPISODES, name: "Эпизоды", url: "/episodes"},
         {id: MENU_ITEM_OTHER, name: "Что-то еще", url: "/photos"}
     ]
