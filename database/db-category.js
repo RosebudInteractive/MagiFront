@@ -1,13 +1,13 @@
 const { DbObject } = require('./db-object');
 const _ = require('lodash');
-const AUTHOR_REQ_TREE = {
+const CATEGORY_REQ_TREE = {
     expr: {
         model: {
-            name: "Author",
+            name: "Category",
             childs: [
                 {
                     dataObject: {
-                        name: "AuthorLng"
+                        name: "CategoryLng"
                     }
                 }
             ]
@@ -18,25 +18,29 @@ const AUTHOR_REQ_TREE = {
 const ACCOUNT_ID = 1;
 const LANGUAGE_ID = 1;
 
-const AUTHOR_MSSQL_ALL_REQ =
-    "select a.[Id], l.[FirstName], l.[LastName], a.[Portrait], l.[Description] from [Author] a\n" +
-    "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and a.[AccountId] = <%= accountId %> and l.[LanguageId] = <%= languageId %>";
+const CATEGORY_MSSQL_ALL_REQ =
+    "select c.[Id], c.[ParentId], l.[Name], lp.[Name] as [ParentName] from [Category] c\n" +
+    "  join [CategoryLng] l on c.[Id] = l.[CategoryId] and l.[LanguageId] = <%= languageId %>\n"+
+    "  left join [CategoryLng] lp on c.[ParentId] = lp.[CategoryId] and lp.[LanguageId] = <%= languageId %>\n" +
+    "where c.[AccountId] = <%= accountId %>";
 
-const AUTHOR_MYSQL_ALL_REQ =
-    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, l.`Description` from `Author` a\n" +
-    "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and a.`AccountId` = <%= accountId %> and l.`LanguageId` = <%= languageId %>";
+const CATEGORY_MYSQL_ALL_REQ =
+    "select c.`Id`, c.`ParentId`, l.`Name`, lp.`Name` as `ParentName` from `Category` c\n" +
+    "  join `CategoryLng` l on c.`Id` = l.`CategoryId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  left join `CategoryLng` lp on c.`ParentId` = lp.`CategoryId` and lp.`LanguageId` = <%= languageId %>\n" +
+    "where c.`AccountId` = <%= accountId %>";
 
-const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
-const AUTHOR_MYSQL_ID_REQ = AUTHOR_MYSQL_ALL_REQ + "\nwhere a.`Id` = <%= id %>";
+const CATEGORY_MSSQL_ID_REQ = CATEGORY_MSSQL_ALL_REQ + " and c.[Id] = <%= id %>";
+const CATEGORY_MYSQL_ID_REQ = CATEGORY_MYSQL_ALL_REQ + " and c.`Id` = <%= id %>";
 
-const DbAuthor = class DbAuthor extends DbObject {
+const DbCategory = class DbCategory extends DbObject {
 
     constructor(options) {
         super(options);
     }
 
     _getObjById(id, expression) {
-        var exp = expression || AUTHOR_REQ_TREE;
+        var exp = expression || CATEGORY_REQ_TREE;
         return super._getObjById(id, exp);
     }
 
@@ -45,8 +49,8 @@ const DbAuthor = class DbAuthor extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(AUTHOR_MYSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID }),
-                        mssql: _.template(AUTHOR_MSSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID })
+                        mysql: _.template(CATEGORY_MYSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID }),
+                        mssql: _.template(CATEGORY_MSSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID })
                     }
                 }, {})
                     .then((result) => {
@@ -61,8 +65,8 @@ const DbAuthor = class DbAuthor extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(AUTHOR_MYSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id }),
-                        mssql: _.template(AUTHOR_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id })
+                        mysql: _.template(CATEGORY_MYSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id }),
+                        mssql: _.template(CATEGORY_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id })
                     }
                 }, {})
                     .then((result) => {
@@ -87,7 +91,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         root_obj = result;
                         collection = root_obj.getCol("DataElements");
                         if (collection.count() != 1)
-                            throw new Error("Author (Id = " + id + ") doesn't exist.");
+                            throw new Error("Category (Id = " + id + ") doesn't exist.");
                         return result.edit()
                     })
                     .then(() => {
@@ -95,7 +99,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Author deleted: Id=" + id + ".");
+                        console.log("Category deleted: Id=" + id + ".");
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -114,8 +118,8 @@ const DbAuthor = class DbAuthor extends DbObject {
 
     update(id, data) {
         return new Promise((resolve, reject) => {
-            let auth_obj;
-            let auth_lng_obj;
+            let ctg_obj;
+            let ctg_lng_obj;
             let opts = {};
             let newId = null;
             let inpFields = data || {};
@@ -125,32 +129,28 @@ const DbAuthor = class DbAuthor extends DbObject {
                         let root_obj = result;
                         let collection = root_obj.getCol("DataElements");
                         if (collection.count() != 1)
-                            throw new Error("Author (Id = " + id + ") doesn't exist.");
-                        auth_obj = collection.get(0);
-                        collection = auth_obj.getDataRoot("AuthorLng").getCol("DataElements");
+                            throw new Error("Category (Id = " + id + ") doesn't exist.");
+                        ctg_obj = collection.get(0);
+                        collection = ctg_obj.getDataRoot("CategoryLng").getCol("DataElements");
                         if (collection.count() != 1)
-                            throw new Error("Author (Id = " + id + ") has inconsistent \"LNG\" part.");
-                        auth_lng_obj = collection.get(0);
-                        return auth_obj.edit()
+                            throw new Error("Category (Id = " + id + ") has inconsistent \"LNG\" part.");
+                        ctg_lng_obj = collection.get(0);
+                        return ctg_obj.edit()
                     })
                     .then(() => {
-                        if (inpFields["Portrait"])
-                            auth_obj.portrait(inpFields["Portrait"]);
-                        if (inpFields["FirstName"])
-                            auth_lng_obj.firstName(inpFields["FirstName"]);
-                        if (inpFields["LastName"])
-                            auth_lng_obj.lastName(inpFields["LastName"]);
-                        if (inpFields["Description"])
-                            auth_lng_obj.description(inpFields["Description"]);
-                        return auth_obj.save(opts);
+                        if (inpFields["ParentId"])
+                            ctg_obj.parentId(inpFields["ParentId"]);
+                        if (inpFields["Name"])
+                            ctg_lng_obj.name(inpFields["Name"]);
+                        return ctg_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Author updated: Id=" + id + ".");
+                        console.log("Category updated: Id=" + id + ".");
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
-                        if (auth_obj)
-                            this._db._deleteRoot(auth_obj.getRoot());
+                        if (ctg_obj)
+                            this._db._deleteRoot(ctg_obj.getRoot());
                         if (isErr)
                             if (res instanceof Error)
                                 throw res
@@ -176,8 +176,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                     })
                     .then(() => {
                         let fields = { AccountId: ACCOUNT_ID };
-                        if (inpFields["Portrait"])
-                            fields["Portrait"] = inpFields["Portrait"];
+                        if (inpFields["ParentId"])
+                            fields["ParentId"] = inpFields["ParentId"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
@@ -185,15 +185,11 @@ const DbAuthor = class DbAuthor extends DbObject {
                     .then((result) => {
                         newId = result.keyValue;
                         let new_obj = this._db.getObj(result.newObject);
-                        let root_lng = new_obj.getDataRoot("AuthorLng");
+                        let root_lng = new_obj.getDataRoot("CategoryLng");
 
                         let fields = { LanguageId: LANGUAGE_ID };
-                        if (inpFields["FirstName"])
-                            fields["FirstName"] = inpFields["FirstName"];
-                        if (inpFields["LastName"])
-                            fields["LastName"] = inpFields["LastName"];
-                        if (inpFields["Description"])
-                            fields["Description"] = inpFields["Description"];
+                        if (inpFields["Name"])
+                            fields["Name"] = inpFields["Name"];
 
                         return root_lng.newObject({
                             fields: fields
@@ -203,7 +199,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Author added: Id=" + newId + ".");
+                        console.log("Category added: Id=" + newId + ".");
                         return { id: newId };
                     })
                     .finally((isErr, res) => {
@@ -221,7 +217,7 @@ const DbAuthor = class DbAuthor extends DbObject {
     }
 };
 
-let dbAuthor = null;
-exports.AuthorsService = () => {
-    return dbAuthor ? dbAuthor : dbAuthor = new DbAuthor();
+let dbCategory = null;
+exports.CategoriesService = () => {
+    return dbCategory ? dbCategory : dbCategory = new DbCategory();
 }

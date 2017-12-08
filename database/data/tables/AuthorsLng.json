@@ -15,7 +15,6 @@
                 "fields": {
                     "Id": 1,
                     "AuthorId": 1,
-                    "AccountId": 1,
                     "LanguageId": 1,
                     "FirstName": "Петр",
                     "LastName": "Петров",
@@ -30,7 +29,6 @@
                 "fields": {
                     "Id": 2,
                     "AuthorId": 2,
-                    "AccountId": 2,
                     "LanguageId": 1,
                     "FirstName": "Сергей",
                     "LastName": "Сергеев",
@@ -45,7 +43,6 @@
                 "fields": {
                     "Id": 3,
                     "AuthorId": 3,
-                    "AccountId": 1,
                     "LanguageId": 1,
                     "FirstName": "Платон",
                     "LastName": "Кузнецов",

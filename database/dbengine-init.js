@@ -216,6 +216,7 @@ exports.DbEngineInit = class DbEngineInit {
         new Dataman(router, rpc, memDbController, $constructors);
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
 
+        // "AuthorsService" tests
         if (false) {
             const { AuthorsService } = require("./db-author");
             let au = AuthorsService();
@@ -252,6 +253,52 @@ exports.DbEngineInit = class DbEngineInit {
                 .then((result) => {
                     let id = result.id;
                     return au.del(id);
+                })
+                .then((result) => {
+                    console.log("Deleted: " + JSON.stringify(result));
+                })
+                .catch((err) => {
+                    console.error("ERROR: " + err.message);
+                });
+        };
+
+        // "CategoriesService" tests
+        if (false) {
+            const { CategoriesService } = require("./db-category");
+            let ctg = CategoriesService();
+            let upd_id;
+            ctg.insert({ Name: "Религия" })
+                .then((result) => {
+                    return ctg.insert({ Name: "Ислам", ParentId: result.id });
+                })
+                .then((result) => {
+                    upd_id = result.id;
+                    return ctg.get(result.id);
+                })
+                .then((result) => {
+                    console.log("get: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ctg.update(upd_id, { Name: "Православие" });
+                })
+                .then((result) => {
+                    return ctg.get(upd_id);
+                })
+                .then((result) => {
+                    console.log("get after update: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ctg.getAll();
+                })
+                .then((result) => {
+                    console.log("getAll: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ctg.insert({ Name: "Category Test" });
+                })
+                .then((result) => {
+                    let id = result.id;
+                    return ctg.del(id);
                 })
                 .then((result) => {
                     console.log("Deleted: " + JSON.stringify(result));

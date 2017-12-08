@@ -18,6 +18,28 @@
                     "Language": "Русский"
                 }, 
                 "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "fd4b9b70-514e-4796-9a27-eb0adf8e7944"
+                },
+                "fields": {
+                    "Id": 2,
+                    "Code": "EN",
+                    "Language": "English"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "fd4b9b70-514e-4796-9a27-eb0adf8e7944"
+                },
+                "fields": {
+                    "Id": 3,
+                    "Code": "FR",
+                    "Language": "Français"
+                },
+                "collections": {}
             }
         ]
     }
