@@ -2,30 +2,31 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as authorsActions from "../actions/AuthorActions";
+import * as categoriesActions from "../actions/CategoriesActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
+import ErrorDialog from '../components/ErrorDialog';
 import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 
-class Authors extends React.Component {
+class Categories extends React.Component {
     componentDidMount(){
-        this.props.authorsActions.getAuthors();
+        this.props.categoriesActions.getCategories();
     }
 
     onAddBtnClick() {
-        this.props.history.push('/authors/new');
-        this.props.authorsActions.showEditDialog(EDIT_MODE_INSERT)
+        this.props.history.push('/categories/new');
+        this.props.categoriesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
-        this.props.history.push('/authors/edit');
-        this.props.authorsActions.showEditDialog(EDIT_MODE_EDIT)
+        this.props.history.push('/categories/edit');
+        this.props.categoriesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
     deleteAuthor() {
-        this.props.authorsActions.deleteAuthor(this.props.selected)
+        this.props.categoriesActions.deleteCategory(this.props.selected)
     }
 
     confirmDeleteAuthor() {
@@ -33,24 +34,25 @@ class Authors extends React.Component {
     }
 
     cancelDelete() {
-        this.props.authorsActions.cancelDelete()
+        this.props.categoriesActions.cancelDelete()
     }
 
     select(id) {
-        this.props.authorsActions.selectAuthor(id);
+        this.props.categoriesActions.selectCategory(id);
     }
 
     render() {
         const {
-            authors,
+            categories,
             fetching,
             hasError,
             message,
             selected,
             deleteDlgShown,
+            errorDlgShown,
         } = this.props;
 
-        return <div className="authors">
+        return <div className="categories">
             {
                 fetching ?
                     <p>Загрузка...</p>
@@ -58,7 +60,7 @@ class Authors extends React.Component {
                     hasError ?
                         <p>{message}</p>
                         :
-                        <div className="authors-content">
+                        <div className="categories-content">
                             <div className="action-bar">
                                 <button className='btn'
                                         onClick={::this.onAddBtnClick}
@@ -75,7 +77,7 @@ class Authors extends React.Component {
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={authors} />
+                                <Webix ui={::this.getUI(::this.select)} data={categories} />
                             </div>
                         </div>
             }
@@ -84,7 +86,16 @@ class Authors extends React.Component {
                     <YesNoDialog
                         yesAction={::this.deleteAuthor}
                         noAction={::this.cancelDelete}
-                        message="Удалить автора?"
+                        message="Удалить категорию?"
+                        data={selected}
+                    />
+                    :
+                    ""
+            }
+            {
+                errorDlgShown ?
+                    <ErrorDialog
+                        message={message}
                         data={selected}
                     />
                     :
@@ -101,12 +112,8 @@ class Authors extends React.Component {
             select: true,
             editable: false,
             columns: [
-                {id: 'FirstName', header: 'Имя', width: 200},
-                {id: 'LastName', header: 'Фамилия', width: 300},
-                {id: "Description", header: "Описание", fillspace: true},
-                // {id: "active", header: "", width: 50, template: "{common.checkbox()}", readOnly: true},
-                // {id: "created", header: "Создан", width: 150, format: this.formatDate},
-                // {id: "updated", header: "Обновлен", width: 150, format: this.formatDate}
+                {id: 'Name', header: 'Название', width: 400},
+                {id: "ParentName", header: "Родительская категория", fillspace: true},
             ],
             on: {
                 onAfterSelect: function (selObj) {
@@ -116,24 +123,13 @@ class Authors extends React.Component {
         };
     }
 }
-//
-// Authors.propTypes = {
-//     episodes: PropTypes.array.isRequired,
-//     hasError: PropTypes.bool.isRequired,
-//     message: PropTypes.string,
-//     selected: PropTypes.number,
-//     deleteDlgShown: PropTypes.bool.isRequired,
-//     errorDlgShown: PropTypes.bool.isRequired,
-//     editDlgShown: PropTypes.bool.isRequired,
-//     editMode: PropTypes.string.isRequired
-// }
 
 function mapStateToProps(state) {
     return {
-        authors: state.authors.authors,
-        selected: state.authors.selected,
-        editDlgShown: state.authors.editDlgShown,
-        editMode: state.authors.editMode,
+        categories: state.categories.categories,
+        selected: state.categories.selected,
+        editDlgShown: state.categories.editDlgShown,
+        editMode: state.categories.editMode,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -144,9 +140,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        authorsActions: bindActionCreators(authorsActions, dispatch),
+        categoriesActions: bindActionCreators(categoriesActions, dispatch),
         commonDlgActions : bindActionCreators(commonDlgActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Authors);
+export default connect(mapStateToProps, mapDispatchToProps)(Categories);

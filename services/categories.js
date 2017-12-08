@@ -1,8 +1,8 @@
-let { AuthorsService } = require('./../database/db-author');
+let { CategoriesService } = require('./../database/category');
 
-function setupAuthors(app) {
-    app.get('/api/authors', (req, res, next) => {
-        AuthorsService()
+function setupCategories(app) {
+    app.get('/api/categories', (req, res, next) => {
+        CategoriesService()
             .getAll()
             .then(rows => {
                 res.send(rows);
@@ -12,8 +12,8 @@ function setupAuthors(app) {
             });
     });
 
-    app.get('/api/authors/:id', (req, res, next) => {
-        AuthorsService()
+    app.get('/api/categories/:id', (req, res, next) => {
+        CategoriesService()
             .get(req.params.id)
             .then(rows => {
                 res.send(rows);
@@ -23,8 +23,8 @@ function setupAuthors(app) {
             });
     });
 
-    app.post('/api/authors', (req, res, next) => {
-        AuthorsService()
+    app.post('/api/categories', (req, res, next) => {
+        CategoriesService()
             .insert(req.body)
             .then(rows => {
                 res.send(rows);
@@ -34,8 +34,8 @@ function setupAuthors(app) {
             });
     });
 
-    app.put('/api/authors/:id', (req, res, next) => {
-        AuthorsService()
+    app.put('/api/categories/:id', (req, res, next) => {
+        CategoriesService()
             .update(req.params.id, req.body)
             .then(rows => {
                 res.send(rows);
@@ -45,8 +45,8 @@ function setupAuthors(app) {
             });
     });
 
-    app.delete('/api/authors/:id', (req, res, next) => {
-        AuthorsService()
+    app.delete('/api/categories/:id', (req, res, next) => {
+        CategoriesService()
             .del(req.params.id)
             .then(() => {
                 res.send({});
@@ -57,4 +57,4 @@ function setupAuthors(app) {
     });
 }
 
-exports.setupAuthors = setupAuthors;
+exports.setupCategories = setupCategories;
