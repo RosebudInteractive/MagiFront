@@ -31,7 +31,7 @@ export default function commonDlg(state = initialState, action) {
             };
 
         case HIDE_ERROR_DIALOG:
-            return {...state, errorDlgShown: false, message: null};
+            return {...state, errorDlgShown: false, message: null, hasError: false};
 
         default:
             return state;

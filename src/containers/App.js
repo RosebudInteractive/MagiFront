@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
+// import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { Switch, Route, withRouter, } from 'react-router-dom'
@@ -11,9 +11,7 @@ import Authors from "./Authors"
 import AuthorForm from './../components/AuthorForm';
 import Categories from './Categories';
 import CategoriesForm from '../components/CategoryForm';
-
-import * as pageActions from '../actions/PageActions'
-// import * as menuActions from "../actions/MenuActions"
+import Courses from '../containers/Courses'
 
 class App extends Component {
     render() {
@@ -42,7 +40,7 @@ class App extends Component {
                             <Route path='/categories/new' component={CategoriesForm}/>
                             <Route path='/categories/edit' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
-
+                            <Route path='/courses' component={Courses}/>
                         </Switch>
                     </div>
                 </div>
@@ -60,11 +58,4 @@ function mapStateToProps(state, ownProps) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        pageActions: bindActionCreators(pageActions, dispatch),
-        // menuActions: bindActionCreators(menuActions, dispatch)
-    }
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
+export default withRouter(connect(mapStateToProps)(App))

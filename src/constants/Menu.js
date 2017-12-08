@@ -8,4 +8,5 @@ export const MENU_ITEM_EPISODES = 'menu-episodes';
 export const MENU_ITEM_NONE = 'menu-none';
 export const MENU_ITEM_AUTHOR='menu-author';
 export const MENU_ITEM_CATEGORIES='menu-categories';
+export const MENU_ITEM_COURSES='menu-courses';
 

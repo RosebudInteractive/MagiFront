@@ -9,6 +9,7 @@ var methodOverride = require('method-override');
 var { setupEpisodes } = require("./episodes");
 let { setupAuthors } = require('./authors');
 let { setupCategories } = require('./categories');
+let { setupCourses } = require('./courses');
 
 function setupAPI(express, app) {
     var path            = require('path');
@@ -22,6 +23,7 @@ function setupAPI(express, app) {
     setupEpisodes(app);
     setupAuthors(app);
     setupCategories(app);
+    setupCourses(app);
 
     app.get('/api', function (req, res) {
         res.send('API is running');

@@ -8,6 +8,7 @@ import commonDlg from './commonDlg';
 import episodes from "./episodes"
 import authors from './authors';
 import categories from './categories';
+import courses from './courses';
 
 export default combineReducers({
     page,
@@ -17,5 +18,6 @@ export default combineReducers({
     episodes,
     authors,
     categories,
+    courses,
     routing: routerReducer,
 })
