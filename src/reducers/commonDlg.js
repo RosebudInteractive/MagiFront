@@ -27,7 +27,7 @@ export default function commonDlg(state = initialState, action) {
                 errorDlgShown: true,
                 deleteDlgShown: false,
                 message: action.payload,
-                editDlgShown: false
+                hasError: true,
             };
 
         case HIDE_ERROR_DIALOG:

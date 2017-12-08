@@ -1,12 +1,13 @@
 import React  from 'react'
 // import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
+import ErrorDialog from '../components/ErrorDialog';
 
 import * as authorsActions from "../actions/AuthorActions";
 // import * as commonDlgActions from '../actions/CommonDlgActions';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {EDIT_MODE_INSERT } from '../constants/Common'
+import {EDIT_MODE_INSERT } from '../constants/Common';
 
 class AuthorForm extends React.Component {
 
@@ -29,9 +30,23 @@ class AuthorForm extends React.Component {
     }
 
     render() {
+        const {
+            selected,
+            message,
+            errorDlgShown,
+        } = this.props;
         return (
             <div className="episodes-content">
                 <Webix ui={::this.getUI(::this.saveAuthor, this.cancelEdit)} data={::this.getCurrentAuthor()}/>
+                {
+                    errorDlgShown ?
+                        <ErrorDialog
+                            message={message}
+                            data={selected}
+                        />
+                        :
+                        ""
+                }
             </div>
         )
     }
@@ -69,6 +84,10 @@ function mapStateToProps(state) {
         authors: state.authors.authors,
         selected: state.authors.selected,
         editMode: state.authors.editMode,
+
+        hasError: state.commonDlg.hasError,
+        message: state.commonDlg.message,
+        errorDlgShown: state.commonDlg.errorDlgShown,
     }
 }
 

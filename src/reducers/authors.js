@@ -34,7 +34,7 @@ export default function authors(state = initialState, action) {
             return { ...state, authors: action.payload, fetching: false };
 
         case GET_AUTHORS_FAIL:
-            return { ...state, authors: [], fetching: false, hasError: true, message: action.payload };
+            return { ...state, authors: [], fetching: false}; //, hasError: true, message: action.payload };
 
         case SELECT_AUTHOR:
             return {...state, selected: action.payload};
