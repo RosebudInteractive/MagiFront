@@ -9,7 +9,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog"
-import EpisodesForm from "../components/EpisodeForm"
+import EpisodesForm from "./EpisodeForm"
 import * as episodesActions from "../actions/EpisodesActions"
 import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common"
 
@@ -164,7 +164,7 @@ Episodes.propTypes = {
     editMode: PropTypes.string.isRequired
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         episodes: state.episodes.episodes,
         hasError: state.episodes.hasError,
@@ -173,7 +173,8 @@ function mapStateToProps(state) {
         deleteDlgShown: state.episodes.deleteDlgShown,
         errorDlgShown: state.episodes.errorDlgShown,
         editDlgShown: state.episodes.editDlgShown,
-        editMode: state.episodes.editMode
+        editMode: state.episodes.editMode,
+        ownProps,
     }
 }
 

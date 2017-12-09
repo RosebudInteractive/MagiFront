@@ -20,7 +20,7 @@ class Authors extends React.Component {
     }
 
     onEditBtnClick() {
-        this.props.history.push('/authors/edit');
+        this.props.history.push('/authors/edit/' + this.props.selected);
         this.props.authorsActions.showEditDialog(EDIT_MODE_EDIT)
     }
 

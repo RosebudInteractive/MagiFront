@@ -85,15 +85,16 @@ class CategoryForm extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         categories: state.categories.categories,
-        selected: state.categories.selected,
         editMode: state.categories.editMode,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
         errorDlgShown: state.commonDlg.errorDlgShown,
+
+        selected: Number(ownProps.match.params.id),
     }
 }
 

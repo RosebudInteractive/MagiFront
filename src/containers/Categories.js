@@ -21,7 +21,7 @@ class Categories extends React.Component {
     }
 
     onEditBtnClick() {
-        this.props.history.push('/categories/edit');
+        this.props.history.push('/categories/edit/' + this.props.selected);
         this.props.categoriesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
