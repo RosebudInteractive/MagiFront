@@ -16,12 +16,12 @@ class Coureses extends React.Component {
     }
 
     onAddBtnClick() {
-        this.props.history.push('/categories/new');
+        this.props.history.push('/courses/new');
         this.props.coursesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
-        this.props.history.push('/categories/edit');
+        this.props.history.push('/courses/edit/' + this.props.selected);
         this.props.coursesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 

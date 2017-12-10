@@ -8,10 +8,11 @@ import Menu from "../components/Menu"
 import Home from "../components/Home"
 import Episodes from "./Episodes"
 import Authors from "./Authors"
-import AuthorForm from './../components/AuthorForm';
+import AuthorForm from './AuthorForm';
 import Categories from './Categories';
-import CategoriesForm from '../components/CategoryForm';
-import Courses from '../containers/Courses'
+import CategoriesForm from './CategoryForm';
+import Courses from './Courses';
+import CourseForm from './CourseForm';
 
 class App extends Component {
     render() {
@@ -35,11 +36,12 @@ class App extends Component {
                             <Route exact path='/' component={Home}/>
                             <Route path="/episodes" component={Episodes}/>
                             <Route path='/authors/new' component={AuthorForm}/>
-                            <Route path='/authors/edit' component={AuthorForm}/>
+                            <Route path='/authors/edit/:id' component={AuthorForm}/>
                             <Route path='/authors' component={Authors}/>
                             <Route path='/categories/new' component={CategoriesForm}/>
-                            <Route path='/categories/edit' component={CategoriesForm}/>
+                            <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
+                            <Route path='/courses/edit/:id' component={CourseForm}/>
                             <Route path='/courses' component={Courses}/>
                         </Switch>
                     </div>
