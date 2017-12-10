@@ -40,6 +40,17 @@
                     "Language": "Français"
                 },
                 "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "fd4b9b70-514e-4796-9a27-eb0adf8e7944"
+                },
+                "fields": {
+                    "Id": 4,
+                    "Code": "GE",
+                    "Language": "Deutsch"
+                },
+                "collections": {}
             }
         ]
     }

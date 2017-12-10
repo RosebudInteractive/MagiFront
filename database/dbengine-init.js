@@ -307,5 +307,51 @@ exports.DbEngineInit = class DbEngineInit {
                     console.error("ERROR: " + err.message);
                 });
         };
+
+        // "LanguagesService" tests
+        if (false) {
+            const { LanguagesService } = require("./db-language");
+            let lng = LanguagesService();
+            let upd_id;
+            lng.insert({ Code: "LT", Language: "Lietuvių" })
+                .then((result) => {
+                    return lng.insert({ Code: "LL", Language: "Latviešu" });
+                })
+                .then((result) => {
+                    upd_id = result.id;
+                    return lng.get(result.id);
+                })
+                .then((result) => {
+                    console.log("get: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return lng.update(upd_id, { Code: "LV" });
+                })
+                .then((result) => {
+                    return lng.get(upd_id);
+                })
+                .then((result) => {
+                    console.log("get after update: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return lng.getAll();
+                })
+                .then((result) => {
+                    console.log("getAll: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return lng.insert({ Code: "ES", Language: "Eesti" });
+                })
+                .then((result) => {
+                    let id = result.id;
+                    return lng.del(id);
+                })
+                .then((result) => {
+                    console.log("Deleted: " + JSON.stringify(result));
+                })
+                .catch((err) => {
+                    console.error("ERROR: " + err.message);
+                });
+        };
     }
 }
