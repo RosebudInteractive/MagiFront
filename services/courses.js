@@ -1,5 +1,5 @@
-let { CoursesService } = require('./../database/courses');
-// let { CoursesService } = require('./../database/db-course');
+//let { CoursesService } = require('./../database/courses');
+ let { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
     app.get('/api/courses', (req, res, next) => {
