@@ -50,8 +50,17 @@ class CategoryForm extends React.Component {
     }
 
     getCategoriesArray(){
-        return this.props.categories.map((elem) => {
-            return { id : elem.id, value : elem.Name };
+        const {
+            categories,
+            selected
+        } = this.props;
+
+        let _filtered = categories.filter((value) => {
+            return value.id !== selected;
+        });
+
+        return _filtered.map((elem) => {
+            return {id: elem.id, value: elem.Name};
         })
     }
 

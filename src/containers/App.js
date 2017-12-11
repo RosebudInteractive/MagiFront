@@ -12,7 +12,7 @@ import AuthorForm from './AuthorForm';
 import Categories from './Categories';
 import CategoriesForm from './CategoryForm';
 import Courses from './Courses';
-import CourseForm from './CourseForm';
+import CourseEditor from './CourseEditor';
 
 class App extends Component {
     render() {
@@ -41,7 +41,7 @@ class App extends Component {
                             <Route path='/categories/new' component={CategoriesForm}/>
                             <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
-                            <Route path='/courses/edit/:id' component={CourseForm}/>
+                            <Route path='/courses/edit/:id' component={CourseEditor}/>
                             <Route path='/courses' component={Courses}/>
                         </Switch>
                     </div>

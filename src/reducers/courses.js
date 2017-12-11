@@ -17,7 +17,8 @@ const initialState = {
     fetching: false,
     selected: null,
     editDlgShown: false,
-    editMode: EDIT_MODE_INSERT
+    editMode: EDIT_MODE_INSERT,
+    lessons: [],
 };
 
 export default function courses(state = initialState, action) {
@@ -32,8 +33,17 @@ export default function courses(state = initialState, action) {
         case GET_COURSES_FAIL:
             return { ...state, courses: [], fetching: false};
 
-        case SELECT_COURSE:
-            return {...state, selected: action.payload};
+        case SELECT_COURSE: {
+            let _selected = action.payload;
+            let _selectedCourse = state.courses.find((elem) => {
+                return elem.id === _selected
+            });
+
+            let _lessons = _selectedCourse ? _selectedCourse.Lessons : [];
+
+            return {...state, selected: action.payload, lessons: _lessons};
+        }
+
 
         case DELETE_COURSE_SUCCESS: {
             let _data = [];
