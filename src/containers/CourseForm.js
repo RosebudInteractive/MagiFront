@@ -6,6 +6,7 @@ import * as coursesActions from "../actions/CoursesActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {EDIT_MODE_INSERT } from '../constants/Common';
+import Lessons from './Lessons';
 
 class CourseForm extends React.Component {
 
@@ -27,16 +28,22 @@ class CourseForm extends React.Component {
         this.props.coursesActions.hideEditDialog();
     }
 
+    selectLesson(id) {
+        this.props.coursesActions.selectCourse(id);
+    }
+
     render() {
         const {
             selected,
             message,
             errorDlgShown,
         } = this.props;
+
         return (
-            <div className="course-content">
-                {'Форма курса #' + selected}
-                <Webix ui={::this.getUI(::this.saveCourse, this.cancelEdit)} data={::this.getCurrentCourse()}/>
+            <div>
+                <Webix ui={::this.getUI(::this.saveCourse, this.cancelEdit)} data={this.getCurrentCourse()}/>
+                <Lessons/>
+                <Webix ui={::this.getButtons()} />
                 {
                     errorDlgShown ?
                         <ErrorDialog
@@ -50,38 +57,52 @@ class CourseForm extends React.Component {
         )
     }
 
-    // getCategoriesArray(){
-    //     return this.props.categories.map((elem) => {
-    //         return { id : elem.id, value : elem.Name };
-    //     })
-    // }
-
     getUI() {
         // let _options = this.getCategoriesArray();
 
         return {
-            view: "form", width: 400, elements: [
-                // {view: "text", name: "Name", label: "Наименование", placeholder: "Введите наименование"},
-                // {view: "combo", name: "ParentId", label: "Родительская категория", placeholder: "Введите категорию",
-                //     options : _options},
-                // {
-                //     cols: [
-                //         {},
-                //         {
-                //             view: "button", value: "ОК", click: function(){
-                //             if (save)
-                //                 save(this.getFormView().getValues());
-                //         }
-                //         },
-                //         {
-                //             view: "button", value: "Отмена", click: function(){
-                //             if (cancel)
-                //                 cancel();
-                //         }
-                //         }
-                //     ]
-                // }
+            view: "form", width : 0, elements: [
+                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
+                {view: "colorpicker", label: "Цвет курса", name: "Color", placeholder: 'Цвет курса',},
+                // {view: "textarea", name: "Description", label: "Описание", placeholder: "Описание", height: 150,},
+                {
+                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
+                },
+
+                {
+                    view: "richtext",
+                    id: "Description",
+                    label: "Описание курса",
+                    labelPosition: "top",
+                    height: 150,
+                    width: 500,
+                    name: "Description",
+                },
             ]
+        }
+    }
+
+    getButtons() {
+        return {
+            view: "form", width : 0, elements: [{
+                cols: [
+                    {},
+                    {},
+                    {
+                        view: "button", value: "ОК", click: function () {
+                        // if (save)
+                        //     save(this.getFormView().getValues());
+                    }
+                    },
+                    {
+                        view: "button", value: "Отмена", click: function () {
+                        // if (cancel)
+                        //     cancel();
+                    }
+                    }
+                ]
+            }]
         }
     }
 }
