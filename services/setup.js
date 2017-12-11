@@ -10,6 +10,7 @@ var { setupEpisodes } = require("./episodes");
 let { setupAuthors } = require('./authors');
 let { setupCategories } = require('./categories');
 let { setupCourses } = require('./courses');
+let { setupLanguages } = require('./languages');
 
 function setupAPI(express, app) {
     var path            = require('path');
@@ -24,6 +25,7 @@ function setupAPI(express, app) {
     setupAuthors(app);
     setupCategories(app);
     setupCourses(app);
+    setupLanguages(app);
 
     app.get('/api', function (req, res) {
         res.send('API is running');

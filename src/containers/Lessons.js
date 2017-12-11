@@ -8,29 +8,29 @@ import * as commonDlgActions from '../actions/CommonDlgActions';
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
 import ErrorDialog from '../components/ErrorDialog';
-import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
+// import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 
-class Coureses extends React.Component {
+class Lessons extends React.Component {
     componentDidMount(){
-        this.props.coursesActions.getCourses();
+        // this.props.coursesActions.getCourses();
     }
 
     onAddBtnClick() {
-        this.props.history.push('/courses/new');
-        this.props.coursesActions.showEditDialog(EDIT_MODE_INSERT)
+        // this.props.history.push('/courses/new');
+        // this.props.coursesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
-        this.props.history.push('/courses/edit/' + this.props.selected);
-        this.props.coursesActions.showEditDialog(EDIT_MODE_EDIT)
+        // this.props.history.push('/courses/edit/' + this.props.selected);
+        // this.props.coursesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
-    deleteCourse() {
-        this.props.coursesActions.deleteCourse(this.props.selected)
+    deleteLesson() {
+        // this.props.coursesActions.deleteCourse(this.props.selected)
     }
 
-    confirmDeleteCourse() {
-        this.props.commonDlgActions.showDeleteConfirmation(this.props.selected)
+    confirmDeleteLesson() {
+        // this.props.commonDlgActions.showDeleteConfirmation(this.props.selected)
     }
 
     cancelDelete() {
@@ -38,12 +38,12 @@ class Coureses extends React.Component {
     }
 
     select(id) {
-        this.props.coursesActions.selectCourse(id);
+        this.props.coursesActions.selectLesson(id);
     }
 
     render() {
         const {
-            courses,
+            lessons,
             fetching,
             hasError,
             message,
@@ -52,7 +52,7 @@ class Coureses extends React.Component {
             errorDlgShown,
         } = this.props;
 
-        return <div className="courses">
+        return <div className="lessons">
             {
                 fetching ?
                     <p>Загрузка...</p>
@@ -60,7 +60,7 @@ class Coureses extends React.Component {
                     hasError ?
                         <p>{message}</p>
                         :
-                        <div className="courses-content">
+                        <div className="lessons-content">
                             <div className="action-bar">
                                 <button className='btn'
                                         onClick={::this.onAddBtnClick}
@@ -72,12 +72,12 @@ class Coureses extends React.Component {
                                 >Исправить...</button>{' '}
                                 <button
                                     className={'btn' + (selected === null ? " disabled" : "")}
-                                    onClick={::this.confirmDeleteCourse}
+                                    onClick={::this.confirmDeleteLesson}
                                     disabled={(selected === null)}
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={courses} />
+                                <Webix ui={::this.getUI(::this.select)} data={lessons} />
                             </div>
                         </div>
             }
@@ -86,7 +86,7 @@ class Coureses extends React.Component {
                     <YesNoDialog
                         yesAction={::this.deleteCourse}
                         noAction={::this.cancelDelete}
-                        message="Удалить курс?"
+                        message="Удалить лекцию?"
                         data={selected}
                     />
                     :
@@ -104,11 +104,7 @@ class Coureses extends React.Component {
         </div>
     }
 
-    getUI(select) {
-        // function getColorStyle(value) {
-        //     return {color : value}
-        // }
-
+    getUI() {
         return {
             view: "datatable",
             scroll: false,
@@ -116,29 +112,34 @@ class Coureses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                // {id: 'Cover', header: 'Обложка', width:150, template : "<img src='#Cover#'/>"},
+                {id: 'Number', header: 'Номер', width: 75},
                 {id: 'Name', header: 'Название', width: 200},
-                {id: 'Color', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #Color#; border-radius: 4px; '>#Color#</span>"}, //cssFormat: getColorStyle},
-                {id: 'URL', header: 'Ярлык URL', width : 150, template:"<a href='#URL#'>#URL#</a>"},
+                // {id: 'Color', header: 'Цвет курса', width: 50, cssFormat: getColorStyle},
                 {id: 'State', header: 'Состояние', width: 150},
-                {id: 'LanguageName', header : 'Язык курса', width: 200},
-                {id: "Description", header: "Описание курса", fillspace: true},
+                {id: 'LanguageName', header: 'Язык курса', width: 200},
+                {id: 'ReadyDate', header: 'Дата готовности', width: 150, format: this.formatDate},
+                {id: "ShortDescription", header: "Описание курса", fillspace: true},
             ],
             on: {
-                onAfterSelect: function (selObj) {
-                    select(selObj.id);
+                onAfterSelect: (selObj) => {
+                    this.selectLesson(selObj.id);
                 }
             }
-        };
+        }
+    }
+
+    formatDate(data) {
+        let fn = window.webix.Date.dateToStr("%d.%m.%Y %H:%i", true);
+        return fn(new Date(data));
     }
 }
 
 function mapStateToProps(state) {
     return {
-        courses: state.courses.courses,
-        selected: state.courses.selected,
-        editDlgShown: state.courses.editDlgShown,
-        editMode: state.courses.editMode,
+        lessons: state.courses.lessons,
+        // selected: state.courses.selected,
+        // editDlgShown: state.courses.editDlgShown,
+        // editMode: state.courses.editMode,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -154,4 +155,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Coureses);
+export default connect(mapStateToProps, mapDispatchToProps)(Lessons);

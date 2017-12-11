@@ -4,8 +4,8 @@
 
 import {
     SELECT_ITEM,
-    MENU_ITEM_EPISODES,
-    MENU_ITEM_OTHER,
+    // MENU_ITEM_EPISODES,
+    // MENU_ITEM_OTHER,
     MENU_ITEM_NONE,
     MENU_ITEM_AUTHOR,
     MENU_ITEM_CATEGORIES,
@@ -20,8 +20,8 @@ const initialState = {
         {id: MENU_ITEM_AUTHOR, name: "Авторы", url:'/authors'},
         {id: MENU_ITEM_CATEGORIES, name : 'Категории' , url : '/categories'},
         {id: MENU_ITEM_COURSES, name : 'Курсы' , url : '/courses'},
-        {id: MENU_ITEM_EPISODES, name: "Эпизоды", url: "/episodes"},
-        {id: MENU_ITEM_OTHER, name: "Что-то еще", url: "/photos"}
+        // {id: MENU_ITEM_EPISODES, name: "Эпизоды", url: "/episodes"},
+        // {id: MENU_ITEM_OTHER, name: "Что-то еще", url: "/photos"}
     ]
 };
 
