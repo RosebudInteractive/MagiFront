@@ -2,7 +2,7 @@ import React  from 'react'
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
-import * as singleCourseActions from "../actions/SingleCourseActions";
+import * as singleLessionActions from "../actions/SingleLessonActions";
 import * as coursesActions from '../actions/CoursesActions';
 import * as authorsActions from "../actions/AuthorActions";
 import * as categoriesActions from "../actions/CategoriesActions";
@@ -15,12 +15,10 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-import CourseLessons from '../components/CourseLessons';
-import CourseAuthors from '../components/CourseAuthors';
-import CourseCategories from '../components/CourseCategories';
+import LessonEpisodes from '../components/LessonEpisodes';
 import LookupDialog from '../components/LookupDialog';
 
-class CourseEditor extends React.Component {
+class LessonEditor extends React.Component {
 
     constructor(props) {
         super(props);
@@ -277,8 +275,8 @@ class CourseEditor extends React.Component {
                         {
                             view: "button", name: 'btnCancel', value: "Отмена",
                             click: function () {
-                                 if (cancel)
-                                     cancel();
+                                if (cancel)
+                                    cancel();
                             }
                         }
                     ]
