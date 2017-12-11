@@ -40,7 +40,7 @@ class CourseCategories extends Component {
                     id: "",
                     template: "<input class='delbtn' type='button' value='Delete'>",
                     // css:"padding_less",
-                    width: 100
+                    width: 80
                 },
             ],
 

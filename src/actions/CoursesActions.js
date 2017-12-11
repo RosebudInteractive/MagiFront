@@ -50,12 +50,6 @@ export const getCourses = ()=> {
     }
 };
 
-// export const addAuthor = (id) => {};
-//
-// export const addLesson = (id) => {
-//
-// };
-
 export const showEditDialog = (mode) => {
     return {
         type: SHOW_EDIT_COURSE_DLG,

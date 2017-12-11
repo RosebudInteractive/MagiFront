@@ -120,13 +120,18 @@ class Coureses extends React.Component {
                 {id: 'Name', header: 'Название', width: 200},
                 {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"}, //cssFormat: getColorStyle},
                 {id: 'URL', header: 'Ярлык URL', width : 150, template:"<a href='#URL#'>#URL#</a>"},
-                {id: 'State', header: 'Состояние', width: 150},
+                {id: 'State', header: 'Состояние', width: 150, editor: 'select',
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]},
                 {id: 'LanguageName', header : 'Язык курса', width: 200},
                 {id: "Description", header: "Описание курса", fillspace: true},
             ],
             on: {
                 onAfterSelect: function (selObj) {
                     select(selObj.id);
+                },
+                onBeforeAdd: function(id, data) {
+                    if (data.values[0].value === "")
+                        data.values[0].value = "Select something";
                 }
             }
         };

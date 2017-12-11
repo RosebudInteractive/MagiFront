@@ -11,6 +11,9 @@ import {
     ADD_CATEGORY,
     REMOVE_CATEGORY,
     HIDE_ADD_CATEGORY_DIALOG,
+    CHANGE_DATA,
+    CANCEL_CHANGE_DATA,
+    REMOVE_LESSON,
 
 } from '../constants/SingleCourse'
 
@@ -19,6 +22,7 @@ import {
 // } from '../constants/Common'
 
 const initialState = {
+    initialCourse: null,
     course: null,
     authors: [],
     categories: [],
@@ -28,11 +32,13 @@ const initialState = {
     // editMode: EDIT_MODE_INSERT,
     showAddAuthorDialog: false,
     showAddCategoryDialog: false,
+    hasChanges : false,
 };
 
 export default function singleCourse(state = initialState, action) {
 
     switch (action.type) {
+
         case CREATE_NEW_COURSE: {
             let _course = {
                 ColorHex: '#FFFFFF',
@@ -44,41 +50,50 @@ export default function singleCourse(state = initialState, action) {
 
             return {
                 ...state,
-                course: _course,
+                initialCourse: _course,
+                course: Object.assign({}, _course),
                 authors: [],
                 categories:[],
                 lessons: [],
-                fetching: false };
+                fetching: false,
+                hasChanges : false,
+            };
         }
 
         case GET_SINGLE_COURSE_REQUEST:
             return {
                 ...state,
+                initialCourse : null,
                 course: null,
                 authors: [],
                 categories:[],
                 lessons: [],
-                fetching: true
+                fetching: true,
+                hasChanges : false,
             };
 
         case GET_SINGLE_COURSE_SUCCESS:
             return {
                 ...state,
-                course: action.payload,
-                authors: action.payload.Authors,
-                categories: action.payload.Categories,
-                lessons: action.payload.Lessons,
-                fetching: false
+                initialCourse: action.payload,
+                course: Object.assign({}, action.payload),
+                authors: [...action.payload.Authors],
+                categories: [...action.payload.Categories],
+                lessons: [...action.payload.Lessons],
+                fetching: false,
+                hasChanges : false,
             };
 
         case GET_SINGLE_COURSE_FAIL:
             return {
                 ...state,
+                initialCourse:null,
                 course: null,
                 authors: [],
                 categories:[],
                 lessons: [],
-                fetching: false
+                fetching: false,
+                hasChanges : false,
             };
 
         case SHOW_ADD_AUTHOR_DIALOG :
@@ -86,27 +101,33 @@ export default function singleCourse(state = initialState, action) {
 
         case ADD_AUTHOR: {
             let _authors = [];
+            let _modified = false;
+
             let _authorId = action.payload;
-            if (!state.course.Authors.includes(_authorId)) {
-                state.course.Authors.push(_authorId)
+            if (!state.authors.includes(_authorId)) {
+                _modified = true;
+                state.authors.push(_authorId)
             }
 
-            _authors.push(...state.course.Authors);
+            _authors.push(...state.authors);
 
-            return {...state, authors: _authors, showAddAuthorDialog : false,};
+            return {...state, authors: _authors, showAddAuthorDialog : false, hasChanges: _modified ? true : state.hasChanges};
         }
 
         case REMOVE_AUTHOR: {
             let _authors = [];
+            let _modified = false;
+
             let _authorId = action.payload;
-            let _index = state.course.Authors.indexOf(_authorId);
+            let _index = state.authors.indexOf(_authorId);
             if (_index > -1) {
-                state.course.Authors.splice(_index, 1);
+                _modified = true;
+                state.authors.splice(_index, 1);
             }
 
-            _authors.push(...state.course.Authors);
+            _authors.push(...state.authors);
 
-            return {...state, authors: _authors}
+            return {...state, authors: _authors, hasChanges: _modified ? true : state.hasChanges};
         }
 
         case HIDE_ADD_AUTHOR_DIALOG :
@@ -117,32 +138,70 @@ export default function singleCourse(state = initialState, action) {
 
         case ADD_CATEGORY: {
             let _categories = [];
+            let _modified = false;
             let _categoryId = action.payload;
-            if (!state.course.Categories.includes(_categoryId)) {
-                state.course.Categories.push(_categoryId)
+            if (!state.categories.includes(_categoryId)) {
+                _modified = true;
+                state.categories.push(_categoryId)
             }
 
-            _categories.push(...state.course.Categories);
+            _categories.push(...state.categories);
 
-            return {...state, categories: _categories};
+            return {...state, categories: _categories, showAddCategoryDialog: false, hasChanges: _modified ? true : state.hasChanges};
         }
 
         case REMOVE_CATEGORY: {
             let _categories = [];
+            let _modified = false;
 
             let _categoryId = action.payload;
-            let _index = state.course.Categories.indexOf(_categoryId);
+            let _index = state.categories.indexOf(_categoryId);
             if (_index > -1) {
-                state.course.Categories.splice(_index, 1);
+                _modified = true;
+                state.categories.splice(_index, 1);
             }
 
-            _categories.push(...state.course.Categories);
+            _categories.push(...state.categories);
 
-            return {...state, categories: _categories}
+            return {...state, categories: _categories, hasChanges: _modified ? true : state.hasChanges};
         }
 
         case HIDE_ADD_CATEGORY_DIALOG :
             return { ...state, showAddCategoryDialog: false};
+
+        case CHANGE_DATA : {
+            let _course = Object.assign({}, action.payload);
+
+            return {...state, course: _course, hasChanges: true };
+        }
+
+        case CANCEL_CHANGE_DATA: {
+            return {
+                ...state,
+                course: Object.assign({},state.initialCourse),
+                authors: [...state.initialCourse.Authors],
+                categories: [...state.initialCourse.Categories],
+                lessons: [...state.initialCourse.Lessons],
+                hasChanges : false,
+            };
+        }
+
+        case REMOVE_LESSON: {
+            let _lessons = [];
+            let _modified = false;
+
+            let _lessonId = action.payload;
+            let _index = state.lessons.findIndex((lesson) => {return lesson.id === _lessonId});
+            if (_index > -1) {
+                _modified = true;
+                state.lessons.splice(_index, 1);
+            }
+
+            _lessons.push(...state.lessons);
+
+            return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
+        }
+
         //
         // case SHOW_EDIT_COURSE_DLG: {
         //     return {...state, editDlgShown: true, editMode: action.payload}
