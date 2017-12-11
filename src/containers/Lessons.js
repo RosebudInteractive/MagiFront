@@ -53,6 +53,7 @@ class Lessons extends React.Component {
         } = this.props;
 
         return <div className="lessons">
+            Лекции курса
             {
                 fetching ?
                     <p>Загрузка...</p>
@@ -64,17 +65,17 @@ class Lessons extends React.Component {
                             <div className="action-bar">
                                 <button className='btn'
                                         onClick={::this.onAddBtnClick}
-                                >Добавить...</button>{' '}
+                                >Создать...</button>{' '}
                                 <button
                                     className={'btn' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={(selected === null)}
-                                >Исправить...</button>{' '}
+                                >Добавить...</button>{' '}
                                 <button
                                     className={'btn' + (selected === null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteLesson}
                                     disabled={(selected === null)}
-                                >Удалить...</button>
+                                >Исправить...</button>
                             </div>
                             <div className="grid-container">
                                 <Webix ui={::this.getUI(::this.select)} data={lessons} />
@@ -109,16 +110,18 @@ class Lessons extends React.Component {
             view: "datatable",
             scroll: false,
             autoheight: true,
+            // autowidth: true,
             select: true,
             editable: false,
+            width: 600,
             columns: [
                 {id: 'Number', header: 'Номер', width: 75},
-                {id: 'Name', header: 'Название', width: 200},
+                {id: 'Name', header: 'Название', fillspace: true},
                 // {id: 'Color', header: 'Цвет курса', width: 50, cssFormat: getColorStyle},
-                {id: 'State', header: 'Состояние', width: 150},
-                {id: 'LanguageName', header: 'Язык курса', width: 200},
-                {id: 'ReadyDate', header: 'Дата готовности', width: 150, format: this.formatDate},
-                {id: "ShortDescription", header: "Описание курса", fillspace: true},
+                {id: 'State', header: 'Состояние', width: 120},
+                {id: 'LanguageName', header: 'Язык курса', width: 120},
+                {id: 'ReadyDate', header: 'Дата готовности', width: 150, format: this.formatDate, },
+                // {id: "ShortDescription", header: "Описание курса", fillspace: true},
             ],
             on: {
                 onAfterSelect: (selObj) => {
@@ -136,7 +139,7 @@ class Lessons extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        lessons: state.courses.lessons,
+        lessons: state.singleCourse.lessons,
         // selected: state.courses.selected,
         // editDlgShown: state.courses.editDlgShown,
         // editMode: state.courses.editMode,

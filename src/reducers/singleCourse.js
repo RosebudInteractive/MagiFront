@@ -1,4 +1,5 @@
 import {
+    CREATE_NEW_COURSE,
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
     GET_SINGLE_COURSE_FAIL,
@@ -6,8 +7,10 @@ import {
     ADD_AUTHOR,
     REMOVE_AUTHOR,
     HIDE_ADD_AUTHOR_DIALOG,
+    SHOW_ADD_CATEGORY_DIALOG,
     ADD_CATEGORY,
     REMOVE_CATEGORY,
+    HIDE_ADD_CATEGORY_DIALOG,
 
 } from '../constants/SingleCourse'
 
@@ -19,67 +22,127 @@ const initialState = {
     course: null,
     authors: [],
     categories: [],
+    lessons: [],
     fetching: false,
     // editDlgShown: false,
     // editMode: EDIT_MODE_INSERT,
-    showAddAuthorDialog : false,
+    showAddAuthorDialog: false,
+    showAddCategoryDialog: false,
 };
 
 export default function singleCourse(state = initialState, action) {
 
     switch (action.type) {
+        case CREATE_NEW_COURSE: {
+            let _course = {
+                ColorHex: '#FFFFFF',
+                State:'D',
+                Authors:[],
+                Categories:[],
+                Lessons:[],
+            };
+
+            return {
+                ...state,
+                course: _course,
+                authors: [],
+                categories:[],
+                lessons: [],
+                fetching: false };
+        }
+
         case GET_SINGLE_COURSE_REQUEST:
-            return { ...state, course: null, authors: [], fetching: true };
+            return {
+                ...state,
+                course: null,
+                authors: [],
+                categories:[],
+                lessons: [],
+                fetching: true
+            };
 
         case GET_SINGLE_COURSE_SUCCESS:
-            return { ...state, course: action.payload, authors: action.payload.Authors, fetching: false };
+            return {
+                ...state,
+                course: action.payload,
+                authors: action.payload.Authors,
+                categories: action.payload.Categories,
+                lessons: action.payload.Lessons,
+                fetching: false
+            };
 
         case GET_SINGLE_COURSE_FAIL:
-            return { ...state, course: null, fetching: false};
+            return {
+                ...state,
+                course: null,
+                authors: [],
+                categories:[],
+                lessons: [],
+                fetching: false
+            };
 
         case SHOW_ADD_AUTHOR_DIALOG :
             return { ...state, showAddAuthorDialog: true};
 
         case ADD_AUTHOR: {
+            let _authors = [];
             let _authorId = action.payload;
             if (!state.course.Authors.includes(_authorId)) {
                 state.course.Authors.push(_authorId)
             }
 
-            return {...state, course: state.course, showAddAuthorDialog : false,};
+            _authors.push(...state.course.Authors);
+
+            return {...state, authors: _authors, showAddAuthorDialog : false,};
         }
 
         case REMOVE_AUTHOR: {
+            let _authors = [];
             let _authorId = action.payload;
             let _index = state.course.Authors.indexOf(_authorId);
             if (_index > -1) {
                 state.course.Authors.splice(_index, 1);
             }
 
-            return {...state, authors: state.course.Authors}
+            _authors.push(...state.course.Authors);
+
+            return {...state, authors: _authors}
         }
 
         case HIDE_ADD_AUTHOR_DIALOG :
             return { ...state, showAddAuthorDialog: false};
 
+        case SHOW_ADD_CATEGORY_DIALOG :
+            return { ...state, showAddCategoryDialog: true};
+
         case ADD_CATEGORY: {
+            let _categories = [];
             let _categoryId = action.payload;
             if (!state.course.Categories.includes(_categoryId)) {
                 state.course.Categories.push(_categoryId)
             }
 
-            return {...state, course: state.course};
+            _categories.push(...state.course.Categories);
+
+            return {...state, categories: _categories};
         }
 
         case REMOVE_CATEGORY: {
+            let _categories = [];
+
             let _categoryId = action.payload;
             let _index = state.course.Categories.indexOf(_categoryId);
             if (_index > -1) {
                 state.course.Categories.splice(_index, 1);
             }
 
-            return {...state, course: state.course}
+            _categories.push(...state.course.Categories);
+
+            return {...state, categories: _categories}
         }
+
+        case HIDE_ADD_CATEGORY_DIALOG :
+            return { ...state, showAddCategoryDialog: false};
         //
         // case SHOW_EDIT_COURSE_DLG: {
         //     return {...state, editDlgShown: true, editMode: action.payload}

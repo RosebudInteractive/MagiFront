@@ -159,7 +159,7 @@ const parseJSON = (response) => {
 
 const handleCourse = (course) => {
     course.id = course.Id;
-    course.ColorHex = course.Color.toString(16);
+    course.ColorHex = '#' + course.Color.toString(16);
     // course.stateName =
     return course;
 };

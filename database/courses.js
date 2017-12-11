@@ -10,7 +10,7 @@ const _rows = [
         URL: 'http:///i_do_not_know.com',
         Description: 'Описание курса 1 https://docs.webix.com',
         Authors: [2, 3],
-        Categories : [1, 2],
+        Categories : [4, 5],
         Lessons: [
             {
                 Id: 1,
@@ -44,6 +44,8 @@ const _rows = [
         LanguageName : 'English',
         URL: '/i_do_not_know',
         Description:'Описание курса 3',
+        Authors: [],
+        Categories : [],
         Lessons : [
             {
                 Id : 3,
@@ -77,6 +79,8 @@ const _rows = [
         LanguageName : 'English',
         URL: '/i_do_not_know',
         Description:'Описание курса 3',
+        Authors: [1, 3],
+        Categories : [2, 5],
         Lessons : [
             {
                 Id : 5,
@@ -112,7 +116,7 @@ const CoursesService = class CoursesService {
 
     get(id) {
         return new Promise((resolve) => {
-            resolve(_rows[0])
+            resolve(_rows[id-1])
         });
     }
 

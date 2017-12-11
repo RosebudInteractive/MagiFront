@@ -1,4 +1,5 @@
 import {
+    CREATE_NEW_COURSE,
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
     GET_SINGLE_COURSE_FAIL,
@@ -6,8 +7,10 @@ import {
     ADD_AUTHOR,
     REMOVE_AUTHOR,
     HIDE_ADD_AUTHOR_DIALOG,
+    SHOW_ADD_CATEGORY_DIALOG,
     ADD_CATEGORY,
     REMOVE_CATEGORY,
+    HIDE_ADD_CATEGORY_DIALOG,
 } from '../constants/SingleCourse'
 
 import {
@@ -53,6 +56,15 @@ export const getCourse = (id)=> {
     }
 };
 
+export const createNewCoures = () => {
+    return (dispatch) => {
+        dispatch({
+            type: CREATE_NEW_COURSE,
+            payload: null
+        });
+    }
+};
+
 export const showAddAuthorDialog = () => {
     return (dispatch) => {
         dispatch({
@@ -89,6 +101,15 @@ export const hideAddAuthorDialog = () => {
     }
 };
 
+export const showAddCategoryDialog = () => {
+    return (dispatch) => {
+        dispatch({
+            type: SHOW_ADD_CATEGORY_DIALOG,
+            payload: null
+        });
+    }
+};
+
 export const addCategory = (id) => {
     return (dispatch) => {
         dispatch({
@@ -107,6 +128,14 @@ export const removeCategory = (id) => {
     }
 };
 
+export const hideAddCategoryDialog = () => {
+    return (dispatch) => {
+        dispatch({
+            type: HIDE_ADD_CATEGORY_DIALOG,
+            payload: null
+        });
+    }
+};
 
 
 

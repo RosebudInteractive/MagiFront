@@ -5,19 +5,19 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as courseActions from '../actions/SingleCourseActions';
 
-class CourseAuthors extends Component {
+class CourseCategories extends Component {
     addClicked() {
-        this.props.addAuthorAction();
+        this.props.addCategoryAction();
     }
 
-    removeAuthorFormCourse(id) {
-        this.props.courseActions.removeAuthor(id)
+    removeCategoryFormCourse(id) {
+        this.props.courseActions.removeCategory(id)
     }
 
     render () {
         const {data} = this.props;
         return <div>
-            Авторы курса
+            Категории курса
             <div className="dlg-btn-bar">
                 <button className="btn yes" onClick={::this.addClicked}>Добавить...</button>
             </div>
@@ -31,35 +31,35 @@ class CourseAuthors extends Component {
             view: "datatable",
             scroll: false,
             autoheight: true,
-            select: true,
             width: 600,
+            select: true,
             editable: false,
             columns: [
-                {id: 'FirstName', header: 'Имя', width : 100, }, //fillspace: true},
-                {id: 'LastName', header: 'Фамилия', fillspace: true, },
-                { 	id:"",
-                    template:"<input class='delbtn' type='button' value='Delete'>",
+                {id: 'Name', header: 'Имя', fillspace: true,}, //fillspace: true},
+                {
+                    id: "",
+                    template: "<input class='delbtn' type='button' value='Delete'>",
                     // css:"padding_less",
-                    width:100 },
+                    width: 100
+                },
             ],
 
-            onClick:{
-                delbtn:(e, id) => {
+            onClick: {
+                delbtn: (e, id) => {
                     //will be called on button click
-                    this.removeAuthorFormCourse(id.row);
+                    this.removeCategoryFormCourse(id.row);
                 }
             }
         };
     }
 }
 
-CourseAuthors.propTypes = {
+CourseCategories.propTypes = {
     // message: PropTypes.string.isRequired,
-    addAuthorAction: PropTypes.func.isRequired,
+    addCategoryAction: PropTypes.func.isRequired,
     // noAction: PropTypes.func.isRequired,
     data: PropTypes.any
 };
-
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -67,4 +67,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 //
-export default connect(null, mapDispatchToProps)(CourseAuthors);
+export default connect(null, mapDispatchToProps)(CourseCategories);
