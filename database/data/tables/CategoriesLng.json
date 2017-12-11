@@ -79,6 +79,54 @@
                     "Name": "Музыка"
                 },
                 "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 7,
+                    "CategoryId": 7,
+                    "LanguageId": 1,
+                    "Name": "Литература"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 8,
+                    "CategoryId": 8,
+                    "LanguageId": 1,
+                    "Name": "Религия"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 9,
+                    "CategoryId": 9,
+                    "LanguageId": 1,
+                    "Name": "Психология"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 10,
+                    "CategoryId": 10,
+                    "LanguageId": 1,
+                    "Name": "Бестселлер"
+                },
+                "collections": {}
             }
         ]
     }

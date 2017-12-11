@@ -1,0 +1,57 @@
+{
+    "$sys": {
+        "typeGuid": "6b65ee98-e1fa-4580-9f90-ad835349a8e5"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "CategoryId": 8, 
+                    "CourseId": 1
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+                },
+                "fields": {
+                    "Id": 2,
+                    "CategoryId": 10,
+                    "CourseId": 1
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+                },
+                "fields": {
+                    "Id": 3,
+                    "CategoryId": 9,
+                    "CourseId": 2
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+                },
+                "fields": {
+                    "Id": 4,
+                    "CategoryId": 7,
+                    "CourseId": 3
+                },
+                "collections": {}
+            }
+        ]
+    }
+}

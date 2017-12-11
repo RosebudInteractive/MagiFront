@@ -1,0 +1,55 @@
+{
+    "$sys": {
+        "typeGuid": "45616f57-8260-497d-9179-25eedce0ba68"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "c93aa70c-6d24-4587-a723-79dbc9e65f99"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "CourseId": 1,
+                    "LessonId": 1,
+                    "Number": 1,
+                    "ReadyDate": "2015-03-05",
+                    "State": "R"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "c93aa70c-6d24-4587-a723-79dbc9e65f99"
+                },
+                "fields": {
+                    "Id": 2,
+                    "CourseId": 1,
+                    "LessonId": 2,
+                    "Number": 2,
+                    "ReadyDate": "2015-04-05",
+                    "State": "R"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "c93aa70c-6d24-4587-a723-79dbc9e65f99"
+                },
+                "fields": {
+                    "Id": 3,
+                    "CourseId": 1,
+                    "LessonId": 3,
+                    "Number": 3,
+                    "ReadyDate": "2015-05-05",
+                    "State": "R"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}

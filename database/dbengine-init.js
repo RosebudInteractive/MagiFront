@@ -28,6 +28,9 @@ exports.DbEngineInit = class DbEngineInit {
         var dbname = null;
         var is_dbname_next = false;
 
+        var sqlTrace = false;
+        var importFileTrace = false;
+
         for (var _cnt = 0; _cnt < process.argv.length; _cnt++) {
             var _arg = process.argv[_cnt];
 
@@ -110,6 +113,14 @@ exports.DbEngineInit = class DbEngineInit {
                 case "-autoimport":
                     autoImportFlag = true;
                     break;
+
+                case "-sqlTrace":
+                    sqlTrace = true;
+                    break;
+
+                case "-importFileTrace":
+                    importFileTrace = true;
+                    break;
             }
         };
 
@@ -163,8 +174,8 @@ exports.DbEngineInit = class DbEngineInit {
                     dataModelsDir: __dirname + "/data/data-models"
                 },
                 trace: {
-                    sqlCommands: false,
-                    importDir: false
+                    sqlCommands: sqlTrace,
+                    importDir: importFileTrace
                 }
             },
             resman: {
@@ -352,6 +363,117 @@ exports.DbEngineInit = class DbEngineInit {
                 .catch((err) => {
                     console.error("ERROR: " + err.message);
                 });
+        };
+
+        // "CoursesService" tests
+        if (false) {
+            const { CoursesService } = require("./db-course");
+            let crs = CoursesService();
+            let upd_id = 1;
+            crs.getAll()
+                .then((result) => {
+                    console.log("getAll: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.get(upd_id);
+                })
+                .then((result) => {
+                    console.log("get: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.insert({
+                        "Color": 13413051,
+                        "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/new-1.jpg",
+                        "State": "D",
+                        "LanguageId": 1,
+                        "URL": "https://magisteria.ru/courseNew",
+                        "Name": "Новый курс",
+                        "Description": "Обзорный курс по обзорному курсу.",
+                        "Authors": [3, 1],
+                        "Categories": [3, 10],
+                        "Lessons": [
+                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" },
+                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
+                            { "LessonId": 1, "ReadyDate": "2018-03-30", "State": "D" }
+                        ]
+                    });
+                })
+                .then((result) => {
+                    upd_id = result.id;
+                    return crs.get(result.id);
+                })
+                .then((result) => {
+                    console.log("get: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.update(upd_id, {
+                        "Color": 333,
+                        "Name": "Новый курс XXXXX",
+                        "Description": "====Обзорный курс по обзорному курсу.",
+                        "Authors": [2],
+                        "Categories": [10, 1],
+                        "Lessons": [
+                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
+                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" }
+                        ]
+                    });
+                })
+                .then((result) => {
+                    return crs.get(upd_id);
+                })
+                .then((result) => {
+                    console.log("get after update: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.del(upd_id);
+                })
+                .then((result) => {
+                    console.log("Deleted: " + JSON.stringify(result));
+                })
+                .catch((err) => {
+                    console.error("ERROR: " + err.message);
+                });
+                ;
+
+            // au.insert({ FirstName: "Alex", LastName: "Pushkin", Portrait: "asdasd.jpg" })
+            //     .then(() => {
+            //         return au.insert({ FirstName: "Mike", LastName: "Lermontov" });
+            //     })
+            //     .then((result) => {
+            //         upd_id = result.id;
+            //         return au.get(result.id);
+            //     })
+            //     .then((result) => {
+            //         console.log("get: " + JSON.stringify(result));
+            //     })
+            //     .then(() => {
+            //         return au.update(upd_id, { FirstName: "=Mike=", LastName: "=Lermontov=", Portrait: "m_lermontov.jpg" });
+            //     })
+            //     .then((result) => {
+            //         return au.get(upd_id);
+            //     })
+            //     .then((result) => {
+            //         console.log("get after update: " + JSON.stringify(result));
+            //     })
+            //     .then(() => {
+            //         return au.getAll();
+            //     })
+            //     .then((result) => {
+            //         console.log("getAll: " + JSON.stringify(result));
+            //     })
+            //     .then(() => {
+            //         return au.insert({ FirstName: "Lev", LastName: "Tolstoy" });
+            //     })
+            //     .then((result) => {
+            //         let id = result.id;
+            //         return au.del(id);
+            //     })
+            //     .then((result) => {
+            //         console.log("Deleted: " + JSON.stringify(result));
+            //     })
+            //     .catch((err) => {
+            //         console.error("ERROR: " + err.message);
+            //     });
         };
     }
 }

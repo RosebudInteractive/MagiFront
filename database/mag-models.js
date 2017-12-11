@@ -62,7 +62,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("AuthorToCourse", "2f0ce749-4169-4ec0-9a87-0ffd405a4337", "RootAuthorToCourse", "feebc518-1fa6-4051-b39e-7958ed30feb7")
             .addField("AuthorId", { type: "dataRef", model: "Author", refAction: "parentRestrict", allowNull: false })
-            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false });
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false });
 
         metaDataMgr.addModel("Course", "5995f1c7-43dc-4367-8071-532702b94235", "RootCourse", "f3500436-4b99-48a7-a60b-8b6d6e1a9ac8")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
@@ -90,25 +90,26 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 100, allowNull: false });
 
         metaDataMgr.addModel("CourseCategory", "61e14112-019b-42ac-9834-073af99a1597", "RootCourseCategory", "6b65ee98-e1fa-4580-9f90-ad835349a8e5")
-            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false })
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
             .addField("CategoryId", { type: "dataRef", model: "Category", refAction: "parentRestrict", allowNull: false });
 
         metaDataMgr.addModel("Lesson", "caadef95-278b-4cad-acc9-a1e27380d6c6", "RootLesson", "819bf85f-e13b-4368-98e5-561f68f90ecd")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false })
             .addField("AuthorId", { type: "dataRef", model: "Author", refAction: "parentRestrict", allowNull: false })
             .addField("LessonType", { type: "enum", values: ["L", "T"], allowNull: false })
-            .addField("Cover", { type: "string", length: 200, allowNull: true });
+            .addField("Cover", { type: "string", length: 200, allowNull: true })
+            .addField("URL", { type: "string", length: 200, allowNull: true });
 
         metaDataMgr.addModel("LessonLng", "7012a967-e186-43d8-b39c-1409b7f198b1", "RootLessonLng", "4dde1122-7556-4929-a81c-5c7679a5bbee")
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false })
             .addField("Name", { type: "string", length: 100, allowNull: false })
-            .addField("SortDescription", { type: "string", length: 200, allowNull: false })
+            .addField("ShortDescription", { type: "string", length: 200, allowNull: false })
             .addField("FullDescription", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
-            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false })
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
