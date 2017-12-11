@@ -70,7 +70,7 @@ class CourseEditor extends React.Component {
     _fillLessons(array) {
         this.props.courseLessons.map((lesson) => {
             array.push({
-                LessonID: lesson.Id,
+                LessonId: lesson.Id,
                 State: lesson.State,
                 ReadyDate: new Date(lesson.ReadyDate),
             })
@@ -242,7 +242,7 @@ class CourseEditor extends React.Component {
                 {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса',},
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
                 },
                 {
                     view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
