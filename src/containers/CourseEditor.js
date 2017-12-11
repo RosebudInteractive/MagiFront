@@ -2,23 +2,40 @@ import React  from 'react'
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
-import * as coursesActions from "../actions/CoursesActions";
+import * as singleCourseActions from "../actions/CoursesActions";
+import * as authorsActions from "../actions/AuthorActions";
+import * as categoriesActions from "../actions/CategoriesActions";
+import * as languagesActions from "../actions/LanguagesActions";
+
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {EDIT_MODE_INSERT } from '../constants/Common';
+// import {EDIT_MODE_INSERT } from '../constants/Common';
 import Lessons from './Lessons';
 
-class CourseForm extends React.Component {
+class CourseEditor extends React.Component {
+    componentDidMount(){
+        const {
+            courseActions,
+            authorsActions,
+            categoriesActions,
+            languagesActions,
+        } = this.props;
 
-    getCurrentCourse() {
-        if (this.props.editMode === EDIT_MODE_INSERT) {
-            return null
-        } else {
-            return this.props.courses.find((elem) => {
-                return elem.id === this.props.selected
-            })
-        }
+        courseActions.getCourse(this.courseId);
+        authorsActions.getAuthors();
+        categoriesActions.getCategories();
+        languagesActions.getLanguages();
     }
+
+    // getCurrentCourse() {
+    //     if (this.props.editMode === EDIT_MODE_INSERT) {
+    //         return null
+    //     } else {
+    //         return this.props.courses.find((elem) => {
+    //             return elem.id === this.props.selected
+    //         })
+    //     }
+    // }
 
     saveCourse(values) {
         this.props.coursesActions.saveCourse(values, this.props.editMode)
@@ -34,21 +51,22 @@ class CourseForm extends React.Component {
 
     render() {
         const {
-            selected,
+            course,
             message,
             errorDlgShown,
         } = this.props;
 
         return (
             <div>
-                <Webix ui={::this.getUI(::this.saveCourse, this.cancelEdit)} data={this.getCurrentCourse()}/>
+                <Webix ui={::this.getUI(::this.saveCourse, this.cancelEdit)} data={course}/>
+
                 <Lessons/>
                 <Webix ui={::this.getButtons()} />
                 {
                     errorDlgShown ?
                         <ErrorDialog
                             message={message}
-                            data={selected}
+                            // data={selected}
                         />
                         :
                         ""
@@ -57,18 +75,26 @@ class CourseForm extends React.Component {
         )
     }
 
+    getLanguagesArray(){
+        return this.props.languages.map((elem) => {
+            return {id: elem.id, value: elem.Name};
+        })
+    }
+
     getUI() {
-        // let _options = this.getCategoriesArray();
+        let _options = this.getLanguagesArray();
 
         return {
-            view: "form", width : 0, elements: [
+            view: "form", width: 0, elements: [
+                {template: "#Cover#", data: {title: "Image One", src: "#Cover#"}},
                 {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
                 {view: "colorpicker", label: "Цвет курса", name: "Color", placeholder: 'Цвет курса',},
-                // {view: "textarea", name: "Description", label: "Описание", placeholder: "Описание", height: 150,},
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
                     options: [{id: 'D', value: 'Черновик'}, {id: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
                 },
+                {view: "combo", name: "LanguageId", label: "Родительская категория", placeholder: "Введите категорию",
+                    options : _options},
 
                 {
                     view: "richtext",
@@ -109,21 +135,25 @@ class CourseForm extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        courses: state.courses.courses,
-        editMode: state.courses.editMode,
+        course: state.singleCourse.course,
+        editMode: state.singleCourse.editMode,
+        languages: state.languages.languages,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
         errorDlgShown: state.commonDlg.errorDlgShown,
 
-        selected: Number(ownProps.match.params.id),
+        courseId: Number(ownProps.match.params.id),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        coursesActions: bindActionCreators(coursesActions, dispatch),
+        courseActions: bindActionCreators(singleCourseActions, dispatch),
+        authorsActions: bindActionCreators(authorsActions, dispatch),
+        categoriesActions: bindActionCreators(categoriesActions, dispatch),
+        languagesActions: bindActionCreators(languagesActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CourseForm);
+export default connect(mapStateToProps, mapDispatchToProps)(CourseEditor);

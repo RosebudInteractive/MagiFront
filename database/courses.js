@@ -9,17 +9,8 @@ const _rows = [
         LanguageName: 'Русский',
         URL: 'http:///i_do_not_know.com',
         Description: 'Описание курса 1 https://docs.webix.com',
-        Authors: [
-            {
-                id: 1,
-                Name: 'Петров В.П.'
-            },
-            {
-                id: 2,
-                Name: 'Иванов Ф.Ф.'
-            }
-
-        ],
+        Authors: [1, 2],
+        Categories : [1, 2],
         Lessons: [
             {
                 Id: 1,
