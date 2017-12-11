@@ -118,7 +118,7 @@ class Coureses extends React.Component {
             columns: [
                 // {id: 'Cover', header: 'Обложка', width:150, template : "<img src='#Cover#'/>"},
                 {id: 'Name', header: 'Название', width: 200},
-                {id: 'Color', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #Color#; border-radius: 4px; '>#Color#</span>"}, //cssFormat: getColorStyle},
+                {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"}, //cssFormat: getColorStyle},
                 {id: 'URL', header: 'Ярлык URL', width : 150, template:"<a href='#URL#'>#URL#</a>"},
                 {id: 'State', header: 'Состояние', width: 150},
                 {id: 'LanguageName', header : 'Язык курса', width: 200},

@@ -2,6 +2,12 @@ import {
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
     GET_SINGLE_COURSE_FAIL,
+    SHOW_ADD_AUTHOR_DIALOG,
+    ADD_AUTHOR,
+    REMOVE_AUTHOR,
+    HIDE_ADD_AUTHOR_DIALOG,
+    ADD_CATEGORY,
+    REMOVE_CATEGORY,
 } from '../constants/SingleCourse'
 
 import {
@@ -25,7 +31,7 @@ export const getCourse = (id)=> {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                data.forEach((course) => handleCourse(course));
+                handleCourse(data);
 
                 dispatch({
                     type: GET_SINGLE_COURSE_SUCCESS,
@@ -47,13 +53,67 @@ export const getCourse = (id)=> {
     }
 };
 
+export const showAddAuthorDialog = () => {
+    return (dispatch) => {
+        dispatch({
+            type: SHOW_ADD_AUTHOR_DIALOG,
+            payload: null
+        });
+    }
+};
+
 export const addAuthor = (id) => {
-
+    return (dispatch) => {
+        dispatch({
+            type: ADD_AUTHOR,
+            payload: id
+        });
+    }
 };
 
-export const addLesson = (id) => {
-
+export const removeAuthor = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: REMOVE_AUTHOR,
+            payload: id
+        });
+    }
 };
+
+export const hideAddAuthorDialog = () => {
+    return (dispatch) => {
+        dispatch({
+            type: HIDE_ADD_AUTHOR_DIALOG,
+            payload: null
+        });
+    }
+};
+
+export const addCategory = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: ADD_CATEGORY,
+            payload: id
+        });
+    }
+};
+
+export const removeCategory = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: REMOVE_CATEGORY,
+            payload: id
+        });
+    }
+};
+
+
+
+
+//
+// export const addLesson = (id) => {
+//
+// };
 
 // export const showEditDialog = (mode) => {
 //     return {
@@ -155,6 +215,7 @@ const parseJSON = (response) => {
 
 const handleCourse = (course) => {
     course.id = course.Id;
+    course.ColorHex = course.Color.toString(16);
     // course.stateName =
     return course;
 };

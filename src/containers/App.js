@@ -41,6 +41,7 @@ class App extends Component {
                             <Route path='/categories/new' component={CategoriesForm}/>
                             <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
+                            <Route path='/courses/new' component={CourseEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>
                             <Route path='/courses' component={Courses}/>
                         </Switch>
