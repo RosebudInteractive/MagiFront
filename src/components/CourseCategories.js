@@ -31,7 +31,7 @@ class CourseCategories extends Component {
             view: "datatable",
             scroll: false,
             autoheight: true,
-            width: 600,
+            width: 700,
             select: true,
             editable: false,
             columns: [

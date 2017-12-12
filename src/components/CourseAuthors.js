@@ -32,7 +32,7 @@ class CourseAuthors extends Component {
             scroll: false,
             autoheight: true,
             select: true,
-            width: 600,
+            width: 700,
             editable: false,
             columns: [
                 {id: 'FirstName', header: 'Имя', width: 100,}, //fillspace: true},
