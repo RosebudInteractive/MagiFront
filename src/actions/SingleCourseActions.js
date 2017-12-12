@@ -14,6 +14,9 @@ import {
     CHANGE_DATA,
     CANCEL_CHANGE_DATA,
     REMOVE_LESSON,
+    MOVE_LESSON_UP,
+    MOVE_LESSON_DOWN,
+
 } from '../constants/SingleCourse'
 
 import {
@@ -165,7 +168,25 @@ export const removeLesson = (id) => {
             payload: id
         });
     }
-}
+};
+
+export const moveLessonUp = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_LESSON_UP,
+            payload: id
+        });
+    }
+};
+
+export const moveLessonDown = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_LESSON_DOWN,
+            payload: id
+        });
+    }
+};
 
 //
 // export const addLesson = (id) => {

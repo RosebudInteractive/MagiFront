@@ -14,6 +14,14 @@ class CourseLessons extends Component {
         this.props.courseActions.removeLesson(id)
     }
 
+    moveUp(){
+
+    }
+
+    moveDown() {
+        
+    }
+
     render () {
         const {data} = this.props;
         return <div>
@@ -22,6 +30,8 @@ class CourseLessons extends Component {
                 <button className="btn yes" onClick={::this.addClicked}>Создать...</button>{' '}
                 <button className="btn yes" onClick={::this.addClicked}>Добавить...</button>{' '}
                 <button className="btn yes" onClick={::this.addClicked}>Исправить...</button>{' '}
+                <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
+                <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
             </div>
             <Webix ui={::this.getUI()} data={data}/>
         </div>

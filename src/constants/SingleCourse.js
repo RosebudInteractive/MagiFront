@@ -15,3 +15,5 @@ export const CHANGE_DATA = 'CHANGE_DATA';
 export const CANCEL_CHANGE_DATA = 'CANCEL_CHANGE_DATA';
 export const ADD_LESSON = 'ADD_LESSON';
 export const REMOVE_LESSON = 'REMOVE_LESSON';
+export const MOVE_LESSON_UP = 'MOVE_LESSON_UP';
+export const MOVE_LESSON_DOWN = 'MOVE_LESSON_DOWN';
