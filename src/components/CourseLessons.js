@@ -40,7 +40,9 @@ class CourseLessons extends Component {
     }
 
     editLesson() {
-        this.props.history.push('/lessons/new');
+        if (this.selectedLesson) {
+            this.props.editLessonAction(this.selectedLesson);
+        }
     }
 
     _hasSelected() {
@@ -113,11 +115,24 @@ class CourseLessons extends Component {
 
 CourseLessons.propTypes = {
     // message: PropTypes.string.isRequired,
-    // addAuthorAction: PropTypes.func.isRequired,
+    editLessonAction: PropTypes.func.isRequired,
     // noAction: PropTypes.func.isRequired,
     data: PropTypes.any
 };
 
+
+function mapStateToProps(state, ownProps) {
+    return {
+        languages: state.languages.languages,
+
+        hasError: state.commonDlg.hasError,
+        message: state.commonDlg.message,
+        errorDlgShown: state.commonDlg.errorDlgShown,
+
+        // fetching: state.authors.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
+        ownProps,
+    }
+}
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -125,4 +140,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 //
-export default connect(null, mapDispatchToProps)(CourseLessons);
+export default connect(mapStateToProps, mapDispatchToProps)(CourseLessons);

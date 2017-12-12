@@ -2,7 +2,7 @@ import React  from 'react'
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
-import * as singleLessionActions from "../actions/SingleLessonActions";
+import * as singleLessonActions from "../actions/SingleLessonActions";
 import * as coursesActions from '../actions/CoursesActions';
 import * as authorsActions from "../actions/AuthorActions";
 import * as categoriesActions from "../actions/CategoriesActions";
@@ -15,7 +15,7 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-import LessonEpisodes from '../components/LessonEpisodes';
+// import LessonEpisodes from '../components/LessonEpisodes';
 import LookupDialog from '../components/LookupDialog';
 
 class LessonEditor extends React.Component {
@@ -23,20 +23,20 @@ class LessonEditor extends React.Component {
     constructor(props) {
         super(props);
         const {
-            courseActions,
-            authorsActions,
-            categoriesActions,
-            languagesActions,
-            courseId,
+            singleLessonActions,
+            // authorsActions,
+            // categoriesActions,
+            // languagesActions,
+            lessonId,
         } = this.props;
 
 
-        if (courseId > 0) {
+        if (lessonId > 0) {
             this.editMode = EDIT_MODE_EDIT;
-            courseActions.getCourse(courseId);
+            singleLessonActions.getLesson(lessonId);
         } else {
             this.editMode = EDIT_MODE_INSERT;
-            courseActions.createNewCoures();
+            // singleLessonActions.createNewCoures();
         }
         authorsActions.getAuthors();
         categoriesActions.getCategories();
@@ -178,7 +178,7 @@ class LessonEditor extends React.Component {
             showAddAuthorDialog,
             showAddCategoryDialog,
             fetching,
-            courseLessons
+            // courseLessons
         } = this.props;
 
         return (
@@ -187,11 +187,11 @@ class LessonEditor extends React.Component {
                 :
                 <div>
                     <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
-                    <CourseAuthors addAuthorAction={::this.showAddAuthorLookup}
-                                   data={::this.getCourseAuthors()}/>
-                    <CourseCategories addCategoryAction={::this.showAddCategoryLookup}
-                                      data={::this.getCourseCategories()}/>
-                    <CourseLessons data={courseLessons}/>
+                    {/*<CourseAuthors addAuthorAction={::this.showAddAuthorLookup}*/}
+                                   {/*data={::this.getCourseAuthors()}/>*/}
+                    {/*<CourseCategories addCategoryAction={::this.showAddCategoryLookup}*/}
+                                      {/*data={::this.getCourseCategories()}/>*/}
+                    {/*<CourseLessons data={courseLessons}/>*/}
                     {/*<Webix ui={::this.getButtons()}/>*/}
                     {
                         errorDlgShown ?
@@ -327,28 +327,28 @@ function mapStateToProps(state, ownProps) {
     return {
         authors: state.authors.authors,
         categories: state.categories.categories,
-        course: state.singleCourse.course,
-        courseAuthors: state.singleCourse.authors,
-        courseCategories: state.singleCourse.categories,
-        courseLessons: state.singleCourse.lessons,
-        editMode: state.courses.editMode,
-        languages: state.languages.languages,
-        showAddAuthorDialog: state.singleCourse.showAddAuthorDialog,
-        showAddCategoryDialog: state.singleCourse.showAddCategoryDialog,
-        hasChanges : state.singleCourse.hasChanges,
+        // course: state.singleCourse.course,
+        // courseAuthors: state.singleCourse.authors,
+        // courseCategories: state.singleCourse.categories,
+        // courseLessons: state.singleCourse.lessons,
+        // editMode: state.courses.editMode,
+        // languages: state.languages.languages,
+        // showAddAuthorDialog: state.singleCourse.showAddAuthorDialog,
+        // showAddCategoryDialog: state.singleCourse.showAddCategoryDialog,
+        // hasChanges : state.singleCourse.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
         errorDlgShown: state.commonDlg.errorDlgShown,
 
-        courseId: Number(ownProps.match.params.id),
+        lessonId: Number(ownProps.match.params.id),
         fetching: state.authors.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        courseActions: bindActionCreators(singleCourseActions, dispatch),
+        singleLessonActions: bindActionCreators(singleLessonActions, dispatch),
         authorsActions: bindActionCreators(authorsActions, dispatch),
         categoriesActions: bindActionCreators(categoriesActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
@@ -356,4 +356,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CourseEditor);
+export default connect(mapStateToProps, mapDispatchToProps)(LessonEditor);

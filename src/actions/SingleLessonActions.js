@@ -30,7 +30,7 @@ export const getLesson = (id)=> {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleCourse(data);
+                handleLesson(data);
 
                 dispatch({
                     type: GET_SINGLE_LESSON_SUCCESS,
@@ -95,7 +95,7 @@ const parseJSON = (response) => {
 };
 
 const handleLesson = (lesson) => {
-    // course.id = course.Id;
+    lesson.id = lesson.Id;
     // course.ColorHex = course.Color.toString(16);
     //
     // course.Lessons.forEach((lesson) => {

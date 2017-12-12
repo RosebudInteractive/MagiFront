@@ -172,6 +172,10 @@ class CourseEditor extends React.Component {
         return this.props.hasChanges;
     }
 
+    _editLesson(id) {
+        this.props.history.push('/lessons/edit/' + id);
+    }
+
     render() {
         const {
             course,
@@ -193,7 +197,8 @@ class CourseEditor extends React.Component {
                                    data={::this.getCourseAuthors()}/>
                     <CourseCategories addCategoryAction={::this.showAddCategoryLookup}
                                       data={::this.getCourseCategories()}/>
-                    <CourseLessons data={courseLessons}/>
+                    <CourseLessons data={courseLessons}
+                                   editLessonAction={::this._editLesson}/>
                     {/*<Webix ui={::this.getButtons()}/>*/}
                     {
                         errorDlgShown ?
