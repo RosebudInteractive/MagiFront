@@ -120,7 +120,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Number", { type: "int", allowNull: false })
             .addField("Description", { type: "string", length: 200, allowNull: false })
             .addField("URL", { type: "string", length: 200, allowNull: true })
-            .addField("Recommended", { type: "boolean", allowNull: true })
+            .addField("Recommended", { type: "boolean", allowNull: false })
             .addField("AuthorComment", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("Episode", "0299e4f3-280d-4622-82ca-8090966fcef6", "RootEpisode", "82466573-53fb-44e5-aec8-dc339d1a2fd8")

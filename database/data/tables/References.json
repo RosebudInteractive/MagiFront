@@ -16,6 +16,7 @@
                     "Id": 1,
                     "LessonLngId": 1,
                     "Number": 1,
+                    "Recommended": false,
                     "Description": "Арья Шура. Гирлянда джатак, или сказания о подвигах Бодхисаттвы, М., ИВ РАН, 2000"
                 }, 
                 "collections": { }
@@ -27,7 +28,8 @@
                 "fields": {
                     "Id": 2,
                     "LessonLngId": 1,
-                    "Number": 1,
+                    "Number": 2,
+                    "Recommended": false,
                     "Description": "Васубандху. Абхидхармакоша. М., Ладомир, 2001"
                 },
                 "collections": {}
@@ -39,7 +41,8 @@
                 "fields": {
                     "Id": 3,
                     "LessonLngId": 1,
-                    "Number": 1,
+                    "Number": 3,
+                    "Recommended": false,
                     "Description": "Дхаммапада. Пер. с пали В.Н.Топорова Самара, ИД Агни, 1998"
                 },
                 "collections": {}
@@ -52,6 +55,7 @@
                     "Id": 4,
                     "LessonLngId": 1,
                     "Number": 1,
+                    "Recommended": true,
                     "Description": "Вопросы Милинды, М., Наука, 1989 (пер. Парибка А.В.)"
                 },
                 "collections": {}
@@ -63,7 +67,8 @@
                 "fields": {
                     "Id": 5,
                     "LessonLngId": 1,
-                    "Number": 1,
+                    "Number": 2,
+                    "Recommended": true,
                     "URL": "https://www.accesstoinsight.org/",
                     "Description": "Палийский канон (большинство сутт) на английском языке."
                 },
