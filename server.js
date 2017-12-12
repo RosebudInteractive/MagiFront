@@ -36,6 +36,7 @@ bld.initDatabase()
             console.log(e)
         }
 
+        app.use('/assets', express.static('assets'))
 
         var {setupAPI} = require("./services/setup");
         setupAPI(express, app);
