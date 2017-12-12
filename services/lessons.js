@@ -1,9 +1,9 @@
-//let { LessonsService } = require('./../database/lessons');
-let { LessonsService } = require('./../database/db-lesson');
+let { LessonsService } = require('./../database/lessons');
+// let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
-    // app.get('/api/courses', (req, res, next) => {
-    //     CoursesService()
+    // app.get('/api/lessons', (req, res, next) => {
+    //     LessonsService()
     //         .getAll()
     //         .then(rows => {
     //             res.send(rows);
