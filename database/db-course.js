@@ -91,7 +91,10 @@ const COURSE_MSSQL_ID_REQ = COURSE_MSSQL_ALL_REQ + "\nwhere c.[Id] = <%= id %>";
 const COURSE_MYSQL_ID_REQ = COURSE_MYSQL_ALL_REQ + "\nwhere c.`Id` = <%= id %>";
 
 const COURSE_MSSQL_AUTHOR_REQ =
-    "select [AuthorId] as [Id] from [AuthorToCourse] where [CourseId] = <%= id %>";
+    "select a.[Id], l.[FirstName], l.[LastName] from [AuthorToCourse] ac\n" +
+    "  join [Author] a on a.[Id] = ac.[AuthorId]\n" +
+    "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and l.[LanguageId] = <%= languageId %>\n" +
+    "where ac.[CourseId] = <%= id %>";
 const COURSE_MSSQL_CATEGORY_REQ =
     "select [CategoryId] as [Id] from [CourseCategory] where [CourseId] = <%= id %>";
 const COURSE_MSSQL_LESSON_REQ =
@@ -103,7 +106,10 @@ const COURSE_MSSQL_LESSON_REQ =
     "order by lc.[Number]";
 
 const COURSE_MYSQL_AUTHOR_REQ =
-    "select `AuthorId` as `Id` from `AuthorToCourse` where `CourseId` = <%= id %>";
+    "select a.`Id`, l.`FirstName`, l.`LastName` from `AuthorToCourse` ac\n" +
+    "  join `Author` a on a.`Id` = ac.`AuthorId`\n" +
+    "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and l.`LanguageId` = <%= languageId %>\n" +
+    "where ac.`CourseId` = <%= id %>";
 const COURSE_MYSQL_CATEGORY_REQ =
     "select `CategoryId` as `Id` from `CourseCategory` where `CourseId` = <%= id %>";
 const COURSE_MYSQL_LESSON_REQ =
@@ -141,6 +147,26 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
+    getAuthors(id) {
+        let course = {};
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ languageId:LANGUAGE_ID, id: id }),
+                        mssql: _.template(COURSE_MSSQL_AUTHOR_REQ)({ languageId: LANGUAGE_ID, id: id })
+                    }
+                }, {})
+                .then((result) => {
+                    let authors = [];
+                    if (result && result.detail && (result.detail.length > 0))
+                        authors = result.detail;
+                    return authors;
+                })
+            );    
+        })
+    }
+
     get(id) {
         let course = {};
         return new Promise((resolve, reject) => {
@@ -156,8 +182,8 @@ const DbCourse = class DbCourse extends DbObject {
                             course = result.detail[0];
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ id: id }),
-                                mssql: _.template(COURSE_MSSQL_AUTHOR_REQ)({ id: id })
+                                mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                mssql: _.template(COURSE_MSSQL_AUTHOR_REQ)({ languageId: LANGUAGE_ID, id: id })
                             }
                         }, {});
                     })
@@ -462,7 +488,6 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                         else
                             result = result.then(() => { return res;})    
-                            
                         return result;
                     })
             );

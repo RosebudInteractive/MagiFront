@@ -381,6 +381,12 @@ exports.DbEngineInit = class DbEngineInit {
                     console.log("get: " + JSON.stringify(result));
                 })
                 .then(() => {
+                    return crs.getAuthors(upd_id);
+                })
+                .then((result) => {
+                    console.log("getAuthors: " + JSON.stringify(result));
+                })
+                .then(() => {
                     return crs.insert({
                         "Color": 13413051,
                         "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/new-1.jpg",
