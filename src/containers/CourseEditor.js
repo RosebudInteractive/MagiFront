@@ -14,7 +14,7 @@ import {
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT
 } from '../constants/Common';
-import Lessons from './Lessons';
+import CourseLessons from '../components/CourseLessons';
 import CourseAuthors from '../components/CourseAuthors';
 import CourseCategories from '../components/CourseCategories';
 import LookupDialog from '../components/LookupDialog';
@@ -77,8 +77,11 @@ class CourseEditor extends React.Component {
         })
     }
 
-    cancelEdit() {
-        // this.props.coursesActions.hideEditDialog();
+    changeData(data) {
+        this.props.courseActions.changeData(data)
+    }
+    cancelChanges() {
+        this.props.courseActions.cancelCanges();
     }
 
     // selectLesson(id) {
@@ -164,6 +167,10 @@ class CourseEditor extends React.Component {
         })
     }
 
+    _getHasChanges() {
+        return this.props.hasChanges;
+    }
+
     render() {
         const {
             course,
@@ -172,20 +179,20 @@ class CourseEditor extends React.Component {
             showAddAuthorDialog,
             showAddCategoryDialog,
             fetching,
+            courseLessons
         } = this.props;
-
 
         return (
             fetching ?
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Webix ui={::this.getUI(::this.saveCourse)} data={course}/>
+                    <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
                     <CourseAuthors addAuthorAction={::this.showAddAuthorLookup}
                                    data={::this.getCourseAuthors()}/>
                     <CourseCategories addCategoryAction={::this.showAddCategoryLookup}
                                       data={::this.getCourseCategories()}/>
-                    <Lessons/>
+                    <CourseLessons data={courseLessons}/>
                     {/*<Webix ui={::this.getButtons()}/>*/}
                     {
                         errorDlgShown ?
@@ -228,14 +235,12 @@ class CourseEditor extends React.Component {
         })
     }
 
-    getUI(saveAction) {
+    getUI(saveAction, cancel, changeData, hasChanges) {
         return {
             view: "form",
             width: 600,
             id: 'mainData',
             elements: [
-                {template: "<img src='#Cover#'/>"},
-                // {template: "#Cover#", data: {title: "Image One", src: "#Cover#"}},
                 {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
 
                 {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL"},
@@ -248,7 +253,6 @@ class CourseEditor extends React.Component {
                     view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
                     options: this.getLanguagesArray()
                 },
-
                 {
                     view: "richtext",
                     id: "Description",
@@ -263,22 +267,37 @@ class CourseEditor extends React.Component {
                         {},
                         {},
                         {
-                            view: "button", value: "ОК",
+                            view: "button", name: 'btnOk', value: "ОК",
                             click: function() {
                                 if (saveAction)
                                     saveAction(this.getFormView().getValues());
                             }
                         },
                         {
-                            view: "button", value: "Отмена", click: function () {
-                            // if (cancel)
-                            //     cancel();
-                        }
+                            view: "button", name: 'btnCancel', value: "Отмена",
+                            click: function () {
+                                 if (cancel)
+                                     cancel();
+                            }
                         }
                     ]
                 }
             ],
-        }
+            on: {
+                onChange: function () {
+                    changeData(::this.getValues());
+                },
+                onValues: function() {
+                    if (hasChanges()) {
+                        this.elements.btnOk.enable();
+                        this.elements.btnCancel.enable()
+                    } else {
+                        this.elements.btnOk.disable();
+                        this.elements.btnCancel.disable()
+                    }
+                },
+            }
+        };
     }
 
     getButtons() {
@@ -317,6 +336,7 @@ function mapStateToProps(state, ownProps) {
         languages: state.languages.languages,
         showAddAuthorDialog: state.singleCourse.showAddAuthorDialog,
         showAddCategoryDialog: state.singleCourse.showAddCategoryDialog,
+        hasChanges : state.singleCourse.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,

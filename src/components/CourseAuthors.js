@@ -35,16 +35,18 @@ class CourseAuthors extends Component {
             width: 600,
             editable: false,
             columns: [
-                {id: 'FirstName', header: 'Имя', width : 100, }, //fillspace: true},
-                {id: 'LastName', header: 'Фамилия', fillspace: true, },
-                { 	id:"",
-                    template:"<input class='delbtn' type='button' value='Delete'>",
+                {id: 'FirstName', header: 'Имя', width: 100,}, //fillspace: true},
+                {id: 'LastName', header: 'Фамилия', fillspace: true,},
+                {
+                    id: "",
+                    template: "<input class='delbtn' type='button' value='Delete'>",
                     // css:"padding_less",
-                    width:100 },
+                    width: 80
+                },
             ],
 
-            onClick:{
-                delbtn:(e, id) => {
+            onClick: {
+                delbtn: (e, id) => {
                     //will be called on button click
                     this.removeAuthorFormCourse(id.row);
                 }

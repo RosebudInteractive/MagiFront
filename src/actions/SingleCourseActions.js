@@ -11,6 +11,12 @@ import {
     ADD_CATEGORY,
     REMOVE_CATEGORY,
     HIDE_ADD_CATEGORY_DIALOG,
+    CHANGE_DATA,
+    CANCEL_CHANGE_DATA,
+    REMOVE_LESSON,
+    MOVE_LESSON_UP,
+    MOVE_LESSON_DOWN,
+
 } from '../constants/SingleCourse'
 
 import {
@@ -137,7 +143,50 @@ export const hideAddCategoryDialog = () => {
     }
 };
 
+export const changeData = (object) => {
+    return (dispatch) => {
+        dispatch({
+            type: CHANGE_DATA,
+            payload: object
+        });
+    }
+};
 
+export const cancelCanges = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CANCEL_CHANGE_DATA,
+            payload: null
+        });
+    }
+};
+
+export const removeLesson = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: REMOVE_LESSON,
+            payload: id
+        });
+    }
+};
+
+export const moveLessonUp = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_LESSON_UP,
+            payload: id
+        });
+    }
+};
+
+export const moveLessonDown = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_LESSON_DOWN,
+            payload: id
+        });
+    }
+};
 
 //
 // export const addLesson = (id) => {
@@ -245,6 +294,9 @@ const parseJSON = (response) => {
 const handleCourse = (course) => {
     course.id = course.Id;
     course.ColorHex = course.Color.toString(16);
-    // course.stateName =
+
+    course.Lessons.forEach((lesson) => {
+        lesson.id = lesson.Id
+    });
     return course;
 };
