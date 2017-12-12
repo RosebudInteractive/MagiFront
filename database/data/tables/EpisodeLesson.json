@@ -1,0 +1,78 @@
+{
+    "$sys": {
+        "typeGuid": "83abc96a-5184-4ed2-a9f2-ccd64733a22e"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "LessonId": 1,
+                    "EpisodeId": 1,
+                    "Number": 1,
+                    "Supp": false
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
+                },
+                "fields": {
+                    "Id": 1,
+                    "LessonId": 1,
+                    "EpisodeId": 2,
+                    "Number": 1,
+                    "Supp": true
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
+                },
+                "fields": {
+                    "Id": 1,
+                    "LessonId": 1,
+                    "EpisodeId": 3,
+                    "Number": 1,
+                    "Supp": false
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
+                },
+                "fields": {
+                    "Id": 1,
+                    "LessonId": 1,
+                    "EpisodeId": 4,
+                    "Number": 1,
+                    "Supp": true
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
+                },
+                "fields": {
+                    "Id": 1,
+                    "LessonId": 1,
+                    "EpisodeId": 5,
+                    "Number": 1,
+                    "Supp": false
+                },
+                "collections": {}
+            }
+        ]
+    }
+}
