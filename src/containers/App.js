@@ -13,6 +13,7 @@ import Categories from './Categories';
 import CategoriesForm from './CategoryForm';
 import Courses from './Courses';
 import CourseEditor from './CourseEditor';
+import LessonEditor from './LessonEditor';
 
 class App extends Component {
     render() {
@@ -44,6 +45,7 @@ class App extends Component {
                             <Route path='/courses/new' component={CourseEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>
                             <Route path='/courses' component={Courses}/>
+                            <Route path='/lessons/edit/:id' component={LessonEditor}/>
                         </Switch>
                     </div>
                 </div>

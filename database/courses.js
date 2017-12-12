@@ -106,6 +106,24 @@ const _rows = [
     },
 ];
 
+const _authors = [
+    {
+        Id : 1,
+        FirstName : 'Петр',
+        LastName : 'Петров',
+    },
+    {
+        Id : 2,
+        FirstName : 'Сергей',
+        LastName : 'Сергеев',
+    },
+    {
+        Id : 3,
+        FirstName : 'Платон',
+        LastName : 'Кузнецов',
+    },
+];
+
 const CoursesService = class CoursesService {
 
     getAll() {
@@ -118,6 +136,12 @@ const CoursesService = class CoursesService {
         return new Promise((resolve) => {
             resolve(_rows[id-1])
         });
+    }
+
+    getAuthors(courseId) {
+        return new Promise((resolve) => {
+            resolve(_authors)
+        })
     }
 
     del(id) {

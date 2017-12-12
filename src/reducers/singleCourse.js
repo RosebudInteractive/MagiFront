@@ -232,7 +232,9 @@ export default function singleCourse(state = initialState, action) {
             let _modified = false;
 
             let _lessonId = action.payload;
-            let _index = state.lessons.findIndex((lesson) => {return lesson.id === _lessonId});
+            let _index = state.lessons.findIndex((lesson) => {
+                return lesson.id === _lessonId
+            });
             if (_index < state.lessons.length - 1) {
                 let _deleted = state.lessons.splice(_index, 1);
                 state.lessons.splice(_index + 1, 0, _deleted[0]);
@@ -241,7 +243,7 @@ export default function singleCourse(state = initialState, action) {
 
             if (_modified) {
                 state.lessons.forEach((lesson, index) => {
-                    lesson.Number = index +1
+                    lesson.Number = index + 1
                 })
             }
 

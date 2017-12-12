@@ -24,6 +24,17 @@ function setupCourses(app) {
             });
     });
 
+    app.get('/api/courses/:id/authors', (req, res, next) => {
+        CoursesService()
+            .getAuthors(req.params.id)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.post('/api/courses', (req, res, next) => {
         CoursesService()
             .insert(req.body)
