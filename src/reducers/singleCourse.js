@@ -14,6 +14,8 @@ import {
     CHANGE_DATA,
     CANCEL_CHANGE_DATA,
     REMOVE_LESSON,
+    // MOVE_LESSON_UP,
+    // MOVE_LESSON_DOWN,
 
 } from '../constants/SingleCourse'
 
@@ -202,33 +204,25 @@ export default function singleCourse(state = initialState, action) {
             return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
         }
 
+        // case MOVE_LESSON_UP: {
+        //     let _lessons = [];
+        //     let _modified = false;
         //
-        // case SHOW_EDIT_COURSE_DLG: {
-        //     return {...state, editDlgShown: true, editMode: action.payload}
-        // }
-        //
-        // case HIDE_EDIT_COURSE_DLG: {
-        //     let _data = [];
-        //     let _replaced = false;
-        //     state.courses.forEach((course) => {
-        //         if (course.id !== action.payload.id) {
-        //             _data.push({...course})
-        //         } else {
-        //             _data.push(action.payload);
-        //             _replaced = true;
-        //         }
-        //     });
-        //
-        //     if (!_replaced) {
-        //         _data.push(action.payload)
+        //     let _lessonId = action.payload;
+        //     let _index = state.lessons.findIndex((lesson) => {return lesson.id === _lessonId});
+        //     if (_index > 0) {
+        //         let _lessons = state.lessons.splice(_index, 1);
+        //         state.lessons.splice(_index + 1, 0, _lessons);
+        //         _modified = true;
         //     }
         //
-        //     return {
-        //         ...state,
-        //         courses: _data,
-        //         editDlgShown: false,
-        //         selected: _replaced ? state.selected : action.payload.id
-        //     };
+        //     _lessons.push(...state.lessons);
+        //
+        //     return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
+        // }
+        //
+        // case MOVE_LESSON_DOWN: {
+        //
         // }
 
         default:

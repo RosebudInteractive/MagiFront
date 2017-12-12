@@ -6,8 +6,14 @@ import { bindActionCreators } from 'redux';
 import * as courseActions from '../actions/SingleCourseActions';
 
 class CourseLessons extends Component {
+    constructor(props) {
+        super(props);
+
+        this.selectedLesson = null;
+    }
+
     addClicked() {
-        this.props.addAuthorAction();
+        // this.props.addAuthorAction();
     }
 
     removeLessonFormCourse(id) {
@@ -22,6 +28,21 @@ class CourseLessons extends Component {
         
     }
 
+    selectLesson(id) {
+        if (this.selectedLesson !== id) {
+            this.selectedLesson = id;
+            this.render();
+        }
+    }
+
+    editLesson() {
+        this.props.history.push('/lessons/new');
+    }
+
+    _hasSelected() {
+        return this.selectedLesson !== null
+    }
+
     render () {
         const {data} = this.props;
         return <div>
@@ -29,15 +50,20 @@ class CourseLessons extends Component {
             <div className="dlg-btn-bar">
                 <button className="btn yes" onClick={::this.addClicked}>Создать...</button>{' '}
                 <button className="btn yes" onClick={::this.addClicked}>Добавить...</button>{' '}
-                <button className="btn yes" onClick={::this.addClicked}>Исправить...</button>{' '}
+                <button
+                    className={'btn' + (::this._hasSelected() ? " disabled" : "")}
+                    onClick={::this.editLesson}
+                    disabled={::this._hasSelected()}
+                >Исправить...
+                </button>{' '}
                 <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
                 <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
             </div>
-            <Webix ui={::this.getUI()} data={data}/>
+            <Webix ui={::this.getUI(::this.selectLesson)} data={data}/>
         </div>
     }
 
-    getUI() {
+    getUI(select) {
         return {
             view: "datatable",
             scroll: false,
@@ -59,6 +85,12 @@ class CourseLessons extends Component {
                     width: 80
                 },
             ],
+
+            on: {
+                onAfterSelect: function (selObj) {
+                    select(selObj.id);
+                }
+            },
 
             onClick: {
                 delbtn: (e, id) => {
