@@ -239,7 +239,7 @@ class CourseEditor extends React.Component {
     getUI(saveAction, cancel, changeData, hasChanges) {
         return {
             view: "form",
-            width: 600,
+            width: 700,
             id: 'mainData',
             elements: [
                 {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
@@ -303,7 +303,7 @@ class CourseEditor extends React.Component {
 
     getButtons() {
         return {
-            view: "form", width : 600, elements: [{
+            view: "form", width : 700, elements: [{
                 cols: [
                     {},
                     {},

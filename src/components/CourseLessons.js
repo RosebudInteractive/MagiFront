@@ -21,11 +21,15 @@ class CourseLessons extends Component {
     }
 
     moveUp(){
-
+        if (this.selectedLesson) {
+            this.props.courseActions.moveLessonUp(this.selectedLesson)
+        }
     }
 
     moveDown() {
-        
+        if (this.selectedLesson) {
+            this.props.courseActions.moveLessonDown(this.selectedLesson)
+        }
     }
 
     selectLesson(id) {
@@ -69,7 +73,7 @@ class CourseLessons extends Component {
             scroll: false,
             autoheight: true,
             select: true,
-            width: 600,
+            width: 700,
             editable: false,
             columns: [
                 {id: 'Number', header: '#', width: 30},
