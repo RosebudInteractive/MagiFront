@@ -110,7 +110,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
-            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });

@@ -258,6 +258,7 @@ const DbCourse = class DbCourse extends DbObject {
             let ctg_new = [];
             let ls_new = [];
 
+            let needToDeleteOwn = false;
             resolve(
                 this._getObjById(id, COURSE_UPD_TREE)
                     .then((result) => {
@@ -279,7 +280,7 @@ const DbCourse = class DbCourse extends DbObject {
                         ls_collection = root_ls.getCol("DataElements");
                         ls_own_collection = crs_obj.getDataRoot("Lesson").getCol("DataElements");
 
-                        for (let i = 0; i < auth_collection.count(); i++){
+                        for (let i = 0; i < auth_collection.count(); i++) {
                             let obj = auth_collection.get(i);
                             auth_list[obj.authorId()] = { deleted: true, obj: obj };
                         }
@@ -370,9 +371,10 @@ const DbCourse = class DbCourse extends DbObject {
 
                         for (let key in ls_list)
                             if (ls_list[key].deleted) {
-                                ls_collection._del(ls_list[key].obj)
                                 if (ls_list[key].isOwner)
-                                    ls_own_collection._del(ls_list[key].ownObj);
+                                    needToDeleteOwn = true
+                                else
+                                    ls_collection._del(ls_list[key].obj);
                             }
                             else {
                                 ls_list[key].obj.number(ls_list[key].data.Number);
@@ -412,6 +414,20 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(() => {
                         return crs_obj.save(opts);
+                    })
+                    .then(() => {
+                        if (needToDeleteOwn)
+                            return crs_obj.edit();
+                    })
+                    .then(() => {
+                        if (needToDeleteOwn) {
+                            for (let key in ls_list)
+                                if (ls_list[key].deleted) {
+                                    if (ls_list[key].isOwner)
+                                        ls_own_collection._del(ls_list[key].ownObj);
+                                }
+                            return crs_obj.save(opts);
+                        }
                     })
                     .then(() => {
                         console.log("Course updated: Id=" + id + ".");

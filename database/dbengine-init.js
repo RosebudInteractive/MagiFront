@@ -406,6 +406,22 @@ exports.DbEngineInit = class DbEngineInit {
                     console.log("get: " + JSON.stringify(result));
                 })
                 .then(() => {
+                    return crs.update(1, {
+                        "Authors": [1],
+                        "Categories": [10, 8],
+                        "Lessons": [
+                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
+                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" }
+                        ]
+                    });
+                })
+                .then((result) => {
+                    return crs.get(1);
+                })
+                .then((result) => {
+                    console.log("get after update 1: " + JSON.stringify(result));
+                })
+                .then(() => {
                     return crs.update(upd_id, {
                         "Color": 333,
                         "Name": "Новый курс XXXXX",
