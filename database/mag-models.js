@@ -116,15 +116,15 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });
 
         metaDataMgr.addModel("Reference", "b919a12f-5202-43b5-b1fc-481f75623659", "RootReference", "8d5fd37d-e686-4eec-a8e8-b7df91160a92")
-            .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentRestrict", allowNull: false })
+            .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("Description", { type: "string", length: 200, allowNull: false })
             .addField("URL", { type: "string", length: 200, allowNull: true })
             .addField("Recommended", { type: "boolean", allowNull: true })
-            .addField("AuthorComment", { type: "string", allowNull: false });
+            .addField("AuthorComment", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("Episode", "0299e4f3-280d-4622-82ca-8090966fcef6", "RootEpisode", "82466573-53fb-44e5-aec8-dc339d1a2fd8")
-            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
             .addField("EpisodeType", { type: "enum", values: ["L", "T"], allowNull: false });
 
         metaDataMgr.addModel("EpisodeLng", "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77", "RootEpisodeLng", "f24fb64f-1e2f-4412-9380-9646181fdbe6")
@@ -137,12 +137,13 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Structure", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("EpisodeLesson", "94d10a1d-d902-489b-8243-5c2dfea57174", "RootEpisodeLesson", "83abc96a-5184-4ed2-a9f2-ccd64733a22e")
-            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentRestrict", allowNull: false })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: true })
+            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
-            .addField("Supp", { type: "boolean", allowNull: true });
+            .addField("Supp", { type: "boolean", allowNull: false });
 
         metaDataMgr.addModel("EpisodeToc", "3936efa7-f575-4de0-80ae-c92ab90f39ae", "RootEpisodeToc", "55fbcaae-b627-4227-944a-ed166b739c6f")
-            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentRestrict", allowNull: false })
+            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false });
 
         metaDataMgr.addModel("EpisodeTocLng", "fdf9eaf6-38b4-4c08-96b7-11ceee183318", "RootEpisodeTocLng", "3866b984-ed0b-4dfc-8567-de00401d5c95")

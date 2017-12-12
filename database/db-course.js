@@ -39,7 +39,14 @@ const COURSE_UPD_TREE = {
             childs: [
                 {
                     dataObject: {
-                        name: "Lesson"
+                        name: "Lesson",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "EpisodeLesson"
+                                }
+                            }
+                        ]
                     }
                 },
                 {
