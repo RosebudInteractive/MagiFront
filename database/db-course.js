@@ -259,6 +259,8 @@ const DbCourse = class DbCourse extends DbObject {
             let ls_new = [];
 
             let needToDeleteOwn = false;
+            let transactionId = null;
+
             resolve(
                 this._getObjById(id, COURSE_UPD_TREE)
                     .then((result) => {
@@ -413,7 +415,12 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                     })
                     .then(() => {
-                        return crs_obj.save(opts);
+                        return $data.tranStart({})
+                            .then((result) => {
+                                transactionId = result.transactionId;
+                                opts = { transactionId: transactionId };
+                                return crs_obj.save(opts);
+                            });
                     })
                     .then(() => {
                         if (needToDeleteOwn)
@@ -434,14 +441,22 @@ const DbCourse = class DbCourse extends DbObject {
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
+                        let result = transactionId ?
+                            (isErr ? $data.tranRollback(transactionId) : $data.tranCommit(transactionId)) : Promise.resolve();
                         if (crs_obj)
                             this._db._deleteRoot(crs_obj.getRoot());
-                        if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
-                        return res;
+                        if (isErr) {
+                            result = result.then(() => {
+                                if (res instanceof Error)
+                                    throw res
+                                else
+                                    throw new Error("Error: " + JSON.stringify(res));
+                            });
+                        }
+                        else
+                            result = result.then(() => { return res;})    
+                            
+                        return result;
                     })
             );
         })

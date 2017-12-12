@@ -449,47 +449,6 @@ exports.DbEngineInit = class DbEngineInit {
                 .catch((err) => {
                     console.error("ERROR: " + err.message);
                 });
-                ;
-
-            // au.insert({ FirstName: "Alex", LastName: "Pushkin", Portrait: "asdasd.jpg" })
-            //     .then(() => {
-            //         return au.insert({ FirstName: "Mike", LastName: "Lermontov" });
-            //     })
-            //     .then((result) => {
-            //         upd_id = result.id;
-            //         return au.get(result.id);
-            //     })
-            //     .then((result) => {
-            //         console.log("get: " + JSON.stringify(result));
-            //     })
-            //     .then(() => {
-            //         return au.update(upd_id, { FirstName: "=Mike=", LastName: "=Lermontov=", Portrait: "m_lermontov.jpg" });
-            //     })
-            //     .then((result) => {
-            //         return au.get(upd_id);
-            //     })
-            //     .then((result) => {
-            //         console.log("get after update: " + JSON.stringify(result));
-            //     })
-            //     .then(() => {
-            //         return au.getAll();
-            //     })
-            //     .then((result) => {
-            //         console.log("getAll: " + JSON.stringify(result));
-            //     })
-            //     .then(() => {
-            //         return au.insert({ FirstName: "Lev", LastName: "Tolstoy" });
-            //     })
-            //     .then((result) => {
-            //         let id = result.id;
-            //         return au.del(id);
-            //     })
-            //     .then((result) => {
-            //         console.log("Deleted: " + JSON.stringify(result));
-            //     })
-            //     .catch((err) => {
-            //         console.error("ERROR: " + err.message);
-            //     });
         };
     }
 }
