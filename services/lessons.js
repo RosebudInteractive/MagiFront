@@ -13,9 +13,9 @@ function setupLessons(app) {
     //         });
     // });
 
-    app.get('/api/lessons/:id', (req, res, next) => {
+    app.get('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .get(req.params.id)
+            .get(req.params.id, req.params.courseId)
             .then(rows => {
                 res.send(rows);
             })
@@ -24,9 +24,9 @@ function setupLessons(app) {
             });
     });
 
-    app.post('/api/lessons', (req, res, next) => {
+    app.post('/api/lessons/:courseId', (req, res, next) => {
         LessonsService()
-            .insert(req.body)
+            .insert(req.body, req.params.courseId)
             .then(rows => {
                 res.send(rows);
             })
@@ -35,9 +35,9 @@ function setupLessons(app) {
             });
     });
 
-    app.put('/api/lessons/:id', (req, res, next) => {
+    app.put('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .update(req.params.id, req.body)
+            .update(req.params.id, req.params.courseId, req.body)
             .then(rows => {
                 res.send(rows);
             })
@@ -46,9 +46,9 @@ function setupLessons(app) {
             });
     });
 
-    app.delete('/api/lessons/:id', (req, res, next) => {
+    app.delete('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .del(req.params.id)
+            .del(req.params.id, req.params.courseId)
             .then(() => {
                 res.send({});
             })
