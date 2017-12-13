@@ -456,5 +456,129 @@ exports.DbEngineInit = class DbEngineInit {
                     console.error("ERROR: " + err.message);
                 });
         };
+
+        // "LessonsService" tests
+        if (true) {
+            const { LessonsService } = require("./db-lesson");
+            const { CoursesService } = require("./db-course");
+            let crs = CoursesService();
+            let ls = LessonsService();
+
+            let upd_id = 1;
+            let course_id = 1;
+            let new_course_id;
+            let new_lesson_id;
+
+            ls.get(upd_id, course_id)
+                .then((result) => {
+                    console.log("Lesson 1 in Course 1 [get]: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.insert({
+                        "Color": 13413051,
+                        "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/new-1.jpg",
+                        "State": "D",
+                        "LanguageId": 1,
+                        "URL": "https://magisteria.ru/courseNew",
+                        "Name": "Новый курс",
+                        "Description": "Обзорный курс по обзорному курсу.",
+                        "Authors": [3, 1],
+                        "Categories": [3, 10],
+                        "Lessons": [
+                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" },
+                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
+                            { "LessonId": 1, "ReadyDate": "2018-03-30", "State": "D" }
+                        ]
+                    });
+                })
+                .then((result) => {
+                    new_course_id = result.id;
+                    return crs.get(result.id);
+                })
+                .then((result) => {
+                    console.log("NEW COURSE get: " + JSON.stringify(result));
+                })
+                .then((result) => {
+                    return ls.get(upd_id, new_course_id);
+                })
+                .then((result) => {
+                    console.log("Lesson 1 in NEW COURSE [get]: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ls.insert({
+                        AuthorId: 3,
+                        LessonType: "L",
+                        URL: null,
+                        State: "D",
+                        ReadyDate: "2017-12-10",
+                        Name: "New Lesson of New Course",
+                        ShortDescription: "New Lesson of New Course ShortDescription",
+                        Episodes: [
+                            { Id: 1, Number: 1, Supp: false },
+                            { Id: 2, Number: 1, Supp: true }
+                        ],
+                        References: [
+                            { Number: 1, Description: "Book 1", Recommended: false },
+                            { Number: 1, Description: "Recommended Book 1", Recommended: true }
+                        ]
+                    }, new_course_id)
+                        .then((result) => {
+                            new_lesson_id = result.id;
+                            return ls.get(result.id, new_course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("NEW LESSON in NEW COURSE [get]: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ls.update(new_lesson_id, new_course_id, {
+                        AuthorId: 1,
+                        LessonType: "L",
+                        URL: "http://rbc.ru",
+                        State: "R",
+                        ReadyDate: "2018-12-10",
+                        FullDescription: "New Lesson of New Course FullDescription",
+                        Episodes: [
+                            { Id: 3, Number: 1, Supp: false },
+                            { Id: 1, Number: 1, Supp: true },
+                            { Id: 4, Number: 2, Supp: true },
+                            { Id: 2, Number: 2, Supp: false }
+                        ],
+                        References: [
+                            { Id: 6, Number: 1, Description: "Book 11", Recommended: false },
+                            { Number: 1, Description: "Another Recommended Book 1", Recommended: true }
+                        ]
+                    })
+                        .then(() => {
+                            return ls.get(new_lesson_id, new_course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("Update NEW LESSON in NEW COURSE [get]: " + JSON.stringify(result));
+                })
+                .then((result) => {
+                    // Delete Lesson 1 from NEW COURSE
+                    return ls.del(upd_id, new_course_id)
+                        .then(() => {
+                            return ls.get(upd_id, new_course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("Lesson 1 in NEW COURSE [get]: " + JSON.stringify(result));
+                })
+                .then((result) => {
+                    // Delete Lesson 1 from Course 1
+                    return ls.del(upd_id, course_id)
+                        .then(() => {
+                            return ls.get(upd_id, course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("Lesson 1 in Course 1 [get]: " + JSON.stringify(result));
+                })
+                .catch((err) => {
+                    console.error("ERROR: " + err.message);
+                });
+        }
     }
 }

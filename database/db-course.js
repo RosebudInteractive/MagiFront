@@ -360,7 +360,7 @@ const DbCourse = class DbCourse extends DbObject {
                             let Number = 1;
                             inpFields.Lessons.forEach((elem) => {
                                 let data = {
-                                    LesonId: elem.LessonId,
+                                    LessonId: elem.LessonId,
                                     Number: Number++,
                                     ReadyDate: elem.ReadyDate ? elem.ReadyDate : null,
                                     State: elem.State
@@ -369,10 +369,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     ls_list[elem.LessonId].deleted = false;
                                     ls_list[elem.LessonId].data = data;
                                 }
-                                else {
+                                else
                                     ls_new.push(data);
-                                    delete ls_list[elem.LessonId];
-                                }
                             })
                         }
 
