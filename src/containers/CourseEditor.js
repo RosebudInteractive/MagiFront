@@ -173,7 +173,7 @@ class CourseEditor extends React.Component {
     }
 
     _editLesson(id) {
-        this.props.history.push('/lessons/edit/' + id);
+        this.props.history.push('/lessons/edit/' + id + '/' + this.props.courseId);
     }
 
     render() {

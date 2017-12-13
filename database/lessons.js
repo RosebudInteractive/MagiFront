@@ -3,12 +3,14 @@ const _rows = [
         Id: 1,
         Name: 'Лекция 1',
         CourseName: 'Курс 1',
-        Author : 1,
+        AuthorId : 1,
         Cover: 'https://magisteria.ru/wp-content/uploads/2016/08/unnamed-2.jpg',
         Number: '1',
         ReadyDate: '01.01.2018',
         State: 'D',
         LessonType: 'L',
+        ShortDescription: 'Краткое описание',
+        FullDescription: 'Полное описание',
         Episodes: [
             {
                 Id: 1,

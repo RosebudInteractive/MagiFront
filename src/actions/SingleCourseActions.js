@@ -16,6 +16,9 @@ import {
     REMOVE_LESSON,
     MOVE_LESSON_UP,
     MOVE_LESSON_DOWN,
+    GET_COURSE_AUTHORS_REQUEST,
+    GET_COURSE_AUTHORS_SUCCESS,
+    GET_COURSE_AUTHORS_FAIL,
 
 } from '../constants/SingleCourse'
 
@@ -188,94 +191,38 @@ export const moveLessonDown = (id) => {
     }
 };
 
-//
-// export const addLesson = (id) => {
-//
-// };
+export const getCourseAuthors = (courseId) => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_COURSE_AUTHORS_REQUEST,
+            payload: courseId
+        });
 
-// export const showEditDialog = (mode) => {
-//     return {
-//         type: SHOW_EDIT_COURSE_DLG,
-//         payload: mode
-//     }
-// };
+        fetch("/api/courses/" + courseId + '/authors')
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                data.forEach((course) => handleAuthor(course));
 
-// export const hideEditDialog = () => {
-//     return {
-//         type: HIDE_EDIT_COURSE_DLG,
-//         payload: null
-//     }
-// };
+                dispatch({
+                    type: GET_COURSE_AUTHORS_SUCCESS,
+                    payload: data
+                })
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_COURSE_AUTHORS_FAIL,
+                    payload: err
+                });
 
-// export const selectCourse = (id) => {
-//     return {
-//         type: SELECT_COURSE,
-//         payload: id
-//     }
-// };
+                dispatch({
+                    type: SHOW_ERROR_DIALOG,
+                    payload: err.message
+                })
+            });
 
-// export const saveCourse = (values, mode) => {
-//
-//     return (dispatch) => {
-//         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-//         let _url = "/api/courses";
-//         if (mode === EDIT_MODE_EDIT) {
-//             _url += "/" + values.id
-//         }
-//         fetch(_url,
-//             {
-//                 method: _type,
-//                 headers: {
-//                     "Content-type": "application/json"
-//                 },
-//                 body: JSON.stringify(values)
-//             })
-//             .then(checkStatus)
-//             .then(parseJSON)
-//             .then((data) => {
-//                 dispatch({
-//                     type: HIDE_EDIT_COURSE_DLG,
-//                     payload: data
-//                 })
-//             })
-//             .catch((err) => {
-//                 dispatch({
-//                     type: SHOW_ERROR_DIALOG,
-//                     payload: err.message
-//                 })
-//             });
-//     }
-// };
-
-// export const deleteCourse = (id) => {
-//     return (dispatch) => {
-//         fetch("/api/courses/" + id,
-//             {
-//                 method: "DELETE"
-//             })
-//             .then(checkStatus)
-//             .then(parseJSON)
-//             .then(() => {
-//                 dispatch({
-//                     type: DELETE_COURSE_SUCCESS,
-//                     payload: id
-//                 })
-//             })
-//             .then(() => {
-//                 dispatch({
-//                     type: HIDE_DELETE_DLG,
-//                     payload: null,
-//                 })
-//             })
-//             .catch((err) => {
-//                 dispatch({
-//                     type: SHOW_ERROR_DIALOG,
-//                     payload: err.message
-//                 })
-//             });
-//
-//     }
-// };
+    }
+};
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {
@@ -299,4 +246,8 @@ const handleCourse = (course) => {
         lesson.id = lesson.Id
     });
     return course;
+};
+
+const handleAuthor = (author) => {
+    author.id = author.Id;
 };

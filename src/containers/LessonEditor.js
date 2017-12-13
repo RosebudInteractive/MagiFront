@@ -3,10 +3,11 @@ import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
 import * as singleLessonActions from "../actions/SingleLessonActions";
-import * as coursesActions from '../actions/CoursesActions';
-import * as authorsActions from "../actions/AuthorActions";
-import * as categoriesActions from "../actions/CategoriesActions";
-import * as languagesActions from "../actions/LanguagesActions";
+import * as singleCourseActions from "../actions/SingleCourseActions";
+// import * as coursesActions from '../actions/CoursesActions';
+// import * as authorsActions from "../actions/AuthorActions";
+// import * as categoriesActions from "../actions/CategoriesActions";
+// import * as languagesActions from "../actions/LanguagesActions";
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -28,6 +29,7 @@ class LessonEditor extends React.Component {
             // categoriesActions,
             // languagesActions,
             lessonId,
+            courseId,
         } = this.props;
 
 
@@ -38,9 +40,9 @@ class LessonEditor extends React.Component {
             this.editMode = EDIT_MODE_INSERT;
             // singleLessonActions.createNewCoures();
         }
-        authorsActions.getAuthors();
-        categoriesActions.getCategories();
-        languagesActions.getLanguages();
+        singleCourseActions.getCourseAuthors(courseId);
+        // categoriesActions.getCategories();
+        // languagesActions.getLanguages();
     }
 
     saveCourse(value) {
@@ -228,9 +230,9 @@ class LessonEditor extends React.Component {
         )
     }
 
-    getLanguagesArray(){
-        return this.props.languages.map((elem) => {
-            return {id: elem.id, value: elem.Language};
+    _getCourseAuthorsArray(){
+        return this.props.authors.map((elem) => {
+            return {id: elem.id, value: elem.FirstName + ' ' + elem.LastName};
         })
     }
 
@@ -240,26 +242,53 @@ class LessonEditor extends React.Component {
             width: 600,
             id: 'mainData',
             elements: [
-                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
-
-                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL"},
-                {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса',},
+                {view: "text", name: "CourseName", label: "Название курса", readonly: true},
+                {view: "text", name: "Number", label: "Номер урока", readonly: true},
                 {
-                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
+                    view: "combo", name: "LessonType", label: "Тип урока", placeholder: "Выберите тип урока",
+                    options: [{id: 'L', value: 'Лекция'}]
+                },
+                {view: "text", name: "Name", label: "Название урока", placeholder: "Введите название урока(лекции)"},
+                {
+                    view: "combo", name: "AuthorId", label: "Автор", placeholder: "Выберите автора",
+                    options: this._getCourseAuthorsArray()
                 },
                 {
-                    view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
-                    options: this.getLanguagesArray()
+                    template: (obj) => {
+                        return '<img src="' + obj.src + '" class="content" ondragstart="return false"/>'
+                    },
+                    data: {src: "imgs/image001.jpg"}
+                },
+                {
+                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
+                },
+                {
+                    view:"datepicker",
+                    // value: new Date(2012, 6, 8),
+                    label: "Планируемая дата публикации",
+                    // timepicker: true,
+                    name: 'ReadyDate',
+                    width: 300
                 },
                 {
                     view: "richtext",
-                    id: "Description",
-                    label: "Описание курса",
-                    labelPosition: "top",
+                    // id: "ShortDescription",
+                    label: "Краткое описание",
+                    // labelPosition: "left",
+                    height: 100,
+                    width: 500,
+                    name: "ShortDescription",
+                },
+                {
+                    view: "richtext",
+                    // id: "ShortDescription",
+                    label: "Полное описание",
+                    // labelPosition: "right",
+                    // labelWidth : 50,
                     height: 150,
                     width: 500,
-                    name: "Description",
+                    name: "FullDescription",
                 },
                 {
                     cols: [
@@ -267,7 +296,7 @@ class LessonEditor extends React.Component {
                         {},
                         {
                             view: "button", name: 'btnOk', value: "ОК",
-                            click: function() {
+                            click: function () {
                                 if (saveAction)
                                     saveAction(this.getFormView().getValues());
                             }
@@ -286,7 +315,7 @@ class LessonEditor extends React.Component {
                 onChange: function () {
                     changeData(::this.getValues());
                 },
-                onValues: function() {
+                onValues: function () {
                     if (hasChanges()) {
                         this.elements.btnOk.enable();
                         this.elements.btnCancel.enable()
@@ -325,8 +354,9 @@ class LessonEditor extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        authors: state.authors.authors,
-        categories: state.categories.categories,
+        authors: state.courseAuthors.authors,
+        lesson: state.singleLesson.lesson,
+        // categories: state.categories.categories,
         // course: state.singleCourse.course,
         // courseAuthors: state.singleCourse.authors,
         // courseCategories: state.singleCourse.categories,
@@ -342,17 +372,18 @@ function mapStateToProps(state, ownProps) {
         errorDlgShown: state.commonDlg.errorDlgShown,
 
         lessonId: Number(ownProps.match.params.id),
-        fetching: state.authors.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
+        courseId: Number(ownProps.match.params.courseId),
+        fetching: state.courseAuthors.fetching || state.singleLesson.fetching, // || state.languages.fetching || state.singleCourse.fetching
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         singleLessonActions: bindActionCreators(singleLessonActions, dispatch),
-        authorsActions: bindActionCreators(authorsActions, dispatch),
-        categoriesActions: bindActionCreators(categoriesActions, dispatch),
-        languagesActions: bindActionCreators(languagesActions, dispatch),
-        coursesActions: bindActionCreators(coursesActions, dispatch),
+        singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
+        // categoriesActions: bindActionCreators(categoriesActions, dispatch),
+        // languagesActions: bindActionCreators(languagesActions, dispatch),
+        // coursesActions: bindActionCreators(coursesActions, dispatch),
     }
 }
 
