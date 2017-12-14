@@ -41,8 +41,12 @@ class CourseLessons extends Component {
 
     editLesson() {
         if (this.selectedLesson) {
-            this.props.editLessonAction(this.selectedLesson);
+            this.props.editAction(this.selectedLesson);
         }
+    }
+
+    _create() {
+        this.props.createAction();
     }
 
     _hasSelected() {
@@ -54,16 +58,11 @@ class CourseLessons extends Component {
         return <div>
             Лекции курса
             <div className="dlg-btn-bar">
-                <button className="btn yes" onClick={::this.addClicked}>Создать...</button>{' '}
-                <button className="btn yes" onClick={::this.addClicked}>Добавить...</button>{' '}
-                <button
-                    className={'btn' + (::this._hasSelected() ? " disabled" : "")}
-                    onClick={::this.editLesson}
-                    disabled={::this._hasSelected()}
-                >Исправить...
-                </button>{' '}
-                <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
-                <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
+                <button className="btn-new" onClick={::this._create}/>{' '}
+                {/*<button className="btn yes" onClick={::this.addClicked}>Добавить...</button>{' '}*/}
+                <button className='btn-edit' onClick={::this.editLesson}/>{' '}
+                <button className="btn-up" onClick={::this.moveUp}/>{' '}
+                <button className="btn-down" onClick={::this.moveDown}/>{' '}
             </div>
             <Webix ui={::this.getUI(::this.selectLesson)} data={data}/>
         </div>
@@ -86,9 +85,9 @@ class CourseLessons extends Component {
                 {id: 'ReadyDate', header: 'Дата готовности', width: 120, format: this.formatDate, },
                 {
                     id: "",
-                    template: "<input class='delbtn' type='button' value='Delete'>",
+                    template: "<input class='delbtn' type='button'>",
                     // css:"padding_less",
-                    width: 80
+                    width: 50
                 },
             ],
 
@@ -115,7 +114,8 @@ class CourseLessons extends Component {
 
 CourseLessons.propTypes = {
     // message: PropTypes.string.isRequired,
-    editLessonAction: PropTypes.func.isRequired,
+    createAction: PropTypes.func.isRequired,
+    editAction: PropTypes.func.isRequired,
     // noAction: PropTypes.func.isRequired,
     data: PropTypes.any
 };

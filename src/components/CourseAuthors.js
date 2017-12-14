@@ -19,7 +19,7 @@ class CourseAuthors extends Component {
         return <div>
             Авторы курса
             <div className="dlg-btn-bar">
-                <button className="btn yes" onClick={::this.addClicked}>Добавить...</button>
+                <button className="btn-add" onClick={::this.addClicked}/>
             </div>
             <Webix ui={::this.getUI()} data={data}/>
 
@@ -39,9 +39,8 @@ class CourseAuthors extends Component {
                 {id: 'LastName', header: 'Фамилия', fillspace: true,},
                 {
                     id: "",
-                    template: "<input class='delbtn' type='button' value='Delete'>",
-                    // css:"padding_less",
-                    width: 80
+                    template: "<input class='delbtn' type='button'>",
+                    width: 50
                 },
             ],
 

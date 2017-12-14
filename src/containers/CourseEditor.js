@@ -81,6 +81,7 @@ class CourseEditor extends React.Component {
     changeData(data) {
         this.props.courseActions.changeData(data)
     }
+
     cancelChanges() {
         this.props.courseActions.cancelCanges();
     }
@@ -116,12 +117,12 @@ class CourseEditor extends React.Component {
     getAuthors() {
         const {
             authors,
-            course
+            courseAuthors
         } = this.props;
 
 
         let _filtered = authors.filter((value) => {
-            return !course.Authors.includes(value.id);
+            return !courseAuthors.includes(value.id);
         });
 
         return _filtered.map((element) => {
@@ -173,7 +174,11 @@ class CourseEditor extends React.Component {
     }
 
     _editLesson(id) {
-        this.props.history.push('/lessons/edit/' + id + '/' + this.props.courseId);
+        this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/edit/' + id);
+    }
+
+    _createLesson() {
+        this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/new/');
     }
 
     render() {
@@ -198,7 +203,10 @@ class CourseEditor extends React.Component {
                     <CourseCategories addCategoryAction={::this.showAddCategoryLookup}
                                       data={::this.getCourseCategories()}/>
                     <CourseLessons data={courseLessons}
-                                   editLessonAction={::this._editLesson}/>
+                                   editAction={::this._editLesson}
+                                   createAction={::this._createLesson}
+
+                    />
                     {/*<Webix ui={::this.getButtons()}/>*/}
                     {
                         errorDlgShown ?

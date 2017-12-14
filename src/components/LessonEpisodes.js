@@ -45,8 +45,6 @@ export default class LessonEpisodes extends Component {
         }
     }
 
-
-
     _hasSelected() {
         return this.select !== null
     }
@@ -56,16 +54,11 @@ export default class LessonEpisodes extends Component {
         return <div>
             {message}
             <div className="dlg-btn-bar">
-                <button className="btn yes" onClick={::this.create}>Создать...</button>{' '}
-                <button className="btn yes" onClick={::this.add}>Добавить...</button>{' '}
-                <button
-                    className={'btn' + (::this._hasSelected() ? " disabled" : "")}
-                    onClick={::this.edit}
-                    disabled={::this._hasSelected()}
-                >Исправить...
-                </button>{' '}
-                <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
-                <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
+                <button className="btn-new" onClick={::this.create}/>{' '}
+                <button className="btn-add" onClick={::this.add}/>{' '}
+                <button className='btn-edit' onClick={::this.edit}/>{' '}
+                <button className="btn-up" onClick={::this.moveUp}/>{' '}
+                <button className="btn-down" onClick={::this.moveDown}/>{' '}
             </div>
             <Webix ui={::this.getUI(::this.select)} data={data}/>
         </div>
@@ -87,8 +80,8 @@ export default class LessonEpisodes extends Component {
                 {id: 'LanguageName', header: 'Язык курса', width: 90},
                 {
                     id: "",
-                    template: "<input class='delbtn' type='button' value='Delete'>",
-                    width: 80
+                    template: "<input class='delbtn' type='button'>",
+                    width: 50
                 },
             ],
 

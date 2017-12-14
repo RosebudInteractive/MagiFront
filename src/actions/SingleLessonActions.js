@@ -70,11 +70,11 @@ export const getLesson = (id, courseId)=> {
     }
 };
 
-export const createNewLesson = () => {
+export const createNewLesson = (obj) => {
     return (dispatch) => {
         dispatch({
             type: CREATE_NEW_LESSON,
-            payload: null
+            payload: obj
         });
     }
 };
@@ -86,6 +86,8 @@ export const saveLesson = (values, mode) => {
         let _url = "/api/lessons";
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id + '/' + values.CourseId
+        } else {
+            _url += "/" + values.CourseId
         }
         fetch(_url,
             {
@@ -293,6 +295,7 @@ const handleLesson = (lesson) => {
     lesson.id = lesson.Id;
     lesson.mainEpisodes = [];
     lesson.suppEpisodes = [];
+
     lesson.Episodes.forEach((episode) => {
         episode.id = episode.Id;
         if (episode.Supp) {
@@ -311,5 +314,21 @@ const handleLesson = (lesson) => {
         } else {
             lesson.commonRef.push(reference)
         }
-    })
+    });
+
+    lesson.mainEpisodes.sort((a, b) => {
+       return a.Number - b.Number
+    });
+
+    lesson.suppEpisodes.sort((a, b) => {
+        return a.Number - b.Number
+    });
+
+    lesson.recommendedRef.sort((a, b) => {
+        return a.Number - b.Number
+    });
+
+    lesson.commonRef.sort((a, b) => {
+        return a.Number - b.Number
+    });
 };

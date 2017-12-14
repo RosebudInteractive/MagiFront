@@ -1,3 +1,116 @@
+/*https://www.iconfinder.com/iconsets/evil-icons-user-interface*/
+.delbtn {
+  background: url(./../icons/basket.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 25px;
+  width: 25px;
+  border: none;
+  margin-left: 2px;
+  margin-bottom: 5px;
+}
+.btn-up {
+  background: url(./../icons/arrow_up.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+.btn-down {
+  background: url(./../icons/arrow_down.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+.btn-new {
+  background: url(./../icons/plus.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+.btn-add {
+  background: url(./../icons/clip.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+.btn-edit {
+  background: url(./../icons/pen.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+.btn-delete {
+  background: url(./../icons/minus.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
+
 .btn {
   border: none;
   border-radius: 2px;

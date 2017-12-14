@@ -46,10 +46,10 @@ export default class LessonReferences extends Component {
         return <div>
             {message}
             <div className="dlg-btn-bar">
-                <button className="btn yes" onClick={::this.create}>Добавить...</button>{' '}
-                <button className='btn' onClick={::this.edit}>Исправить...</button>{' '}
-                <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
-                <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
+                <button className="btn-add" onClick={::this.create}/>{' '}
+                <button className='btn-edit' onClick={::this.edit}/>{' '}
+                <button className="btn-up" onClick={::this.moveUp}/>{' '}
+                <button className="btn-down" onClick={::this.moveDown}/>{' '}
             </div>
             <Webix ui={::this.getUI(::this.select)} data={data}/>
         </div>
@@ -69,8 +69,8 @@ export default class LessonReferences extends Component {
                 {id: 'URL', header: 'URL', width: 120},
                 {
                     id: "",
-                    template: "<input class='delbtn' type='button' value='Delete'>",
-                    width: 80
+                    template: "<input class='delbtn' type='button'>",
+                    width: 50
                 },
             ],
 

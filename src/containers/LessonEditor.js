@@ -15,7 +15,6 @@ import {
 
 import LessonEpisodes from '../components/LessonEpisodes';
 import LessonReferences from '../components/LessonReferences'
-// import LookupDialog from '../components/LookupDialog';
 import ReferenceForm from '../components/ReferenceForm';
 
 class LessonEditor extends React.Component {
@@ -27,17 +26,35 @@ class LessonEditor extends React.Component {
             singleCourseActions,
             lessonId,
             courseId,
+            course
         } = this.props;
 
+        if ((!course) || (course.id !== courseId)) {
+            singleCourseActions.getCourse(courseId);
+        }
 
         if (lessonId > 0) {
             this.editMode = EDIT_MODE_EDIT;
             lessonActions.getLesson(lessonId, courseId);
         } else {
             this.editMode = EDIT_MODE_INSERT;
-            lessonActions.createNewLesson(courseId);
         }
         singleCourseActions.getCourseAuthors(courseId);
+    }
+
+    componentWillReceiveProps(next) {
+        const {
+            lessonActions,
+            courseId,
+            lesson,
+            course,
+        } = next;
+
+        if (this.editMode === EDIT_MODE_INSERT) {
+            if ((course) && (!lesson)) {
+                lessonActions.createNewLesson({CourseId : courseId, CourseName: course.Name, Number: course.Lessons.length + 1, LessonType:'L'});
+            }
+        }
     }
 
     saveLesson(value) {
@@ -114,10 +131,10 @@ class LessonEditor extends React.Component {
         })
     }
 
-    changeData(data) {
+    _changeData(data) {
         this.props.lessonActions.changeData(data)
     }
-    cancelChanges() {
+    _cancelChanges() {
         this.props.lessonActions.cancelCanges();
     }
 
@@ -264,6 +281,8 @@ class LessonEditor extends React.Component {
     }
 
     render() {
+        let _isEditMode = this.editMode === EDIT_MODE_EDIT;
+
         const {
             lesson,
             message,
@@ -282,7 +301,15 @@ class LessonEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Webix ui={::this.getUI(::this.saveLesson, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={lesson}/>
+                    <Webix ui={
+                            ::this.getUI(::this.saveLesson,
+                            ::this._cancelChanges,
+                            ::this._changeData,
+                            ::this._getHasChanges,
+                            _isEditMode)}
+                           data={lesson}
+                    />
+
                     <LessonEpisodes message={'Основные эпизоды'}
                                     createAction={::this._editEpisode}
                                     editAction={::this._editEpisode}
@@ -344,10 +371,10 @@ class LessonEditor extends React.Component {
         })
     }
 
-    getUI(saveAction, cancel){//, changeData, hasChanges) {
+    getUI(saveAction, cancel, changeData, hasChanges) {
         return {
             view: "form",
-            width: 600,
+            width: 700,
             id: 'mainData',
             elements: [
                 {view: "text", name: "CourseName", label: "Название курса", readonly: true},
@@ -374,12 +401,17 @@ class LessonEditor extends React.Component {
                 },
                 {
                     view:"datepicker",
-                    // value: new Date(2012, 6, 8),
                     label: "Планируемая дата публикации",
-                    // timepicker: true,
                     name: 'ReadyDate',
-                    width: 300
+                    width: 300,
+                    stringResult: true,
+                    // on : {
+                    //     onBeforeRender: function(obj) {
+                    //         alert(obj)
+                        // }
+                    // }
                 },
+                {view: "text", name: "ReadyDate", label: "Название урока", placeholder: "Введите название урока(лекции)"},
                 {
                     view: "richtext",
                     // id: "ShortDescription",
@@ -422,42 +454,19 @@ class LessonEditor extends React.Component {
             ],
             on: {
                 onChange: function () {
-                    // changeData(::this.getValues());
+                    changeData(::this.getValues());
                 },
                 onValues: function () {
-                    // if (hasChanges()) {
-                    //     this.elements.btnOk.enable();
-                    //     this.elements.btnCancel.enable()
-                    // } else {
-                    //     this.elements.btnOk.disable();
-                    //     this.elements.btnCancel.disable()
-                    // }
+                    if (hasChanges()) {
+                        this.elements.btnOk.enable();
+                        this.elements.btnCancel.enable()
+                    } else {
+                        this.elements.btnOk.disable();
+                        this.elements.btnCancel.disable()
+                    }
                 },
             }
         };
-    }
-
-    getButtons() {
-        return {
-            view: "form", width : 600, elements: [{
-                cols: [
-                    {},
-                    {},
-                    {
-                        view: "button", value: "ОК",
-                        click: () => {
-                            ::this.saveCourse();
-                        }
-                    },
-                    {
-                        view: "button", value: "Отмена", click: function () {
-                        // if (cancel)
-                        //     cancel();
-                    }
-                    }
-                ]
-            }]
-        }
     }
 }
 
@@ -472,16 +481,8 @@ function mapStateToProps(state, ownProps) {
         showReferenceEditor: state.references.showEditor,
         reference: state.references.reference,
         referenceEditMode : state.references.editMode,
-        // categories: state.categories.categories,
-        // course: state.singleCourse.course,
-        // courseAuthors: state.singleCourse.authors,
-        // courseCategories: state.singleCourse.categories,
-        // courseLessons: state.singleCourse.lessons,
-        // editMode: state.courses.editMode,
-        // languages: state.languages.languages,
-        // showAddAuthorDialog: state.singleCourse.showAddAuthorDialog,
-        // showAddCategoryDialog: state.singleCourse.showAddCategoryDialog,
-        // hasChanges : state.singleCourse.hasChanges,
+        course: state.singleCourse.course,
+        hasChanges : state.singleLesson.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -489,7 +490,7 @@ function mapStateToProps(state, ownProps) {
 
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
-        fetching: state.courseAuthors.fetching || state.singleLesson.fetching, // || state.languages.fetching || state.singleCourse.fetching
+        fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching
     }
 }
 

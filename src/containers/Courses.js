@@ -62,19 +62,19 @@ class Coureses extends React.Component {
                         :
                         <div className="courses-content">
                             <div className="action-bar">
-                                <button className='btn'
+                                <button className='btn-new'
                                         onClick={::this.onAddBtnClick}
-                                >Добавить...</button>{' '}
+                                />{' '}
                                 <button
-                                    className={'btn' + (selected === null ? " disabled" : "")}
+                                    className={'btn-edit' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={(selected === null)}
-                                >Исправить...</button>{' '}
+                                />{' '}
                                 <button
-                                    className={'btn' + (selected === null ? " disabled" : "")}
+                                    className={'btn-delete' + (selected === null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteCourse}
                                     disabled={(selected === null)}
-                                >Удалить...</button>
+                                />
                             </div>
                             <div className="grid-container">
                                 <Webix ui={::this.getUI(::this.select)} data={courses} />
