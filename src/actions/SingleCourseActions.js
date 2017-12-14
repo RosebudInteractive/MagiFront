@@ -195,7 +195,7 @@ export const getCourseAuthors = (courseId) => {
     return (dispatch) => {
         dispatch({
             type: GET_COURSE_AUTHORS_REQUEST,
-            payload: courseId
+            payload: null
         });
 
         fetch("/api/courses/" + courseId + '/authors')

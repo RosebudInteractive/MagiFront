@@ -19,14 +19,14 @@ import {
 
 import 'whatwg-fetch';
 
-export const getLesson = (id)=> {
+export const getLesson = (id, courseId)=> {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_LESSON_REQUEST,
             payload: null
         });
 
-        fetch("/api/lessons/" + id)
+        fetch("/api/lessons/" + id + '/' + courseId)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

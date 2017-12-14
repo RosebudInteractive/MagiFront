@@ -25,6 +25,7 @@ class LessonEditor extends React.Component {
         super(props);
         const {
             singleLessonActions,
+            singleCourseActions,
             // authorsActions,
             // categoriesActions,
             // languagesActions,
@@ -35,7 +36,7 @@ class LessonEditor extends React.Component {
 
         if (lessonId > 0) {
             this.editMode = EDIT_MODE_EDIT;
-            singleLessonActions.getLesson(lessonId);
+            singleLessonActions.getLesson(lessonId, courseId);
         } else {
             this.editMode = EDIT_MODE_INSERT;
             // singleLessonActions.createNewCoures();
@@ -102,17 +103,6 @@ class LessonEditor extends React.Component {
         this.props.courseActions.hideAddAuthorDialog();
     }
 
-    getCourseAuthors() {
-        const {
-            authors,
-            courseAuthors
-        } = this.props;
-
-        return authors.filter((value) => {
-            return courseAuthors.includes(value.id);
-        });
-    }
-
     getAuthors() {
         const {
             authors,
@@ -174,7 +164,7 @@ class LessonEditor extends React.Component {
 
     render() {
         const {
-            course,
+            lesson,
             message,
             errorDlgShown,
             showAddAuthorDialog,
@@ -188,7 +178,7 @@ class LessonEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
+                    <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={lesson}/>
                     {/*<CourseAuthors addAuthorAction={::this.showAddAuthorLookup}*/}
                                    {/*data={::this.getCourseAuthors()}/>*/}
                     {/*<CourseCategories addCategoryAction={::this.showAddCategoryLookup}*/}
@@ -236,7 +226,7 @@ class LessonEditor extends React.Component {
         })
     }
 
-    getUI(saveAction, cancel, changeData, hasChanges) {
+    getUI(saveAction, cancel){//, changeData, hasChanges) {
         return {
             view: "form",
             width: 600,
@@ -255,9 +245,10 @@ class LessonEditor extends React.Component {
                 },
                 {
                     template: (obj) => {
-                        return '<img src="' + obj.src + '" class="content" ondragstart="return false"/>'
+                        return '<img src="' + obj.src + '" />'
                     },
-                    data: {src: "imgs/image001.jpg"}
+                    data: {src: "/assets/images/avatar.png"},
+                    height : 100,
                 },
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
@@ -313,16 +304,16 @@ class LessonEditor extends React.Component {
             ],
             on: {
                 onChange: function () {
-                    changeData(::this.getValues());
+                    // changeData(::this.getValues());
                 },
                 onValues: function () {
-                    if (hasChanges()) {
-                        this.elements.btnOk.enable();
-                        this.elements.btnCancel.enable()
-                    } else {
-                        this.elements.btnOk.disable();
-                        this.elements.btnCancel.disable()
-                    }
+                    // if (hasChanges()) {
+                    //     this.elements.btnOk.enable();
+                    //     this.elements.btnCancel.enable()
+                    // } else {
+                    //     this.elements.btnOk.disable();
+                    //     this.elements.btnCancel.disable()
+                    // }
                 },
             }
         };

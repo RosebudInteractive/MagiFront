@@ -11,7 +11,7 @@ const initialState = {
     hasChanges : false,
 };
 
-export default function courseAuthors(state = initialState, action) {
+export default function singleLesson(state = initialState, action) {
 
     switch (action.type) {
         case GET_SINGLE_LESSON_REQUEST:

@@ -39,7 +39,7 @@ module.exports = {
                 test: /\.js$/
             },
             {
-                test:   /\.css$/,
+                test: /\.css$/,
                 loader: 'style-loader!css-loader'
             },
             {
@@ -57,6 +57,19 @@ module.exports = {
             {
                 test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
                 loader: "file-loader"
+            },
+            {
+                test: /\.(gif|jpe?g|png|ico)$/,
+                loader: "url-loader?limit=10000&mimetype=image/png+ico"
+                // use: [
+                //     {
+                //         loader: 'file-loader',
+                //         options: {
+                //             name: '[path][name].[ext]',
+                //             outputPath: 'images/'
+                //         }
+                //     }
+                // ]
             },
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,

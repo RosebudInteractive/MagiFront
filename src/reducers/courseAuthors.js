@@ -24,5 +24,4 @@ export default function courseAuthors(state = initialState, action) {
         default:
             return state;
     }
-
 }
