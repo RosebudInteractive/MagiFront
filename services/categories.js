@@ -15,7 +15,7 @@ function setupCategories(app) {
 
     app.get('/api/categories/:id', (req, res, next) => {
         CategoriesService()
-            .get(req.params.id)
+            .get(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -37,7 +37,7 @@ function setupCategories(app) {
 
     app.put('/api/categories/:id', (req, res, next) => {
         CategoriesService()
-            .update(req.params.id, req.body)
+            .update(parseInt(req.params.id), req.body)
             .then(rows => {
                 res.send(rows);
             })
@@ -48,7 +48,7 @@ function setupCategories(app) {
 
     app.delete('/api/categories/:id', (req, res, next) => {
         CategoriesService()
-            .del(req.params.id)
+            .del(parseInt(req.params.id))
             .then(() => {
                 res.send({});
             })

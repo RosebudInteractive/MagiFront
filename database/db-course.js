@@ -315,30 +315,12 @@ const DbCourse = class DbCourse extends DbObject {
                         ls_collection = root_ls.getCol("DataElements");
                         ls_own_collection = crs_obj.getDataRoot("Lesson").getCol("DataElements");
 
-                        for (let i = 0; i < auth_collection.count(); i++) {
-                            let obj = auth_collection.get(i);
-                            auth_list[obj.authorId()] = { deleted: true, obj: obj };
-                        }
-
-                        for (let i = 0; i < ctg_collection.count(); i++) {
-                            let obj = ctg_collection.get(i);
-                            ctg_list[obj.categoryId()] = { deleted: true, obj: obj };
-                        }
-
-                        for (let i = 0; i < ls_collection.count(); i++) {
-                            let obj = ls_collection.get(i);
-                            ls_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
-                        }
-
-                        for (let i = 0; i < ls_own_collection.count(); i++) {
-                            let obj = ls_own_collection.get(i);
-                            if (!ls_list[obj.id()])
-                                throw new Error("Unknown own lesson (Id = " + obj.id() + ").");
-                            ls_list[obj.id()].isOwner = true;
-                            ls_list[obj.id()].ownObj = obj;
-                        }
-
                         if (inpFields.Authors && (inpFields.Authors.length > 0)) {
+                            for (let i = 0; i < auth_collection.count(); i++) {
+                                let obj = auth_collection.get(i);
+                                auth_list[obj.authorId()] = { deleted: true, obj: obj };
+                            }
+
                             inpFields.Authors.forEach((elem) => {
                                 if (auth_list[elem])
                                     delete auth_list[elem]
@@ -348,6 +330,11 @@ const DbCourse = class DbCourse extends DbObject {
                         }
 
                         if (inpFields.Categories && (inpFields.Categories.length > 0)) {
+                            for (let i = 0; i < ctg_collection.count(); i++) {
+                                let obj = ctg_collection.get(i);
+                                ctg_list[obj.categoryId()] = { deleted: true, obj: obj };
+                            }
+
                             inpFields.Categories.forEach((elem) => {
                                 if (ctg_list[elem])
                                     delete ctg_list[elem]
@@ -357,6 +344,19 @@ const DbCourse = class DbCourse extends DbObject {
                         }
 
                         if (inpFields.Lessons && (inpFields.Lessons.length > 0)) {
+                            for (let i = 0; i < ls_collection.count(); i++) {
+                                let obj = ls_collection.get(i);
+                                ls_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
+                            }
+
+                            for (let i = 0; i < ls_own_collection.count(); i++) {
+                                let obj = ls_own_collection.get(i);
+                                if (!ls_list[obj.id()])
+                                    throw new Error("Unknown own lesson (Id = " + obj.id() + ").");
+                                ls_list[obj.id()].isOwner = true;
+                                ls_list[obj.id()].ownObj = obj;
+                            }
+
                             let Number = 1;
                             inpFields.Lessons.forEach((elem) => {
                                 let data = {

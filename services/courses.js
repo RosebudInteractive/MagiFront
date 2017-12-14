@@ -1,5 +1,5 @@
-let { CoursesService } = require('./../database/courses');
- // let { CoursesService } = require('./../database/db-course');
+//let { CoursesService } = require('./../database/courses');
+let { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
     app.get('/api/courses', (req, res, next) => {
@@ -15,7 +15,7 @@ function setupCourses(app) {
 
     app.get('/api/courses/:id', (req, res, next) => {
         CoursesService()
-            .get(req.params.id)
+            .get(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -26,7 +26,7 @@ function setupCourses(app) {
 
     app.get('/api/courses/:id/authors', (req, res, next) => {
         CoursesService()
-            .getAuthors(req.params.id)
+            .getAuthors(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -48,7 +48,7 @@ function setupCourses(app) {
 
     app.put('/api/courses/:id', (req, res, next) => {
         CoursesService()
-            .update(req.params.id, req.body)
+            .update(parseInt(req.params.id), req.body)
             .then(rows => {
                 res.send(rows);
             })
@@ -59,7 +59,7 @@ function setupCourses(app) {
 
     app.delete('/api/courses/:id', (req, res, next) => {
         CoursesService()
-            .del(req.params.id)
+            .del(parseInt(req.params.id))
             .then(() => {
                 res.send({});
             })

@@ -1,5 +1,5 @@
-let { LessonsService } = require('./../database/lessons');
-// let { LessonsService } = require('./../database/db-lesson');
+//let { LessonsService } = require('./../database/lessons');
+let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
     // app.get('/api/lessons', (req, res, next) => {
@@ -15,7 +15,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .get(req.params.id, req.params.courseId)
+            .get(parseInt(req.params.id), parseInt(req.params.courseId))
             .then(rows => {
                 res.send(rows);
             })
@@ -26,7 +26,7 @@ function setupLessons(app) {
 
     app.post('/api/lessons/:courseId', (req, res, next) => {
         LessonsService()
-            .insert(req.body, req.params.courseId)
+            .insert(req.body, parseInt(req.params.courseId))
             .then(rows => {
                 res.send(rows);
             })
@@ -37,7 +37,7 @@ function setupLessons(app) {
 
     app.put('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .update(req.params.id, req.params.courseId, req.body)
+            .update(parseInt(req.params.id), parseInt(req.params.courseId), req.body)
             .then(rows => {
                 res.send(rows);
             })
@@ -48,7 +48,7 @@ function setupLessons(app) {
 
     app.delete('/api/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .del(req.params.id, req.params.courseId)
+            .del(parseInt(req.params.id), parseInt(req.params.courseId))
             .then(() => {
                 res.send({});
             })

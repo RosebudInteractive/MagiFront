@@ -14,7 +14,7 @@ function setupAuthors(app) {
 
     app.get('/api/authors/:id', (req, res, next) => {
         AuthorsService()
-            .get(req.params.id)
+            .get(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -36,7 +36,7 @@ function setupAuthors(app) {
 
     app.put('/api/authors/:id', (req, res, next) => {
         AuthorsService()
-            .update(req.params.id, req.body)
+            .update(parseInt(req.params.id), req.body)
             .then(rows => {
                 res.send(rows);
             })
@@ -47,7 +47,7 @@ function setupAuthors(app) {
 
     app.delete('/api/authors/:id', (req, res, next) => {
         AuthorsService()
-            .del(req.params.id)
+            .del(parseInt(req.params.id))
             .then(() => {
                 res.send({});
             })
