@@ -3,10 +3,7 @@ import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
 import * as singleLessonActions from "../actions/SingleLessonActions";
-import * as coursesActions from '../actions/CoursesActions';
-import * as authorsActions from "../actions/AuthorActions";
-import * as categoriesActions from "../actions/CategoriesActions";
-import * as languagesActions from "../actions/LanguagesActions";
+import * as singleCourseActions from "../actions/SingleCourseActions";
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -15,7 +12,8 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-// import LessonEpisodes from '../components/LessonEpisodes';
+import LessonEpisodes from '../components/LessonEpisodes';
+import LessonReferences from '../components/LessonReferences'
 import LookupDialog from '../components/LookupDialog';
 
 class LessonEditor extends React.Component {
@@ -23,64 +21,96 @@ class LessonEditor extends React.Component {
     constructor(props) {
         super(props);
         const {
-            singleLessonActions,
-            // authorsActions,
-            // categoriesActions,
-            // languagesActions,
+            lessonActions,
+            singleCourseActions,
             lessonId,
+            courseId,
         } = this.props;
 
 
         if (lessonId > 0) {
             this.editMode = EDIT_MODE_EDIT;
-            singleLessonActions.getLesson(lessonId);
+            lessonActions.getLesson(lessonId, courseId);
         } else {
             this.editMode = EDIT_MODE_INSERT;
-            // singleLessonActions.createNewCoures();
+            lessonActions.createNewLesson(courseId);
         }
-        authorsActions.getAuthors();
-        categoriesActions.getCategories();
-        languagesActions.getLanguages();
+        singleCourseActions.getCourseAuthors(courseId);
     }
 
-    saveCourse(value) {
+    saveLesson(value) {
         let _obj = {
             id: value.id,
+            CourseId: this.props.courseId,
             Id: value.id,
             Name: value.Name,
             State: value.State,
+            AuthorId : value.AuthorId,
             Cover: value.Cover,
-            Color: parseInt(value.ColorHex.substr(1), 16),
-            LanguageId: value.LanguageId,
             URL: value.URL,
-            Description: value.Description,
-            Authors: [],
-            Categories : [],
-            Lessons:[],
+            LessonType: value.LessonType,
+            ReadyDate: new Date(value.ReadyDate),
+            ShortDescription: value.ShortDescription,
+            FullDescription: value.FullDescription,
+            Episodes: [],
+            References : [],
         };
 
-        _obj.Authors.push(...this.props.courseAuthors);
-        _obj.Categories.push(...this.props.courseCategories);
-        this._fillLessons(_obj.Lessons);
+        this._fillEpisodes(_obj.Episodes);
+        this._fillReferences(_obj.References);
 
-        this.props.coursesActions.saveCourse(_obj, this.editMode)
+        this.props.lessonActions.saveLesson(_obj, this.editMode)
     }
 
-    _fillLessons(array) {
-        this.props.courseLessons.map((lesson) => {
+    _fillEpisodes(array) {
+        this.props.mainEpisodes.map((episode) => {
             array.push({
-                LessonId: lesson.Id,
-                State: lesson.State,
-                ReadyDate: new Date(lesson.ReadyDate),
+                Id: episode.Id,
+                Name: episode.Name,
+                State: episode.State,
+                Number:episode.Number,
+                Supp: false,
+            })
+        });
+
+        this.props.suppEpisodes.map((episode) => {
+            array.push({
+                Id: episode.Id,
+                Name: episode.Name,
+                State: episode.State,
+                Number:episode.Number,
+                Supp: true,
+            })
+        })
+    }
+
+    _fillReferences(array) {
+        this.props.recommendedRef.map((reference) => {
+            array.push({
+                Id: reference.Id,
+                Description: reference.Description,
+                URL: reference.URL,
+                Number:reference.Number,
+                Recommended: true,
+            })
+        });
+
+        this.props.commonRef.map((reference) => {
+            array.push({
+                Id: reference.Id,
+                Description: reference.Description,
+                URL: reference.URL,
+                Number:reference.Number,
+                Recommended: false,
             })
         })
     }
 
     changeData(data) {
-        this.props.courseActions.changeData(data)
+        this.props.lessonActions.changeData(data)
     }
     cancelChanges() {
-        this.props.courseActions.cancelCanges();
+        this.props.lessonActions.cancelCanges();
     }
 
     // selectLesson(id) {
@@ -98,17 +128,6 @@ class LessonEditor extends React.Component {
     addAuthorAction(id) {
         this.props.courseActions.addAuthor(id);
         this.props.courseActions.hideAddAuthorDialog();
-    }
-
-    getCourseAuthors() {
-        const {
-            authors,
-            courseAuthors
-        } = this.props;
-
-        return authors.filter((value) => {
-            return courseAuthors.includes(value.id);
-        });
     }
 
     getAuthors() {
@@ -140,45 +159,74 @@ class LessonEditor extends React.Component {
         this.props.courseActions.hideAddCategoryDialog();
     }
 
-    getCourseCategories() {
-        const {
-            categories,
-            courseCategories
-        } = this.props;
-
-        return categories.filter((value) => {
-            return courseCategories.includes(value.id);
-        });
-    }
-
-    getCategories() {
-        const {
-            categories,
-            course
-        } = this.props;
-
-        let _filtered = categories.filter((value) => {
-            return !course.Categories.includes(value.id);
-        });
-
-        return _filtered.map((element) => {
-            return {id: element.id, value: element.Name}
-        })
-    }
-
     _getHasChanges() {
         return this.props.hasChanges;
     }
 
+    _moveMainEpisodeDown(episodeId) {
+        this.props.lessonActions.moveMainEpisodeDown(episodeId)
+    }
+
+    _moveMainEpisodeUp(episodeId) {
+        this.props.lessonActions.moveMainEpisodeUp(episodeId)
+    }
+
+    _removeMainEpisode(episodeId) {
+        this.props.lessonActions.removeMainEpisode(episodeId)
+    }
+
+    _editEpisode(episodeId) {
+        alert(episodeId);
+    }
+
+    _moveSuppEpisodeDown(episodeId) {
+        this.props.lessonActions.moveSuppEpisodeDown(episodeId)
+    }
+
+    _moveSuppEpisodeUp(episodeId) {
+        this.props.lessonActions.moveSuppEpisodeUp(episodeId)
+    }
+
+    _removeSuppEpisode(episodeId) {
+        this.props.lessonActions.removeSuppEpisode(episodeId)
+    }
+
+    _createReference(){
+
+    }
+
+    _editReference(){
+
+    }
+
+    _removeRecommendedReference(refId){
+        this.props.lessonActions.removeRecommendedReference(refId)
+    }
+
+    _moveRecommendedReferenceUp(){
+
+    }
+
+    _moveRecommendedReferenceDown(){
+
+    }
+
+    _removeCommonReference(refId){
+        this.props.lessonActions.removeCommonReference(refId)
+    }
+
     render() {
         const {
-            course,
+            lesson,
             message,
             errorDlgShown,
             showAddAuthorDialog,
             showAddCategoryDialog,
             fetching,
-            // courseLessons
+            mainEpisodes,
+            suppEpisodes,
+            recommendedRef,
+            commonRef,
         } = this.props;
 
         return (
@@ -186,13 +234,39 @@ class LessonEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
-                    {/*<CourseAuthors addAuthorAction={::this.showAddAuthorLookup}*/}
-                                   {/*data={::this.getCourseAuthors()}/>*/}
-                    {/*<CourseCategories addCategoryAction={::this.showAddCategoryLookup}*/}
-                                      {/*data={::this.getCourseCategories()}/>*/}
-                    {/*<CourseLessons data={courseLessons}/>*/}
-                    {/*<Webix ui={::this.getButtons()}/>*/}
+                    <Webix ui={::this.getUI(::this.saveLesson, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={lesson}/>
+                    <LessonEpisodes message={'Основные эпизоды'}
+                                    createAction={::this._editEpisode}
+                                    editAction={::this._editEpisode}
+                                    removeAction={::this._removeMainEpisode}
+                                    moveUpAction={::this._moveMainEpisodeUp}
+                                    moveDownAction={::this._moveMainEpisodeDown}
+                                    data={mainEpisodes}
+                    />
+                    <LessonEpisodes message={'Дополнительные эпизоды'}
+                                    createAction={::this._editEpisode}
+                                    editAction={::this._editEpisode}
+                                    removeAction={::this._removeSuppEpisode}
+                                    moveUpAction={::this._moveSuppEpisodeUp}
+                                    moveDownAction={::this._moveSuppEpisodeDown}
+                                    data={suppEpisodes}
+                    />
+                    <LessonReferences message={'Список литературы'}
+                                      createAction={::this._createReference}
+                                      editAction={::this._editReference}
+                                      removeAction={::this._removeCommonReference}
+                                      moveUpAction={::this._moveRecommendedReferenceUp}
+                                      moveDownAction={::this._moveRecommendedReferenceDown}
+                                      data={commonRef}
+                    />
+                    <LessonReferences message={'Рекомендуемая литература'}
+                                      createAction={::this._createReference}
+                                      editAction={::this._editReference}
+                                      removeAction={::this._removeRecommendedReference}
+                                      moveUpAction={::this._moveRecommendedReferenceUp}
+                                      moveDownAction={::this._moveRecommendedReferenceDown}
+                                      data={recommendedRef}
+                    />
                     {
                         errorDlgShown ?
                             <ErrorDialog
@@ -228,38 +302,66 @@ class LessonEditor extends React.Component {
         )
     }
 
-    getLanguagesArray(){
-        return this.props.languages.map((elem) => {
-            return {id: elem.id, value: elem.Language};
+    _getCourseAuthorsArray(){
+        return this.props.authors.map((elem) => {
+            return {id: elem.id, value: elem.FirstName + ' ' + elem.LastName};
         })
     }
 
-    getUI(saveAction, cancel, changeData, hasChanges) {
+    getUI(saveAction, cancel){//, changeData, hasChanges) {
         return {
             view: "form",
             width: 600,
             id: 'mainData',
             elements: [
-                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
-
-                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL"},
-                {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса',},
+                {view: "text", name: "CourseName", label: "Название курса", readonly: true},
+                {view: "text", name: "Number", label: "Номер урока", readonly: true},
                 {
-                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
+                    view: "combo", name: "LessonType", label: "Тип урока", placeholder: "Выберите тип урока",
+                    options: [{id: 'L', value: 'Лекция'}]
+                },
+                {view: "text", name: "Name", label: "Название урока", placeholder: "Введите название урока(лекции)"},
+                {
+                    view: "combo", name: "AuthorId", label: "Автор", placeholder: "Выберите автора",
+                    options: this._getCourseAuthorsArray()
                 },
                 {
-                    view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
-                    options: this.getLanguagesArray()
+                    template: (obj) => {
+                        return '<img src="' + obj.src + '" />'
+                    },
+                    data: {src: "/assets/images/avatar.png"},
+                    height : 100,
+                },
+                {
+                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
+                },
+                {
+                    view:"datepicker",
+                    // value: new Date(2012, 6, 8),
+                    label: "Планируемая дата публикации",
+                    // timepicker: true,
+                    name: 'ReadyDate',
+                    width: 300
                 },
                 {
                     view: "richtext",
-                    id: "Description",
-                    label: "Описание курса",
-                    labelPosition: "top",
+                    // id: "ShortDescription",
+                    label: "Краткое описание",
+                    // labelPosition: "left",
+                    height: 100,
+                    width: 500,
+                    name: "ShortDescription",
+                },
+                {
+                    view: "richtext",
+                    // id: "ShortDescription",
+                    label: "Полное описание",
+                    // labelPosition: "right",
+                    // labelWidth : 50,
                     height: 150,
                     width: 500,
-                    name: "Description",
+                    name: "FullDescription",
                 },
                 {
                     cols: [
@@ -267,7 +369,7 @@ class LessonEditor extends React.Component {
                         {},
                         {
                             view: "button", name: 'btnOk', value: "ОК",
-                            click: function() {
+                            click: function () {
                                 if (saveAction)
                                     saveAction(this.getFormView().getValues());
                             }
@@ -284,16 +386,16 @@ class LessonEditor extends React.Component {
             ],
             on: {
                 onChange: function () {
-                    changeData(::this.getValues());
+                    // changeData(::this.getValues());
                 },
-                onValues: function() {
-                    if (hasChanges()) {
-                        this.elements.btnOk.enable();
-                        this.elements.btnCancel.enable()
-                    } else {
-                        this.elements.btnOk.disable();
-                        this.elements.btnCancel.disable()
-                    }
+                onValues: function () {
+                    // if (hasChanges()) {
+                    //     this.elements.btnOk.enable();
+                    //     this.elements.btnCancel.enable()
+                    // } else {
+                    //     this.elements.btnOk.disable();
+                    //     this.elements.btnCancel.disable()
+                    // }
                 },
             }
         };
@@ -325,8 +427,13 @@ class LessonEditor extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        authors: state.authors.authors,
-        categories: state.categories.categories,
+        authors: state.courseAuthors.authors,
+        lesson: state.singleLesson.lesson,
+        mainEpisodes: state.singleLesson.mainEpisodes,
+        suppEpisodes: state.singleLesson.suppEpisodes,
+        recommendedRef: state.singleLesson.recommendedRef,
+        commonRef: state.singleLesson.commonRef,
+        // categories: state.categories.categories,
         // course: state.singleCourse.course,
         // courseAuthors: state.singleCourse.authors,
         // courseCategories: state.singleCourse.categories,
@@ -342,17 +449,15 @@ function mapStateToProps(state, ownProps) {
         errorDlgShown: state.commonDlg.errorDlgShown,
 
         lessonId: Number(ownProps.match.params.id),
-        fetching: state.authors.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
+        courseId: Number(ownProps.match.params.courseId),
+        fetching: state.courseAuthors.fetching || state.singleLesson.fetching, // || state.languages.fetching || state.singleCourse.fetching
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        singleLessonActions: bindActionCreators(singleLessonActions, dispatch),
-        authorsActions: bindActionCreators(authorsActions, dispatch),
-        categoriesActions: bindActionCreators(categoriesActions, dispatch),
-        languagesActions: bindActionCreators(languagesActions, dispatch),
-        coursesActions: bindActionCreators(coursesActions, dispatch),
+        lessonActions: bindActionCreators(singleLessonActions, dispatch),
+        singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
     }
 }
 
