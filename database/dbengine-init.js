@@ -229,7 +229,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         // "AuthorsService" tests
         if (false) {
-            const { AuthorsService } = require("./db-author");
+            let { AuthorsService } = require("./db-author");
             let au = AuthorsService();
             let upd_id;
             au.insert({ FirstName: "Alex", LastName: "Pushkin", Portrait: "asdasd.jpg" })
@@ -275,7 +275,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         // "CategoriesService" tests
         if (false) {
-            const { CategoriesService } = require("./db-category");
+            let { CategoriesService } = require("./db-category");
             let ctg = CategoriesService();
             let upd_id;
             ctg.insert({ Name: "Религия" })
@@ -321,7 +321,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         // "LanguagesService" tests
         if (false) {
-            const { LanguagesService } = require("./db-language");
+            let { LanguagesService } = require("./db-language");
             let lng = LanguagesService();
             let upd_id;
             lng.insert({ Code: "LT", Language: "Lietuvių" })
@@ -367,7 +367,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         // "CoursesService" tests
         if (false) {
-            const { CoursesService } = require("./db-course");
+            let { CoursesService } = require("./db-course");
             let crs = CoursesService();
             let upd_id = 1;
             crs.getAll()
@@ -458,9 +458,9 @@ exports.DbEngineInit = class DbEngineInit {
         };
 
         // "LessonsService" tests
-        if (true) {
-            const { LessonsService } = require("./db-lesson");
-            const { CoursesService } = require("./db-course");
+       if (true) {
+            let { LessonsService } = require("./db-lesson");
+            let { CoursesService } = require("./db-course");
             let crs = CoursesService();
             let ls = LessonsService();
 
@@ -555,6 +555,28 @@ exports.DbEngineInit = class DbEngineInit {
                 })
                 .then((result) => {
                     console.log("Update NEW LESSON in NEW COURSE [get]: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ls.update(upd_id, course_id, {
+                        AuthorId: 1,
+                        LessonType: "L",
+                        URL: "http://rbc.ru",
+                        State: "R",
+                        ReadyDate: "2018-12-10",
+                        FullDescription: "New Lesson of New Course FullDescription",
+                        Episodes: [
+                            { Id: 3, Number: 1, Supp: false },
+                            { Id: 1, Number: 1, Supp: true },
+                            { Id: 4, Number: 2, Supp: true },
+                            { Id: 2, Number: 2, Supp: false }
+                        ]
+                    })
+                        .then(() => {
+                            return ls.get(upd_id, course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("Update 1st LESSON in the 1st COURSE [get]: " + JSON.stringify(result));
                 })
                 .then((result) => {
                     // Delete Lesson 1 from NEW COURSE

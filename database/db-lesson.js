@@ -222,26 +222,49 @@ const DbLesson = class DbLesson extends DbObject {
             let opts = {};
             let newId = null;
             let collection = null;
+            let course_obj = null;
+            let ls_course_collection = null;
+            let ls_course_obj = null;
+            let lesson_number;
+
+            let transactionId = null;
+
             resolve(
-                this._getObjById(id, {
-                    expr: {
-                        model: {
-                            name: "Lesson",
-                            childs: [
-                                {
-                                    dataObject: {
-                                        name: "LessonCourse"
-                                    }
-                                },
-                                {
-                                    dataObject: {
-                                        name: "EpisodeLesson"
-                                    }
-                                }
-                            ]
+                this._getObjById(course_id, COURSE_REQ_TREE)
+                    .then((result) => {
+                        ls_course_collection = result.getCol("DataElements");
+                        if (ls_course_collection.count() != 1)
+                            throw new Error("Course (Id = " + course_id + ") doesn't exist.");
+                        course_obj = ls_course_collection.get(0);
+                        ls_course_collection = course_obj.getDataRoot("LessonCourse").getCol("DataElements");
+                        for (let i = 0; i < ls_course_collection.count(); i++) {
+                            if (ls_course_collection.get(i).lessonId() === id) {
+                                ls_course_obj = ls_course_collection.get(i);
+                                lesson_number = ls_course_obj.number();
+                                break;
+                            }
                         }
-                    }
-                })
+                        if (!ls_course_obj)
+                            throw new Error("Lesson (Id = " + id + ") desn't belong to course (Id = " + course_id + ").");
+
+                        return course_obj.edit()
+                            .then(() => {
+                                return this._getObjById(id, {
+                                    expr: {
+                                        model: {
+                                            name: "Lesson",
+                                            childs: [
+                                                {
+                                                    dataObject: {
+                                                        name: "EpisodeLesson"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                });
+                            })
+                    })
                     .then((result) => {
                         root_obj = result;
                         collection = root_obj.getCol("DataElements");
@@ -254,34 +277,47 @@ const DbLesson = class DbLesson extends DbObject {
                         if (lesson_obj.courseId() === course_id)
                             // We need to remove whole lesson here    
                             collection._del(lesson_obj)
-                        else {
-                            // Removing lesson reference from course    
-                            let course_collection = lesson_obj.getDataRoot("LessonCourse").getCol("DataElements");
-                            let course_obj;
-                            for (let i = 0; i < course_collection.count(); i++)
-                                if (course_collection.get(i).courseId() === course_id) {
-                                    course_obj = course_collection.get(i);
-                                    break;
-                                }
-                            if (!course_obj)
-                                throw new Error("Lesson Id = " + id + " doesn't belong to course CourseId = " + course_id + ".");
-                            course_collection._del(course_obj);
+
+                        // Removing lesson reference from course    
+                        ls_course_collection._del(ls_course_obj);
+                        for (let i = 0; i < ls_course_collection.count(); i++) {
+                            let lsn = ls_course_collection.get(i);
+                            if (lsn.number() > lesson_number)
+                                lsn.number(lsn.number() - 1);
                         }
-                        return root_obj.save(opts);
-                    })
+
+                        return $data.tranStart({})
+                            .then((result) => {
+                                transactionId = result.transactionId;
+                                opts = { transactionId: transactionId };
+                                return course_obj.save(opts);
+                            })
+                            .then(() => {
+                                return root_obj.save(opts);
+                            });
+                   })
                     .then(() => {
                         console.log("Course deleted: Id=" + id + ".");
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
+                        let result = transactionId ?
+                            (isErr ? $data.tranRollback(transactionId) : $data.tranCommit(transactionId)) : Promise.resolve();
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
-                        if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
-                        return res;
+                        if (course_obj)
+                            this._db._deleteRoot(course_obj.getRoot());
+                        if (isErr) {
+                            result = result.then(() => {
+                                if (res instanceof Error)
+                                    throw res
+                                else
+                                    throw new Error("Error: " + JSON.stringify(res));
+                            });
+                        }
+                        else
+                            result = result.then(() => { return res; })
+                        return result;
                     })
             );
         })
@@ -340,25 +376,12 @@ const DbLesson = class DbLesson extends DbObject {
                         epi_collection = root_epi.getCol("DataElements");
                         epi_own_collection = lsn_obj.getDataRoot("Episode").getCol("DataElements");
 
-                        for (let i = 0; i < ref_collection.count(); i++) {
-                            let obj = ref_collection.get(i);
-                            ref_list[obj.id()] = { deleted: true, obj: obj };
-                        }
-
-                        for (let i = 0; i < epi_collection.count(); i++) {
-                            let obj = epi_collection.get(i);
-                            epi_list[obj.episodeId()] = { deleted: true, isOwner: false, obj: obj };
-                        }
-
-                        for (let i = 0; i < epi_own_collection.count(); i++) {
-                            let obj = epi_own_collection.get(i);
-                            if (!epi_list[obj.id()])
-                                throw new Error("Unknown own episode (Id = " + obj.id() + ").");
-                            epi_list[obj.id()].isOwner = true;
-                            epi_list[obj.id()].ownObj = obj;
-                        }
-
                         if (inpFields.References && (inpFields.References.length > 0)) {
+                            for (let i = 0; i < ref_collection.count(); i++) {
+                                let obj = ref_collection.get(i);
+                                ref_list[obj.id()] = { deleted: true, obj: obj };
+                            }
+
                             inpFields.References.forEach((elem) => {
                                 let data = {
                                     Number: elem.Number,
@@ -366,9 +389,9 @@ const DbLesson = class DbLesson extends DbObject {
                                     Recommended: elem.Recommended
                                 };
                                 if (typeof (elem.URL) !== "undefined")
-                                    data.URL = elem.URL;    
+                                    data.URL = elem.URL;
                                 if (typeof (elem.AuthorComment) !== "undefined")
-                                    data.AuthorComment = elem.AuthorComment;    
+                                    data.AuthorComment = elem.AuthorComment;
                                 if (typeof (elem.Id) === "number") {
                                     if (ref_list[elem.Id]) {
                                         ref_list[elem.Id].deleted = false;
@@ -386,6 +409,19 @@ const DbLesson = class DbLesson extends DbObject {
                         }
 
                         if (inpFields.Episodes && (inpFields.Episodes.length > 0)) {
+                            for (let i = 0; i < epi_collection.count(); i++) {
+                                let obj = epi_collection.get(i);
+                                epi_list[obj.episodeId()] = { deleted: true, isOwner: false, obj: obj };
+                            }
+
+                            for (let i = 0; i < epi_own_collection.count(); i++) {
+                                let obj = epi_own_collection.get(i);
+                                if (!epi_list[obj.id()])
+                                    throw new Error("Unknown own episode (Id = " + obj.id() + ").");
+                                epi_list[obj.id()].isOwner = true;
+                                epi_list[obj.id()].ownObj = obj;
+                            }
+
                             let Number = 1;
                             inpFields.Episodes.forEach((elem) => {
                                 let data = {
