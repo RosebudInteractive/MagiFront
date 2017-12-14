@@ -514,8 +514,8 @@ exports.DbEngineInit = class DbEngineInit {
                         Name: "New Lesson of New Course",
                         ShortDescription: "New Lesson of New Course ShortDescription",
                         Episodes: [
-                            { Id: 1, Number: 1, Supp: false },
-                            { Id: 2, Number: 1, Supp: true }
+                            { Id: 1, Supp: false },
+                            { Id: 2, Supp: true }
                         ],
                         References: [
                             { Number: 1, Description: "Book 1", Recommended: false },
@@ -539,14 +539,14 @@ exports.DbEngineInit = class DbEngineInit {
                         ReadyDate: "2018-12-10",
                         FullDescription: "New Lesson of New Course FullDescription",
                         Episodes: [
-                            { Id: 3, Number: 1, Supp: false },
-                            { Id: 1, Number: 1, Supp: true },
-                            { Id: 4, Number: 2, Supp: true },
-                            { Id: 2, Number: 2, Supp: false }
+                            { Id: 3, Supp: false },
+                            { Id: 1, Supp: true },
+                            { Id: 4, Supp: true },
+                            { Id: 2, Supp: false }
                         ],
                         References: [
-                            { Id: 6, Number: 1, Description: "Book 11", Recommended: false },
-                            { Number: 1, Description: "Another Recommended Book 1", Recommended: true }
+                            { Id: 6, Description: "Book 11", Recommended: false },
+                            { Description: "Another Recommended Book 1", Recommended: true }
                         ]
                     })
                         .then(() => {
@@ -565,10 +565,10 @@ exports.DbEngineInit = class DbEngineInit {
                         ReadyDate: "2018-12-10",
                         FullDescription: "New Lesson of New Course FullDescription",
                         Episodes: [
-                            { Id: 3, Number: 1, Supp: false },
-                            { Id: 1, Number: 1, Supp: true },
-                            { Id: 4, Number: 2, Supp: true },
-                            { Id: 2, Number: 2, Supp: false }
+                            { Id: 3, Supp: false },
+                            { Id: 1, Supp: true },
+                            { Id: 4, Supp: true },
+                            { Id: 2, Supp: false }
                         ]
                     })
                         .then(() => {
