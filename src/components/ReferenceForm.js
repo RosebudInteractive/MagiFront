@@ -4,7 +4,8 @@ import Webix from '../components/Webix';
 
 export default class ReferenceForm extends React.Component {
     _save(value){
-        value.Recommmended = this.props.data.Recommmended;
+        value.Recommended = this.props.data.Recommended;
+        value.Id = this.props.data.Id;
         this.props.save(value)
     }
 

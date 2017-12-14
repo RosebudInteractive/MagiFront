@@ -4,10 +4,17 @@ import {
     CLEAR_REFERENCE,
 } from '../constants/References'
 
+import {
+    EDIT_MODE_INSERT,
+    EDIT_MODE_EDIT,
+} from '../constants/Common'
+
 const initialState = {
     reference: null,
     hasChanges: false,
     showEditor: false,
+    internalId: -1,
+    editMode: EDIT_MODE_INSERT,
 };
 
 
@@ -17,12 +24,15 @@ export default function reference(state = initialState, action) {
         case CREATE_NEW_REFERENCE:{
             let _ref = {};
             _ref.Recommended = action.payload;
+            _ref.Id = state.internalId;
 
             return {
                 ...state,
                 reference: _ref,
                 hasChanges: false,
                 showEditor: true,
+                internalId: --state.internalId,
+                editMode: EDIT_MODE_INSERT,
             };
         }
 
@@ -33,6 +43,7 @@ export default function reference(state = initialState, action) {
                 reference: action.payload,
                 hasChanges: false,
                 showEditor: true,
+                editMode: EDIT_MODE_EDIT,
             };
 
         case CLEAR_REFERENCE:

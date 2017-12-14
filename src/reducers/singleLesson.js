@@ -9,11 +9,12 @@ import {
     MOVE_SUPP_EPISODE_UP,
     MOVE_SUPP_EPISODE_DOWN,
     INSERT_RECOMMENDED_REFERENCE,
-    // UPDATE_RECOMMENDED_REFERENCE,
     REMOVE_RECOMMENDED_REFERENCE,
     INSERT_COMMON_REFERENCE,
-    // UPDATE_COMMON_REFERENCE,
     REMOVE_COMMON_REFERENCE,
+    UPDATE_COMMON_REFERENCE,
+    UPDATE_RECOMMENDED_REFERENCE, MOVE_RECOMMENDED_REFERENCE_DOWN, MOVE_RECOMMENDED_REFERENCE_UP,
+    MOVE_COMMON_REFERENCE_UP, MOVE_COMMON_REFERENCE_DOWN,
 } from '../constants/SingleLesson'
 
 const initialState = {
@@ -201,6 +202,30 @@ export default function singleLesson(state = initialState, action) {
             return {...state, recommendedRef: [...state.recommendedRef, action.payload], hasChanges: true};
         }
 
+        case UPDATE_RECOMMENDED_REFERENCE: {
+            let _array = [];
+            let _replaced = false;
+            state.recommendedRef.forEach((item) => {
+                if (item.Id !== action.payload.Id) {
+                    _array.push({...item})
+                } else {
+                    _array.push(action.payload);
+                    _replaced = true;
+                }
+            });
+
+            if (!_replaced) {
+                _array.push(action.payload)
+            }
+
+            return {
+                ...state,
+                recommendedRef: _array,
+                hasChanges: true
+                // selected: _replaced ? state.selected : action.payload.id
+            };
+        }
+
         case REMOVE_RECOMMENDED_REFERENCE: {
             let _array = [];
             let _modified = false;
@@ -217,8 +242,80 @@ export default function singleLesson(state = initialState, action) {
             return {...state, recommendedRef: _array, hasChanges: _modified ? true : state.hasChanges};
         }
 
+        case MOVE_RECOMMENDED_REFERENCE_UP: {
+            let _array = [];
+            let _modified = false;
+
+            let _itemId = action.payload;
+            let _index = state.recommendedRef.findIndex((item) => {return item.id === _itemId});
+            if (_index > 0) {
+                let _deleted = state.recommendedRef.splice(_index - 1, 1);
+                state.recommendedRef.splice(_index, 0, _deleted[0]);
+                _modified = true;
+            }
+
+            if (_modified) {
+                state.recommendedRef.forEach((item, index) => {
+                    item.Number = index +1
+                })
+            }
+
+            _array.push(...state.recommendedRef);
+
+            return {...state, recommendedRef: _array, hasChanges: _modified ? true : state.hasChanges};
+        }
+
+        case MOVE_RECOMMENDED_REFERENCE_DOWN: {
+            let _array = [];
+            let _modified = false;
+
+            let _itemId = action.payload;
+            let _index = state.recommendedRef.findIndex((item) => {
+                return item.id === _itemId
+            });
+            if (_index < state.recommendedRef.length - 1) {
+                let _deleted = state.recommendedRef.splice(_index, 1);
+                state.recommendedRef.splice(_index + 1, 0, _deleted[0]);
+                _modified = true;
+            }
+
+            if (_modified) {
+                state.recommendedRef.forEach((item, index) => {
+                    item.Number = index + 1
+                })
+            }
+
+            _array.push(...state.recommendedRef);
+
+            return {...state, recommendedRef: _array, hasChanges: _modified ? true : state.hasChanges};
+        }
+
         case INSERT_COMMON_REFERENCE: {
             return {...state, commonRef: [...state.commonRef, action.payload], hasChanges: true};
+        }
+
+        case UPDATE_COMMON_REFERENCE: {
+            let _array = [];
+            let _replaced = false;
+            state.commonRef.forEach((item) => {
+                if (item.Id !== action.payload.Id) {
+                    _array.push({...item})
+                } else {
+                    _array.push(action.payload);
+                    _replaced = true;
+                }
+            });
+
+            if (!_replaced) {
+                _array.push(action.payload)
+            }
+
+            return {
+                ...state,
+                commonRef: _array,
+                hasChanges: true
+                // selected: _replaced ? state.selected : action.payload.id
+            };
         }
 
         case REMOVE_COMMON_REFERENCE: {
@@ -230,6 +327,54 @@ export default function singleLesson(state = initialState, action) {
             if (_index > -1) {
                 _modified = true;
                 state.commonRef.splice(_index, 1);
+            }
+
+            _array.push(...state.commonRef);
+
+            return {...state, commonRef: _array, hasChanges: _modified ? true : state.hasChanges};
+        }
+
+        case MOVE_COMMON_REFERENCE_UP: {
+            let _array = [];
+            let _modified = false;
+
+            let _itemId = action.payload;
+            let _index = state.commonRef.findIndex((item) => {return item.id === _itemId});
+            if (_index > 0) {
+                let _deleted = state.commonRef.splice(_index - 1, 1);
+                state.commonRef.splice(_index, 0, _deleted[0]);
+                _modified = true;
+            }
+
+            if (_modified) {
+                state.commonRef.forEach((item, index) => {
+                    item.Number = index +1
+                })
+            }
+
+            _array.push(...state.commonRef);
+
+            return {...state, commonRef: _array, hasChanges: _modified ? true : state.hasChanges};
+        }
+
+        case MOVE_COMMON_REFERENCE_DOWN: {
+            let _array = [];
+            let _modified = false;
+
+            let _itemId = action.payload;
+            let _index = state.commonRef.findIndex((item) => {
+                return item.id === _itemId
+            });
+            if (_index < state.commonRef.length - 1) {
+                let _deleted = state.commonRef.splice(_index, 1);
+                state.commonRef.splice(_index + 1, 0, _deleted[0]);
+                _modified = true;
+            }
+
+            if (_modified) {
+                state.commonRef.forEach((item, index) => {
+                    item.Number = index + 1
+                })
             }
 
             _array.push(...state.commonRef);

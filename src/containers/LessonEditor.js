@@ -88,23 +88,29 @@ class LessonEditor extends React.Component {
 
     _fillReferences(array) {
         this.props.recommendedRef.map((reference) => {
-            array.push({
-                Id: reference.Id,
-                Description: reference.Description,
-                URL: reference.URL,
-                Number:reference.Number,
-                Recommended: true,
-            })
+            let _obj = {};
+            if (reference.Id > 0) {
+                _obj.Id = reference.Id
+            }
+            _obj.Description = reference.Description;
+            _obj.URL = reference.URL;
+            _obj.Number = reference.Number;
+            _obj.Recommended = true;
+
+            array.push(_obj);
         });
 
         this.props.commonRef.map((reference) => {
-            array.push({
-                Id: reference.Id,
-                Description: reference.Description,
-                URL: reference.URL,
-                Number:reference.Number,
-                Recommended: false,
-            })
+            let _obj = {};
+            if (reference.Id > 0) {
+                _obj.Id = reference.Id
+            }
+            _obj.Description = reference.Description;
+            _obj.URL = reference.URL;
+            _obj.Number = reference.Number;
+            _obj.Recommended = false;
+
+            array.push(_obj);
         })
     }
 
@@ -197,28 +203,48 @@ class LessonEditor extends React.Component {
         this.props.referenceActions.createNewReference(true);
     }
 
+    _editRecommendedReference(refId){
+        let _ref = this.props.recommendedRef.find((item) => {
+            return item.id === refId
+        });
+
+        this.props.referenceActions.editReference(_ref);
+    }
+
     _createCommonReference(){
         this.props.referenceActions.createNewReference(false);
     }
 
-    _editReference(ref){
-        this.props.referenceActions.editReference(ref);
+    _editCommonReference(refId){
+        let _ref = this.props.commonRef.find((item) => {
+            return item.id === refId
+        });
+
+        this.props.referenceActions.editReference(_ref);
     }
 
     _removeRecommendedReference(refId){
         this.props.lessonActions.removeRecommendedReference(refId)
     }
 
-    _moveRecommendedReferenceUp(){
-
+    _moveRecommendedReferenceUp(refId){
+        this.props.lessonActions.moveRecommendedReferenceUp(refId)
     }
 
-    _moveRecommendedReferenceDown(){
-
+    _moveRecommendedReferenceDown(refId){
+        this.props.lessonActions.moveRecommendedReferenceDown(refId)
     }
 
     _removeCommonReference(refId){
         this.props.lessonActions.removeCommonReference(refId)
+    }
+
+    _moveCommonReferenceUp(refId){
+        this.props.lessonActions.moveCommonReferenceUp(refId)
+    }
+
+    _moveCommonReferenceDown(refId){
+        this.props.lessonActions.moveCommonReferenceDown(refId)
     }
 
     _cancelEditReference(){
@@ -226,12 +252,12 @@ class LessonEditor extends React.Component {
     }
 
     _saveReference(value) {
-        let {lessonActions} = this.props;
+        let {lessonActions, referenceEditMode} = this.props;
 
         if (value.Recommended) {
-            value.Id ? lessonActions.updateRecommendedReference(value) : lessonActions.insertRecommendedReference(value);
+            (referenceEditMode === EDIT_MODE_EDIT) ? lessonActions.updateRecommendedReference(value) : lessonActions.insertRecommendedReference(value);
         } else {
-            value.Id ? lessonActions.updateCommonReference(value) : lessonActions.insertCommonReference(value);
+            (referenceEditMode === EDIT_MODE_EDIT) ? lessonActions.updateCommonReference(value) : lessonActions.insertCommonReference(value);
         }
 
         this.props.referenceActions.clearReference();
@@ -275,15 +301,15 @@ class LessonEditor extends React.Component {
                     />
                     <LessonReferences message={'Список литературы'}
                                       createAction={::this._createCommonReference}
-                                      editAction={::this._editReference}
+                                      editAction={::this._editCommonReference}
                                       removeAction={::this._removeCommonReference}
-                                      moveUpAction={::this._moveRecommendedReferenceUp}
-                                      moveDownAction={::this._moveRecommendedReferenceDown}
+                                      moveUpAction={::this._moveCommonReferenceUp}
+                                      moveDownAction={::this._moveCommonReferenceDown}
                                       data={commonRef}
                     />
                     <LessonReferences message={'Рекомендуемая литература'}
                                       createAction={::this._createRecommendedReference}
-                                      editAction={::this._editReference}
+                                      editAction={::this._editRecommendedReference}
                                       removeAction={::this._removeRecommendedReference}
                                       moveUpAction={::this._moveRecommendedReferenceUp}
                                       moveDownAction={::this._moveRecommendedReferenceDown}
@@ -445,6 +471,7 @@ function mapStateToProps(state, ownProps) {
         commonRef: state.singleLesson.commonRef,
         showReferenceEditor: state.references.showEditor,
         reference: state.references.reference,
+        referenceEditMode : state.references.editMode,
         // categories: state.categories.categories,
         // course: state.singleCourse.course,
         // courseAuthors: state.singleCourse.authors,

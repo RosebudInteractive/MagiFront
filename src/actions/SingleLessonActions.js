@@ -19,6 +19,10 @@ import {
     INSERT_COMMON_REFERENCE,
     UPDATE_COMMON_REFERENCE,
     REMOVE_COMMON_REFERENCE,
+    MOVE_RECOMMENDED_REFERENCE_UP,
+    MOVE_RECOMMENDED_REFERENCE_DOWN,
+    MOVE_COMMON_REFERENCE_UP,
+    MOVE_COMMON_REFERENCE_DOWN,
 
 
 } from '../constants/SingleLesson'
@@ -190,6 +194,24 @@ export const removeRecommendedReference = (id) => {
     }
 };
 
+export const moveRecommendedReferenceUp = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_RECOMMENDED_REFERENCE_UP,
+            payload: id
+        });
+    }
+};
+
+export const moveRecommendedReferenceDown = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_RECOMMENDED_REFERENCE_DOWN,
+            payload: id
+        });
+    }
+};
+
 export const insertCommonReference = (value) => {
     return (dispatch) => {
         dispatch({
@@ -212,6 +234,24 @@ export const removeCommonReference = (id) => {
     return (dispatch) => {
         dispatch({
             type: REMOVE_COMMON_REFERENCE,
+            payload: id
+        });
+    }
+};
+
+export const moveCommonReferenceUp = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_COMMON_REFERENCE_UP,
+            payload: id
+        });
+    }
+};
+
+export const moveCommonReferenceDown = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: MOVE_COMMON_REFERENCE_DOWN,
             payload: id
         });
     }
