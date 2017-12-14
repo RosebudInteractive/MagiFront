@@ -4,10 +4,6 @@ import ErrorDialog from '../components/ErrorDialog';
 
 import * as singleLessonActions from "../actions/SingleLessonActions";
 import * as singleCourseActions from "../actions/SingleCourseActions";
-// import * as coursesActions from '../actions/CoursesActions';
-// import * as authorsActions from "../actions/AuthorActions";
-// import * as categoriesActions from "../actions/CategoriesActions";
-// import * as languagesActions from "../actions/LanguagesActions";
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -16,7 +12,8 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-// import LessonEpisodes from '../components/LessonEpisodes';
+import LessonEpisodes from '../components/LessonEpisodes';
+import LessonReferences from '../components/LessonReferences'
 import LookupDialog from '../components/LookupDialog';
 
 class LessonEditor extends React.Component {
@@ -24,11 +21,8 @@ class LessonEditor extends React.Component {
     constructor(props) {
         super(props);
         const {
-            singleLessonActions,
+            lessonActions,
             singleCourseActions,
-            // authorsActions,
-            // categoriesActions,
-            // languagesActions,
             lessonId,
             courseId,
         } = this.props;
@@ -36,54 +30,87 @@ class LessonEditor extends React.Component {
 
         if (lessonId > 0) {
             this.editMode = EDIT_MODE_EDIT;
-            singleLessonActions.getLesson(lessonId, courseId);
+            lessonActions.getLesson(lessonId, courseId);
         } else {
             this.editMode = EDIT_MODE_INSERT;
-            // singleLessonActions.createNewCoures();
+            lessonActions.createNewLesson(courseId);
         }
         singleCourseActions.getCourseAuthors(courseId);
-        // categoriesActions.getCategories();
-        // languagesActions.getLanguages();
     }
 
-    saveCourse(value) {
+    saveLesson(value) {
         let _obj = {
             id: value.id,
+            CourseId: this.props.courseId,
             Id: value.id,
             Name: value.Name,
             State: value.State,
+            AuthorId : value.AuthorId,
             Cover: value.Cover,
-            Color: parseInt(value.ColorHex.substr(1), 16),
-            LanguageId: value.LanguageId,
             URL: value.URL,
-            Description: value.Description,
-            Authors: [],
-            Categories : [],
-            Lessons:[],
+            LessonType: value.LessonType,
+            ReadyDate: new Date(value.ReadyDate),
+            ShortDescription: value.ShortDescription,
+            FullDescription: value.FullDescription,
+            Episodes: [],
+            References : [],
         };
 
-        _obj.Authors.push(...this.props.courseAuthors);
-        _obj.Categories.push(...this.props.courseCategories);
-        this._fillLessons(_obj.Lessons);
+        this._fillEpisodes(_obj.Episodes);
+        this._fillReferences(_obj.References);
 
-        this.props.coursesActions.saveCourse(_obj, this.editMode)
+        this.props.lessonActions.saveLesson(_obj, this.editMode)
     }
 
-    _fillLessons(array) {
-        this.props.courseLessons.map((lesson) => {
+    _fillEpisodes(array) {
+        this.props.mainEpisodes.map((episode) => {
             array.push({
-                LessonId: lesson.Id,
-                State: lesson.State,
-                ReadyDate: new Date(lesson.ReadyDate),
+                Id: episode.Id,
+                Name: episode.Name,
+                State: episode.State,
+                Number:episode.Number,
+                Supp: false,
+            })
+        });
+
+        this.props.suppEpisodes.map((episode) => {
+            array.push({
+                Id: episode.Id,
+                Name: episode.Name,
+                State: episode.State,
+                Number:episode.Number,
+                Supp: true,
+            })
+        })
+    }
+
+    _fillReferences(array) {
+        this.props.recommendedRef.map((reference) => {
+            array.push({
+                Id: reference.Id,
+                Description: reference.Description,
+                URL: reference.URL,
+                Number:reference.Number,
+                Recommended: true,
+            })
+        });
+
+        this.props.commonRef.map((reference) => {
+            array.push({
+                Id: reference.Id,
+                Description: reference.Description,
+                URL: reference.URL,
+                Number:reference.Number,
+                Recommended: false,
             })
         })
     }
 
     changeData(data) {
-        this.props.courseActions.changeData(data)
+        this.props.lessonActions.changeData(data)
     }
     cancelChanges() {
-        this.props.courseActions.cancelCanges();
+        this.props.lessonActions.cancelCanges();
     }
 
     // selectLesson(id) {
@@ -132,34 +159,60 @@ class LessonEditor extends React.Component {
         this.props.courseActions.hideAddCategoryDialog();
     }
 
-    getCourseCategories() {
-        const {
-            categories,
-            courseCategories
-        } = this.props;
-
-        return categories.filter((value) => {
-            return courseCategories.includes(value.id);
-        });
-    }
-
-    getCategories() {
-        const {
-            categories,
-            course
-        } = this.props;
-
-        let _filtered = categories.filter((value) => {
-            return !course.Categories.includes(value.id);
-        });
-
-        return _filtered.map((element) => {
-            return {id: element.id, value: element.Name}
-        })
-    }
-
     _getHasChanges() {
         return this.props.hasChanges;
+    }
+
+    _moveMainEpisodeDown(episodeId) {
+        this.props.lessonActions.moveMainEpisodeDown(episodeId)
+    }
+
+    _moveMainEpisodeUp(episodeId) {
+        this.props.lessonActions.moveMainEpisodeUp(episodeId)
+    }
+
+    _removeMainEpisode(episodeId) {
+        this.props.lessonActions.removeMainEpisode(episodeId)
+    }
+
+    _editEpisode(episodeId) {
+        alert(episodeId);
+    }
+
+    _moveSuppEpisodeDown(episodeId) {
+        this.props.lessonActions.moveSuppEpisodeDown(episodeId)
+    }
+
+    _moveSuppEpisodeUp(episodeId) {
+        this.props.lessonActions.moveSuppEpisodeUp(episodeId)
+    }
+
+    _removeSuppEpisode(episodeId) {
+        this.props.lessonActions.removeSuppEpisode(episodeId)
+    }
+
+    _createReference(){
+
+    }
+
+    _editReference(){
+
+    }
+
+    _removeRecommendedReference(refId){
+        this.props.lessonActions.removeRecommendedReference(refId)
+    }
+
+    _moveRecommendedReferenceUp(){
+
+    }
+
+    _moveRecommendedReferenceDown(){
+
+    }
+
+    _removeCommonReference(refId){
+        this.props.lessonActions.removeCommonReference(refId)
     }
 
     render() {
@@ -170,7 +223,10 @@ class LessonEditor extends React.Component {
             showAddAuthorDialog,
             showAddCategoryDialog,
             fetching,
-            // courseLessons
+            mainEpisodes,
+            suppEpisodes,
+            recommendedRef,
+            commonRef,
         } = this.props;
 
         return (
@@ -178,13 +234,39 @@ class LessonEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={lesson}/>
-                    {/*<CourseAuthors addAuthorAction={::this.showAddAuthorLookup}*/}
-                                   {/*data={::this.getCourseAuthors()}/>*/}
-                    {/*<CourseCategories addCategoryAction={::this.showAddCategoryLookup}*/}
-                                      {/*data={::this.getCourseCategories()}/>*/}
-                    {/*<CourseLessons data={courseLessons}/>*/}
-                    {/*<Webix ui={::this.getButtons()}/>*/}
+                    <Webix ui={::this.getUI(::this.saveLesson, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={lesson}/>
+                    <LessonEpisodes message={'Основные эпизоды'}
+                                    createAction={::this._editEpisode}
+                                    editAction={::this._editEpisode}
+                                    removeAction={::this._removeMainEpisode}
+                                    moveUpAction={::this._moveMainEpisodeUp}
+                                    moveDownAction={::this._moveMainEpisodeDown}
+                                    data={mainEpisodes}
+                    />
+                    <LessonEpisodes message={'Дополнительные эпизоды'}
+                                    createAction={::this._editEpisode}
+                                    editAction={::this._editEpisode}
+                                    removeAction={::this._removeSuppEpisode}
+                                    moveUpAction={::this._moveSuppEpisodeUp}
+                                    moveDownAction={::this._moveSuppEpisodeDown}
+                                    data={suppEpisodes}
+                    />
+                    <LessonReferences message={'Список литературы'}
+                                      createAction={::this._createReference}
+                                      editAction={::this._editReference}
+                                      removeAction={::this._removeCommonReference}
+                                      moveUpAction={::this._moveRecommendedReferenceUp}
+                                      moveDownAction={::this._moveRecommendedReferenceDown}
+                                      data={commonRef}
+                    />
+                    <LessonReferences message={'Рекомендуемая литература'}
+                                      createAction={::this._createReference}
+                                      editAction={::this._editReference}
+                                      removeAction={::this._removeRecommendedReference}
+                                      moveUpAction={::this._moveRecommendedReferenceUp}
+                                      moveDownAction={::this._moveRecommendedReferenceDown}
+                                      data={recommendedRef}
+                    />
                     {
                         errorDlgShown ?
                             <ErrorDialog
@@ -347,6 +429,10 @@ function mapStateToProps(state, ownProps) {
     return {
         authors: state.courseAuthors.authors,
         lesson: state.singleLesson.lesson,
+        mainEpisodes: state.singleLesson.mainEpisodes,
+        suppEpisodes: state.singleLesson.suppEpisodes,
+        recommendedRef: state.singleLesson.recommendedRef,
+        commonRef: state.singleLesson.commonRef,
         // categories: state.categories.categories,
         // course: state.singleCourse.course,
         // courseAuthors: state.singleCourse.authors,
@@ -370,11 +456,8 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        singleLessonActions: bindActionCreators(singleLessonActions, dispatch),
+        lessonActions: bindActionCreators(singleLessonActions, dispatch),
         singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
-        // categoriesActions: bindActionCreators(categoriesActions, dispatch),
-        // languagesActions: bindActionCreators(languagesActions, dispatch),
-        // coursesActions: bindActionCreators(coursesActions, dispatch),
     }
 }
 

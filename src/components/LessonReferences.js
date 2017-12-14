@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 
-export default class LessonEpisodes extends Component {
+export default class LessonReferences extends Component {
     constructor(props) {
         super(props);
 
@@ -10,17 +10,7 @@ export default class LessonEpisodes extends Component {
     }
 
     create(){
-
-    }
-
-    add() {
-        // this.props.addAuthorAction();
-    }
-
-    edit() {
-        if (this.selected) {
-            this.props.editAction(this.selected);
-        }
+        this.props.createAction();
     }
 
     remove(id) {
@@ -45,10 +35,10 @@ export default class LessonEpisodes extends Component {
         }
     }
 
-
-
-    _hasSelected() {
-        return this.select !== null
+    edit() {
+        if (this.selected) {
+            this.props.editAction(this.selected);
+        }
     }
 
     render () {
@@ -56,14 +46,8 @@ export default class LessonEpisodes extends Component {
         return <div>
             {message}
             <div className="dlg-btn-bar">
-                <button className="btn yes" onClick={::this.create}>Создать...</button>{' '}
-                <button className="btn yes" onClick={::this.add}>Добавить...</button>{' '}
-                <button
-                    className={'btn' + (::this._hasSelected() ? " disabled" : "")}
-                    onClick={::this.edit}
-                    disabled={::this._hasSelected()}
-                >Исправить...
-                </button>{' '}
+                <button className="btn yes" onClick={::this.create}>Добавить...</button>{' '}
+                <button className='btn' onClick={::this.edit}>Исправить...</button>{' '}
                 <button className="btn yes" onClick={::this.moveUp}>Вверх</button>{' '}
                 <button className="btn yes" onClick={::this.moveDown}>Вниз</button>{' '}
             </div>
@@ -81,10 +65,8 @@ export default class LessonEpisodes extends Component {
             editable: false,
             columns: [
                 {id: 'Number', header: '#', width: 30},
-                {id: 'Name', header: 'Название', fillspace: true},
-                {id: 'State', header: 'Состояние', width: 90, editor: 'select',
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]},
-                {id: 'LanguageName', header: 'Язык курса', width: 90},
+                {id: 'Description', header: 'Описание', fillspace: true},
+                {id: 'URL', header: 'URL', width: 120},
                 {
                     id: "",
                     template: "<input class='delbtn' type='button' value='Delete'>",
@@ -107,7 +89,7 @@ export default class LessonEpisodes extends Component {
     }
 }
 
-LessonEpisodes.propTypes = {
+LessonReferences.propTypes = {
     message: PropTypes.string.isRequired,
     createAction: PropTypes.func.isRequired,
     editAction: PropTypes.func.isRequired,

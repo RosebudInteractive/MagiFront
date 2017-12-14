@@ -83,7 +83,7 @@ const LessonsService = class LessonsService {
         });
     }
 
-    update(id, data) {
+    update(id, courseId, data) {
         return new Promise((resolve) => {
             console.log(id, data);
             resolve(data);
