@@ -382,9 +382,11 @@ const DbLesson = class DbLesson extends DbObject {
                                 ref_list[obj.id()] = { deleted: true, obj: obj };
                             }
 
+                            let Number = 1;
+                            let NumberRec = 1;
                             inpFields.References.forEach((elem) => {
                                 let data = {
-                                    Number: elem.Number,
+                                    Number: elem.Recommended ? NumberRec++ : Number++,
                                     Description: elem.Description,
                                     Recommended: elem.Recommended
                                 };
@@ -423,10 +425,11 @@ const DbLesson = class DbLesson extends DbObject {
                             }
 
                             let Number = 1;
+                            let NumberSupp = 1;
                             inpFields.Episodes.forEach((elem) => {
                                 let data = {
                                     EpisodeId: elem.Id,
-                                    Number: elem.Number,
+                                    Number: elem.Supp ? NumberSupp++ : Number++,
                                     Supp: elem.Supp
                                 };
                                 if (epi_list[elem.Id]) {
@@ -617,14 +620,19 @@ const DbLesson = class DbLesson extends DbObject {
                         new_lng_obj = this._db.getObj(result.newObject);
                         let root_epl = new_obj.getDataRoot("EpisodeLesson");
                         if (inpFields.Episodes && (inpFields.Episodes.length > 0)) {
+                            let Number = 1;
+                            let NumberSupp = 1;
                             return Utils.seqExec(inpFields.Episodes, (elem) => {
                                 let fields = {};
                                 if (typeof (elem["Id"]) !== "undefined")
                                     fields["EpisodeId"] = elem["Id"];
-                                if (typeof (elem["Number"]) !== "undefined")
-                                    fields["Number"] = elem["Number"];
-                                if (typeof (elem["Supp"]) !== "undefined")
+                                if (typeof (elem["Supp"]) !== "undefined") {
                                     fields["Supp"] = elem["Supp"];
+                                    if (!fields.Supp)
+                                        fields.Number = Number++
+                                    else
+                                        fields.Number = NumberSupp++;
+                                }
                                 return root_epl.newObject({
                                     fields: fields
                                 }, opts);
@@ -634,16 +642,21 @@ const DbLesson = class DbLesson extends DbObject {
                     .then(() => {
                         let root_ref = new_lng_obj.getDataRoot("Reference");
                         if (inpFields.References && (inpFields.References.length > 0)) {
+                            let Number = 1;
+                            let NumberRec = 1;
                             return Utils.seqExec(inpFields.References, (elem) => {
                                 let fields = {};
-                                if (typeof (elem["Number"]) !== "undefined")
-                                    fields["Number"] = elem["Number"];
                                 if (typeof (elem["Description"]) !== "undefined")
                                     fields["Description"] = elem["Description"];
                                 if (typeof (elem["URL"]) !== "undefined")
                                     fields["URL"] = elem["URL"];
-                                if (typeof (elem["Recommended"]) !== "undefined")
+                                if (typeof (elem["Recommended"]) !== "undefined") {
                                     fields["Recommended"] = elem["Recommended"];
+                                    if (!fields.Recommended)
+                                        fields.Number = Number++
+                                    else
+                                        fields.Number = NumberRec++;
+                                }
                                 if (typeof (elem["AuthorComment"]) !== "undefined")
                                     fields["AuthorComment"] = elem["AuthorComment"];
                                 return root_ref.newObject({
