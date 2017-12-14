@@ -137,7 +137,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Structure", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("EpisodeLesson", "94d10a1d-d902-489b-8243-5c2dfea57174", "RootEpisodeLesson", "83abc96a-5184-4ed2-a9f2-ccd64733a22e")
-            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: true })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
             .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("Supp", { type: "boolean", allowNull: false });

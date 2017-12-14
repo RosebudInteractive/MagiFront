@@ -26,7 +26,7 @@
                     "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
                 },
                 "fields": {
-                    "Id": 1,
+                    "Id": 2,
                     "LessonId": 1,
                     "EpisodeId": 2,
                     "Number": 1,
@@ -39,10 +39,10 @@
                     "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
                 },
                 "fields": {
-                    "Id": 1,
+                    "Id": 3,
                     "LessonId": 1,
                     "EpisodeId": 3,
-                    "Number": 1,
+                    "Number": 2,
                     "Supp": false
                 },
                 "collections": {}
@@ -52,10 +52,10 @@
                     "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
                 },
                 "fields": {
-                    "Id": 1,
+                    "Id": 4,
                     "LessonId": 1,
                     "EpisodeId": 4,
-                    "Number": 1,
+                    "Number": 2,
                     "Supp": true
                 },
                 "collections": {}
@@ -65,10 +65,10 @@
                     "typeGuid": "94d10a1d-d902-489b-8243-5c2dfea57174"
                 },
                 "fields": {
-                    "Id": 1,
+                    "Id": 5,
                     "LessonId": 1,
                     "EpisodeId": 5,
-                    "Number": 1,
+                    "Number": 3,
                     "Supp": false
                 },
                 "collections": {}
