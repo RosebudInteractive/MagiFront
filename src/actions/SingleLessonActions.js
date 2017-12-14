@@ -12,7 +12,12 @@ import {
 
     CHANGE_LESSON_DATA,
     CANCEL_CHANGE_LESSON_DATA,
+
+    INSERT_RECOMMENDED_REFERENCE,
+    UPDATE_RECOMMENDED_REFERENCE,
     REMOVE_RECOMMENDED_REFERENCE,
+    INSERT_COMMON_REFERENCE,
+    UPDATE_COMMON_REFERENCE,
     REMOVE_COMMON_REFERENCE,
 
 
@@ -158,11 +163,47 @@ export const moveSuppEpisodeDown = (id) => {
     }
 };
 
+export const insertRecommendedReference = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: INSERT_RECOMMENDED_REFERENCE,
+            payload: value
+        });
+    }
+};
+
+export const updateRecommendedReference = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: UPDATE_RECOMMENDED_REFERENCE,
+            payload: value
+        });
+    }
+};
+
 export const removeRecommendedReference = (id) => {
     return (dispatch) => {
         dispatch({
             type: REMOVE_RECOMMENDED_REFERENCE,
             payload: id
+        });
+    }
+};
+
+export const insertCommonReference = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: INSERT_COMMON_REFERENCE,
+            payload: value
+        });
+    }
+};
+
+export const updateCommonReference = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: UPDATE_COMMON_REFERENCE,
+            payload: value
         });
     }
 };

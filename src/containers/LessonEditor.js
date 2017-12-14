@@ -4,6 +4,7 @@ import ErrorDialog from '../components/ErrorDialog';
 
 import * as singleLessonActions from "../actions/SingleLessonActions";
 import * as singleCourseActions from "../actions/SingleCourseActions";
+import * as referenceActions from '../actions/ReferencesActions';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -14,7 +15,8 @@ import {
 
 import LessonEpisodes from '../components/LessonEpisodes';
 import LessonReferences from '../components/LessonReferences'
-import LookupDialog from '../components/LookupDialog';
+// import LookupDialog from '../components/LookupDialog';
+import ReferenceForm from '../components/ReferenceForm';
 
 class LessonEditor extends React.Component {
 
@@ -117,8 +119,8 @@ class LessonEditor extends React.Component {
     //     // this.props.coursesActions.selectCourse(id);
     // }
 
-    showAddAuthorLookup(){
-        this.props.courseActions.showAddAuthorDialog()
+    _createRecommendedReferenceDialog(){
+        this.props.lessonActions.showEditReferenceDialog(EDIT_MODE_INSERT)
     }
 
     hideAddAuthorDialog() {
@@ -191,12 +193,16 @@ class LessonEditor extends React.Component {
         this.props.lessonActions.removeSuppEpisode(episodeId)
     }
 
-    _createReference(){
-
+    _createRecommendedReference(){
+        this.props.referenceActions.createNewReference(true);
     }
 
-    _editReference(){
+    _createCommonReference(){
+        this.props.referenceActions.createNewReference(false);
+    }
 
+    _editReference(ref){
+        this.props.referenceActions.editReference(ref);
     }
 
     _removeRecommendedReference(refId){
@@ -215,18 +221,34 @@ class LessonEditor extends React.Component {
         this.props.lessonActions.removeCommonReference(refId)
     }
 
+    _cancelEditReference(){
+        this.props.referenceActions.clearReference();
+    }
+
+    _saveReference(value) {
+        let {lessonActions} = this.props;
+
+        if (value.Recommended) {
+            value.Id ? lessonActions.updateRecommendedReference(value) : lessonActions.insertRecommendedReference(value);
+        } else {
+            value.Id ? lessonActions.updateCommonReference(value) : lessonActions.insertCommonReference(value);
+        }
+
+        this.props.referenceActions.clearReference();
+    }
+
     render() {
         const {
             lesson,
             message,
             errorDlgShown,
-            showAddAuthorDialog,
-            showAddCategoryDialog,
+            showReferenceEditor,
             fetching,
             mainEpisodes,
             suppEpisodes,
             recommendedRef,
             commonRef,
+            reference,
         } = this.props;
 
         return (
@@ -252,7 +274,7 @@ class LessonEditor extends React.Component {
                                     data={suppEpisodes}
                     />
                     <LessonReferences message={'Список литературы'}
-                                      createAction={::this._createReference}
+                                      createAction={::this._createCommonReference}
                                       editAction={::this._editReference}
                                       removeAction={::this._removeCommonReference}
                                       moveUpAction={::this._moveRecommendedReferenceUp}
@@ -260,7 +282,7 @@ class LessonEditor extends React.Component {
                                       data={commonRef}
                     />
                     <LessonReferences message={'Рекомендуемая литература'}
-                                      createAction={::this._createReference}
+                                      createAction={::this._createRecommendedReference}
                                       editAction={::this._editReference}
                                       removeAction={::this._removeRecommendedReference}
                                       moveUpAction={::this._moveRecommendedReferenceUp}
@@ -277,23 +299,11 @@ class LessonEditor extends React.Component {
                             ""
                     }
                     {
-                        showAddAuthorDialog ?
-                            <LookupDialog
-                                message='Авторы'
-                                data={::this.getAuthors()}
-                                yesAction={::this.addAuthorAction}
-                                noAction={::this.hideAddAuthorDialog}
-                            />
-                            :
-                            ''
-                    }
-                    {
-                        showAddCategoryDialog ?
-                            <LookupDialog
-                                message='Категориии'
-                                data={::this.getCategories()}
-                                yesAction={::this.addCategoryAction}
-                                noAction={::this.hideAddCategoryDialog}
+                        showReferenceEditor ?
+                            <ReferenceForm
+                                cancel={::this._cancelEditReference}
+                                save={::this._saveReference}
+                                data={reference}
                             />
                             :
                             ''
@@ -433,6 +443,8 @@ function mapStateToProps(state, ownProps) {
         suppEpisodes: state.singleLesson.suppEpisodes,
         recommendedRef: state.singleLesson.recommendedRef,
         commonRef: state.singleLesson.commonRef,
+        showReferenceEditor: state.references.showEditor,
+        reference: state.references.reference,
         // categories: state.categories.categories,
         // course: state.singleCourse.course,
         // courseAuthors: state.singleCourse.authors,
@@ -458,6 +470,7 @@ function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
+        referenceActions : bindActionCreators(referenceActions, dispatch),
     }
 }
 

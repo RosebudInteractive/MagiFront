@@ -6,7 +6,7 @@ const _rows = [
         AuthorId : 1,
         Cover: 'https://magisteria.ru/wp-content/uploads/2016/08/unnamed-2.jpg',
         Number: '1',
-        ReadyDate: '01.01.2018',
+        ReadyDate: '2018-07-17T21:00:00.000Z',
         State: 'D',
         LessonType: 'L',
         ShortDescription: 'Краткое описание',

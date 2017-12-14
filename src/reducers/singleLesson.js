@@ -8,7 +8,11 @@ import {
     REMOVE_SUPP_EPISODE,
     MOVE_SUPP_EPISODE_UP,
     MOVE_SUPP_EPISODE_DOWN,
+    INSERT_RECOMMENDED_REFERENCE,
+    // UPDATE_RECOMMENDED_REFERENCE,
     REMOVE_RECOMMENDED_REFERENCE,
+    INSERT_COMMON_REFERENCE,
+    // UPDATE_COMMON_REFERENCE,
     REMOVE_COMMON_REFERENCE,
 } from '../constants/SingleLesson'
 
@@ -193,6 +197,10 @@ export default function singleLesson(state = initialState, action) {
             return {...state, suppEpisodes: _array, hasChanges: _modified ? true : state.hasChanges};
         }
 
+        case INSERT_RECOMMENDED_REFERENCE: {
+            return {...state, recommendedRef: [...state.recommendedRef, action.payload], hasChanges: true};
+        }
+
         case REMOVE_RECOMMENDED_REFERENCE: {
             let _array = [];
             let _modified = false;
@@ -207,6 +215,10 @@ export default function singleLesson(state = initialState, action) {
             _array.push(...state.recommendedRef);
 
             return {...state, recommendedRef: _array, hasChanges: _modified ? true : state.hasChanges};
+        }
+
+        case INSERT_COMMON_REFERENCE: {
+            return {...state, commonRef: [...state.commonRef, action.payload], hasChanges: true};
         }
 
         case REMOVE_COMMON_REFERENCE: {
