@@ -458,7 +458,7 @@ exports.DbEngineInit = class DbEngineInit {
         };
 
         // "LessonsService" tests
-       if (true) {
+       if (false) {
             let { LessonsService } = require("./db-lesson");
             let { CoursesService } = require("./db-course");
             let crs = CoursesService();
