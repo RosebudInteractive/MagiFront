@@ -1,0 +1,52 @@
+{
+    "$sys": {
+        "typeGuid": "3866b984-ed0b-4dfc-8567-de00401d5c95"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "fdf9eaf6-38b4-4c08-96b7-11ceee183318"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "EpisodeTocId": 1,
+                    "LanguageId": 1,
+                    "Topic": "Topic 1",
+                    "TimeStamp": 0
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "fdf9eaf6-38b4-4c08-96b7-11ceee183318"
+                },
+                "fields": {
+                    "Id": 2,
+                    "EpisodeTocId": 2,
+                    "LanguageId": 1,
+                    "Topic": "Topic 2",
+                    "TimeStamp": 100
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "fdf9eaf6-38b4-4c08-96b7-11ceee183318"
+                },
+                "fields": {
+                    "Id": 3,
+                    "EpisodeTocId": 3,
+                    "LanguageId": 1,
+                    "Topic": "Topic 3",
+                    "TimeStamp": 200
+                },
+                "collections": {}
+            }
+        ]
+    }
+}
