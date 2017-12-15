@@ -18,7 +18,10 @@ import {
     MOVE_RECOMMENDED_REFERENCE_DOWN,
     MOVE_RECOMMENDED_REFERENCE_UP,
     MOVE_COMMON_REFERENCE_UP,
-    MOVE_COMMON_REFERENCE_DOWN, CHANGE_LESSON_DATA, CANCEL_CHANGE_LESSON_DATA,
+    MOVE_COMMON_REFERENCE_DOWN,
+    CHANGE_LESSON_DATA,
+    CANCEL_CHANGE_LESSON_DATA,
+    SAVE_LESSON_SUCCESS,
 } from '../constants/SingleLesson'
 
 import * as tools from './tools';
@@ -104,6 +107,21 @@ export default function singleLesson(state = initialState, action) {
                 hasChanges : false,
             };
 
+        case SAVE_LESSON_SUCCESS: {
+            let _newInitialLesson = Object.assign({},state.lesson);
+            _newInitialLesson.mainEpisodes = [...state.mainEpisodes];
+            _newInitialLesson.suppEpisodes = [...state.suppEpisodes];
+            _newInitialLesson.recommendedRef = [...state.recommendedRef];
+            _newInitialLesson.commonRef = [...state.commonRef];
+
+            return {
+                ...state,
+                initialLesson: _newInitialLesson,
+                fetching: false,
+                hasChanges : false,
+            };
+        }
+
         case REMOVE_MAIN_EPISODE: {
             let _result = tools.removeObject(state.mainEpisodes, action.payload);
             return {...state, mainEpisodes: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
@@ -135,7 +153,7 @@ export default function singleLesson(state = initialState, action) {
         }
 
         case INSERT_RECOMMENDED_REFERENCE: {
-            let _array = [...state.commonRef, action.payload];
+            let _array = [...state.recommendedRef, action.payload];
             tools.setObjectsRank(_array);
 
             return {...state, recommendedRef: _array, hasChanges: true};

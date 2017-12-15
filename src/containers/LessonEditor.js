@@ -68,7 +68,7 @@ class LessonEditor extends React.Component {
             Cover: value.Cover,
             URL: value.URL,
             LessonType: value.LessonType,
-            ReadyDate: new Date(value.ReadyDate),
+            ReadyDate: value.DT_ReadyDate,
             ShortDescription: value.ShortDescription,
             FullDescription: value.FullDescription,
             Episodes: [],
@@ -402,16 +402,10 @@ class LessonEditor extends React.Component {
                 {
                     view:"datepicker",
                     label: "Планируемая дата публикации",
-                    name: 'ReadyDate',
+                    name: 'DT_ReadyDate',
                     width: 300,
                     stringResult: true,
-                    // on : {
-                    //     onBeforeRender: function(obj) {
-                    //         alert(obj)
-                        // }
-                    // }
                 },
-                {view: "text", name: "ReadyDate", label: "Название урока", placeholder: "Введите название урока(лекции)"},
                 {
                     view: "richtext",
                     // id: "ShortDescription",

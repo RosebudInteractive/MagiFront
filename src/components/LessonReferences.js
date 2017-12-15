@@ -46,7 +46,7 @@ export default class LessonReferences extends Component {
         return <div>
             {message}
             <div className="dlg-btn-bar">
-                <button className="btn-add" onClick={::this.create}/>{' '}
+                <button className="btn-new" onClick={::this.create}/>{' '}
                 <button className='btn-edit' onClick={::this.edit}/>{' '}
                 <button className="btn-up" onClick={::this.moveUp}/>{' '}
                 <button className="btn-down" onClick={::this.moveDown}/>{' '}

@@ -23,7 +23,7 @@ import {
     MOVE_RECOMMENDED_REFERENCE_DOWN,
     MOVE_COMMON_REFERENCE_UP,
     MOVE_COMMON_REFERENCE_DOWN,
-
+    SAVE_LESSON_SUCCESS,
 
 } from '../constants/SingleLesson'
 
@@ -99,12 +99,12 @@ export const saveLesson = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            // .then((data) => {
-            //     dispatch({
-            //         type: HIDE_EDIT_COURSE_DLG,
-            //         payload: data
-            //     })
-            // })
+            .then(() => {
+                dispatch({
+                    type: SAVE_LESSON_SUCCESS,
+                    payload: null
+                })
+            })
             .catch((err) => {
                 dispatch({
                     type: SHOW_ERROR_DIALOG,
@@ -295,6 +295,8 @@ const handleLesson = (lesson) => {
     lesson.id = lesson.Id;
     lesson.mainEpisodes = [];
     lesson.suppEpisodes = [];
+
+    lesson.DT_ReadyDate = new Date(lesson.ReadyDate);
 
     lesson.Episodes.forEach((episode) => {
         episode.id = episode.Id;
