@@ -297,7 +297,7 @@ const DbLesson = class DbLesson extends DbObject {
                             });
                    })
                     .then(() => {
-                        console.log("Course deleted: Id=" + id + ".");
+                        console.log("Lesson deleted: Id=" + id + ".");
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {

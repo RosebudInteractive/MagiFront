@@ -612,5 +612,73 @@ exports.DbEngineInit = class DbEngineInit {
                     console.error("ERROR: " + err.message);
                 });
         }
+
+       // "EpisodesService" tests
+       if (false) {
+           let { LessonsService } = require("./db-lesson");
+           let { CoursesService } = require("./db-course");
+           let { EpisodesService } = require("./db-episode");
+           let crs = CoursesService();
+           let ls = LessonsService();
+           let epi = EpisodesService();
+
+           let course_id = 2;
+           let upd_id = 1;
+           let lesson_id = 1;
+           let new_lesson_id;
+           let new_episode_id;
+
+           epi.get(upd_id, lesson_id)
+               .then((result) => {
+                   console.log("Episode 1 in Lesson 1 [get]: " + JSON.stringify(result));
+               })
+               .then(() => {
+                   return ls.insert({
+                       AuthorId: 3,
+                       LessonType: "L",
+                       URL: null,
+                       State: "D",
+                       ReadyDate: "2017-12-10",
+                       Name: "New Lesson of Course " + course_id,
+                       ShortDescription: "New Lesson of " + course_id + " ShortDescription",
+                       Episodes: [
+                           { Id: 1, Supp: false },
+                           { Id: 2, Supp: true }
+                       ],
+                       References: [
+                           { Number: 1, Description: "Book 1", Recommended: false },
+                           { Number: 1, Description: "Recommended Book 1", Recommended: true }
+                       ]
+                   }, course_id)
+                       .then((result) => {
+                           new_lesson_id = result.id;
+                           return ls.get(result.id, course_id);
+                       });
+               })
+               .then((result) => {
+                   console.log("NEW LESSON in Course " + course_id + " [get]: " + JSON.stringify(result));
+               })
+               .then(() => {
+                   return epi.insert({
+                       EpisodeType: "L",
+                       State: "D",
+                       Audio: "/assets/audio/1.mp3",
+                       Name: "New Episode",
+                       Structure: "{id:1}",
+                       Supp: false,
+                       Transcript: "New Episode of a New Lection " + new_lesson_id
+                   }, new_lesson_id)
+                       .then((result) => {
+                           new_episode_id = result.id;
+                           return epi.get(result.id, new_lesson_id);
+                       });
+               })
+               .then((result) => {
+                   console.log("NEW Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
+               })
+               .catch((err) => {
+                   console.error("ERROR: " + err.message);
+               });
+      }
     }
 }
