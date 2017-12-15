@@ -1,12 +1,70 @@
-/**
- * Created by levan.kiknadze on 13/11/2017.
- */
+const _rows = [
+    {
+        Id: 1,
+        Name: 'Эпизод 1',
+        Number: '1',
+        Audio: '/assets/audio/1.mp3',
+        State: 'D',
+        EpisodeType: 'L',
+        Supp: false,
+        Transcript: 'Описание 1'
+    },
+    {
+        Id: 2,
+        Name: 'Эпизод 2',
+        Number: '2',
+        Audio: '/assets/audio/1.mp3',
+        State: 'R',
+        EpisodeType: 'L',
+        Supp: false,
+        Transcript: 'Описание 2'
+    },
+    {
+        Id: 3,
+        Name: 'Эпизод 3',
+        Number: '3',
+        Audio: '/assets/audio/1.mp3',
+        State: 'A',
+        EpisodeType: 'L',
+        Supp: true,
+        Transcript: 'Описание 3'
+    },
+];
 
 var { DatabasePool } = require("./db_connection");
-var { magisteryConfig } = require("../etc/config")
+var { magisteryConfig } = require("../etc/config");
 
 
-exports.EpisodesService = class EpisodesService {
+const EpisodesService = class EpisodesService {
+    get(id, lessonId) {
+        return new Promise((resolve) => {
+            resolve(_rows[0])
+        });
+    }
+
+    del(id, lessonId) {
+        return new Promise((resolve) => {
+            console.log(id);
+            resolve(null);
+        });
+    }
+
+    update(id, lessonId, data) {
+        return new Promise((resolve) => {
+            console.log(id, data);
+            resolve(data);
+        });
+    }
+
+    insert(lessonId, data) {
+        return new Promise((resolve) => {
+            console.log(data);
+            resolve(_rows[0]);
+        });
+    }
+};
+
+class OldEpisodesService {
     constructor() {
         this._pool = new DatabasePool(magisteryConfig);
     }
@@ -132,3 +190,8 @@ exports.EpisodesService = class EpisodesService {
         });
     }
 }
+
+let dbEpisodes = null;
+exports.LessonsService = () => {
+    return dbEpisodes ? dbEpisodes : dbEpisodes = new EpisodesService();
+};
