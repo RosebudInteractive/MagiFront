@@ -43,13 +43,16 @@ class App extends Component {
                             <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
                             <Route path='/courses/new' component={CourseEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episode/edit/:id'
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episode/edit/:id'
+                                   component={EpisodeEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episode/new'
+                                   render={(props) => (
+                                       <EpisodeEditor {...props} isSupp={false} />
+                                   )}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episode/new'
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episode/edit/:id'
-                                   component={EpisodeEditor}
-                                   isSupp={false}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>

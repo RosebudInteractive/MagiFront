@@ -38,7 +38,7 @@ var { magisteryConfig } = require("../etc/config");
 const EpisodesService = class EpisodesService {
     get(id, lessonId) {
         return new Promise((resolve) => {
-            resolve(_rows[0])
+            resolve(_rows[id])
         });
     }
 

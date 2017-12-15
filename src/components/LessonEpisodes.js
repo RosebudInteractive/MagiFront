@@ -10,7 +10,7 @@ export default class LessonEpisodes extends Component {
     }
 
     create(){
-
+        this.props.createAction();
     }
 
     add() {

@@ -218,18 +218,11 @@ class LessonEditor extends React.Component {
             '/supp-episode/new/');
     }
 
-    _editMainEpisode(episodeId) {
+    _editEpisode(episodeId) {
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
-            '/main-episode/edit/' + episodeId);
-    }
-
-    _editSuppEpisode(episodeId) {
-        this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
-            '/lessons/edit/' + this.props.lessonId +
-            '/supp-episode/edit/' + episodeId);
+            '/episode/edit/' + episodeId);
     }
 
     _moveSuppEpisodeDown(episodeId) {
@@ -344,7 +337,7 @@ class LessonEditor extends React.Component {
 
                     <LessonEpisodes message={'Основные эпизоды'}
                                     createAction={::this._newMainEpisode}
-                                    editAction={::this._editMainEpisode}
+                                    editAction={::this._editEpisode}
                                     removeAction={::this._removeMainEpisode}
                                     moveUpAction={::this._moveMainEpisodeUp}
                                     moveDownAction={::this._moveMainEpisodeDown}
@@ -352,7 +345,7 @@ class LessonEditor extends React.Component {
                     />
                     <LessonEpisodes message={'Дополнительные эпизоды'}
                                     createAction={::this._newSuppEpisode}
-                                    editAction={::this._editSuppEpisode}
+                                    editAction={::this._editEpisode}
                                     removeAction={::this._removeSuppEpisode}
                                     moveUpAction={::this._moveSuppEpisodeUp}
                                     moveDownAction={::this._moveSuppEpisodeDown}

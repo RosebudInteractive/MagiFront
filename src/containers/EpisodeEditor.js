@@ -58,7 +58,7 @@ class EpisodeEditor extends React.Component {
             Audio: value.Audio,
             EpisodeType: value.EpisodeType,
             Transcript: value.Transcript,
-            Supp: value.Supp,
+            Supp: !!+value.Supp,
         };
 
         episodeActions.save(_obj, this.editMode)
@@ -134,7 +134,7 @@ class EpisodeEditor extends React.Component {
                 {
                     view: "button", name: 'btnOk', value: '<<< Назад',//css:'btn-back',
                     click: () => {
-                        saveAction(this._goBack());
+                        this._goBack();
                     }
                 },
                 {view: "text", name: "Name", label: "Название эпизода", placeholder: "Введите название эпизода"},
@@ -196,7 +196,7 @@ class EpisodeEditor extends React.Component {
 }
 
 EpisodeEditor.propTypes = {
-    isSupp : PropTypes.bool.isRequired
+    isSupp : PropTypes.bool
 };
 
 function mapStateToProps(state, ownProps) {

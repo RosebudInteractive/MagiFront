@@ -23,7 +23,7 @@ export default function singleEpisode(state = initialState, action) {
             let _episode = {
                 Number: action.payload.Number,
                 State:'D',
-                EpisodeType: action.payload.LessonType,
+                EpisodeType: action.payload.EpisodeType,
                 Supp: action.payload.Supp,
             };
 
