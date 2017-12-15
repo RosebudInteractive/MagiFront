@@ -22,6 +22,7 @@ import {
     CHANGE_LESSON_DATA,
     CANCEL_CHANGE_LESSON_DATA,
     SAVE_LESSON_SUCCESS,
+    CLEAR_LESSON,
 } from '../constants/SingleLesson'
 
 import * as tools from './tools';
@@ -266,6 +267,10 @@ export default function singleLesson(state = initialState, action) {
                 fetching: false,
                 hasChanges : false,
             };
+        }
+
+        case CLEAR_LESSON:{
+            return initialState
         }
 
         default:

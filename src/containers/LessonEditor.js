@@ -57,6 +57,10 @@ class LessonEditor extends React.Component {
         }
     }
 
+    componentWillUnmount(){
+        this.props.lessonActions.clearLesson()
+    }
+
     saveLesson(value) {
         let _obj = {
             id: value.id,
@@ -280,6 +284,10 @@ class LessonEditor extends React.Component {
         this.props.referenceActions.clearReference();
     }
 
+    _goBack() {
+        this.props.history.goBack()
+    }
+
     render() {
         let _isEditMode = this.editMode === EDIT_MODE_EDIT;
 
@@ -377,6 +385,12 @@ class LessonEditor extends React.Component {
             width: 700,
             id: 'mainData',
             elements: [
+                {
+                    view: "button", name: 'btnOk', value:'<<< Назад',//css:'btn-back',
+                    click: () => {
+                        saveAction(this._goBack());
+                    }
+                },
                 {view: "text", name: "CourseName", label: "Название курса", readonly: true},
                 {view: "text", name: "Number", label: "Номер урока", readonly: true},
                 {
@@ -405,22 +419,18 @@ class LessonEditor extends React.Component {
                     name: 'DT_ReadyDate',
                     width: 300,
                     stringResult: true,
+                    format: this.formatDate,
                 },
                 {
                     view: "richtext",
-                    // id: "ShortDescription",
                     label: "Краткое описание",
-                    // labelPosition: "left",
                     height: 100,
                     width: 500,
                     name: "ShortDescription",
                 },
                 {
                     view: "richtext",
-                    // id: "ShortDescription",
                     label: "Полное описание",
-                    // labelPosition: "right",
-                    // labelWidth : 50,
                     height: 150,
                     width: 500,
                     name: "FullDescription",
@@ -461,6 +471,11 @@ class LessonEditor extends React.Component {
                 },
             }
         };
+    }
+
+    formatDate(data) {
+        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+        return fn(new Date(data));
     }
 }
 
