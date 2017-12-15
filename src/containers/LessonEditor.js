@@ -204,8 +204,32 @@ class LessonEditor extends React.Component {
         this.props.lessonActions.removeMainEpisode(episodeId)
     }
 
-    _editEpisode(episodeId) {
-        alert(episodeId);
+    _newMainEpisode() {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/main-episode/new');
+    }
+
+    _newSuppEpisode() {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/supp-episode/new/');
+    }
+
+    _editMainEpisode(episodeId) {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/main-episode/edit/' + episodeId);
+    }
+
+    _editSuppEpisode(episodeId) {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/supp-episode/edit/' + episodeId);
     }
 
     _moveSuppEpisodeDown(episodeId) {
@@ -319,16 +343,16 @@ class LessonEditor extends React.Component {
                     />
 
                     <LessonEpisodes message={'Основные эпизоды'}
-                                    createAction={::this._editEpisode}
-                                    editAction={::this._editEpisode}
+                                    createAction={::this._newMainEpisode}
+                                    editAction={::this._editMainEpisode}
                                     removeAction={::this._removeMainEpisode}
                                     moveUpAction={::this._moveMainEpisodeUp}
                                     moveDownAction={::this._moveMainEpisodeDown}
                                     data={mainEpisodes}
                     />
                     <LessonEpisodes message={'Дополнительные эпизоды'}
-                                    createAction={::this._editEpisode}
-                                    editAction={::this._editEpisode}
+                                    createAction={::this._newSuppEpisode}
+                                    editAction={::this._editSuppEpisode}
                                     removeAction={::this._removeSuppEpisode}
                                     moveUpAction={::this._moveSuppEpisodeUp}
                                     moveDownAction={::this._moveSuppEpisodeDown}

@@ -192,6 +192,6 @@ class OldEpisodesService {
 }
 
 let dbEpisodes = null;
-exports.LessonsService = () => {
+exports.EpisodesService = () => {
     return dbEpisodes ? dbEpisodes : dbEpisodes = new EpisodesService();
 };

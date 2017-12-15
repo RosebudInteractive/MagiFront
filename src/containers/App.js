@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-// import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
 import { Switch, Route, withRouter, } from 'react-router-dom'
@@ -14,6 +13,7 @@ import CategoriesForm from './CategoryForm';
 import Courses from './Courses';
 import CourseEditor from './CourseEditor';
 import LessonEditor from './LessonEditor';
+import EpisodeEditor from './EpisodeEditor';
 
 class App extends Component {
     render() {
@@ -43,6 +43,14 @@ class App extends Component {
                             <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
                             <Route path='/courses/new' component={CourseEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episode/edit/:id'
+                                   render={(props) => (
+                                       <EpisodeEditor {...props} isSupp={true} />
+                                   )}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episode/edit/:id'
+                                   component={EpisodeEditor}
+                                   isSupp={false}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>
