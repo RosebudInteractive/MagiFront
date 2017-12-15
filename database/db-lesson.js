@@ -483,8 +483,7 @@ const DbLesson = class DbLesson extends DbObject {
                             if (epi_list[key].deleted) {
                                 if (epi_list[key].isOwner)
                                     needToDeleteOwn = true
-                                else
-                                    epi_collection._del(epi_list[key].obj);
+                                epi_collection._del(epi_list[key].obj);
                             }
                             else {
                                 for (let field in epi_list[key].data)

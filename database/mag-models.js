@@ -110,7 +110,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
-            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });
@@ -138,7 +138,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("EpisodeLesson", "94d10a1d-d902-489b-8243-5c2dfea57174", "RootEpisodeLesson", "83abc96a-5184-4ed2-a9f2-ccd64733a22e")
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
-            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentCascade", allowNull: false })
+            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentRestrict", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
             .addField("Supp", { type: "boolean", allowNull: false });
 

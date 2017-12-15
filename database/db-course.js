@@ -237,7 +237,26 @@ const DbCourse = class DbCourse extends DbObject {
                 this._getObjById(id, {
                     expr: {
                         model: {
-                            name: "Course"
+                            name: "Course",
+                            childs: [
+                                {
+                                    dataObject: {
+                                        name: "Lesson",
+                                        childs: [
+                                            {
+                                                dataObject: {
+                                                    name: "EpisodeLesson"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    dataObject: {
+                                        name: "LessonCourse"
+                                    }
+                                }
+                            ]
                         }
                     }
                 })
@@ -406,8 +425,7 @@ const DbCourse = class DbCourse extends DbObject {
                             if (ls_list[key].deleted) {
                                 if (ls_list[key].isOwner)
                                     needToDeleteOwn = true
-                                else
-                                    ls_collection._del(ls_list[key].obj);
+                                ls_collection._del(ls_list[key].obj);
                             }
                             else {
                                 ls_list[key].obj.number(ls_list[key].data.Number);

@@ -412,22 +412,6 @@ exports.DbEngineInit = class DbEngineInit {
                     console.log("get: " + JSON.stringify(result));
                 })
                 .then(() => {
-                    return crs.update(1, {
-                        "Authors": [1],
-                        "Categories": [10, 8],
-                        "Lessons": [
-                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
-                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" }
-                        ]
-                    });
-                })
-                .then((result) => {
-                    return crs.get(1);
-                })
-                .then((result) => {
-                    console.log("get after update 1: " + JSON.stringify(result));
-                })
-                .then(() => {
                     return crs.update(upd_id, {
                         "Color": 333,
                         "Name": "Новый курс XXXXX",
@@ -451,6 +435,22 @@ exports.DbEngineInit = class DbEngineInit {
                 })
                 .then((result) => {
                     console.log("Deleted: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return crs.update(1, {
+                        "Authors": [1],
+                        "Categories": [10, 8],
+                        "Lessons": [
+                            { "LessonId": 2, "ReadyDate": "2018-01-30", "State": "D" },
+                            { "LessonId": 3, "ReadyDate": "2017-12-30", "State": "D" }
+                        ]
+                    });
+                })
+                .then((result) => {
+                    return crs.get(1);
+                })
+                .then((result) => {
+                    console.log("get after update 1: " + JSON.stringify(result));
                 })
                 .catch((err) => {
                     console.error("ERROR: " + err.message);
@@ -577,6 +577,16 @@ exports.DbEngineInit = class DbEngineInit {
                 })
                 .then((result) => {
                     console.log("Update 1st LESSON in the 1st COURSE [get]: " + JSON.stringify(result));
+                })
+                .then((result) => {
+                    // Delete NEW_LESSON from NEW COURSE
+                    return ls.del(new_lesson_id, new_course_id)
+                        .then(() => {
+                            return ls.get(new_lesson_id, new_course_id);
+                        });
+                })
+                .then((result) => {
+                    console.log("NEW_LESSON in NEW COURSE [get]: " + JSON.stringify(result));
                 })
                 .then((result) => {
                     // Delete Lesson 1 from NEW COURSE
