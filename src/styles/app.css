@@ -110,6 +110,22 @@
   /*margin-left: 2px;*/
   margin-bottom: 2px;
 }
+.btn-back {
+  background: url(./../icons/arrow_left.svg);
+  border-radius: 2px;
+  background-size: contain;
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  background-color: #96c8ff;
+  height: 2.5714em;
+  /*height: 25px;*/
+  width: 2.5714em;
+  border: none;
+  /*margin-left: 2px;*/
+  margin-bottom: 2px;
+}
 
 .btn {
   border: none;

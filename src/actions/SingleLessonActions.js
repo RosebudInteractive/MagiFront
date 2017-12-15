@@ -24,6 +24,7 @@ import {
     MOVE_COMMON_REFERENCE_UP,
     MOVE_COMMON_REFERENCE_DOWN,
     SAVE_LESSON_SUCCESS,
+    CLEAR_LESSON,
 
 } from '../constants/SingleLesson'
 
@@ -276,6 +277,15 @@ export const cancelCanges = ()=> {
         });
     }
 };
+
+export const clearLesson = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CLEAR_LESSON,
+            payload: null
+        });
+    }
+}
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {
