@@ -2,7 +2,8 @@
  * Created by levan.kiknadze on 14/11/2017.
  */
 
-let { EpisodesService } = require("../database/episodes");
+//let { EpisodesService } = require("../database/episodes");
+let { EpisodesService } = require("../database/db-episode");
 
 function setupEpisodes(app) {
     app.get('/api/episodes/:id/:lessonId', (req, res, next) => {

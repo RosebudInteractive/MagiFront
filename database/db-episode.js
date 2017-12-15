@@ -218,18 +218,18 @@ const DbEpisode = class DbEpisode extends DbObject {
                     .then(() => {
 
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
-                            epi_obj.authorId(inpFields["EpisodeType"]);
+                            epi_obj.episodeType(inpFields["EpisodeType"]);
 
                         if (typeof (inpFields["State"]) !== "undefined")
                             epi_lng_obj.state(inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
                             epi_lng_obj.name(inpFields["Name"]);
                         if (typeof (inpFields["Transcript"]) !== "undefined")
-                            epi_lng_obj.shortDescription(inpFields["Transcript"]);
+                            epi_lng_obj.transcript(inpFields["Transcript"]);
                         if (typeof (inpFields["Audio"]) !== "undefined")
-                            epi_lng_obj.fullDescription(inpFields["Audio"]);
+                            epi_lng_obj.audio(inpFields["Audio"]);
                         if (typeof (inpFields["Structure"]) !== "undefined")
-                            epi_lng_obj.fullDescription(inpFields["Structure"]);
+                            epi_lng_obj.structure(inpFields["Structure"]);
 
                     })
                     .then(() => {
@@ -319,7 +319,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                     .then(() => {
                         let root_lsn = lesson_obj.getDataRoot("EpisodeLesson");
                         let collection = root_lsn.getCol("DataElements");
-                        let Number = collection.count() + 1;
+                        let Number = 1;
+                        for (let i = 0; i < collection.count(); i++)
+                            if (collection.get(i).supp() === inpFields.Supp)
+                                Number++;    
                         return root_lsn.newObject({
                             fields: { EpisodeId: newId, Supp: inpFields.Supp, Number: Number }
                         }, opts);
