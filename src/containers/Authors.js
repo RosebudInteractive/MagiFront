@@ -75,7 +75,7 @@ class Authors extends React.Component {
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={authors} />
+                                <Webix ui={::this.getUI(::this.select, selected)} data={authors} />
                             </div>
                         </div>
             }
@@ -93,7 +93,7 @@ class Authors extends React.Component {
         </div>
     }
 
-    getUI(select) {
+    getUI(select, selected) {
         return {
             view: "datatable",
             scroll: false,
@@ -111,6 +111,11 @@ class Authors extends React.Component {
             on: {
                 onAfterSelect: function (selObj) {
                     select(selObj.id);
+                },
+                onAfterRender: function() {
+                    if ((selected) && this.getItem(selected)) {
+                        this.select(selected)
+                    }
                 }
             }
         };

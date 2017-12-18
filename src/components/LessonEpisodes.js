@@ -46,7 +46,7 @@ export default class LessonEpisodes extends Component {
     }
 
     _hasSelected() {
-        return this.select !== null
+        return this.selected !== null
     }
 
     render () {
@@ -60,11 +60,11 @@ export default class LessonEpisodes extends Component {
                 <button className="btn-up" onClick={::this.moveUp}/>{' '}
                 <button className="btn-down" onClick={::this.moveDown}/>{' '}
             </div>
-            <Webix ui={::this.getUI(::this.select)} data={data}/>
+            <Webix ui={::this.getUI(this.selected)} data={data}/>
         </div>
     }
 
-    getUI() {
+    getUI(selected) {
         return {
             view: "datatable",
             scroll: false,
@@ -88,6 +88,11 @@ export default class LessonEpisodes extends Component {
             on: {
                 onAfterSelect: (selObj) => {
                     this.select(selObj.id);
+                },
+                onAfterRender: function() {
+                    if ((selected) && this.getItem(selected)) {
+                        this.select(selected)
+                    }
                 }
             },
 
