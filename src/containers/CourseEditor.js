@@ -15,9 +15,7 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-import CourseLessons from '../components/CourseLessons';
-import CourseAuthors from '../components/CourseAuthors';
-import CourseCategories from '../components/CourseCategories';
+import { CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
 import LookupDialog from '../components/LookupDialog';
 
 class CourseEditor extends React.Component {
@@ -103,6 +101,14 @@ class CourseEditor extends React.Component {
         this.props.courseActions.hideAddAuthorDialog();
     }
 
+    _removeAuthorFromCourse(id) {
+        this.props.courseActions.removeAuthor(id)
+    }
+
+    _selectAuthor(id) {
+        this.props.courseActions.selectAuthor(id)
+    }
+
     getCourseAuthors() {
         const {
             authors,
@@ -139,8 +145,16 @@ class CourseEditor extends React.Component {
     }
 
     addCategoryAction(id) {
-        this.props.courseActions.addCategory(id);
         this.props.courseActions.hideAddCategoryDialog();
+        this.props.courseActions.addCategory(id);
+    }
+
+    _removeCategoryFromCourse(id) {
+        this.props.courseActions.removeCategory(id)
+    }
+
+    _selectCategory(id) {
+        this.props.courseActions.selectCategory(id)
     }
 
     getCourseCategories() {
@@ -157,11 +171,11 @@ class CourseEditor extends React.Component {
     getCategories() {
         const {
             categories,
-            course
+            courseCategories
         } = this.props;
 
         let _filtered = categories.filter((value) => {
-            return !course.Categories.includes(value.id);
+            return !courseCategories.includes(value.id);
         });
 
         return _filtered.map((element) => {
@@ -173,12 +187,28 @@ class CourseEditor extends React.Component {
         return this.props.hasChanges;
     }
 
+    _selectLesson(id){
+        this.props.courseActions.selectLesson(id)
+    }
+
     _editLesson(id) {
         this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/edit/' + id);
     }
 
     _createLesson() {
         this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/new/');
+    }
+
+    _moveUpLesson(id) {
+        this.props.courseActions.moveLessonUp(id);
+    }
+
+    _moveDownLesson(id) {
+        this.props.courseActions.moveLessonDown(id);
+    }
+
+    _removeLessonFromCourse(id) {
+        this.props.courseActions.removeLesson(id)
     }
 
     render() {
@@ -189,7 +219,10 @@ class CourseEditor extends React.Component {
             showAddAuthorDialog,
             showAddCategoryDialog,
             fetching,
-            courseLessons
+            courseLessons,
+            selectedAuthor,
+            selectedCategory,
+            selectedLesson,
         } = this.props;
 
         return (
@@ -198,16 +231,26 @@ class CourseEditor extends React.Component {
                 :
                 <div>
                     <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
-                    <CourseAuthors addAuthorAction={::this.showAddAuthorLookup}
+                    <CourseAuthors addAction={::this.showAddAuthorLookup}
+                                   removeAction={::this._removeAuthorFromCourse}
+                                   selectAction={::this._selectAuthor}
+                                   selected={selectedAuthor}
                                    data={::this.getCourseAuthors()}/>
-                    <CourseCategories addCategoryAction={::this.showAddCategoryLookup}
+                    <CourseCategories addAction={::this.showAddCategoryLookup}
+                                      removeAction={::this._removeCategoryFromCourse}
+                                      selectAction={::this._selectCategory}
+                                      selected={selectedCategory}
                                       data={::this.getCourseCategories()}/>
                     <CourseLessons data={courseLessons}
-                                   editAction={::this._editLesson}
+                                   selectAction={::this._selectLesson}
                                    createAction={::this._createLesson}
-
+                                   // addAction={::this._addLesson}
+                                   removeAction={::this._removeLessonFromCourse}
+                                   editAction={::this._editLesson}
+                                   moveUpAction={::this._moveUpLesson}
+                                   moveDownAction={::this._moveDownLesson}
+                                   selected={selectedLesson}
                     />
-                    {/*<Webix ui={::this.getButtons()}/>*/}
                     {
                         errorDlgShown ?
                             <ErrorDialog
@@ -255,7 +298,7 @@ class CourseEditor extends React.Component {
             width: 700,
             id: 'mainData',
             elements: [
-                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название"},
+                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название",},
 
                 {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL"},
                 {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса',},
@@ -283,8 +326,10 @@ class CourseEditor extends React.Component {
                         {
                             view: "button", name: 'btnOk', value: "ОК",
                             click: function() {
-                                if (saveAction)
+                                let _validated = this.getFormView().validate();
+                                if ((saveAction) && _validated) {
                                     saveAction(this.getFormView().getValues());
+                                }
                             }
                         },
                         {
@@ -295,10 +340,16 @@ class CourseEditor extends React.Component {
                             }
                         }
                     ]
-                }
+                },
             ],
+            rules:{
+                "Name" : window.webix.rules.isNotEmpty,
+                "ColorHex": window.webix.rules.isNotEmpty,
+                "State": window.webix.rules.isNotEmpty
+            },
             on: {
                 onChange: function () {
+                    this.validate();
                     changeData(::this.getValues());
                 },
                 onValues: function() {
@@ -313,34 +364,14 @@ class CourseEditor extends React.Component {
             }
         };
     }
-
-    getButtons() {
-        return {
-            view: "form", width : 700, elements: [{
-                cols: [
-                    {},
-                    {},
-                    {
-                        view: "button", value: "ОК",
-                        click: () => {
-                            ::this.saveCourse();
-                        }
-                    },
-                    {
-                        view: "button", value: "Отмена", click: function () {
-                        // if (cancel)
-                        //     cancel();
-                    }
-                    }
-                ]
-            }]
-        }
-    }
 }
 
 function mapStateToProps(state, ownProps) {
     return {
         authors: state.authors.authors,
+        selectedAuthor: state.courseAuthors.selected,
+        selectedCategory: state.courseCategories.selected,
+        selectedLesson: state.courseLessons.selected,
         categories: state.categories.categories,
         course: state.singleCourse.course,
         courseAuthors: state.singleCourse.authors,

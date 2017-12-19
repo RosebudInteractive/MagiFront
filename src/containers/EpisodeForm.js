@@ -8,7 +8,7 @@ import Webix from '../components/Webix';
 
 export default class EpisodeForm extends Component {
     render() {
-        const { episode, save, cancel } = this.props
+        const { episode, save, cancel } = this.props;
         return <div className="dlg">
             <div className="dlg-bg">
             </div>

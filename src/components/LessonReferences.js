@@ -57,6 +57,7 @@ export default class LessonReferences extends Component {
 
     getUI() {
         return {
+            container :'MainEpisodesDiv',
             view: "datatable",
             scroll: false,
             autoheight: true,

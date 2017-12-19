@@ -50,7 +50,7 @@ export default class LessonEpisodes extends Component {
     }
 
     render () {
-        const {message, data} = this.props;
+        const {message, data, divName} = this.props;
         return <div>
             {message}
             <div className="dlg-btn-bar">
@@ -60,12 +60,15 @@ export default class LessonEpisodes extends Component {
                 <button className="btn-up" onClick={::this.moveUp}/>{' '}
                 <button className="btn-down" onClick={::this.moveDown}/>{' '}
             </div>
-            <Webix ui={::this.getUI(this.selected)} data={data}/>
+            <Webix ui={::this.getUI(this.selected, divName)} data={data}/>
         </div>
     }
 
-    getUI(selected) {
+    getUI(selected, divName)  {
+        // let that = this;
+
         return {
+            container: divName,
             view: "datatable",
             scroll: false,
             autoheight: true,
@@ -93,7 +96,7 @@ export default class LessonEpisodes extends Component {
                     if ((selected) && this.getItem(selected)) {
                         this.select(selected)
                     }
-                }
+                },
             },
 
             onClick: {

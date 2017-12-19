@@ -13,6 +13,8 @@ import singleCourse from './singleCourse';
 import singleLesson from './singleLesson';
 import languages from './languages';
 import courseAuthors from './courseAuthors';
+import courseCategories from './courseCategories';
+import courseLessons from './courseLessons';
 import singleEpisode from './singleEpisode';
 import references from './references';
 
@@ -28,6 +30,8 @@ export default combineReducers({
     courses,
     singleCourse,
     courseAuthors,
+    courseCategories,
+    courseLessons,
     singleLesson,
     references,
     singleEpisode,

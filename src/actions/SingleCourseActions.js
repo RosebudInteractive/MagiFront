@@ -4,15 +4,18 @@ import {
     GET_SINGLE_COURSE_SUCCESS,
     GET_SINGLE_COURSE_FAIL,
     SHOW_ADD_AUTHOR_DIALOG,
+    SELECT_COURSE_AUTHOR,
     ADD_AUTHOR,
     REMOVE_AUTHOR,
     HIDE_ADD_AUTHOR_DIALOG,
     SHOW_ADD_CATEGORY_DIALOG,
+    SELECT_COURSE_CATEGORY,
     ADD_CATEGORY,
     REMOVE_CATEGORY,
     HIDE_ADD_CATEGORY_DIALOG,
     CHANGE_DATA,
     CANCEL_CHANGE_DATA,
+    SELECT_COURSE_LESSON,
     REMOVE_LESSON,
     MOVE_LESSON_UP,
     MOVE_LESSON_DOWN,
@@ -31,6 +34,7 @@ import {
 
 
 import 'whatwg-fetch';
+// import {SELECT_COURSE} from "../constants/Courses";
 
 export const getCourse = (id)=> {
     return (dispatch) => {
@@ -83,10 +87,24 @@ export const showAddAuthorDialog = () => {
     }
 };
 
+export const selectAuthor = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_COURSE_AUTHOR,
+            payload: id
+        });
+    }
+};
+
 export const addAuthor = (id) => {
     return (dispatch) => {
         dispatch({
             type: ADD_AUTHOR,
+            payload: id
+        });
+
+        dispatch({
+            type: SELECT_COURSE_AUTHOR,
             payload: id
         });
     }
@@ -119,10 +137,24 @@ export const showAddCategoryDialog = () => {
     }
 };
 
+export const selectCategory = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_COURSE_CATEGORY,
+            payload: id
+        });
+    }
+}
+
 export const addCategory = (id) => {
     return (dispatch) => {
         dispatch({
             type: ADD_CATEGORY,
+            payload: id
+        });
+
+        dispatch({
+            type: SELECT_COURSE_CATEGORY,
             payload: id
         });
     }
@@ -163,6 +195,15 @@ export const cancelCanges = ()=> {
         });
     }
 };
+
+export const selectLesson = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_COURSE_LESSON,
+            payload: id
+        });
+    }
+}
 
 export const removeLesson = (id) => {
     return (dispatch) => {

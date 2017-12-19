@@ -76,10 +76,13 @@ class CategoryForm extends React.Component {
                     cols: [
                         {},
                         {
-                            view: "button", value: "ОК", click: function(){
-                            if (save)
-                                save(this.getFormView().getValues());
-                        }
+                            view: "button", value: "ОК",
+                            click: function () {
+                                let _validated = this.getFormView().validate();
+                                if ((save) && _validated) {
+                                    save(this.getFormView().getValues());
+                                }
+                            }
                         },
                         {
                             view: "button", value: "Отмена", click: function(){
@@ -89,7 +92,10 @@ class CategoryForm extends React.Component {
                         }
                     ]
                 }
-            ]
+            ],
+            rules: {
+                Name: window.webix.rules.isNotEmpty,
+            }
         }
     }
 }

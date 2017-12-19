@@ -13,6 +13,7 @@ import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 class Categories extends React.Component {
     componentDidMount(){
         this.props.categoriesActions.getCategories();
+        this._selected = null;
     }
 
     onAddBtnClick() {
@@ -51,6 +52,7 @@ class Categories extends React.Component {
             deleteDlgShown,
             errorDlgShown,
         } = this.props;
+        this._selected = selected;
 
         return <div className="categories">
             {
@@ -77,7 +79,7 @@ class Categories extends React.Component {
                                 >Удалить...</button>
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={categories} />
+                                <Webix ui={::this.getUI()} data={categories} />
                             </div>
                         </div>
             }
@@ -104,7 +106,9 @@ class Categories extends React.Component {
         </div>
     }
 
-    getUI(select) {
+    getUI() {
+        let that = this;
+
         return {
             view: "datatable",
             scroll: false,
@@ -116,8 +120,15 @@ class Categories extends React.Component {
                 {id: "ParentName", header: "Родительская категория", fillspace: true},
             ],
             on: {
-                onAfterSelect: function (selObj) {
-                    select(selObj.id);
+                onAfterSelect: function(selObj) {
+                    if (selObj.id !== that._selected)
+                    that._selected = null;
+                    that.select(selObj.id);
+                },
+                onAfterRender: function() {
+                    if ((that._selected) && this.getItem(that._selected)) {
+                        this.select(that._selected)
+                    }
                 }
             }
         };

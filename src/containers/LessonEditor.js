@@ -29,6 +29,8 @@ class LessonEditor extends React.Component {
             course
         } = this.props;
 
+        this._currentPage = 'MainEpisodes';
+
         if ((!course) || (course.id !== courseId)) {
             singleCourseActions.getCourse(courseId);
         }
@@ -91,7 +93,7 @@ class LessonEditor extends React.Component {
                 Id: episode.Id,
                 Name: episode.Name,
                 State: episode.State,
-                Number:episode.Number,
+                Number: episode.Number,
                 Supp: false,
             })
         });
@@ -101,7 +103,7 @@ class LessonEditor extends React.Component {
                 Id: episode.Id,
                 Name: episode.Name,
                 State: episode.State,
-                Number:episode.Number,
+                Number: episode.Number,
                 Supp: true,
             })
         })
@@ -305,6 +307,13 @@ class LessonEditor extends React.Component {
         this.props.history.goBack()
     }
 
+    _changePage(newPage){
+        if (this._currentPage !== newPage) {
+            this._currentPage = newPage;
+            this.render();
+        }
+    }
+
     render() {
         let _isEditMode = this.editMode === EDIT_MODE_EDIT;
 
@@ -321,6 +330,11 @@ class LessonEditor extends React.Component {
             reference,
         } = this.props;
 
+        let _showMainEpisodes = this._currentPage === 'MainEpisodes';
+        let _showSuppEpisodes = this._currentPage === 'SuppEpisodes';
+        let _showCommonRefs = this._currentPage === 'CommonRefs';
+        let _showRecommendedRefs = this._currentPage === 'RecommendedRefs';
+
         return (
             fetching ?
                 <p>Загрузка...</p>
@@ -334,39 +348,60 @@ class LessonEditor extends React.Component {
                             _isEditMode)}
                            data={lesson}
                     />
-
-                    <LessonEpisodes message={'Основные эпизоды'}
-                                    createAction={::this._newMainEpisode}
-                                    editAction={::this._editEpisode}
-                                    removeAction={::this._removeMainEpisode}
-                                    moveUpAction={::this._moveMainEpisodeUp}
-                                    moveDownAction={::this._moveMainEpisodeDown}
-                                    data={mainEpisodes}
-                    />
-                    <LessonEpisodes message={'Дополнительные эпизоды'}
-                                    createAction={::this._newSuppEpisode}
-                                    editAction={::this._editEpisode}
-                                    removeAction={::this._removeSuppEpisode}
-                                    moveUpAction={::this._moveSuppEpisodeUp}
-                                    moveDownAction={::this._moveSuppEpisodeDown}
-                                    data={suppEpisodes}
-                    />
-                    <LessonReferences message={'Список литературы'}
-                                      createAction={::this._createCommonReference}
-                                      editAction={::this._editCommonReference}
-                                      removeAction={::this._removeCommonReference}
-                                      moveUpAction={::this._moveCommonReferenceUp}
-                                      moveDownAction={::this._moveCommonReferenceDown}
-                                      data={commonRef}
-                    />
-                    <LessonReferences message={'Рекомендуемая литература'}
-                                      createAction={::this._createRecommendedReference}
-                                      editAction={::this._editRecommendedReference}
-                                      removeAction={::this._removeRecommendedReference}
-                                      moveUpAction={::this._moveRecommendedReferenceUp}
-                                      moveDownAction={::this._moveRecommendedReferenceDown}
-                                      data={recommendedRef}
-                    />
+                    {
+                        _showMainEpisodes ?
+                            <LessonEpisodes message={'Основные эпизоды'}
+                                            divName={'MainEpisodesDiv'}
+                                            createAction={::this._newMainEpisode}
+                                            editAction={::this._editEpisode}
+                                            removeAction={::this._removeMainEpisode}
+                                            moveUpAction={::this._moveMainEpisodeUp}
+                                            moveDownAction={::this._moveMainEpisodeDown}
+                                            data={mainEpisodes}
+                            />
+                            :
+                            ''
+                    }
+                    {
+                        _showSuppEpisodes ?
+                            <LessonEpisodes message={'Дополнительные эпизоды'}
+                                            divName={'SuppEpisodesDiv'}
+                                            createAction={::this._newSuppEpisode}
+                                            editAction={::this._editEpisode}
+                                            removeAction={::this._removeSuppEpisode}
+                                            moveUpAction={::this._moveSuppEpisodeUp}
+                                            moveDownAction={::this._moveSuppEpisodeDown}
+                                            data={suppEpisodes}
+                            />
+                            :
+                            ''
+                    }
+                    {
+                        _showCommonRefs ?
+                            <LessonReferences message={'Список литературы'}
+                                              createAction={::this._createCommonReference}
+                                              editAction={::this._editCommonReference}
+                                              removeAction={::this._removeCommonReference}
+                                              moveUpAction={::this._moveCommonReferenceUp}
+                                              moveDownAction={::this._moveCommonReferenceDown}
+                                              data={commonRef}
+                            />
+                            :
+                            ''
+                    }
+                    {
+                        _showRecommendedRefs ?
+                            <LessonReferences message={'Рекомендуемая литература'}
+                                              createAction={::this._createRecommendedReference}
+                                              editAction={::this._editRecommendedReference}
+                                              removeAction={::this._removeRecommendedReference}
+                                              moveUpAction={::this._moveRecommendedReferenceUp}
+                                              moveDownAction={::this._moveRecommendedReferenceDown}
+                                              data={recommendedRef}
+                            />
+                            :
+                            ''
+                    }
                     {
                         errorDlgShown ?
                             <ErrorDialog
@@ -402,6 +437,116 @@ class LessonEditor extends React.Component {
             width: 700,
             id: 'mainData',
             elements: [
+                // {
+                //     container: "areaA",
+                //     height: 500,
+                //     type: "space", padding: 8,
+                //
+                //     rows: [
+                //         {
+                //             type: "clean",
+                //             rows: [
+                //                 {
+                //                     borderless: true,
+                //                     view: "tabview",
+                //                     id: 'tabbar',
+                //                     // value: 'listView',
+                //                     multiview: true,
+                //
+                //                     // options: [
+                //                     //     {value: 'Основные эпизоды', id: 'MainEpisodes'},
+                //                     //     {value: 'Доп. эпизоды', id: 'SuppEpisodes'},
+                //                     //     {value: 'Список литературы', id: 'CommonRefs'},
+                //                     //     {value: 'Рекомендуемая литература', id: 'RecommendedRefs'},
+                //                     // ],
+                //
+                //                     on: {
+                //                         onChange: (newv) => {
+                //                             this._changePage(newv);
+                //                         },
+                //                     },
+                //                 },
+                //                 {
+                //                     cells: [
+                //                         {
+                //                             header : 'Основные эпизоды',
+                //                             body:{
+                //                                 id: "MainEpisodes",
+                //                                 // template: "<div id='MainEpisodesDiv' />",
+                //                                 type: {
+                //                                     width: 120
+                //                                 },
+                //                                 select: true,
+                //                             }
+                //
+                //                         },
+                //                         {
+                //                             header : '2',
+                //                             body: {
+                //                                 id: "SuppEpisodes",
+                //                                 // template: "<div id='SuppEpisodesDiv'/>",
+                //                             }
+                //
+                //                         },
+                //                         {
+                //                             header: '3',
+                //                             body: {
+                //                                 id: "CommonRefs",
+                //                                 // template: "<div id='CommonRefsDiv'/>",
+                //                             }
+                //
+                //                         },
+                //                         // {
+                //                         //     id: "formView",
+                //                         //     view: "htmlform",
+                //                         //     content: "areaB",
+                //                         //     // rules: {
+                //                         //     //     title: webix.rules.isNotEmpty,
+                //                         //     //     year: webix.rules.isNumber,
+                //                         //     //     rank: webix.rules.isNumber
+                //                         //     // }
+                //                         // },
+                //                         // {id: "SuppEpisodes", template: " "}
+                //                     ]
+                //                 },
+                //             ]
+                //         }
+                //     ]
+                // },
+                {
+                    container: "areaA",
+                    borderless: true,
+                    height: 500,
+
+                    view: "tabview",
+                    cells: [
+                        {
+                            header: '1',
+                            body: {
+                                id: "MainEpisodes",
+                                template: "<div id='MainEpisodesDiv' />",
+                                type: {
+                                    width: 120
+                                },
+                                select: true,
+                            }
+                        },
+                        {
+                            header: '2',
+                            body: {
+                                id: "SuppEpisodes",
+                                template: "<div id='SuppEpisodesDiv'/>",
+                            }
+                        },
+                        {header: "Empty", body: {}}
+                    ],
+                    on: {
+                        onChange: (newv) => {
+                            this._changePage(newv);
+                        },
+                    },
+                },
+
                 {
                     view: "button", name: 'btnOk', value:'<<< Назад',//css:'btn-back',
                     click: () => {

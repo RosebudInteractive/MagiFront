@@ -13,6 +13,7 @@ import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 class Coureses extends React.Component {
     componentDidMount(){
         this.props.coursesActions.getCourses();
+        this._selected = null;
     }
 
     onAddBtnClick() {
@@ -51,6 +52,7 @@ class Coureses extends React.Component {
             deleteDlgShown,
             errorDlgShown,
         } = this.props;
+        this._selected = selected;
 
         return <div className="courses">
             {
@@ -104,10 +106,8 @@ class Coureses extends React.Component {
         </div>
     }
 
-    getUI(select) {
-        // function getColorStyle(value) {
-        //     return {color : value}
-        // }
+    getUI() {
+        let that = this;
 
         return {
             view: "datatable",
@@ -116,7 +116,6 @@ class Coureses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                // {id: 'Cover', header: 'Обложка', width:150, template : "<img src='#Cover#'/>"},
                 {id: 'Name', header: 'Название', width: 200},
                 {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"}, //cssFormat: getColorStyle},
                 {id: 'URL', header: 'Ярлык URL', width : 150, template:"<a href='#URL#'>#URL#</a>"},
@@ -127,11 +126,14 @@ class Coureses extends React.Component {
             ],
             on: {
                 onAfterSelect: function (selObj) {
-                    select(selObj.id);
+                    if (selObj.id !== that._selected)
+                        that._selected = null;
+                    that.select(selObj.id);
                 },
-                onBeforeAdd: function(id, data) {
-                    if (data.values[0].value === "")
-                        data.values[0].value = "Select something";
+                onAfterRender: function() {
+                    if ((that._selected) && this.getItem(that._selected)) {
+                        this.select(that._selected)
+                    }
                 }
             }
         };

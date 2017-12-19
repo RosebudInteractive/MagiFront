@@ -12,6 +12,7 @@ import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 class Authors extends React.Component {
     componentDidMount(){
         this.props.authorsActions.getAuthors();
+        this._selected = null;
     }
 
     onAddBtnClick() {
@@ -49,6 +50,7 @@ class Authors extends React.Component {
             selected,
             deleteDlgShown,
         } = this.props;
+        this._selected = selected;
 
         return <div className="authors">
             {
@@ -93,7 +95,9 @@ class Authors extends React.Component {
         </div>
     }
 
-    getUI(select, selected) {
+    getUI() {
+        let that = this;
+
         return {
             view: "datatable",
             scroll: false,
@@ -104,17 +108,16 @@ class Authors extends React.Component {
                 {id: 'FirstName', header: 'Имя', width: 200},
                 {id: 'LastName', header: 'Фамилия', width: 300},
                 {id: "Description", header: "Описание", fillspace: true},
-                // {id: "active", header: "", width: 50, template: "{common.checkbox()}", readOnly: true},
-                // {id: "created", header: "Создан", width: 150, format: this.formatDate},
-                // {id: "updated", header: "Обновлен", width: 150, format: this.formatDate}
             ],
             on: {
                 onAfterSelect: function (selObj) {
-                    select(selObj.id);
+                    if (selObj.id !== that._selected)
+                        that._selected = null;
+                    that.select(selObj.id);
                 },
                 onAfterRender: function() {
-                    if ((selected) && this.getItem(selected)) {
-                        this.select(selected)
+                    if ((that._selected) && this.getItem(that._selected)) {
+                        this.select(that._selected)
                     }
                 }
             }

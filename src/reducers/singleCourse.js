@@ -19,6 +19,8 @@ import {
 
 } from '../constants/SingleCourse'
 
+import * as tools from './tools';
+
 // import {
 //     EDIT_MODE_INSERT,
 // } from '../constants/Common'
@@ -113,7 +115,10 @@ export default function singleCourse(state = initialState, action) {
 
             _authors.push(...state.authors);
 
-            return {...state, authors: _authors, showAddAuthorDialog : false, hasChanges: _modified ? true : state.hasChanges};
+            return {...state, authors: _authors,
+                showAddAuthorDialog : false,
+                hasChanges: _modified ? true : state.hasChanges,
+            };
         }
 
         case REMOVE_AUTHOR: {
@@ -205,51 +210,57 @@ export default function singleCourse(state = initialState, action) {
         }
 
         case MOVE_LESSON_UP: {
-            let _lessons = [];
-            let _modified = false;
+            let _result = tools.moveObjectUp(state.lessons, action.payload);
+            return {...state, lessons: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
 
-            let _lessonId = action.payload;
-            let _index = state.lessons.findIndex((lesson) => {return lesson.id === _lessonId});
-            if (_index > 0) {
-                let _deleted = state.lessons.splice(_index - 1, 1);
-                state.lessons.splice(_index, 0, _deleted[0]);
-                _modified = true;
-            }
-
-            if (_modified) {
-                state.lessons.forEach((lesson, index) => {
-                    lesson.Number = index +1
-                })
-            }
-
-            _lessons.push(...state.lessons);
-
-            return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
+            // let _lessons = [];
+            // let _modified = false;
+            //
+            // let _lessonId = action.payload;
+            // let _index = state.lessons.findIndex((lesson) => {return lesson.id === _lessonId});
+            // if (_index > 0) {
+            //     let _deleted = state.lessons.splice(_index - 1, 1);
+            //     state.lessons.splice(_index, 0, _deleted[0]);
+            //     _modified = true;
+            // }
+            //
+            // if (_modified) {
+            //     state.lessons.forEach((lesson, index) => {
+            //         lesson.Number = index +1
+            //     })
+            // }
+            //
+            // _lessons.push(...state.lessons);
+            //
+            // return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
         }
 
         case MOVE_LESSON_DOWN: {
-            let _lessons = [];
-            let _modified = false;
+            let _result = tools.moveObjectDown(state.lessons, action.payload);
+            return {...state, lessons: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
 
-            let _lessonId = action.payload;
-            let _index = state.lessons.findIndex((lesson) => {
-                return lesson.id === _lessonId
-            });
-            if (_index < state.lessons.length - 1) {
-                let _deleted = state.lessons.splice(_index, 1);
-                state.lessons.splice(_index + 1, 0, _deleted[0]);
-                _modified = true;
-            }
-
-            if (_modified) {
-                state.lessons.forEach((lesson, index) => {
-                    lesson.Number = index + 1
-                })
-            }
-
-            _lessons.push(...state.lessons);
-
-            return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
+            // let _lessons = [];
+            // let _modified = false;
+            //
+            // let _lessonId = action.payload;
+            // let _index = state.lessons.findIndex((lesson) => {
+            //     return lesson.id === _lessonId
+            // });
+            // if (_index < state.lessons.length - 1) {
+            //     let _deleted = state.lessons.splice(_index, 1);
+            //     state.lessons.splice(_index + 1, 0, _deleted[0]);
+            //     _modified = true;
+            // }
+            //
+            // if (_modified) {
+            //     state.lessons.forEach((lesson, index) => {
+            //         lesson.Number = index + 1
+            //     })
+            // }
+            //
+            // _lessons.push(...state.lessons);
+            //
+            // return {...state, lessons: _lessons, hasChanges: _modified ? true : state.hasChanges};
         }
 
         default:

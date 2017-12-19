@@ -51,7 +51,9 @@ class AuthorForm extends React.Component {
 
     getUI(save, cancel) {
         return {
-            view: "form", width: 400, elements: [
+            view: "form",
+            width: 400,
+            elements: [
                 {view: "text", name: "FirstName", label: "Имя", placeholder: "Введите имя"},
                 {view: "text", name: "LastName", label: "Фамилия", placeholder: "Введите фамилию"},
                 {view: "textarea", name: "Description", label: "Описание", placeholder: "Описание", height: 150,},
@@ -59,20 +61,27 @@ class AuthorForm extends React.Component {
                     cols: [
                         {},
                         {
-                            view: "button", value: "ОК", click: function(){
-                            if (save)
-                                save(this.getFormView().getValues());
-                        }
+                            view: "button", value: "ОК",
+                            click: function () {
+                                let _validated = this.getFormView().validate();
+                                if ((save) && _validated) {
+                                    save(this.getFormView().getValues());
+                                }
+                            }
                         },
                         {
-                            view: "button", value: "Отмена", click: function(){
+                            view: "button", value: "Отмена", click: function () {
                             if (cancel)
                                 cancel();
                         }
                         }
                     ]
                 }
-            ]
+            ],
+            rules: {
+                FirstName: window.webix.rules.isNotEmpty,
+                LastName: window.webix.rules.isNotEmpty,
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ export const moveObjectUp = (array, objectId) => {
     let _array = [];
     let _modified = false;
 
-    let _index = array.findIndex((item) => {return item.id === objectId});
+    let _index = array.findIndex((item) => {return item.id == objectId});
     if (_index > 0) {
         let _deleted = array.splice(_index - 1, 1);
         array.splice(_index, 0, _deleted[0]);

@@ -1,17 +1,28 @@
 import React, { Component } from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as courseActions from '../actions/SingleCourseActions';
 
-class CourseCategories extends Component {
-    addClicked() {
-        this.props.addCategoryAction();
+export default class CourseCategories extends Component {
+    constructor(props){
+        super(props);
+
+        this._selected = this.props.selected;
     }
 
-    removeCategoryFormCourse(id) {
-        this.props.courseActions.removeCategory(id)
+    componentWillReceiveProps(nextProps) {
+        this._selected = nextProps.selected
+    }
+
+    select(id) {
+        this.props.selectAction(id);
+    }
+
+    addClicked() {
+        this.props.addAction();
+    }
+
+    remove(id) {
+        this.props.removeAction(id);
     }
 
     render () {
@@ -27,6 +38,8 @@ class CourseCategories extends Component {
     }
 
     getUI() {
+        let that = this;
+
         return {
             view: "datatable",
             scroll: false,
@@ -43,10 +56,23 @@ class CourseCategories extends Component {
                 },
             ],
 
+            on: {
+                onAfterSelect: function (selObj) {
+                    if (selObj.id !== that._selected)
+                        that._selected = null;
+                    that.select(selObj.id);
+                },
+                onAfterRender: function() {
+                    if ((that._selected) && this.getItem(that._selected)) {
+                        this.select(that._selected)
+                    }
+                }
+            },
+
             onClick: {
                 delbtn: (e, id) => {
                     //will be called on button click
-                    this.removeCategoryFormCourse(id.row);
+                    this.remove(id.row);
                 }
             }
         };
@@ -54,16 +80,9 @@ class CourseCategories extends Component {
 }
 
 CourseCategories.propTypes = {
-    // message: PropTypes.string.isRequired,
-    addCategoryAction: PropTypes.func.isRequired,
-    // noAction: PropTypes.func.isRequired,
+    selectAction: PropTypes.func.isRequired,
+    addAction: PropTypes.func.isRequired,
+    removeAction: PropTypes.func.isRequired,
+    selected: PropTypes.number,
     data: PropTypes.any
 };
-
-function mapDispatchToProps(dispatch) {
-    return {
-        courseActions : bindActionCreators(courseActions, dispatch),
-    }
-}
-//
-export default connect(null, mapDispatchToProps)(CourseCategories);
