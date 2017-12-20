@@ -365,7 +365,8 @@ class CourseEditor extends React.Component {
                 {
                     view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
                     options: this.getLanguagesArray(),
-                    labelWidth: 120
+                    labelWidth: 120,
+                    invalidMessage: "Значение не может быть пустым",
                 },
                 {
                     view: "richtext",
@@ -402,6 +403,7 @@ class CourseEditor extends React.Component {
             rules: {
                 "Name": window.webix.rules.isNotEmpty,
                 "ColorHex": window.webix.rules.isNotEmpty,
+                LanguageId: window.webix.rules.isNotEmpty,
                 "State": function(value){ return that._checkLessonsState(value) }
             },
             on: {
