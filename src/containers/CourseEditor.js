@@ -45,6 +45,10 @@ class CourseEditor extends React.Component {
         languagesActions.getLanguages();
     }
 
+    _goBack(){
+        this.props.history.push('/courses');
+    }
+
     saveCourse(value) {
         let _obj = {
             id: value.id,
@@ -83,6 +87,7 @@ class CourseEditor extends React.Component {
     }
 
     cancelChanges() {
+        this._needRevalidate = true;
         this.props.courseActions.cancelCanges();
     }
 
@@ -213,6 +218,16 @@ class CourseEditor extends React.Component {
         this.props.courseActions.removeLesson(id)
     }
 
+    _checkLessonsState(newState){
+        if (newState === 'P') {
+            return this.props.courseLessons.some((lesson) => {
+                return lesson.State === 'R'
+            })
+        } else {
+            return true
+        }
+    }
+
     render() {
         const {
             course,
@@ -310,29 +325,50 @@ class CourseEditor extends React.Component {
     }
 
     getUI(saveAction, cancel, changeData, hasChanges) {
+        let that = this;
+
         return {
             view: "form",
             width: 700,
             id: 'mainData',
             elements: [
-                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название",
-                    invalidMessage: "Incorrect e-mail address", labelWidth:120 ,},
-
-                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL", labelWidth:120},
-                {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса', labelWidth:120},
+                {
+                    view: "button", name: 'btnOk', value: '<<< Назад',
+                    click: () => {
+                        this._goBack();
+                    }
+                },
+                {
+                    view: "text", name: "Name",
+                    label: "Название курса",
+                    placeholder: "Введите название",
+                    invalidMessage: "Значение не может быть пустым",
+                    labelWidth: 120,
+                },
+                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL", labelWidth: 120},
+                {
+                    view: "colorpicker",
+                    label: "Цвет курса",
+                    name: "ColorHex",
+                    placeholder: 'Цвет курса',
+                    labelWidth: 120
+                },
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}],
-                    labelWidth:120
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {
+                        id: 'A',
+                        value: 'Архив'
+                    }],
+                    labelWidth: 120,
+                    invalidMessage: 'Недопустимое состояние',
                 },
                 {
                     view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
                     options: this.getLanguagesArray(),
-                    labelWidth:120
+                    labelWidth: 120
                 },
                 {
                     view: "richtext",
-                    // labelWidth:120,
                     id: "Description",
                     label: "Описание курса",
                     labelPosition: "top",
@@ -346,7 +382,7 @@ class CourseEditor extends React.Component {
                         {},
                         {
                             view: "button", name: 'btnOk', value: "ОК",
-                            click: function() {
+                            click: function () {
                                 let _validated = this.getFormView().validate();
                                 if ((saveAction) && _validated) {
                                     saveAction(this.getFormView().getValues());
@@ -356,30 +392,35 @@ class CourseEditor extends React.Component {
                         {
                             view: "button", name: 'btnCancel', value: "Отмена",
                             click: function () {
-                                 if (cancel)
-                                     cancel();
+                                if (cancel)
+                                    cancel();
                             }
                         }
                     ]
                 },
             ],
-            rules:{
-                "Name" : window.webix.rules.isNotEmpty,
+            rules: {
+                "Name": window.webix.rules.isNotEmpty,
                 "ColorHex": window.webix.rules.isNotEmpty,
-                "State": window.webix.rules.isNotEmpty
+                "State": function(value){ return that._checkLessonsState(value) }
             },
             on: {
                 onChange: function () {
                     this.validate();
                     changeData(::this.getValues());
                 },
-                onValues: function() {
+                onValues: function () {
                     if (hasChanges()) {
                         this.elements.btnOk.enable();
                         this.elements.btnCancel.enable()
                     } else {
                         this.elements.btnOk.disable();
                         this.elements.btnCancel.disable()
+                    }
+
+                    if (that._needRevalidate) {
+                        this.validate();
+                        that._needRevalidate = false;
                     }
                 },
             }

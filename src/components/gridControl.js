@@ -7,14 +7,18 @@ export default class GridControl extends Component {
         super(props);
 
         this._selected = this.props.selected;
+        this._isFirstSelected = false;
+        this._isLastSelected = false;
     }
 
     componentWillReceiveProps(nextProps) {
         this._selected = nextProps.selected
     }
 
-    _select(id) {
-        this.props.selectAction(id);
+    _select(selectedObj) {
+        this._isFirstSelected = selectedObj.isFirst;
+        this._isLastSelected = selectedObj.isLast;
+        this.props.selectAction(selectedObj.id);
     }
 
     _addClicked() {
@@ -65,11 +69,11 @@ export default class GridControl extends Component {
         }
 
         if (this.props.moveUpAction) {
-            _buttons.push(<button key='btnUp' className='btn-up' disabled={(this._selected === null)} onClick={::this._moveUp}/>)
+            _buttons.push(<button key='btnUp' className='btn-up' disabled={((this._selected === null) || (this._isFirstSelected))} onClick={::this._moveUp}/>)
         }
 
         if (this.props.moveDownAction) {
-            _buttons.push(<button key='btnDown' className='btn-down' disabled={(this._selected === null)} onClick={::this._moveDown}/>)
+            _buttons.push(<button key='btnDown' className='btn-down' disabled={((this._selected === null) || (this._isLastSelected))} onClick={::this._moveDown}/>)
         }
 
         return _buttons;
@@ -112,7 +116,12 @@ export default class GridControl extends Component {
                 onAfterSelect: function (selObj) {
                     if (parseInt(selObj.id) !== that._selected) {
                         that._selected = null;
-                        that._select(selObj.id);
+                        let _obj = {
+                            isFirst : this.getFirstId() === selObj.id,
+                            isLast : this.getLastId() === selObj.id,
+                            id : selObj.id,
+                        }
+                        that._select(_obj);
                     }
                 },
                 onAfterRender: function () {

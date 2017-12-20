@@ -69,6 +69,7 @@ class EpisodeEditor extends React.Component {
         this.props.episodeActions.changeData(data)
     }
     _cancelChanges() {
+        this._needRevalidate = true;
         this.props.episodeActions.cancelCanges();
     }
 
@@ -129,6 +130,8 @@ class EpisodeEditor extends React.Component {
     }
 
     getUI(saveAction, cancel, changeData, hasChanges) {
+        let that = this;
+
         return {
             view: "form",
             width: 700,
@@ -140,17 +143,34 @@ class EpisodeEditor extends React.Component {
                         this._goBack();
                     }
                 },
-                {view: "text", name: "Name", label: "Название эпизода", placeholder: "Введите название эпизода"},
-                {view: "text", name: "Number", label: "Номер эпизода", readonly: true},
                 {
-                    view: "combo", name: "EpisodeType", label: "Тип эпизода", placeholder: "Выберите тип эпизода",
-                    options: [{id: 'L', value: 'Лекция'}]
+                    view: "text",
+                    name: "Name",
+                    label: "Название эпизода",
+                    placeholder: "Введите название эпизода",
+                    labelWidth: 120,
+                    invalidMessage: "Значение не может быть пустым",
                 },
-                {view: "text", name: "Audio", label: "Аудио-контент", placeholder: ""},
-                {view: "checkbox", name: "Supp", label: "Дополнительный материал", readonly: true},
+                {view: "text", name: "Number", label: "Номер эпизода", readonly: true, labelWidth: 120,},
+                {
+                    view: "combo",
+                    name: "EpisodeType",
+                    label: "Тип эпизода", placeholder: "Выберите тип эпизода",
+                    options: [{id: 'L', value: 'Лекция'}],
+                    labelWidth: 120,
+                },
+                {
+                    view: "text",
+                    name: "Audio",
+                    label: "Аудио-контент",
+                    placeholder: "", labelWidth: 120,
+                    invalidMessage: "Значение не может быть пустым",
+                },
+                {view: "checkbox", name: "Supp", label: "Дополнительный материал", readonly: true, labelWidth: 120,},
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}],
+                    labelWidth: 120,
                 },
                 {
                     view: "richtext",
@@ -188,6 +208,7 @@ class EpisodeEditor extends React.Component {
             },
             on: {
                 onChange: function () {
+                    this.validate();
                     changeData(::this.getValues());
                 },
                 onValues: function () {
@@ -197,6 +218,11 @@ class EpisodeEditor extends React.Component {
                     } else {
                         this.elements.btnOk.disable();
                         this.elements.btnCancel.disable()
+                    }
+
+                    if (that._needRevalidate) {
+                        this.validate();
+                        that._needRevalidate = false;
                     }
                 },
             }

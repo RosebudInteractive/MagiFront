@@ -56,12 +56,17 @@ class LessonEditor extends React.Component {
 
         if (this.editMode === EDIT_MODE_INSERT) {
             if ((course) && (!lesson)) {
-                lessonActions.createNewLesson({CourseId : courseId, CourseName: course.Name, Number: course.Lessons.length + 1, LessonType:'L'});
+                lessonActions.createNewLesson({
+                    CourseId: courseId,
+                    CourseName: course.Name,
+                    Number: course.Lessons.length + 1,
+                    LessonType: 'L'
+                });
             }
         }
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.props.lessonActions.clearLesson()
     }
 
@@ -72,7 +77,7 @@ class LessonEditor extends React.Component {
             Id: value.id,
             Name: value.Name,
             State: value.State,
-            AuthorId : value.AuthorId,
+            AuthorId: value.AuthorId,
             Cover: value.Cover,
             URL: value.URL,
             LessonType: value.LessonType,
@@ -80,7 +85,7 @@ class LessonEditor extends React.Component {
             ShortDescription: value.ShortDescription,
             FullDescription: value.FullDescription,
             Episodes: [],
-            References : [],
+            References: [],
         };
 
         this._fillEpisodes(_obj.Episodes);
@@ -142,7 +147,9 @@ class LessonEditor extends React.Component {
     _changeData(data) {
         this.props.lessonActions.changeData(data)
     }
+
     _cancelChanges() {
+        this._needRevalidate = true;
         this.props.lessonActions.cancelCanges();
     }
 
@@ -150,7 +157,7 @@ class LessonEditor extends React.Component {
     //     // this.props.coursesActions.selectCourse(id);
     // }
 
-    _createRecommendedReferenceDialog(){
+    _createRecommendedReferenceDialog() {
         this.props.lessonActions.showEditReferenceDialog(EDIT_MODE_INSERT)
     }
 
@@ -249,11 +256,11 @@ class LessonEditor extends React.Component {
         this.props.lessonActions.removeSuppEpisode(episodeId)
     }
 
-    _createRecommendedReference(){
+    _createRecommendedReference() {
         this.props.referenceActions.createNewReference(true);
     }
 
-    _editRecommendedReference(refId){
+    _editRecommendedReference(refId) {
         let _ref = this.props.recommendedRef.find((item) => {
             return item.id === parseInt(refId)
         });
@@ -261,15 +268,15 @@ class LessonEditor extends React.Component {
         this.props.referenceActions.editReference(_ref);
     }
 
-    _selectCommonReference(id){
+    _selectCommonReference(id) {
         this.props.lessonActions.selectCommonReference(id)
     }
 
-    _createCommonReference(){
+    _createCommonReference() {
         this.props.referenceActions.createNewReference(false);
     }
 
-    _editCommonReference(refId){
+    _editCommonReference(refId) {
         let _ref = this.props.commonRef.find((item) => {
             return item.id === parseInt(refId)
         });
@@ -277,35 +284,35 @@ class LessonEditor extends React.Component {
         this.props.referenceActions.editReference(_ref);
     }
 
-    _selectRecommendedReference(id){
+    _selectRecommendedReference(id) {
         this.props.lessonActions.selectRecommendedReference(id)
     }
 
-    _removeRecommendedReference(refId){
+    _removeRecommendedReference(refId) {
         this.props.lessonActions.removeRecommendedReference(refId)
     }
 
-    _moveRecommendedReferenceUp(refId){
+    _moveRecommendedReferenceUp(refId) {
         this.props.lessonActions.moveRecommendedReferenceUp(refId)
     }
 
-    _moveRecommendedReferenceDown(refId){
+    _moveRecommendedReferenceDown(refId) {
         this.props.lessonActions.moveRecommendedReferenceDown(refId)
     }
 
-    _removeCommonReference(refId){
+    _removeCommonReference(refId) {
         this.props.lessonActions.removeCommonReference(refId)
     }
 
-    _moveCommonReferenceUp(refId){
+    _moveCommonReferenceUp(refId) {
         this.props.lessonActions.moveCommonReferenceUp(refId)
     }
 
-    _moveCommonReferenceDown(refId){
+    _moveCommonReferenceDown(refId) {
         this.props.lessonActions.moveCommonReferenceDown(refId)
     }
 
-    _cancelEditReference(){
+    _cancelEditReference() {
         this.props.referenceActions.clearReference();
     }
 
@@ -322,7 +329,7 @@ class LessonEditor extends React.Component {
     }
 
     _goBack() {
-        this.props.history.goBack()
+        this.props.history.push('/courses/edit/' + this.props.courseId)
     }
 
     render() {
@@ -353,7 +360,7 @@ class LessonEditor extends React.Component {
                 <div>
                     <Prompt when={hasChanges} message='Есть несохраненные данные. Уйти?'/>
                     <Webix ui={
-                            ::this.getUI(::this.saveLesson,
+                        ::this.getUI(::this.saveLesson,
                             ::this._cancelChanges,
                             ::this._changeData,
                             ::this._getHasChanges,
@@ -444,13 +451,30 @@ class LessonEditor extends React.Component {
         )
     }
 
-    _getCourseAuthorsArray(){
+    _getCourseAuthorsArray() {
         return this.props.authors.map((elem) => {
             return {id: elem.id, value: elem.FirstName + ' ' + elem.LastName};
         })
     }
 
+    _checkEpisodesState(newState) {
+        if (newState === 'R') {
+            let _mainEpisodesReady =  (this.props.mainEpisodes.length > 0) &&this.props.mainEpisodes.every((episode) => {
+                return episode.State === 'R'
+            });
+
+            let _suppEpisodesReady = (this.props.suppEpisodes.length > 0) && this.props.suppEpisodes.every((episode) => {
+                return episode.State === 'R'
+            });
+
+            return _mainEpisodesReady && _suppEpisodesReady;
+        } else {
+            return true
+        }
+    }
+
     getUI(saveAction, cancel, changeData, hasChanges) {
+        let that = this;
         return {
             view: "form",
             width: 700,
@@ -533,21 +557,33 @@ class LessonEditor extends React.Component {
                 //     ]
                 // },
                 {
-                    view: "button", name: 'btnOk', value: '<<< Назад',//css:'btn-back',
+                    view: "button", name: 'btnOk', value: '<<< Назад',
                     click: () => {
-                        saveAction(this._goBack());
+                        this._goBack();
                     }
                 },
-                {view: "text", name: "CourseName", label: "Название курса", readonly: true},
-                {view: "text", name: "Number", label: "Номер урока", readonly: true},
+                {view: "text", name: "CourseName", label: "Название курса", readonly: true, labelWidth: 120,},
+                {view: "text", name: "Number", label: "Номер урока", readonly: true, labelWidth: 120},
                 {
                     view: "combo", name: "LessonType", label: "Тип урока", placeholder: "Выберите тип урока",
-                    options: [{id: 'L', value: 'Лекция'}]
+                    options: [{id: 'L', value: 'Лекция'}],
+                    labelWidth: 120,
                 },
-                {view: "text", name: "Name", label: "Название урока", placeholder: "Введите название урока(лекции)"},
                 {
-                    view: "combo", name: "AuthorId", label: "Автор", placeholder: "Выберите автора",
-                    options: this._getCourseAuthorsArray()
+                    view: "text",
+                    name: "Name",
+                    label: "Название урока",
+                    placeholder: "Введите название урока(лекции)",
+                    labelWidth: 120,
+                    invalidMessage: "Значение не может быть пустым",
+                },
+                {
+                    view: "combo",
+                    name: "AuthorId",
+                    label: "Автор",
+                    placeholder: "Выберите автора",
+                    options: this._getCourseAuthorsArray(),
+                    labelWidth: 120,
                 },
                 {
                     template: (obj) => {
@@ -557,8 +593,13 @@ class LessonEditor extends React.Component {
                     height: 100,
                 },
                 {
-                    view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
+                    view: "combo",
+                    name: "State",
+                    label: "Состояние",
+                    placeholder: "Выберите состояние",
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}],
+                    labelWidth: 120,
+                    invalidMessage: 'Недопустимое состояние',
                 },
                 {
                     view: "datepicker",
@@ -567,6 +608,7 @@ class LessonEditor extends React.Component {
                     width: 300,
                     stringResult: true,
                     format: this.formatDate,
+                    labelWidth: 120,
                 },
                 {
                     view: "accordion",
@@ -574,12 +616,12 @@ class LessonEditor extends React.Component {
 
                     rows: [
                         {
-                            view:"accordionitem",
-                            headerHeight:40,
+                            view: "accordionitem",
+                            headerHeight: 40,
                             header: "Краткое описание",
                             body: {
                                 view: "richtext",
-                                // label: "Краткое описание",
+                                labelWidth: 0,
                                 height: 100,
                                 width: 0,
                                 name: "ShortDescription",
@@ -592,29 +634,14 @@ class LessonEditor extends React.Component {
                             header: "Полное описание",
                             body: {
                                 view: "richtext",
-                                // label: "Полное описание",
+                                labelWidth: 0,
                                 height: 150,
                                 width: 0,
                                 name: "FullDescription",
                             },
                         },
-                        // { header:"col 3", body:"content 3" }
                     ]
                 },
-                // {
-                //     view: "richtext",
-                //     label: "Краткое описание",
-                //     height: 100,
-                //     width: 500,
-                //     name: "ShortDescription",
-                // },
-                // {
-                //     view: "richtext",
-                //     label: "Полное описание",
-                //     height: 150,
-                //     width: 500,
-                //     name: "FullDescription",
-                // },
                 {
                     cols: [
                         {},
@@ -636,8 +663,18 @@ class LessonEditor extends React.Component {
                     ]
                 }
             ],
+            rules: {
+                "Name": window.webix.rules.isNotEmpty,
+                "Number": window.webix.rules.isNotEmpty,
+                AuthorId: window.webix.rules.isNotEmpty,
+                LessonType: window.webix.rules.isNotEmpty,
+                "State": function (value) {
+                    return that._checkEpisodesState(value)
+                }
+            },
             on: {
                 onChange: function () {
+                    this.validate();
                     changeData(::this.getValues());
                 },
                 onValues: function () {
@@ -647,6 +684,11 @@ class LessonEditor extends React.Component {
                     } else {
                         this.elements.btnOk.disable();
                         this.elements.btnCancel.disable()
+                    }
+
+                    if (that._needRevalidate) {
+                        this.validate();
+                        that._needRevalidate = false;
                     }
                 },
             }

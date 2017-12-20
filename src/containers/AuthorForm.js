@@ -8,8 +8,14 @@ import { connect } from 'react-redux';
 import {EDIT_MODE_INSERT } from '../constants/Common';
 
 class AuthorForm extends React.Component {
+    constructor(props) {
+        super(props);
 
-    getCurrentAuthor() {
+        this._initialValue = Object.assign({}, this._getCurrentAuthor());
+        this._currentValue = Object.assign({}, this._initialValue);
+    }
+
+    _getCurrentAuthor() {
         if (this.props.editMode === EDIT_MODE_INSERT) {
             return null
         } else {
@@ -20,27 +26,29 @@ class AuthorForm extends React.Component {
     }
 
     saveAuthor(values) {
-        this.props.authorsActions.saveAuthor(values, this.props.editMode)
+        this.props.authorsActions.saveAuthor(values, this.props.editMode);
+        this._initialValue = Object.assign({}, this._currentValue);
     }
 
-    cancelEdit() {
+    _cancel() {
         this.props.authorsActions.hideEditDialog();
+        this._currentValue = Object.assign({}, this._initialValue);
     }
 
     render() {
         const {
-            selected,
+            // selected,
             message,
             errorDlgShown,
         } = this.props;
         return (
             <div className="episodes-content">
-                <Webix ui={::this.getUI(::this.saveAuthor, this.cancelEdit)} data={::this.getCurrentAuthor()}/>
+                <Webix ui={::this.getUI()} data={::this._getCurrentAuthor()}/>
                 {
                     errorDlgShown ?
                         <ErrorDialog
                             message={message}
-                            data={selected}
+                            data={this._currentValue}
                         />
                         :
                         ""
@@ -49,7 +57,23 @@ class AuthorForm extends React.Component {
         )
     }
 
-    getUI(save, cancel) {
+    _changeData(obj) {
+        this._currentValue.FirstName = obj.FirstName;
+        this._currentValue.LastName = obj.LastName;
+        this._currentValue.Description = obj.Description;
+
+        this.render();
+    }
+
+    _hasChanges() {
+        return (this._currentValue.FirstName !== this._initialValue.FirstName) ||
+            (this._currentValue.LastName !== this._initialValue.LastName) ||
+            (this._currentValue.Description !== this._initialValue.Description)
+    }
+
+    getUI() {
+        let that = this;
+
         return {
             view: "form",
             width: 400,
@@ -61,19 +85,18 @@ class AuthorForm extends React.Component {
                     cols: [
                         {},
                         {
-                            view: "button", value: "ОК",
+                            view: "button", value: "ОК", name: 'btnOk',
                             click: function () {
-                                let _validated = this.getFormView().validate();
-                                if ((save) && _validated) {
-                                    save(this.getFormView().getValues());
+                                if (this.getFormView().validate()) {
+                                    that.saveAuthor(this.getFormView().getValues());
                                 }
                             }
                         },
                         {
-                            view: "button", value: "Отмена", click: function () {
-                            if (cancel)
-                                cancel();
-                        }
+                            view: "button", value: "Отмена", name: 'btnCancel',
+                            click: function () {
+                                that._cancel();
+                            }
                         }
                     ]
                 }
@@ -81,6 +104,26 @@ class AuthorForm extends React.Component {
             rules: {
                 FirstName: window.webix.rules.isNotEmpty,
                 LastName: window.webix.rules.isNotEmpty,
+            },
+            on: {
+                onChange: function () {
+                    this.validate();
+                    that._changeData(::this.getValues());
+                },
+                onValues: function () {
+                    // if (that._hasChanges()) {
+                        this.elements.btnOk.enable();
+                        this.elements.btnCancel.enable()
+                    // } else {
+                    //     this.elements.btnOk.disable();
+                    //     this.elements.btnCancel.disable()
+                    // }
+
+                    if (that._needRevalidate) {
+                        this.validate();
+                        that._needRevalidate = false;
+                    }
+                },
             }
         }
     }

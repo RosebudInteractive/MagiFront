@@ -29,7 +29,7 @@ class Authors extends React.Component {
         this.props.authorsActions.deleteAuthor(this.props.selected)
     }
 
-    confirmDeleteAuthor() {
+    _confirmDelete() {
         this.props.commonDlgActions.showDeleteConfirmation(this.props.selected)
     }
 
@@ -61,20 +61,20 @@ class Authors extends React.Component {
                         <p>{message}</p>
                         :
                         <div className="authors-content">
-                            <div className="action-bar">
-                                <button className='btn'
+                            <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
+                                <button className='btn-new'
                                         onClick={::this.onAddBtnClick}
-                                >Добавить...</button>{' '}
+                                />{' '}
                                 <button
-                                    className={'btn' + (selected === null ? " disabled" : "")}
+                                    className={'btn-edit' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={(selected === null)}
-                                >Исправить...</button>{' '}
+                                />{' '}
                                 <button
-                                    className={'btn' + (selected === null ? " disabled" : "")}
-                                    onClick={::this.confirmDeleteAuthor}
+                                    className={'btn-delete' + (selected === null ? " disabled" : "")}
+                                    onClick={::this._confirmDelete}
                                     disabled={(selected === null)}
-                                >Удалить...</button>
+                                />
                             </div>
                             <div className="grid-container">
                                 <Webix ui={::this.getUI(::this.select, selected)} data={authors} />
