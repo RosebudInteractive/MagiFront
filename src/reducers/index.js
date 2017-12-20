@@ -17,6 +17,8 @@ import courseCategories from './courseCategories';
 import courseLessons from './courseLessons';
 import singleEpisode from './singleEpisode';
 import references from './references';
+import lessonEpisodes from './lessonEpisodes';
+import lessonRefs from './lessonRefs';
 
 export default combineReducers({
     page,
@@ -35,5 +37,7 @@ export default combineReducers({
     singleLesson,
     references,
     singleEpisode,
+    lessonEpisodes,
+    lessonRefs,
     routing: routerReducer,
 })

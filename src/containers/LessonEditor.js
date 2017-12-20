@@ -1,4 +1,5 @@
-import React  from 'react'
+import React  from 'react';
+import {Prompt} from 'react-router-dom';
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
@@ -13,9 +14,10 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-import LessonEpisodes from '../components/LessonEpisodes';
-import LessonReferences from '../components/LessonReferences'
+import { LessonEpisodes, LessonReferences, } from '../components/lessonGrids';
 import ReferenceForm from '../components/ReferenceForm';
+
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
 
 class LessonEditor extends React.Component {
 
@@ -206,6 +208,10 @@ class LessonEditor extends React.Component {
         this.props.lessonActions.removeMainEpisode(episodeId)
     }
 
+    _selectMainEpisode(id) {
+        this.props.lessonActions.selectMainEpisode(id)
+    }
+
     _newMainEpisode() {
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
@@ -227,6 +233,10 @@ class LessonEditor extends React.Component {
             '/episode/edit/' + episodeId);
     }
 
+    _selectSuppEpisode(id) {
+        this.props.lessonActions.selectSuppEpisode(id)
+    }
+
     _moveSuppEpisodeDown(episodeId) {
         this.props.lessonActions.moveSuppEpisodeDown(episodeId)
     }
@@ -245,10 +255,14 @@ class LessonEditor extends React.Component {
 
     _editRecommendedReference(refId){
         let _ref = this.props.recommendedRef.find((item) => {
-            return item.id === refId
+            return item.id === parseInt(refId)
         });
 
         this.props.referenceActions.editReference(_ref);
+    }
+
+    _selectCommonReference(id){
+        this.props.lessonActions.selectCommonReference(id)
     }
 
     _createCommonReference(){
@@ -257,10 +271,14 @@ class LessonEditor extends React.Component {
 
     _editCommonReference(refId){
         let _ref = this.props.commonRef.find((item) => {
-            return item.id === refId
+            return item.id === parseInt(refId)
         });
 
         this.props.referenceActions.editReference(_ref);
+    }
+
+    _selectRecommendedReference(id){
+        this.props.lessonActions.selectRecommendedReference(id)
     }
 
     _removeRecommendedReference(refId){
@@ -307,13 +325,6 @@ class LessonEditor extends React.Component {
         this.props.history.goBack()
     }
 
-    _changePage(newPage){
-        if (this._currentPage !== newPage) {
-            this._currentPage = newPage;
-            this.render();
-        }
-    }
-
     render() {
         let _isEditMode = this.editMode === EDIT_MODE_EDIT;
 
@@ -328,18 +339,19 @@ class LessonEditor extends React.Component {
             recommendedRef,
             commonRef,
             reference,
+            selectedMainEpisode,
+            selectedSuppEpisode,
+            selectedCommonRef,
+            selectedRecommendedRef,
+            hasChanges,
         } = this.props;
-
-        let _showMainEpisodes = this._currentPage === 'MainEpisodes';
-        let _showSuppEpisodes = this._currentPage === 'SuppEpisodes';
-        let _showCommonRefs = this._currentPage === 'CommonRefs';
-        let _showRecommendedRefs = this._currentPage === 'RecommendedRefs';
 
         return (
             fetching ?
                 <p>Загрузка...</p>
                 :
                 <div>
+                    <Prompt when={hasChanges} message='Есть несохраненные данные. Уйти?'/>
                     <Webix ui={
                             ::this.getUI(::this.saveLesson,
                             ::this._cancelChanges,
@@ -348,60 +360,67 @@ class LessonEditor extends React.Component {
                             _isEditMode)}
                            data={lesson}
                     />
-                    {
-                        _showMainEpisodes ?
-                            <LessonEpisodes message={'Основные эпизоды'}
-                                            divName={'MainEpisodesDiv'}
-                                            createAction={::this._newMainEpisode}
-                                            editAction={::this._editEpisode}
-                                            removeAction={::this._removeMainEpisode}
-                                            moveUpAction={::this._moveMainEpisodeUp}
-                                            moveDownAction={::this._moveMainEpisodeDown}
-                                            data={mainEpisodes}
-                            />
-                            :
-                            ''
-                    }
-                    {
-                        _showSuppEpisodes ?
-                            <LessonEpisodes message={'Дополнительные эпизоды'}
-                                            divName={'SuppEpisodesDiv'}
-                                            createAction={::this._newSuppEpisode}
-                                            editAction={::this._editEpisode}
-                                            removeAction={::this._removeSuppEpisode}
-                                            moveUpAction={::this._moveSuppEpisodeUp}
-                                            moveDownAction={::this._moveSuppEpisodeDown}
-                                            data={suppEpisodes}
-                            />
-                            :
-                            ''
-                    }
-                    {
-                        _showCommonRefs ?
-                            <LessonReferences message={'Список литературы'}
-                                              createAction={::this._createCommonReference}
-                                              editAction={::this._editCommonReference}
-                                              removeAction={::this._removeCommonReference}
-                                              moveUpAction={::this._moveCommonReferenceUp}
-                                              moveDownAction={::this._moveCommonReferenceDown}
-                                              data={commonRef}
-                            />
-                            :
-                            ''
-                    }
-                    {
-                        _showRecommendedRefs ?
-                            <LessonReferences message={'Рекомендуемая литература'}
-                                              createAction={::this._createRecommendedReference}
-                                              editAction={::this._editRecommendedReference}
-                                              removeAction={::this._removeRecommendedReference}
-                                              moveUpAction={::this._moveRecommendedReferenceUp}
-                                              moveDownAction={::this._moveRecommendedReferenceDown}
-                                              data={recommendedRef}
-                            />
-                            :
-                            ''
-                    }
+                    <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true}>
+                        <div className="tab-links">
+                            <TabLink to="tab1">Основные эпизоды</TabLink>
+                            <TabLink to="tab2">Дополнительные эпизоды</TabLink>
+                            <TabLink to="tab3">Список литературы</TabLink>
+                            <TabLink to="tab4">Рекомендуемая литература</TabLink>
+                        </div>
+
+                        <div className="content">
+                            <TabContent for="tab1">
+                                <LessonEpisodes message={'Основные эпизоды'}
+                                                divName={'MainEpisodesDiv'}
+                                                selectAction={::this._selectMainEpisode}
+                                                createAction={::this._newMainEpisode}
+                                                editAction={::this._editEpisode}
+                                                removeAction={::this._removeMainEpisode}
+                                                moveUpAction={::this._moveMainEpisodeUp}
+                                                moveDownAction={::this._moveMainEpisodeDown}
+                                                selected={selectedMainEpisode}
+                                                data={mainEpisodes}
+                                />
+                            </TabContent>
+                            <TabContent for="tab2">
+                                <LessonEpisodes message={'Дополнительные эпизоды'}
+                                                divName={'SuppEpisodesDiv'}
+                                                selectAction={::this._selectSuppEpisode}
+                                                createAction={::this._newSuppEpisode}
+                                                editAction={::this._editEpisode}
+                                                removeAction={::this._removeSuppEpisode}
+                                                moveUpAction={::this._moveSuppEpisodeUp}
+                                                moveDownAction={::this._moveSuppEpisodeDown}
+                                                selected={selectedSuppEpisode}
+                                                data={suppEpisodes}
+                                />
+                            </TabContent>
+                            <TabContent for="tab3">
+                                <LessonReferences message={'Список литературы'}
+                                                  selectAction={::this._selectCommonReference}
+                                                  createAction={::this._createCommonReference}
+                                                  editAction={::this._editCommonReference}
+                                                  removeAction={::this._removeCommonReference}
+                                                  moveUpAction={::this._moveCommonReferenceUp}
+                                                  moveDownAction={::this._moveCommonReferenceDown}
+                                                  selected={selectedCommonRef}
+                                                  data={commonRef}
+                                />
+                            </TabContent>
+                            <TabContent for="tab4">
+                                <LessonReferences message={'Рекомендуемая литература'}
+                                                  selectAction={::this._selectRecommendedReference}
+                                                  createAction={::this._createRecommendedReference}
+                                                  editAction={::this._editRecommendedReference}
+                                                  removeAction={::this._removeRecommendedReference}
+                                                  moveUpAction={::this._moveRecommendedReferenceUp}
+                                                  moveDownAction={::this._moveRecommendedReferenceDown}
+                                                  selected={selectedRecommendedRef}
+                                                  data={recommendedRef}
+                                />
+                            </TabContent>
+                        </div>
+                    </Tabs>
                     {
                         errorDlgShown ?
                             <ErrorDialog
@@ -514,41 +533,7 @@ class LessonEditor extends React.Component {
                 //     ]
                 // },
                 {
-                    container: "areaA",
-                    borderless: true,
-                    height: 500,
-
-                    view: "tabview",
-                    cells: [
-                        {
-                            header: '1',
-                            body: {
-                                id: "MainEpisodes",
-                                template: "<div id='MainEpisodesDiv' />",
-                                type: {
-                                    width: 120
-                                },
-                                select: true,
-                            }
-                        },
-                        {
-                            header: '2',
-                            body: {
-                                id: "SuppEpisodes",
-                                template: "<div id='SuppEpisodesDiv'/>",
-                            }
-                        },
-                        {header: "Empty", body: {}}
-                    ],
-                    on: {
-                        onChange: (newv) => {
-                            this._changePage(newv);
-                        },
-                    },
-                },
-
-                {
-                    view: "button", name: 'btnOk', value:'<<< Назад',//css:'btn-back',
+                    view: "button", name: 'btnOk', value: '<<< Назад',//css:'btn-back',
                     click: () => {
                         saveAction(this._goBack());
                     }
@@ -569,14 +554,14 @@ class LessonEditor extends React.Component {
                         return '<img src="' + obj.src + '" />'
                     },
                     data: {src: "/assets/images/avatar.png"},
-                    height : 100,
+                    height: 100,
                 },
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
                     options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}]
                 },
                 {
-                    view:"datepicker",
+                    view: "datepicker",
                     label: "Планируемая дата публикации",
                     name: 'DT_ReadyDate',
                     width: 300,
@@ -584,19 +569,52 @@ class LessonEditor extends React.Component {
                     format: this.formatDate,
                 },
                 {
-                    view: "richtext",
-                    label: "Краткое описание",
-                    height: 100,
-                    width: 500,
-                    name: "ShortDescription",
+                    view: "accordion",
+                    multi: true,
+
+                    rows: [
+                        {
+                            view:"accordionitem",
+                            headerHeight:40,
+                            header: "Краткое описание",
+                            body: {
+                                view: "richtext",
+                                // label: "Краткое описание",
+                                height: 100,
+                                width: 0,
+                                name: "ShortDescription",
+                            },
+                            // collapsed:true,
+                        },
+                        {
+                            view: "accordionitem",
+                            headerHeight: 40,
+                            header: "Полное описание",
+                            body: {
+                                view: "richtext",
+                                // label: "Полное описание",
+                                height: 150,
+                                width: 0,
+                                name: "FullDescription",
+                            },
+                        },
+                        // { header:"col 3", body:"content 3" }
+                    ]
                 },
-                {
-                    view: "richtext",
-                    label: "Полное описание",
-                    height: 150,
-                    width: 500,
-                    name: "FullDescription",
-                },
+                // {
+                //     view: "richtext",
+                //     label: "Краткое описание",
+                //     height: 100,
+                //     width: 500,
+                //     name: "ShortDescription",
+                // },
+                // {
+                //     view: "richtext",
+                //     label: "Полное описание",
+                //     height: 150,
+                //     width: 500,
+                //     name: "FullDescription",
+                // },
                 {
                     cols: [
                         {},
@@ -654,6 +672,10 @@ function mapStateToProps(state, ownProps) {
         referenceEditMode : state.references.editMode,
         course: state.singleCourse.course,
         hasChanges : state.singleLesson.hasChanges,
+        selectedMainEpisode: state.lessonEpisodes.mainSelected,
+        selectedSuppEpisode: state.lessonEpisodes.suppSelected,
+        selectedCommonRef: state.lessonRefs.commonSelected,
+        selectedRecommendedRef: state.lessonRefs.recommendedSelected,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,

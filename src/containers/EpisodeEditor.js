@@ -1,4 +1,5 @@
-import React  from 'react'
+import React  from 'react';
+import {Prompt} from 'react-router-dom';
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 import PropTypes from 'prop-types';
@@ -91,6 +92,7 @@ class EpisodeEditor extends React.Component {
             message,
             errorDlgShown,
             fetching,
+            hasChanges
         } = this.props;
 
         return (
@@ -98,6 +100,7 @@ class EpisodeEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
+                    <Prompt when={hasChanges} message='Есть несохраненные данные. Уйти?'/>
                     <Webix ui={
                         ::this.getUI(::this.saveEpisode,
                             ::this._cancelChanges,
@@ -163,8 +166,9 @@ class EpisodeEditor extends React.Component {
                         {
                             view: "button", name: 'btnOk', value: "ОК",
                             click: function () {
-                                if (saveAction)
+                                if ((saveAction) && this.getFormView().validate()) {
                                     saveAction(this.getFormView().getValues());
+                                }
                             }
                         },
                         {
@@ -177,6 +181,11 @@ class EpisodeEditor extends React.Component {
                     ]
                 }
             ],
+            rules: {
+                Name: window.webix.rules.isNotEmpty,
+                EpisodeType: window.webix.rules.isNotEmpty,
+                Audio: window.webix.rules.isNotEmpty,
+            },
             on: {
                 onChange: function () {
                     changeData(::this.getValues());

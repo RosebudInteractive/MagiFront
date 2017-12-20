@@ -3,9 +3,11 @@ import {
     GET_SINGLE_LESSON_REQUEST,
     GET_SINGLE_LESSON_SUCCESS,
     GET_SINGLE_LESSON_FAIL,
+    SELECT_MAIN_EPISODE,
     REMOVE_MAIN_EPISODE,
     MOVE_MAIN_EPISODE_UP,
     MOVE_MAIN_EPISODE_DOWN,
+    SELECT_SUPP_EPISODE,
     REMOVE_SUPP_EPISODE,
     MOVE_SUPP_EPISODE_UP,
     MOVE_SUPP_EPISODE_DOWN,
@@ -13,9 +15,11 @@ import {
     CHANGE_LESSON_DATA,
     CANCEL_CHANGE_LESSON_DATA,
 
+    SELECT_RECOMMENDED_REFERENCE,
     INSERT_RECOMMENDED_REFERENCE,
     UPDATE_RECOMMENDED_REFERENCE,
     REMOVE_RECOMMENDED_REFERENCE,
+    SELECT_COMMON_REFERENCE,
     INSERT_COMMON_REFERENCE,
     UPDATE_COMMON_REFERENCE,
     REMOVE_COMMON_REFERENCE,
@@ -116,6 +120,15 @@ export const saveLesson = (values, mode) => {
     }
 };
 
+export const selectMainEpisode = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_MAIN_EPISODE,
+            payload: id
+        });
+    }
+};
+
 export const removeMainEpisode = (id) => {
     return (dispatch) => {
         dispatch({
@@ -143,6 +156,15 @@ export const moveMainEpisodeDown = (id) => {
     }
 };
 
+export const selectSuppEpisode = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_SUPP_EPISODE,
+            payload: id
+        });
+    }
+};
+
 export const removeSuppEpisode = (id) => {
     return (dispatch) => {
         dispatch({
@@ -165,6 +187,15 @@ export const moveSuppEpisodeDown = (id) => {
     return (dispatch) => {
         dispatch({
             type: MOVE_SUPP_EPISODE_DOWN,
+            payload: id
+        });
+    }
+};
+
+export const selectRecommendedReference = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_RECOMMENDED_REFERENCE,
             payload: id
         });
     }
@@ -210,6 +241,15 @@ export const moveRecommendedReferenceDown = (id) => {
     return (dispatch) => {
         dispatch({
             type: MOVE_RECOMMENDED_REFERENCE_DOWN,
+            payload: id
+        });
+    }
+};
+
+export const selectCommonReference = (id) => {
+    return (dispatch) => {
+        dispatch({
+            type: SELECT_COMMON_REFERENCE,
             payload: id
         });
     }
@@ -285,7 +325,7 @@ export const clearLesson = ()=> {
             payload: null
         });
     }
-}
+};
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {

@@ -3,7 +3,7 @@ import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 
 export default class GridControl extends Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this._selected = this.props.selected;
@@ -31,53 +31,54 @@ export default class GridControl extends Component {
         this.props.removeAction(id);
     }
 
-    _edit(){
+    _edit() {
         if ((this._selected) && (this.props.editAction)) {
             this.props.editAction(this._selected);
         }
     }
 
-    _moveUp(){
+    _moveUp() {
         if ((this._selected) && (this.props.moveUpAction)) {
             this.props.moveUpAction(this._selected)
         }
     }
 
     _moveDown() {
-        if ((this._selected) && (this.props.moveDownAction)){
+        if ((this._selected) && (this.props.moveDownAction)) {
             this.props.moveDownAction(this._selected)
         }
     }
 
     _configButtons() {
+
         let _buttons = [];
         if (this.props.createAction) {
             _buttons.push(<button key='btnNew' className="btn-new" onClick={::this._create}/>)
         }
 
         if (this.props.addAction) {
-            _buttons.push(<button key='btnAdd' className="btn-add" onClick={::this._addClicked}/>)
+            _buttons.push(<button key='btnAdd' className="btn-add"  onClick={::this._addClicked}/>)
         }
 
         if (this.props.editAction) {
-            _buttons.push(<button key='btnEdit' className='btn-edit' onClick={::this._edit}/>)
+            _buttons.push(<button key='btnEdit' className='btn-edit' disabled={(this._selected === null)} onClick={::this._edit}/>)
         }
 
         if (this.props.moveUpAction) {
-            _buttons.push(<button key='btnUp' className="btn-up" onClick={::this._moveUp}/>)
+            _buttons.push(<button key='btnUp' className='btn-up' disabled={(this._selected === null)} onClick={::this._moveUp}/>)
         }
 
         if (this.props.moveDownAction) {
-            _buttons.push(<button key='btnDown' className="btn-down" onClick={::this._moveDown}/>)
+            _buttons.push(<button key='btnDown' className='btn-down' disabled={(this._selected === null)} onClick={::this._moveDown}/>)
         }
 
         return _buttons;
     }
 
-    render () {
-        const {message, data} = this.props;
+    render() {
+        const {data} = this.props;
         return <div>
-            {message}
+            {/*{message}*/}
             <div className="dlg-btn-bar">
                 {this._configButtons()}
             </div>
@@ -101,18 +102,20 @@ export default class GridControl extends Component {
             view: "datatable",
             scroll: false,
             autoheight: true,
+            // height: 0,
             select: true,
-            width: 700,
+            width: 0,
             editable: false,
             columns: that._getColumns(),
 
             on: {
                 onAfterSelect: function (selObj) {
-                    if (selObj.id !== that._selected)
+                    if (parseInt(selObj.id) !== that._selected) {
                         that._selected = null;
-                    that._select(selObj.id);
+                        that._select(selObj.id);
+                    }
                 },
-                onAfterRender: function() {
+                onAfterRender: function () {
                     if ((that._selected) && this.getItem(that._selected)) {
                         this.select(that._selected)
                     }
@@ -124,7 +127,7 @@ export default class GridControl extends Component {
                     this._remove(id.row);
                 }
             }
-        };
+        }
     }
 }
 

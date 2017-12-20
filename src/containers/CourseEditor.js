@@ -1,4 +1,5 @@
-import React  from 'react'
+import React from 'react'
+import {Prompt} from 'react-router-dom';
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
@@ -17,6 +18,7 @@ import {
 
 import { CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
 import LookupDialog from '../components/LookupDialog';
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
 
 class CourseEditor extends React.Component {
 
@@ -223,6 +225,7 @@ class CourseEditor extends React.Component {
             selectedAuthor,
             selectedCategory,
             selectedLesson,
+            hasChanges,
         } = this.props;
 
         return (
@@ -230,32 +233,46 @@ class CourseEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
+                    <Prompt when={hasChanges} message='Есть несохраненные данные. Уйти?'/>
                     <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
-                    <CourseAuthors addAction={::this.showAddAuthorLookup}
-                                   removeAction={::this._removeAuthorFromCourse}
-                                   selectAction={::this._selectAuthor}
-                                   selected={selectedAuthor}
-                                   data={::this.getCourseAuthors()}/>
-                    <CourseCategories addAction={::this.showAddCategoryLookup}
-                                      removeAction={::this._removeCategoryFromCourse}
-                                      selectAction={::this._selectCategory}
-                                      selected={selectedCategory}
-                                      data={::this.getCourseCategories()}/>
-                    <CourseLessons data={courseLessons}
-                                   selectAction={::this._selectLesson}
-                                   createAction={::this._createLesson}
-                                   // addAction={::this._addLesson}
-                                   removeAction={::this._removeLessonFromCourse}
-                                   editAction={::this._editLesson}
-                                   moveUpAction={::this._moveUpLesson}
-                                   moveDownAction={::this._moveDownLesson}
-                                   selected={selectedLesson}
-                    />
+                    <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true}>
+                        <div className="tab-links">
+                            <TabLink to="tab1">Авторы</TabLink>
+                            <TabLink to="tab2">Категории</TabLink>
+                            <TabLink to="tab3">Лекции</TabLink>
+                        </div>
+                        <div className="content">
+                            <TabContent for="tab1">
+                                <CourseAuthors addAction={::this.showAddAuthorLookup}
+                                               removeAction={::this._removeAuthorFromCourse}
+                                               selectAction={::this._selectAuthor}
+                                               selected={selectedAuthor}
+                                               data={::this.getCourseAuthors()}/>
+                            </TabContent>
+                            <TabContent for="tab2">
+                                <CourseCategories addAction={::this.showAddCategoryLookup}
+                                                  removeAction={::this._removeCategoryFromCourse}
+                                                  selectAction={::this._selectCategory}
+                                                  selected={selectedCategory}
+                                                  data={::this.getCourseCategories()}/>
+                            </TabContent>
+                            <TabContent for="tab3">
+                                <CourseLessons data={courseLessons}
+                                               selectAction={::this._selectLesson}
+                                               createAction={::this._createLesson}
+                                               removeAction={::this._removeLessonFromCourse}
+                                               editAction={::this._editLesson}
+                                               moveUpAction={::this._moveUpLesson}
+                                               moveDownAction={::this._moveDownLesson}
+                                               selected={selectedLesson}
+                                />
+                            </TabContent>
+                        </div>
+                    </Tabs>
                     {
                         errorDlgShown ?
                             <ErrorDialog
                                 message={message}
-                                // data={selected}
                             />
                             :
                             ""
@@ -298,20 +315,24 @@ class CourseEditor extends React.Component {
             width: 700,
             id: 'mainData',
             elements: [
-                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название",},
+                {view: "text", name: "Name", label: "Название курса", placeholder: "Введите название",
+                    invalidMessage: "Incorrect e-mail address", labelWidth:120 ,},
 
-                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL"},
-                {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса',},
+                {view: 'text', name: 'URL', label: 'URL', placeholder: "Введите URL", labelWidth:120},
+                {view: "colorpicker", label: "Цвет курса", name: "ColorHex", placeholder: 'Цвет курса', labelWidth:120},
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}],
+                    labelWidth:120
                 },
                 {
                     view: "combo", name: "LanguageId", label: "Язык", placeholder: "Выберите язык",
-                    options: this.getLanguagesArray()
+                    options: this.getLanguagesArray(),
+                    labelWidth:120
                 },
                 {
                     view: "richtext",
+                    // labelWidth:120,
                     id: "Description",
                     label: "Описание курса",
                     labelPosition: "top",

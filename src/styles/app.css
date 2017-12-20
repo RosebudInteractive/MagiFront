@@ -1,13 +1,90 @@
 /*https://www.iconfinder.com/iconsets/evil-icons-user-interface*/
+#confirm .holder{
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(0,0,0,0.25)
+}
+#confirm .popup {
+  background: #fff;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  width: 300px;
+  padding: 25px;
+}
+#confirm .popup .dlg-btn-bar {
+  padding: 1em;
+  text-align: right;
+}
+#confirm .popup .dlg-btn-bar .btn {
+  margin-left: 0.5em;
+}
+#confirm .popup .dlg-message {
+  padding: 1em 1em 0 1em;
+  font-size: 16px;
+  font-weight: 600;
+}
+.tabs {
+  width: 700px;
+  display: inline-block;
+  margin-right: 30px;
+  vertical-align: top;
+}
+
+.tabs-1 .tab-links {
+  margin: 0;
+  padding: 0;
+  border: 1px solid #CCC;
+  border-bottom: 1px solid #868686;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  height: 35px;
+  position: relative;
+  top: 5px;
+}
+
+.tabs-1 .tab-link {
+  padding: 0 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: inline-block;
+  position: relative;
+  height: 40px;
+  line-height: 41px;
+  top: -6px;
+  left: -1px;
+}
+
+.tabs-1 .tab-link-active {
+  font-weight: bold;
+  border: 1px solid #868686;
+  border-bottom: 1px solid white;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  background-color: #96c8ff;
+}
+
+.tabs-1 .content {
+  padding: 10px;
+  /*border: 1px solid #868686;*/
+  /*border-top: 1px solid transparent;*/
+  /*height: 200px;*/
+}
+
+/*.tabs-1 .tabContent: {}*/
+
 .delbtn {
-  background: url(./../icons/basket.svg);
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/basket.svg);
   height: 25px;
   width: 25px;
   border: none;
@@ -15,116 +92,110 @@
   margin-bottom: 5px;
 }
 .btn-up {
-  background: url(./../icons/arrow_up.svg);
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/arrow_up.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
 }
 .btn-down {
-  background: url(./../icons/arrow_down.svg);
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/arrow_down.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
 }
 .btn-new {
-  background: url(./../icons/plus.svg);
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/plus.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
 }
 .btn-add {
-  background: url(./../icons/clip.svg);
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/clip.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
 }
 .btn-edit {
-  background: url(./../icons/pen.svg);
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/pen.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
 }
 .btn-delete {
-  background: url(./../icons/minus.svg);
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
-  background-color: #96c8ff;
+  background: #96c8ff url(./../icons/minus.svg);
   height: 2.5714em;
-  /*height: 25px;*/
   width: 2.5714em;
   border: none;
-  /*margin-left: 2px;*/
   margin-bottom: 2px;
 }
 .btn-back {
   background: url(./../icons/arrow_left.svg);
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
-  background-color: #96c8ff;
-  height: 2.5714em;
-  /*height: 25px;*/
-  width: 2.5714em;
-  border: none;
-  /*margin-left: 2px;*/
-  margin-bottom: 2px;
+  /*border-radius: 2px;*/
+  /*background-size: contain;*/
+  /*cursor: pointer;*/
+  /*display: inline-block;*/
+  /*vertical-align: middle;*/
+  /*color: #fff;*/
+  /*background-color: #96c8ff;*/
+  /*height: 2.5714em;*/
+  /*!*height: 25px;*!*/
+  /*width: 2.5714em;*/
+  /*border: none;*/
+  /*!*margin-left: 2px;*!*/
+  /*margin-bottom: 2px;*/
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
 }
 
 .btn {

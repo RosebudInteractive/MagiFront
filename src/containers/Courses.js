@@ -63,7 +63,7 @@ class Coureses extends React.Component {
                         <p>{message}</p>
                         :
                         <div className="courses-content">
-                            <div className="action-bar">
+                            <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
                                 <button className='btn-new'
                                         onClick={::this.onAddBtnClick}
                                 />{' '}
