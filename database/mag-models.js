@@ -87,7 +87,9 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("CategoryLng", "6bae1b6a-82d4-4f54-a953-080edf274588", "RootCategoryLng", "bd317677-91f9-44b2-b449-d368e42a2b6a")
             .addField("CategoryId", { type: "dataRef", model: "Category", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
-            .addField("Name", { type: "string", length: 100, allowNull: false });
+            .addField("Name", { type: "string", length: 100, allowNull: false })
+            .addField("Description", { type: "string", length: 255, allowNull: true })
+            .addField("Alias", { type: "string", length: 100, allowNull: true });
 
         metaDataMgr.addModel("CourseCategory", "61e14112-019b-42ac-9834-073af99a1597", "RootCourseCategory", "6b65ee98-e1fa-4580-9f90-ad835349a8e5")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
