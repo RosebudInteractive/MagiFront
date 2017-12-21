@@ -17,6 +17,7 @@
                     "AccountId": 1,
                     "LanguageId": 1,
                     "State": "P",
+                    "OneLesson": false,
                     "Color": 13413051,
                     "URL": "https://magisteria.ru/course1",
                     "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/unnamed-1.jpg"
@@ -32,6 +33,7 @@
                     "AccountId": 1,
                     "LanguageId": 1,
                     "State": "P",
+                    "OneLesson": false,
                     "Color": 10070783,
                     "URL": "https://magisteria.ru/course1",
                     "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/unnamed-2.jpg"
@@ -47,6 +49,7 @@
                     "AccountId": 1,
                     "LanguageId": 1,
                     "State": "P",
+                    "OneLesson": false,
                     "Color": 16755234,
                     "URL": "https://magisteria.ru/course1",
                     "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/unnamed-3.jpg"
