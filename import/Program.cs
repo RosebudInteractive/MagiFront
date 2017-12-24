@@ -800,6 +800,11 @@ namespace MagImport
                 if (!authorsDB.TryGetValue(rdr.GetInt32("author_id"), out curr_author))
                     throw new Exception(String.Format("Can't find author (Id={0}) for lesson (Id={1}).", rdr.GetInt32("author_id"), db_id));
 
+                // Child lessons are currently not processed ! 
+                //
+                if (String.Compare(rdr.GetString("is_ext"), "1") == 0)
+                    continue;
+
                 Lesson lesson = new Lesson();
                 lessons.Elems.Add(lesson);
                 lesson.Fields.Id = lessons.GetNextId();
@@ -828,7 +833,6 @@ namespace MagImport
             rdr.Close();
 
             ReferenceRoot references = null;
-
             foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse>> pair in lessonsDB)
             {
                 int db_id = pair.Key;
@@ -853,7 +857,8 @@ namespace MagImport
                         lesson_prop_value[rdr_det.GetString("meta_key")] = rdr_det.GetString("meta_value");
                 rdr_det.Close();
 
-                int int_val;
+                int int_val = 0;
+
                 if (lesson_prop_value.TryGetValue(att_lsn_number_name, out val))
                     if (Int32.TryParse(val, out int_val))
                         lesson_course.Fields.Number = int_val;
@@ -865,32 +870,43 @@ namespace MagImport
                 if (lesson_prop_value.TryGetValue(att_lsn_descr_name, out val))
                     lesson_lng.Fields.ShortDescription = val;
 
-                if (lesson_prop_value.TryGetValue("список_литературы_v2", out val))
-                    if (Int32.TryParse(val, out int_val))
+                bool flag = false;
+                Dictionary<string, string> ref_attrs = ref_attrs_v1;
+                if (lesson_prop_value.TryGetValue(ref_attrs["counter"], out val))
+                    flag = Int32.TryParse(val, out int_val);
+
+                if (!flag)
+                {
+                    ref_attrs = ref_attrs_v2;
+                    if (lesson_prop_value.TryGetValue(ref_attrs["counter"], out val))
+                        flag = Int32.TryParse(val, out int_val);
+                }
+
+                if (flag)
+                {
+                    for (int i = 0; i < int_val; i++)
                     {
-                        for (int i = 0; i < int_val; i++)
+                        string att_ref_name = String.Format(ref_attrs["att_ref_name"], i);
+                        if (lesson_prop_value.TryGetValue(att_ref_name, out val))
                         {
-                            string att_ref_name = String.Format("список_литературы_v2_{0}_название_список литературы_v2", i);
-                            if (lesson_prop_value.TryGetValue(att_ref_name, out val))
+                            if (references == null)
                             {
-                                if (references == null)
-                                {
-                                    references = new ReferenceRoot();
-                                    allData.Add(references);
-                                }
-                                Reference reference = new Reference();
-                                references.Elems.Add(reference);
-                                reference.Fields.Id = references.GetNextId();
-                                reference.Fields.LessonLngId = lesson_lng.Fields.Id;
-                                reference.Fields.Number = i + 1;
-                                reference.Fields.Description = val;
-                                reference.Fields.Recommended = false;
-                                string att_ref_url_name = String.Format("список_литературы_v2_{0}_url_список литературы_v2", i);
-                                if (lesson_prop_value.TryGetValue(att_ref_url_name, out val))
-                                    reference.Fields.URL = String.IsNullOrEmpty(val) ? null : val;
+                                references = new ReferenceRoot();
+                                allData.Add(references);
                             }
+                            Reference reference = new Reference();
+                            references.Elems.Add(reference);
+                            reference.Fields.Id = references.GetNextId();
+                            reference.Fields.LessonLngId = lesson_lng.Fields.Id;
+                            reference.Fields.Number = i + 1;
+                            reference.Fields.Description = val;
+                            reference.Fields.Recommended = false;
+                            string att_ref_url_name = String.Format(ref_attrs["att_ref_url_name"], i);
+                            if (lesson_prop_value.TryGetValue(att_ref_url_name, out val))
+                                reference.Fields.URL = String.IsNullOrEmpty(val) ? null : val;
                         }
                     }
+                }
 
                 if (photo_id != 0)
                 {
@@ -934,6 +950,21 @@ namespace MagImport
         const string att_course_category_name = "раздел";
         const string att_course_color_name = "color";
 
+        const string att_ext_lsn_name = "dop_lecture_bool";
+        const string att_parent_lsn_id_name = "main_lecture";
+
+        Dictionary<string, string> ref_attrs_v1 = new Dictionary<string, string>
+        {
+            { "counter", "список_литературы_v2" },
+            { "att_ref_name", "список_литературы_v2_{0}_название_список литературы_v2" },
+            { "att_ref_url_name", "список_литературы_v2_{0}_url_список литературы_v2" }
+        };
+        Dictionary<string, string> ref_attrs_v2 = new Dictionary<string, string>
+        {
+            { "counter", "список_литературы" },
+            { "att_ref_name", "список_литературы_{0}_название" },
+            { "att_ref_url_name", "список_литературы_{0}_url" }
+        };
         const string sql_get_term_det =
             "select `meta_key`, `meta_value` from `wp_termmeta`\n" +
             "  where `term_id` = @Id";
@@ -964,7 +995,7 @@ namespace MagImport
 
         const string sql_get_lessons =
             "select `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name`,\n" +
-            "  `p`.`id` as `lesson_id`, `p`.`post_title` as `lesson_name`, `p`.`post_content`, `p`.`post_excerpt`,\n" +
+            "  `p`.`id` as `lesson_id`, coalesce(`pm`.`meta_value`,'0') `is_ext`, `p`.`post_title` as `lesson_name`, `p`.`post_content`, `p`.`post_excerpt`,\n" +
             "  `p`.`post_status`, `p`.`comment_status`, `p`.`ping_status`, `p`.`post_name` from `wp_terms` `t`\n" +
             "  join `wp_term_taxonomy` `m` on `t`.`term_id` = `m`.`term_id` and `m`.`taxonomy` = 'autor'\n" +
             "  join `wp_term_relationships` `r` on `r`.`term_taxonomy_id` = `m`.`term_taxonomy_id`\n" +
@@ -972,6 +1003,7 @@ namespace MagImport
             "  join `wp_term_relationships` `rc` on `rc`.`object_id` = `r`.`object_id`\n" +
             "  join `wp_term_taxonomy` `mc` on `rc`.`term_taxonomy_id` = `mc`.`term_taxonomy_id` and `mc`.`taxonomy` = 'category'\n" +
             "  join `wp_terms` `tc` on `tc`.`term_id` = `mc`.`term_id`\n" +
+            "  left join(select `post_id`, `meta_value` from `wp_postmeta` where `meta_key` = 'dop_lecture_bool') `pm` on `pm`.`post_id` = `p`.`id`\n" +
             "order by `t`.`term_id`, `tc`.`term_id`, `p`.`id`";
 
         Encoding enc = new UTF8Encoding(false); // UTF8 w/o BOM 
