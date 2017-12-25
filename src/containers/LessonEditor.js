@@ -455,7 +455,7 @@ class LessonEditor extends React.Component {
         let that = this;
         return {
             view: "form",
-            width: 700,
+            width: 1000,
             id: 'mainData',
             elements: [
                 // {
