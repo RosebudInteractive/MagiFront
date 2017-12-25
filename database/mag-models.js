@@ -99,6 +99,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("Lesson", "caadef95-278b-4cad-acc9-a1e27380d6c6", "RootLesson", "819bf85f-e13b-4368-98e5-561f68f90ecd")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false })
             .addField("AuthorId", { type: "dataRef", model: "Author", refAction: "parentRestrict", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: true })
             .addField("LessonType", { type: "enum", values: ["L", "T"], allowNull: false })
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("URL", { type: "string", length: 255, allowNull: true });
@@ -114,6 +115,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "LessonCourse", refAction: "parentRestrict", allowNull: true })
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });
@@ -153,7 +155,37 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("EpisodeTocId", { type: "dataRef", model: "EpisodeToc", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("Topic", { type: "string", length: 255, allowNull: false })
-            .addField("TimeStamp", { type: "int", allowNull: false });
+            .addField("StartTime", { type: "int", allowNull: false });
+
+        metaDataMgr.addModel("EntityType", "59411fd7-3b22-4ed7-bc03-d7536fef74b9", "RootEntityType", "ef2277ad-49ef-4f0d-8c80-5abebbdd9c76")
+            .addField("Code", { type: "string", length: 50, allowNull: false });
+
+        metaDataMgr.addModel("EntityTypeLng", "c942f8fa-a0aa-4024-bd5a-939bbe6490c1", "RootEntityTypeLng", "33efa9c5-1ed5-4aef-a996-1cffc582a847")
+            .addField("EntityTypeId", { type: "dataRef", model: "EntityType", refAction: "parentCascade", allowNull: false })
+            .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false });
+
+        metaDataMgr.addModel("Entity", "d5db7d84-7418-4d90-87fc-10f675f12587", "RootEntity", "46c70949-19a0-418d-b2ba-2f338978fe31")
+            .addField("EntityTypeId", { type: "dataRef", model: "EntityType", refAction: "parentRestrict", allowNull: false });
+
+        metaDataMgr.addModel("EntityLng", "00c07c36-6dd1-4920-a534-1f08e50cd002", "RootEntityLng", "dc5a5bf0-52b2-4ff6-b355-dc144dc23bfe")
+            .addField("EntityId", { type: "dataRef", model: "Entity", refAction: "parentCascade", allowNull: false })
+            .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false });
+
+        metaDataMgr.addModel("Resource", "89e7a678-5414-498f-b635-b172bf402816", "RootResource", "5c605246-56ff-4b40-9c27-242e678899e4")
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
+            .addField("EntityId", { type: "dataRef", model: "Entity", refAction: "parentRestrict", allowNull: true })
+            .addField("ResType", { type: "enum", values: ["P", "V"], allowNull: false })
+            .addField("FileName", { type: "string", length: 255, allowNull: false });
+
+        metaDataMgr.addModel("EpisodeContent", "b6b2fbd3-57e6-48c1-aa8b-7751daa2bfed", "RootEpisodeContent", "1996d0fc-a93f-420f-b1c3-627fef86bb60")
+            .addField("EpisodeId", { type: "dataRef", model: "Episode", refAction: "parentCascade", allowNull: false })
+            .addField("ResourceId", { type: "dataRef", model: "Resource", refAction: "parentRestrict", allowNull: false })
+            .addField("CompType", { type: "enum", values: ["PIC", "VDO", "TXT", "TLN"], allowNull: false })
+            .addField("StartTime", { type: "int", allowNull: false })
+            .addField("Duration", { type: "int", allowNull: false })
+            .addField("Content", { type: "string", allowNull: true });
 
         metaDataMgr.checkSchema();
     }
