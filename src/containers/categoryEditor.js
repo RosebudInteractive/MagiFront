@@ -21,6 +21,10 @@ class CategoryForm extends ObjectEditor {
         return 'categoryId'
     }
 
+    get objectName() {
+        return 'category'
+    }
+
     get objectActions() {
         return this.props.categoryActions;
     }

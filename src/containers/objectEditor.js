@@ -1,5 +1,6 @@
 import React  from 'react'
 import ErrorDialog from '../components/ErrorDialog';
+import {Prompt} from 'react-router-dom';
 
 import {
     EDIT_MODE_INSERT,
@@ -32,6 +33,10 @@ export default class ObjectEditor extends React.Component {
     }
 
     get objectIdPropName() {
+        throw 'Undefined object prop name'
+    }
+
+    get objectName() {
         throw 'Undefined object name'
     }
 
@@ -61,7 +66,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentWillReceiveProps(next) {
-        let _newObjectId = next[this.objectIdPropName];
+        let _newObjectId = next[this.objectName] ? next[this.objectName].id : null;
         let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (_newObjectId);
 
         if (_isNeedSwitchMode) {
@@ -70,7 +75,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     _switchToEditObject(objId){
-        let _newRout = this.getRootRout() + '/' + objId;
+        let _newRout = this.getRootRout() + '/edit/' + objId;
         this.editMode = EDIT_MODE_EDIT;
         this.props.history.push(_newRout);
     }
@@ -105,6 +110,7 @@ export default class ObjectEditor extends React.Component {
             fetching,
             message,
             errorDlgShown,
+            hasChanges
         } = this.props;
         return (
             <div className="object-content">
@@ -112,9 +118,11 @@ export default class ObjectEditor extends React.Component {
                     fetching ?
                         <p>Загрузка...</p>
                         :
-                        <div>{this._getWebixForm()}</div>
+                        <div>
+                            <Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>
+                            {this._getWebixForm()}
+                        </div>
                 }
-                {/*<Webix ui={::this.getUI()} data={author}/>*/}
                 {
                     errorDlgShown ?
                         <ErrorDialog

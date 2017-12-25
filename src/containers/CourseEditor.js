@@ -44,10 +44,7 @@ class CourseEditor extends React.Component {
         categoriesActions.getCategories();
         languagesActions.getLanguages();
     }
-
-    // componentWillReceiveProps(nextProps) {
-    //
-    // }
+    
 
     _goBack(){
         this.props.history.push('/courses');
