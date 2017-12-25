@@ -407,6 +407,10 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_obj.languageId(inpFields["LanguageId"]);
                         if (inpFields["URL"])
                             crs_obj.uRL(inpFields["URL"]);
+
+                        crs_obj.oneLesson(false);
+                        if (typeof (inpFields["OneLesson"]) === "boolean")
+                            crs_obj.oneLesson(inpFields["OneLesson"]);
                         
                         if (inpFields["State"])
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
@@ -535,6 +539,9 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["LanguageId"] = inpFields["LanguageId"];
                         if (inpFields["URL"])
                             fields["URL"] = inpFields["URL"];
+                        fields["OneLesson"] = false;
+                        if (typeof (inpFields["OneLesson"]) === "boolean")
+                            fields["OneLesson"] = inpFields["OneLesson"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
