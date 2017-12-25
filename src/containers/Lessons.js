@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as coursesActions from "../actions/CoursesActions";
+import * as coursesActions from "../actions/coursesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';

@@ -8,7 +8,8 @@ import commonDlg from './commonDlg';
 import episodes from "./episodes";
 import author from './author';
 import authorsList from './authorsList';
-import categories from './categories';
+import category from './category';
+import categoriesList from './categoriesList';
 import courses from './courses';
 import singleCourse from './singleCourse';
 import singleLesson from './singleLesson';
@@ -30,7 +31,8 @@ export default combineReducers({
     episodes,
     languages,
     authorsList,
-    categories,
+    category,
+    categoriesList,
     courses,
     singleCourse,
     courseAuthors,

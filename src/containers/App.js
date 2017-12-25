@@ -11,8 +11,8 @@ import AuthorForm from './authorEditor';
 import Categories from './Categories';
 import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
-import CourseEditor from './CourseEditor';
-import LessonEditor from './LessonEditor';
+import CourseEditor from './courseEditor';
+import LessonEditor from './lessonEditor';
 import EpisodeEditor from './EpisodeEditor';
 
 class App extends Component {

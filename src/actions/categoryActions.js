@@ -1,13 +1,13 @@
 import {
-    CREATE_NEW_AUTHOR,
-    GET_AUTHOR_REQUEST,
-    GET_AUTHOR_SUCCESS,
-    GET_AUTHOR_FAIL,
-    SAVE_AUTHOR_DATA,
-    CHANGE_AUTHOR_DATA,
-    CANCEL_CHANGE_AUTHOR_DATA,
-    CLEAR_AUTHOR,
-} from '../constants/author';
+    CREATE_NEW_CATEGORY,
+    GET_CATEGORY_REQUEST,
+    GET_CATEGORY_SUCCESS,
+    GET_CATEGORY_FAIL,
+    SAVE_CATEGORY_DATA,
+    CHANGE_CATEGORY_DATA,
+    CANCEL_CHANGE_CATEGORY_DATA,
+    CLEAR_CATEGORY,
+} from '../constants/category';
 
 import {
     SHOW_ERROR_DIALOG,
@@ -20,7 +20,7 @@ import 'whatwg-fetch';
 export const create = (obj) => {
     return (dispatch) => {
         dispatch({
-            type: CREATE_NEW_AUTHOR,
+            type: CREATE_NEW_CATEGORY,
             payload: obj
         });
     }
@@ -29,24 +29,24 @@ export const create = (obj) => {
 export const get = (id)=> {
     return (dispatch) => {
         dispatch({
-            type: GET_AUTHOR_REQUEST,
+            type: GET_CATEGORY_REQUEST,
             payload: null
         });
 
-        fetch("/api/authors/" + id)
+        fetch("/api/categories/" + id)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                handleAuthor(data);
+                handleCategory(data);
 
                 dispatch({
-                    type: GET_AUTHOR_SUCCESS,
+                    type: GET_CATEGORY_SUCCESS,
                     payload: data
                 })
             })
             .catch((err) => {
                 dispatch({
-                    type: GET_AUTHOR_FAIL,
+                    type: GET_CATEGORY_FAIL,
                     payload: err
                 });
 
@@ -63,7 +63,7 @@ export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/authors";
+        let _url = "/api/categories";
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id
         }
@@ -80,7 +80,7 @@ export const save = (values, mode) => {
             .then(parseJSON)
             .then((id) => {
                 dispatch({
-                    type: SAVE_AUTHOR_DATA,
+                    type: SAVE_CATEGORY_DATA,
                     payload: id
                 })
             })
@@ -97,7 +97,7 @@ export const save = (values, mode) => {
 export const changeData = (object) => {
     return (dispatch) => {
         dispatch({
-            type: CHANGE_AUTHOR_DATA,
+            type: CHANGE_CATEGORY_DATA,
             payload: object
         });
     }
@@ -106,7 +106,7 @@ export const changeData = (object) => {
 export const cancelChanges = ()=> {
     return (dispatch) => {
         dispatch({
-            type: CANCEL_CHANGE_AUTHOR_DATA,
+            type: CANCEL_CHANGE_CATEGORY_DATA,
             payload: null
         });
     }
@@ -115,7 +115,7 @@ export const cancelChanges = ()=> {
 export const clear = ()=> {
     return (dispatch) => {
         dispatch({
-            type: CLEAR_AUTHOR,
+            type: CLEAR_CATEGORY,
             payload: null
         });
     }
@@ -135,7 +135,7 @@ const parseJSON = (response) => {
     return response.json()
 };
 
-const handleAuthor = (author) => {
-    author.id = author.Id;
-    return author;
+const handleCategory = (category) => {
+    category.id = category.Id;
+    return category;
 };

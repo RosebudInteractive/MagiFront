@@ -5,7 +5,7 @@ import ErrorDialog from '../components/ErrorDialog';
 import PropTypes from 'prop-types';
 
 import * as singleEpisodeActions from "../actions/SingleEpisodeActions";
-import * as singleLessonActions from "../actions/SingleLessonActions";
+import * as singleLessonActions from "../actions/lessonActions";
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
@@ -134,7 +134,7 @@ class EpisodeEditor extends React.Component {
 
         return {
             view: "form",
-            width: 700,
+            width: 1000,
             id: 'mainData',
             elements: [
                 {
@@ -175,7 +175,7 @@ class EpisodeEditor extends React.Component {
                 {
                     view: "richtext",
                     label: "Транскрипт",
-                    height: 100,
+                    height: 300,
                     width: 500,
                     name: "Transcript",
                 },
@@ -238,7 +238,6 @@ function mapStateToProps(state, ownProps) {
     return {
         episode: state.singleEpisode.episode,
         lesson: state.singleLesson.lesson,
-        // course: state.singleCourse.course,
         hasChanges : state.singleEpisode.hasChanges,
 
         hasError: state.commonDlg.hasError,

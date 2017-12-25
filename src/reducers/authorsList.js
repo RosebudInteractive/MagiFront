@@ -4,8 +4,6 @@ import {
     GET_AUTHORS_LIST_FAIL,
     SELECT_AUTHOR,
     DELETE_AUTHOR_SUCCESS,
-    SHOW_EDIT_AUTHOR_DLG,
-    HIDE_EDIT_AUTHOR_DLG,
 } from '../constants/authorsList'
 
 import {
@@ -35,7 +33,7 @@ export default function authorsList(state = initialState, action) {
         }
 
         case GET_AUTHORS_LIST_FAIL:
-            return initialState; //, hasError: true, message: action.payload };
+            return initialState;
 
         case SELECT_AUTHOR:
             return {...state, selected: action.payload};
@@ -50,34 +48,6 @@ export default function authorsList(state = initialState, action) {
             });
 
             return {...state, authors: _authors}
-        }
-
-        case SHOW_EDIT_AUTHOR_DLG: {
-            return {...state, editDlgShown: true, editMode: action.payload}
-        }
-
-        case HIDE_EDIT_AUTHOR_DLG: {
-            let _authors = [];
-            let _replaced = false;
-            state.authors.forEach((author) => {
-                if (author.id !== action.payload.id) {
-                    _authors.push({...author})
-                } else {
-                    _authors.push(action.payload);
-                    _replaced = true;
-                }
-            });
-
-            if (!_replaced) {
-                _authors.push(action.payload)
-            }
-
-            return {
-                ...state,
-                authors: _authors,
-                editDlgShown: false,
-                selected: _replaced ? state.selected : action.payload.id
-            };
         }
 
         default:

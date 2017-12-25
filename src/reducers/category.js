@@ -1,13 +1,13 @@
 import {
-    CREATE_NEW_AUTHOR,
-    GET_AUTHOR_REQUEST,
-    GET_AUTHOR_SUCCESS,
-    GET_AUTHOR_FAIL,
-    CHANGE_AUTHOR_DATA,
-    CANCEL_CHANGE_AUTHOR_DATA,
-    SAVE_AUTHOR_DATA,
-    CLEAR_AUTHOR,
-} from '../constants/author'
+    CREATE_NEW_CATEGORY,
+    GET_CATEGORY_REQUEST,
+    GET_CATEGORY_SUCCESS,
+    GET_CATEGORY_FAIL,
+    SAVE_CATEGORY_DATA,
+    CHANGE_CATEGORY_DATA,
+    CANCEL_CHANGE_CATEGORY_DATA,
+    CLEAR_CATEGORY,
+} from '../constants/category'
 
 const initialState = {
     initial: null,
@@ -16,14 +16,13 @@ const initialState = {
     hasChanges: false,
 };
 
-export default function author(state = initialState, action) {
+export default function category(state = initialState, action) {
 
     switch (action.type) {
-        case CREATE_NEW_AUTHOR: {
+        case CREATE_NEW_CATEGORY: {
             let _newObject = {
-                FirstName: '',
-                LastName: '',
-                Description: '',
+                Name: '',
+                ParentId: null,
             };
 
             return {
@@ -35,14 +34,14 @@ export default function author(state = initialState, action) {
             }
         }
 
-        case GET_AUTHOR_REQUEST:
+        case GET_CATEGORY_REQUEST:
             return {
                 ...state,
                 fetching: true,
                 hasError: false
             };
 
-        case GET_AUTHOR_SUCCESS: {
+        case GET_CATEGORY_SUCCESS: {
             return {
                 ...state,
                 initial: action.payload,
@@ -52,10 +51,10 @@ export default function author(state = initialState, action) {
             };
         }
 
-        case GET_AUTHOR_FAIL:
+        case GET_CATEGORY_FAIL:
             return initialState;
 
-        case SAVE_AUTHOR_DATA: {
+        case SAVE_CATEGORY_DATA: {
             state.current.id = action.payload.id;
             state.current.Id = action.payload.id;
 
@@ -67,17 +66,17 @@ export default function author(state = initialState, action) {
             };
         }
 
-        case CHANGE_AUTHOR_DATA: {
+        case CHANGE_CATEGORY_DATA: {
             let _object = Object.assign({}, action.payload);
 
             return {...state, current: _object, hasChanges: true };
         }
 
-        case CANCEL_CHANGE_AUTHOR_DATA: {
+        case CANCEL_CHANGE_CATEGORY_DATA: {
             return {...state, current: Object.assign({}, state.initial), hasChanges: false}
         }
 
-        case CLEAR_AUTHOR:{
+        case CLEAR_CATEGORY:{
             return initialState
         }
 

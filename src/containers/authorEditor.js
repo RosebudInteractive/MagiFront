@@ -1,188 +1,81 @@
 import React  from 'react'
 import Webix from '../components/Webix';
-import ErrorDialog from '../components/ErrorDialog';
+// import ErrorDialog from '../components/ErrorDialog';
 
 import * as authorActions from "../actions/authorActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {
-    EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT
-} from '../constants/Common';
+// import {
+//     EDIT_MODE_INSERT,
+//     EDIT_MODE_EDIT
+// } from '../constants/Common';
 
-const requiredField = {
-    FirstName: 'FirstName',
-    LastName: 'LastName'
-};
+import ObjectEditor, {labelWidth, } from './objectEditor';
 
-class AuthorEditor extends React.Component {
-    constructor(props) {
-        super(props);
-        const {
-            authorActions,
-            authorId,
-        } = this.props;
+class AuthorEditor extends ObjectEditor {
 
-
-        if (authorId > 0) {
-            this.editMode = EDIT_MODE_EDIT;
-            authorActions.get(authorId);
-        } else {
-            this.editMode = EDIT_MODE_INSERT;
-            authorActions.create();
-        }
-
-        this._validateResult = {};
-        this._dataLoaded = false;
+    getObject() {
+        return this.props.author
     }
 
-    componentWillReceiveProps(next) {
-        if ((this.editMode === EDIT_MODE_INSERT) && (next.author.id)) {
-            let _newRout = '/authors/edit/' + next.author.id;
-            this.editMode = EDIT_MODE_EDIT;
-            this.props.history.push(_newRout);
-        }
+    getRootRout() {
+        return '/authors'
     }
 
-    componentWillUnmount() {
-        this.props.authorActions.clear()
+    get objectIdPropName() {
+        return 'authorId'
     }
 
-    _goBack(){
-        this.props.history.push('/authors');
+    get objectName() {
+        return 'author'
     }
 
-    _save(values) {
-        this.props.authorActions.save(values, this.editMode);
+    get objectActions() {
+        return this.props.authorActions;
     }
 
-    _cancel() {
-        this._dataLoaded = false;
-        this.props.authorActions.cancelChanges();
+    _getWebixForm(){
+        let _data = this.getObject();
+        return <Webix ui={::this.getUI()} data={_data}/>
     }
 
-    render() {
-        const {
-            author,
-            message,
-            errorDlgShown,
-        } = this.props;
-        return (
-            <div className="episodes-content">
-                <Webix ui={::this.getUI()} data={author}/>
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                        />
-                        :
-                        ""
-                }
-            </div>
-        )
-    }
-
-    _notifyDataLoaded() {
-        this._dataLoaded = true;
-    }
-
-    _changeData(obj) {
-        this.props.authorActions.changeData(obj);
-    }
-
-    _hasChanges() {
-        return this.props.hasChanges;
-    }
-
-    _enableApplyChanges() {
-        let _array = Object.values(this._validateResult);
-        return _array.every((value) => {
-            return value === true
-        })
-    }
-
-    _externalValidate(field) {
-        if (this._dataLoaded) {
-            let _isValid = field.validate();
-            this._validateResult[field.data.name] = _isValid;
-        }
-    }
-
-    getUI() {
+    _getExtElements() {
         let that = this;
 
-        return {
-            view: "form",
-            width: 700,
-            elements: [
-                {
-                    view: "button", name: 'btnOk', value: '<<< Назад',
-                    click: () => {
-                        this._goBack();
-                    }
-                },
-                {
-                    view: "text", name: requiredField.FirstName, label: "Имя",
-                    placeholder: "Введите имя",
-                    labelWidth: 120,
-                    validate: window.webix.rules.isNotEmpty,
-                    invalidMessage: "Значение не может быть пустым",
-                    on: {
-                        onChange: function () {
-                            that._externalValidate(this);
-                        },
+        return [
+            {
+                view: "text", name: 'FirstName', label: "Имя",
+                placeholder: "Введите имя",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
                     },
                 },
-                {
-                    view: "text", name: "LastName", label: "Фамилия",
-                    placeholder: "Введите фамилию",
-                    labelWidth: 120,
-                    validate: window.webix.rules.isNotEmpty,
-                    invalidMessage: "Значение не может быть пустым",
-                    on: {
-                        onChange: function () {
-                            that._externalValidate(this);
-                        },
+            },
+            {
+                view: "text", name: "LastName", label: "Фамилия",
+                placeholder: "Введите фамилию",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
                     },
                 },
-                {view: "textarea", name: "Description", label: "Описание", placeholder: "Описание", height: 150, labelWidth: 120,},
-                {
-                    cols: [
-                        {},
-                        {},
-                        {
-                            view: "button", value: "ОК", name: 'btnOk',
-                            click: function () {
-                                if (this.getFormView().validate()) {
-                                    that._save(this.getFormView().getValues());
-                                }
-                            }
-                        },
-                        {
-                            view: "button", value: "Отмена", name: 'btnCancel',
-                            click: function () {
-                                this.getFormView().clearValidation();
-                                that._cancel();
-                            }
-                        }
-                    ]
-                }
-            ],
-            on: {
-                onChange: function () {
-                    that._changeData(::this.getValues());
-                },
-                onValues: function () {
-                    that._notifyDataLoaded();
-
-                    that._hasChanges() ?
-                        this.elements.btnCancel.enable() : this.elements.btnCancel.disable();
-
-                    (that._hasChanges() && that._enableApplyChanges()) ?
-                        this.elements.btnOk.enable() : this.elements.btnOk.disable();
-                },
+            },
+            {
+                view: "textarea",
+                name: "Description",
+                label: "Описание",
+                placeholder: "Описание",
+                height: 150,
+                labelWidth: labelWidth,
             }
-        }
+        ];
     }
 }
 

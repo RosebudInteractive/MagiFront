@@ -4,15 +4,11 @@ import {
     GET_COURSES_FAIL,
     SELECT_COURSE,
     DELETE_COURSE_SUCCESS,
-    HIDE_EDIT_COURSE_DLG,
-    SHOW_EDIT_COURSE_DLG,
 } from '../constants/Courses'
 
 import {
     HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
-    EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT,
 } from '../constants/Common';
 
 import 'whatwg-fetch';
@@ -50,22 +46,6 @@ export const getCourses = ()=> {
     }
 };
 
-export const showEditDialog = (mode) => {
-    return {
-        type: SHOW_EDIT_COURSE_DLG,
-        payload: mode
-    }
-
-};
-
-export const hideEditDialog = () => {
-    return {
-        type: HIDE_EDIT_COURSE_DLG,
-        payload: null
-    }
-
-};
-
 export const selectCourse = (id) => {
     return {
         type: SELECT_COURSE,
@@ -73,39 +53,39 @@ export const selectCourse = (id) => {
     }
 };
 
-export const saveCourse = (values, mode) => {
-
-    return (dispatch) => {
-        let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/courses";
-        if (mode === EDIT_MODE_EDIT) {
-            _url += "/" + values.id
-        }
-        fetch(_url,
-            {
-                method: _type,
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(values)
-            })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then((data) => {
-                dispatch({
-                    type: HIDE_EDIT_COURSE_DLG,
-                    payload: data
-                })
-            })
-            .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
-    }
-};
+// export const saveCourse = (values, mode) => {
+//
+//     return (dispatch) => {
+//         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
+//         let _url = "/api/courses";
+//         if (mode === EDIT_MODE_EDIT) {
+//             _url += "/" + values.id
+//         }
+//         fetch(_url,
+//             {
+//                 method: _type,
+//                 headers: {
+//                     "Content-type": "application/json"
+//                 },
+//                 body: JSON.stringify(values)
+//             })
+//             .then(checkStatus)
+//             .then(parseJSON)
+//             .then((data) => {
+//                 dispatch({
+//                     type: HIDE_EDIT_COURSE_DLG,
+//                     payload: data
+//                 })
+//             })
+//             .catch((err) => {
+//                 dispatch({
+//                     type: SHOW_ERROR_DIALOG,
+//                     payload: err.message
+//                 })
+//             });
+//
+//     }
+// };
 
 export const deleteCourse = (id) => {
     return (dispatch) => {

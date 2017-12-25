@@ -28,8 +28,8 @@ import {
 import * as tools from './tools';
 
 const initialState = {
-    initialLesson: null,
-    lesson: null,
+    initial: null,
+    current: null,
     mainEpisodes: [],
     suppEpisodes: [],
     recommendedRef: [],
@@ -42,7 +42,7 @@ export default function singleLesson(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_LESSON: {
-            let _lesson = {
+            let _newObject = {
                 CourseId: action.payload.CourseId,
                 CourseName: action.payload.CourseName,
                 Number: action.payload.Number,
@@ -56,8 +56,8 @@ export default function singleLesson(state = initialState, action) {
 
             return {
                 ...state,
-                initialLesson: _lesson,
-                lesson: Object.assign({}, _lesson),
+                initial: _newObject,
+                current: Object.assign({}, _newObject),
                 mainEpisodes: [],
                 suppEpisodes: [],
                 recommendedRef: [],
@@ -70,21 +70,21 @@ export default function singleLesson(state = initialState, action) {
         case GET_SINGLE_LESSON_REQUEST:
             return {
                 ...state,
-                initialLesson : null,
-                lesson: null,
+                initial: null,
+                current: null,
                 mainEpisodes: [],
                 suppEpisodes: [],
                 recommendedRef: [],
                 commonRef: [],
                 fetching: true,
-                hasChanges : false,
+                hasChanges: false,
             };
 
         case GET_SINGLE_LESSON_SUCCESS: {
             return {
                 ...state,
-                initialLesson: action.payload,
-                lesson: Object.assign({}, action.payload),
+                initial: action.payload,
+                current: Object.assign({}, action.payload),
                 mainEpisodes: [...action.payload.mainEpisodes],
                 suppEpisodes: [...action.payload.suppEpisodes],
                 recommendedRef: [...action.payload.recommendedRef],
@@ -96,20 +96,13 @@ export default function singleLesson(state = initialState, action) {
         }
 
         case GET_SINGLE_LESSON_FAIL:
-            return {
-                ...state,
-                initialLesson : null,
-                lesson: null,
-                mainEpisodes: [],
-                suppEpisodes: [],
-                recommendedRef: [],
-                commonRef: [],
-                fetching: false,
-                hasChanges : false,
-            };
+            return initialState;
 
         case SAVE_LESSON_SUCCESS: {
-            let _newInitialLesson = Object.assign({},state.lesson);
+            state.current.id = action.payload.id;
+            state.current.Id = action.payload.id;
+
+            let _newInitialLesson = Object.assign({}, state.current);
             _newInitialLesson.mainEpisodes = [...state.mainEpisodes];
             _newInitialLesson.suppEpisodes = [...state.suppEpisodes];
             _newInitialLesson.recommendedRef = [...state.recommendedRef];
@@ -248,22 +241,22 @@ export default function singleLesson(state = initialState, action) {
         case CHANGE_LESSON_DATA : {
             let _object = Object.assign({}, action.payload);
 
-            return {...state, lesson: _object, hasChanges: true };
+            return {...state, current: _object, hasChanges: true };
         }
 
         case CANCEL_CHANGE_LESSON_DATA: {
-            tools.setObjectsRank(state.initialLesson.mainEpisodes);
-            tools.setObjectsRank(state.initialLesson.suppEpisodes);
-            tools.setObjectsRank(state.initialLesson.recommendedRef);
-            tools.setObjectsRank(state.initialLesson.commonRef);
+            tools.setObjectsRank(state.initial.mainEpisodes);
+            tools.setObjectsRank(state.initial.suppEpisodes);
+            tools.setObjectsRank(state.initial.recommendedRef);
+            tools.setObjectsRank(state.initial.commonRef);
             
             return {
                 ...state,
-                lesson: Object.assign({},state.initialLesson),
-                mainEpisodes: [...state.initialLesson.mainEpisodes],
-                suppEpisodes: [...state.initialLesson.suppEpisodes],
-                recommendedRef: [...state.initialLesson.recommendedRef],
-                commonRef: [...state.initialLesson.commonRef],
+                current: Object.assign({},state.initial),
+                mainEpisodes: [...state.initial.mainEpisodes],
+                suppEpisodes: [...state.initial.suppEpisodes],
+                recommendedRef: [...state.initial.recommendedRef],
+                commonRef: [...state.initial.commonRef],
                 fetching: false,
                 hasChanges : false,
             };

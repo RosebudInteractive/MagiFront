@@ -8,7 +8,6 @@ import * as commonDlgActions from '../actions/CommonDlgActions';
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
 import ErrorDialog from '../components/ErrorDialog';
-import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 
 class Categories extends React.Component {
     componentDidMount(){
@@ -18,12 +17,12 @@ class Categories extends React.Component {
 
     onAddBtnClick() {
         this.props.history.push('/categories/new');
-        this.props.categoriesActions.showEditDialog(EDIT_MODE_INSERT)
+        // this.props.categoriesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
         this.props.history.push('/categories/edit/' + this.props.selected);
-        this.props.categoriesActions.showEditDialog(EDIT_MODE_EDIT)
+        // this.props.categoriesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
     deleteCategory() {
@@ -137,10 +136,8 @@ class Categories extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        categories: state.categories.categories,
-        selected: state.categories.selected,
-        editDlgShown: state.categories.editDlgShown,
-        editMode: state.categories.editMode,
+        categories: state.categoriesList.categories,
+        selected: state.categoriesList.selected,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,

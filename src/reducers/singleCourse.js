@@ -11,19 +11,20 @@ import {
     ADD_CATEGORY,
     REMOVE_CATEGORY,
     HIDE_ADD_CATEGORY_DIALOG,
-    CHANGE_DATA,
-    CANCEL_CHANGE_DATA,
+    CHANGE_COURSE_DATA,
+    CANCEL_CHANGE_COURSE_DATA,
     REMOVE_LESSON,
     MOVE_LESSON_UP,
     MOVE_LESSON_DOWN,
-
+    CLEAR_COURSE,
+    SAVE_COURSE_DATA,
 } from '../constants/SingleCourse'
 
 import * as tools from './tools';
 
 const initialState = {
-    initialCourse: null,
-    course: null,
+    initial: null,
+    current: null,
     authors: [],
     categories: [],
     lessons: [],
@@ -38,7 +39,7 @@ export default function singleCourse(state = initialState, action) {
     switch (action.type) {
 
         case CREATE_NEW_COURSE: {
-            let _course = {
+            let _newObject = {
                 ColorHex: '#FFFFFF',
                 State:'D',
                 Authors:[],
@@ -48,8 +49,8 @@ export default function singleCourse(state = initialState, action) {
 
             return {
                 ...state,
-                initialCourse: _course,
-                course: Object.assign({}, _course),
+                initial: _newObject,
+                current: Object.assign({}, _newObject),
                 authors: [],
                 categories:[],
                 lessons: [],
@@ -61,7 +62,7 @@ export default function singleCourse(state = initialState, action) {
         case GET_SINGLE_COURSE_REQUEST:
             return {
                 ...state,
-                initialCourse : null,
+                initial : null,
                 course: null,
                 authors: [],
                 categories:[],
@@ -73,8 +74,8 @@ export default function singleCourse(state = initialState, action) {
         case GET_SINGLE_COURSE_SUCCESS:
             return {
                 ...state,
-                initialCourse: action.payload,
-                course: Object.assign({}, action.payload),
+                initial: action.payload,
+                current: Object.assign({}, action.payload),
                 authors: [...action.payload.Authors],
                 categories: [...action.payload.Categories],
                 lessons: [...action.payload.Lessons],
@@ -83,16 +84,23 @@ export default function singleCourse(state = initialState, action) {
             };
 
         case GET_SINGLE_COURSE_FAIL:
+            return initialState;
+
+        case SAVE_COURSE_DATA : {
+            state.current.id = action.payload.id;
+            state.current.Id = action.payload.id;
+
             return {
                 ...state,
-                initialCourse:null,
-                course: null,
-                authors: [],
-                categories:[],
-                lessons: [],
+                initial: Object.assign({}, state.current),
                 fetching: false,
                 hasChanges : false,
             };
+        }
+
+        case CLEAR_COURSE:{
+            return initialState
+        }
 
         case SHOW_ADD_AUTHOR_DIALOG :
             return { ...state, showAddAuthorDialog: true};
@@ -170,19 +178,19 @@ export default function singleCourse(state = initialState, action) {
         case HIDE_ADD_CATEGORY_DIALOG :
             return { ...state, showAddCategoryDialog: false};
 
-        case CHANGE_DATA : {
+        case CHANGE_COURSE_DATA : {
             let _course = Object.assign({}, action.payload);
 
-            return {...state, course: _course, hasChanges: true };
+            return {...state, current: _course, hasChanges: true };
         }
 
-        case CANCEL_CHANGE_DATA: {
+        case CANCEL_CHANGE_COURSE_DATA: {
             return {
                 ...state,
-                course: Object.assign({},state.initialCourse),
-                authors: [...state.initialCourse.Authors],
-                categories: [...state.initialCourse.Categories],
-                lessons: [...state.initialCourse.Lessons],
+                current: Object.assign({},state.initial),
+                authors: [...state.initial.Authors],
+                categories: [...state.initial.Categories],
+                lessons: [...state.initial.Lessons],
                 hasChanges : false,
             };
         }

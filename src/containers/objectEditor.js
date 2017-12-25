@@ -1,20 +1,23 @@
 import React  from 'react'
 import ErrorDialog from '../components/ErrorDialog';
+import {Prompt} from 'react-router-dom';
 
 import {
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-class ObjectEditor extends React.Component {
+export const labelWidth = 120;
+
+export default class ObjectEditor extends React.Component {
     constructor(props) {
         super(props);
         this._editMode = EDIT_MODE_INSERT;
 
         if (this.objectId > 0) {
-            this.initEditMode()
+            this._initEditMode()
         } else {
-            this.initInsertMode()
+            this._initInsertMode()
         }
 
         this._validateResult = {};
@@ -29,6 +32,10 @@ class ObjectEditor extends React.Component {
         throw 'Undefined rout'
     }
 
+    get objectIdPropName() {
+        throw 'Undefined object prop name'
+    }
+
     get objectName() {
         throw 'Undefined object name'
     }
@@ -38,7 +45,7 @@ class ObjectEditor extends React.Component {
     }
 
     get objectId() {
-        return this.getObject().id;
+        return this.props[this.objectIdPropName];
     }
 
     get editMode() {
@@ -46,19 +53,25 @@ class ObjectEditor extends React.Component {
     }
 
     set editMode(value) {
-        this._editMode(value)
+        this._editMode = value
     }
 
-    initEditMode(){
+    _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
+        this.objectActions.get(this.objectId);
     }
 
-    initInsertMode() {
+    _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
+        this.objectActions.create(this._getInitStateOfNewObject())
+    }
+
+    _getInitStateOfNewObject(){
+        return null
     }
 
     componentWillReceiveProps(next) {
-        let _newObjectId = next[this.objectName].id;
+        let _newObjectId = next[this.objectName] ? next[this.objectName].id : null;
         let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (_newObjectId);
 
         if (_isNeedSwitchMode) {
@@ -67,7 +80,7 @@ class ObjectEditor extends React.Component {
     }
 
     _switchToEditObject(objId){
-        let _newRout = this.getRootRout() + objId;
+        let _newRout = this.getRootRout() + '/edit/' + objId;
         this.editMode = EDIT_MODE_EDIT;
         this.props.history.push(_newRout);
     }
@@ -99,14 +112,22 @@ class ObjectEditor extends React.Component {
 
     render() {
         const {
-            author,
+            fetching,
             message,
             errorDlgShown,
+            hasChanges
         } = this.props;
         return (
             <div className="object-content">
-                {this._getWebixForm()}
-                {/*<Webix ui={::this.getUI()} data={author}/>*/}
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
+                        :
+                        <div>
+                            <Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>
+                            {this._getWebixForm()}
+                        </div>
+                }
                 {
                     errorDlgShown ?
                         <ErrorDialog
@@ -115,6 +136,7 @@ class ObjectEditor extends React.Component {
                         :
                         ""
                 }
+                {this._getExtDialogs()}
             </div>
         )
     }
@@ -124,11 +146,14 @@ class ObjectEditor extends React.Component {
     }
 
     _hasChanges() {
-        return false;
+        return this.props.hasChanges;
     }
 
     _enableApplyChanges() {
-        return false;
+        let _array = Object.values(this._validateResult);
+        return _array.every((value) => {
+            return value === true
+        })
     }
 
     _getWebixForm(){}
@@ -138,7 +163,7 @@ class ObjectEditor extends React.Component {
 
         return {
             view: "form",
-            width: 700,
+            width: 1000,
             elements: that._getElements(),
             on: {
                 onChange: function () {
@@ -194,11 +219,23 @@ class ObjectEditor extends React.Component {
                     }
                 ]
             }
-        )
+        );
+
+        return _elems;
     }
 
     _getExtElements() {
         return [];
+    }
+
+    _externalValidate(field) {
+        if (this._dataLoaded) {
+            this._validateResult[field.data.name] = field.validate();
+        }
+    }
+
+    _getExtDialogs() {
+        return []
     }
 }
 
