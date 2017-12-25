@@ -26,11 +26,17 @@ export default function categories(state = initialState, action) {
         case GET_CATEGORIES_REQUEST:
             return { ...state, categories: [], fetching: true, hasError: false };
 
-        case GET_CATEGORIES_SUCCESS:
-            return { ...state, categories: action.payload, fetching: false };
+        case GET_CATEGORIES_SUCCESS: {
+            let _categories = action.payload;
+            let _selected = (_categories.length > 0) ? _categories[0].id : null;
+
+            return { ...state, categories: _categories, selected : _selected, fetching: false };
+        }
+
+
 
         case GET_CATEGORIES_FAIL:
-            return { ...state, categories: [], fetching: false};
+            return initialState;
 
         case SELECT_CATEGORY:
             return {...state, selected: action.payload};

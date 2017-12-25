@@ -1,12 +1,12 @@
 import {
-    GET_AUTHORS_REQUEST,
-    GET_AUTHORS_SUCCESS,
-    GET_AUTHORS_FAIL,
+    GET_AUTHORS_LIST_REQUEST,
+    GET_AUTHORS_LIST_SUCCESS,
+    GET_AUTHORS_LIST_FAIL,
     SELECT_AUTHOR,
     DELETE_AUTHOR_SUCCESS,
     SHOW_EDIT_AUTHOR_DLG,
     HIDE_EDIT_AUTHOR_DLG,
-} from '../constants/Authors'
+} from '../constants/authorsList'
 
 import {
     EDIT_MODE_INSERT,
@@ -20,17 +20,22 @@ const initialState = {
     editMode: EDIT_MODE_INSERT
 };
 
-export default function authors(state = initialState, action) {
+export default function authorsList(state = initialState, action) {
 
     switch (action.type) {
-        case GET_AUTHORS_REQUEST:
+        case GET_AUTHORS_LIST_REQUEST:
             return { ...state, authors: [], fetching: true, hasError: false };
 
-        case GET_AUTHORS_SUCCESS:
-            return { ...state, authors: action.payload, fetching: false };
+        case GET_AUTHORS_LIST_SUCCESS: {
+            let _authors = action.payload;
+            let _selected = (_authors.length > 0) ? _authors[0].id : null;
 
-        case GET_AUTHORS_FAIL:
-            return { ...state, authors: [], fetching: false}; //, hasError: true, message: action.payload };
+            return { ...state, authors: _authors, selected : _selected,
+            fetching: false };
+        }
+
+        case GET_AUTHORS_LIST_FAIL:
+            return initialState; //, hasError: true, message: action.payload };
 
         case SELECT_AUTHOR:
             return {...state, selected: action.payload};

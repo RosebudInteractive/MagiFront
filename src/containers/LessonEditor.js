@@ -150,24 +150,11 @@ class LessonEditor extends React.Component {
 
     _cancelChanges() {
         this._needRevalidate = true;
-        this.props.lessonActions.cancelCanges();
-    }
-
-    // selectLesson(id) {
-    //     // this.props.coursesActions.selectCourse(id);
-    // }
-
-    _createRecommendedReferenceDialog() {
-        this.props.lessonActions.showEditReferenceDialog(EDIT_MODE_INSERT)
+        this.props.lessonActions.cancelChanges();
     }
 
     hideAddAuthorDialog() {
         this.props.courseActions.hideAddAuthorDialog()
-    }
-
-    addAuthorAction(id) {
-        this.props.courseActions.addAuthor(id);
-        this.props.courseActions.hideAddAuthorDialog();
     }
 
     getAuthors() {
@@ -192,11 +179,6 @@ class LessonEditor extends React.Component {
 
     hideAddCategoryDialog() {
         this.props.courseActions.hideAddCategoryDialog()
-    }
-
-    addCategoryAction(id) {
-        this.props.courseActions.addCategory(id);
-        this.props.courseActions.hideAddCategoryDialog();
     }
 
     _getHasChanges() {

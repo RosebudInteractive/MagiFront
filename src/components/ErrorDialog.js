@@ -26,7 +26,6 @@ class ErrorDialog extends Component {
 
 ErrorDialog.propTypes = {
     message: PropTypes.string.isRequired,
-    data: PropTypes.any
 };
 
 function mapDispatchToProps(dispatch) {

@@ -7,7 +7,7 @@ import Menu from "../components/Menu"
 import Home from "../components/Home"
 import Episodes from "./Episodes"
 import Authors from "./Authors"
-import AuthorForm from './AuthorForm';
+import AuthorForm from './authorEditor';
 import Categories from './Categories';
 import CategoriesForm from './CategoryForm';
 import Courses from './Courses';
@@ -23,7 +23,7 @@ class App extends Component {
                     <div className="logo-sidebar">
                         <div>Magisteria</div>
                     </div>
-                    <Menu/>
+                    <Menu history={this.props.history}/>
                 </div>
             </div>
             <div className="right">

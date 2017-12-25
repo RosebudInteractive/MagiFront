@@ -70,7 +70,7 @@ class EpisodeEditor extends React.Component {
     }
     _cancelChanges() {
         this._needRevalidate = true;
-        this.props.episodeActions.cancelCanges();
+        this.props.episodeActions.cancelChanges();
     }
 
     // selectLesson(id) {

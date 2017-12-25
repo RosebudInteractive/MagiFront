@@ -1,13 +1,13 @@
 import {
-    CREATE_NEW_EPISODE,
-    GET_SINGLE_EPISODE_REQUEST,
-    GET_SINGLE_EPISODE_SUCCESS,
-    GET_SINGLE_EPISODE_FAIL,
-    CHANGE_EPISODE_DATA,
-    CANCEL_CHANGE_EPISODE_DATA,
-    SAVE_EPISODE_SUCCESS,
-    CLEAR_EPISODE,
-} from '../constants/SingleEpisode'
+    CREATE_NEW_AUTHOR,
+    GET_AUTHOR_REQUEST,
+    GET_AUTHOR_SUCCESS,
+    GET_AUTHOR_FAIL,
+    SAVE_AUTHOR_DATA,
+    CHANGE_AUTHOR_DATA,
+    CANCEL_CHANGE_AUTHOR_DATA,
+    CLEAR_AUTHOR,
+} from '../constants/author';
 
 import {
     // HIDE_DELETE_DLG,
@@ -16,30 +16,38 @@ import {
     EDIT_MODE_EDIT,
 } from '../constants/Common';
 
-
 import 'whatwg-fetch';
 
-export const get = (id, lessonId)=> {
+export const create = (obj) => {
     return (dispatch) => {
         dispatch({
-            type: GET_SINGLE_EPISODE_REQUEST,
+            type: CREATE_NEW_AUTHOR,
+            payload: obj
+        });
+    }
+};
+
+export const get = (id)=> {
+    return (dispatch) => {
+        dispatch({
+            type: GET_AUTHOR_REQUEST,
             payload: null
         });
 
-        fetch("/api/episodes/" + id + '/' + lessonId)
+        fetch("/api/authors/" + id)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                handleEpisode(data);
+                handleAuthor(data);
 
                 dispatch({
-                    type: GET_SINGLE_EPISODE_SUCCESS,
+                    type: GET_AUTHOR_SUCCESS,
                     payload: data
                 })
             })
             .catch((err) => {
                 dispatch({
-                    type: GET_SINGLE_EPISODE_FAIL,
+                    type: GET_AUTHOR_FAIL,
                     payload: err
                 });
 
@@ -52,25 +60,15 @@ export const get = (id, lessonId)=> {
     }
 };
 
-export const create = (obj) => {
-    return (dispatch) => {
-        dispatch({
-            type: CREATE_NEW_EPISODE,
-            payload: obj
-        });
-    }
-};
-
 export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/episodes";
+        let _url = "/api/authors";
         if (mode === EDIT_MODE_EDIT) {
-            _url += "/" + values.id + '/' + values.LessonId
-        } else {
-            _url += "/" + values.LessonId
+            _url += "/" + values.id
         }
+
         fetch(_url,
             {
                 method: _type,
@@ -83,7 +81,7 @@ export const save = (values, mode) => {
             .then(parseJSON)
             .then(() => {
                 dispatch({
-                    type: SAVE_EPISODE_SUCCESS,
+                    type: SAVE_AUTHOR_DATA,
                     payload: null
                 })
             })
@@ -100,7 +98,7 @@ export const save = (values, mode) => {
 export const changeData = (object) => {
     return (dispatch) => {
         dispatch({
-            type: CHANGE_EPISODE_DATA,
+            type: CHANGE_AUTHOR_DATA,
             payload: object
         });
     }
@@ -109,7 +107,7 @@ export const changeData = (object) => {
 export const cancelChanges = ()=> {
     return (dispatch) => {
         dispatch({
-            type: CANCEL_CHANGE_EPISODE_DATA,
+            type: CANCEL_CHANGE_AUTHOR_DATA,
             payload: null
         });
     }
@@ -118,7 +116,7 @@ export const cancelChanges = ()=> {
 export const clear = ()=> {
     return (dispatch) => {
         dispatch({
-            type: CLEAR_EPISODE,
+            type: CLEAR_AUTHOR,
             payload: null
         });
     }
@@ -138,6 +136,7 @@ const parseJSON = (response) => {
     return response.json()
 };
 
-const handleEpisode = (episode) => {
-    episode.id = episode.Id;
+const handleAuthor = (author) => {
+    author.id = author.Id;
+    return author;
 };

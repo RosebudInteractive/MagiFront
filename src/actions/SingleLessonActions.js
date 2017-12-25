@@ -309,7 +309,7 @@ export const changeData = (object) => {
     }
 };
 
-export const cancelCanges = ()=> {
+export const cancelChanges = ()=> {
     return (dispatch) => {
         dispatch({
             type: CANCEL_CHANGE_LESSON_DATA,
