@@ -88,15 +88,41 @@ namespace MagImport
             const string EXT_DFLT = ".json";
         };
 
-        public class DataObjTyped<T> : DataObject where T : BaseFieldsData, new()
+        public class DataObjTyped<T, R> : DataObject where T : BaseFieldsData, new() where R : RootDataObject, new()
         {
+            [JsonIgnore]
+            public static List<RootDataObject> AllData
+            {
+                get { return all_data; }
+                set
+                {
+                    if (all_data != value)
+                    {
+                        all_data = value;
+                        if ((Root != null) && (all_data != null))
+                            all_data.Add(Root);
+                    }
+                }
+            }
+            [JsonIgnore]
+            public static R Root = null;
+
             [JsonIgnore]
             public T Fields { get { return (T)fields; } }
             public DataObjTyped(string type_guid)
             {
                 _sys = new SysFieldsData { typeGuid = type_guid };
                 fields = new T();
+                if (Root == null)
+                {
+                    Root = new R();
+                    if (AllData != null)
+                        AllData.Add(Root);
+                }
+                fields.Id = Root.GetNextId();
+                Root.Elems.Add(this);
             }
+            static List<RootDataObject> all_data = null;
         };
 
         //
@@ -108,7 +134,7 @@ namespace MagImport
             public string Language { get; set; }
         };
 
-        public class Language : DataObjTyped<LanguageFields>
+        public class Language : DataObjTyped<LanguageFields, LanguageRoot>
         {
             const string CLASS_GUID = "fd4b9b70-514e-4796-9a27-eb0adf8e7944";
             public Language() : base(CLASS_GUID) { }
@@ -130,7 +156,7 @@ namespace MagImport
             public int? DefLangId { get; set; }
         };
 
-        public class Account : DataObjTyped<AccountFields>
+        public class Account : DataObjTyped<AccountFields, AccountRoot>
         {
             const string CLASS_GUID = "81b276ee-a34a-4267-9f24-0fce75896c91";
             public Account() : base(CLASS_GUID) { }
@@ -154,7 +180,7 @@ namespace MagImport
             public string Description { get; set; }
         };
 
-        public class AccountLng : DataObjTyped<AccountLngFields>
+        public class AccountLng : DataObjTyped<AccountLngFields, AccountLngRoot>
         {
             const string CLASS_GUID = "a3d4d86b-aa83-4a31-b655-88a8a846e36d";
             public AccountLng() : base(CLASS_GUID) { }
@@ -176,7 +202,7 @@ namespace MagImport
             public string Portrait { get; set; }
         };
 
-        public class Author : DataObjTyped<AuthorFields>
+        public class Author : DataObjTyped<AuthorFields, AuthorRoot>
         {
             const string CLASS_GUID = "47b13680-c656-4ba4-82e6-3bd14badfcef";
             public Author() : base(CLASS_GUID) { }
@@ -202,7 +228,7 @@ namespace MagImport
             public string Alias { get; set; }
         };
 
-        public class AuthorLng : DataObjTyped<AuthorLngFields>
+        public class AuthorLng : DataObjTyped<AuthorLngFields, AuthorLngRoot>
         {
             const string CLASS_GUID = "2efeead7-684d-46fa-b11b-555ffb2da5a6";
             public AuthorLng() : base(CLASS_GUID) { }
@@ -224,7 +250,7 @@ namespace MagImport
             public int? CourseId { get; set; }
         };
 
-        public class AuthorToCourse : DataObjTyped<AuthorToCourseFields>
+        public class AuthorToCourse : DataObjTyped<AuthorToCourseFields, AuthorToCourseRoot>
         {
             const string CLASS_GUID = "2f0ce749-4169-4ec0-9a87-0ffd405a4337";
             public AuthorToCourse() : base(CLASS_GUID) { }
@@ -251,7 +277,7 @@ namespace MagImport
             public string URL { get; set; }
         };
 
-        public class Course : DataObjTyped<CourseFields>
+        public class Course : DataObjTyped<CourseFields, CourseRoot>
         {
             const string CLASS_GUID = "5995f1c7-43dc-4367-8071-532702b94235";
             public Course() : base(CLASS_GUID) { }
@@ -277,7 +303,7 @@ namespace MagImport
             public string Description { get; set; }
         };
 
-        public class CourseLng : DataObjTyped<CourseLngFields>
+        public class CourseLng : DataObjTyped<CourseLngFields, CourseLngRoot>
         {
             const string CLASS_GUID = "e1f6512f-c0e4-40b1-84bf-072bb6346fcb";
             public CourseLng() : base(CLASS_GUID) { }
@@ -299,7 +325,7 @@ namespace MagImport
             public int? ParentId { get; set; }
         };
 
-        public class Category : DataObjTyped<CategoryFields>
+        public class Category : DataObjTyped<CategoryFields, CategoryRoot>
         {
             const string CLASS_GUID = "fa44e670-4ee6-4227-ab4d-083924a92d8a";
             public Category() : base(CLASS_GUID) { }
@@ -324,7 +350,7 @@ namespace MagImport
             public string Alias { get; set; }
         };
 
-        public class CategoryLng : DataObjTyped<CategoryLngFields>
+        public class CategoryLng : DataObjTyped<CategoryLngFields, CategoryLngRoot>
         {
             const string CLASS_GUID = "6bae1b6a-82d4-4f54-a953-080edf274588";
             public CategoryLng() : base(CLASS_GUID) { }
@@ -346,7 +372,7 @@ namespace MagImport
             public int? CategoryId { get; set; }
         };
 
-        public class CourseCategory : DataObjTyped<CourseCategoryFields>
+        public class CourseCategory : DataObjTyped<CourseCategoryFields, CourseCategoryRoot>
         {
             const string CLASS_GUID = "61e14112-019b-42ac-9834-073af99a1597";
             public CourseCategory() : base(CLASS_GUID) { }
@@ -364,14 +390,15 @@ namespace MagImport
         //
         public class LessonFields : BaseFieldsData
         {
-            public int? CourseId { get; set; }
-            public int? AuthorId { get; set; }
+            public int CourseId { get; set; }
+            public int AuthorId { get; set; }
+            public int? ParentId { get; set; }
             public string LessonType { get; set; }
             public string Cover { get; set; }
             public string URL { get; set; }
         };
 
-        public class Lesson : DataObjTyped<LessonFields>
+        public class Lesson : DataObjTyped<LessonFields, LessonRoot>
         {
             const string CLASS_GUID = "caadef95-278b-4cad-acc9-a1e27380d6c6";
             public Lesson() : base(CLASS_GUID) { }
@@ -397,7 +424,7 @@ namespace MagImport
             public string FullDescription { get; set; }
         };
 
-        public class LessonLng : DataObjTyped<LessonLngFields>
+        public class LessonLng : DataObjTyped<LessonLngFields, LessonLngRoot>
         {
             const string CLASS_GUID = "7012a967-e186-43d8-b39c-1409b7f198b1";
             public LessonLng() : base(CLASS_GUID) { }
@@ -415,14 +442,15 @@ namespace MagImport
         //
         public class LessonCourseFields : BaseFieldsData
         {
-            public int? CourseId { get; set; }
-            public int? LessonId { get; set; }
-            public int? Number { get; set; }
+            public int CourseId { get; set; }
+            public int LessonId { get; set; }
+            public int? ParentId { get; set; }
+            public int Number { get; set; }
             public DateTime? ReadyDate { get; set; }
             public string State { get; set; }
         };
 
-        public class LessonCourse : DataObjTyped<LessonCourseFields>
+        public class LessonCourse : DataObjTyped<LessonCourseFields, LessonCourseRoot>
         {
             const string CLASS_GUID = "c93aa70c-6d24-4587-a723-79dbc9e65f99";
             public LessonCourse() : base(CLASS_GUID) { }
@@ -448,7 +476,7 @@ namespace MagImport
             public string AuthorComment { get; set; }
         };
 
-        public class Reference : DataObjTyped<ReferenceFields>
+        public class Reference : DataObjTyped<ReferenceFields, ReferenceRoot>
         {
             const string CLASS_GUID = "b919a12f-5202-43b5-b1fc-481f75623659";
             public Reference() : base(CLASS_GUID) { }
@@ -459,6 +487,175 @@ namespace MagImport
             const string CLASS_GUID = "8d5fd37d-e686-4eec-a8e8-b7df91160a92";
             public override string GetClassName() { return "Reference"; }
             public ReferenceRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // Episode
+        //
+        public class EpisodeFields : BaseFieldsData
+        {
+            public int LessonId { get; set; }
+            public string EpisodeType { get; set; }
+        };
+
+        public class Episode : DataObjTyped<EpisodeFields, EpisodeRoot>
+        {
+            const string CLASS_GUID = "0299e4f3-280d-4622-82ca-8090966fcef6";
+            public Episode() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeRoot : RootDataObject
+        {
+            const string CLASS_GUID = "82466573-53fb-44e5-aec8-dc339d1a2fd8";
+            public override string GetClassName() { return "Episode"; }
+            public EpisodeRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // EpisodeLng
+        //
+        public class EpisodeLngFields : BaseFieldsData
+        {
+            public int EpisodeId { get; set; }
+            public int LanguageId { get; set; }
+            public string State { get; set; }
+            public string Name { get; set; }
+            public string Transcript { get; set; }
+            public string Audio { get; set; }
+            public string Structure { get; set; }
+        };
+
+        public class EpisodeLng : DataObjTyped<EpisodeLngFields, EpisodeLngRoot>
+        {
+            const string CLASS_GUID = "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77";
+            public EpisodeLng() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeLngRoot : RootDataObject
+        {
+            const string CLASS_GUID = "f24fb64f-1e2f-4412-9380-9646181fdbe6";
+            public override string GetClassName() { return "EpisodeLng"; }
+            public EpisodeLngRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // EpisodeLesson
+        //
+        public class EpisodeLessonFields : BaseFieldsData
+        {
+            public int LessonId { get; set; }
+            public int EpisodeId { get; set; }
+            public int Number { get; set; }
+            public bool Supp { get; set; }
+        };
+
+        public class EpisodeLesson : DataObjTyped<EpisodeLessonFields, EpisodeLessonRoot>
+        {
+            const string CLASS_GUID = "94d10a1d-d902-489b-8243-5c2dfea57174";
+            public EpisodeLesson() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeLessonRoot : RootDataObject
+        {
+            const string CLASS_GUID = "83abc96a-5184-4ed2-a9f2-ccd64733a22e";
+            public override string GetClassName() { return "EpisodeLesson"; }
+            public EpisodeLessonRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // EpisodeToc
+        //
+        public class EpisodeTocFields : BaseFieldsData
+        {
+            public int EpisodeId { get; set; }
+            public int Number { get; set; }
+        };
+
+        public class EpisodeToc : DataObjTyped<EpisodeTocFields, EpisodeTocRoot>
+        {
+            const string CLASS_GUID = "3936efa7-f575-4de0-80ae-c92ab90f39ae";
+            public EpisodeToc() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeTocRoot : RootDataObject
+        {
+            const string CLASS_GUID = "55fbcaae-b627-4227-944a-ed166b739c6f";
+            public override string GetClassName() { return "EpisodeToc"; }
+            public EpisodeTocRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // EpisodeTocLng
+        //
+        public class EpisodeTocLngFields : BaseFieldsData
+        {
+            public int EpisodeTocId { get; set; }
+            public int LanguageId { get; set; }
+            public string Topic { get; set; }
+            public int StartTime { get; set; }
+        };
+
+        public class EpisodeTocLng : DataObjTyped<EpisodeTocLngFields, EpisodeTocLngRoot>
+        {
+            const string CLASS_GUID = "fdf9eaf6-38b4-4c08-96b7-11ceee183318";
+            public EpisodeTocLng() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeTocLngRoot : RootDataObject
+        {
+            const string CLASS_GUID = "3866b984-ed0b-4dfc-8567-de00401d5c95";
+            public override string GetClassName() { return "EpisodeTocLng"; }
+            public EpisodeTocLngRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // Resource
+        //
+        public class ResourceFields : BaseFieldsData
+        {
+            public int LessonId { get; set; }
+            public int? EntityId { get; set; }
+            public string ResType { get; set; }
+            public string FileName { get; set; }
+        };
+
+        public class Resource : DataObjTyped<ResourceFields, ResourceRoot>
+        {
+            const string CLASS_GUID = "89e7a678-5414-498f-b635-b172bf402816";
+            public Resource() : base(CLASS_GUID) { }
+        };
+
+        public class ResourceRoot : RootDataObject
+        {
+            const string CLASS_GUID = "5c605246-56ff-4b40-9c27-242e678899e4";
+            public override string GetClassName() { return "Resource"; }
+            public ResourceRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // EpisodeContent
+        //
+        public class EpisodeContentFields : BaseFieldsData
+        {
+            public int EpisodeId { get; set; }
+            public int ResourceId { get; set; }
+            public string CompType { get; set; }
+            public int StartTime { get; set; }
+            public int Duration { get; set; }
+            public string Content { get; set; }
+        };
+
+        public class EpisodeContent : DataObjTyped<EpisodeContentFields, EpisodeContentRoot>
+        {
+            const string CLASS_GUID = "b6b2fbd3-57e6-48c1-aa8b-7751daa2bfed";
+            public EpisodeContent() : base(CLASS_GUID) { }
+        };
+
+        public class EpisodeContentRoot : RootDataObject
+        {
+            const string CLASS_GUID = "1996d0fc-a93f-420f-b1c3-627fef86bb60";
+            public override string GetClassName() { return "EpisodeContent"; }
+            public EpisodeContentRoot() : base(CLASS_GUID) { }
         };
 
         public MagisteryToJSON(string connStr)
@@ -476,49 +673,35 @@ namespace MagImport
         {
             List<RootDataObject> allData = new List<RootDataObject>();
 
-            LanguageRoot languages = new LanguageRoot();
-            allData.Add(languages);
-
+            Language.AllData = allData;
             Language lang = new Language();
             lang.Fields.Id = LANGUAGE_ID;
             lang.Fields.Code = "RUS";
             lang.Fields.Language = "Русский";
-            languages.Elems.Add(lang);
 
             lang = new Language();
-            lang.Fields.Id = 2;
             lang.Fields.Code = "ENG";
             lang.Fields.Language = "English";
-            languages.Elems.Add(lang);
 
             lang = new Language();
-            lang.Fields.Id = 3;
             lang.Fields.Code = "FRA";
             lang.Fields.Language = "Français";
-            languages.Elems.Add(lang);
 
             lang = new Language();
-            lang.Fields.Id = 4;
             lang.Fields.Code = "GER";
             lang.Fields.Language = "Deutsch";
-            languages.Elems.Add(lang);
 
-            AccountRoot accounts = new AccountRoot();
-            allData.Add(accounts);
+            Account.AllData = allData;
             Account acc = new Account();
             acc.Fields.Id = ACCOUNT_ID;
             acc.Fields.DefLangId = LANGUAGE_ID;
             acc.Fields.Domain = "pmt";
-            accounts.Elems.Add(acc);
 
-            AccountLngRoot accounts_lng = new AccountLngRoot();
-            allData.Add(accounts_lng);
+            AccountLng.AllData = allData;
             AccountLng acc_lng = new AccountLng();
-            acc_lng.Fields.Id = 1;
             acc_lng.Fields.AccountId = ACCOUNT_ID;
             acc_lng.Fields.LanguageId = LANGUAGE_ID;
             acc_lng.Fields.Name = "Пост Модерн Текнолоджи";
-            accounts_lng.Elems.Add(acc_lng);
 
             MySqlConnection conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
@@ -527,11 +710,9 @@ namespace MagImport
             //
             // Read Categories
             //
+            Category.AllData = allData;
+            CategoryLng.AllData = allData;
             Dictionary<int, Tuple<Category, CategoryLng>> categoriesDB = new Dictionary<int, Tuple<Category, CategoryLng>>();
-            CategoryRoot categories = new CategoryRoot();
-            allData.Add(categories);
-            CategoryLngRoot categories_lng = new CategoryLngRoot();
-            allData.Add(categories_lng);
 
             MySqlCommand cmd = new MySqlCommand(sql_get_category, conn);
             cmd.Parameters.AddWithValue("@TermType", "razdel");
@@ -541,13 +722,9 @@ namespace MagImport
             {
                 int db_id = rdr.GetInt32("id");
                 Category cat = new Category();
-                categories.Elems.Add(cat);
-                cat.Fields.Id = categories.GetNextId();
                 cat.Fields.AccountId = ACCOUNT_ID;
 
                 CategoryLng cat_lng = new CategoryLng();
-                categories_lng.Elems.Add(cat_lng);
-                cat_lng.Fields.Id = categories_lng.GetNextId();
                 cat_lng.Fields.CategoryId = cat.Fields.Id;
                 cat_lng.Fields.LanguageId = LANGUAGE_ID;
                 cat_lng.Fields.Name = rdr.GetString("name");
@@ -561,11 +738,9 @@ namespace MagImport
             //
             // Read Authors
             //
+            Author.AllData = allData;
+            AuthorLng.AllData = allData;
             Dictionary<int, Tuple<Author, AuthorLng>> authorsDB = new Dictionary<int, Tuple<Author, AuthorLng>>();
-            AuthorRoot authors = new AuthorRoot();
-            allData.Add(authors);
-            AuthorLngRoot authors_lng = new AuthorLngRoot();
-            allData.Add(authors_lng);
 
             cmd = new MySqlCommand(sql_get_category, conn);
             cmd.Parameters.AddWithValue("@TermType", "autor");
@@ -575,13 +750,9 @@ namespace MagImport
             {
                 int db_id = rdr.GetInt32("id");
                 Author au = new Author();
-                authors.Elems.Add(au);
-                au.Fields.Id = authors.GetNextId();
                 au.Fields.AccountId = ACCOUNT_ID;
 
                 AuthorLng au_lng = new AuthorLng();
-                authors_lng.Elems.Add(au_lng);
-                au_lng.Fields.Id = authors_lng.GetNextId();
                 au_lng.Fields.AuthorId = au.Fields.Id;
                 au_lng.Fields.LanguageId = LANGUAGE_ID;
                 string[] names = rdr.GetString("name").Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
@@ -657,16 +828,13 @@ namespace MagImport
             //
             // Read Courses
             //
+            Course.AllData = allData;
+            CourseLng.AllData = allData;
+            CourseCategory.AllData = allData;
+            AuthorToCourse.AllData = allData;
+
             Dictionary<int, Tuple<Course, CourseLng, CourseCategory>> coursesDB =
                 new Dictionary<int, Tuple<Course, CourseLng, CourseCategory>>();
-            CourseRoot courses = new CourseRoot();
-            allData.Add(courses);
-            CourseLngRoot courses_lng = new CourseLngRoot();
-            allData.Add(courses_lng);
-            CourseCategoryRoot course_categories = new CourseCategoryRoot();
-            allData.Add(course_categories);
-            AuthorToCourseRoot authors_to_courses = new AuthorToCourseRoot();
-            allData.Add(authors_to_courses);
 
             cmd = new MySqlCommand(sql_get_category, conn);
             cmd.Parameters.AddWithValue("@TermType", "category");
@@ -678,8 +846,6 @@ namespace MagImport
                 if (db_id == 1) // Skip 1st fake course
                     continue;
                 Course course = new Course();
-                courses.Elems.Add(course);
-                course.Fields.Id = courses.GetNextId();
                 course.Fields.AccountId = ACCOUNT_ID;
                 course.Fields.LanguageId = LANGUAGE_ID;
                 course.Fields.OneLesson = false;
@@ -687,8 +853,6 @@ namespace MagImport
                 course.Fields.State = "P";
 
                 CourseLng course_lng = new CourseLng();
-                courses_lng.Elems.Add(course_lng);
-                course_lng.Fields.Id = courses_lng.GetNextId();
                 course_lng.Fields.CourseId = course.Fields.Id;
                 course_lng.Fields.LanguageId = LANGUAGE_ID;
                 course_lng.Fields.Name = String.IsNullOrEmpty(rdr.GetString("name")) ? null : rdr.GetString("name");
@@ -696,8 +860,6 @@ namespace MagImport
                 course_lng.Fields.State = "R";
 
                 CourseCategory course_category = new CourseCategory();
-                course_categories.Elems.Add(course_category);
-                course_category.Fields.Id = course_categories.GetNextId();
                 course_category.Fields.CourseId = course.Fields.Id;
 
                 Tuple<Author, AuthorLng> author;
@@ -705,8 +867,6 @@ namespace MagImport
                     throw new Exception(String.Format("Course \"{0}\" (Id={1}) doesn't have an author.", course_lng.Fields.Name, db_id));
 
                 AuthorToCourse author_to_course = new AuthorToCourse();
-                authors_to_courses.Elems.Add(author_to_course);
-                author_to_course.Fields.Id = authors_to_courses.GetNextId();
                 author_to_course.Fields.CourseId = course.Fields.Id;
                 author_to_course.Fields.AuthorId = author.Item1.Fields.Id;
 
@@ -777,14 +937,11 @@ namespace MagImport
             //
             // Read Lessons
             //
+            Lesson.AllData = allData;
+            LessonLng.AllData = allData;
+            LessonCourse.AllData = allData;
             Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse>> lessonsDB =
                 new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse>>();
-            LessonRoot lessons = new LessonRoot();
-            allData.Add(lessons);
-            LessonLngRoot lessons_lng = new LessonLngRoot();
-            allData.Add(lessons_lng);
-            LessonCourseRoot lessons_courses = new LessonCourseRoot();
-            allData.Add(lessons_courses);
 
             cmd = new MySqlCommand(sql_get_lessons, conn);
             rdr = cmd.ExecuteReader();
@@ -806,15 +963,11 @@ namespace MagImport
                     continue;
 
                 Lesson lesson = new Lesson();
-                lessons.Elems.Add(lesson);
-                lesson.Fields.Id = lessons.GetNextId();
                 lesson.Fields.AuthorId = curr_author.Item1.Fields.Id;
                 lesson.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson.Fields.LessonType = "L";
 
                 LessonLng lesson_lng = new LessonLng();
-                lessons_lng.Elems.Add(lesson_lng);
-                lesson_lng.Fields.Id = lessons_lng.GetNextId();
                 lesson_lng.Fields.LessonId = lesson.Fields.Id;
                 lesson_lng.Fields.LanguageId = LANGUAGE_ID;
                 lesson_lng.Fields.Name = rdr.GetString("lesson_name");
@@ -822,8 +975,6 @@ namespace MagImport
                 lesson_lng.Fields.State = "R";
 
                 LessonCourse lesson_course = new LessonCourse();
-                lessons_courses.Elems.Add(lesson_course);
-                lesson_course.Fields.Id = lessons_courses.GetNextId();
                 lesson_course.Fields.LessonId = lesson.Fields.Id;
                 lesson_course.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson_course.Fields.State = "R";
@@ -832,7 +983,7 @@ namespace MagImport
             }
             rdr.Close();
 
-            ReferenceRoot references = null;
+            Reference.AllData = allData;
             foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse>> pair in lessonsDB)
             {
                 int db_id = pair.Key;
@@ -889,14 +1040,7 @@ namespace MagImport
                         string att_ref_name = String.Format(ref_attrs["att_ref_name"], i);
                         if (lesson_prop_value.TryGetValue(att_ref_name, out val))
                         {
-                            if (references == null)
-                            {
-                                references = new ReferenceRoot();
-                                allData.Add(references);
-                            }
                             Reference reference = new Reference();
-                            references.Elems.Add(reference);
-                            reference.Fields.Id = references.GetNextId();
                             reference.Fields.LessonLngId = lesson_lng.Fields.Id;
                             reference.Fields.Number = i + 1;
                             reference.Fields.Description = val;
