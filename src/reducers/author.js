@@ -57,6 +57,9 @@ export default function authorsList(state = initialState, action) {
             return initialState;
 
         case SAVE_AUTHOR_DATA: {
+            state.current.id = action.payload.id;
+            state.current.Id = action.payload.id;
+
             return {
                 ...state,
                 initial: Object.assign({}, state.current),

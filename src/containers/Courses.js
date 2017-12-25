@@ -142,7 +142,7 @@ class Coureses extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        courses: state.courses.courses,
+        courses: state.courses.items,
         selected: state.courses.selected,
         editDlgShown: state.courses.editDlgShown,
         editMode: state.courses.editMode,

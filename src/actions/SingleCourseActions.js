@@ -49,7 +49,28 @@ export const getCourse = (id)=> {
                 dispatch({
                     type: GET_SINGLE_COURSE_SUCCESS,
                     payload: data
-                })
+                });
+
+                if (data.Authors.length > 0) {
+                    dispatch({
+                        type: SELECT_COURSE_AUTHOR,
+                        payload: data.Authors[0]
+                    });
+                }
+
+                if (data.Categories.length > 0) {
+                    dispatch({
+                        type: SELECT_COURSE_CATEGORY,
+                        payload: data.Categories[0]
+                    });
+                }
+
+                if (data.Lessons.length > 0) {
+                    dispatch({
+                        type: SELECT_COURSE_LESSON,
+                        payload: data.Lessons[0].id
+                    });
+                }
             })
             .catch((err) => {
                 dispatch({

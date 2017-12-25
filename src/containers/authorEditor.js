@@ -36,6 +36,14 @@ class AuthorEditor extends React.Component {
         this._dataLoaded = false;
     }
 
+    componentWillReceiveProps(next) {
+        if ((this.editMode === EDIT_MODE_INSERT) && (next.author.id)) {
+            let _newRout = '/authors/edit/' + next.author.id;
+            this.editMode = EDIT_MODE_EDIT;
+            this.props.history.push(_newRout);
+        }
+    }
+
     componentWillUnmount() {
         this.props.authorActions.clear()
     }
@@ -45,7 +53,7 @@ class AuthorEditor extends React.Component {
     }
 
     _save(values) {
-        this.props.authorActions.save(values, this.props.editMode);
+        this.props.authorActions.save(values, this.editMode);
     }
 
     _cancel() {

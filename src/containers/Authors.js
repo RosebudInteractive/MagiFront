@@ -7,7 +7,7 @@ import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
-import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
+import ErrorDialog from '../components/ErrorDialog';
 
 class Authors extends React.Component {
     componentDidMount(){
@@ -16,12 +16,10 @@ class Authors extends React.Component {
 
     onAddBtnClick() {
         this.props.history.push('/authors/new');
-        this.props.authorsActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
         this.props.history.push('/authors/edit/' + this.props.selected);
-        this.props.authorsActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
     deleteAuthor() {
@@ -44,9 +42,9 @@ class Authors extends React.Component {
         const {
             authors,
             fetching,
-            hasError,
             message,
             selected,
+            errorDlgShown,
             deleteDlgShown,
         } = this.props;
         this._selected = selected;
@@ -56,29 +54,36 @@ class Authors extends React.Component {
                 fetching ?
                     <p>Загрузка...</p>
                     :
-                    hasError ?
-                        <p>{message}</p>
-                        :
-                        <div className="authors-content">
-                            <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
-                                <button className='btn-new'
-                                        onClick={::this.onAddBtnClick}
-                                />{' '}
-                                <button
-                                    className={'btn-edit' + (selected === null ? " disabled" : "")}
-                                    onClick={::this.onEditBtnClick}
-                                    disabled={(selected === null)}
-                                />{' '}
-                                <button
-                                    className={'btn-delete' + (selected === null ? " disabled" : "")}
-                                    onClick={::this._confirmDelete}
-                                    disabled={(selected === null)}
-                                />
-                            </div>
-                            <div className="grid-container">
-                                <Webix ui={::this.getUI(selected)} data={authors} />
-                            </div>
+                    <div className="authors-content">
+                        <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
+                            <button className='btn-new'
+                                    onClick={::this.onAddBtnClick}
+                            />
+                            {' '}
+                            <button
+                                className={'btn-edit' + (selected === null ? " disabled" : "")}
+                                onClick={::this.onEditBtnClick}
+                                disabled={(selected === null)}
+                            />
+                            {' '}
+                            <button
+                                className={'btn-delete' + (selected === null ? " disabled" : "")}
+                                onClick={::this._confirmDelete}
+                                disabled={(selected === null)}
+                            />
                         </div>
+                        <div className="grid-container">
+                            <Webix ui={::this.getUI(selected)} data={authors}/>
+                        </div>
+                    </div>
+            }
+            {
+                errorDlgShown ?
+                    <ErrorDialog
+                        message={message}
+                    />
+                    :
+                    ""
             }
             {
                 deleteDlgShown ?

@@ -4,7 +4,6 @@ import {
     GET_CATEGORIES_FAIL,
     SELECT_CATEGORY,
     DELETE_CATEGORY_SUCCESS,
-    SHOW_EDIT_CATEGORY_DLG,
     HIDE_EDIT_CATEGORY_DLG,
 } from '../constants/Categories';
 
@@ -50,28 +49,21 @@ export const getCategories = ()=> {
     }
 };
 
-export const showEditDialog = (mode) => {
-    return {
-        type: SHOW_EDIT_CATEGORY_DLG,
-        payload: mode
-    }
-
-};
-
-export const hideEditDialog = () => {
-    return {
-        type: HIDE_EDIT_CATEGORY_DLG,
-        payload: null
-    }
-
-};
-
 
 export const selectCategory = (id) => {
     return {
         type: SELECT_CATEGORY,
         payload: id
     }
+};
+export const cancelDelete = () => {
+    return (dispatch) => {
+        dispatch({
+            type: HIDE_DELETE_DLG,
+            payload: null,
+        })
+    }
+
 };
 
 export const saveCategory = (values, mode) => {

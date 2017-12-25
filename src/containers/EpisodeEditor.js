@@ -166,7 +166,7 @@ class EpisodeEditor extends React.Component {
                     placeholder: "", labelWidth: 120,
                     invalidMessage: "Значение не может быть пустым",
                 },
-                {view: "checkbox", name: "Supp", label: "Дополнительный материал", readonly: true, labelWidth: 120,},
+                {view: "checkbox", name: "Supp", label: "Дополнительный материал", readonly: true, labelWidth: 120, disabled: true},
                 {
                     view: "combo", name: "State", label: "Состояние", placeholder: "Выберите состояние",
                     options: [{id: 'D', value: 'Черновик'}, {id: 'R', value: 'Готовый'}, {id: 'A', value: 'Архив'}],

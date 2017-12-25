@@ -44,7 +44,7 @@ export default function authorsList(state = initialState, action) {
             let _authors = [];
 
             state.authors.forEach((author) => {
-                if (author.id !== action.payload) {
+                if (author.id !== parseInt(action.payload)) {
                     _authors.push({...author})
                 }
             });

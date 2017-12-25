@@ -173,10 +173,6 @@ class LessonEditor extends React.Component {
         })
     }
 
-    showAddCategoryLookup() {
-        this.props.courseActions.showAddCategoryDialog();
-    }
-
     hideAddCategoryDialog() {
         this.props.courseActions.hideAddCategoryDialog()
     }
@@ -544,8 +540,8 @@ class LessonEditor extends React.Component {
                         this._goBack();
                     }
                 },
-                {view: "text", name: "CourseName", label: "Название курса", readonly: true, labelWidth: 120,},
-                {view: "text", name: "Number", label: "Номер урока", readonly: true, labelWidth: 120},
+                {view: "text", name: "CourseName", label: "Название курса", readonly: true, labelWidth: 120, disabled: true},
+                {view: "text", name: "Number", label: "Номер урока", readonly: true, labelWidth: 120, disabled: true},
                 {
                     view: "combo", name: "LessonType", label: "Тип урока", placeholder: "Выберите тип урока",
                     options: [{id: 'L', value: 'Лекция'}],

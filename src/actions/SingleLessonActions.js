@@ -58,7 +58,35 @@ export const getLesson = (id, courseId)=> {
                 dispatch({
                     type: GET_SINGLE_LESSON_SUCCESS,
                     payload: data
-                })
+                });
+
+                if (data.mainEpisodes.length > 0) {
+                    dispatch({
+                        type: SELECT_MAIN_EPISODE,
+                        payload: data.mainEpisodes[0].id
+                    });
+                }
+
+                if (data.suppEpisodes.length > 0) {
+                    dispatch({
+                        type: SELECT_SUPP_EPISODE,
+                        payload: data.suppEpisodes[0].id
+                    });
+                }
+
+                if (data.recommendedRef.length > 0) {
+                    dispatch({
+                        type: SELECT_RECOMMENDED_REFERENCE,
+                        payload: data.recommendedRef[0].id
+                    });
+                }
+
+                if (data.commonRef.length > 0) {
+                    dispatch({
+                        type: SELECT_COMMON_REFERENCE,
+                        payload: data.commonRef[0].id
+                    });
+                }
             })
             .catch((err) => {
                 dispatch({

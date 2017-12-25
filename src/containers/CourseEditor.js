@@ -6,7 +6,7 @@ import ErrorDialog from '../components/ErrorDialog';
 import * as singleCourseActions from "../actions/SingleCourseActions";
 import * as coursesActions from '../actions/CoursesActions';
 import * as authorsActions from "../actions/authorsListActions";
-import * as categoriesActions from "../actions/CategoriesActions";
+import * as categoriesActions from "../actions/categoriesListActions";
 import * as languagesActions from "../actions/LanguagesActions";
 
 import { bindActionCreators } from 'redux';
@@ -44,6 +44,10 @@ class CourseEditor extends React.Component {
         categoriesActions.getCategories();
         languagesActions.getLanguages();
     }
+
+    // componentWillReceiveProps(nextProps) {
+    //
+    // }
 
     _goBack(){
         this.props.history.push('/courses');
@@ -116,18 +120,28 @@ class CourseEditor extends React.Component {
         this.props.courseActions.selectAuthor(id)
     }
 
-    getCourseAuthors() {
+    _getCourseAuthors() {
         const {
             authors,
             courseAuthors
         } = this.props;
 
-        return authors.filter((value) => {
-            return courseAuthors.includes(value.id);
+        let _courseAuthors = [];
+
+        courseAuthors.map((item) => {
+            let _author = authors.find((author) => {
+                return author.id === item
+            });
+
+            if (_author) {
+                _courseAuthors.push(_author);
+            }
         });
+
+        return _courseAuthors;
     }
 
-    getAuthors() {
+    _getAuthorsList() {
         const {
             authors,
             courseAuthors
@@ -164,18 +178,28 @@ class CourseEditor extends React.Component {
         this.props.courseActions.selectCategory(id)
     }
 
-    getCourseCategories() {
+    _getCourseCategories() {
         const {
             categories,
             courseCategories
         } = this.props;
 
-        return categories.filter((value) => {
-            return courseCategories.includes(value.id);
+        let _courseCategories = [];
+
+        courseCategories.map((item) => {
+            let _category = categories.find((category) => {
+                return category.id === item
+            });
+
+            if (_category) {
+                _courseCategories.push(_category);
+            }
         });
+
+        return _courseCategories;
     }
 
-    getCategories() {
+    _getCategories() {
         const {
             categories,
             courseCategories
@@ -262,14 +286,14 @@ class CourseEditor extends React.Component {
                                                removeAction={::this._removeAuthorFromCourse}
                                                selectAction={::this._selectAuthor}
                                                selected={selectedAuthor}
-                                               data={::this.getCourseAuthors()}/>
+                                               data={::this._getCourseAuthors()}/>
                             </TabContent>
                             <TabContent for="tab2">
                                 <CourseCategories addAction={::this.showAddCategoryLookup}
                                                   removeAction={::this._removeCategoryFromCourse}
                                                   selectAction={::this._selectCategory}
                                                   selected={selectedCategory}
-                                                  data={::this.getCourseCategories()}/>
+                                                  data={::this._getCourseCategories()}/>
                             </TabContent>
                             <TabContent for="tab3">
                                 <CourseLessons data={courseLessons}
@@ -296,7 +320,7 @@ class CourseEditor extends React.Component {
                         showAddAuthorDialog ?
                             <LookupDialog
                                 message='Авторы'
-                                data={::this.getAuthors()}
+                                data={::this._getAuthorsList()}
                                 yesAction={::this.addAuthorAction}
                                 noAction={::this.hideAddAuthorDialog}
                             />
@@ -307,7 +331,7 @@ class CourseEditor extends React.Component {
                         showAddCategoryDialog ?
                             <LookupDialog
                                 message='Категориии'
-                                data={::this.getCategories()}
+                                data={::this._getCategories()}
                                 yesAction={::this.addCategoryAction}
                                 noAction={::this.hideAddCategoryDialog}
                             />
@@ -432,7 +456,7 @@ class CourseEditor extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        authors: state.authors.authors,
+        authors: state.authorsList.authors,
         selectedAuthor: state.courseAuthors.selected,
         selectedCategory: state.courseCategories.selected,
         selectedLesson: state.courseLessons.selected,
@@ -452,7 +476,7 @@ function mapStateToProps(state, ownProps) {
         errorDlgShown: state.commonDlg.errorDlgShown,
 
         courseId: Number(ownProps.match.params.id),
-        fetching: state.authors.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
+        fetching: state.authorsList.fetching || state.categories.fetching || state.languages.fetching || state.singleCourse.fetching
     }
 }
 

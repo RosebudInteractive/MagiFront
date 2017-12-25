@@ -2,7 +2,7 @@ import React  from 'react'
 import Webix from '../components/Webix';
 import ErrorDialog from '../components/ErrorDialog';
 
-import * as categoriesActions from "../actions/CategoriesActions";
+import * as categoriesActions from "../actions/categoriesListActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {EDIT_MODE_INSERT } from '../constants/Common';

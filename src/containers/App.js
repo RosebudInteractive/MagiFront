@@ -9,7 +9,7 @@ import Episodes from "./Episodes"
 import Authors from "./Authors"
 import AuthorForm from './authorEditor';
 import Categories from './Categories';
-import CategoriesForm from './CategoryForm';
+import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
 import CourseEditor from './CourseEditor';
 import LessonEditor from './LessonEditor';

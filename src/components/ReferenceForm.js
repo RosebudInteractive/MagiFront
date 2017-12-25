@@ -23,8 +23,8 @@ export default class ReferenceForm extends React.Component {
     getUI(save, cancel) {
         return {
             view:"form", width:400, elements:[
-                { view:"text", name:"Description", label:"Описание", placeholder:"Введите описание"},
-                { view:"text", name:"URL", label:"Ссылка на источник", placeholder:"Введите URL"},
+                { view:"textarea", labelPosition:"top", height: 300, name:"Description", label:"Описание", placeholder:"Введите описание"},
+                { view:"text", labelPosition:"top", name:"URL", label:"Ссылка на источник", placeholder:"Введите URL"},
                 { cols:[
                     {},
                     {

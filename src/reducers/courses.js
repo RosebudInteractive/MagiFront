@@ -13,7 +13,7 @@ import {
 } from '../constants/Common'
 
 const initialState = {
-    courses: [],
+    items: [],
     fetching: false,
     selected: null,
     editDlgShown: false,
@@ -25,17 +25,23 @@ export default function courses(state = initialState, action) {
 
     switch (action.type) {
         case GET_COURSES_REQUEST:
-            return { ...state, courses: [], fetching: true, hasError: false };
+            return { ...state, items: [], fetching: true, hasError: false };
 
-        case GET_COURSES_SUCCESS:
-            return { ...state, courses: action.payload, fetching: false };
+        case GET_COURSES_SUCCESS: {
+            let _list = action.payload;
+            let _selected = (_list.length > 0) ? _list[0].id : null;
+
+            return { ...state, items: action.payload, selected: _selected, fetching: false };
+        }
+
+
 
         case GET_COURSES_FAIL:
-            return { ...state, courses: [], fetching: false};
+            return { ...state, items: [], fetching: false};
 
         case SELECT_COURSE: {
             let _selected = action.payload;
-            let _selectedCourse = state.courses.find((elem) => {
+            let _selectedCourse = state.items.find((elem) => {
                 return elem.id === _selected
             });
 
@@ -48,13 +54,13 @@ export default function courses(state = initialState, action) {
         case DELETE_COURSE_SUCCESS: {
             let _data = [];
 
-            state.courses.forEach((category) => {
-                if (category.id !== action.payload) {
-                    _data.push({...category})
+            state.items.forEach((item) => {
+                if (item.id !== action.payload) {
+                    _data.push({...item})
                 }
             });
 
-            return {...state, courses: _data}
+            return {...state, items: _data}
         }
 
         case SHOW_EDIT_COURSE_DLG: {
@@ -64,7 +70,7 @@ export default function courses(state = initialState, action) {
         case HIDE_EDIT_COURSE_DLG: {
             let _data = [];
             let _replaced = false;
-            state.courses.forEach((course) => {
+            state.items.forEach((course) => {
                 if (course.id !== action.payload.id) {
                     _data.push({...course})
                 } else {
@@ -79,7 +85,7 @@ export default function courses(state = initialState, action) {
 
             return {
                 ...state,
-                courses: _data,
+                items: _data,
                 editDlgShown: false,
                 selected: _replaced ? state.selected : action.payload.id
             };

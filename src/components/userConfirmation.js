@@ -33,6 +33,7 @@ export default class UserConfirmation extends React.Component {
         return (
             <div className='holder'>
                 <div className='popup'>
+                    <div className="dlg-bg"/>
                     <div className="dlg-message">{this.props.message}</div>
                     <div className="dlg-btn-bar">
                         <button className="btn yes" onClick={::this.yes}>Да</button>

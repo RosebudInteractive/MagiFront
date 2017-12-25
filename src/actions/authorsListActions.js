@@ -4,8 +4,6 @@ import {
     GET_AUTHORS_LIST_FAIL,
     SELECT_AUTHOR,
     DELETE_AUTHOR_SUCCESS,
-    SHOW_EDIT_AUTHOR_DLG,
-    HIDE_EDIT_AUTHOR_DLG,
 } from '../constants/authorsList';
 
 import {
@@ -44,23 +42,6 @@ export const getAuthors = ()=> {
     }
 };
 
-export const showEditDialog = (mode) => {
-    return {
-        type: SHOW_EDIT_AUTHOR_DLG,
-        payload: mode
-    }
-
-};
-
-export const hideEditDialog = () => {
-    return {
-        type: HIDE_EDIT_AUTHOR_DLG,
-        payload: null
-    }
-
-};
-
-
 export const selectAuthor = (id) => {
     return {
         type: SELECT_AUTHOR,
@@ -96,6 +77,16 @@ export const deleteAuthor = (id) => {
             });
 
     }
+};
+
+export const cancelDelete = () => {
+    return (dispatch) => {
+        dispatch({
+            type: HIDE_DELETE_DLG,
+            payload: null,
+        })
+    }
+
 };
 
 const checkStatus = (response) => {

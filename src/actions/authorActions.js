@@ -79,10 +79,10 @@ export const save = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            .then(() => {
+            .then((id) => {
                 dispatch({
                     type: SAVE_AUTHOR_DATA,
-                    payload: null
+                    payload: id
                 })
             })
             .catch((err) => {
