@@ -34,21 +34,6 @@ class AuthorEditor extends ObjectEditor {
         return this.props.authorActions;
     }
 
-    _initEditMode(){
-        super._initEditMode();
-        const {
-            authorActions,
-            authorId,
-        } = this.props;
-
-        authorActions.get(authorId);
-    }
-
-    _initInsertMode() {
-        super._initInsertMode();
-        this.props.authorActions.create();
-    }
-
     _getWebixForm(){
         let _data = this.getObject();
         return <Webix ui={::this.getUI()} data={_data}/>

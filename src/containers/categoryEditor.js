@@ -31,32 +31,23 @@ class CategoryForm extends ObjectEditor {
 
     _initEditMode(){
         super._initEditMode();
-        let {
-            categoryId,
-            categories,
-            categoryActions,
-            categoriesListActions
-        } = this.props;
-
-        categoryActions.get(categoryId);
-        if (categories.length === 0) {
-            categoriesListActions.getCategories()
-        }
+        this._refreshCategoriesList();
     }
 
     _initInsertMode() {
         super._initInsertMode();
+        this._refreshCategoriesList();
+    }
+
+    _refreshCategoriesList(){
         let {
             categories,
-            categoryActions,
             categoriesListActions
         } = this.props;
 
         if (categories.length === 0) {
             categoriesListActions.getCategories()
         }
-
-        categoryActions.create();
     }
 
     _getWebixForm(){

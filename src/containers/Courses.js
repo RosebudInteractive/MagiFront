@@ -2,13 +2,12 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as coursesActions from "../actions/CoursesActions";
+import * as coursesActions from "../actions/coursesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
 import ErrorDialog from '../components/ErrorDialog';
-import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 
 class Coureses extends React.Component {
     componentDidMount(){
@@ -18,12 +17,10 @@ class Coureses extends React.Component {
 
     onAddBtnClick() {
         this.props.history.push('/courses/new');
-        this.props.coursesActions.showEditDialog(EDIT_MODE_INSERT)
     }
 
     onEditBtnClick() {
         this.props.history.push('/courses/edit/' + this.props.selected);
-        this.props.coursesActions.showEditDialog(EDIT_MODE_EDIT)
     }
 
     deleteCourse() {

@@ -13,8 +13,8 @@ import {
     ADD_CATEGORY,
     REMOVE_CATEGORY,
     HIDE_ADD_CATEGORY_DIALOG,
-    CHANGE_DATA,
-    CANCEL_CHANGE_DATA,
+    CHANGE_COURSE_DATA,
+    CANCEL_CHANGE_COURSE_DATA,
     SELECT_COURSE_LESSON,
     REMOVE_LESSON,
     MOVE_LESSON_UP,
@@ -22,18 +22,28 @@ import {
     GET_COURSE_AUTHORS_REQUEST,
     GET_COURSE_AUTHORS_SUCCESS,
     GET_COURSE_AUTHORS_FAIL,
-
+    CLEAR_COURSE,
+    SAVE_COURSE_DATA,
 } from '../constants/SingleCourse'
 
 import {
+    EDIT_MODE_INSERT,
+    EDIT_MODE_EDIT,
     SHOW_ERROR_DIALOG,
 } from '../constants/Common';
 
-
 import 'whatwg-fetch';
-// import {SELECT_COURSE} from "../constants/Courses";
 
-export const getCourse = (id)=> {
+export const create = () => {
+    return (dispatch) => {
+        dispatch({
+            type: CREATE_NEW_COURSE,
+            payload: null
+        });
+    }
+};
+
+export const get = (id)=> {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_COURSE_REQUEST,
@@ -87,10 +97,62 @@ export const getCourse = (id)=> {
     }
 };
 
-export const createNewCoures = () => {
+export const save = (values, mode) => {
+
+    return (dispatch) => {
+        let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
+        let _url = "/api/courses";
+        if (mode === EDIT_MODE_EDIT) {
+            _url += "/" + values.id
+        }
+        fetch(_url,
+            {
+                method: _type,
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(values)
+            })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then((id) => {
+                dispatch({
+                    type: SAVE_COURSE_DATA,
+                    payload: id
+                })
+            })
+            .catch((err) => {
+                dispatch({
+                    type: SHOW_ERROR_DIALOG,
+                    payload: err.message
+                })
+            });
+
+    }
+};
+
+export const changeData = (object) => {
     return (dispatch) => {
         dispatch({
-            type: CREATE_NEW_COURSE,
+            type: CHANGE_COURSE_DATA,
+            payload: object
+        });
+    }
+};
+
+export const cancelChanges = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CANCEL_CHANGE_COURSE_DATA,
+            payload: null
+        });
+    }
+};
+
+export const clear = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CLEAR_COURSE,
             payload: null
         });
     }
@@ -191,24 +253,6 @@ export const hideAddCategoryDialog = () => {
     return (dispatch) => {
         dispatch({
             type: HIDE_ADD_CATEGORY_DIALOG,
-            payload: null
-        });
-    }
-};
-
-export const changeData = (object) => {
-    return (dispatch) => {
-        dispatch({
-            type: CHANGE_DATA,
-            payload: object
-        });
-    }
-};
-
-export const cancelChanges = ()=> {
-    return (dispatch) => {
-        dispatch({
-            type: CANCEL_CHANGE_DATA,
             payload: null
         });
     }

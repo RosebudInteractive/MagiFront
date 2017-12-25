@@ -42,7 +42,7 @@ import {
 
 import 'whatwg-fetch';
 
-export const getLesson = (id, courseId)=> {
+export const get = (id, courseId)=> {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_LESSON_REQUEST,
@@ -103,7 +103,7 @@ export const getLesson = (id, courseId)=> {
     }
 };
 
-export const createNewLesson = (obj) => {
+export const create = (obj) => {
     return (dispatch) => {
         dispatch({
             type: CREATE_NEW_LESSON,
@@ -112,7 +112,7 @@ export const createNewLesson = (obj) => {
     }
 };
 
-export const saveLesson = (values, mode) => {
+export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
@@ -132,10 +132,10 @@ export const saveLesson = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            .then(() => {
+            .then((id) => {
                 dispatch({
                     type: SAVE_LESSON_SUCCESS,
-                    payload: null
+                    payload: id
                 })
             })
             .catch((err) => {
@@ -145,6 +145,33 @@ export const saveLesson = (values, mode) => {
                 })
             });
 
+    }
+};
+
+export const changeData = (object) => {
+    return (dispatch) => {
+        dispatch({
+            type: CHANGE_LESSON_DATA,
+            payload: object
+        });
+    }
+};
+
+export const cancelChanges = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CANCEL_CHANGE_LESSON_DATA,
+            payload: null
+        });
+    }
+};
+
+export const clear = ()=> {
+    return (dispatch) => {
+        dispatch({
+            type: CLEAR_LESSON,
+            payload: null
+        });
     }
 };
 
@@ -324,33 +351,6 @@ export const moveCommonReferenceDown = (id) => {
         dispatch({
             type: MOVE_COMMON_REFERENCE_DOWN,
             payload: id
-        });
-    }
-};
-
-export const changeData = (object) => {
-    return (dispatch) => {
-        dispatch({
-            type: CHANGE_LESSON_DATA,
-            payload: object
-        });
-    }
-};
-
-export const cancelChanges = ()=> {
-    return (dispatch) => {
-        dispatch({
-            type: CANCEL_CHANGE_LESSON_DATA,
-            payload: null
-        });
-    }
-};
-
-export const clearLesson = ()=> {
-    return (dispatch) => {
-        dispatch({
-            type: CLEAR_LESSON,
-            payload: null
         });
     }
 };

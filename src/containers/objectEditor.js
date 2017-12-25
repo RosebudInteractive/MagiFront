@@ -46,7 +46,6 @@ export default class ObjectEditor extends React.Component {
 
     get objectId() {
         return this.props[this.objectIdPropName];
-        // throw 'Undefined object id'
     }
 
     get editMode() {
@@ -59,10 +58,16 @@ export default class ObjectEditor extends React.Component {
 
     _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
+        this.objectActions.get(this.objectId);
     }
 
     _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
+        this.objectActions.create(this._getInitStateOfNewObject())
+    }
+
+    _getInitStateOfNewObject(){
+        return null
     }
 
     componentWillReceiveProps(next) {
@@ -131,6 +136,7 @@ export default class ObjectEditor extends React.Component {
                         :
                         ""
                 }
+                {this._getExtDialogs()}
             </div>
         )
     }
@@ -157,7 +163,7 @@ export default class ObjectEditor extends React.Component {
 
         return {
             view: "form",
-            width: 700,
+            width: 1000,
             elements: that._getElements(),
             on: {
                 onChange: function () {
@@ -226,6 +232,10 @@ export default class ObjectEditor extends React.Component {
         if (this._dataLoaded) {
             this._validateResult[field.data.name] = field.validate();
         }
+    }
+
+    _getExtDialogs() {
+        return []
     }
 }
 
