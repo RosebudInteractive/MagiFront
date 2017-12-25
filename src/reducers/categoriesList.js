@@ -6,7 +6,7 @@ import {
     DELETE_CATEGORY_SUCCESS,
     SHOW_EDIT_CATEGORY_DLG,
     HIDE_EDIT_CATEGORY_DLG,
-} from '../constants/Categories'
+} from '../constants/categoriesList'
 
 import {
     EDIT_MODE_INSERT,

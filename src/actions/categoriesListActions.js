@@ -5,7 +5,7 @@ import {
     SELECT_CATEGORY,
     DELETE_CATEGORY_SUCCESS,
     HIDE_EDIT_CATEGORY_DLG,
-} from '../constants/Categories';
+} from '../constants/categoriesList';
 
 import {
     HIDE_DELETE_DLG,
@@ -49,13 +49,13 @@ export const getCategories = ()=> {
     }
 };
 
-
 export const selectCategory = (id) => {
     return {
         type: SELECT_CATEGORY,
         payload: id
     }
 };
+
 export const cancelDelete = () => {
     return (dispatch) => {
         dispatch({

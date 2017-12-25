@@ -9,7 +9,6 @@ import {
     CLEAR_AUTHOR,
 } from '../constants/author'
 
-
 const initialState = {
     initial: null,
     current: null,

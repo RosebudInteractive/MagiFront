@@ -7,7 +7,25 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {EDIT_MODE_INSERT } from '../constants/Common';
 
-class CategoryForm extends React.Component {
+import ObjectEditor from './objectEditor';
+
+class CategoryForm extends ObjectEditor {
+
+    getObject() {
+        return this.props.
+    }
+
+    getRootRout() {
+        throw 'Undefined rout'
+    }
+
+    get objectName() {
+        throw 'Undefined object name'
+    }
+
+    get objectActions() {
+        throw 'Undefined object actions'
+    }
 
     getCurrentCategory() {
         if (this.props.editMode === EDIT_MODE_INSERT) {

@@ -6,7 +6,7 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-class ObjectEditor extends React.Component {
+export default class ObjectEditor extends React.Component {
     constructor(props) {
         super(props);
         this._editMode = EDIT_MODE_INSERT;

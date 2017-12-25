@@ -1,13 +1,6 @@
 import {
-    CREATE_NEW_AUTHOR,
-    GET_AUTHOR_REQUEST,
-    GET_AUTHOR_SUCCESS,
-    GET_AUTHOR_FAIL,
-    SAVE_AUTHOR_DATA,
-    CHANGE_AUTHOR_DATA,
-    CANCEL_CHANGE_AUTHOR_DATA,
-    CLEAR_AUTHOR,
-} from '../constants/author';
+    CRE
+} from '../constants/category';
 
 import {
     SHOW_ERROR_DIALOG,

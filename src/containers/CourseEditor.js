@@ -272,7 +272,7 @@ class CourseEditor extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <div>
-                    <Prompt when={hasChanges} message='Есть несохраненные данные. Уйти?'/>
+                    <Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>
                     <Webix ui={::this.getUI(::this.saveCourse, ::this.cancelChanges, ::this.changeData, ::this._getHasChanges)} data={course}/>
                     <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true}>
                         <div className="tab-links">

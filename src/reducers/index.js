@@ -8,7 +8,7 @@ import commonDlg from './commonDlg';
 import episodes from "./episodes";
 import author from './author';
 import authorsList from './authorsList';
-import categories from './categories';
+import categories from './categoriesList';
 import courses from './courses';
 import singleCourse from './singleCourse';
 import singleLesson from './singleLesson';
