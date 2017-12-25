@@ -7,13 +7,12 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as menuActions from "../actions/MenuActions";
-import { Link } from 'react-router-dom';
 
 class Menu extends Component {
-    onMenuItemClick(id) {
+    onMenuItemClick(id, url) {
         if (this.props.selected !== id) {
-            this.props.setSelected(id);
-            // this.props.history.push(url);
+            this.props.menuActions.setSelected(id);
+            this.props.history.push(url);
         }
     }
 
@@ -23,11 +22,13 @@ class Menu extends Component {
         return <div className='main-menu'>
             {
                 items.map((item) => {
-                        return <div className="menu-item" key={item.id} /*onClick={() => {this.onMenuItemClick(item.id, item.url)}}>*/>
+                        return <div className="menu-item"
+                                    key={item.id}
+                                    onClick={() => {
+                                        this.onMenuItemClick(item.id, item.url)
+                                    }}>
                             <div className={"link" + (selected === item.id ? " open" : "")}>
-                                <Link to={{pathname: item.url}} style={{textDecoration: 'none', color: '#333333'}}>
-                                    {item.name}
-                                </Link>
+                                {item.name}
                             </div>
                         </div>
                     }

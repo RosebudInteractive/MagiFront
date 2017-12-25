@@ -1,18 +1,16 @@
 import {
-    GET_AUTHORS_REQUEST,
-    GET_AUTHORS_SUCCESS,
-    GET_AUTHORS_FAIL,
+    GET_AUTHORS_LIST_REQUEST,
+    GET_AUTHORS_LIST_SUCCESS,
+    GET_AUTHORS_LIST_FAIL,
     SELECT_AUTHOR,
     DELETE_AUTHOR_SUCCESS,
     SHOW_EDIT_AUTHOR_DLG,
     HIDE_EDIT_AUTHOR_DLG,
-} from '../constants/Authors';
+} from '../constants/authorsList';
 
 import {
     HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
-    EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT,
 } from '../constants/Common';
 
 import 'whatwg-fetch';
@@ -21,7 +19,7 @@ import 'whatwg-fetch';
 export const getAuthors = ()=> {
     return (dispatch) => {
         dispatch({
-            type: GET_AUTHORS_REQUEST,
+            type: GET_AUTHORS_LIST_REQUEST,
             payload: null
         });
 
@@ -32,13 +30,13 @@ export const getAuthors = ()=> {
                 data.forEach((author) => handleAuthor(author));
 
                 dispatch({
-                    type: GET_AUTHORS_SUCCESS,
+                    type: GET_AUTHORS_LIST_SUCCESS,
                     payload: data
                 })
             })
             .catch((err) => {
                 dispatch({
-                    type: GET_AUTHORS_FAIL,
+                    type: GET_AUTHORS_LIST_FAIL,
                     payload: err
                 })
             });
@@ -67,40 +65,6 @@ export const selectAuthor = (id) => {
     return {
         type: SELECT_AUTHOR,
         payload: id
-    }
-};
-
-export const saveAuthor = (values, mode) => {
-
-    return (dispatch) => {
-        let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/authors";
-        if (mode === EDIT_MODE_EDIT) {
-            _url += "/" + values.id
-        }
-        fetch(_url,
-            {
-                method: _type,
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(values)
-            })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then((data) => {
-                dispatch({
-                    type: HIDE_EDIT_AUTHOR_DLG,
-                    payload: data
-                })
-            })
-            .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
     }
 };
 

@@ -5,7 +5,7 @@ import ErrorDialog from '../components/ErrorDialog';
 
 import * as singleCourseActions from "../actions/SingleCourseActions";
 import * as coursesActions from '../actions/CoursesActions';
-import * as authorsActions from "../actions/AuthorActions";
+import * as authorsActions from "../actions/authorsListActions";
 import * as categoriesActions from "../actions/CategoriesActions";
 import * as languagesActions from "../actions/LanguagesActions";
 
@@ -88,7 +88,7 @@ class CourseEditor extends React.Component {
 
     cancelChanges() {
         this._needRevalidate = true;
-        this.props.courseActions.cancelCanges();
+        this.props.courseActions.cancelChanges();
     }
 
     // selectLesson(id) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as authorsActions from "../actions/AuthorActions";
+import * as authorsActions from "../actions/authorsListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
@@ -12,7 +12,6 @@ import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common";
 class Authors extends React.Component {
     componentDidMount(){
         this.props.authorsActions.getAuthors();
-        this._selected = null;
     }
 
     onAddBtnClick() {
@@ -77,7 +76,7 @@ class Authors extends React.Component {
                                 />
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select, selected)} data={authors} />
+                                <Webix ui={::this.getUI(selected)} data={authors} />
                             </div>
                         </div>
             }
@@ -124,24 +123,11 @@ class Authors extends React.Component {
         };
     }
 }
-//
-// Authors.propTypes = {
-//     episodes: PropTypes.array.isRequired,
-//     hasError: PropTypes.bool.isRequired,
-//     message: PropTypes.string,
-//     selected: PropTypes.number,
-//     deleteDlgShown: PropTypes.bool.isRequired,
-//     errorDlgShown: PropTypes.bool.isRequired,
-//     editDlgShown: PropTypes.bool.isRequired,
-//     editMode: PropTypes.string.isRequired
-// }
 
 function mapStateToProps(state) {
     return {
-        authors: state.authors.authors,
-        selected: state.authors.selected,
-        editDlgShown: state.authors.editDlgShown,
-        editMode: state.authors.editMode,
+        authors: state.authorsList.authors,
+        selected: state.authorsList.selected,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,

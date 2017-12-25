@@ -60,7 +60,6 @@ export default function singleEpisode(state = initialState, action) {
             return initialState;
 
         case SAVE_EPISODE_SUCCESS: {
-
             return {
                 ...state,
                 initialEpisode: Object.assign({}, state.episode),

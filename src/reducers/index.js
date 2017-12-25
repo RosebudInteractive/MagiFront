@@ -5,8 +5,9 @@ import page from "./page"
 import user from "./user"
 import menu from "./menu"
 import commonDlg from './commonDlg';
-import episodes from "./episodes"
-import authors from './authors';
+import episodes from "./episodes";
+import author from './author';
+import authorsList from './authorsList';
 import categories from './categories';
 import courses from './courses';
 import singleCourse from './singleCourse';
@@ -25,9 +26,10 @@ export default combineReducers({
     user,
     menu,
     commonDlg,
+    author,
     episodes,
     languages,
-    authors,
+    authorsList,
     categories,
     courses,
     singleCourse,
