@@ -6,15 +6,17 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
+export const labelWidth = 120;
+
 export default class ObjectEditor extends React.Component {
     constructor(props) {
         super(props);
         this._editMode = EDIT_MODE_INSERT;
 
         if (this.objectId > 0) {
-            this.initEditMode()
+            this._initEditMode()
         } else {
-            this.initInsertMode()
+            this._initInsertMode()
         }
 
         this._validateResult = {};
@@ -29,7 +31,7 @@ export default class ObjectEditor extends React.Component {
         throw 'Undefined rout'
     }
 
-    get objectName() {
+    get objectIdPropName() {
         throw 'Undefined object name'
     }
 
@@ -38,7 +40,8 @@ export default class ObjectEditor extends React.Component {
     }
 
     get objectId() {
-        return this.getObject().id;
+        return this.props[this.objectIdPropName];
+        // throw 'Undefined object id'
     }
 
     get editMode() {
@@ -46,19 +49,19 @@ export default class ObjectEditor extends React.Component {
     }
 
     set editMode(value) {
-        this._editMode(value)
+        this._editMode = value
     }
 
-    initEditMode(){
+    _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
     }
 
-    initInsertMode() {
+    _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
     }
 
     componentWillReceiveProps(next) {
-        let _newObjectId = next[this.objectName].id;
+        let _newObjectId = next[this.objectIdPropName];
         let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (_newObjectId);
 
         if (_isNeedSwitchMode) {
@@ -67,7 +70,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     _switchToEditObject(objId){
-        let _newRout = this.getRootRout() + objId;
+        let _newRout = this.getRootRout() + '/' + objId;
         this.editMode = EDIT_MODE_EDIT;
         this.props.history.push(_newRout);
     }
@@ -99,13 +102,18 @@ export default class ObjectEditor extends React.Component {
 
     render() {
         const {
-            author,
+            fetching,
             message,
             errorDlgShown,
         } = this.props;
         return (
             <div className="object-content">
-                {this._getWebixForm()}
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
+                        :
+                        <div>{this._getWebixForm()}</div>
+                }
                 {/*<Webix ui={::this.getUI()} data={author}/>*/}
                 {
                     errorDlgShown ?
@@ -124,11 +132,14 @@ export default class ObjectEditor extends React.Component {
     }
 
     _hasChanges() {
-        return false;
+        return this.props.hasChanges;
     }
 
     _enableApplyChanges() {
-        return false;
+        let _array = Object.values(this._validateResult);
+        return _array.every((value) => {
+            return value === true
+        })
     }
 
     _getWebixForm(){}
@@ -194,11 +205,19 @@ export default class ObjectEditor extends React.Component {
                     }
                 ]
             }
-        )
+        );
+
+        return _elems;
     }
 
     _getExtElements() {
         return [];
+    }
+
+    _externalValidate(field) {
+        if (this._dataLoaded) {
+            this._validateResult[field.data.name] = field.validate();
+        }
     }
 }
 

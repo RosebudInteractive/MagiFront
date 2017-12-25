@@ -16,7 +16,7 @@ const initialState = {
     hasChanges: false,
 };
 
-export default function authorsList(state = initialState, action) {
+export default function author(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_AUTHOR: {

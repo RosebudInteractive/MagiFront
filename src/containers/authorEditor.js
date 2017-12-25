@@ -10,11 +10,6 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-const requiredField = {
-    FirstName: 'FirstName',
-    LastName: 'LastName'
-};
-
 class AuthorEditor extends React.Component {
     constructor(props) {
         super(props);
@@ -122,7 +117,7 @@ class AuthorEditor extends React.Component {
                     }
                 },
                 {
-                    view: "text", name: requiredField.FirstName, label: "Имя",
+                    view: "text", name: 'FirstName', label: "Имя",
                     placeholder: "Введите имя",
                     labelWidth: 120,
                     validate: window.webix.rules.isNotEmpty,
@@ -145,7 +140,14 @@ class AuthorEditor extends React.Component {
                         },
                     },
                 },
-                {view: "textarea", name: "Description", label: "Описание", placeholder: "Описание", height: 150, labelWidth: 120,},
+                {
+                    view: "textarea",
+                    name: "Description",
+                    label: "Описание",
+                    placeholder: "Описание",
+                    height: 150,
+                    labelWidth: 120,
+                },
                 {
                     cols: [
                         {},

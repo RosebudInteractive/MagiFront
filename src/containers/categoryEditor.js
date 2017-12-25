@@ -1,139 +1,130 @@
 import React  from 'react'
 import Webix from '../components/Webix';
-import ErrorDialog from '../components/ErrorDialog';
 
+import * as categoryActions from "../actions/categoryActions";
 import * as categoriesActions from "../actions/categoriesListActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {EDIT_MODE_INSERT } from '../constants/Common';
-
-import ObjectEditor from './objectEditor';
+import ObjectEditor, {labelWidth, } from './objectEditor';
 
 class CategoryForm extends ObjectEditor {
 
     getObject() {
-        return this.props.
+        return this.props.category
     }
 
     getRootRout() {
-        throw 'Undefined rout'
+        return '/categories'
     }
 
-    get objectName() {
-        throw 'Undefined object name'
+    get objectIdPropName() {
+        return 'categoryId'
     }
 
     get objectActions() {
-        throw 'Undefined object actions'
+        return this.props.categoryActions;
     }
 
-    getCurrentCategory() {
-        if (this.props.editMode === EDIT_MODE_INSERT) {
-            return null
-        } else {
-            return this.props.categories.find((elem) => {
-                return elem.id === this.props.selected
-            })
+    _initEditMode(){
+        super._initEditMode();
+        let {
+            categoryId,
+            categories,
+            categoryActions,
+            categoriesListActions
+        } = this.props;
+
+        categoryActions.get(categoryId);
+        if (categories.length === 0) {
+            categoriesListActions.getCategories()
         }
     }
 
-    saveCategory(values) {
-        this.props.categoriesActions.saveCategory(values, this.props.editMode)
-    }
-
-    cancelEdit() {
-        this.props.categoriesActions.hideEditDialog();
-    }
-
-    render() {
-        const {
-            selected,
-            message,
-            errorDlgShown,
+    _initInsertMode() {
+        super._initInsertMode();
+        let {
+            categories,
+            categoryActions,
+            categoriesListActions
         } = this.props;
-        return (
-            <div className="episodes-content">
-                <Webix ui={::this.getUI(::this.saveCategory, this.cancelEdit)} data={::this.getCurrentCategory()}/>
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                            data={selected}
-                        />
-                        :
-                        ""
-                }
-            </div>
-        )
+
+        if (categories.length === 0) {
+            categoriesListActions.getCategories()
+        }
+
+        categoryActions.create();
     }
 
-    getCategoriesArray(){
+    _getWebixForm(){
+        let _data = this.getObject();
+        return <Webix ui={::this.getUI()} data={_data}/>
+    }
+
+    _getExtElements() {
+        let that = this;
+        let _options = this._getCategoriesArray();
+
+        return [
+            {
+                view: "text",
+                name: "Name",
+                label: "Наименование",
+                placeholder: "Введите наименование",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
+            },
+            {
+                view: "combo",
+                name: "ParentId",
+                label: "Родительская категория",
+                placeholder: "Введите категорию",
+                options : _options,
+                labelWidth: labelWidth,
+            },
+        ];
+    }
+
+    _getCategoriesArray(){
         const {
             categories,
-            selected
+            categoryId
         } = this.props;
 
         let _filtered = categories.filter((value) => {
-            return value.id !== selected;
+            return value.id !== categoryId;
         });
 
         return _filtered.map((elem) => {
             return {id: elem.id, value: elem.Name};
         })
     }
-
-    getUI(save, cancel) {
-        let _options = this.getCategoriesArray();
-
-        return {
-            view: "form", width: 400, elements: [
-                {view: "text", name: "Name", label: "Наименование", placeholder: "Введите наименование"},
-                {view: "combo", name: "ParentId", label: "Родительская категория", placeholder: "Введите категорию",
-                    options : _options},
-                {
-                    cols: [
-                        {},
-                        {
-                            view: "button", value: "ОК",
-                            click: function () {
-                                let _validated = this.getFormView().validate();
-                                if ((save) && _validated) {
-                                    save(this.getFormView().getValues());
-                                }
-                            }
-                        },
-                        {
-                            view: "button", value: "Отмена", click: function(){
-                            if (cancel)
-                                cancel();
-                        }
-                        }
-                    ]
-                }
-            ],
-            rules: {
-                Name: window.webix.rules.isNotEmpty,
-            }
-        }
-    }
 }
 
 function mapStateToProps(state, ownProps) {
     return {
-        categories: state.categories.categories,
-        editMode: state.categories.editMode,
+        categories: state.categoriesList.categories,
+        category: state.category.current,
+        hasChanges : state.category.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
         errorDlgShown: state.commonDlg.errorDlgShown,
 
-        selected: Number(ownProps.match.params.id),
+        categoryId: Number(ownProps.match.params.id),
+        fetching: state.category.fetching || state.categoriesList.fetching,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        categoriesActions: bindActionCreators(categoriesActions, dispatch),
+        categoryActions: bindActionCreators(categoryActions, dispatch),
+        categoriesListActions: bindActionCreators(categoriesActions, dispatch),
     }
 }
 

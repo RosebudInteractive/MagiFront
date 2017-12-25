@@ -4,14 +4,11 @@ import {
     GET_CATEGORIES_FAIL,
     SELECT_CATEGORY,
     DELETE_CATEGORY_SUCCESS,
-    HIDE_EDIT_CATEGORY_DLG,
 } from '../constants/categoriesList';
 
 import {
     HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
-    EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT,
 } from '../constants/Common';
 
 import 'whatwg-fetch';
@@ -66,39 +63,39 @@ export const cancelDelete = () => {
 
 };
 
-export const saveCategory = (values, mode) => {
-
-    return (dispatch) => {
-        let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/categories";
-        if (mode === EDIT_MODE_EDIT) {
-            _url += "/" + values.id
-        }
-        fetch(_url,
-            {
-                method: _type,
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(values)
-            })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then((data) => {
-                dispatch({
-                    type: HIDE_EDIT_CATEGORY_DLG,
-                    payload: data
-                })
-            })
-            .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
-    }
-};
+// export const saveCategory = (values, mode) => {
+//
+//     return (dispatch) => {
+//         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
+//         let _url = "/api/categories";
+//         if (mode === EDIT_MODE_EDIT) {
+//             _url += "/" + values.id
+//         }
+//         fetch(_url,
+//             {
+//                 method: _type,
+//                 headers: {
+//                     "Content-type": "application/json"
+//                 },
+//                 body: JSON.stringify(values)
+//             })
+//             .then(checkStatus)
+//             .then(parseJSON)
+//             .then((data) => {
+//                 dispatch({
+//                     type: HIDE_EDIT_CATEGORY_DLG,
+//                     payload: data
+//                 })
+//             })
+//             .catch((err) => {
+//                 dispatch({
+//                     type: SHOW_ERROR_DIALOG,
+//                     payload: err.message
+//                 })
+//             });
+//
+//     }
+// };
 
 export const deleteCategory = (id) => {
     return (dispatch) => {

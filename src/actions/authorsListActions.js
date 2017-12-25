@@ -12,7 +12,6 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
-// import authors from "../reducers/authors";
 
 export const getAuthors = ()=> {
     return (dispatch) => {
