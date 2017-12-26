@@ -63,16 +63,16 @@ export default class ObjectEditor extends React.Component {
 
     _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
-        this.objectActions.create(this._getInitStateOfNewObject())
+        this.objectActions.create(this._getInitStateOfNewObject(this.props))
     }
 
     _getInitStateOfNewObject(){
         return null
     }
 
-    componentWillReceiveProps(next) {
-        let _newObjectId = next[this.objectName] ? next[this.objectName].id : null;
-        let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (_newObjectId);
+    componentDidUpdate() {
+        let _newObjectId = this.props[this.objectName] ? this.props[this.objectName].id : null;
+        let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (!!+_newObjectId);
 
         if (_isNeedSwitchMode) {
             this._switchToEditObject(_newObjectId)
@@ -80,9 +80,13 @@ export default class ObjectEditor extends React.Component {
     }
 
     _switchToEditObject(objId){
-        let _newRout = this.getRootRout() + '/edit/' + objId;
+        let _newRout = this.getRootRout() + this._getEditRout() + objId;
         this.editMode = EDIT_MODE_EDIT;
         this.props.history.push(_newRout);
+    }
+
+    _getEditRout() {
+        return '/edit/';
     }
 
     componentWillUnmount() {
@@ -236,6 +240,11 @@ export default class ObjectEditor extends React.Component {
 
     _getExtDialogs() {
         return []
+    }
+
+    _formatDate(data) {
+        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+        return data ? fn(new Date(data)) : null;
     }
 }
 

@@ -32,7 +32,7 @@ class Coureses extends React.Component {
     }
 
     cancelDelete() {
-        this.props.categoriesActions.cancelDelete()
+        this.props.coursesActions.cancelDelete()
     }
 
     select(id) {
@@ -114,8 +114,15 @@ class Coureses extends React.Component {
             editable: false,
             columns: [
                 {id: 'Name', header: 'Название', width: 200},
-                {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"}, //cssFormat: getColorStyle},
-                {id: 'URL', header: 'Ярлык URL', width : 150, template:"<a href='#URL#'>#URL#</a>"},
+                {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"},
+                {
+                    id: 'URL',
+                    header: 'Ярлык URL',
+                    width: 150,
+                    template: (obj) => {
+                        return obj.URL ? "<a href='" + obj.URL+ "'>" + obj.URL + "</a>" : ''
+                    },
+                },
                 {id: 'State', header: 'Состояние', width: 150, editor: 'select',
                     options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]},
                 {id: 'LanguageName', header : 'Язык курса', width: 200},

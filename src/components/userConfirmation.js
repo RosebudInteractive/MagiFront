@@ -13,13 +13,14 @@ export default class UserConfirmation extends React.Component {
     }
 
     yes() {
-        this.props.callback(true)
-        this.setState({ hidden: true })
+        this.props.callback(true);
+        this.setState({hidden: true});
     }
 
-    no() {
-        this.props.callback(false)
-        this.setState({ hidden: true })
+    no(e) {
+        this.props.callback(false);
+        this.setState({hidden: true});
+        e.preventDefault();
     }
 
     componentWillReceiveProps() {
@@ -31,13 +32,13 @@ export default class UserConfirmation extends React.Component {
             return null
         }
         return (
-            <div className='holder'>
+            <div className='holder' >
                 <div className='popup'>
                     <div className="dlg-bg"/>
                     <div className="dlg-message">{this.props.message}</div>
                     <div className="dlg-btn-bar">
-                        <button className="btn yes" onClick={::this.yes}>Да</button>
-                        <button className="btn no" onClick={::this.no}>Нет</button>
+                        <button className="btn" onClick={::this.yes}>Да</button>
+                        <button className="btn no" onClick={::this.no} autoFocus={true}>Нет</button>
                     </div>
                 </div>
             </div>

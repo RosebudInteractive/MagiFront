@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
+import {EDIT_MODE_EDIT} from '../constants/Common'
 
 export default class GridControl extends Component {
     constructor(props) {
@@ -54,26 +55,38 @@ export default class GridControl extends Component {
     }
 
     _configButtons() {
+        let {
+            createAction,
+            addAction,
+            editAction,
+            moveUpAction,
+            moveDownAction,
+            editMode,
+        } = this.props;
 
         let _buttons = [];
-        if (this.props.createAction) {
-            _buttons.push(<button key='btnNew' className="btn-new" onClick={::this._create}/>)
+        if (createAction) {
+            let _disabled = editMode !== EDIT_MODE_EDIT;
+            _buttons.push(<button key='btnNew' className="btn-new" disabled={_disabled} onClick={::this._create}/>)
         }
 
-        if (this.props.addAction) {
+        if (addAction) {
             _buttons.push(<button key='btnAdd' className="btn-add"  onClick={::this._addClicked}/>)
         }
 
-        if (this.props.editAction) {
-            _buttons.push(<button key='btnEdit' className='btn-edit' disabled={(this._selected === null)} onClick={::this._edit}/>)
+        if (editAction) {
+            let _disabled = (!this._selected) || (editMode !== EDIT_MODE_EDIT);
+            _buttons.push(<button key='btnEdit' className='btn-edit' disabled={_disabled} onClick={::this._edit}/>)
         }
 
-        if (this.props.moveUpAction) {
-            _buttons.push(<button key='btnUp' className='btn-up' disabled={((this._selected === null) || (this._isFirstSelected))} onClick={::this._moveUp}/>)
+        if (moveUpAction) {
+            let _disabled = ((!this._selected) || (this._isFirstSelected));
+            _buttons.push(<button key='btnUp' className='btn-up' disabled={_disabled} onClick={::this._moveUp}/>)
         }
 
-        if (this.props.moveDownAction) {
-            _buttons.push(<button key='btnDown' className='btn-down' disabled={((this._selected === null) || (this._isLastSelected))} onClick={::this._moveDown}/>)
+        if (moveDownAction) {
+            let _disabled = ((!this._selected) || (this._isLastSelected));
+            _buttons.push(<button key='btnDown' className='btn-down' disabled={_disabled} onClick={::this._moveDown}/>)
         }
 
         return _buttons;
@@ -106,7 +119,6 @@ export default class GridControl extends Component {
             view: "datatable",
             scroll: false,
             autoheight: true,
-            // height: 0,
             select: true,
             width: 0,
             editable: false,
@@ -138,6 +150,11 @@ export default class GridControl extends Component {
             }
         }
     }
+
+    _formatDate(data) {
+        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
+        return data ? fn(new Date(data)) : '';
+    }
 }
 
 GridControl.propTypes = {
@@ -149,6 +166,6 @@ GridControl.propTypes = {
     removeAction: PropTypes.func.isRequired,
     moveUpAction: PropTypes.func,
     moveDownAction: PropTypes.func,
-    // selected: PropTypes.string,
+    editMode: PropTypes.string,
     data: PropTypes.any.isRequired,
 };

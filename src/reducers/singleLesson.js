@@ -118,7 +118,12 @@ export default function singleLesson(state = initialState, action) {
 
         case REMOVE_MAIN_EPISODE: {
             let _result = tools.removeObject(state.mainEpisodes, action.payload);
-            return {...state, mainEpisodes: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                mainEpisodes: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges,
+                selected: _result.selected ? _result.selected : state.selected
+            };
         }
 
         case MOVE_MAIN_EPISODE_UP: {
@@ -133,7 +138,12 @@ export default function singleLesson(state = initialState, action) {
 
         case REMOVE_SUPP_EPISODE: {
             let _result = tools.removeObject(state.suppEpisodes, action.payload);
-            return {...state, suppEpisodes: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                suppEpisodes: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges,
+                selected: _result.selected ? _result.selected : state.selected
+            };
         }
 
         case MOVE_SUPP_EPISODE_UP: {
@@ -173,13 +183,17 @@ export default function singleLesson(state = initialState, action) {
                 ...state,
                 recommendedRef: _array,
                 hasChanges: true
-                // selected: _replaced ? state.selected : action.payload.id
             };
         }
 
         case REMOVE_RECOMMENDED_REFERENCE: {
             let _result = tools.removeObject(state.recommendedRef, action.payload);
-            return {...state, recommendedRef: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                recommendedRef: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges,
+                selected: _result.selected ? _result.selected : state.selected
+            };
         }
 
         case MOVE_RECOMMENDED_REFERENCE_UP: {
@@ -219,13 +233,17 @@ export default function singleLesson(state = initialState, action) {
                 ...state,
                 commonRef: _array,
                 hasChanges: true
-                // selected: _replaced ? state.selected : action.payload.id
             };
         }
 
         case REMOVE_COMMON_REFERENCE: {
             let _result = tools.removeObject(state.commonRef, action.payload);
-            return {...state, commonRef: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                commonRef: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges,
+                selected: _result.selected ? _result.selected : state.selected
+            };
         }
 
         case MOVE_COMMON_REFERENCE_UP: {
