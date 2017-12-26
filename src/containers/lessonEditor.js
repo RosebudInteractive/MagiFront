@@ -39,6 +39,10 @@ class LessonEditor extends ObjectEditor {
         return '/courses/edit/' + this.props.courseId
     }
 
+    _getEditRout() {
+        return '/lessons/edit/';
+    }
+
     get objectIdPropName() {
         return 'lessonId'
     }
@@ -61,8 +65,6 @@ class LessonEditor extends ObjectEditor {
     }
 
     componentWillReceiveProps(next) {
-        super.componentWillReceiveProps(next);
-
         const {
             lesson,
             course,
@@ -202,21 +204,21 @@ class LessonEditor extends ObjectEditor {
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
-            '/main-episode/new');
+            '/main-episodes/new');
     }
 
     _newSuppEpisode() {
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
-            '/supp-episode/new/');
+            '/supp-episodes/new/');
     }
 
     _editEpisode(episodeId) {
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
-            '/episode/edit/' + episodeId);
+            '/episodes/edit/' + episodeId);
     }
 
     _selectSuppEpisode(id) {
@@ -362,6 +364,7 @@ class LessonEditor extends ObjectEditor {
                                         removeAction={::this._removeMainEpisode}
                                         moveUpAction={::this._moveMainEpisodeUp}
                                         moveDownAction={::this._moveMainEpisodeDown}
+                                        editMode={this.editMode}
                                         selected={selectedMainEpisode}
                                         data={mainEpisodes}
                         />
@@ -375,6 +378,7 @@ class LessonEditor extends ObjectEditor {
                                         removeAction={::this._removeSuppEpisode}
                                         moveUpAction={::this._moveSuppEpisodeUp}
                                         moveDownAction={::this._moveSuppEpisodeDown}
+                                        editMode={this.editMode}
                                         selected={selectedSuppEpisode}
                                         data={suppEpisodes}
                         />
@@ -387,6 +391,7 @@ class LessonEditor extends ObjectEditor {
                                           removeAction={::this._removeCommonReference}
                                           moveUpAction={::this._moveCommonReferenceUp}
                                           moveDownAction={::this._moveCommonReferenceDown}
+                                          editMode={this.editMode}
                                           selected={selectedCommonRef}
                                           data={commonRef}
                         />
@@ -399,6 +404,7 @@ class LessonEditor extends ObjectEditor {
                                           removeAction={::this._removeRecommendedReference}
                                           moveUpAction={::this._moveRecommendedReferenceUp}
                                           moveDownAction={::this._moveRecommendedReferenceDown}
+                                          editMode={this.editMode}
                                           selected={selectedRecommendedRef}
                                           data={recommendedRef}
                         />
@@ -470,6 +476,13 @@ class LessonEditor extends ObjectEditor {
                 placeholder: "Выберите автора",
                 options: this._getCourseAuthorsArray(),
                 labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
             {
                 template: (obj) => {
@@ -503,7 +516,7 @@ class LessonEditor extends ObjectEditor {
                 name: 'DT_ReadyDate',
                 width: 300,
                 stringResult: true,
-                format: this.formatDate,
+                format: this._formatDate,
                 labelWidth: labelWidth,
             },
             {
@@ -539,11 +552,6 @@ class LessonEditor extends ObjectEditor {
                 ]
             },
         ];
-    }
-
-    formatDate(data) {
-        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-        return fn(new Date(data));
     }
 }
 

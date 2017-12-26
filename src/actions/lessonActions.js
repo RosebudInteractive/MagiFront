@@ -262,6 +262,11 @@ export const insertRecommendedReference = (value) => {
             type: INSERT_RECOMMENDED_REFERENCE,
             payload: value
         });
+
+        dispatch({
+            type: SELECT_RECOMMENDED_REFERENCE,
+            payload: value.id
+        });
     }
 };
 
@@ -315,6 +320,11 @@ export const insertCommonReference = (value) => {
         dispatch({
             type: INSERT_COMMON_REFERENCE,
             payload: value
+        });
+
+        dispatch({
+            type: SELECT_COMMON_REFERENCE,
+            payload: value.id
         });
     }
 };
@@ -376,25 +386,30 @@ const handleLesson = (lesson) => {
 
     lesson.DT_ReadyDate = new Date(lesson.ReadyDate);
 
-    lesson.Episodes.forEach((episode) => {
-        episode.id = episode.Id;
-        if (episode.Supp) {
-            lesson.suppEpisodes.push(episode)
-        } else {
-            lesson.mainEpisodes.push(episode)
-        }
-    });
+    if (lesson.Episodes) {
+        lesson.Episodes.forEach((episode) => {
+            episode.id = episode.Id;
+            if (episode.Supp) {
+                lesson.suppEpisodes.push(episode)
+            } else {
+                lesson.mainEpisodes.push(episode)
+            }
+        });
+    }
+
 
     lesson.recommendedRef = [];
     lesson.commonRef = [];
-    lesson.References.forEach((reference) => {
-        reference.id = reference.Id;
-        if (reference.Recommended) {
-            lesson.recommendedRef.push(reference)
-        } else {
-            lesson.commonRef.push(reference)
-        }
-    });
+    if (lesson.References) {
+        lesson.References.forEach((reference) => {
+            reference.id = reference.Id;
+            if (reference.Recommended) {
+                lesson.recommendedRef.push(reference)
+            } else {
+                lesson.commonRef.push(reference)
+            }
+        });
+    }
 
     lesson.mainEpisodes.sort((a, b) => {
        return a.Number - b.Number

@@ -40,9 +40,4 @@ export class CourseLessons extends GridControl{
 
         return _columns;
     }
-
-    _formatDate(data) {
-        let fn = window.webix.Date.dateToStr("%d.%m.%Y %H:%i", true);
-        return fn(new Date(data));
-    }
 }

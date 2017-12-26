@@ -13,7 +13,7 @@ import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
 import CourseEditor from './courseEditor';
 import LessonEditor from './lessonEditor';
-import EpisodeEditor from './EpisodeEditor';
+import EpisodeEditor from './episodeEditor';
 
 class App extends Component {
     render() {
@@ -43,13 +43,13 @@ class App extends Component {
                             <Route path='/categories/edit/:id' component={CategoriesForm}/>
                             <Route path='/categories' component={Categories}/>
                             <Route path='/courses/new' component={CourseEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episode/edit/:id'
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episodes/edit/:id'
                                    component={EpisodeEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episode/new'
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episodes/new'
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={false} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episode/new'
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episodes/new'
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>

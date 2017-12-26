@@ -17,7 +17,7 @@
                     "EpisodeTocId": 1,
                     "LanguageId": 1,
                     "Topic": "Topic 1",
-                    "TimeStamp": 0
+                    "StartTime": 0
                 }, 
                 "collections": { }
             },
@@ -30,7 +30,7 @@
                     "EpisodeTocId": 2,
                     "LanguageId": 1,
                     "Topic": "Topic 2",
-                    "TimeStamp": 100
+                    "StartTime": 100
                 },
                 "collections": {}
             },
@@ -43,7 +43,7 @@
                     "EpisodeTocId": 3,
                     "LanguageId": 1,
                     "Topic": "Topic 3",
-                    "TimeStamp": 200
+                    "StartTime": 200
                 },
                 "collections": {}
             }

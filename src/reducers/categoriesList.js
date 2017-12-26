@@ -4,13 +4,13 @@ import {
     GET_CATEGORIES_FAIL,
     SELECT_CATEGORY,
     DELETE_CATEGORY_SUCCESS,
-    SHOW_EDIT_CATEGORY_DLG,
-    HIDE_EDIT_CATEGORY_DLG,
 } from '../constants/categoriesList'
 
 import {
     EDIT_MODE_INSERT,
-} from '../constants/Common'
+} from '../constants/Common';
+
+import * as tools from './tools';
 
 const initialState = {
     categories: [],
@@ -33,8 +33,6 @@ export default function categories(state = initialState, action) {
             return { ...state, categories: _categories, selected : _selected, fetching: false };
         }
 
-
-
         case GET_CATEGORIES_FAIL:
             return initialState;
 
@@ -42,43 +40,9 @@ export default function categories(state = initialState, action) {
             return {...state, selected: action.payload};
 
         case DELETE_CATEGORY_SUCCESS: {
-            let _data = [];
+            let _result = tools.deleteObject(state.categories, action.payload);
 
-            state.categories.forEach((category) => {
-                if (category.id !== action.payload) {
-                    _data.push({...category})
-                }
-            });
-
-            return {...state, categories: _data}
-        }
-
-        case SHOW_EDIT_CATEGORY_DLG: {
-            return {...state, editDlgShown: true, editMode: action.payload}
-        }
-
-        case HIDE_EDIT_CATEGORY_DLG: {
-            let _data = [];
-            let _replaced = false;
-            state.categories.forEach((category) => {
-                if (category.id !== action.payload.id) {
-                    _data.push({...category})
-                } else {
-                    _data.push(action.payload);
-                    _replaced = true;
-                }
-            });
-
-            if (!_replaced) {
-                _data.push(action.payload)
-            }
-
-            return {
-                ...state,
-                categories: _data,
-                editDlgShown: false,
-                selected: _replaced ? state.selected : action.payload.id
-            };
+            return {...state, categories: _result.resultArray, selected : _result.selected}
         }
 
         default:

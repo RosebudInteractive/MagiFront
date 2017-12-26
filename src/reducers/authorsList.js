@@ -10,6 +10,8 @@ import {
     EDIT_MODE_INSERT,
 } from '../constants/Common'
 
+import * as tools from './tools';
+
 const initialState = {
     authors: [],
     fetching: false,
@@ -39,15 +41,9 @@ export default function authorsList(state = initialState, action) {
             return {...state, selected: action.payload};
 
         case DELETE_AUTHOR_SUCCESS: {
-            let _authors = [];
+            let _result = tools.deleteObject(state.authors, action.payload);
 
-            state.authors.forEach((author) => {
-                if (author.id !== parseInt(action.payload)) {
-                    _authors.push({...author})
-                }
-            });
-
-            return {...state, authors: _authors}
+            return {...state, authors: _result.resultArray, selected : _result.selected}
         }
 
         default:

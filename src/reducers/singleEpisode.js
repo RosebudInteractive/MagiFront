@@ -10,8 +10,8 @@ import {
 } from '../constants/SingleEpisode'
 
 const initialState = {
-    initialEpisode: null,
-    episode: null,
+    initial: null,
+    current: null,
     fetching: false,
     hasChanges: false,
 };
@@ -20,7 +20,7 @@ export default function singleEpisode(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_EPISODE: {
-            let _episode = {
+            let _newObject = {
                 Number: action.payload.Number,
                 State:'D',
                 EpisodeType: action.payload.EpisodeType,
@@ -29,8 +29,8 @@ export default function singleEpisode(state = initialState, action) {
 
             return {
                 ...state,
-                initialEpisode: _episode,
-                episode: Object.assign({}, _episode),
+                initial: _newObject,
+                current: Object.assign({}, _newObject),
                 fetching: false,
                 hasChanges: false,
             };
@@ -39,8 +39,8 @@ export default function singleEpisode(state = initialState, action) {
         case GET_SINGLE_EPISODE_REQUEST:
             return {
                 ...state,
-                initialEpisode: null,
-                episode: null,
+                initial: null,
+                current: null,
                 fetching: true,
                 hasChanges: false,
             };
@@ -48,8 +48,8 @@ export default function singleEpisode(state = initialState, action) {
         case GET_SINGLE_EPISODE_SUCCESS: {
             return {
                 ...state,
-                initialEpisode: action.payload,
-                episode: Object.assign({}, action.payload),
+                initial: action.payload,
+                current: Object.assign({}, action.payload),
                 fetching: false,
                 hasChanges : false,
             };
@@ -60,9 +60,12 @@ export default function singleEpisode(state = initialState, action) {
             return initialState;
 
         case SAVE_EPISODE_SUCCESS: {
+            state.current.id = action.payload.id;
+            state.current.Id = action.payload.id;
+
             return {
                 ...state,
-                initialEpisode: Object.assign({}, state.episode),
+                initial: Object.assign({}, state.current),
                 fetching: false,
                 hasChanges : false,
             };
@@ -71,13 +74,13 @@ export default function singleEpisode(state = initialState, action) {
         case CHANGE_EPISODE_DATA : {
             let _object = Object.assign({}, action.payload);
 
-            return {...state, episode: _object, hasChanges: true };
+            return {...state, current: _object, hasChanges: true };
         }
 
         case CANCEL_CHANGE_EPISODE_DATA: {
             return {
                 ...state,
-                episode: Object.assign({},state.initialEpisode),
+                current: Object.assign({},state.initial),
                 fetching: false,
                 hasChanges : false,
             };

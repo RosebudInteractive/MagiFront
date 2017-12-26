@@ -81,10 +81,10 @@ export const save = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            .then(() => {
+            .then((id) => {
                 dispatch({
                     type: SAVE_EPISODE_SUCCESS,
-                    payload: null
+                    payload: id
                 })
             })
             .catch((err) => {

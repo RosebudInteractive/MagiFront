@@ -43,7 +43,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     get objectName() {
-        return 'category'
+        return 'course'
     }
 
     get objectActions() {
@@ -261,6 +261,7 @@ class CourseEditor extends ObjectEditor {
                                        removeAction={::this._removeAuthorFromCourse}
                                        selectAction={::this._selectAuthor}
                                        selected={selectedAuthor}
+                                       editMode={this.editMode}
                                        data={::this._getCourseAuthors()}/>
                     </TabContent>
                     <TabContent for="tab2">
@@ -268,6 +269,7 @@ class CourseEditor extends ObjectEditor {
                                           removeAction={::this._removeCategoryFromCourse}
                                           selectAction={::this._selectCategory}
                                           selected={selectedCategory}
+                                          editMode={this.editMode}
                                           data={::this._getCourseCategories()}/>
                     </TabContent>
                     <TabContent for="tab3">
@@ -278,6 +280,7 @@ class CourseEditor extends ObjectEditor {
                                        editAction={::this._editLesson}
                                        moveUpAction={::this._moveUpLesson}
                                        moveDownAction={::this._moveDownLesson}
+                                       editMode={this.editMode}
                                        selected={selectedLesson}
                         />
                     </TabContent>
@@ -381,6 +384,12 @@ class CourseEditor extends ObjectEditor {
                 name: "Description",
             },
         ];
+    }
+
+    _enableApplyChanges() {
+        let _enable = super._enableApplyChanges();
+
+        return _enable && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
     }
 }
 

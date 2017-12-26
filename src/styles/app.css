@@ -25,6 +25,10 @@
 #confirm .popup .dlg-btn-bar .btn {
   margin-left: 0.5em;
 }
+#confirm .no {
+  background-color: #63abf8;
+}
+
 #confirm .popup .dlg-message {
   padding: 1em 1em 0 1em;
   font-size: 16px;
