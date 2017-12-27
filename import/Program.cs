@@ -1006,6 +1006,7 @@ namespace MagImport
                 lesson.Fields.AuthorId = curr_author.Item1.Fields.Id;
                 lesson.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson.Fields.LessonType = "L";
+                lesson.Fields.URL= rdr.GetString("post_name");
                 lesson.HasParent = String.Compare(rdr.GetString("is_ext"), "1") == 0;
 
                 LessonLng lesson_lng = new LessonLng();
