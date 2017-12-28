@@ -53,7 +53,7 @@ class App extends Component {
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>

@@ -16,6 +16,11 @@ export default class GridControl extends Component {
         this._selected = nextProps.selected
     }
 
+    shouldComponentUpdate(nextProps) {
+        return this.props.selected === nextProps.selected;
+        // return true;
+    }
+
     _select(selectedObj) {
         this._isFirstSelected = selectedObj.isFirst;
         this._isLastSelected = selectedObj.isLast;
@@ -158,7 +163,7 @@ export default class GridControl extends Component {
 }
 
 GridControl.propTypes = {
-    message: PropTypes.string,
+    // message: PropTypes.string,
     selectAction: PropTypes.func.isRequired,
     createAction: PropTypes.func,
     addAction: PropTypes.func,
@@ -167,5 +172,6 @@ GridControl.propTypes = {
     moveUpAction: PropTypes.func,
     moveDownAction: PropTypes.func,
     editMode: PropTypes.string,
+    selected: PropTypes.number,
     data: PropTypes.any.isRequired,
 };

@@ -43,15 +43,20 @@ class LessonEditor extends ObjectEditor {
     }
 
     getRootRout() {
-        return '/courses/edit/' + this.props.courseId
+        return this.isSubLesson
+            ?
+            ('/courses/edit/' + this.props.courseId +
+                '/lessons/edit/' + this.props.lessonId)
+            :
+            ('/courses/edit/' + this.props.courseId);
     }
 
     _getEditRout() {
-        return '/lessons/edit/';
+        return this.isSubLesson ? 'sub-lessons/edit/' : '/lessons/edit/';
     }
 
     get objectIdPropName() {
-        return 'lessonId'
+        return this.isSubLesson ? 'subLessonId' : 'lessonId'
     }
 
     get objectName() {
@@ -62,9 +67,14 @@ class LessonEditor extends ObjectEditor {
         return this.props.lessonActions;
     }
 
+    get isSubLesson() {
+        return (this.props.subLessonId > 0) || ((this.props.lessonId > 0) && (this.props.subLessonId === 0))
+    }
+
     _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
-        this.objectActions.get(this.objectId, this.props.courseId, this.props.parentLessonId);
+        let _parentId = this.isSubLesson ? this.props.lessonId : null;
+        this.objectActions.get(this.objectId, this.props.courseId, _parentId);
     }
 
     _initInsertMode() {
@@ -338,13 +348,13 @@ class LessonEditor extends ObjectEditor {
         }
     }
 
-    _selectSubLesson(id) {
-        this.props.subLessonsActions.select(id)
-    }
+    // _selectSubLesson(id) {
+    //     this.props.subLessonsActions.select(id)
+    // }
 
-    _removeSubLesson(id) {
-        this.props.subLessonsActions.remove(id)
-    }
+    // _removeSubLesson(id) {
+    //     this.props.subLessonsActions.remove(id)
+    // }
 
     _moveSubLessonUp(id) {
         this.props.subLessonsActions.moveUp(id);
@@ -352,6 +362,20 @@ class LessonEditor extends ObjectEditor {
 
     _moveSubLessonDown(id) {
         this.props.subLessonsActions.moveDown(id);
+    }
+
+    _newSubLesson() {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/sub-lessons/new');
+    }
+
+    _editSubLesson(id) {
+        this.props.history.push(
+            '/courses/edit/' + this.props.courseId +
+            '/lessons/edit/' + this.props.lessonId +
+            '/sub-lessons/edit/' + id);
     }
 
     _selectResource(id) {
@@ -363,6 +387,7 @@ class LessonEditor extends ObjectEditor {
     }
 
     _getWebixForm(){
+
         const {
             mainEpisodes,
             subLessons,
@@ -374,6 +399,8 @@ class LessonEditor extends ObjectEditor {
             selectedCommonRef,
             selectedRecommendedRef,
             selectedResource,
+            subLessonsActions,
+            resourcesActions,
         } = this.props;
 
         let _data = this.getObject();
@@ -382,7 +409,10 @@ class LessonEditor extends ObjectEditor {
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
                     <TabLink to="tab1">Эпизоды</TabLink>
-                    <TabLink to="tab2">Дополнительные лекции</TabLink>
+                    {
+                        !this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''
+                    }
+
                     <TabLink to="tab3">Список литературы</TabLink>
                     <TabLink to="tab4">Рекомендуемая литература</TabLink>
                     <TabLink to="tab5">Ресурсы</TabLink>
@@ -406,12 +436,12 @@ class LessonEditor extends ObjectEditor {
                     <TabContent for="tab2">
                         <LessonSubLessons message={'Дополнительные эпизоды'}
                                         divName={'SuppEpisodesDiv'}
-                                        selectAction={::this._selectSubLesson}
-                                        // createAction={::this._newSuppEpisode}
-                                        // editAction={::this._editEpisode}
-                                        removeAction={::this._removeSubLesson}
-                                        moveUpAction={::this._moveSubLessonUp}
-                                        moveDownAction={::this._moveSubLessonDown}
+                                        selectAction={subLessonsActions.select}
+                                        createAction={::this._newSubLesson}
+                                        editAction={::this._editSubLesson}
+                                        removeAction={subLessonsActions.remove}
+                                        // moveUpAction={::this._moveSubLessonUp}
+                                        // moveDownAction={::this._moveSubLessonDown}
                                         editMode={this.editMode}
                                         selected={selectedSubLesson}
                                         data={subLessons}
@@ -445,11 +475,9 @@ class LessonEditor extends ObjectEditor {
                     </TabContent>
                     <TabContent for="tab5">
                         <LessonResources message={'Ресурсы'}
-                                         selectAction={::this._selectResource}
+                                         selectAction={resourcesActions.select}
                                          // editAction={::this._editRecommendedReference}
-                                         removeAction={::this._removeResource}
-                                         // moveUpAction={::this._moveResourceUp}
-                                         // moveDownAction={::this._moveResourceDown}
+                                         removeAction={resourcesActions.remove}
                                          editMode={this.editMode}
                                          selected={selectedResource}
                                          data={resources}
@@ -631,6 +659,7 @@ function mapStateToProps(state, ownProps) {
 
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
+        subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching
     }
 }
