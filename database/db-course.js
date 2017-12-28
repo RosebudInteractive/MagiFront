@@ -102,7 +102,7 @@ const COURSE_MSSQL_LESSON_REQ =
     "  join [LessonLng] lsl on ls.[Id] = lsl.[LessonId]\n" +
     "  join [Language] l on lsl.[LanguageId] = l.[Id]\n" +
     "  join [LessonCourse] lc on lc.[LessonId] = ls.[Id]\n" +
-    "where lc.[CourseId] = <%= id %>\n"+
+    "where (lc.[CourseId] = <%= id %>) and (lc.[ParentId] is NULL)\n"+
     "order by lc.[Number]";
 
 const COURSE_MYSQL_AUTHOR_REQ =
@@ -117,7 +117,7 @@ const COURSE_MYSQL_LESSON_REQ =
     "  join `LessonLng` lsl on ls.`Id` = lsl.`LessonId`\n" +
     "  join `Language` l on lsl.`LanguageId` = l.`Id`\n" +
     "  join `LessonCourse` lc on lc.`LessonId` = ls.`Id`\n" +
-    "where lc.`CourseId` = <%= id %>\n" +
+    "where (lc.`CourseId` = <%= id %>) and (lc.`ParentId` is NULL)\n" +
     "order by lc.`Number`";
 
 const DbCourse = class DbCourse extends DbObject {

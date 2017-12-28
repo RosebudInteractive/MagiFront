@@ -40,12 +40,42 @@ const EPISODE_MSSQL_ID_REQ =
     "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId] and el.[LanguageId] = <%= languageId %>\n" +
     "  join [EpisodeLesson] els on e.[Id] = els.[EpisodeId]\n" +
     "where e.[Id] = <%= id %> and els.[LessonId] = <%= lessonId %>";
+const EPISODE_MSSQL_TOC_REQ =
+    "select t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
+    "where e.[Id] = <%= id %>\n" +
+    "order by t.[Number]";
+const EPISODE_MSSQL_CONT_REQ =
+    "select r.[Id], r.[ResType], r.[FileName],\n" +
+    "  t.[CompType], t.[StartTime], t.[Duration], t.[Content] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and rl.[LanguageId] = <%= languageId %>\n" +
+    "where e.[Id] = <%= id %>\n" +
+    "order by t.[StartTime]";
 
 const EPISODE_MYSQL_ID_REQ =
     "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
     "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId` and el.`LanguageId` = <%= languageId %>\n" +
     "  join `EpisodeLesson` els on e.`Id` = els.`EpisodeId`\n" +
     "where e.`Id` = <%= id %> and els.`LessonId` = <%= lessonId %>";
+const EPISODE_MYSQL_TOC_REQ =
+    "select t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
+    "where e.`Id` = <%= id %>\n" +
+    "order by t.`Number`";
+const EPISODE_MYSQL_CONT_REQ =
+    "select r.`Id`, r.`ResType`, r.`FileName`,\n" +
+    "  t.`CompType`, t.`StartTime`, t.`Duration`, t.`Content` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and rl.`LanguageId` = <%= languageId %>\n" +
+    "where e.`Id` = <%= id %>\n" +
+    "order by t.`StartTime`";
 
 const DbEpisode = class DbEpisode extends DbObject {
 
@@ -67,6 +97,7 @@ const DbEpisode = class DbEpisode extends DbObject {
 
     get(id, lesson_id) {
         let episode = {};
+        let isNotFound = true;
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -80,10 +111,42 @@ const DbEpisode = class DbEpisode extends DbObject {
                             episode = result.detail[0];
                             if (typeof (episode.Supp) === "number")
                                 episode.Supp = episode.Supp === 0 ? false : true;
+                            isNotFound = false;
+                            if (!isNotFound)
+                                return $data.execSql({
+                                    dialect: {
+                                        mysql: _.template(EPISODE_MYSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                        mssql: _.template(EPISODE_MSSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                    }
+                                }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (!isNotFound) {
+                            let toc = [];
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                toc = result.detail;
+                            }
+                            episode.Toc = toc;
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(EPISODE_MYSQL_CONT_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                    mssql: _.template(EPISODE_MSSQL_CONT_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (!isNotFound) {
+                            let content = [];
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                content = result.detail;
+                            }
+                            episode.Content = content;
                         }
                         return episode;
                     })
-            );
+           );
         })
     }
 

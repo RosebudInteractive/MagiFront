@@ -15,47 +15,12 @@ namespace MagImport
 {
     public class MagisteryToJSON
     {
-        public class SysFieldsData
+        public class JSONSerializable
         {
-            public string typeGuid { get; set; }
-        };
-
-        public class BaseFieldsData
-        {
-            public int Id { get; set; }
-        };
-
-        public class RootFieldsData : BaseFieldsData
-        {
-            public string Name { get; set; }
-            public RootFieldsData() { Id = 1000; Name = "DataRoot"; }
-        };
-
-        public class DataObject
-        {
-            [JsonProperty("$sys")]
-            public SysFieldsData _sys { get; set; }
-            public BaseFieldsData fields { get; set; }
-            public IDictionary<string, List<DataObject>> collections;
-            public DataObject() { collections = new Dictionary<string, List<DataObject>>(); }
-        };
-
-        public class RootDataObject : DataObject
-        {
-            [JsonIgnore]
-            public List<DataObject> Elems
+            public virtual string GetClassName()
             {
-                get { return collections["DataElements"]; }
+                return this.GetType().Name;
             }
-
-            public RootDataObject(string type_guid)
-            {
-                _sys = new SysFieldsData { typeGuid = type_guid };
-                fields = new RootFieldsData();
-                collections.Add("DataElements", new List<DataObject>());
-            }
-
-            public virtual string GetClassName() { return "RootDataObject"; }
 
             public string ToJSONString(Formatting fmt = Formatting.None, JsonSerializerSettings settings = null)
             {
@@ -79,13 +44,57 @@ namespace MagImport
                 File.WriteAllText(path, json, enc == null ? enc_dflt : enc);
             }
 
-            public int GetNextId() { return current_id++; }
-
             Encoding enc_dflt = new UTF8Encoding(false); /* UTF8 w/o BOM */
             JsonSerializerSettings jss = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
-            int current_id = 1;
 
             const string EXT_DFLT = ".json";
+        }
+
+        public class SysFieldsData
+        {
+            public string typeGuid { get; set; }
+        };
+
+        public class BaseFieldsData
+        {
+            public int Id { get; set; }
+        };
+
+        public class RootFieldsData : BaseFieldsData
+        {
+            public string Name { get; set; }
+            public RootFieldsData() { Id = 1000; Name = "DataRoot"; }
+        };
+
+        public class DataObject: JSONSerializable
+        {
+            [JsonProperty("$sys")]
+            public SysFieldsData _sys { get; set; }
+            public BaseFieldsData fields { get; set; }
+            public IDictionary<string, List<DataObject>> collections;
+            public DataObject() { collections = new Dictionary<string, List<DataObject>>(); }
+        };
+
+        public class RootDataObject : DataObject
+        {
+            [JsonIgnore]
+            public List<DataObject> Elems
+            {
+                get { return collections["DataElements"]; }
+            }
+
+            public RootDataObject(string type_guid)
+            {
+                _sys = new SysFieldsData { typeGuid = type_guid };
+                fields = new RootFieldsData();
+                collections.Add("DataElements", new List<DataObject>());
+            }
+
+            public override string GetClassName() { return "RootDataObject"; }
+
+            public int GetNextId() { return current_id++; }
+            int current_id = 1;
+
         };
 
         public class DataObjTyped<T, R> : DataObject where T : BaseFieldsData, new() where R : RootDataObject, new()
@@ -401,7 +410,8 @@ namespace MagImport
         public class Lesson : DataObjTyped<LessonFields, LessonRoot>
         {
             const string CLASS_GUID = "caadef95-278b-4cad-acc9-a1e27380d6c6";
-            public Lesson() : base(CLASS_GUID) { }
+            public bool HasParent { get; set; }
+            public Lesson() : base(CLASS_GUID) { HasParent = false; }
         };
 
         public class LessonRoot : RootDataObject
@@ -615,6 +625,7 @@ namespace MagImport
         {
             public int LessonId { get; set; }
             public int? EntityId { get; set; }
+            public int? LanguageId { get; set; }
             public string ResType { get; set; }
             public string FileName { get; set; }
         };
@@ -633,11 +644,35 @@ namespace MagImport
         };
 
         //
+        // ResourceLng
+        //
+        public class ResourceLngFields : BaseFieldsData
+        {
+            public int ResourceId { get; set; }
+            public int LanguageId { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class ResourceLng : DataObjTyped<ResourceLngFields, ResourceLngRoot>
+        {
+            const string CLASS_GUID = "08fc5411-e11e-48be-bbb4-b7638a600f71";
+            public ResourceLng() : base(CLASS_GUID) { }
+        };
+
+        public class ResourceLngRoot : RootDataObject
+        {
+            const string CLASS_GUID = "4f1238b4-c65c-4c19-bea8-b67413d724aa";
+            public override string GetClassName() { return "ResourceLng"; }
+            public ResourceLngRoot() : base(CLASS_GUID) { }
+        };
+
+        //
         // EpisodeContent
         //
         public class EpisodeContentFields : BaseFieldsData
         {
-            public int EpisodeId { get; set; }
+            public int EpisodeLngId { get; set; }
             public int ResourceId { get; set; }
             public string CompType { get; set; }
             public int StartTime { get; set; }
@@ -656,6 +691,13 @@ namespace MagImport
             const string CLASS_GUID = "1996d0fc-a93f-420f-b1c3-627fef86bb60";
             public override string GetClassName() { return "EpisodeContent"; }
             public EpisodeContentRoot() : base(CLASS_GUID) { }
+        };
+
+        public class ResourceDescription: JSONSerializable
+        {
+            public string Name { get; set; }
+            public string Description { get; set; }
+
         };
 
         public MagisteryToJSON(string connStr)
@@ -703,7 +745,7 @@ namespace MagImport
             acc_lng.Fields.LanguageId = LANGUAGE_ID;
             acc_lng.Fields.Name = "Пост Модерн Текнолоджи";
 
-            MySqlConnection conn = new MySqlConnection(conn_str);
+            conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
             conn.Open();
 
@@ -716,7 +758,7 @@ namespace MagImport
 
             MySqlCommand cmd = new MySqlCommand(sql_get_category, conn);
             cmd.Parameters.AddWithValue("@TermType", "razdel");
-            MySqlDataReader rdr = cmd.ExecuteReader();
+            rdr = cmd.ExecuteReader();
 
             while (rdr.Read())
             {
@@ -778,32 +820,32 @@ namespace MagImport
                 //
                 MySqlCommand cmd_det = new MySqlCommand(sql_get_term_det, conn);
                 cmd_det.Parameters.AddWithValue("@Id", db_id);
-                MySqlDataReader rdr_det = cmd_det.ExecuteReader();
+                rdr = cmd_det.ExecuteReader();
                 int photo_id = 0;
-                while (rdr_det.Read())
+                while (rdr.Read())
                 {
-                    string option_name = rdr_det.GetString("meta_key");
+                    string option_name = rdr.GetString("meta_key");
                     if (option_name == att_author_photo_name)
                     {
-                        Int32.TryParse(rdr_det.GetString("meta_value"), out photo_id);
+                        Int32.TryParse(rdr.GetString("meta_value"), out photo_id);
                     }
                     else
                     if (option_name == att_author_bio_name)
                         au_lng.Fields.Description =
-                            String.IsNullOrEmpty(rdr_det.GetString("meta_value")) ? null : rdr_det.GetString("meta_value");
+                            String.IsNullOrEmpty(rdr.GetString("meta_value")) ? null : rdr.GetString("meta_value");
                 }
-                rdr_det.Close();
+                rdr.Close();
                 if (photo_id != 0)
                 {
                     cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
                     cmd_det.Parameters.AddWithValue("@PostId", photo_id);
                     cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr_det = cmd_det.ExecuteReader();
-                    if (rdr_det.Read())
+                    rdr = cmd_det.ExecuteReader();
+                    if (rdr.Read())
                     {
-                        au.Fields.Portrait = rdr_det.GetString("meta_value");
+                        au.Fields.Portrait = rdr.GetString("meta_value");
                     }
-                    rdr_det.Close();
+                    rdr.Close();
                 }
             }
 
@@ -886,20 +928,20 @@ namespace MagImport
                 //
                 MySqlCommand cmd_det = new MySqlCommand(sql_get_term_det, conn);
                 cmd_det.Parameters.AddWithValue("@Id", db_id);
-                MySqlDataReader rdr_det = cmd_det.ExecuteReader();
+                rdr = cmd_det.ExecuteReader();
                 int photo_id = 0;
-                while (rdr_det.Read())
+                while (rdr.Read())
                 {
-                    string option_name = rdr_det.GetString("meta_key");
+                    string option_name = rdr.GetString("meta_key");
                     if (option_name == att_course_cover_name)
                     {
-                        Int32.TryParse(rdr_det.GetString("meta_value"), out photo_id);
+                        Int32.TryParse(rdr.GetString("meta_value"), out photo_id);
                     }
                     else
                     if (option_name == att_course_category_name)
                     {
                         int cat_id = 0;
-                        if (Int32.TryParse(rdr_det.GetString("meta_value"), out cat_id))
+                        if (Int32.TryParse(rdr.GetString("meta_value"), out cat_id))
                         {
                             Tuple<Category, CategoryLng> cat;
                             if (categoriesDB.TryGetValue(cat_id, out cat))
@@ -913,24 +955,24 @@ namespace MagImport
                     {
                         try
                         {
-                            string color = String.IsNullOrEmpty(rdr_det.GetString("meta_value")) ? null : rdr_det.GetString("meta_value");
+                            string color = String.IsNullOrEmpty(rdr.GetString("meta_value")) ? null : rdr.GetString("meta_value");
                             course.Fields.Color = Convert.ToInt32(color.Replace("#", null), 16);
                         }
                         catch (Exception) { }
                     }
                 }
-                rdr_det.Close();
+                rdr.Close();
                 if (photo_id != 0)
                 {
                     cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
                     cmd_det.Parameters.AddWithValue("@PostId", photo_id);
                     cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr_det = cmd_det.ExecuteReader();
-                    if (rdr_det.Read())
+                    rdr = cmd_det.ExecuteReader();
+                    if (rdr.Read())
                     {
-                        course.Fields.Cover = rdr_det.GetString("meta_value");
+                        course.Fields.Cover = rdr.GetString("meta_value");
                     }
-                    rdr_det.Close();
+                    rdr.Close();
                 }
             }
 
@@ -940,8 +982,11 @@ namespace MagImport
             Lesson.AllData = allData;
             LessonLng.AllData = allData;
             LessonCourse.AllData = allData;
-            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse>> lessonsDB =
-                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse>>();
+            Episode.AllData = allData;
+            EpisodeLng.AllData = allData;
+            EpisodeLesson.AllData = allData;
+            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>> lessonsDB =
+                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>>();
 
             cmd = new MySqlCommand(sql_get_lessons, conn);
             rdr = cmd.ExecuteReader();
@@ -957,21 +1002,17 @@ namespace MagImport
                 if (!authorsDB.TryGetValue(rdr.GetInt32("author_id"), out curr_author))
                     throw new Exception(String.Format("Can't find author (Id={0}) for lesson (Id={1}).", rdr.GetInt32("author_id"), db_id));
 
-                // Child lessons are currently not processed ! 
-                //
-                if (String.Compare(rdr.GetString("is_ext"), "1") == 0)
-                    continue;
-
                 Lesson lesson = new Lesson();
                 lesson.Fields.AuthorId = curr_author.Item1.Fields.Id;
                 lesson.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson.Fields.LessonType = "L";
+                lesson.Fields.URL= rdr.GetString("post_name");
+                lesson.HasParent = String.Compare(rdr.GetString("is_ext"), "1") == 0;
 
                 LessonLng lesson_lng = new LessonLng();
                 lesson_lng.Fields.LessonId = lesson.Fields.Id;
                 lesson_lng.Fields.LanguageId = LANGUAGE_ID;
                 lesson_lng.Fields.Name = rdr.GetString("lesson_name");
-                lesson_lng.Fields.FullDescription = String.IsNullOrEmpty(rdr.GetString("post_content")) ? null : rdr.GetString("post_content");
                 lesson_lng.Fields.State = "R";
 
                 LessonCourse lesson_course = new LessonCourse();
@@ -979,36 +1020,85 @@ namespace MagImport
                 lesson_course.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson_course.Fields.State = "R";
 
-                lessonsDB.Add(db_id, new Tuple<Lesson, LessonLng, LessonCourse>(lesson, lesson_lng, lesson_course));
+                Episode episode = new Episode();
+                episode.Fields.LessonId = lesson.Fields.Id;
+                episode.Fields.EpisodeType = "L";
+
+                EpisodeLng episode_lng = new EpisodeLng();
+                episode_lng.Fields.EpisodeId = episode.Fields.Id;
+                episode_lng.Fields.LanguageId = LANGUAGE_ID;
+                episode_lng.Fields.State = "R";
+                episode_lng.Fields.Name = lesson_lng.Fields.Name;
+                episode_lng.Fields.Transcript = String.IsNullOrEmpty(rdr.GetString("post_content")) ? null : rdr.GetString("post_content");
+
+                EpisodeLesson episode_lsn = new EpisodeLesson();
+                episode_lsn.Fields.EpisodeId = episode.Fields.Id;
+                episode_lsn.Fields.LessonId = lesson.Fields.Id;
+                episode_lsn.Fields.Number = 1;
+                episode_lsn.Fields.Supp = false;
+
+                lessonsDB.Add(db_id, new Tuple<Lesson, LessonLng, LessonCourse, Episode,
+                    EpisodeLng, EpisodeLesson>(lesson, lesson_lng, lesson_course, episode, episode_lng, episode_lsn));
             }
             rdr.Close();
 
             Reference.AllData = allData;
-            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse>> pair in lessonsDB)
+            EpisodeToc.AllData = allData;
+            EpisodeTocLng.AllData = allData;
+
+            Resource.AllData = allData;
+            ResourceLng.AllData = allData;
+            EpisodeContent.AllData = allData;
+
+            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>> pair in lessonsDB)
             {
                 int db_id = pair.Key;
                 Lesson lesson = pair.Value.Item1;
                 LessonLng lesson_lng = pair.Value.Item2;
                 LessonCourse lesson_course = pair.Value.Item3;
+                Episode episode = pair.Value.Item4;
+                EpisodeLng episode_lng = pair.Value.Item5;
+                EpisodeLesson episode_lsn = pair.Value.Item6;
 
                 //
-                // Read course details
+                // Read lesson details
                 //
                 MySqlCommand cmd_det = new MySqlCommand(sql_get_post_det, conn);
                 cmd_det.Parameters.AddWithValue("@Id", db_id);
-                MySqlDataReader rdr_det = cmd_det.ExecuteReader();
+                rdr = cmd_det.ExecuteReader();
 
                 Dictionary<string, string> lesson_prop_value = new Dictionary<string, string>();
 
                 string val;
-                while (rdr_det.Read())
-                    if (!lesson_prop_value.TryGetValue(rdr_det.GetString("meta_key"), out val))
-                        lesson_prop_value.Add(rdr_det.GetString("meta_key"), rdr_det.GetString("meta_value"));
+                while (rdr.Read())
+                    if (!lesson_prop_value.TryGetValue(rdr.GetString("meta_key"), out val))
+                        lesson_prop_value.Add(rdr.GetString("meta_key"), rdr.GetString("meta_value"));
                     else
-                        lesson_prop_value[rdr_det.GetString("meta_key")] = rdr_det.GetString("meta_value");
-                rdr_det.Close();
+                        lesson_prop_value[rdr.GetString("meta_key")] = rdr.GetString("meta_value");
+                rdr.Close();
 
                 int int_val = 0;
+
+                if (lesson.HasParent)
+                {
+                    lesson.Fields.ParentId = null;
+                    int parent_db = 0;
+                    if (lesson_prop_value.TryGetValue(att_lsn_parent_id_name, out val))
+                        Int32.TryParse(val, out parent_db);
+                    if (parent_db == 0)
+                        throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Invalid value of attr \"{2}\".",
+                            lesson_lng.Fields.Name, db_id, att_lsn_parent_id_name));
+                    Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson> parent = null;
+                    if (!lessonsDB.TryGetValue(parent_db, out parent))
+                        throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Can't find parent (DbId={2}).",
+                            lesson_lng.Fields.Name, db_id, parent_db));
+
+                    Lesson parent_lesson = parent.Item1;
+                    lesson.Fields.ParentId = parent_lesson.Fields.Id;
+
+                    LessonCourse lesson_course_parent = parent.Item3;
+                    lesson_course.Fields.ParentId = lesson_course_parent.Fields.Id;
+                }
 
                 if (lesson_prop_value.TryGetValue(att_lsn_number_name, out val))
                     if (Int32.TryParse(val, out int_val))
@@ -1018,9 +1108,15 @@ namespace MagImport
                 if (lesson_prop_value.TryGetValue(att_lsn_cover_name, out val))
                     Int32.TryParse(val, out photo_id);
 
+                int audio_id = 0;
+                if (lesson_prop_value.TryGetValue(att_lsn_audio_name, out val))
+                    Int32.TryParse(val, out audio_id);
+
                 if (lesson_prop_value.TryGetValue(att_lsn_descr_name, out val))
                     lesson_lng.Fields.ShortDescription = val;
 
+                // References
+                //
                 bool flag = false;
                 Dictionary<string, string> ref_attrs = ref_attrs_v1;
                 if (lesson_prop_value.TryGetValue(ref_attrs["counter"], out val))
@@ -1052,15 +1148,144 @@ namespace MagImport
                     }
                 }
 
+                // Table of content
+                //
+                if (lesson_prop_value.TryGetValue(att_lsn_toc_name, out val))
+                    if (Int32.TryParse(val, out int_val))
+                    {
+                        for (int i = 0; i < int_val; i++)
+                        {
+                            string att_topic = String.Format(att_lsn_toc_dsc_name, i);
+                            string att_time = String.Format(att_lsn_toc_tm_name, i);
+                            string att_time_ms = String.Format(att_lsn_toc_tms_name, i);
+                            if (lesson_prop_value.TryGetValue(att_topic, out val))
+                            {
+                                EpisodeToc epi_toc = new EpisodeToc();
+                                epi_toc.Fields.EpisodeId = episode.Fields.Id;
+                                epi_toc.Fields.Number = i + 1;
+                                EpisodeTocLng epi_toc_lng = new EpisodeTocLng();
+                                epi_toc_lng.Fields.EpisodeTocId = epi_toc.Fields.Id;
+                                epi_toc_lng.Fields.LanguageId = LANGUAGE_ID;
+                                epi_toc_lng.Fields.Topic = val;
+                                epi_toc_lng.Fields.StartTime = 0;
+                                int tms = 0;
+                                if (lesson_prop_value.TryGetValue(att_time_ms, out val))
+                                    Int32.TryParse(val, out tms);
+                                 if (lesson_prop_value.TryGetValue(att_time, out val))
+                                {
+                                    epi_toc_lng.Fields.StartTime = stringToSec(val) * 1000 + tms;
+                                    //epi_toc_lng.Fields.Topic += String.Format(" {0}.{1}", val, tms);
+                                }
+                            }
+                        }
+                    }
+
+                // Pictures
+                //
+                Dictionary<int, Tuple<Resource, ResourceLng>> resourcesDB = new Dictionary<int, Tuple<Resource, ResourceLng>>();
+                if (lesson_prop_value.TryGetValue(att_lsn_rc_name, out val))
+                    if (Int32.TryParse(val, out int_val))
+                    {
+                        EpisodeContent epi_content_prev = null;
+                        for (int i = 0; i < int_val; i++)
+                        {
+                            string att_id = String.Format(att_lsn_rc_id_name, i);
+                            string att_time = String.Format(att_lsn_rc_tm_name, i);
+                            string att_time_ms = String.Format(att_lsn_toc_tms_name, i);
+                            int picture_id;
+                            if (lesson_prop_value.TryGetValue(att_id, out val))
+                            {
+                                if (Int32.TryParse(val, out picture_id))
+                                {
+                                    Resource resource = null; ;
+                                    ResourceLng res_lng = null;
+                                    Tuple<Resource, ResourceLng> res_reslng = null;
+                                    if (resourcesDB.TryGetValue(picture_id, out res_reslng))
+                                    {
+                                        resource = res_reslng.Item1;
+                                        res_lng = res_reslng.Item2;
+                                    }
+                                    else
+                                    {
+                                        Dictionary<string, string> file_desc = getFileDecription(picture_id);
+                                        string fn;
+                                        if (file_desc.TryGetValue("FileName", out fn))
+                                        {
+                                            resource = new Resource();
+                                            resource.Fields.LessonId = lesson.Fields.Id;
+                                            resource.Fields.ResType = "P";
+                                            resource.Fields.FileName = fn;
+                                            res_lng = new ResourceLng();
+                                            res_lng.Fields.ResourceId = resource.Fields.Id;
+                                            res_lng.Fields.LanguageId = LANGUAGE_ID;
+                                            if (file_desc.TryGetValue("Description", out fn))
+                                                res_lng.Fields.Name = fn;
+                                            else
+                                                throw new Exception(String.Format("Picture (Id={0}): Description is empty.", picture_id));
+                                            if (file_desc.TryGetValue("ExtDescription", out fn))
+                                                res_lng.Fields.Description = fn;
+
+                                            resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
+                                        }
+                                    }
+                                    if ((resource != null) && (res_lng != null))
+                                    {
+                                        EpisodeContent epi_content = new EpisodeContent();
+                                        epi_content.Fields.EpisodeLngId = episode_lng.Fields.Id;
+                                        epi_content.Fields.ResourceId = resource.Fields.Id;
+                                        epi_content.Fields.CompType = "PIC";
+                                        epi_content.Fields.Content =
+                                            (
+                                                new ResourceDescription
+                                                {
+                                                    Name = res_lng.Fields.Name,
+                                                    Description = res_lng.Fields.Description
+                                                }
+                                            )
+                                            .ToJSONString();
+                                        epi_content.Fields.Duration = 0;
+                                        epi_content.Fields.StartTime = 0;
+                                        int tms = 0;
+                                        if (lesson_prop_value.TryGetValue(att_time_ms, out val))
+                                            Int32.TryParse(val, out tms);
+                                        if (lesson_prop_value.TryGetValue(att_time, out val))
+                                        {
+                                            epi_content.Fields.StartTime = stringToSec(val) * 1000 + tms;
+                                            if (epi_content_prev != null)
+                                                epi_content_prev.Fields.Duration =
+                                                    epi_content.Fields.StartTime - epi_content_prev.Fields.StartTime;
+                                        }
+                                        epi_content_prev = epi_content;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                // Cover
+                //
                 if (photo_id != 0)
                 {
                     cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
                     cmd_det.Parameters.AddWithValue("@PostId", photo_id);
                     cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr_det = cmd_det.ExecuteReader();
-                    if (rdr_det.Read())
-                        lesson.Fields.Cover = rdr_det.GetString("meta_value");
-                    rdr_det.Close();
+                    rdr = cmd_det.ExecuteReader();
+                    if (rdr.Read())
+                        lesson.Fields.Cover = rdr.GetString("meta_value");
+                    rdr.Close();
+                }
+
+                // Audio file
+                //
+                if (audio_id != 0)
+                {
+                    cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
+                    cmd_det.Parameters.AddWithValue("@PostId", audio_id);
+                    cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
+                    rdr = cmd_det.ExecuteReader();
+                    if (rdr.Read())
+                        episode_lng.Fields.Audio = rdr.GetString("meta_value");
+                    rdr.Close();
                 }
             }
 
@@ -1072,6 +1297,34 @@ namespace MagImport
             foreach (RootDataObject root in allData)
                 root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
+        }
+
+        int stringToSec(string time)
+        {
+            int res = 0;
+            char[] sep = { ':' };
+            string[] vals = time.Split(sep, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = vals.Length - 1, mult = 1, val = 0; i >= 0; i--, mult *= 60)
+                if (Int32.TryParse(vals[i], out val))
+                    res += val * mult;
+            return res;
+        }
+
+        Dictionary<string, string> getFileDecription(int obj_id)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            MySqlCommand cmd = new MySqlCommand(sql_get_file_desc, conn);
+            cmd.Parameters.AddWithValue("@PostId", obj_id);
+            rdr = cmd.ExecuteReader();
+            if (rdr.Read())
+            {
+                res["ExtDescription"] = rdr.GetString("ext_desc");
+                res["Description"] = rdr.GetString("desc");
+                res["Name"] = rdr.GetString("name");
+                res["FileName"] = rdr.GetString("file_name");
+            }
+            rdr.Close();
+            return res;
         }
 
         const int LANGUAGE_ID = 1;
@@ -1093,9 +1346,6 @@ namespace MagImport
         const string att_course_cover_name = "иллюстрация_курса";
         const string att_course_category_name = "раздел";
         const string att_course_color_name = "color";
-
-        const string att_ext_lsn_name = "dop_lecture_bool";
-        const string att_parent_lsn_id_name = "main_lecture";
 
         Dictionary<string, string> ref_attrs_v1 = new Dictionary<string, string>
         {
@@ -1123,6 +1373,12 @@ namespace MagImport
             "  join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id`\n" +
             "where `p`.`id` = @PostId and `m`.`meta_key` = @MetaKey";
 
+        const string sql_get_file_desc =
+            "select `p`.`post_content` as `ext_desc`, `p`.`post_title` as `desc`, `p`.`post_name` as `name`,\n"+
+            "  `m`.`meta_value` as `file_name` from `wp_posts` `p`\n" +
+            "  left join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id` and `m`.`meta_key` = '_wp_attached_file'\n" +
+            "where `p`.`id` = @PostId";
+
         const string sql_get_author_to_course =
             "select distinct `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name` from `wp_terms` `t`\n" +
             "  join `wp_term_taxonomy` `m` on `t`.`term_id` = `m`.`term_id` and `m`.`taxonomy` = 'autor'\n" +
@@ -1136,6 +1392,19 @@ namespace MagImport
         const string att_lsn_number_name = "номер_сортировки";
         const string att_lsn_cover_name = "картинка_лекции";
         const string att_lsn_descr_name = "краткое_описание";
+        const string att_lsn_ext_name = "dop_lecture_bool";
+        const string att_lsn_parent_id_name = "main_lecture";
+        const string att_lsn_audio_name = "audio";
+
+        const string att_lsn_toc_name = "оглавление";
+        const string att_lsn_toc_dsc_name = "оглавление_{0}_название";
+        const string att_lsn_toc_tm_name = "оглавление_{0}_время";
+        const string att_lsn_toc_tms_name = "оглавление_{0}_время_миллисекунды";
+
+        const string att_lsn_rc_name = "иллюстрации_лекции_(слайды)";
+        const string att_lsn_rc_id_name = "иллюстрации_лекции_(слайды)_{0}_картинка";
+        const string att_lsn_rc_tm_name = "иллюстрации_лекции_(слайды)_{0}_время";
+        const string att_lsn_rc_tms_name = "иллюстрации_лекции_(слайды)_{0}_время_миллисекунды";
 
         const string sql_get_lessons =
             "select `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name`,\n" +
@@ -1154,6 +1423,8 @@ namespace MagImport
         JsonSerializerSettings jss = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore };
         Formatting fmt = Formatting.None;
 
+        MySqlConnection conn;
+        MySqlDataReader rdr;
     };
 
     class Program
