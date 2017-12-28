@@ -469,7 +469,13 @@ exports.DbEngineInit = class DbEngineInit {
             let new_course_id;
             let new_lesson_id;
 
-            ls.get(upd_id, course_id)
+            ls.getResources(upd_id)
+                .then((result) => {
+                    console.log("Lesson 1 resources: " + JSON.stringify(result));
+                })
+                .then(() => {
+                    return ls.get(upd_id, course_id);
+                })
                 .then((result) => {
                     console.log("Lesson 1 in Course 1 [get]: " + JSON.stringify(result));
                 })

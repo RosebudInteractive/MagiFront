@@ -288,6 +288,26 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
+    getResources(id) {
+        let resources = [];
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                        mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            resources = result.detail;
+                        }
+                        return resources;
+                    })
+            );
+        })
+    }
+
     del(id, course_id, parent_id) {
         return new Promise((resolve, reject) => {
             let root_obj;
