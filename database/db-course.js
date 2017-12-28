@@ -120,6 +120,54 @@ const COURSE_MYSQL_LESSON_REQ =
     "where (lc.`CourseId` = <%= id %>) and (lc.`ParentId` is NULL)\n" +
     "order by lc.`Number`";
 
+const COURSE_MSSQL_DELETE_SCRIPT =
+    [
+        "delete el from [Course] c\n" +
+        "  join[Lesson] l on c.[Id] = l.[CourseId]\n" +
+        "  join[EpisodeLesson] el on l.[Id] = el.[EpisodeId]\n" +
+        "where c.[Id] = <%= id %>",
+        "delete l from [LessonCourse] l\n" +
+        "where l.[CourseId] = <%= id %> and (not l.[ParentId] is NULL)",
+        "delete l from [LessonCourse] l\n" +
+        "where l.[CourseId] = <%= id %>",
+        "delete ec from [Course] c\n" +
+        "  join[Lesson] l on c.[Id] = l.[CourseId]\n" +
+        "  join[Episode] e on l.[Id] = e.[LessonId]\n" +
+        "  join[EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
+        "  join[EpisodeContent] ec on el.[Id] = ec.[EpisodeLngId]\n" +
+        "where c.[Id] = <%= id %>",
+        "delete l from [Course] c\n" +
+        "  join [Lesson] l on c.[Id] = l.[CourseId]\n" +
+        "where c.[Id] = <%= id %> and (not l.[ParentId] is NULL)",
+        "delete l from [Course] c\n" +
+        "  join [Lesson] l on c.[Id] = l.[CourseId]\n" +
+        "where c.[Id] = <%= id %>"
+    ];
+
+const COURSE_MYSQL_DELETE_SCRIPT =
+    [
+        "delete el from `Course` c\n" +
+        "  join`Lesson` l on c.`Id` = l.`CourseId`\n" +
+        "  join`EpisodeLesson` el on l.`Id` = el.`EpisodeId`\n" +
+        "where c.`Id` = <%= id %>",
+        "delete l from `LessonCourse` l\n" +
+        "where l.`CourseId` = <%= id %> and (not l.`ParentId` is NULL)",
+        "delete l from `LessonCourse` l\n" +
+        "where l.`CourseId` = <%= id %>",
+        "delete ec from `Course` c\n" +
+        "  join`Lesson` l on c.`Id` = l.`CourseId`\n" +
+        "  join`Episode` e on l.`Id` = e.`LessonId`\n" +
+        "  join`EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
+        "  join`EpisodeContent` ec on el.`Id` = ec.`EpisodeLngId`\n" +
+        "where c.`Id` = <%= id %>",
+        "delete l from `Course` c\n" +
+        "  join `Lesson` l on c.`Id` = l.`CourseId`\n" +
+        "where c.`Id` = <%= id %> and (not l.`ParentId` is NULL)",
+        "delete l from `Course` c\n" +
+        "  join `Lesson` l on c.`Id` = l.`CourseId`\n" +
+        "where c.`Id` = <%= id %>"
+    ];
+
 const DbCourse = class DbCourse extends DbObject {
 
     constructor(options) {
@@ -153,17 +201,17 @@ const DbCourse = class DbCourse extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ languageId:LANGUAGE_ID, id: id }),
+                        mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ languageId: LANGUAGE_ID, id: id }),
                         mssql: _.template(COURSE_MSSQL_AUTHOR_REQ)({ languageId: LANGUAGE_ID, id: id })
                     }
                 }, {})
-                .then((result) => {
-                    let authors = [];
-                    if (result && result.detail && (result.detail.length > 0))
-                        authors = result.detail;
-                    return authors;
-                })
-            );    
+                    .then((result) => {
+                        let authors = [];
+                        if (result && result.detail && (result.detail.length > 0))
+                            authors = result.detail;
+                        return authors;
+                    })
+            );
         })
     }
 
@@ -190,7 +238,7 @@ const DbCourse = class DbCourse extends DbObject {
                     .then((result) => {
                         let authors = [];
                         if (result && result.detail && (result.detail.length > 0)) {
-                            result.detail.forEach(function(element) {
+                            result.detail.forEach(function (element) {
                                 authors.push(element.Id);
                             });
                         }
@@ -228,65 +276,91 @@ const DbCourse = class DbCourse extends DbObject {
     }
 
     del(id) {
+        let self = this;
         return new Promise((resolve, reject) => {
             let root_obj;
+            let course_obj = null;
             let opts = {};
-            let newId = null;
             let collection = null;
+            let transactionId = null;
             resolve(
                 this._getObjById(id, {
                     expr: {
                         model: {
-                            name: "Course",
-                            childs: [
-                                {
-                                    dataObject: {
-                                        name: "Lesson",
-                                        childs: [
-                                            {
-                                                dataObject: {
-                                                    name: "EpisodeLesson"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                {
-                                    dataObject: {
-                                        name: "LessonCourse"
-                                    }
-                                }
-                            ]
+                            name: "Course"
                         }
                     }
                 })
-                .then((result) => {
-                    root_obj = result;
-                    collection = root_obj.getCol("DataElements");
-                    if (collection.count() != 1)
-                        throw new Error("Course (Id = " + id + ") doesn't exist.");
-                    return result.edit()
-                })
-                .then(() => {
-                    collection._del(collection.get(0));
-                    return root_obj.save(opts);
-                })
-                .then(() => {
-                    console.log("Course deleted: Id=" + id + ".");
-                    return { result: "OK" };
-                })
-                .finally((isErr, res) => {
-                    if (root_obj)
-                        this._db._deleteRoot(root_obj.getRoot());
-                    if (isErr)
-                        if (res instanceof Error)
-                            throw res
+                    .then((result) => {
+                        root_obj = result;
+                        collection = root_obj.getCol("DataElements");
+                        if (collection.count() != 1)
+                            throw new Error("Course (Id = " + id + ") doesn't exist.");
+                        course_obj = collection.get(0);
+                        return result.edit()
+                    })
+                    .then(() => {
+                        return $data.tranStart({})
+                            .then((result) => {
+                                transactionId = result.transactionId;
+                                opts = { transactionId: transactionId };
+                            });
+                    })
+                    .then(() => {
+                        let mysql_script = [];
+                        COURSE_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                            mysql_script.push(_.template(elem)({ id: id }));
+                        });
+                        let mssql_script = [];
+                        COURSE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                            mssql_script.push(_.template(elem)({ id: id }));
+                        });
+                        return self._execSqlScript(mysql_script, mssql_script, opts);
+                    })
+                    .then(() => {
+                        collection._del(course_obj);
+                        return root_obj.save(opts);
+                    })
+                    .then(() => {
+                        console.log("Course deleted: Id=" + id + ".");
+                        return { result: "OK" };
+                    })
+                    .finally((isErr, res) => {
+                        let result = transactionId ?
+                            (isErr ? $data.tranRollback(transactionId) : $data.tranCommit(transactionId)) : Promise.resolve();
+                        if (root_obj)
+                            this._db._deleteRoot(root_obj.getRoot());
+                        if (isErr) {
+                            result = result.then(() => {
+                                if (res instanceof Error)
+                                    throw res
+                                else
+                                    throw new Error("Error: " + JSON.stringify(res));
+                            });
+                        }
                         else
-                            throw new Error("Error: " + JSON.stringify(res));
-                    return res;
-                })
+                            result = result.then(() => { return res; })
+                        return result;
+                    })
             );
         })
+    }
+
+    _execSqlScript(mysql_script, mssql_script, opts) {
+        return new Promise((resolve, reject) => {
+            if (mysql_script.length !== mssql_script.length)
+                throw new Error("MySql and MSSQL scripts have different lengths.");    
+            resolve(
+                Utils.seqExec(mysql_script.length, (idx) => {
+                    return $data.execSql({
+                        dialect: {
+                            mysql: mysql_script[idx],
+                            mssql: mssql_script[idx]
+                        }
+                    }, opts);
+                })
+            );    
+        });    
     }
 
     update(id, data) {
