@@ -4,10 +4,17 @@ import Webix from '../components/Webix';
 import * as singleLessonActions from "../actions/lessonActions";
 import * as singleCourseActions from "../actions/courseActions";
 import * as referenceActions from '../actions/ReferencesActions';
+import * as subLessonsActions from '../actions/subLessonsActions';
+import * as lessonResourcesActions from '../actions/lessonResourcesActions';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { LessonEpisodes, LessonReferences, } from '../components/lessonGrids';
+import {
+    LessonEpisodes,
+    LessonReferences,
+    LessonSubLessons,
+    LessonResources
+} from '../components/lessonGrids';
 import ReferenceForm from '../components/ReferenceForm';
 import {EDIT_MODE_INSERT, EDIT_MODE_EDIT} from '../constants/Common'
 
@@ -331,16 +338,42 @@ class LessonEditor extends ObjectEditor {
         }
     }
 
+    _selectSubLesson(id) {
+        this.props.subLessonsActions.select(id)
+    }
+
+    _removeSubLesson(id) {
+        this.props.subLessonsActions.remove(id)
+    }
+
+    _moveSubLessonUp(id) {
+        this.props.subLessonsActions.moveUp(id);
+    }
+
+    _moveSubLessonDown(id) {
+        this.props.subLessonsActions.moveDown(id);
+    }
+
+    _selectResource(id) {
+        this.props.resourcesActions.select(id);
+    }
+
+    _removeResource(id) {
+        this.props.resourcesActions.remove(id);
+    }
+
     _getWebixForm(){
         const {
             mainEpisodes,
-            suppEpisodes,
+            subLessons,
+            resources,
             recommendedRef,
             commonRef,
             selectedMainEpisode,
-            selectedSuppEpisode,
+            selectedSubLesson,
             selectedCommonRef,
             selectedRecommendedRef,
+            selectedResource,
         } = this.props;
 
         let _data = this.getObject();
@@ -348,10 +381,11 @@ class LessonEditor extends ObjectEditor {
             <Webix ui={::this.getUI()} data={_data} key='webix1'/>,
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
-                    <TabLink to="tab1">Основные эпизоды</TabLink>
-                    <TabLink to="tab2">Дополнительные эпизоды</TabLink>
+                    <TabLink to="tab1">Эпизоды</TabLink>
+                    <TabLink to="tab2">Дополнительные лекции</TabLink>
                     <TabLink to="tab3">Список литературы</TabLink>
                     <TabLink to="tab4">Рекомендуемая литература</TabLink>
+                    <TabLink to="tab5">Ресурсы</TabLink>
                 </div>
 
                 <div className="content">
@@ -370,17 +404,17 @@ class LessonEditor extends ObjectEditor {
                         />
                     </TabContent>
                     <TabContent for="tab2">
-                        <LessonEpisodes message={'Дополнительные эпизоды'}
+                        <LessonSubLessons message={'Дополнительные эпизоды'}
                                         divName={'SuppEpisodesDiv'}
-                                        selectAction={::this._selectSuppEpisode}
-                                        createAction={::this._newSuppEpisode}
-                                        editAction={::this._editEpisode}
-                                        removeAction={::this._removeSuppEpisode}
-                                        moveUpAction={::this._moveSuppEpisodeUp}
-                                        moveDownAction={::this._moveSuppEpisodeDown}
+                                        selectAction={::this._selectSubLesson}
+                                        // createAction={::this._newSuppEpisode}
+                                        // editAction={::this._editEpisode}
+                                        removeAction={::this._removeSubLesson}
+                                        moveUpAction={::this._moveSubLessonUp}
+                                        moveDownAction={::this._moveSubLessonDown}
                                         editMode={this.editMode}
-                                        selected={selectedSuppEpisode}
-                                        data={suppEpisodes}
+                                        selected={selectedSubLesson}
+                                        data={subLessons}
                         />
                     </TabContent>
                     <TabContent for="tab3">
@@ -407,6 +441,18 @@ class LessonEditor extends ObjectEditor {
                                           editMode={this.editMode}
                                           selected={selectedRecommendedRef}
                                           data={recommendedRef}
+                        />
+                    </TabContent>
+                    <TabContent for="tab5">
+                        <LessonResources message={'Ресурсы'}
+                                         selectAction={::this._selectResource}
+                                         // editAction={::this._editRecommendedReference}
+                                         removeAction={::this._removeResource}
+                                         // moveUpAction={::this._moveResourceUp}
+                                         // moveDownAction={::this._moveResourceDown}
+                                         editMode={this.editMode}
+                                         selected={selectedResource}
+                                         data={resources}
                         />
                     </TabContent>
                 </div>
@@ -537,18 +583,18 @@ class LessonEditor extends ObjectEditor {
                         },
                         // collapsed:true,
                     },
-                    {
-                        view: "accordionitem",
-                        headerHeight: 40,
-                        header: "Полное описание",
-                        body: {
-                            view: "richtext",
-                            labelWidth: 0,
-                            height: 150,
-                            width: 0,
-                            name: "FullDescription",
-                        },
-                    },
+                    // {
+                    //     view: "accordionitem",
+                    //     headerHeight: 40,
+                    //     header: "Полное описание",
+                    //     body: {
+                    //         view: "richtext",
+                    //         labelWidth: 0,
+                    //         height: 150,
+                    //         width: 0,
+                    //         name: "FullDescription",
+                    //     },
+                    // },
                 ]
             },
         ];
@@ -567,11 +613,17 @@ function mapStateToProps(state, ownProps) {
         reference: state.references.reference,
         referenceEditMode : state.references.editMode,
         course: state.singleCourse.current,
-        hasChanges : state.singleLesson.hasChanges,
+        hasChanges : state.singleLesson.hasChanges || state.subLessons.hasChanges || state.lessonResources.hasChanges,
         selectedMainEpisode: state.lessonEpisodes.mainSelected,
-        selectedSuppEpisode: state.lessonEpisodes.suppSelected,
+        // selectedSuppEpisode: state.lessonEpisodes.suppSelected,
         selectedCommonRef: state.lessonRefs.commonSelected,
         selectedRecommendedRef: state.lessonRefs.recommendedSelected,
+
+        subLessons: state.subLessons.current,
+        selectedSubLesson : state.subLessons.selected,
+
+        resources: state.lessonResources.current,
+        selectedResource: state.lessonResources.selected,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -588,6 +640,8 @@ function mapDispatchToProps(dispatch) {
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
         referenceActions : bindActionCreators(referenceActions, dispatch),
+        subLessonsActions : bindActionCreators(subLessonsActions, dispatch),
+        resourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
     }
 }
 

@@ -56,18 +56,18 @@ class Authors extends React.Component {
                     :
                     <div className="authors-content">
                         <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
-                            <button className='btn-new'
+                            <button className='tool-btn new'
                                     onClick={::this.onAddBtnClick}
                             />
                             {' '}
                             <button
-                                className={'btn-edit' + (selected === null ? " disabled" : "")}
+                                className={'tool-btn edit' + (selected === null ? " disabled" : "")}
                                 onClick={::this.onEditBtnClick}
                                 disabled={(selected === null)}
                             />
                             {' '}
                             <button
-                                className={'btn-delete' + (selected === null ? " disabled" : "")}
+                                className={'tool-btn delete' + (selected === null ? " disabled" : "")}
                                 onClick={::this._confirmDelete}
                                 disabled={(selected === null)}
                             />

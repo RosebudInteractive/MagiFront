@@ -1,7 +1,7 @@
 import {
-    SELECT_COURSE_CATEGORY,
+    SELECT_COURSE_LESSON,
 
-} from '../constants/SingleCourse'
+} from '../../constants/SingleCourse'
 
 const initialState = {
     // authors: [],
@@ -9,7 +9,7 @@ const initialState = {
     selected: null,
 };
 
-export default function courseCategories(state = initialState, action) {
+export default function courseLessons(state = initialState, action) {
 
     switch (action.type) {
         // case GET_COURSE_AUTHORS_REQUEST:
@@ -21,7 +21,7 @@ export default function courseCategories(state = initialState, action) {
         // case GET_COURSE_AUTHORS_FAIL:
         //     return { ...state, authors: [], fetching: false};
 
-        case SELECT_COURSE_CATEGORY : {
+        case SELECT_COURSE_LESSON : {
             return { ...state, selected: action.payload}
         }
 

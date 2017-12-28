@@ -49,8 +49,6 @@ export const get = (id, courseId, parentLessonId)=> {
             payload: null
         });
 
-
-
         fetch("/api/lessons/" + id + '/' + courseId + '/' + parentLessonId)
             .then(checkStatus)
             .then(parseJSON)
@@ -428,4 +426,16 @@ const handleLesson = (lesson) => {
     lesson.commonRef.sort((a, b) => {
         return a.Number - b.Number
     });
+
+    if (lesson.Resources) {
+        lesson.Resources.forEach((resource) => {
+            resource.id = resource.Id
+        })
+    }
+
+    if (lesson.Childs) {
+        lesson.Childs.forEach((child) => {
+            handleLesson(child)
+        })
+    }
 };

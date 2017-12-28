@@ -53,7 +53,7 @@ export const removeObject = (array, objectId) => {
     _array.push(...array);
 
     let _selected =
-        (_index > -1)
+        ((_array.length > 0) && (_index > -1))
             ?
             (_index < _array.length)
                 ?
@@ -89,9 +89,9 @@ export const deleteObject = (array, objectId) => {
     });
 
     let _selected =
-        (_deleted > -1)
+        ((_array.length > 0) && (_deleted > -1))
             ?
-            ((_array.length > 0) && (_deleted < _array.length))
+            (_deleted < _array.length)
                 ?
                 _array[_deleted].id
                 :

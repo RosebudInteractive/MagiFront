@@ -7,7 +7,7 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
-} from '../constants/SingleEpisode'
+} from '../../constants/episode/singleEpisode'
 
 const initialState = {
     initial: null,

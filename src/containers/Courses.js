@@ -61,16 +61,16 @@ class Coureses extends React.Component {
                         :
                         <div className="courses-content">
                             <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
-                                <button className='btn-new'
+                                <button className='tool-btn new'
                                         onClick={::this.onAddBtnClick}
                                 />{' '}
                                 <button
-                                    className={'btn-edit' + (selected === null ? " disabled" : "")}
+                                    className={'tool-btn edit' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={(selected === null)}
                                 />{' '}
                                 <button
-                                    className={'btn-delete' + (selected === null ? " disabled" : "")}
+                                    className={'tool-btn delete' + (selected === null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteCourse}
                                     disabled={(selected === null)}
                                 />
