@@ -2,20 +2,21 @@
 let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
-    // app.get('/api/lessons', (req, res, next) => {
-    //     LessonsService()
-    //         .getAll()
-    //         .then(rows => {
-    //             res.send(rows);
-    //         })
-    //         .catch(err => {
-    //             next(err);
-    //         });
-    // });
 
     app.get('/api/lessons/:id/:courseId/:parentId', (req, res, next) => {
         LessonsService()
             .get(parseInt(req.params.id), parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/lessons/resources/:id', (req, res, next) => {
+        LessonsService()
+            .getResources(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
