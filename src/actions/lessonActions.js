@@ -384,7 +384,7 @@ const handleLesson = (lesson) => {
     lesson.mainEpisodes = [];
     lesson.suppEpisodes = [];
 
-    lesson.DT_ReadyDate = new Date(lesson.ReadyDate);
+    lesson.DT_ReadyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null;
 
     if (lesson.Episodes) {
         lesson.Episodes.forEach((episode) => {

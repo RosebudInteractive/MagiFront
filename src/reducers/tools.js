@@ -91,7 +91,7 @@ export const deleteObject = (array, objectId) => {
     let _selected =
         (_deleted > -1)
             ?
-            (_deleted < _array.length)
+            ((_array.length > 0) && (_deleted < _array.length))
                 ?
                 _array[_deleted].id
                 :
