@@ -13,7 +13,7 @@ function setupLessons(app) {
     //         });
     // });
 
-    app.get('/api/lessons/:id/:courseId', (req, res, next) => {
+    app.get('/api/lessons/:id/:courseId/:parentId', (req, res, next) => {
         LessonsService()
             .get(parseInt(req.params.id), parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {

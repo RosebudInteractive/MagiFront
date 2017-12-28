@@ -57,7 +57,7 @@ class LessonEditor extends ObjectEditor {
 
     _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
-        this.objectActions.get(this.objectId, this.props.courseId);
+        this.objectActions.get(this.objectId, this.props.courseId, this.props.parentLessonId);
     }
 
     _initInsertMode() {
