@@ -67,26 +67,26 @@ export default class GridControl extends Component {
         let _buttons = [];
         if (createAction) {
             let _disabled = editMode !== EDIT_MODE_EDIT;
-            _buttons.push(<button key='btnNew' className="btn-new" disabled={_disabled} onClick={::this._create}/>)
+            _buttons.push(<button key='btnNew' className="tool-btn new" disabled={_disabled} onClick={::this._create}/>)
         }
 
         if (addAction) {
-            _buttons.push(<button key='btnAdd' className="btn-add"  onClick={::this._addClicked}/>)
+            _buttons.push(<button key='btnAdd' className="tool-btn add"  onClick={::this._addClicked}/>)
         }
 
         if (editAction) {
             let _disabled = (!this._selected) || (editMode !== EDIT_MODE_EDIT);
-            _buttons.push(<button key='btnEdit' className='btn-edit' disabled={_disabled} onClick={::this._edit}/>)
+            _buttons.push(<button key='btnEdit' className='tool-btn edit' disabled={_disabled} onClick={::this._edit}/>)
         }
 
         if (moveUpAction) {
             let _disabled = ((!this._selected) || (this._isFirstSelected));
-            _buttons.push(<button key='btnUp' className='btn-up' disabled={_disabled} onClick={::this._moveUp}/>)
+            _buttons.push(<button key='btnUp' className='tool-btn up' disabled={_disabled} onClick={::this._moveUp}/>)
         }
 
         if (moveDownAction) {
             let _disabled = ((!this._selected) || (this._isLastSelected));
-            _buttons.push(<button key='btnDown' className='btn-down' disabled={_disabled} onClick={::this._moveDown}/>)
+            _buttons.push(<button key='btnDown' className='tool-btn down' disabled={_disabled} onClick={::this._moveDown}/>)
         }
 
         return _buttons;
@@ -107,7 +107,7 @@ export default class GridControl extends Component {
     _getColumns() {
         return [{
             id: "",
-            template: "<input class='delbtn' type='button'>",
+            template: "<input class='tool-btn del' type='button'>",
             width: 50
         }]
     }
@@ -126,7 +126,7 @@ export default class GridControl extends Component {
 
             on: {
                 onAfterSelect: function (selObj) {
-                    if (parseInt(selObj.id) !== that._selected) {
+                    if ((parseInt(selObj.id) !== that._selected) && this.getItem(selObj.id)) {
                         that._selected = null;
                         let _obj = {
                             isFirst : this.getFirstId() === selObj.id,
@@ -144,7 +144,7 @@ export default class GridControl extends Component {
             },
 
             onClick: {
-                delbtn: (e, id) => {
+                del: (e, id) => {
                     this._remove(id.row);
                 }
             }

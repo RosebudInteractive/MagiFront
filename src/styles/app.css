@@ -26,7 +26,9 @@
   margin-left: 0.5em;
 }
 #confirm .no {
-  background-color: #63abf8;
+  /*background-color: #63abf8;*/
+  border: 3px dotted #000000;
+  border-radius: 4px;
 }
 
 #confirm .popup .dlg-message {
@@ -93,118 +95,48 @@
 
 /*.tabs-1 .tabContent: {}*/
 
-.delbtn {
+.tool-btn {
+  margin-right: 3px;
+  margin-bottom: 3px;
   border-radius: 2px;
   background-size: contain;
   cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   color: #fff;
+  height: 2.5714em;
+  width: 2.5714em;
+  border: none;
+}
+
+.del {
   background: #96c8ff url(./../icons/basket.svg);
   height: 25px;
   width: 25px;
-  border: none;
   margin-left: 2px;
   margin-bottom: 5px;
+  margin-right: 0;
 }
-.btn-up {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.up {
   background: #96c8ff url(./../icons/arrow_up.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
 }
-.btn-down {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.down {
   background: #96c8ff url(./../icons/arrow_down.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
 }
-.btn-new {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.new {
   background: #96c8ff url(./../icons/plus.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
 }
-.btn-add {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.add {
   background: #96c8ff url(./../icons/clip.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
 }
-.btn-edit {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.edit {
   background: #96c8ff url(./../icons/pen.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
 }
-.btn-delete {
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
+.delete {
   background: #96c8ff url(./../icons/minus.svg);
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
-  margin-bottom: 2px;
 }
-.btn-back {
+.back {
   background: url(./../icons/arrow_left.svg);
-  /*border-radius: 2px;*/
-  /*background-size: contain;*/
-  /*cursor: pointer;*/
-  /*display: inline-block;*/
-  /*vertical-align: middle;*/
-  /*color: #fff;*/
-  /*background-color: #96c8ff;*/
-  /*height: 2.5714em;*/
-  /*!*height: 25px;*!*/
-  /*width: 2.5714em;*/
-  /*border: none;*/
-  /*!*margin-left: 2px;*!*/
-  /*margin-bottom: 2px;*/
 }
 
 button:disabled,
@@ -369,6 +301,7 @@ html,
 .app .main-area {
   flex: 1 1 100px;
   width: 100%;
+  overflow-y: scroll;
 }
 .app .page {
   width: 100%;

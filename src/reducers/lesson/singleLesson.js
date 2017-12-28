@@ -23,9 +23,9 @@ import {
     CANCEL_CHANGE_LESSON_DATA,
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
-} from '../constants/SingleLesson'
+} from '../../constants/SingleLesson'
 
-import * as tools from './tools';
+import * as tools from '../tools';
 
 const initialState = {
     initial: null,

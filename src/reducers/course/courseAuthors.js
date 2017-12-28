@@ -4,7 +4,7 @@ import {
     GET_COURSE_AUTHORS_FAIL,
     SELECT_COURSE_AUTHOR,
 
-} from '../constants/SingleCourse'
+} from '../../constants/SingleCourse'
 
 const initialState = {
     authors: [],

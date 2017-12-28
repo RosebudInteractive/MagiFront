@@ -18,9 +18,9 @@ import {
     MOVE_LESSON_DOWN,
     CLEAR_COURSE,
     SAVE_COURSE_DATA,
-} from '../constants/SingleCourse'
+} from '../../constants/SingleCourse'
 
-import * as tools from './tools';
+import * as tools from '../tools';
 
 const initialState = {
     initial: null,

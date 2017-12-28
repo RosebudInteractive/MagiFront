@@ -1,19 +1,18 @@
 import React  from 'react';
-// import {Prompt} from 'react-router-dom';
 import Webix from '../components/Webix';
-// import ErrorDialog from '../components/ErrorDialog';
 import PropTypes from 'prop-types';
 
-import * as singleEpisodeActions from "../actions/episodeActions";
+import * as singleEpisodeActions from "../actions/episode/episodeActions";
 import * as singleLessonActions from "../actions/lessonActions";
+import * as episodeTocActions from '../actions/episode/episodeTocActions';
+import * as contentActions from '../actions/episode/episodeContentActions'
+import { EpisodeToc, EpisodeContent} from '../components/episodeGrids'
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import {
-    // EDIT_MODE_INSERT,
-    EDIT_MODE_EDIT
-} from '../constants/Common';
+import { EDIT_MODE_EDIT } from '../constants/Common';
 import ObjectEditor, {labelWidth, } from './objectEditor';
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
 
 class EpisodeEditor extends ObjectEditor {
 
@@ -42,29 +41,6 @@ class EpisodeEditor extends ObjectEditor {
         return this.props.episodeActions;
     }
 
-    // constructor(props) {
-    //     super(props);
-    //
-    //     const {
-    //         episodeActions,
-    //         episodeId,
-    //         lessonId,
-    //         lesson,
-    //         isSupp
-    //
-    //     } = this.props;
-    //
-    //     if (episodeId > 0) {
-    //         this.editMode = EDIT_MODE_EDIT;
-    //         episodeActions.get(episodeId, lessonId);
-    //     } else {
-    //         this.editMode = EDIT_MODE_INSERT;
-    //         let _number = lesson ? (isSupp ? lesson.suppEpisodes.length : lesson.mainEpisodes.length) : 0;
-    //         _number++;
-    //         episodeActions.create({Number: _number, EpisodeType:'L', Supp: isSupp});
-    //     }
-    // }
-
     _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId, this.props.lessonId);
@@ -80,14 +56,6 @@ class EpisodeEditor extends ObjectEditor {
         _number++;
         return {Number: _number, EpisodeType: 'L', Supp: isSupp};
     }
-
-    // _initInsertMode() {
-    //     this.editMode = EDIT_MODE_INSERT;
-    // }
-
-    // componentWillUnmount(){
-    //     this.props.episodeActions.clear()
-    // }
 
     _save(value) {
         let _obj = {
@@ -106,9 +74,53 @@ class EpisodeEditor extends ObjectEditor {
         super._save(_obj)
     }
 
-    _getWebixForm(){
+    _getWebixForm() {
+        let {
+            tocActions,
+            selectedToc,
+            episodeToc,
+            contentActions,
+            content,
+            selectedContent,
+        } = this.props;
+
         let _data = this.getObject();
-        return <Webix ui={::this.getUI()} data={_data}/>
+        return [
+            <Webix ui={::this.getUI()} data={_data} key='webix1'/>,
+            <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
+                <div className="tab-links">
+                    <TabLink to="tabToc">Оглавление эпизода</TabLink>
+                    <TabLink to="tabContent">Компоненты</TabLink>
+                </div>
+
+                <div className="content">
+                    <TabContent for="tabToc">
+                        <EpisodeToc selectAction={tocActions.select}
+                            // createAction={::this._createRecommendedReference}
+                            // editAction={::this._editRecommendedReference}
+                                    removeAction={tocActions.remove}
+                                    moveUpAction={tocActions.moveUp}
+                                    moveDownAction={tocActions.moveDown}
+                                    editMode={this.editMode}
+                                    selected={selectedToc}
+                                    data={episodeToc}
+                        />
+                    </TabContent>
+                    <TabContent for="tabContent">
+                        <EpisodeContent selectAction={contentActions.select}
+                            // createAction={::this._newSuppEpisode}
+                            // editAction={::this._editEpisode}
+                                        removeAction={contentActions.remove}
+                                        moveUpAction={contentActions.moveUp}
+                                        moveDownAction={contentActions.moveDown}
+                                        editMode={this.editMode}
+                                        selected={selectedContent}
+                                        data={content}
+                        />
+                    </TabContent>
+                </div>
+            </Tabs>
+        ]
     }
 
     _getExtElements() {
@@ -199,7 +211,14 @@ function mapStateToProps(state, ownProps) {
     return {
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
-        hasChanges : state.singleEpisode.hasChanges,
+
+        episodeToc: state.episodeToc.current,
+        selectedToc: state.episodeToc.selected,
+
+        content: state.episodeContent.current,
+        selectedContent: state.episodeContent.selected,
+
+        hasChanges : state.singleEpisode.hasChanges || state.episodeToc.hasChanges || state.episodeContent.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -216,6 +235,8 @@ function mapDispatchToProps(dispatch) {
     return {
         episodeActions: bindActionCreators(singleEpisodeActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
+        tocActions : bindActionCreators(episodeTocActions, dispatch),
+        contentActions: bindActionCreators(contentActions, dispatch),
     }
 }
 

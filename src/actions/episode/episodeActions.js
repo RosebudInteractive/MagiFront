@@ -7,14 +7,14 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
-} from '../constants/SingleEpisode'
+} from '../../constants/episode/singleEpisode'
 
 import {
     // HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT,
-} from '../constants/Common';
+} from '../../constants/Common';
 
 
 import 'whatwg-fetch';
@@ -140,4 +140,24 @@ const parseJSON = (response) => {
 
 const handleEpisode = (episode) => {
     episode.id = episode.Id;
+
+    episode.Toc.forEach((item) => {
+        item.id = item.Id
+    });
+
+    episode.Content.forEach((item) => {
+        item.id = item.Id;
+
+        let _obj = {};
+        try {
+            _obj = JSON.parse(item.Content);
+        }
+        catch (e) {
+            _obj.Name = '';
+            _obj.Description = '';
+        }
+
+        item.Name = _obj.Name;
+        item.Description = _obj.Description;
+    });
 };
