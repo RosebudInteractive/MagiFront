@@ -1,14 +1,14 @@
 import {
-    SELECT_TOC,
-    REMOVE_TOC,
-    MOVE_TOC_UP,
-    MOVE_TOC_DOWN,
-} from '../../constants/episode/episodeToc';
+    SELECT_EPISODE_CONTENT,
+    REMOVE_EPISODE_CONTENT,
+    MOVE_EPISODE_CONTENT_UP,
+    MOVE_EPISODE_CONTENT_DOWN,
+} from '../../constants/episode/episodeContent';
 
 export const select = (id) => {
     return (dispatch) => {
         dispatch({
-            type: SELECT_TOC,
+            type: SELECT_EPISODE_CONTENT,
             payload: id
         });
     }
@@ -17,7 +17,7 @@ export const select = (id) => {
 export const remove = (id) => {
     return (dispatch) => {
         dispatch({
-            type: REMOVE_TOC,
+            type: REMOVE_EPISODE_CONTENT,
             payload: id
         });
     }
@@ -26,7 +26,7 @@ export const remove = (id) => {
 export const moveUp = (id) => {
     return (dispatch) => {
         dispatch({
-            type: MOVE_TOC_UP,
+            type: MOVE_EPISODE_CONTENT_UP,
             payload: id
         });
     }
@@ -35,7 +35,7 @@ export const moveUp = (id) => {
 export const moveDown = (id) => {
     return (dispatch) => {
         dispatch({
-            type: MOVE_TOC_DOWN,
+            type: MOVE_EPISODE_CONTENT_DOWN,
             payload: id
         });
     }

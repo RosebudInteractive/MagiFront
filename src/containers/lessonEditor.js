@@ -43,20 +43,23 @@ class LessonEditor extends ObjectEditor {
     }
 
     getRootRout() {
-        return this.isSubLesson
+        return (this.editMode === EDIT_MODE_INSERT)
             ?
-            ('/courses/edit/' + this.props.courseId +
-                '/lessons/edit/' + this.props.lessonId)
+            this.currentUrl.replace(this._getInsertRout(), '')
             :
-            ('/courses/edit/' + this.props.courseId);
+            this.currentUrl.replace(this._getEditRout() + this.objectId, '')
     }
 
     _getEditRout() {
-        return this.isSubLesson ? 'sub-lessons/edit/' : '/lessons/edit/';
+        return this.isSubLesson ? '/sub-lessons/edit/' : '/lessons/edit/';
+    }
+
+    _getInsertRout() {
+        return this.isSubLesson ? '/sub-lessons/new' : '/lessons/new';
     }
 
     get objectIdPropName() {
-        return this.isSubLesson ? 'subLessonId' : 'lessonId'
+        return this.isSubLesson ? 'subLessonId' : 'lessonId';
     }
 
     get objectName() {
@@ -218,24 +221,18 @@ class LessonEditor extends ObjectEditor {
     }
 
     _newMainEpisode() {
-        this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
-            '/lessons/edit/' + this.props.lessonId +
-            '/main-episodes/new');
+        this.props.history.push(this.currentUrl + '/episodes/new');
     }
 
-    _newSuppEpisode() {
-        this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
-            '/lessons/edit/' + this.props.lessonId +
-            '/supp-episodes/new/');
-    }
+    // _newSuppEpisode() {
+    //     this.props.history.push(
+    //         '/courses/edit/' + this.props.courseId +
+    //         '/lessons/edit/' + this.props.lessonId +
+    //         '/supp-episodes/new/');
+    // }
 
     _editEpisode(episodeId) {
-        this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
-            '/lessons/edit/' + this.props.lessonId +
-            '/episodes/edit/' + episodeId);
+        this.props.history.push(this.currentUrl + '/episodes/edit/' + episodeId)
     }
 
     _selectSuppEpisode(id) {
@@ -334,15 +331,15 @@ class LessonEditor extends ObjectEditor {
 
     _checkEpisodesState(newState) {
         if (newState === 'R') {
-            let _mainEpisodesReady =  (this.props.mainEpisodes.length > 0) &&this.props.mainEpisodes.every((episode) => {
-                return episode.State === 'R'
-            });
 
-            let _suppEpisodesReady = (this.props.suppEpisodes.length > 0) && this.props.suppEpisodes.every((episode) => {
-                return episode.State === 'R'
-            });
 
-            return _mainEpisodesReady && _suppEpisodesReady;
+            // let _suppEpisodesReady = (this.props.suppEpisodes.length > 0) && this.props.suppEpisodes.every((episode) => {
+            //     return episode.State === 'R'
+            // });
+
+            return (this.props.mainEpisodes.length > 0) && this.props.mainEpisodes.every((episode) => {
+                return episode.State === 'R'
+            }) ;
         } else {
             return true
         }
@@ -384,6 +381,10 @@ class LessonEditor extends ObjectEditor {
 
     _removeResource(id) {
         this.props.resourcesActions.remove(id);
+    }
+
+    _createResource() {
+
     }
 
     _getWebixForm(){
@@ -476,6 +477,7 @@ class LessonEditor extends ObjectEditor {
                     <TabContent for="tab5">
                         <LessonResources message={'Ресурсы'}
                                          selectAction={resourcesActions.select}
+                                         createAction={::this._createResource}
                                          // editAction={::this._editRecommendedReference}
                                          removeAction={resourcesActions.remove}
                                          editMode={this.editMode}
@@ -660,7 +662,9 @@ function mapStateToProps(state, ownProps) {
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
-        fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching
+        fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching,
+
+        ownProps : ownProps,
     }
 }
 
