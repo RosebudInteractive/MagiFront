@@ -96,7 +96,7 @@ class EpisodeEditor extends ObjectEditor {
                 <div className="content">
                     <TabContent for="tabToc">
                         <EpisodeToc selectAction={tocActions.select}
-                            // createAction={::this._createRecommendedReference}
+                                    createAction={::this._createRecommendedReference}
                             // editAction={::this._editRecommendedReference}
                                     removeAction={tocActions.remove}
                                     moveUpAction={tocActions.moveUp}

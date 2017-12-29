@@ -386,6 +386,10 @@ class LessonEditor extends ObjectEditor {
         this.props.resourcesActions.remove(id);
     }
 
+    _createResource() {
+        
+    }
+
     _getWebixForm(){
 
         const {
@@ -476,6 +480,7 @@ class LessonEditor extends ObjectEditor {
                     <TabContent for="tab5">
                         <LessonResources message={'Ресурсы'}
                                          selectAction={resourcesActions.select}
+                                         createAction={::this._createResource}
                                          // editAction={::this._editRecommendedReference}
                                          removeAction={resourcesActions.remove}
                                          editMode={this.editMode}

@@ -1,4 +1,6 @@
 import {
+    // CREATE_TOC,
+    // EDIT_TOC,
     SELECT_TOC,
     REMOVE_TOC,
     MOVE_TOC_UP,
@@ -14,6 +16,11 @@ import {
     CLEAR_EPISODE,
 } from '../../constants/episode/singleEpisode';
 
+import {
+    EDIT_MODE_INSERT,
+    // EDIT_MODE_EDIT,
+} from '../../constants/Common'
+
 import * as tools from '../tools';
 
 const initialState = {
@@ -21,6 +28,8 @@ const initialState = {
     current: [],
     selected: null,
     hasChanges: false,
+    internalId: -1,
+    editMode: EDIT_MODE_INSERT,
 };
 
 export default function episodeToc(state = initialState, action) {
@@ -48,6 +57,10 @@ export default function episodeToc(state = initialState, action) {
             }
 
         }
+
+        // case CREATE_TOC: {
+        //
+        // }
 
         case SELECT_TOC:
             return {...state, selected: action.payload};
