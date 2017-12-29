@@ -92,7 +92,7 @@ const LESSON_UPD_TREE = {
 const LESSON_MSSQL_ID_REQ =
     "select l.[Id], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], lc.[Number], lc.[ReadyDate],\n"+
-    "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[LanguageId] as [CurrParentName] from [Lesson] l\n" +
+    "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId] and ll.[LanguageId] = <%= languageId %>\n" +
     "  join [LessonCourse] lc on l.[Id] = lc.[LessonId]\n" +
     "  join [Author] a on a.[Id] = l.[AuthorId]\n" +
@@ -123,7 +123,7 @@ const LESSON_MSSQL_CHLD_REQ =
 const LESSON_MYSQL_ID_REQ =
     "select l.`Id`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`LanguageId` as `CurrParentName` from `Lesson` l\n" +
+    "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId` and ll.`LanguageId` = <%= languageId %>\n" +
     "  join `LessonCourse` lc on l.`Id` = lc.`LessonId`\n" +
     "  join `Author` a on a.`Id` = l.`AuthorId`\n" +
