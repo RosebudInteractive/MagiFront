@@ -21,12 +21,19 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     getRootRout() {
-        return '/courses/edit/' + this.props.courseId +
-            '/lessons/edit/' + this.props.lessonId
+        return (this.editMode !== EDIT_MODE_EDIT)
+            ?
+            this.currentUrl.replace(this._getInsertRout(), '')
+            :
+            this.currentUrl.replace(this._getEditRout() + this.objectId, '')
     }
 
     _getEditRout() {
         return '/episodes/edit/';
+    }
+
+    _getInsertRout() {
+        return '/episodes/new';
     }
 
     get objectIdPropName() {
@@ -42,8 +49,9 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _initEditMode(){
+        let _lessonId = !this.props.subLessonId ? this.props.lessonId : this.props.subLessonId
         this.editMode = EDIT_MODE_EDIT;
-        this.objectActions.get(this.objectId, this.props.lessonId);
+        this.objectActions.get(this.objectId, _lessonId);
     }
 
     _getInitStateOfNewObject(props) {
@@ -96,8 +104,8 @@ class EpisodeEditor extends ObjectEditor {
                 <div className="content">
                     <TabContent for="tabToc">
                         <EpisodeToc selectAction={tocActions.select}
-                                    createAction={::this._createRecommendedReference}
-                            // editAction={::this._editRecommendedReference}
+                                    // createAction={::this._createRecommendedReference}
+                                    // editAction={::this._editRecommendedReference}
                                     removeAction={tocActions.remove}
                                     moveUpAction={tocActions.moveUp}
                                     moveDownAction={tocActions.moveDown}
@@ -108,8 +116,8 @@ class EpisodeEditor extends ObjectEditor {
                     </TabContent>
                     <TabContent for="tabContent">
                         <EpisodeContent selectAction={contentActions.select}
-                            // createAction={::this._newSuppEpisode}
-                            // editAction={::this._editEpisode}
+                                        // createAction={::this._newSuppEpisode}
+                                        // editAction={::this._editEpisode}
                                         removeAction={contentActions.remove}
                                         moveUpAction={contentActions.moveUp}
                                         moveDownAction={contentActions.moveDown}
@@ -227,7 +235,10 @@ function mapStateToProps(state, ownProps) {
         episodeId: parseInt(ownProps.match.params.id),
         lessonId: parseInt(ownProps.match.params.lessonId),
         courseId: parseInt(ownProps.match.params.courseId),
+        subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching, // || state.singleCourse.fetching
+
+        ownProps : ownProps,
     }
 }
 

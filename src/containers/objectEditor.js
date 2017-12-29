@@ -56,6 +56,10 @@ export default class ObjectEditor extends React.Component {
         this._editMode = value
     }
 
+    get currentUrl() {
+        return this.props.ownProps ? this.props.ownProps.location.pathname : '';
+    }
+
     _initEditMode(){
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId);

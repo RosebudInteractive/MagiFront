@@ -13,13 +13,21 @@ export default class GridControl extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        // this.needRender = this.props.data.some((item, index) => {
+        //     return item.id !== nextProps.data[index].id
+        // });
+
         this._selected = nextProps.selected
     }
 
-    shouldComponentUpdate(nextProps) {
-        return this.props.selected === nextProps.selected;
-        // return true;
-    }
+    // shouldComponentUpdate(nextProps) {
+    //     let _need = this.props.data.some((item, index) => {
+    //         return item.id !== nextProps.data[index].id
+    //     });
+    //
+    //     return _need;
+    // //     // return true;
+    // }
 
     _select(selectedObj) {
         this._isFirstSelected = selectedObj.isFirst;

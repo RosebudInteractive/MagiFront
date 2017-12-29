@@ -13,6 +13,7 @@ import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
 import CourseEditor from './courseEditor';
 import LessonEditor from './lessonEditor';
+import SubLessonEditor from './subLessonEditor';
 import EpisodeEditor from './episodeEditor';
 
 class App extends Component {
@@ -45,7 +46,13 @@ class App extends Component {
                             <Route path='/courses/new' component={CourseEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episodes/edit/:id'
                                    component={EpisodeEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/main-episodes/new'
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episodes/new'
+                                   render={(props) => (
+                                       <EpisodeEditor {...props} isSupp={false} />
+                                   )}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/edit/:id'
+                                   component={EpisodeEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/new'
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={false} />
                                    )}/>
@@ -53,7 +60,7 @@ class App extends Component {
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId' component={LessonEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId' component={SubLessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>
