@@ -1,4 +1,5 @@
 const { DbObject } = require('./db-object');
+const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -181,7 +182,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                             }
                         }
                         if (!ep_lesson_obj)
-                            throw new Error("Episode (Id = " + id + ") desn't belong to lesson (Id = " + lesson_id + ").");
+                            throw new Error("Episode (Id = " + id + ") doesn't belong to lesson (Id = " + lesson_id + ").");
 
                         return lesson_obj.edit()
                             .then(() => {

@@ -18,6 +18,7 @@ exports.DbObject = class DbObject {
             predicate
                 .addCondition({ field: "Id", op: "=", value: id });
             exp_filtered.expr.predicate = predicate.serialize(true);
+            this._db._deleteRoot(predicate.getRoot());
 
             resolve(
                 this._db.getData(Utils.guid(), null, null, exp_filtered)

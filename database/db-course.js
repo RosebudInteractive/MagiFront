@@ -1,4 +1,5 @@
 const { DbObject } = require('./db-object');
+const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -159,7 +160,7 @@ const COURSE_MYSQL_DELETE_SCRIPT =
 const LESSON_MSSQL_DELETE_SCRIPT =
     [
         "delete el from [Lesson] l\n" +
-        "  join [EpisodeLesson] el on l.[Id] = el.[EpisodeId]\n" +
+        "  join [EpisodeLesson] el on l.[Id] = el.[LessonId]\n" +
         "where l.[Id] = <%= id %>",
         "delete ec from [Lesson] l\n" +
         "  join[Episode] e on l.[Id] = e.[LessonId]\n" +
@@ -172,7 +173,7 @@ const LESSON_MSSQL_DELETE_SCRIPT =
 const LESSON_MYSQL_DELETE_SCRIPT =
     [
         "delete el from `Lesson` l\n" +
-        "  join `EpisodeLesson` el on l.`Id` = el.`EpisodeId`\n" +
+        "  join `EpisodeLesson` el on l.`Id` = el.`LessonId`\n" +
         "where l.`Id` = <%= id %>",
         "delete ec from `Lesson` l\n" +
         "  join`Episode` e on l.`Id` = e.`LessonId`\n" +
@@ -335,7 +336,7 @@ const DbCourse = class DbCourse extends DbObject {
                         COURSE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
                             mssql_script.push(_.template(elem)({ id: id }));
                         });
-                        return self._execSqlScript(mysql_script, mssql_script, opts);
+                        return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
                     })
                     .then(() => {
                         collection._del(course_obj);
@@ -364,23 +365,6 @@ const DbCourse = class DbCourse extends DbObject {
                     })
             );
         })
-    }
-
-    _execSqlScript(mysql_script, mssql_script, opts) {
-        return new Promise((resolve, reject) => {
-            if (mysql_script.length !== mssql_script.length)
-                throw new Error("MySql and MSSQL scripts have different lengths.");    
-            resolve(
-                Utils.seqExec(mysql_script.length, (idx) => {
-                    return $data.execSql({
-                        dialect: {
-                            mysql: mysql_script[idx],
-                            mssql: mssql_script[idx]
-                        }
-                    }, opts);
-                })
-            );    
-        });    
     }
 
     update(id, data) {
@@ -446,7 +430,7 @@ const DbCourse = class DbCourse extends DbObject {
                         root_ls = crs_obj.getDataRoot("LessonCourse");
                         ls_collection = root_ls.getCol("DataElements");
 
-                        if (inpFields.Authors && (inpFields.Authors.length > 0)) {
+                        if (inpFields.Authors && (typeof (inpFields.Authors.length) === "number")) {
                             for (let i = 0; i < auth_collection.count(); i++) {
                                 let obj = auth_collection.get(i);
                                 auth_list[obj.authorId()] = { deleted: true, obj: obj };
@@ -460,7 +444,7 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                         }
 
-                        if (inpFields.Categories && (inpFields.Categories.length > 0)) {
+                        if (inpFields.Categories && (typeof (inpFields.Categories.length) === "number")) {
                             for (let i = 0; i < ctg_collection.count(); i++) {
                                 let obj = ctg_collection.get(i);
                                 ctg_list[obj.categoryId()] = { deleted: true, obj: obj };
@@ -474,7 +458,7 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                         }
 
-                        if (inpFields.Lessons && (inpFields.Lessons.length > 0)) {
+                        if (inpFields.Lessons && (typeof (inpFields.Lessons.length) === "number")) {
                             for (let i = 0; i < ls_collection.count(); i++) {
                                 let obj = ls_collection.get(i);
                                 let deleted = typeof (obj.parentId()) !== "number";
@@ -634,7 +618,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
                                     mssql_script.push(_.template(elem)({ id: id }));
                                 });
-                                return self._execSqlScript(mysql_script, mssql_script, opts);
+                                return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
                             };
                             return Utils.seqExec(lsn_child_deleted, lesson_del_func)
                                 .then(() => {
