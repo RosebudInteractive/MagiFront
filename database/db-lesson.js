@@ -256,13 +256,6 @@ const DbLesson = class DbLesson extends DbObject {
         super(options);
     }
 
-    _genGetterName(fname) {
-        var res = fname;
-        if (fname.length > 0) {
-            res = fname[0].toLowerCase() + fname.substring(1);
-        };
-        return res;
-    }
     _getObjById(id, expression) {
         var exp = expression || LESSON_REQ_TREE;
         return super._getObjById(id, exp);

@@ -8,6 +8,14 @@ exports.DbObject = class DbObject {
         this._db = $memDataBase;
     }
 
+    _genGetterName(fname) {
+        var res = fname;
+        if (fname.length > 0) {
+            res = fname[0].toLowerCase() + fname.substring(1);
+        };
+        return res;
+    }
+
     _getObjById(id, expression) {
         return new MemDbPromise(this._db, (resolve) => {
             if (!expression)
@@ -31,6 +39,35 @@ exports.DbObject = class DbObject {
                         }
                         else
                             throw new Error("DbObject::_getObjById: Invalid result of \"getData\": " + JSON.stringify(result));
+                    })
+            );
+        });
+    }
+
+    _getObjects(expression, simple_condition) {
+        return new MemDbPromise(this._db, (resolve) => {
+            if (!expression)
+                throw new Error("DbObject::_getObjects: Invalid parameter \"expression\": " + JSON.stringify(expression));
+            let exp_filtered = Object.assign({}, expression);
+
+            if (simple_condition) {
+                let predicate = new Predicate(this._db, {});
+                predicate
+                    .addCondition(simple_condition);
+                exp_filtered.expr.predicate = predicate.serialize(true);
+                this._db._deleteRoot(predicate.getRoot());
+            }
+            resolve(
+                this._db.getData(Utils.guid(), null, null, exp_filtered)
+                    .then((result) => {
+                        if (result && result.guids && (result.guids.length === 1)) {
+                            let obj = this._db.getObj(result.guids[0]);
+                            if (!obj)
+                                throw new Error("DbObject::_getObjects: Object doesn't exist: " + result.guids[0]);
+                            return obj;
+                        }
+                        else
+                            throw new Error("DbObject::_getObjects: Invalid result of \"getData\": " + JSON.stringify(result));
                     })
             );
         });

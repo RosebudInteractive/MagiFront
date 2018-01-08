@@ -682,6 +682,31 @@ exports.DbEngineInit = class DbEngineInit {
                .then((result) => {
                    console.log("NEW Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
                })
+               .then(() => {
+                   return epi.update(new_episode_id, new_lesson_id, {
+                       EpisodeType: "L",
+                       State: "R",
+                       Audio: "/assets/audio/111.mp3",
+                       Name: "New Episode Upd",
+                       Structure: "{id:111}",
+                       Transcript: "Upd New Episode of a New Lection " + new_lesson_id
+                   })
+                    .then(() => {
+                        return epi.get(new_episode_id, new_lesson_id);
+                    });
+               })
+               .then((result) => {
+                   console.log("Updated Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
+               })
+               .then(() => {
+                   return epi.del(new_episode_id, new_lesson_id)
+                       .then(() => {
+                           return epi.get(new_episode_id, new_lesson_id);
+                       });
+               })
+               .then((result) => {
+                   console.log("Deleted Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
+               })
                .catch((err) => {
                    console.error("ERROR: " + err.message);
                });
