@@ -652,6 +652,7 @@ namespace MagImport
             public int LanguageId { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }
+            public string MetaData { get; set; }
         };
 
         public class ResourceLng : DataObjTyped<ResourceLngFields, ResourceLngRoot>
@@ -700,9 +701,61 @@ namespace MagImport
 
         };
 
-        public MagisteryToJSON(string connStr)
+        public class JSObject
         {
-            conn_str = connStr;
+            public enum FieldType { Bool, Int, String, Double, Obj };
+            public Dictionary<string, Tuple<FieldType, bool, int, string, double, JSObject>> obj;
+
+            public JSObject()
+            {
+                obj = new Dictionary<string, Tuple<FieldType, bool, int, string, double, JSObject>>();
+            }
+
+            public string ToJSON() { return _toJSON(this); }
+            string _toJSON(JSObject val)
+            {
+                StringBuilder sb = new StringBuilder("{");
+                bool is_first = true;
+                foreach (KeyValuePair<string, Tuple<FieldType, bool, int, string, double, JSObject>> pair in val.obj)
+                {
+                    if(!is_first)
+                        sb.Append(",");
+                    sb.Append("\"" + pair.Key + "\":");
+                    is_first = false;
+                    switch (pair.Value.Item1)
+                    {
+                        case FieldType.Bool:
+                            sb.Append(pair.Value.Item2 ? "true" : "false");
+                            break;
+
+                        case FieldType.Int:
+                            sb.Append(pair.Value.Item3);
+                            break;
+
+                        case FieldType.String:
+                            sb.Append("\"" + pair.Value.Item4.Replace("\"", "\\\"").Replace("\n","\\n").Replace("\r", null) + "\"");
+                            break;
+
+                        case FieldType.Double:
+                            sb.Append(pair.Value.Item5);
+                            break;
+
+                        case FieldType.Obj:
+                            sb.Append(_toJSON(pair.Value.Item6));
+                            break;
+                    }
+                }
+                sb.Append("}");
+                return sb.ToString();
+            }
+        }
+
+        public static JSObject MagJSONParse(string inp_str, Encoding enc = null)
+        {
+            StringBuilder sb = new StringBuilder(inp_str);
+            int curr_pos = 0;
+            _getTokenType(sb, ref curr_pos, 'a');
+            return _JSONParse(sb, ref curr_pos, enc == null ? Encoding.UTF8 : enc);
         }
 
         public Encoding JSONEncoding { get { return enc; } set { enc = value; } }
@@ -710,6 +763,11 @@ namespace MagImport
         public Formatting JSONFormatting { get { return fmt; } set { fmt = value; } }
 
         public JsonSerializerSettings JSONSettings { get { return jss; } set { jss = value; } }
+
+        public MagisteryToJSON(string connStr)
+        {
+            conn_str = connStr;
+        }
 
         public void StartImport(string outDir)
         {
@@ -1224,6 +1282,8 @@ namespace MagImport
                                                 throw new Exception(String.Format("Picture (Id={0}): Description is empty.", picture_id));
                                             if (file_desc.TryGetValue("ExtDescription", out fn))
                                                 res_lng.Fields.Description = fn;
+                                            if (file_desc.TryGetValue("MetaData", out fn))
+                                                res_lng.Fields.MetaData = fn;
 
                                             resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
                                         }
@@ -1299,6 +1359,172 @@ namespace MagImport
 
         }
 
+        static string ErrInvSymbolExpMsg = "MagisteryToJSON::_JSONParse: Invalid symbol \"{0}\" at position {1}. Expected one is \"{2}\".";
+        static string ErrInvIntMsg = "MagisteryToJSON::_JSONParse: Invalid integer value \"{0}\" at position {1}.";
+        static string ErrInvDblMsg = "MagisteryToJSON::_JSONParse: Invalid double value \"{0}\" at position {1}.";
+        static string ErrInvBoolMsg = "MagisteryToJSON::_JSONParse: Invalid bool value \"{0}\" at position {1}.";
+        static string ErrInvTokTpMsg = "MagisteryToJSON::_JSONParse: Invalid token type \"{0}\" at position {1}.";
+        static string ErrEOLMsg = "MagisteryToJSON::_JSONParse: Unexpected EOL at position {0}.";
+        static string DfltSeps = ";";
+
+        static char _getNext(StringBuilder sb, ref int curr_pos, char ch_expected = '\0')
+        {
+            if (curr_pos >= sb.Length)
+                throw new Exception(String.Format(ErrEOLMsg, curr_pos));
+            char ch = sb[curr_pos];
+            if ((ch_expected != '\0') && (ch != ch_expected))
+                throw new Exception(String.Format(ErrInvSymbolExpMsg, ch, curr_pos, ch_expected));
+            curr_pos++;
+            return ch;
+        }
+
+        static string _getSeparated(StringBuilder sb, ref int curr_pos, string seps_val = null)
+        {
+            string seps = seps_val == null ? DfltSeps : seps_val;
+            StringBuilder res = new StringBuilder();
+            while (true)
+            {
+                char ch = _getNext(sb, ref curr_pos);
+                bool isDone = false;
+                for (int i = 0; i < seps.Length; i++)
+                    if (ch == seps[i])
+                    {
+                        isDone = true;
+                        break;
+                    }
+                if (isDone)
+                    break;
+                res.Append(ch);
+            }
+            return res.ToString();
+        }
+
+        static int _getInt(StringBuilder sb, ref int curr_pos, string seps_val = null)
+        {
+            int start_pos = curr_pos;
+            string int_str = _getSeparated(sb, ref curr_pos, seps_val);
+            int val;
+            if (!Int32.TryParse(int_str, out val))
+                throw new Exception(String.Format(ErrInvIntMsg, int_str, start_pos));
+            return val;
+        }
+
+        static string _getString(StringBuilder sb, ref int curr_pos, Encoding enc, bool is_quoted = true)
+        {
+            StringBuilder res = new StringBuilder();
+            int str_len_in_bytes = _getInt(sb, ref curr_pos, ":");
+
+            char[] ch = new char[1] { '"' };
+            int quotation_len = enc.GetByteCount(ch);
+            str_len_in_bytes = is_quoted ? str_len_in_bytes + 2 * quotation_len : str_len_in_bytes;
+
+            for (int i = 0; i < str_len_in_bytes; i += enc.GetByteCount(ch))
+            {
+                if (is_quoted && ((i == 0) || (i == (str_len_in_bytes - quotation_len))))
+                    ch[0] = _getNext(sb, ref curr_pos, '"');
+                else
+                    res.Append(ch[0] = _getNext(sb, ref curr_pos));
+            }
+            _getNext(sb, ref curr_pos, ';');
+            return res.ToString();
+        }
+
+        static bool _getBool(StringBuilder sb, ref int curr_pos, string seps_val = null)
+        {
+            int start_pos = curr_pos;
+            int val = _getInt(sb, ref curr_pos, seps_val);
+            if ((val < 0) || (val > 1))
+                throw new Exception(String.Format(ErrInvBoolMsg, val, start_pos));
+            return val > 0;
+        }
+
+        static double _getDouble(StringBuilder sb, ref int curr_pos, string seps_val = null)
+        {
+            int start_pos = curr_pos;
+            string dbl_str = _getSeparated(sb, ref curr_pos, seps_val);
+            double val;
+            if (!Double.TryParse(dbl_str, out val))
+                throw new Exception(String.Format(ErrInvDblMsg, dbl_str, start_pos));
+            return val;
+        }
+
+        static char _getTokenType(StringBuilder sb, ref int curr_pos, char ch_expected = '\0')
+        {
+            int start_pos = curr_pos;
+            string attr_tp = _getSeparated(sb, ref curr_pos, ":");
+            if (attr_tp.Length != 1)
+                throw new Exception(String.Format(ErrInvTokTpMsg, attr_tp, start_pos));
+            if ((ch_expected != '\0') && (attr_tp[0] != ch_expected))
+                throw new Exception(String.Format(ErrInvTokTpMsg, attr_tp, start_pos));
+            return attr_tp[0];
+        }
+
+        static JSObject _JSONParse(StringBuilder sb, ref int curr_pos, Encoding enc)
+        {
+            JSObject res = new JSObject();
+            int n_attrs = _getInt(sb, ref curr_pos, ":");
+            _getNext(sb, ref curr_pos, '{');
+            for (int i = 0; i < n_attrs; i++)
+            {
+                char token_tp = _getTokenType(sb, ref curr_pos);
+                string attr_name;
+                int start_pos = curr_pos;
+                switch (token_tp)
+                {
+                    case 's':
+                        attr_name = _getString(sb, ref curr_pos, enc);
+                        break;
+
+                    case 'i':
+                        attr_name = _getInt(sb, ref curr_pos).ToString();
+                        break;
+
+                    default:
+                        throw new Exception(String.Format(ErrInvTokTpMsg, token_tp, start_pos));
+                };
+
+                switch (_getTokenType(sb, ref curr_pos))
+                {
+                    case 's':
+                        string str_val = _getString(sb, ref curr_pos, enc);
+                        res.obj.Add(attr_name,
+                            new Tuple<JSObject.FieldType, bool, int, string, double, JSObject>(
+                                JSObject.FieldType.String, false, 0, str_val, 0, null));
+                        break;
+
+                    case 'i':
+                        int int_val = _getInt(sb, ref curr_pos);
+                        res.obj.Add(attr_name,
+                            new Tuple<JSObject.FieldType, bool, int, string, double, JSObject>(
+                                JSObject.FieldType.Int, false, int_val, null, 0, null));
+                        break;
+
+                    case 'd':
+                        double dbl_val = _getDouble(sb, ref curr_pos);
+                        res.obj.Add(attr_name,
+                            new Tuple<JSObject.FieldType, bool, int, string, double, JSObject>(
+                                JSObject.FieldType.Double, false, 0, null, dbl_val, null));
+                        break;
+
+                    case 'b':
+                        bool bool_val = _getBool(sb, ref curr_pos);
+                        res.obj.Add(attr_name,
+                            new Tuple<JSObject.FieldType, bool, int, string, double, JSObject>(
+                                JSObject.FieldType.Bool, bool_val, 0, null, 0, null));
+                        break;
+
+                    case 'a':
+                        JSObject obj_val = _JSONParse(sb, ref curr_pos, enc);
+                        res.obj.Add(attr_name,
+                            new Tuple<JSObject.FieldType, bool, int, string, double, JSObject>(
+                                JSObject.FieldType.Obj, false, 0, null, 0, obj_val));
+                        break;
+                }
+            }
+            _getNext(sb, ref curr_pos, '}');
+            return res;
+        }
+
         int stringToSec(string time)
         {
             int res = 0;
@@ -1316,12 +1542,21 @@ namespace MagImport
             MySqlCommand cmd = new MySqlCommand(sql_get_file_desc, conn);
             cmd.Parameters.AddWithValue("@PostId", obj_id);
             rdr = cmd.ExecuteReader();
-            if (rdr.Read())
+            bool is_first = true;
+            while (rdr.Read())
             {
-                res["ExtDescription"] = rdr.GetString("ext_desc");
-                res["Description"] = rdr.GetString("desc");
-                res["Name"] = rdr.GetString("name");
-                res["FileName"] = rdr.GetString("file_name");
+                if (is_first)
+                {
+                    res["ExtDescription"] = rdr.GetString("ext_desc");
+                    res["Description"] = rdr.GetString("desc");
+                    res["Name"] = rdr.GetString("name");
+                    is_first = false;
+                }
+                string meta_key = rdr.GetString("meta_key");
+                if (meta_key == "_wp_attached_file")
+                    res["FileName"] = rdr.GetString("meta_value");
+                if (meta_key == "_wp_attachment_metadata")
+                    res["MetaData"] = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value")).ToJSON();
             }
             rdr.Close();
             return res;
@@ -1375,8 +1610,8 @@ namespace MagImport
 
         const string sql_get_file_desc =
             "select `p`.`post_content` as `ext_desc`, `p`.`post_title` as `desc`, `p`.`post_name` as `name`,\n"+
-            "  `m`.`meta_value` as `file_name` from `wp_posts` `p`\n" +
-            "  left join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id` and `m`.`meta_key` = '_wp_attached_file'\n" +
+            "  `m`.`meta_value`, `m`.`meta_key` from `wp_posts` `p`\n" +
+            "  left join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id`\n" +
             "where `p`.`id` = @PostId";
 
         const string sql_get_author_to_course =
@@ -1530,6 +1765,10 @@ namespace MagImport
 
             string connStr = String.Format("server={0};user={2};database={1};password={3};port={4}",
                 server_name, db_name, user_name, pwd, server_port);
+
+            //string pjson = File.ReadAllText("mag_json.txt", Encoding.UTF8);
+            //MagisteryToJSON.JSObject obj = MagisteryToJSON.MagJSONParse(pjson);
+            //string ss = obj.ToJSON();
 
             MagisteryToJSON mag = new MagisteryToJSON(connStr);
             mag.JSONFormatting = Formatting.Indented;
