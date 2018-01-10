@@ -209,6 +209,7 @@ namespace MagImport
         {
             public int? AccountId { get; set; }
             public string Portrait { get; set; }
+            public string PortraitMeta { get; set; }
         };
 
         public class Author : DataObjTyped<AuthorFields, AuthorRoot>
@@ -280,6 +281,7 @@ namespace MagImport
             public int? AccountId { get; set; }
             public string State { get; set; }
             public string Cover { get; set; }
+            public string CoverMeta { get; set; }
             public int? Color { get; set; }
             public int? LanguageId { get; set; }
             public bool? OneLesson { get; set; }
@@ -404,6 +406,7 @@ namespace MagImport
             public int? ParentId { get; set; }
             public string LessonType { get; set; }
             public string Cover { get; set; }
+            public string CoverMeta { get; set; }
             public string URL { get; set; }
         };
 
@@ -532,6 +535,7 @@ namespace MagImport
             public string Name { get; set; }
             public string Transcript { get; set; }
             public string Audio { get; set; }
+            public string AudioMeta { get; set; }
             public string Structure { get; set; }
         };
 
@@ -895,15 +899,12 @@ namespace MagImport
                 rdr.Close();
                 if (photo_id != 0)
                 {
-                    cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
-                    cmd_det.Parameters.AddWithValue("@PostId", photo_id);
-                    cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr = cmd_det.ExecuteReader();
-                    if (rdr.Read())
-                    {
-                        au.Fields.Portrait = rdr.GetString("meta_value");
-                    }
-                    rdr.Close();
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    string fn;
+                    if (file_desc.TryGetValue("FileName", out fn))
+                        au.Fields.Portrait = fn;
+                    if (file_desc.TryGetValue("MetaData", out fn))
+                        au.Fields.PortraitMeta = fn;
                 }
             }
 
@@ -1022,15 +1023,12 @@ namespace MagImport
                 rdr.Close();
                 if (photo_id != 0)
                 {
-                    cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
-                    cmd_det.Parameters.AddWithValue("@PostId", photo_id);
-                    cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr = cmd_det.ExecuteReader();
-                    if (rdr.Read())
-                    {
-                        course.Fields.Cover = rdr.GetString("meta_value");
-                    }
-                    rdr.Close();
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    string fn;
+                    if (file_desc.TryGetValue("FileName", out fn))
+                        course.Fields.Cover = fn;
+                    if (file_desc.TryGetValue("MetaData", out fn))
+                        course.Fields.CoverMeta = fn;
                 }
             }
 
@@ -1326,26 +1324,24 @@ namespace MagImport
                 //
                 if (photo_id != 0)
                 {
-                    cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
-                    cmd_det.Parameters.AddWithValue("@PostId", photo_id);
-                    cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr = cmd_det.ExecuteReader();
-                    if (rdr.Read())
-                        lesson.Fields.Cover = rdr.GetString("meta_value");
-                    rdr.Close();
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    string fn;
+                    if (file_desc.TryGetValue("FileName", out fn))
+                        lesson.Fields.Cover = fn;
+                    if (file_desc.TryGetValue("MetaData", out fn))
+                        lesson.Fields.CoverMeta = fn;
                 }
 
                 // Audio file
                 //
                 if (audio_id != 0)
                 {
-                    cmd_det = new MySqlCommand(sql_get_postmeta_val, conn);
-                    cmd_det.Parameters.AddWithValue("@PostId", audio_id);
-                    cmd_det.Parameters.AddWithValue("@MetaKey", attached_file_meta);
-                    rdr = cmd_det.ExecuteReader();
-                    if (rdr.Read())
-                        episode_lng.Fields.Audio = rdr.GetString("meta_value");
-                    rdr.Close();
+                    Dictionary<string, string> file_desc = getFileDecription(audio_id);
+                    string fn;
+                    if (file_desc.TryGetValue("FileName", out fn))
+                        episode_lng.Fields.Audio = fn;
+                    if (file_desc.TryGetValue("MetaData", out fn))
+                        episode_lng.Fields.AudioMeta = fn;
                 }
             }
 
@@ -1553,9 +1549,9 @@ namespace MagImport
                     is_first = false;
                 }
                 string meta_key = rdr.GetString("meta_key");
-                if (meta_key == "_wp_attached_file")
+                if (meta_key == attached_file_meta)
                     res["FileName"] = rdr.GetString("meta_value");
-                if (meta_key == "_wp_attachment_metadata")
+                if (meta_key == attachment_metadata)
                     res["MetaData"] = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value")).ToJSON();
             }
             rdr.Close();
@@ -1603,6 +1599,8 @@ namespace MagImport
             "  where `post_id` = @Id";
 
         const string attached_file_meta = "_wp_attached_file";
+        const string attachment_metadata = "_wp_attachment_metadata";
+
         const string sql_get_postmeta_val =
             "select `m`.`meta_value` from `wp_posts` `p`\n" +
             "  join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id`\n" +
