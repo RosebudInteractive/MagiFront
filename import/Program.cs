@@ -656,6 +656,7 @@ namespace MagImport
             public int LanguageId { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }
+            public string RawMetaData { get; set; }
             public string MetaData { get; set; }
         };
 
@@ -698,11 +699,112 @@ namespace MagImport
             public EpisodeContentRoot() : base(CLASS_GUID) { }
         };
 
-        public class ResourceDescription: JSONSerializable
+        public class AudioFileDescriptionObj: JSONSerializable
         {
-            public string Name { get; set; }
-            public string Description { get; set; }
+            public string title { get; set; }
+            public string file { get; set; }
+            public string dataformat { get; set; }
+            public int bitrate { get; set; }
+            public int filesize { get; set; }
+            [JsonProperty("mime-type")]
+            public string mime_type { get; set; }
+            public int length { get; set; }
+            public string length_formatted { get; set; }
+        };
 
+        public class PictureResourceDescriptionObj : JSONSerializable
+        {
+            public string path { get; set; }
+            [JsonProperty("mime-type")]
+            public string mime_type { get; set; }
+            public Dictionary<string, int> size { get; set; }
+            public Dictionary<string, string> content { get; set; }
+            public string icon { get; set; }
+
+            public PictureResourceDescriptionObj(JSObject js_obj)
+            {
+                size = new Dictionary<string, int>();
+                content = new Dictionary<string, string>();
+
+                Tuple<JSObject.FieldType, bool, int, string, double, JSObject> data;
+                if (js_obj.obj.TryGetValue("width", out data) && (data.Item1 == JSObject.FieldType.Int))
+                    size.Add("width", data.Item3);
+                else
+                    throw new Exception(String.Format("csIncorrectFieldErr", "width"));
+                if (js_obj.obj.TryGetValue("height", out data) && (data.Item1 == JSObject.FieldType.Int))
+                    size.Add("height", data.Item3);
+                else
+                    throw new Exception(String.Format("csIncorrectFieldErr", "height"));
+                path = "";
+                string file;
+                mime_type = null;
+                if (js_obj.obj.TryGetValue("file", out data) && (data.Item1 == JSObject.FieldType.String))
+                {
+                    file = data.Item4;
+                    path = Path.GetDirectoryName(file).Replace("\\","/");
+                    path += path.Length > 0 ? "/" : "";
+                }
+                else
+                    throw new Exception(String.Format("csIncorrectFieldErr", "file"));
+                icon = null;
+                if (js_obj.obj.TryGetValue("sizes", out data) && (data.Item1 == JSObject.FieldType.Obj))
+                {
+                    JSObject sizes = data.Item6;
+                    if (sizes.obj.TryGetValue("thumbnail", out data) && (data.Item1 == JSObject.FieldType.Obj))
+                    {
+                        JSObject obj = data.Item6;
+                        if (obj.obj.TryGetValue("file", out data) && (data.Item1 == JSObject.FieldType.String))
+                            icon = data.Item4;
+                        if ((mime_type == null) && obj.obj.TryGetValue("mime-type", out data) && (data.Item1 == JSObject.FieldType.String))
+                            mime_type = data.Item4;
+                    }
+                    if (icon == null)
+                        icon = file;
+                    if (sizes.obj.TryGetValue("img_1366", out data) && (data.Item1 == JSObject.FieldType.Obj))
+                    {
+                        JSObject obj = data.Item6;
+                        if (obj.obj.TryGetValue("file", out data) && (data.Item1 == JSObject.FieldType.String))
+                            content.Add("l", data.Item4);
+                        if ((mime_type == null) && obj.obj.TryGetValue("mime-type", out data) && (data.Item1 == JSObject.FieldType.String))
+                            mime_type = data.Item4;
+                    }
+                    if (sizes.obj.TryGetValue("img_768", out data) && (data.Item1 == JSObject.FieldType.Obj))
+                    {
+                        JSObject obj = data.Item6;
+                        if (obj.obj.TryGetValue("file", out data) && (data.Item1 == JSObject.FieldType.String))
+                            content.Add("m", data.Item4);
+                        if ((mime_type == null) && obj.obj.TryGetValue("mime-type", out data) && (data.Item1 == JSObject.FieldType.String))
+                            mime_type = data.Item4;
+                    }
+                    if (sizes.obj.TryGetValue("img_360", out data) && (data.Item1 == JSObject.FieldType.Obj))
+                    {
+                        JSObject obj = data.Item6;
+                        if (obj.obj.TryGetValue("file", out data) && (data.Item1 == JSObject.FieldType.String))
+                            content.Add("s", data.Item4);
+                        if ((mime_type == null) && obj.obj.TryGetValue("mime-type", out data) && (data.Item1 == JSObject.FieldType.String))
+                            mime_type = data.Item4;
+                    }
+                }
+                else
+                    throw new Exception(String.Format("csIncorrectFieldErr", "sizes"));
+                if (mime_type == null)
+                    throw new Exception(String.Format("csIncorrectFieldErr", "mime-type"));
+            }
+
+            const string csIncorrectFieldErr = "PictureResourceDescriptionObj: Incorrect or missing field \"{0}\"";
+        };
+
+        public class EpisodeContentObj : JSONSerializable
+        {
+            public string title { get; set; }
+            public string title2 { get; set; }
+            public int track { get; set; }
+            public double duration { get; set; }
+            public EpisodeContentObj()
+            {
+                track = 1;
+                duration = 0;
+            }
         };
 
         public class JSObject
@@ -1236,6 +1338,18 @@ namespace MagImport
                         }
                     }
 
+                // Audio file
+                //
+                if (audio_id != 0)
+                {
+                    Dictionary<string, string> file_desc = getFileDecription(audio_id);
+                    string fn;
+                    if (file_desc.TryGetValue("FileName", out fn))
+                        episode_lng.Fields.Audio = fn;
+                    if (file_desc.TryGetValue("MetaData", out fn))
+                        episode_lng.Fields.AudioMeta = fn;
+                }
+
                 // Pictures
                 //
                 Dictionary<int, Tuple<Resource, ResourceLng>> resourcesDB = new Dictionary<int, Tuple<Resource, ResourceLng>>();
@@ -1263,7 +1377,8 @@ namespace MagImport
                                     }
                                     else
                                     {
-                                        Dictionary<string, string> file_desc = getFileDecription(picture_id);
+                                        JSObject meta = null;
+                                        Dictionary<string, string> file_desc = getFileDecription(picture_id,out meta);
                                         string fn;
                                         if (file_desc.TryGetValue("FileName", out fn))
                                         {
@@ -1281,7 +1396,11 @@ namespace MagImport
                                             if (file_desc.TryGetValue("ExtDescription", out fn))
                                                 res_lng.Fields.Description = fn;
                                             if (file_desc.TryGetValue("MetaData", out fn))
-                                                res_lng.Fields.MetaData = fn;
+                                            {
+                                                res_lng.Fields.RawMetaData = fn;
+                                                PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                                                res_lng.Fields.MetaData = pict.ToJSONString();
+                                            }
 
                                             resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
                                         }
@@ -1294,10 +1413,10 @@ namespace MagImport
                                         epi_content.Fields.CompType = "PIC";
                                         epi_content.Fields.Content =
                                             (
-                                                new ResourceDescription
+                                                new EpisodeContentObj
                                                 {
-                                                    Name = res_lng.Fields.Name,
-                                                    Description = res_lng.Fields.Description
+                                                    title = res_lng.Fields.Name,
+                                                    title2 = res_lng.Fields.Description
                                                 }
                                             )
                                             .ToJSONString();
@@ -1330,18 +1449,6 @@ namespace MagImport
                         lesson.Fields.Cover = fn;
                     if (file_desc.TryGetValue("MetaData", out fn))
                         lesson.Fields.CoverMeta = fn;
-                }
-
-                // Audio file
-                //
-                if (audio_id != 0)
-                {
-                    Dictionary<string, string> file_desc = getFileDecription(audio_id);
-                    string fn;
-                    if (file_desc.TryGetValue("FileName", out fn))
-                        episode_lng.Fields.Audio = fn;
-                    if (file_desc.TryGetValue("MetaData", out fn))
-                        episode_lng.Fields.AudioMeta = fn;
                 }
             }
 
@@ -1534,7 +1641,14 @@ namespace MagImport
 
         Dictionary<string, string> getFileDecription(int obj_id)
         {
+            JSObject raw_meta = null;
+            return getFileDecription(obj_id, out raw_meta);
+        }
+
+        Dictionary<string, string> getFileDecription(int obj_id, out JSObject raw_meta)
+        {
             Dictionary<string, string> res = new Dictionary<string, string>();
+            raw_meta = null;
             MySqlCommand cmd = new MySqlCommand(sql_get_file_desc, conn);
             cmd.Parameters.AddWithValue("@PostId", obj_id);
             rdr = cmd.ExecuteReader();
@@ -1543,7 +1657,7 @@ namespace MagImport
             {
                 if (is_first)
                 {
-                    res["ExtDescription"] = rdr.GetString("ext_desc");
+                    res["ExtDescription"] = String.IsNullOrEmpty(rdr.GetString("ext_desc")) ? null : rdr.GetString("ext_desc");
                     res["Description"] = rdr.GetString("desc");
                     res["Name"] = rdr.GetString("name");
                     is_first = false;
@@ -1552,7 +1666,10 @@ namespace MagImport
                 if (meta_key == attached_file_meta)
                     res["FileName"] = rdr.GetString("meta_value");
                 if (meta_key == attachment_metadata)
-                    res["MetaData"] = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value")).ToJSON();
+                {
+                    raw_meta = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value"));
+                    res["MetaData"] = raw_meta.ToJSON();
+                }
             }
             rdr.Close();
             return res;
