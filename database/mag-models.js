@@ -143,6 +143,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Transcript", { type: "string", allowNull: true })
             .addField("Audio", { type: "string", length: 255, allowNull: true })
             .addField("AudioMeta", { type: "string", allowNull: true })
+            .addField("RawAudioMeta", { type: "string", allowNull: true })
             .addField("Structure", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("EpisodeLesson", "94d10a1d-d902-489b-8243-5c2dfea57174", "RootEpisodeLesson", "83abc96a-5184-4ed2-a9f2-ccd64733a22e")

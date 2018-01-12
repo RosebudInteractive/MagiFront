@@ -94,7 +94,7 @@ const EPISODE_INS_TREE = {
 };
 
 const EPISODE_MSSQL_ID_REQ =
-    "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
+    "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[AudioMeta], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
     "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId] and el.[LanguageId] = <%= languageId %>\n" +
     "  join [EpisodeLesson] els on e.[Id] = els.[EpisodeId]\n" +
     "where e.[Id] = <%= id %> and els.[LessonId] = <%= lessonId %>";
@@ -115,7 +115,7 @@ const EPISODE_MSSQL_CONT_REQ =
     "order by t.[StartTime]";
 
 const EPISODE_MYSQL_ID_REQ =
-    "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
+    "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`AudioMeta`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
     "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId` and el.`LanguageId` = <%= languageId %>\n" +
     "  join `EpisodeLesson` els on e.`Id` = els.`EpisodeId`\n" +
     "where e.`Id` = <%= id %> and els.`LessonId` = <%= lessonId %>";

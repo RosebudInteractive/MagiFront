@@ -186,7 +186,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], ll.[Language], l.[Name], l.[Description] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
     "  join[ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  left join [Language] ll on ll.[Id] = r.[LanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
@@ -201,7 +201,7 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, ll.`Language`, l.`Name`, l.`Description` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  left join `Language` ll on ll.`Id` = r.`LanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
@@ -353,6 +353,26 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getResources(id) {
+        let resources = [];
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                        mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            resources = result.detail;
+                        }
+                        return resources;
+                    })
+            );
+        })
+    }
+
+    getPlayerData(id) {
         let resources = [];
         return new Promise((resolve, reject) => {
             resolve(

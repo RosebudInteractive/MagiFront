@@ -536,6 +536,7 @@ namespace MagImport
             public string Transcript { get; set; }
             public string Audio { get; set; }
             public string AudioMeta { get; set; }
+            public string RawAudioMeta { get; set; }
             public string Structure { get; set; }
         };
 
@@ -684,6 +685,8 @@ namespace MagImport
             public int StartTime { get; set; }
             public int Duration { get; set; }
             public string Content { get; set; }
+            [JsonIgnore]
+            public EpisodeContentObj contentObj { get; set; }
         };
 
         public class EpisodeContent : DataObjTyped<EpisodeContentFields, EpisodeContentRoot>
@@ -702,7 +705,6 @@ namespace MagImport
         public class AudioFileDescriptionObj: JSONSerializable
         {
             public string title { get; set; }
-            public string file { get; set; }
             public string dataformat { get; set; }
             public int bitrate { get; set; }
             public int filesize { get; set; }
@@ -710,6 +712,75 @@ namespace MagImport
             public string mime_type { get; set; }
             public int length { get; set; }
             public string length_formatted { get; set; }
+
+            public AudioFileDescriptionObj(JSObject js_obj)
+            {
+                Tuple<JSObject.FieldType, bool, int, string, double, JSObject> data;
+                if (js_obj.obj.TryGetValue("album", out data) && (data.Item1 == JSObject.FieldType.String))
+                    title = String.IsNullOrEmpty(data.Item4) ? null : data.Item4;
+
+                if (js_obj.obj.TryGetValue("dataformat", out data) && (data.Item1 == JSObject.FieldType.String))
+                    dataformat = data.Item4;
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "dataformat"));
+
+                if (js_obj.obj.TryGetValue("mime_type", out data) && (data.Item1 == JSObject.FieldType.String))
+                    mime_type = data.Item4;
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "mime_type"));
+
+                if (js_obj.obj.TryGetValue("length_formatted", out data) && (data.Item1 == JSObject.FieldType.String))
+                    length_formatted = data.Item4;
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "length_formatted"));
+
+                if (js_obj.obj.TryGetValue("bitrate", out data) && ((data.Item1 == JSObject.FieldType.Int) || (data.Item1 == JSObject.FieldType.String)))
+                {
+                    if (data.Item1 == JSObject.FieldType.String)
+                    {
+                        int val;
+                        if(!Int32.TryParse(data.Item4,out val))
+                            throw new Exception(String.Format(csIncorrectFieldErr, "bitrate"));
+                        bitrate = val;
+                    }
+                    else
+                        bitrate = data.Item3;
+                }
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "bitrate"));
+
+                if (js_obj.obj.TryGetValue("filesize", out data) && ((data.Item1 == JSObject.FieldType.Int) || (data.Item1 == JSObject.FieldType.String)))
+                {
+                    if (data.Item1 == JSObject.FieldType.String)
+                    {
+                        int val;
+                        if (!Int32.TryParse(data.Item4, out val))
+                            throw new Exception(String.Format(csIncorrectFieldErr, "filesize"));
+                        filesize = val;
+                    }
+                    else
+                        filesize = data.Item3;
+                }
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "filesize"));
+
+                if (js_obj.obj.TryGetValue("length", out data) && ((data.Item1 == JSObject.FieldType.Int) || (data.Item1 == JSObject.FieldType.String)))
+                {
+                    if (data.Item1 == JSObject.FieldType.String)
+                    {
+                        int val;
+                        if (!Int32.TryParse(data.Item4, out val))
+                            throw new Exception(String.Format(csIncorrectFieldErr, "length"));
+                        length = val;
+                    }
+                    else
+                        length = data.Item3;
+                }
+                else
+                    throw new Exception(String.Format(csIncorrectFieldErr, "length"));
+            }
+
+            const string csIncorrectFieldErr = "PictureResourceDescriptionObj: Incorrect or missing field \"{0}\"";
         };
 
         public class PictureResourceDescriptionObj : JSONSerializable
@@ -730,11 +801,11 @@ namespace MagImport
                 if (js_obj.obj.TryGetValue("width", out data) && (data.Item1 == JSObject.FieldType.Int))
                     size.Add("width", data.Item3);
                 else
-                    throw new Exception(String.Format("csIncorrectFieldErr", "width"));
+                    throw new Exception(String.Format(csIncorrectFieldErr, "width"));
                 if (js_obj.obj.TryGetValue("height", out data) && (data.Item1 == JSObject.FieldType.Int))
                     size.Add("height", data.Item3);
                 else
-                    throw new Exception(String.Format("csIncorrectFieldErr", "height"));
+                    throw new Exception(String.Format(csIncorrectFieldErr, "height"));
                 path = "";
                 string file;
                 mime_type = null;
@@ -745,7 +816,7 @@ namespace MagImport
                     path += path.Length > 0 ? "/" : "";
                 }
                 else
-                    throw new Exception(String.Format("csIncorrectFieldErr", "file"));
+                    throw new Exception(String.Format(csIncorrectFieldErr, "file"));
                 icon = null;
                 if (js_obj.obj.TryGetValue("sizes", out data) && (data.Item1 == JSObject.FieldType.Obj))
                 {
@@ -786,9 +857,9 @@ namespace MagImport
                     }
                 }
                 else
-                    throw new Exception(String.Format("csIncorrectFieldErr", "sizes"));
+                    throw new Exception(String.Format(csIncorrectFieldErr, "sizes"));
                 if (mime_type == null)
-                    throw new Exception(String.Format("csIncorrectFieldErr", "mime-type"));
+                    throw new Exception(String.Format(csIncorrectFieldErr, "mime-type"));
             }
 
             const string csIncorrectFieldErr = "PictureResourceDescriptionObj: Incorrect or missing field \"{0}\"";
@@ -1340,14 +1411,21 @@ namespace MagImport
 
                 // Audio file
                 //
+                int audio_duration = 0;
                 if (audio_id != 0)
                 {
-                    Dictionary<string, string> file_desc = getFileDecription(audio_id);
+                    JSObject meta = null;
+                    Dictionary<string, string> file_desc = getFileDecription(audio_id, out meta);
                     string fn;
                     if (file_desc.TryGetValue("FileName", out fn))
                         episode_lng.Fields.Audio = fn;
                     if (file_desc.TryGetValue("MetaData", out fn))
-                        episode_lng.Fields.AudioMeta = fn;
+                    {
+                        episode_lng.Fields.RawAudioMeta = fn;
+                        AudioFileDescriptionObj audio_dsc = new AudioFileDescriptionObj(meta);
+                        audio_duration = audio_dsc.length;
+                        episode_lng.Fields.AudioMeta = audio_dsc.ToJSONString();
+                    }
                 }
 
                 // Pictures
@@ -1356,12 +1434,13 @@ namespace MagImport
                 if (lesson_prop_value.TryGetValue(att_lsn_rc_name, out val))
                     if (Int32.TryParse(val, out int_val))
                     {
-                        EpisodeContent epi_content_prev = null;
+                        SortedDictionary<int, List<EpisodeContent>> ordered_picts = new SortedDictionary<int, List<EpisodeContent>>();
+                        List<EpisodeContent> lst;
                         for (int i = 0; i < int_val; i++)
                         {
                             string att_id = String.Format(att_lsn_rc_id_name, i);
                             string att_time = String.Format(att_lsn_rc_tm_name, i);
-                            string att_time_ms = String.Format(att_lsn_toc_tms_name, i);
+                            string att_time_ms = String.Format(att_lsn_rc_tms_name, i);
                             int picture_id;
                             if (lesson_prop_value.TryGetValue(att_id, out val))
                             {
@@ -1411,15 +1490,15 @@ namespace MagImport
                                         epi_content.Fields.EpisodeLngId = episode_lng.Fields.Id;
                                         epi_content.Fields.ResourceId = resource.Fields.Id;
                                         epi_content.Fields.CompType = "PIC";
-                                        epi_content.Fields.Content =
+                                        epi_content.Fields.contentObj =
                                             (
                                                 new EpisodeContentObj
                                                 {
                                                     title = res_lng.Fields.Name,
-                                                    title2 = res_lng.Fields.Description
+                                                    title2 = res_lng.Fields.Description,
+                                                    track = 1
                                                 }
-                                            )
-                                            .ToJSONString();
+                                            );
                                         epi_content.Fields.Duration = 0;
                                         epi_content.Fields.StartTime = 0;
                                         int tms = 0;
@@ -1428,15 +1507,40 @@ namespace MagImport
                                         if (lesson_prop_value.TryGetValue(att_time, out val))
                                         {
                                             epi_content.Fields.StartTime = stringToSec(val) * 1000 + tms;
-                                            if (epi_content_prev != null)
-                                                epi_content_prev.Fields.Duration =
-                                                    epi_content.Fields.StartTime - epi_content_prev.Fields.StartTime;
+                                            if (ordered_picts.TryGetValue(epi_content.Fields.StartTime, out lst))
+                                                lst.Add(epi_content);
+                                            else
+                                                ordered_picts.Add(epi_content.Fields.StartTime,
+                                                    new List<EpisodeContent>() { epi_content });
                                         }
-                                        epi_content_prev = epi_content;
                                     }
                                 }
                             }
                         }
+
+                        List<EpisodeContent> lst_prev = null;
+                        int curr_time = 0;
+                        foreach (KeyValuePair<int, List<EpisodeContent>> p in ordered_picts)
+                        {
+                            curr_time = p.Value[0].Fields.StartTime;
+                            if (lst_prev != null)
+                            {
+                                foreach (EpisodeContent epc in lst_prev)
+                                {
+                                    epc.Fields.Duration = curr_time - epc.Fields.StartTime;
+                                    epc.Fields.contentObj.duration = (double)epc.Fields.Duration / 1000;
+                                    epc.Fields.Content = epc.Fields.contentObj.ToJSONString();
+                                }
+                            }
+                            lst_prev = p.Value;
+                        }
+                        if (lst_prev != null)
+                            foreach (EpisodeContent epc in lst_prev)
+                            {
+                                epc.Fields.Duration = audio_duration * 1000 - epc.Fields.StartTime;
+                                epc.Fields.contentObj.duration = (double)epc.Fields.Duration / 1000.0;
+                                epc.Fields.Content = epc.Fields.contentObj.ToJSONString();
+                            }
                     }
 
                 // Cover
