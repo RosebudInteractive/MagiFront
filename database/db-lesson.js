@@ -190,6 +190,27 @@ const LESSON_MSSQL_RESOURCE_REQ =
     "  join[ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  left join [Language] ll on ll.[Id] = r.[LanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
+const LESSON_MSSQL_TOC_REQ =
+    "select e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
+    "where e.[LessonId] = <%= id %>\n" +
+    "order by e.[Id], t.[Number]";
+const LESSON_MSSQL_CONTENT_REQ =
+    "select e.[Id] Episode, t.[Id], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
+    "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "where e.[LessonId] = <%= id %>\n" +
+    "order by e.[Id], t.[StartTime]";
+const LESSON_MSSQL_ASSETS_REQ =
+    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "where e.[LessonId] = <%= id %>";
 
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
@@ -205,6 +226,27 @@ const LESSON_MYSQL_RESOURCE_REQ =
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  left join `Language` ll on ll.`Id` = r.`LanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
+const LESSON_MYSQL_TOC_REQ =
+    "select e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
+    "where e.`LessonId` = <%= id %>\n" +
+    "order by e.`Id`, t.`Number`";
+const LESSON_MYSQL_CONTENT_REQ =
+    "select e.`Id` Episode, t.`Id`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
+    "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "where e.`LessonId` = <%= id %>\n" +
+    "order by e.`Id`, t.`StartTime`";
+const LESSON_MYSQL_ASSETS_REQ =
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "where e.`LessonId` = <%= id %>";
 
 const EPISODE_MSSQL_DELETE_SCRIPT =
     [
@@ -373,20 +415,100 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getPlayerData(id) {
-        let resources = [];
+        let data = { assets: [], episodes: [] };
+        let epi_list = {};
+        let assets_list = {};
+
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                        mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                        mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                        mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id })
                     }
                 }, {})
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
-                            resources = result.detail;
+                            result.detail.forEach((elem) => {
+                                if (!assets_list[elem.Id]) {
+                                    let asset = {
+                                        id: elem.Id,
+                                        file: elem.FileName,
+                                        info: JSON.parse(elem.MetaData)
+                                    };
+                                    if (elem.Name)
+                                        asset.title = elem.Name;    
+                                    if (elem.Description)
+                                        asset.title2 = elem.Description;    
+                                    assets_list[elem.Id] = asset;
+                                    data.assets.push(asset);
+                                }
+                            });
                         }
-                        return resources;
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                mssql: _.template(LESSON_MSSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let curr_id = -1;
+                            let curr_episode = null;;
+                            
+                            result.detail.forEach((elem) => {
+                                let assetId = elem.AssetId;
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = {
+                                        id: elem.Episode,
+                                        elements: [],
+                                        audio: {
+                                            file: elem.Audio,
+                                            info: JSON.parse(elem.AudioMeta)
+                                        },
+                                        contents: []
+                                    };
+                                    data.episodes.push(curr_episode);
+                                    epi_list[elem.Episode] = curr_episode;
+                                    curr_id = elem.Episode;
+                                }
+                                let curr_elem = {
+                                    id: elem.Id,
+                                    assetId: assetId,
+                                    start: elem.StartTime/ 1000.,
+                                    content: JSON.parse(elem.Content),
+                                };
+                                curr_episode.elements.push(curr_elem);
+                                if (!assets_list[assetId])
+                                    throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode+").");    
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = epi_list[elem.Episode];
+                                    if (!curr_episode)
+                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");    
+                                }
+                                curr_episode.contents.push({
+                                    id: elem.Id,
+                                    title: elem.Topic,
+                                    begin: elem.StartTime / 1000.
+                                });
+                            });
+                        }
+                        return data;
                     })
             );
         })

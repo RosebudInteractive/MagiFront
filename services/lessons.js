@@ -25,6 +25,17 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/lessons/player/:id', (req, res, next) => {
+        LessonsService()
+            .getPlayerData(parseInt(req.params.id))
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.post('/api/lessons/:courseId', (req, res, next) => {
         LessonsService()
             .insert(req.body, parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
