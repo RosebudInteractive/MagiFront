@@ -25,7 +25,7 @@ function setupLessons(app) {
             });
     });
 
-    app.get('/api/lessons/player/:id', (req, res, next) => {
+    app.get('/api/lessons/play/:id', (req, res, next) => {
         LessonsService()
             .getPlayerData(parseInt(req.params.id))
             .then(rows => {
