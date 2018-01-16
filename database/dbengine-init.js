@@ -1,11 +1,17 @@
 const uccelloDir = '../../Uccello2';
-
+const path = require('path');
 
 exports.DbEngineInit = class DbEngineInit {
     constructor(options) {
 
         var debugFlag = false;
         var autoImportFlag = false;
+
+        var impDir = __dirname + "/data/";
+        var is_impDir_next = false;
+        
+        var httpPort = options && options.http && options.http.port ? options.http.port : 3000;
+        var is_httpPort_next = false;
 
         var provider = null;
         var is_provider_next = false;
@@ -33,6 +39,18 @@ exports.DbEngineInit = class DbEngineInit {
 
         for (var _cnt = 0; _cnt < process.argv.length; _cnt++) {
             var _arg = process.argv[_cnt];
+
+            if (is_impDir_next) {
+                is_impDir_next = false;
+                impDir = path.normalize(__dirname + "/../" + _arg + "/");
+                continue;
+            }
+
+            if (is_httpPort_next) {
+                is_httpPort_next = false;
+                httpPort = parseInt(_arg);
+                continue;
+            }
 
             if (is_provider_next) {
                 is_provider_next = false;
@@ -77,6 +95,14 @@ exports.DbEngineInit = class DbEngineInit {
             }
 
             switch (_arg) {
+
+                case "-D":
+                    is_impDir_next = true;
+                    break;
+
+                case "-P":
+                    is_httpPort_next = true;
+                    break;
 
                 case "-v":
                     is_provider_next = true;
@@ -124,6 +150,12 @@ exports.DbEngineInit = class DbEngineInit {
             }
         };
 
+        if (options) {
+            if (!options.http)
+                options.http = {};    
+            options.http.port = httpPort;
+        }
+
         var mssql_connection = { //MSSQL
             host: process.env.MS_HOST || host || "10.1.1.3", // "SQL-SERVER"
             port: process.env.MS_PORT || port || 1435,       // instanceName: "SQL2008R2"
@@ -162,16 +194,16 @@ exports.DbEngineInit = class DbEngineInit {
 
         const UccelloConfig = require(uccelloDir + '/config/config');
         global.UCCELLO_CONFIG = new UccelloConfig({
-            dataPath: __dirname + '/data/',
+            dataPath: impDir,
             uccelloPath: __dirname + '/' + uccelloDir + '/',
             dataman: {
                 connection: USE_MSSQL_SERVER ? mssql_connection : mysql_connection,
 
                 importData: {
                     autoimport: autoImportFlag,
-                    dir: __dirname + "/data/tables",
-                    metaDir: __dirname + "/data/meta",
-                    dataModelsDir: __dirname + "/data/data-models"
+                    dir: impDir + "tables",
+                    metaDir: impDir + "meta",
+                    dataModelsDir: impDir + "data-models"
                 },
                 trace: {
                     sqlCommands: sqlTrace,
@@ -182,8 +214,8 @@ exports.DbEngineInit = class DbEngineInit {
                 useDb: true,
                 defaultProduct: "ProtoOne",
                 sourceDir: [
-                    { path: __dirname + "/data/meta/", type: "META" },
-                    { path: __dirname + "/data/data-models/", type: "DMODEL" }
+                    { path: impDir + "meta/", type: "META" },
+                    { path: impDir + "data-models/", type: "DMODEL" }
                 ]
             },
             resourceBuilder: {
@@ -191,7 +223,7 @@ exports.DbEngineInit = class DbEngineInit {
                     { Code: "META", Name: "Meta Model", ClassName: "MetaModel", Description: "Мета-информация" },
                     { Code: "DMODEL", Name: "Data Model", ClassName: "DataModel", Description: "Data-модель" }
                 ],
-                destDir: __dirname + "/data/tables/",
+                destDir: impDir + "tables/",
                 formResTypeId: 1,
                 productId: 2,
                 currBuildId: 2
@@ -681,6 +713,31 @@ exports.DbEngineInit = class DbEngineInit {
                })
                .then((result) => {
                    console.log("NEW Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
+               })
+               .then(() => {
+                   return epi.update(new_episode_id, new_lesson_id, {
+                       EpisodeType: "L",
+                       State: "R",
+                       Audio: "/assets/audio/111.mp3",
+                       Name: "New Episode Upd",
+                       Structure: "{id:111}",
+                       Transcript: "Upd New Episode of a New Lection " + new_lesson_id
+                   })
+                    .then(() => {
+                        return epi.get(new_episode_id, new_lesson_id);
+                    });
+               })
+               .then((result) => {
+                   console.log("Updated Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
+               })
+               .then(() => {
+                   return epi.del(new_episode_id, new_lesson_id)
+                       .then(() => {
+                           return epi.get(new_episode_id, new_lesson_id);
+                       });
+               })
+               .then((result) => {
+                   console.log("Deleted Episode in Lesson " + new_lesson_id + " [get]: " + JSON.stringify(result));
                })
                .catch((err) => {
                    console.error("ERROR: " + err.message);

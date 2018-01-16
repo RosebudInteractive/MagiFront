@@ -17,10 +17,10 @@ var log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 
-bld.initDatabase()
+//bld.initDatabase()
+Promise.resolve()
     .then(() => {
-        log.info("Init Db succeded!")
-        // Prepare http server
+        // log.info("Init Db succeded!")
 
         // Prepare http server
         var express = require('express');
@@ -29,28 +29,30 @@ bld.initDatabase()
 
         var compiler = webpack(config);
         try {
-            app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
+            app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
             app.use(webpackHotMiddleware(compiler));
         }
         catch (e) {
             console.log(e)
         }
 
-        app.use('/assets', express.static('assets'))
+        app.use('/assets', express.static('assets'));
+        app.use('/data', express.static('../uploads'));
 
-        var {setupAPI} = require("./services/setup");
+        var { setupAPI } = require("./services/setup");
         setupAPI(express, app);
 
-    app.get("/*", function(req, res) {
-        res.sendFile(__dirname + '/index.html');
-    })
+        app.get("/*", function (req, res) {
+            res.sendFile(__dirname + '/index.html');
+        });
+
         app.get('/ErrorExample', function (req, res, next) {
             next(new Error('Random error!'));
         });
 
         app.get("/", function (req, res) {
             res.sendFile(__dirname + '/index.html');
-        })
+        });
 
         app.listen(port, function (error) {
             if (error) {
@@ -65,7 +67,7 @@ bld.initDatabase()
         console.error("Server exited with error", err);
         process.exit(1);
     })
-    .catch((e)=> {
+    .catch((e) => {
         console.log(e)
     });
 

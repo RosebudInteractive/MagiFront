@@ -1,4 +1,5 @@
 const { DbObject } = require('./db-object');
+const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -39,12 +40,24 @@ const LESSON_REQ_TREE = {
                 },
                 {
                     dataObject: {
-                        name: "EpisodeLesson"
+                        name: "Lesson"
                     }
                 },
                 {
                     dataObject: {
-                        name: "LessonCourse"
+                        name: "Resource",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "ResourceLng"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "EpisodeLesson"
                     }
                 }
             ]
@@ -76,7 +89,19 @@ const LESSON_UPD_TREE = {
                 },
                 {
                     dataObject: {
-                        name: "LessonCourse"
+                        name: "Lesson"
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "Resource",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "ResourceLng"
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -161,10 +186,31 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], ll.[Language], l.[Name], l.[Description] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
     "  join[ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  left join [Language] ll on ll.[Id] = r.[LanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
+const LESSON_MSSQL_TOC_REQ =
+    "select e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
+    "where e.[LessonId] = <%= id %>\n" +
+    "order by e.[Id], t.[Number]";
+const LESSON_MSSQL_CONTENT_REQ =
+    "select e.[Id] Episode, t.[Id], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
+    "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "where e.[LessonId] = <%= id %>\n" +
+    "order by e.[Id], t.[StartTime]";
+const LESSON_MSSQL_ASSETS_REQ =
+    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "where e.[LessonId] = <%= id %>";
 
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
@@ -176,10 +222,75 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, ll.`Language`, l.`Name`, l.`Description` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  left join `Language` ll on ll.`Id` = r.`LanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
+const LESSON_MYSQL_TOC_REQ =
+    "select e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
+    "where e.`LessonId` = <%= id %>\n" +
+    "order by e.`Id`, t.`Number`";
+const LESSON_MYSQL_CONTENT_REQ =
+    "select e.`Id` Episode, t.`Id`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
+    "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "where e.`LessonId` = <%= id %>\n" +
+    "order by e.`Id`, t.`StartTime`";
+const LESSON_MYSQL_ASSETS_REQ =
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "where e.`LessonId` = <%= id %>";
+
+const EPISODE_MSSQL_DELETE_SCRIPT =
+    [
+        "delete ec from [Episode] e\n" +
+        "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
+        "  join [EpisodeContent] ec on el.[Id] = ec.[EpisodeLngId]\n" +
+        "where e.[Id] = <%= id %>",
+        "delete from [Episode] where [Id] = <%= id %>"
+    ];
+
+const EPISODE_MYSQL_DELETE_SCRIPT =
+    [
+        "delete ec from `Episode` e\n" +
+        "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
+        "  join `EpisodeContent` ec on el.`Id` = ec.`EpisodeLngId`\n" +
+        "where e.`Id` = <%= id %>",
+        "delete from `Episode` where `Id` = <%= id %>"
+    ];
+
+const LESSON_MSSQL_DELETE_SCRIPT =
+    [
+        "delete el from [Lesson] l\n" +
+        "  join [EpisodeLesson] el on l.[Id] = el.[LessonId]\n" +
+        "where l.[Id] = <%= id %>",
+        "delete ec from [Lesson] l\n" +
+        "  join[Episode] e on l.[Id] = e.[LessonId]\n" +
+        "  join[EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
+        "  join[EpisodeContent] ec on el.[Id] = ec.[EpisodeLngId]\n" +
+        "where l.[Id] = <%= id %>",
+        "delete from[Lesson] where [Id] = <%= id %>"
+    ];
+
+const LESSON_MYSQL_DELETE_SCRIPT =
+    [
+        "delete el from `Lesson` l\n" +
+        "  join `EpisodeLesson` el on l.`Id` = el.`LessonId`\n" +
+        "where l.`Id` = <%= id %>",
+        "delete ec from `Lesson` l\n" +
+        "  join`Episode` e on l.`Id` = e.`LessonId`\n" +
+        "  join`EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
+        "  join`EpisodeContent` ec on el.`Id` = ec.`EpisodeLngId`\n" +
+        "where l.`Id` = <%= id %>",
+        "delete from`Lesson` where `Id` = <%= id %>"
+    ];
 
 const DbLesson = class DbLesson extends DbObject {
 
@@ -187,13 +298,6 @@ const DbLesson = class DbLesson extends DbObject {
         super(options);
     }
 
-    _genGetterName(fname) {
-        var res = fname;
-        if (fname.length > 0) {
-            res = fname[0].toLowerCase() + fname.substring(1);
-        };
-        return res;
-    }
     _getObjById(id, expression) {
         var exp = expression || LESSON_REQ_TREE;
         return super._getObjById(id, exp);
@@ -310,19 +414,122 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
+    getPlayerData(id) {
+        let data = { assets: [], episodes: [] };
+        let epi_list = {};
+        let assets_list = {};
+
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                        mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (!assets_list[elem.Id]) {
+                                    let asset = {
+                                        id: elem.Id,
+                                        file: elem.FileName,
+                                        info: JSON.parse(elem.MetaData)
+                                    };
+                                    if (elem.Name)
+                                        asset.title = elem.Name;    
+                                    if (elem.Description)
+                                        asset.title2 = elem.Description;    
+                                    assets_list[elem.Id] = asset;
+                                    data.assets.push(asset);
+                                }
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                mssql: _.template(LESSON_MSSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let curr_id = -1;
+                            let curr_episode = null;;
+                            
+                            result.detail.forEach((elem) => {
+                                let assetId = elem.AssetId;
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = {
+                                        id: elem.Episode,
+                                        elements: [],
+                                        audio: {
+                                            file: elem.Audio,
+                                            info: JSON.parse(elem.AudioMeta)
+                                        },
+                                        contents: []
+                                    };
+                                    data.episodes.push(curr_episode);
+                                    epi_list[elem.Episode] = curr_episode;
+                                    curr_id = elem.Episode;
+                                }
+                                let curr_elem = {
+                                    id: elem.Id,
+                                    assetId: assetId,
+                                    start: elem.StartTime/ 1000.,
+                                    content: JSON.parse(elem.Content),
+                                };
+                                curr_episode.elements.push(curr_elem);
+                                if (!assets_list[assetId])
+                                    throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode+").");    
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id }),
+                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = epi_list[elem.Episode];
+                                    if (!curr_episode)
+                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");    
+                                }
+                                curr_episode.contents.push({
+                                    id: elem.Id,
+                                    title: elem.Topic,
+                                    begin: elem.StartTime / 1000.
+                                });
+                            });
+                        }
+                        return data;
+                    })
+            );
+        })
+    }
+
     del(id, course_id, parent_id) {
         return new Promise((resolve, reject) => {
             let root_obj;
             let opts = {};
-            let newId = null;
-            let collection = null;
+            let lesson_obj = null;
             let course_obj = null;
             let ls_course_collection = null;
             let ls_course_obj = null;
             let lesson_number;
 
             let transactionId = null;
+            let hasParent = typeof (parent_id) === "number";
+            let curr_parent_id;
+            let lc_parent_id;
 
+            let lsn_to_delete = [];
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
                     .then((result) => {
@@ -339,7 +546,18 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                         }
                         if (!ls_course_obj)
-                            throw new Error("Lesson (Id = " + id + ") desn't belong to course (Id = " + course_id + ").");
+                            throw new Error("Lesson (Id = " + id + ") doesn't belong to course (Id = " + course_id + ").");
+
+                        lc_parent_id = ls_course_obj.parentId();
+                        if (hasParent) {
+                            for (let i = 0; i < ls_course_collection.count(); i++) {
+                                if (ls_course_collection.get(i).id() === lc_parent_id)
+                                    curr_parent_id = ls_course_collection.get(i).lessonId();
+                            }
+                            if (curr_parent_id !== parent_id)
+                                throw new Error("Lesson (Id = " + id + ") doesn't belong to parent (Id = " + parent_id +
+                                    ") in course (Id = " + course_id + ") context.");
+                        }
 
                         return course_obj.edit()
                             .then(() => {
@@ -350,7 +568,7 @@ const DbLesson = class DbLesson extends DbObject {
                                             childs: [
                                                 {
                                                     dataObject: {
-                                                        name: "EpisodeLesson"
+                                                        name: "Lesson"
                                                     }
                                                 }
                                             ]
@@ -361,23 +579,35 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then((result) => {
                         root_obj = result;
-                        collection = root_obj.getCol("DataElements");
+                        let collection = result.getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Lesson (Id = " + id + ") doesn't exist.");
-                        return result.edit()
-                    })
-                    .then(() => {
-                        let lesson_obj = collection.get(0);
-                        if (lesson_obj.courseId() === course_id)
-                            // We need to remove whole lesson here    
-                            collection._del(lesson_obj)
 
-                        // Removing lesson reference from course    
+                        let lesson_obj = collection.get(0);
+                        if (lesson_obj.courseId() === course_id) {
+                            // We need to remove whole lesson here    
+                            lsn_to_delete.push(lesson_obj.id());
+                            let ch_collection = lesson_obj.getDataRoot("Lesson").getCol("DataElements");
+                            for (let i = 0; i < ch_collection.count(); i++)
+                                lsn_to_delete.unshift(ch_collection.get(i).id());
+                        }
+
+                        // Removing lesson reference from course
+                        let ch_to_del = [];
+                        for (let i = 0; i < ls_course_collection.count(); i++) {
+                            let lsn = ls_course_collection.get(i);
+                            if (ls_course_obj.id() === lsn.parentId())
+                                ch_to_del.push(lsn);
+                        }
+                        ch_to_del.forEach((elem) => {
+                            ls_course_collection._del(elem);
+                        });
                         ls_course_collection._del(ls_course_obj);
                         for (let i = 0; i < ls_course_collection.count(); i++) {
                             let lsn = ls_course_collection.get(i);
-                            if (lsn.number() > lesson_number)
-                                lsn.number(lsn.number() - 1);
+                            if ((hasParent && (lsn.parentId() === lc_parent_id)) || ((!hasParent) && (!lsn.parentId())))
+                                if (lsn.number() > lesson_number)
+                                    lsn.number(lsn.number() - 1);
                         }
 
                         return $data.tranStart({})
@@ -387,7 +617,18 @@ const DbLesson = class DbLesson extends DbObject {
                                 return course_obj.save(opts);
                             })
                             .then(() => {
-                                return root_obj.save(opts);
+                                if (lsn_to_delete.length > 0)
+                                    return Utils.seqExec(lsn_to_delete, (id) => {
+                                        let mysql_script = [];
+                                        LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                            mysql_script.push(_.template(elem)({ id: id }));
+                                        });
+                                        let mssql_script = [];
+                                        LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                            mssql_script.push(_.template(elem)({ id: id }));
+                                        });
+                                        return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                    });
                             });
                    })
                     .then(() => {
@@ -420,28 +661,51 @@ const DbLesson = class DbLesson extends DbObject {
     update(id, course_id, data, parent_id) {
         let self = this;
         return new Promise((resolve, reject) => {
+            let course_obj;
             let lsn_obj;
             let lsn_lng_obj;
+            let root_ch;
+            let root_res;
             let root_ref;
             let root_epi;
+            let ch_collection;
+            let ch_own_collection;
+            let res_collection;
             let ref_collection;
             let epi_collection;
             let epi_own_collection;
+            let ch_list = {};
+            let res_list = {};
             let ref_list = {};
             let epi_list = {};
             let opts = {};
             let inpFields = data || {};
             
+            let ch_new = [];
+            let res_new = [];
             let ref_new = [];
             let epi_new = [];
 
             let needToDeleteOwn = false;
+            let needToDeleteOwnCh = false;
             let transactionId = null;
 
             let ls_course_obj = null;
+            let hasParent = typeof (parent_id) === "number";
 
             resolve(
-                this._getObjById(id, LESSON_UPD_TREE)
+                this._getObjById(course_id, COURSE_REQ_TREE)
+                    .then((result) => {
+                        let collection = result.getCol("DataElements");
+                        if (collection.count() != 1)
+                            throw new Error("Course (Id = " + course_id + ") doesn't exist.");
+                        course_obj = collection.get(0);
+
+                        return course_obj.edit()
+                            .then(() => {
+                                return this._getObjById(id, LESSON_UPD_TREE);
+                            })
+                    })
                     .then((result) => {
                         let root_obj = result;
                         let collection = root_obj.getCol("DataElements");
@@ -449,28 +713,104 @@ const DbLesson = class DbLesson extends DbObject {
                             throw new Error("Lesson (Id = " + id + ") doesn't exist.");
                         lsn_obj = collection.get(0);
 
-                        collection = lsn_obj.getDataRoot("LessonCourse").getCol("DataElements");
-                        for (let i = 0; i < collection.count(); i++){
-                            if (collection.get(i).courseId() === course_id) {
-                                ls_course_obj = collection.get(i);
+                        root_ch = course_obj.getDataRoot("LessonCourse");
+                        ch_collection = root_ch.getCol("DataElements");
+                        for (let i = 0; i < ch_collection.count(); i++){
+                            if (ch_collection.get(i).lessonId() === id) {
+                                ls_course_obj = ch_collection.get(i);
                                 break;
                             }
                         }
                         if (!ls_course_obj)
-                            throw new Error("Lesson (Id = " + id + ") desn't belong to course (Id = " + course_id + ").");
+                            throw new Error("Lesson (Id = " + id + ") doesn't belong to course (Id = " + course_id + ").");
 
                         collection = lsn_obj.getDataRoot("LessonLng").getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Lesson (Id = " + id + ") has inconsistent \"LNG\" part.");
                         lsn_lng_obj = collection.get(0);
 
+                        ch_own_collection = lsn_obj.getDataRoot("Lesson").getCol("DataElements");
+                        root_res = lsn_obj.getDataRoot("Resource");
+                        res_collection = root_res.getCol("DataElements");
                         root_ref = lsn_lng_obj.getDataRoot("Reference");
                         ref_collection = root_ref.getCol("DataElements");
                         root_epi = lsn_obj.getDataRoot("EpisodeLesson");
                         epi_collection = root_epi.getCol("DataElements");
                         epi_own_collection = lsn_obj.getDataRoot("Episode").getCol("DataElements");
 
-                        if (inpFields.References && (inpFields.References.length > 0)) {
+                        if ((!hasParent) && inpFields.Childs && (typeof (inpFields.Childs.length) === "number")) {
+                            let lc_parent_id = ls_course_obj.id();
+                            for (let i = 0; i < ch_collection.count(); i++) {
+                                let obj = ch_collection.get(i);
+                                if (obj.parentId() === lc_parent_id)
+                                ch_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
+                            }
+
+                            for (let i = 0; i < ch_own_collection.count(); i++) {
+                                let obj = ch_own_collection.get(i);
+                                if (!ch_list[obj.id()])
+                                    throw new Error("Unknown own child lesson (Id = " + obj.id() + ").");
+                                ch_list[obj.id()].isOwner = true;
+                                ch_list[obj.id()].ownObj = obj;
+                            }
+
+                            let Number = 1;
+                            inpFields.Childs.forEach((elem) => {
+                                let data = {
+                                    ParentId: lc_parent_id,
+                                    LessonId: elem.Id,
+                                    Number: Number++,
+                                    State: elem.State
+                                };
+                                if (typeof (elem.ReadyDate) !== "undefined")
+                                    data.ReadyDate = elem.ReadyDate;
+                                if (ch_list[elem.Id]) {
+                                    ch_list[elem.Id].deleted = false;
+                                    ch_list[elem.Id].data = data;
+                                }
+                                else
+                                    ch_new.push(data);
+                            })
+                        }
+
+                        if (inpFields.Resources && (typeof (inpFields.Resources.length) === "number")) {
+                            for (let i = 0; i < res_collection.count(); i++) {
+                                let obj = res_collection.get(i);
+                                let collection = obj.getDataRoot("ResourceLng").getCol("DataElements");
+                                if (collection.count() != 1)
+                                    throw new Error("Resource (Id = " + obj.id() + ") has inconsistent \"LNG\" part.");
+                                let lng_obj = collection.get(0);
+                                res_list[obj.id()] = { deleted: true, obj: obj, lngObj: lng_obj };
+                            }
+
+                            inpFields.Resources.forEach((elem) => {
+                                let data = {
+                                    res: {
+                                        ResType: elem.ResType ? elem.ResType : "P",
+                                        FileName: elem.FileName
+                                    },
+                                    lng: {
+                                        Name: elem.Name ? elem.Name : ""
+                                    }
+                                };
+                                if (typeof (elem.Description) !== "undefined")
+                                    data.lng.Description = elem.Description;
+                                if (typeof (elem.Id) === "number") {
+                                    if (res_list[elem.Id]) {
+                                        res_list[elem.Id].deleted = false;
+                                        res_list[elem.Id].data = data;
+                                    }
+                                    else {
+                                        delete elem.Id;
+                                        res_new.push(data);
+                                    }
+                                }
+                                else
+                                    res_new.push(data);
+                            })
+                        }
+
+                        if (inpFields.References && (typeof (inpFields.References.length) === "number")) {
                             for (let i = 0; i < ref_collection.count(); i++) {
                                 let obj = ref_collection.get(i);
                                 ref_list[obj.id()] = { deleted: true, obj: obj };
@@ -504,7 +844,7 @@ const DbLesson = class DbLesson extends DbObject {
                             })
                         }
 
-                        if (inpFields.Episodes && (inpFields.Episodes.length > 0)) {
+                        if (inpFields.Episodes && (typeof (inpFields.Episodes.length) === "number")) {
                             for (let i = 0; i < epi_collection.count(); i++) {
                                 let obj = epi_collection.get(i);
                                 epi_list[obj.episodeId()] = { deleted: true, isOwner: false, obj: obj };
@@ -565,6 +905,27 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["ReadyDate"]) !== "undefined")
                             ls_course_obj.readyDate(inpFields["ReadyDate"]);
                         
+                        for (let key in ch_list)
+                            if (ch_list[key].deleted) {
+                                if (ch_list[key].isOwner)
+                                    needToDeleteOwnCh = true;
+                                ch_collection._del(ch_list[key].obj);
+                            }
+                            else {
+                                for (let field in ch_list[key].data)
+                                    ch_list[key].obj[self._genGetterName(field)](ch_list[key].data[field]);
+                            }
+
+                        for (let key in res_list)
+                            if (res_list[key].deleted)
+                                res_collection._del(res_list[key].obj)
+                            else {
+                                for (let field in res_list[key].data.res)
+                                    res_list[key].obj[self._genGetterName(field)](res_list[key].data.res[field]);
+                                for (let field in res_list[key].data.lng)
+                                    res_list[key].lngObj[self._genGetterName(field)](res_list[key].data.lng[field]);
+                            }
+
                         for (let key in ref_list)
                             if (ref_list[key].deleted)
                                 ref_collection._del(ref_list[key].obj)
@@ -576,13 +937,38 @@ const DbLesson = class DbLesson extends DbObject {
                         for (let key in epi_list)
                             if (epi_list[key].deleted) {
                                 if (epi_list[key].isOwner)
-                                    needToDeleteOwn = true
+                                    needToDeleteOwn = true;
                                 epi_collection._del(epi_list[key].obj);
                             }
                             else {
                                 for (let field in epi_list[key].data)
                                     epi_list[key].obj[self._genGetterName(field)](epi_list[key].data[field]);    
                             }
+                    })
+                    .then(() => {
+                        if (ch_new && (ch_new.length > 0)) {
+                            return Utils.seqExec(ch_new, (elem) => {
+                                return root_ch.newObject({
+                                    fields: elem
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        if (res_new && (res_new.length > 0)) {
+                            return Utils.seqExec(res_new, (elem) => {
+                                return root_res.newObject({
+                                    fields: elem.res
+                                }, opts)
+                                    .then((result) => {
+                                        let new_res_obj = this._db.getObj(result.newObject);
+                                        let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
+                                        return root_res_lng.newObject({
+                                            fields: elem.lng
+                                        }, opts);
+                                    });
+                            });
+                        }
                     })
                     .then(() => {
                         if (ref_new && (ref_new.length > 0)) {
@@ -607,22 +993,49 @@ const DbLesson = class DbLesson extends DbObject {
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
-                                return lsn_obj.save(opts);
+                                return lsn_obj.save(opts)
+                                    .then(() => {
+                                        return course_obj.save(opts);
+                                    });
+                            });
+                    })
+                    .then(() => {
+                        if (needToDeleteOwnCh)
+                            return Utils.seqExec(ch_list, (elem) => {
+                                let rc = Promise.resolve();
+                                if (elem.deleted && elem.isOwner) {
+                                    let id = elem.ownObj.id();
+                                    let mysql_script = [];
+                                    LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mysql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    let mssql_script = [];
+                                    LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mssql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    rc = DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                }
+                                return rc;
                             });
                     })
                     .then(() => {
                         if (needToDeleteOwn)
-                            return lsn_obj.edit();
-                    })
-                    .then(() => {
-                        if (needToDeleteOwn) {
-                            for (let key in epi_list)
-                                if (epi_list[key].deleted) {
-                                    if (epi_list[key].isOwner)
-                                        epi_own_collection._del(epi_list[key].ownObj);
+                            return Utils.seqExec(epi_list, (elem) => {
+                                let rc = Promise.resolve();
+                                if (elem.deleted && elem.isOwner) {
+                                    let id = elem.ownObj.id();
+                                    let mysql_script = [];
+                                    EPISODE_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mysql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    let mssql_script = [];
+                                    EPISODE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mssql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    rc = DbUtils.execSqlScript(mysql_script, mssql_script, opts);
                                 }
-                            return lsn_obj.save(opts);
-                        }
+                                return rc;
+                            });
                     })
                     .then(() => {
                         console.log("Lesson updated: Id=" + id + ".");
@@ -659,6 +1072,7 @@ const DbLesson = class DbLesson extends DbObject {
             let new_lng_obj = null;
             let inpFields = data || {};
             let transactionId = null;
+            let hasParent = typeof (parent_id) === "number";
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
                     .then((result) => {
@@ -759,15 +1173,73 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
+                        let root_res = new_lng_obj.getDataRoot("Resource");
+                        if (inpFields.Resources && (inpFields.Resources.length > 0)) {
+                            return Utils.seqExec(inpFields.Resources, (elem) => {
+                                let fields = { ResType: "P" };
+                                if (typeof (elem["ResType"]) !== "undefined")
+                                    fields["ResType"] = elem["ResType"];
+                                if (typeof (elem["FileName"]) !== "undefined")
+                                    fields["FileName"] = elem["FileName"];
+                                return root_res.newObject({
+                                    fields: fields
+                                }, opts)
+                                    .then((result) => {
+                                        new_res_obj = this._db.getObj(result.newObject);
+                                        let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
+                                        let fields = { Name: "", LanguageId: LANGUAGE_ID };
+                                        if (typeof (elem["Name"]) !== "undefined")
+                                            fields["Name"] = elem["Name"];
+                                        if (typeof (elem["Description"]) !== "undefined")
+                                            fields["Description"] = elem["Description"];
+                                        return root_res_lng.newObject({
+                                            fields: fields
+                                        }, opts);
+                                    });
+                            });
+                        }
+                    })
+                    .then(() => {
                         let root_lsn = course_obj.getDataRoot("LessonCourse");
                         let collection = root_lsn.getCol("DataElements");
                         let Number = collection.count() + 1;
+                        if (hasParent) {
+                            let parent_lc_id = -1;
+                            for (let i = 0; i < collection.count(); i++){
+                                if (collection.get(i).lessonId() === parent_id) {
+                                    parent_lc_id = collection.get(i).id();
+                                    break;
+                                }
+                            }
+                            if (parent_lc_id === -1)
+                                throw new Error("Parent lesson (Id=" + parent_id + ") doesn't belong to a course (Id=" + course_id + ").");
+                            Number = 1;
+                            for (let i = 0; i < collection.count(); i++) {
+                                if (collection.get(i).parentId() === parent_lc_id)
+                                    Number++;
+                            }
+                        }
                         let fields = { LessonId: newId, State: inpFields.State, Number: Number };
                         if (typeof (inpFields["ReadyDate"]) !== "undefined")
                             fields["ReadyDate"] = inpFields["ReadyDate"];
                         return root_lsn.newObject({
                             fields: fields
                         }, opts);
+                    })
+                    .then((result) => {
+                        let parent_lc_id = result.keyValue;
+                        if ((!hasParent) && inpFields.Childs && (inpFields.Childs.length > 0)) {
+                            let Number = 1;
+                            let root_lsn = course_obj.getDataRoot("LessonCourse");
+                            return Utils.seqExec(inpFields.Childs, (elem) => {
+                                let fields = { LessonId: elem.Id, ParentId: parent_lc_id, State: elem.State, Number: Number++ };
+                                if (typeof (inpFields["ReadyDate"]) !== "undefined")
+                                    fields["ReadyDate"] = inpFields["ReadyDate"];
+                                return root_lsn.newObject({
+                                    fields: fields
+                                }, opts);
+                            });
+                        }
                     })
                     .then(() => {
                         return $data.tranStart({})
