@@ -49,7 +49,7 @@ export const get = (id, courseId, parentLessonId)=> {
             payload: null
         });
 
-        fetch("/api/lessons/" + id + '/' + courseId + '/' + parentLessonId)
+        fetch("/api/lessons/" + id + '/' + courseId + '/' + parentLessonId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -128,7 +128,8 @@ export const save = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)

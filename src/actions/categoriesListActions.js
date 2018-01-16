@@ -13,14 +13,14 @@ import {
 
 import 'whatwg-fetch';
 
-export const getCategories = ()=> {
+export const getCategories = () => {
     return (dispatch) => {
         dispatch({
             type: GET_CATEGORIES_REQUEST,
             payload: null
         });
 
-        fetch("/api/categories")
+        fetch("/api/categories", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -63,45 +63,12 @@ export const cancelDelete = () => {
 
 };
 
-// export const saveCategory = (values, mode) => {
-//
-//     return (dispatch) => {
-//         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-//         let _url = "/api/categories";
-//         if (mode === EDIT_MODE_EDIT) {
-//             _url += "/" + values.id
-//         }
-//         fetch(_url,
-//             {
-//                 method: _type,
-//                 headers: {
-//                     "Content-type": "application/json"
-//                 },
-//                 body: JSON.stringify(values)
-//             })
-//             .then(checkStatus)
-//             .then(parseJSON)
-//             .then((data) => {
-//                 dispatch({
-//                     type: HIDE_EDIT_CATEGORY_DLG,
-//                     payload: data
-//                 })
-//             })
-//             .catch((err) => {
-//                 dispatch({
-//                     type: SHOW_ERROR_DIALOG,
-//                     payload: err.message
-//                 })
-//             });
-//
-//     }
-// };
-
 export const deleteCategory = (id) => {
     return (dispatch) => {
         fetch("/api/categories/" + id,
             {
-                method: "DELETE"
+                method: "DELETE",
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)

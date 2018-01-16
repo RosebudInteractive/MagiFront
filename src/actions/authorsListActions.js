@@ -13,14 +13,14 @@ import {
 
 import 'whatwg-fetch';
 
-export const getAuthors = ()=> {
+export const getAuthors = () => {
     return (dispatch) => {
         dispatch({
             type: GET_AUTHORS_LIST_REQUEST,
             payload: null
         });
 
-        fetch("/api/authors")
+        fetch("/api/authors", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -52,7 +52,8 @@ export const deleteAuthor = (id) => {
     return (dispatch) => {
         fetch("/api/authors/" + id,
             {
-                method: "DELETE"
+                method: "DELETE",
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)
