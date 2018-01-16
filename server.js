@@ -37,7 +37,7 @@ Promise.resolve()
         }
 
         app.use('/assets', express.static('assets'));
-        app.use('/u', express.static('../uploads'));
+        app.use('/data', express.static('../uploads'));
 
         var { setupAPI } = require("./services/setup");
         setupAPI(express, app);
