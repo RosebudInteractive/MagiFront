@@ -1214,8 +1214,8 @@ namespace MagImport
             Episode.AllData = allData;
             EpisodeLng.AllData = allData;
             EpisodeLesson.AllData = allData;
-            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>> lessonsDB =
-                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>>();
+            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>> lessonsDB =
+                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>>();
 
             cmd = new MySqlCommand(sql_get_lessons, conn);
             rdr = cmd.ExecuteReader();
@@ -1267,7 +1267,8 @@ namespace MagImport
                 episode_lsn.Fields.Supp = false;
 
                 lessonsDB.Add(db_id, new Tuple<Lesson, LessonLng, LessonCourse, Episode,
-                    EpisodeLng, EpisodeLesson>(lesson, lesson_lng, lesson_course, episode, episode_lng, episode_lsn));
+                    EpisodeLng, EpisodeLesson, CourseLng>(lesson, lesson_lng, lesson_course, episode,
+                        episode_lng, episode_lsn, curr_course.Item2));
             }
             rdr.Close();
 
@@ -1279,7 +1280,7 @@ namespace MagImport
             ResourceLng.AllData = allData;
             EpisodeContent.AllData = allData;
 
-            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson>> pair in lessonsDB)
+            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>> pair in lessonsDB)
             {
                 int db_id = pair.Key;
                 Lesson lesson = pair.Value.Item1;
@@ -1308,6 +1309,21 @@ namespace MagImport
 
                 int int_val = 0;
 
+                if (lesson_prop_value.TryGetValue(att_lsn_readydate_name, out val))
+                {
+                    if (!String.IsNullOrEmpty(val))
+                    {
+                        lesson_course.Fields.ReadyDate = _monthYearToDate(val);
+                    }
+                }
+                if (lesson_course.Fields.ReadyDate.HasValue)
+                {
+                    lesson_course.Fields.State = "D";
+                    lesson_lng.Fields.State = "D";
+                    episode_lng.Fields.State = "D";
+                    pair.Value.Item7.Fields.State = "D"; // CourseLng
+                }
+
                 if (lesson.HasParent)
                 {
                     lesson.Fields.ParentId = null;
@@ -1317,7 +1333,7 @@ namespace MagImport
                     if (parent_db == 0)
                         throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Invalid value of attr \"{2}\".",
                             lesson_lng.Fields.Name, db_id, att_lsn_parent_id_name));
-                    Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson> parent = null;
+                    Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng> parent = null;
                     if (!lessonsDB.TryGetValue(parent_db, out parent))
                         throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Can't find parent (DbId={2}).",
                             lesson_lng.Fields.Name, db_id, parent_db));
@@ -1732,6 +1748,40 @@ namespace MagImport
             return res;
         }
 
+        Dictionary<string, int> monthes = new Dictionary<string, int>()
+        {
+            {"январь",0 },
+            {"февраль",1 },
+            {"март",2 },
+            {"апрель",3 },
+            {"май",4 },
+            {"июнь",5 },
+            {"июль",6 },
+            {"август",7 },
+            {"сентябрь",8 },
+            {"октябрь",9 },
+            {"ноябрь",10 },
+            {"декабрь",11 }
+        };
+
+        DateTime? _monthYearToDate(string month_year)
+        {
+            DateTime? dt = null;
+            string[] date_strs = month_year.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            if (date_strs.Length == 2)
+            {
+                int month;
+                if (monthes.TryGetValue(date_strs[0], out month))
+                {
+                    month = (month + 1) % 12;
+                    int year;
+                    if (Int32.TryParse(date_strs[1], out year))
+                        dt = (new DateTime(year, month + 1, 1)).AddDays(-1);
+                }
+            }
+            return dt;
+        }
+
         int stringToSec(string time)
         {
             int res = 0;
@@ -1849,6 +1899,7 @@ namespace MagImport
         const string att_lsn_ext_name = "dop_lecture_bool";
         const string att_lsn_parent_id_name = "main_lecture";
         const string att_lsn_audio_name = "audio";
+        const string att_lsn_readydate_name = "предполагаемая_дата_публикации";
 
         const string att_lsn_toc_name = "оглавление";
         const string att_lsn_toc_dsc_name = "оглавление_{0}_название";
