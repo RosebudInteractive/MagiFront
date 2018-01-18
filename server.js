@@ -16,6 +16,7 @@ var bld = new DatabaseBuilder(magisteryConfig)
 var log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
+const { FileUpload } = require("./database/file-upload");
 
 //bld.initDatabase()
 Promise.resolve()
@@ -42,6 +43,10 @@ Promise.resolve()
         var { setupAPI } = require("./services/setup");
         setupAPI(express, app);
 
+        app.get("/testupload", function (req, res) {
+            res.sendFile(__dirname + '/FileUploadTest.html');
+        });
+
         app.get("/*", function (req, res) {
             res.sendFile(__dirname + '/index.html');
         });
@@ -53,6 +58,8 @@ Promise.resolve()
         app.get("/", function (req, res) {
             res.sendFile(__dirname + '/index.html');
         });
+
+        app.post('/upload', FileUpload.getFileUploadProc());
 
         app.listen(port, function (error) {
             if (error) {

@@ -37,6 +37,7 @@
     "babel-runtime": "^6.26.0",
     "cors": "^2.8.4",
     "express-logger": "0.0.3",
+    "formidable": "^1.1.1",
     "history": "^4.7.2",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
