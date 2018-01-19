@@ -1,174 +1,189 @@
 /*https://www.iconfinder.com/iconsets/evil-icons-user-interface*/
-#confirm .holder{
-  font: 12px sans-serif;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: rgba(0,0,0,0.25);
-  z-index: 10;
+#confirm .holder {
+    font: 12px sans-serif;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 10;
 }
+
 #confirm .popup {
-  background: #fff;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  width: 300px;
-  padding: 25px;
+    background: #fff;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    width: 300px;
+    padding: 25px;
 }
+
 #confirm .popup .dlg-btn-bar {
-  padding: 1em;
-  text-align: right;
+    padding: 1em;
+    text-align: right;
 }
+
 #confirm .popup .dlg-btn-bar .btn {
-  margin-left: 0.5em;
+    margin-left: 0.5em;
 }
+
 #confirm .no {
-  /*background-color: #63abf8;*/
-  border: 3px dotted #000000;
-  border-radius: 4px;
+    /*background-color: #63abf8;*/
+    border: 3px dotted #000000;
+    border-radius: 4px;
 }
 
 #confirm .popup .dlg-message {
-  padding: 1em 1em 0 1em;
-  font-size: 16px;
-  font-weight: 600;
+    padding: 1em 1em 0 1em;
+    font-size: 16px;
+    font-weight: 600;
 }
+
 .tabs {
-  width: 1000px;
-  display: inline-block;
-  margin-right: 30px;
-  vertical-align: top;
+    width: 1000px;
+    display: inline-block;
+    margin-right: 30px;
+    vertical-align: top;
 }
 
 .tabs-1 .tab-links {
-  margin: 0;
-  padding: 0;
-  border: 1px solid #CCC;
-  border-bottom: 1px solid #868686;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  height: 35px;
-  position: relative;
-  top: 5px;
-  font-family: 'PT Sans', Tahoma, serif;
-  font-size: 15px;
-  color: #666;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #CCC;
+    border-bottom: 1px solid #868686;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 35px;
+    position: relative;
+    top: 5px;
+    font-family: 'PT Sans', Tahoma, serif;
+    font-size: 15px;
+    color: #666;
 }
 
 .tabs-1 .tab-link {
-  padding: 0 10px;
-  cursor: pointer;
-  /*border: 1px solid transparent;*/
-  display: inline-block;
-  position: relative;
-  height: 35px;
-  line-height: 41px;
-  top: -1px;
-  left: -1px;
-  border: 1px solid #868686;
-  border-bottom: 1px solid white;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+    padding: 0 10px;
+    cursor: pointer;
+    /*border: 1px solid transparent;*/
+    display: inline-block;
+    position: relative;
+    height: 35px;
+    line-height: 41px;
+    top: -1px;
+    left: -1px;
+    border: 1px solid #868686;
+    border-bottom: 1px solid white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
 }
 
 .tabs-1 .tab-link-active {
-  font-weight: normal;
-  border: 1px solid #868686;
-  height: 40px;
-  top: -6px;
-  border-bottom: 1px solid white;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  background-color: #268fd5;
-  color: #fff
+    font-weight: normal;
+    border: 1px solid #868686;
+    height: 40px;
+    top: -6px;
+    border-bottom: 1px solid white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-color: #268fd5;
+    color: #fff
 }
 
 .tabs-1 .content {
-  padding: 10px;
-  /*border: 1px solid #868686;*/
-  /*border-top: 1px solid transparent;*/
-  /*height: 200px;*/
+    padding: 10px;
+    /*border: 1px solid #868686;*/
+    /*border-top: 1px solid transparent;*/
+    /*height: 200px;*/
 }
 
 /*.tabs-1 .tabContent: {}*/
 
 .tool-btn {
-  margin-right: 3px;
-  margin-bottom: 3px;
-  border-radius: 2px;
-  background-size: contain;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-  color: #fff;
-  height: 2.5714em;
-  width: 2.5714em;
-  border: none;
+    margin-right: 3px;
+    margin-bottom: 3px;
+    border-radius: 2px;
+    background-size: contain;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    color: #fff;
+    height: 2.5714em;
+    width: 2.5714em;
+    border: none;
 }
 
 .del {
-  background: #96c8ff url(./../icons/basket.svg);
-  height: 25px;
-  width: 25px;
-  margin-left: 2px;
-  margin-bottom: 5px;
-  margin-right: 0;
+    background: #96c8ff url(./../icons/basket.svg);
+    height: 25px;
+    width: 25px;
+    margin-left: 2px;
+    margin-bottom: 5px;
+    margin-right: 0;
 }
+
 .up {
-  background: #96c8ff url(./../icons/arrow_up.svg);
+    background: #96c8ff url(./../icons/arrow_up.svg);
 }
+
 .down {
-  background: #96c8ff url(./../icons/arrow_down.svg);
+    background: #96c8ff url(./../icons/arrow_down.svg);
 }
+
 .new {
-  background: #96c8ff url(./../icons/plus.svg);
+    background: #96c8ff url(./../icons/plus.svg);
 }
+
 .add {
-  background: #96c8ff url(./../icons/clip.svg);
+    background: #96c8ff url(./../icons/clip.svg);
 }
+
 .edit {
-  background: #96c8ff url(./../icons/pen.svg);
+    background: #96c8ff url(./../icons/pen.svg);
 }
+
 .delete {
-  background: #96c8ff url(./../icons/minus.svg);
+    background: #96c8ff url(./../icons/minus.svg);
 }
+
 .back {
-  background: url(./../icons/arrow_left.svg);
+    background: url(./../icons/arrow_left.svg);
 }
 
 button:disabled,
-button[disabled]{
-  border: 1px solid #999999;
-  background-color: #cccccc;
-  color: #666666;
+button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
 }
 
 .btn {
-  border: none;
-  border-radius: 2px;
-  display: inline-block;
-  height: 2.5714em;
-  line-height: 2.5714em;
-  font-size: 14px;
-  outline: 0;
-  padding: 0 2rem;
-  vertical-align: middle;
-  color: #fff;
-  background-color: #6383a8;
-  text-align: center;
-  transition: 0.2s ease-out;
-  cursor: pointer;
+    border: none;
+    border-radius: 2px;
+    display: inline-block;
+    height: 2.5714em;
+    line-height: 2.5714em;
+    font-size: 14px;
+    outline: 0;
+    padding: 0 2rem;
+    vertical-align: middle;
+    color: #fff;
+    background-color: #6383a8;
+    text-align: center;
+    transition: 0.2s ease-out;
+    cursor: pointer;
 }
+
 .btn:hover {
-  background-color: #6d8cb0;
+    background-color: #6d8cb0;
 }
+
 .btn.disabled {
-  background-color: #a7b3cb;
-  color: #656565;
+    background-color: #a7b3cb;
+    color: #656565;
 }
+
 article,
 aside,
 details,
@@ -180,197 +195,243 @@ hgroup,
 menu,
 nav,
 section {
-  display: block;
+    display: block;
 }
+
 h3 {
-  font-size: 22px;
-  margin: 10px 0 0;
+    font-size: 22px;
+    margin: 10px 0 0;
 }
+
 table {
-  border-collapse: collapse;
-  border-spacing: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
 }
+
 ol,
 ul {
-  list-style: none;
+    list-style: none;
 }
+
 blockquote,
 q {
-  quotes: none;
+    quotes: none;
 }
+
 blockquote:before,
 blockquote:after,
 q:before,
 q:after {
-  content: '';
-  content: none;
+    content: '';
+    content: none;
 }
+
 body,
 html,
 #root {
-  margin: 0;
-  height: 100%;
+    margin: 0;
+    height: 100%;
 }
+
 .app {
-  font: 12px sans-serif;
-  display: flex;
-  flex-direction: row;
-  height: 100%;
+    font: 12px sans-serif;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
 }
+
 .app div {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
+
 .app .left {
-  width: 20em;
-  position: relative;
+    width: 20em;
+    position: relative;
 }
+
 .app .tollbar {
-  width: 100%;
+    width: 100%;
 }
+
 .app .top-bar-size {
-  height: 5em;
+    height: 5em;
 }
+
 .app .logo-sidebar {
-  text-align: center;
-  display: block;
-  top: 0px;
-  background-color: #424b5f;
-  height: 100%;
-  color: #fff;
-  font-size: 2em;
-  position: relative;
+    text-align: center;
+    display: block;
+    top: 0px;
+    background-color: #424b5f;
+    height: 100%;
+    color: #fff;
+    font-size: 2em;
+    position: relative;
 }
+
 .app .logo-sidebar div {
-  position: absolute;
-  top: 50%;
-  transform: translate(50%, -50%);
+    position: absolute;
+    top: 50%;
+    transform: translate(50%, -50%);
 }
+
 .app .main-menu {
-  height: 100%;
-  list-style: none;
-  padding-top: 0.5em;
+    height: 100%;
+    list-style: none;
+    padding-top: 0.5em;
 }
+
 .app .main-menu .menu-item {
-  position: relative;
-  background: transparent;
+    position: relative;
+    background: transparent;
 }
+
 .app .main-menu .menu-item .link {
-  display: inline-block;
-  width: 100%;
-  height: 2.8571em;
-  padding: 0 1.25em;
-  line-height: 3em;
-  font-size: 14px;
-  color: #a7b3cb;
-  transition: 0.2s ease-out;
+    display: inline-block;
+    width: 100%;
+    height: 2.8571em;
+    padding: 0 1.25em;
+    line-height: 3em;
+    font-size: 14px;
+    color: #a7b3cb;
+    transition: 0.2s ease-out;
 }
+
 .app .main-menu .menu-item .link:hover {
-  background: #424b5f;
-  text-decoration: none;
-  color: #fff;
+    background: #424b5f;
+    text-decoration: none;
+    color: #fff;
 }
+
 .app .main-menu .menu-item .link.open {
-  background: #424b5f;
-  text-decoration: none;
-  color: #fff;
+    background: #424b5f;
+    text-decoration: none;
+    color: #fff;
 }
+
 .app .main-menu .menu-item .link.open:after {
-  border-left: 4px solid #1ba8ed;
-  content: '';
-  display: block;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
+    border-left: 4px solid #1ba8ed;
+    content: '';
+    display: block;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
 }
+
 .app .bar-bgcolor {
-  background-color: #4f5a6e;
+    background-color: #4f5a6e;
 }
+
 .app .right {
-  flex: 1 1 100px;
+    flex: 1 1 100px;
 }
+
 .app .right-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
+
 .app .right-top {
-  flex: none;
+    flex: none;
 }
+
 .app .main-area {
-  flex: 1 1 100px;
-  width: 100%;
-  overflow-y: scroll;
+    flex: 1 1 100px;
+    width: 100%;
+    overflow-y: scroll;
 }
+
 .app .page {
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  padding: 1em;
-  position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 1em;
+    position: relative;
 }
+
 .app .action-bar {
-  flex: none;
-  height: 4em;
-  width: 100%;
+    flex: none;
+    height: 4em;
+    width: 100%;
 }
+
 .app .episodes {
-  width: 100%;
-  height: 100%;
+    width: 100%;
+    height: 100%;
 }
+
 .app .episodes .episodes-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
+
 .app .episodes .grid-container {
-  flex: 1 1 100px;
-  width: 100%;
-  overflow-y: auto;
+    flex: 1 1 100px;
+    width: 100%;
+    overflow-y: auto;
 }
+
 .app .episodes .grid {
-  width: 100%;
-  height: auto;
+    width: 100%;
+    height: auto;
 }
+
 .app .dlg {
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 10;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
 }
+
 .app .dlg .dlg-bg {
-  position: absolute;
-  float: left;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  opacity: 0.6;
+    position: absolute;
+    float: left;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.6;
 }
+
 .app .dlg .dlg-window {
-  position: relative;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  top: 50%;
-  width: 300px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    top: 50%;
+    width: 300px;
 }
+
 .app .dlg .dlg-btn-bar {
-  padding: 1em;
-  text-align: right;
+    padding: 1em;
+    text-align: right;
 }
+
 .app .dlg .dlg-btn-bar .btn {
-  margin-left: 0.5em;
+    margin-left: 0.5em;
 }
+
 .app .dlg .dlg-message {
-  padding: 1em 1em 0 1em;
-  font-size: 16px;
-  font-weight: 600;
+    padding: 1em 1em 0 1em;
+    font-size: 16px;
+    font-weight: 600;
 }
+
+.app .color-box {
+    border: 1px solid #CCC;
+    border-radius: 5px;
+    height: 80%;
+    width: 80%;
+    margin-left: 4px;
+    margin-top: 3px;
+}
+
 /*  .data-grid
     width 100%
     border-collapse separate
@@ -428,6 +489,6 @@ html,
 */
 /************************************************/
 .user {
-  width: 20%;
-  vertical-align: top;
+    width: 20%;
+    vertical-align: top;
 }
