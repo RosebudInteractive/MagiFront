@@ -3,7 +3,7 @@ import {
     REMOVE_RESOURCE,
     MOVE_RESOURCE_UP,
     MOVE_RESOURCE_DOWN,
-} from '../constants/lessonResources';
+} from '../../constants/lessonResources';
 
 export const select = (id) => {
     return (dispatch) => {

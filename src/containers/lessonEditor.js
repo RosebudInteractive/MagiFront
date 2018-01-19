@@ -1,11 +1,11 @@
 import React  from 'react';
 import Webix from '../components/Webix';
 
-import * as singleLessonActions from "../actions/lessonActions";
-import * as singleCourseActions from "../actions/courseActions";
+import * as singleLessonActions from "../actions/lesson/lessonActions";
+import * as singleCourseActions from "../actions/course/courseActions";
 import * as referenceActions from '../actions/ReferencesActions';
 import * as subLessonsActions from '../actions/subLessonsActions';
-import * as lessonResourcesActions from '../actions/lessonResourcesActions';
+import * as lessonResourcesActions from '../actions/lesson/lessonResourcesActions';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';

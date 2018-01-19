@@ -2,7 +2,7 @@ import {
     SELECT_MAIN_EPISODE,
     SELECT_SUPP_EPISODE,
 
-} from '../../constants/SingleLesson'
+} from '../../constants/lesson/singleLesson'
 
 const initialState = {
     mainSelected: null,

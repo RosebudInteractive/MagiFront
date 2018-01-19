@@ -343,6 +343,11 @@ html,
     overflow-y: scroll;
 }
 
+.app .tab-scroll-box {
+    height: 300px;
+    overflow-y: scroll;
+}
+
 .app .page {
     width: 100%;
     height: 100%;

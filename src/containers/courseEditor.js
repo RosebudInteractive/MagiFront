@@ -1,7 +1,7 @@
 import React from 'react'
 import Webix from '../components/Webix';
 
-import * as singleCourseActions from "../actions/courseActions";
+import * as singleCourseActions from "../actions/course/courseActions";
 import * as coursesActions from '../actions/coursesListActions';
 import * as authorsActions from "../actions/authorsListActions";
 import * as categoriesActions from "../actions/categoriesListActions";
