@@ -1,6 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 
 import * as coursesActions from "../actions/coursesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
@@ -10,7 +10,7 @@ import YesNoDialog from "../components/YesNoDialog";
 import ErrorDialog from '../components/ErrorDialog';
 
 class Coureses extends React.Component {
-    componentDidMount(){
+    componentDidMount() {
         this.props.coursesActions.getCourses();
         this._selected = null;
     }
@@ -63,12 +63,14 @@ class Coureses extends React.Component {
                             <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
                                 <button className='tool-btn new'
                                         onClick={::this.onAddBtnClick}
-                                />{' '}
+                                />
+                                {' '}
                                 <button
                                     className={'tool-btn edit' + (selected === null ? " disabled" : "")}
                                     onClick={::this.onEditBtnClick}
                                     disabled={(selected === null)}
-                                />{' '}
+                                />
+                                {' '}
                                 <button
                                     className={'tool-btn delete' + (selected === null ? " disabled" : "")}
                                     onClick={::this.confirmDeleteCourse}
@@ -76,7 +78,7 @@ class Coureses extends React.Component {
                                 />
                             </div>
                             <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={courses} />
+                                <Webix ui={::this.getUI(::this.select)} data={courses}/>
                             </div>
                         </div>
             }
@@ -113,19 +115,29 @@ class Coureses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название', width: 200},
-                {id: 'ColorHex', header: 'Цвет курса', width: 80, template : "<span style = 'background-color : #ColorHex#; border-radius: 4px; '>#ColorHex#</span>"},
+                {id: 'Name', header: 'Название', width: 230},
+                {
+                    id: 'ColorHex',
+                    header: 'Цвет курса',
+                    width: 50,
+                    template: "<div class='color-box' style = 'background-color : #ColorHex#;'> </div>"
+                },
                 {
                     id: 'URL',
                     header: 'Ярлык URL',
                     width: 150,
                     template: (obj) => {
-                        return obj.URL ? "<a href='" + obj.URL+ "'>" + obj.URL + "</a>" : ''
+                        return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
                     },
                 },
-                {id: 'State', header: 'Состояние', width: 150, editor: 'select',
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {id: 'A', value: 'Архив'}]},
-                {id: 'LanguageName', header : 'Язык курса', width: 200},
+                {
+                    id: 'State', header: 'Состояние', width: 150, editor: 'select',
+                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {
+                        id: 'A',
+                        value: 'Архив'
+                    }]
+                },
+                {id: 'LanguageName', header: 'Язык курса', width: 200},
                 {id: "Description", header: "Описание курса", fillspace: true},
             ],
             on: {
@@ -134,7 +146,7 @@ class Coureses extends React.Component {
                         that._selected = null;
                     that.select(selObj.id);
                 },
-                onAfterRender: function() {
+                onAfterRender: function () {
                     if ((that._selected) && this.getItem(that._selected)) {
                         this.select(that._selected)
                     }
@@ -161,7 +173,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
-        commonDlgActions : bindActionCreators(commonDlgActions, dispatch),
+        commonDlgActions: bindActionCreators(commonDlgActions, dispatch),
     }
 }
 

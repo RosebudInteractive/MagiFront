@@ -30,14 +30,14 @@ import {
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
 
-} from '../constants/SingleLesson'
+} from '../../constants/lesson/singleLesson'
 
 import {
     // HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT,
-} from '../constants/Common';
+} from '../../constants/Common';
 
 
 import 'whatwg-fetch';

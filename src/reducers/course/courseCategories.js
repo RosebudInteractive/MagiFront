@@ -1,7 +1,7 @@
 import {
     SELECT_COURSE_CATEGORY,
 
-} from '../../constants/SingleCourse'
+} from '../../constants/course/singleCourse'
 
 const initialState = {
     // authors: [],

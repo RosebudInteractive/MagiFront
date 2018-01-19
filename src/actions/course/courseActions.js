@@ -24,13 +24,13 @@ import {
     GET_COURSE_AUTHORS_FAIL,
     CLEAR_COURSE,
     SAVE_COURSE_DATA,
-} from '../constants/SingleCourse'
+} from '../../constants/course/singleCourse'
 
 import {
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT,
     SHOW_ERROR_DIALOG,
-} from '../constants/Common';
+} from '../../constants/Common';
 
 import 'whatwg-fetch';
 

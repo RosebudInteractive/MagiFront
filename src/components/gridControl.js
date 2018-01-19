@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 import {EDIT_MODE_EDIT} from '../constants/Common'
@@ -32,7 +32,8 @@ export default class GridControl extends Component {
     _select(selectedObj) {
         this._isFirstSelected = selectedObj.isFirst;
         this._isLastSelected = selectedObj.isLast;
-        this.props.selectAction(selectedObj.id);
+        this._selected = selectedObj.id;
+        // this.props.selectAction(selectedObj.id);
     }
 
     _addClicked() {
@@ -46,6 +47,7 @@ export default class GridControl extends Component {
     }
 
     _remove(id) {
+        this._selected = null;
         this.props.removeAction(id);
     }
 
@@ -84,7 +86,7 @@ export default class GridControl extends Component {
         }
 
         if (addAction) {
-            _buttons.push(<button key='btnAdd' className="tool-btn add"  onClick={::this._addClicked}/>)
+            _buttons.push(<button key='btnAdd' className="tool-btn add" onClick={::this._addClicked}/>)
         }
 
         if (editAction) {
@@ -99,7 +101,8 @@ export default class GridControl extends Component {
 
         if (moveDownAction) {
             let _disabled = ((!this._selected) || (this._isLastSelected));
-            _buttons.push(<button key='btnDown' className='tool-btn down' disabled={_disabled} onClick={::this._moveDown}/>)
+            _buttons.push(<button key='btnDown' className='tool-btn down' disabled={_disabled}
+                                  onClick={::this._moveDown}/>)
         }
 
         return _buttons;
@@ -112,8 +115,9 @@ export default class GridControl extends Component {
             <div className="dlg-btn-bar">
                 {this._configButtons()}
             </div>
-            <Webix ui={::this.getUI()} data={data}/>
-
+            <div className="tab-scroll-box">
+                <Webix ui={::this.getUI()} data={data}/>
+            </div>
         </div>
     }
 
@@ -142,15 +146,17 @@ export default class GridControl extends Component {
                     if ((parseInt(selObj.id) !== that._selected) && this.getItem(selObj.id)) {
                         that._selected = null;
                         let _obj = {
-                            isFirst : this.getFirstId() === selObj.id,
-                            isLast : this.getLastId() === selObj.id,
-                            id : selObj.id,
-                        }
+                            isFirst: this.getFirstId() === selObj.id,
+                            isLast: this.getLastId() === selObj.id,
+                            id: selObj.id,
+                        };
                         that._select(_obj);
                     }
                 },
                 onAfterRender: function () {
-                    if ((that._selected) && this.getItem(that._selected)) {
+                    let _selected = this.getSelectedId();
+                    let _selectedId = parseInt(_selected ? _selected.id : null);
+                    if ((that._selected) && this.getItem(that._selected) && (that._selected !== _selectedId)) {
                         this.select(that._selected)
                     }
                 }

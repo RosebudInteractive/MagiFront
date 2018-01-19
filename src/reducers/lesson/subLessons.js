@@ -12,7 +12,7 @@ import {
     SAVE_LESSON_SUCCESS,
     CANCEL_CHANGE_LESSON_DATA,
     CLEAR_LESSON,
-} from '../../constants/SingleLesson';
+} from '../../constants/lesson/singleLesson';
 
 import * as tools from '../tools';
 

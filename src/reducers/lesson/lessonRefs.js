@@ -2,7 +2,7 @@ import {
     SELECT_COMMON_REFERENCE,
     SELECT_RECOMMENDED_REFERENCE,
 
-} from '../../constants/SingleLesson'
+} from '../../constants/lesson/singleLesson'
 
 const initialState = {
     commonSelected: null,

@@ -23,7 +23,7 @@ import {
     CANCEL_CHANGE_LESSON_DATA,
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
-} from '../../constants/SingleLesson'
+} from '../../constants/lesson/singleLesson'
 
 import * as tools from '../tools';
 

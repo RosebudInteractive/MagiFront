@@ -1,18 +1,18 @@
-import React  from 'react';
+import React from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 
 import * as singleEpisodeActions from "../actions/episode/episodeActions";
-import * as singleLessonActions from "../actions/lessonActions";
+import * as singleLessonActions from "../actions/lesson/lessonActions";
 import * as episodeTocActions from '../actions/episode/episodeTocActions';
 import * as contentActions from '../actions/episode/episodeContentActions'
-import { EpisodeToc, EpisodeContent} from '../components/episodeGrids'
+import {EpisodeToc, EpisodeContent} from '../components/episodeGrids'
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-import { EDIT_MODE_EDIT } from '../constants/Common';
-import ObjectEditor, {labelWidth, } from './objectEditor';
-import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import {EDIT_MODE_EDIT} from '../constants/Common';
+import ObjectEditor, {labelWidth,} from './objectEditor';
+import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 
 class EpisodeEditor extends ObjectEditor {
 
@@ -48,7 +48,7 @@ class EpisodeEditor extends ObjectEditor {
         return this.props.episodeActions;
     }
 
-    _initEditMode(){
+    _initEditMode() {
         let _lessonId = !this.props.subLessonId ? this.props.lessonId : this.props.subLessonId
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId, _lessonId);
@@ -100,12 +100,11 @@ class EpisodeEditor extends ObjectEditor {
                     <TabLink to="tabToc">Оглавление эпизода</TabLink>
                     <TabLink to="tabContent">Компоненты</TabLink>
                 </div>
-
                 <div className="content">
                     <TabContent for="tabToc">
                         <EpisodeToc selectAction={tocActions.select}
-                                    // createAction={::this._createRecommendedReference}
-                                    // editAction={::this._editRecommendedReference}
+                            // createAction={::this._createRecommendedReference}
+                            // editAction={::this._editRecommendedReference}
                                     removeAction={tocActions.remove}
                                     moveUpAction={tocActions.moveUp}
                                     moveDownAction={tocActions.moveDown}
@@ -116,8 +115,8 @@ class EpisodeEditor extends ObjectEditor {
                     </TabContent>
                     <TabContent for="tabContent">
                         <EpisodeContent selectAction={contentActions.select}
-                                        // createAction={::this._newSuppEpisode}
-                                        // editAction={::this._editEpisode}
+                            // createAction={::this._newSuppEpisode}
+                            // editAction={::this._editEpisode}
                                         removeAction={contentActions.remove}
                                         moveUpAction={contentActions.moveUp}
                                         moveDownAction={contentActions.moveDown}
@@ -196,7 +195,7 @@ class EpisodeEditor extends ObjectEditor {
                     {id: 'D', value: 'Черновик'},
                     {id: 'R', value: 'Готовый'},
                     {id: 'A', value: 'Архив'}
-                    ],
+                ],
                 labelWidth: labelWidth,
             },
             {
@@ -212,7 +211,7 @@ class EpisodeEditor extends ObjectEditor {
 }
 
 EpisodeEditor.propTypes = {
-    isSupp : PropTypes.bool
+    isSupp: PropTypes.bool
 };
 
 function mapStateToProps(state, ownProps) {
@@ -226,7 +225,7 @@ function mapStateToProps(state, ownProps) {
         content: state.episodeContent.current,
         selectedContent: state.episodeContent.selected,
 
-        hasChanges : state.singleEpisode.hasChanges || state.episodeToc.hasChanges || state.episodeContent.hasChanges,
+        hasChanges: state.singleEpisode.hasChanges || state.episodeToc.hasChanges || state.episodeContent.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -238,7 +237,7 @@ function mapStateToProps(state, ownProps) {
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching, // || state.singleCourse.fetching
 
-        ownProps : ownProps,
+        ownProps: ownProps,
     }
 }
 
@@ -246,7 +245,7 @@ function mapDispatchToProps(dispatch) {
     return {
         episodeActions: bindActionCreators(singleEpisodeActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
-        tocActions : bindActionCreators(episodeTocActions, dispatch),
+        tocActions: bindActionCreators(episodeTocActions, dispatch),
         contentActions: bindActionCreators(contentActions, dispatch),
     }
 }
