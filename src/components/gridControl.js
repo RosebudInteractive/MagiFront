@@ -32,7 +32,8 @@ export default class GridControl extends Component {
     _select(selectedObj) {
         this._isFirstSelected = selectedObj.isFirst;
         this._isLastSelected = selectedObj.isLast;
-        this.props.selectAction(selectedObj.id);
+        this._selected = selectedObj.id;
+        // this.props.selectAction(selectedObj.id);
     }
 
     _addClicked() {
@@ -46,6 +47,7 @@ export default class GridControl extends Component {
     }
 
     _remove(id) {
+        this._selected = null;
         this.props.removeAction(id);
     }
 
@@ -145,12 +147,14 @@ export default class GridControl extends Component {
                             isFirst : this.getFirstId() === selObj.id,
                             isLast : this.getLastId() === selObj.id,
                             id : selObj.id,
-                        }
+                        };
                         that._select(_obj);
                     }
                 },
                 onAfterRender: function () {
-                    if ((that._selected) && this.getItem(that._selected)) {
+                    let _selected = this.getSelectedId();
+                    let _selectedId =  parseInt(_selected ? _selected.id : null);
+                    if ((that._selected) && this.getItem(that._selected) && (that._selected !== _selectedId)) {
                         this.select(that._selected)
                     }
                 }
