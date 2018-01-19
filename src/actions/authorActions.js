@@ -26,14 +26,14 @@ export const create = (obj) => {
     }
 };
 
-export const get = (id)=> {
+export const get = (id) => {
     return (dispatch) => {
         dispatch({
             type: GET_AUTHOR_REQUEST,
             payload: null
         });
 
-        fetch("/api/authors/" + id)
+        fetch("/api/authors/" + id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -74,7 +74,8 @@ export const save = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)
@@ -103,7 +104,7 @@ export const changeData = (object) => {
     }
 };
 
-export const cancelChanges = ()=> {
+export const cancelChanges = () => {
     return (dispatch) => {
         dispatch({
             type: CANCEL_CHANGE_AUTHOR_DATA,
@@ -112,7 +113,7 @@ export const cancelChanges = ()=> {
     }
 };
 
-export const clear = ()=> {
+export const clear = () => {
     return (dispatch) => {
         dispatch({
             type: CLEAR_AUTHOR,

@@ -28,7 +28,7 @@ export const getEpisodes = () => {
             payload: null
         });
 
-        fetch("/api/episodes")
+        fetch("/api/episodes", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -58,7 +58,8 @@ export const deleteEpisode = (id) => {
     return (dispatch) => {
         fetch("/api/episodes/" + id,
             {
-                method: "DELETE"
+                method: "DELETE",
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)
@@ -108,7 +109,8 @@ export const saveEpisode = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)

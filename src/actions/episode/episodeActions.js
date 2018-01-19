@@ -19,14 +19,14 @@ import {
 
 import 'whatwg-fetch';
 
-export const get = (id, lessonId)=> {
+export const get = (id, lessonId) => {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_EPISODE_REQUEST,
             payload: null
         });
 
-        fetch("/api/episodes/" + id + '/' + lessonId)
+        fetch("/api/episodes/" + id + '/' + lessonId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -77,7 +77,8 @@ export const save = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)
@@ -106,7 +107,7 @@ export const changeData = (object) => {
     }
 };
 
-export const cancelChanges = ()=> {
+export const cancelChanges = () => {
     return (dispatch) => {
         dispatch({
             type: CANCEL_CHANGE_EPISODE_DATA,
@@ -115,7 +116,7 @@ export const cancelChanges = ()=> {
     }
 };
 
-export const clear = ()=> {
+export const clear = () => {
     return (dispatch) => {
         dispatch({
             type: CLEAR_EPISODE,

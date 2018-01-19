@@ -1,4 +1,5 @@
 const { DbObject } = require('./db-object');
+const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -35,8 +36,65 @@ const EPISODE_REQ_TREE = {
     }
 };
 
+const EPISODE_TOC_TREE = {
+    expr: {
+        model: {
+            name: "EpisodeToc",
+            childs: [
+                {
+                    dataObject: {
+                        name: "EpisodeTocLng",
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const EPISODE_CONTENT_TREE = {
+    expr: {
+        model: {
+            name: "EpisodeContent"
+        }
+    }
+};
+
+const EPISODE_INS_TREE = {
+    expr: {
+        model: {
+            name: "Episode",
+            childs: [
+                {
+                    dataObject: {
+                        name: "EpisodeLng",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "EpisodeContent",
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "EpisodeToc",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "EpisodeTocLng",
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+};
+
 const EPISODE_MSSQL_ID_REQ =
-    "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
+    "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[AudioMeta], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
     "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId] and el.[LanguageId] = <%= languageId %>\n" +
     "  join [EpisodeLesson] els on e.[Id] = els.[EpisodeId]\n" +
     "where e.[Id] = <%= id %> and els.[LessonId] = <%= lessonId %>";
@@ -57,7 +115,7 @@ const EPISODE_MSSQL_CONT_REQ =
     "order by t.[StartTime]";
 
 const EPISODE_MYSQL_ID_REQ =
-    "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
+    "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`AudioMeta`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
     "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId` and el.`LanguageId` = <%= languageId %>\n" +
     "  join `EpisodeLesson` els on e.`Id` = els.`EpisodeId`\n" +
     "where e.`Id` = <%= id %> and els.`LessonId` = <%= lessonId %>";
@@ -77,19 +135,28 @@ const EPISODE_MYSQL_CONT_REQ =
     "where e.`Id` = <%= id %>\n" +
     "order by t.`StartTime`";
 
+const EPISODE_MSSQL_DELETE_SCRIPT =
+    [
+        "delete ec from [Episode] e\n" +
+        "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
+        "  join [EpisodeContent] ec on el.[Id] = ec.[EpisodeLngId]\n" +
+        "where e.[Id] = <%= id %>",
+    ];
+
+const EPISODE_MYSQL_DELETE_SCRIPT =
+    [
+        "delete ec from `Episode` e\n" +
+        "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
+        "  join `EpisodeContent` ec on el.`Id` = ec.`EpisodeLngId`\n" +
+        "where e.`Id` = <%= id %>",
+    ];
+
 const DbEpisode = class DbEpisode extends DbObject {
 
     constructor(options) {
         super(options);
     }
 
-    _genGetterName(fname) {
-        var res = fname;
-        if (fname.length > 0) {
-            res = fname[0].toLowerCase() + fname.substring(1);
-        };
-        return res;
-    }
     _getObjById(id, expression) {
         var exp = expression || EPISODE_REQ_TREE;
         return super._getObjById(id, exp);
@@ -162,6 +229,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             let episode_number;
             let isSupp;
 
+            let hasDeleted = false;
             let transactionId = null;
 
             resolve(
@@ -181,7 +249,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                             }
                         }
                         if (!ep_lesson_obj)
-                            throw new Error("Episode (Id = " + id + ") desn't belong to lesson (Id = " + lesson_id + ").");
+                            throw new Error("Episode (Id = " + id + ") doesn't belong to lesson (Id = " + lesson_id + ").");
 
                         return lesson_obj.edit()
                             .then(() => {
@@ -203,9 +271,11 @@ const DbEpisode = class DbEpisode extends DbObject {
                     })
                     .then(() => {
                         let episode_obj = collection.get(0);
-                        if (episode_obj.lessonId() === lesson_id)
+                        if (episode_obj.lessonId() === lesson_id) {
                             // We need to remove whole episode here    
-                            collection._del(episode_obj)
+                            collection._del(episode_obj);
+                            hasDeleted = true;
+                        }
 
                         // Removing episode reference from lesson
                         ep_lesson_collection._del(ep_lesson_obj);
@@ -222,7 +292,20 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 return lesson_obj.save(opts);
                             })
                             .then(() => {
-                                return root_obj.save(opts);
+                                if (hasDeleted) {
+                                    let mysql_script = [];
+                                    EPISODE_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mysql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    let mssql_script = [];
+                                    EPISODE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                        mssql_script.push(_.template(elem)({ id: id }));
+                                    });
+                                    return DbUtils.execSqlScript(mysql_script, mssql_script, opts)
+                                        .then(() => {
+                                            return root_obj.save(opts);
+                                        });
+                                }
                             });
                    })
                     .then(() => {
@@ -253,11 +336,21 @@ const DbEpisode = class DbEpisode extends DbObject {
     }
 
     update(id, lesson_id, data) {
-        let self = this;
         return new Promise((resolve, reject) => {
             let epi_obj;
             let epi_lng_obj;
             let opts = {};
+
+            let root_toc = null;
+            let toc_collection;
+            let toc_list = {};
+            let toc_new = [];
+
+            let root_content = null;
+            let content_collection;
+            let content_list = {};
+            let content_new = [];
+
             let inpFields = data || {};
             
             let transactionId = null;
@@ -279,7 +372,93 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return epi_obj.edit()
                     })
                     .then(() => {
+                        if (inpFields.Toc && (typeof (inpFields.Toc.length) === "number")) {
+                            let episode_id = epi_obj.id();
+                            return this._getObjects(EPISODE_TOC_TREE, { field: "EpisodeId", op: "=", value: episode_id })
+                                .then((result) => {
+                                    root_toc = result;
+                                    toc_collection = root_toc.getCol("DataElements");
+                                    for (let i = 0; i < toc_collection.count(); i++) {
+                                        let obj = toc_collection.get(i);
+                                        let collection = obj.getDataRoot("EpisodeTocLng").getCol("DataElements");
+                                        if (collection.count() != 1)
+                                            throw new Error("Toc element (Id = " + obj.id() + ") has inconsistent \"LNG\" part.");
+                                        let lng_obj = collection.get(0);
+                                        toc_list[obj.id()] = { deleted: true, obj: obj, lngObj: lng_obj };
+                                    }
 
+                                    let Number = 1;
+                                    inpFields.Toc.forEach((elem) => {
+                                        let data = {
+                                            toc: {
+                                                EpisodeId: episode_id,
+                                                Number: Number++
+                                            },
+                                            lng: {
+                                                LanguageId: LANGUAGE_ID
+                                            }
+                                        };
+                                        if (typeof (elem.Topic) !== "undefined")
+                                            data.lng.Topic = elem.Topic;
+                                        if (typeof (elem.StartTime) !== "undefined")
+                                            data.lng.StartTime = elem.StartTime;
+                                        if (typeof (elem.Id) === "number") {
+                                            if (toc_list[elem.Id]) {
+                                                toc_list[elem.Id].deleted = false;
+                                                toc_list[elem.Id].data = data;
+                                            }
+                                            else {
+                                                delete elem.Id;
+                                                toc_new.push(data);
+                                            }
+                                        }
+                                        else
+                                            toc_new.push(data);
+                                    });
+                                    return root_toc.edit();
+                                });
+                        }
+                    })
+                    .then(() => {
+                        if (inpFields.Content && (typeof (inpFields.Content.length) === "number")) {
+                            let episode_lng_id = epi_lng_obj.id();
+                            return this._getObjects(EPISODE_CONTENT_TREE, { field: "EpisodeLngId", op: "=", value: episode_lng_id })
+                                .then((result) => {
+                                    root_content = result;
+                                    content_collection = root_content.getCol("DataElements");
+                                    for (let i = 0; i < content_collection.count(); i++) {
+                                        let obj = content_collection.get(i);
+                                        content_list[obj.id()] = { deleted: true, obj: obj };
+                                    }
+
+                                    inpFields.Content.forEach((elem) => {
+                                        let data = {
+                                            EpisodeLngId: episode_lng_id,
+                                            ResourceId: elem.ResourceId,
+                                            CompType: elem.CompType,
+                                            StartTime: elem.StartTime,
+                                            Duration: elem.Duration
+                                        };
+                                        if (typeof (elem.Content) !== "undefined")
+                                            data.Content = elem.Content;
+                                        if (typeof (elem.Id) === "number") {
+                                            if (content_list[elem.Id]) {
+                                                content_list[elem.Id].deleted = false;
+                                                content_list[elem.Id].data = data;
+                                            }
+                                            else {
+                                                delete elem.Id;
+                                                content_new.push(data);
+                                            }
+                                        }
+                                        else
+                                            content_new.push(data);
+                                    });
+                                    return root_content.edit();
+                                });
+                        }
+                    })
+                    .then(() => {
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
                             epi_obj.episodeType(inpFields["EpisodeType"]);
 
@@ -294,9 +473,64 @@ const DbEpisode = class DbEpisode extends DbObject {
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
 
+                        for (let key in toc_list)
+                            if (toc_list[key].deleted)
+                                toc_collection._del(toc_list[key].obj)
+                            else {
+                                for (let field in toc_list[key].data.toc)
+                                    toc_list[key].obj[self._genGetterName(field)](toc_list[key].data.toc[field]);
+                                for (let field in toc_list[key].data.lng)
+                                    toc_list[key].lngObj[self._genGetterName(field)](toc_list[key].data.lng[field]);
+                            }
+
+                        for (let key in content_list)
+                            if (content_list[key].deleted)
+                                content_collection._del(content_list[key].obj)
+                            else {
+                                for (let field in content_list[key].data)
+                                    content_list[key].obj[self._genGetterName(field)](content_list[key].data[field]);
+                            }
                     })
                     .then(() => {
-                        return epi_obj.save(opts);
+                        if (toc_new && (toc_new.length > 0)) {
+                            return Utils.seqExec(toc_new, (elem) => {
+                                return root_toc.newObject({
+                                    fields: elem.toc
+                                }, opts)
+                                    .then((result) => {
+                                        let new_toc_obj = this._db.getObj(result.newObject);
+                                        let root_toc_lng = new_toc_obj.getDataRoot("EpisodeLng");
+                                        return root_toc_lng.newObject({
+                                            fields: elem.lng
+                                        }, opts);
+                                    });
+                            });
+                        }
+                    })
+                    .then(() => {
+                        if (content_new && (content_new.length > 0)) {
+                            return Utils.seqExec(content_new, (elem) => {
+                                return root_content.newObject({
+                                    fields: elem
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        return $data.tranStart({})
+                            .then((result) => {
+                                transactionId = result.transactionId;
+                                opts = { transactionId: transactionId };
+                                return epi_obj.save(opts)
+                                    .then(() => {
+                                        if (root_toc)
+                                            return root_toc.save(opts);
+                                    })
+                                    .then(() => {
+                                        if (root_content)
+                                            return root_content.save(opts);
+                                    });
+                            });
                     })
                     .then(() => {
                         console.log("Episode updated: Id=" + id + ".");
@@ -343,7 +577,7 @@ const DbEpisode = class DbEpisode extends DbObject {
 
                         return lesson_obj.edit()
                             .then(() => {
-                                return this._getObjById(-1);
+                                return this._getObjById(-1, EPISODE_INS_TREE);
                             })
                     })
                     .then((result) => {
@@ -378,6 +612,52 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return root_lng.newObject({
                             fields: fields
                         }, opts);
+                    })
+                    .then((result) => {
+                        new_lng_obj = this._db.getObj(result.newObject);
+                        let root_content = new_lng_obj.getDataRoot("EpisodeContent");
+                        if (inpFields.Content && (inpFields.Content.length > 0)) {
+                            return Utils.seqExec(inpFields.Content, (elem) => {
+                                let fields = {};
+                                if (typeof (elem["ResourceId"]) !== "undefined")
+                                    fields["ResourceId"] = elem["ResourceId"];
+                                if (typeof (elem["CompType"]) !== "undefined")
+                                    fields["CompType"] = elem["CompType"];
+                                if (typeof (elem["StartTime"]) !== "undefined")
+                                    fields["StartTime"] = elem["StartTime"];
+                                if (typeof (elem["Duration"]) !== "undefined")
+                                    fields["Duration"] = elem["Duration"];
+                                if (typeof (elem["Content"]) !== "undefined")
+                                    fields["Content"] = elem["Content"];
+                                return root_content.newObject({
+                                    fields: fields
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        let root_toc = new_obj.getDataRoot("EpisodeToc");
+                        if (inpFields.Toc && (inpFields.Toc.length > 0)) {
+                            let number = 1;
+                            return Utils.seqExec(inpFields.Toc, (elem) => {
+                                let fields = { Number: number++ };
+                                return root_toc.newObject({
+                                    fields: fields
+                                }, opts)
+                                    .then((result) => {
+                                        let new_toc_obj = this._db.getObj(result.newObject);
+                                        let root_lng = new_lng_obj.getDataRoot("EpisodeTocLng");
+                                        let fields_lng = { LanguageId: LANGUAGE_ID };
+                                        if (typeof (elem["Topic"]) !== "undefined")
+                                            fields_lng["Topic"] = elem["Topic"];
+                                        if (typeof (elem["StartTime"]) !== "undefined")
+                                            fields_lng["StartTime"] = elem["StartTime"];
+                                        return root_lng.newObject({
+                                            fields: fields_lng
+                                        }, opts);
+                                    });
+                            });
+                        }
                     })
                     .then(() => {
                         let root_lsn = lesson_obj.getDataRoot("EpisodeLesson");

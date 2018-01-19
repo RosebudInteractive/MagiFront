@@ -33,7 +33,7 @@ export const get = (id)=> {
             payload: null
         });
 
-        fetch("/api/categories/" + id)
+        fetch("/api/categories/" + id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -74,7 +74,8 @@ export const save = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)

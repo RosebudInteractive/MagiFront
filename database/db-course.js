@@ -1,4 +1,5 @@
 const { DbObject } = require('./db-object');
+const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -37,18 +38,6 @@ const COURSE_UPD_TREE = {
         model: {
             name: "Course",
             childs: [
-                {
-                    dataObject: {
-                        name: "Lesson",
-                        childs: [
-                            {
-                                dataObject: {
-                                    name: "EpisodeLesson"
-                                }
-                            }
-                        ]
-                    }
-                },
                 {
                     dataObject: {
                         name: "CourseLng"
@@ -167,6 +156,38 @@ const COURSE_MYSQL_DELETE_SCRIPT =
         "  join `Lesson` l on c.`Id` = l.`CourseId`\n" +
         "where c.`Id` = <%= id %>"
     ];
+
+const LESSON_MSSQL_DELETE_SCRIPT =
+    [
+        "delete el from [Lesson] l\n" +
+        "  join [EpisodeLesson] el on l.[Id] = el.[LessonId]\n" +
+        "where l.[Id] = <%= id %>",
+        "delete ec from [Lesson] l\n" +
+        "  join[Episode] e on l.[Id] = e.[LessonId]\n" +
+        "  join[EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
+        "  join[EpisodeContent] ec on el.[Id] = ec.[EpisodeLngId]\n" +
+        "where l.[Id] = <%= id %>",
+        "delete from[Lesson] where [Id] = <%= id %>"
+    ];
+
+const LESSON_MYSQL_DELETE_SCRIPT =
+    [
+        "delete el from `Lesson` l\n" +
+        "  join `EpisodeLesson` el on l.`Id` = el.`LessonId`\n" +
+        "where l.`Id` = <%= id %>",
+        "delete ec from `Lesson` l\n" +
+        "  join`Episode` e on l.`Id` = e.`LessonId`\n" +
+        "  join`EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
+        "  join`EpisodeContent` ec on el.`Id` = ec.`EpisodeLngId`\n" +
+        "where l.`Id` = <%= id %>",
+        "delete from`Lesson` where `Id` = <%= id %>"
+    ];
+
+const COURSE_LESSONS_MSSQL =
+    "select [Id], [ParentId] from [Lesson] where [CourseId] = <%= id %>";
+
+const COURSE_LESSONS_MYSQL =
+    "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
 const DbCourse = class DbCourse extends DbObject {
 
@@ -315,7 +336,7 @@ const DbCourse = class DbCourse extends DbObject {
                         COURSE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
                             mssql_script.push(_.template(elem)({ id: id }));
                         });
-                        return self._execSqlScript(mysql_script, mssql_script, opts);
+                        return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
                     })
                     .then(() => {
                         collection._del(course_obj);
@@ -346,25 +367,10 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    _execSqlScript(mysql_script, mssql_script, opts) {
-        return new Promise((resolve, reject) => {
-            if (mysql_script.length !== mssql_script.length)
-                throw new Error("MySql and MSSQL scripts have different lengths.");    
-            resolve(
-                Utils.seqExec(mysql_script.length, (idx) => {
-                    return $data.execSql({
-                        dialect: {
-                            mysql: mysql_script[idx],
-                            mssql: mssql_script[idx]
-                        }
-                    }, opts);
-                })
-            );    
-        });    
-    }
-
     update(id, data) {
+        let self = this;
         return new Promise((resolve, reject) => {
+            let root_obj;
             let crs_obj;
             let crs_lng_obj;
             let root_auth;
@@ -387,10 +393,27 @@ const DbCourse = class DbCourse extends DbObject {
             let needToDeleteOwn = false;
             let transactionId = null;
 
+            let lsn_deleted = {};
+            let lsn_child_deleted = [];
+            let lc_deleted = {};
+            let lc_child_deleted = [];
+
             resolve(
-                this._getObjById(id, COURSE_UPD_TREE)
+                this._getObjById(id)
                     .then((result) => {
-                        let root_obj = result;
+                        root_obj = result;
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(COURSE_LESSONS_MYSQL)({ id: id }),
+                                mssql: _.template(COURSE_LESSONS_MSSQL)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        ls_own_collection = [];
+                        if (result && result.detail && (result.detail.length > 0))
+                            ls_own_collection = result.detail;
+
                         let collection = root_obj.getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Course (Id = " + id + ") doesn't exist.");
@@ -406,9 +429,8 @@ const DbCourse = class DbCourse extends DbObject {
                         ctg_collection = root_ctg.getCol("DataElements");
                         root_ls = crs_obj.getDataRoot("LessonCourse");
                         ls_collection = root_ls.getCol("DataElements");
-                        ls_own_collection = crs_obj.getDataRoot("Lesson").getCol("DataElements");
 
-                        if (inpFields.Authors && (inpFields.Authors.length > 0)) {
+                        if (inpFields.Authors && (typeof (inpFields.Authors.length) === "number")) {
                             for (let i = 0; i < auth_collection.count(); i++) {
                                 let obj = auth_collection.get(i);
                                 auth_list[obj.authorId()] = { deleted: true, obj: obj };
@@ -422,7 +444,7 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                         }
 
-                        if (inpFields.Categories && (inpFields.Categories.length > 0)) {
+                        if (inpFields.Categories && (typeof (inpFields.Categories.length) === "number")) {
                             for (let i = 0; i < ctg_collection.count(); i++) {
                                 let obj = ctg_collection.get(i);
                                 ctg_list[obj.categoryId()] = { deleted: true, obj: obj };
@@ -436,18 +458,19 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                         }
 
-                        if (inpFields.Lessons && (inpFields.Lessons.length > 0)) {
+                        if (inpFields.Lessons && (typeof (inpFields.Lessons.length) === "number")) {
                             for (let i = 0; i < ls_collection.count(); i++) {
                                 let obj = ls_collection.get(i);
-                                ls_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
+                                let deleted = typeof (obj.parentId()) !== "number";
+                                ls_list[obj.lessonId()] = { deleted: deleted, isOwner: false, obj: obj };
                             }
 
-                            for (let i = 0; i < ls_own_collection.count(); i++) {
-                                let obj = ls_own_collection.get(i);
-                                if (!ls_list[obj.id()])
-                                    throw new Error("Unknown own lesson (Id = " + obj.id() + ").");
-                                ls_list[obj.id()].isOwner = true;
-                                ls_list[obj.id()].ownObj = obj;
+                            for (let i = 0; i < ls_own_collection.length; i++) {
+                                let obj = ls_own_collection[i];
+                                if (!ls_list[obj.Id])
+                                    throw new Error("Unknown own lesson (Id = " + obj.Id + ").");
+                                ls_list[obj.Id].isOwner = true;
+                                ls_list[obj.Id].ownObj = obj;
                             }
 
                             let Number = 1;
@@ -501,15 +524,39 @@ const DbCourse = class DbCourse extends DbObject {
 
                         for (let key in ls_list)
                             if (ls_list[key].deleted) {
-                                if (ls_list[key].isOwner)
-                                    needToDeleteOwn = true
-                                ls_collection._del(ls_list[key].obj);
+                                if (ls_list[key].isOwner) {
+                                    needToDeleteOwn = true;
+                                    lsn_deleted[ls_list[key].obj.id()] = ls_list[key].obj;
+                                }
+                                lc_deleted[ls_list[key].obj.id()] = ls_list[key].obj;
+                                //ls_collection._del(ls_list[key].obj);
                             }
                             else {
-                                ls_list[key].obj.number(ls_list[key].data.Number);
-                                ls_list[key].obj.readyDate(ls_list[key].data.ReadyDate);
-                                ls_list[key].obj.state(ls_list[key].data.State);
+                                if (typeof (ls_list[key].obj.parentId()) !== "number") {
+                                    ls_list[key].obj.number(ls_list[key].data.Number);
+                                    ls_list[key].obj.readyDate(ls_list[key].data.ReadyDate);
+                                    ls_list[key].obj.state(ls_list[key].data.State);
+                                }
                             }
+                        for (let key in ls_list) {
+                            let parent_id = ls_list[key].obj.parentId();
+                            if (typeof (parent_id) === "number") {
+                                if (lc_deleted[parent_id]) {
+                                    lc_child_deleted.push(ls_list[key].obj);
+                                    if (lsn_deleted[parent_id])
+                                        lsn_child_deleted.push(ls_list[key].obj);
+                                }
+                            }
+                        }
+                        if (lc_child_deleted.length > 0) {
+                            for (let i = 0; i < lc_child_deleted.length; i++)
+                                ls_collection._del(lc_child_deleted[i]);
+                        }
+                        else {
+                            for (let key in lc_deleted) {
+                                ls_collection._del(lc_deleted[key]);
+                            }
+                        }
                     })
                     .then(() => {
                         if (auth_new && (auth_new.length > 0)) {
@@ -550,17 +597,33 @@ const DbCourse = class DbCourse extends DbObject {
                             });
                     })
                     .then(() => {
-                        if (needToDeleteOwn)
-                            return crs_obj.edit();
+                        if (Object.keys(lc_deleted).length > 0)
+                            return crs_obj.edit()
+                                .then(() => {
+                                    for (let key in lc_deleted) {
+                                        ls_collection._del(lc_deleted[key]);
+                                    }
+                                    return crs_obj.save(opts);
+                                });
                     })
                     .then(() => {
                         if (needToDeleteOwn) {
-                            for (let key in ls_list)
-                                if (ls_list[key].deleted) {
-                                    if (ls_list[key].isOwner)
-                                        ls_own_collection._del(ls_list[key].ownObj);
-                                }
-                            return crs_obj.save(opts);
+                            let lesson_del_func = (elem) => {
+                                let id = elem.lessonId();
+                                let mysql_script = [];
+                                LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                    mysql_script.push(_.template(elem)({ id: id }));
+                                });
+                                let mssql_script = [];
+                                LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                    mssql_script.push(_.template(elem)({ id: id }));
+                                });
+                                return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                            };
+                            return Utils.seqExec(lsn_child_deleted, lesson_del_func)
+                                .then(() => {
+                                    return Utils.seqExec(lsn_deleted, lesson_del_func);
+                                });
                         }
                     })
                     .then(() => {
@@ -581,7 +644,7 @@ const DbCourse = class DbCourse extends DbObject {
                             });
                         }
                         else
-                            result = result.then(() => { return res;})    
+                            result = result.then(() => { return res; })
                         return result;
                     })
             );

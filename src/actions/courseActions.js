@@ -50,7 +50,7 @@ export const get = (id)=> {
             payload: null
         });
 
-        fetch("/api/courses/" + id)
+        fetch("/api/courses/" + id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -111,7 +111,8 @@ export const save = (values, mode) => {
                 headers: {
                     "Content-type": "application/json"
                 },
-                body: JSON.stringify(values)
+                body: JSON.stringify(values),
+                credentials: 'include'
             })
             .then(checkStatus)
             .then(parseJSON)
@@ -301,7 +302,7 @@ export const getCourseAuthors = (courseId) => {
             payload: null
         });
 
-        fetch("/api/courses/" + courseId + '/authors')
+        fetch("/api/courses/" + courseId + '/authors', {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
