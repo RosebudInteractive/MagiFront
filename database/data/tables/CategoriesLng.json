@@ -1,0 +1,133 @@
+{
+    "$sys": {
+        "typeGuid": "bd317677-91f9-44b2-b449-d368e42a2b6a"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "CategoryId": 1,
+                    "LanguageId": 1,
+                    "Name": "Искусство"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 2,
+                    "CategoryId": 2,
+                    "LanguageId": 1,
+                    "Name": "История"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 3,
+                    "CategoryId": 3,
+                    "LanguageId": 1,
+                    "Name": "Философия"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 4,
+                    "CategoryId": 4,
+                    "LanguageId": 1,
+                    "Name": "Изобразительное искусство"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 5,
+                    "CategoryId": 5,
+                    "LanguageId": 1,
+                    "Name": "Скульптура"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 6,
+                    "CategoryId": 6,
+                    "LanguageId": 1,
+                    "Name": "Музыка"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 7,
+                    "CategoryId": 7,
+                    "LanguageId": 1,
+                    "Name": "Литература"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 8,
+                    "CategoryId": 8,
+                    "LanguageId": 1,
+                    "Name": "Религия"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 9,
+                    "CategoryId": 9,
+                    "LanguageId": 1,
+                    "Name": "Психология"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "6bae1b6a-82d4-4f54-a953-080edf274588"
+                },
+                "fields": {
+                    "Id": 10,
+                    "CategoryId": 10,
+                    "LanguageId": 1,
+                    "Name": "Бестселлер"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}

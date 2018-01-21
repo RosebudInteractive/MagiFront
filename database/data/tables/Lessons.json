@@ -1,0 +1,55 @@
+{
+    "$sys": {
+        "typeGuid": "819bf85f-e13b-4368-98e5-561f68f90ecd"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "caadef95-278b-4cad-acc9-a1e27380d6c6"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "CourseId": 1,
+                    "AuthorId": 1,
+                    "LessonType": "L",
+                    "URL": "https://magisteria.ru/lesson1_of_course1",
+                    "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/lesson-1.jpg"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "caadef95-278b-4cad-acc9-a1e27380d6c6"
+                },
+                "fields": {
+                    "Id": 2,
+                    "CourseId": 1,
+                    "AuthorId": 1,
+                    "LessonType": "L",
+                    "URL": "https://magisteria.ru/lesson2_of_course1",
+                    "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/lesson-2.jpg"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "caadef95-278b-4cad-acc9-a1e27380d6c6"
+                },
+                "fields": {
+                    "Id": 3,
+                    "CourseId": 1,
+                    "AuthorId": 1,
+                    "LessonType": "L",
+                    "URL": "https://magisteria.ru/lesson3_of_course1",
+                    "Cover": "https://magisteria.ru/wp-content/uploads/2016/08/lesson-3.jpg"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}

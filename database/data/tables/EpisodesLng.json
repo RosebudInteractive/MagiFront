@@ -1,0 +1,78 @@
+{
+    "$sys": {
+        "typeGuid": "f24fb64f-1e2f-4412-9380-9646181fdbe6"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "EpisodeId": 1,
+                    "LanguageId": 1,
+                    "State": "R",
+                    "Name": "Эпизод 1"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77"
+                },
+                "fields": {
+                    "Id": 2,
+                    "EpisodeId": 2,
+                    "LanguageId": 1,
+                    "State": "R",
+                    "Name": "Эпизод 2"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77"
+                },
+                "fields": {
+                    "Id": 3,
+                    "EpisodeId": 3,
+                    "LanguageId": 1,
+                    "State": "R",
+                    "Name": "Эпизод 3"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77"
+                },
+                "fields": {
+                    "Id": 4,
+                    "EpisodeId": 4,
+                    "LanguageId": 1,
+                    "State": "R",
+                    "Name": "Эпизод 4"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "e9a4a681-b2d9-48fe-8c82-cb2201d5ef77"
+                },
+                "fields": {
+                    "Id": 5,
+                    "EpisodeId": 5,
+                    "LanguageId": 1,
+                    "State": "R",
+                    "Name": "Эпизод 5"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}

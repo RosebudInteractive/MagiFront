@@ -1,0 +1,46 @@
+{
+    "$sys": {
+        "typeGuid": "065a0fce-be87-45db-8aa6-0581e7846c83"
+    }, 
+    "fields": {
+        "Id": 1000, 
+        "Name": "DataRoot"
+    }, 
+    "collections": {
+        "DataElements": [
+            {
+                "$sys": {
+                    "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+                }, 
+                "fields": {
+                    "Id": 1,
+                    "AccountId": 1,
+                    "Portrait": "http: //example.image1.ru"
+                }, 
+                "collections": { }
+            },
+            {
+                "$sys": {
+                    "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+                },
+                "fields": {
+                    "Id": 2,
+                    "AccountId": 1,
+                    "Portrait": "http: //example.image2.ru"
+                },
+                "collections": {}
+            },
+            {
+                "$sys": {
+                    "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+                },
+                "fields": {
+                    "Id": 3,
+                    "AccountId": 1,
+                    "Portrait": "http: //example.image3.ru"
+                },
+                "collections": {}
+            }
+        ]
+    }
+}
