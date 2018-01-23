@@ -105,7 +105,7 @@ const EPISODE_MSSQL_TOC_REQ =
     "where e.[Id] = <%= id %>\n" +
     "order by t.[Number]";
 const EPISODE_MSSQL_CONT_REQ =
-    "select r.[Id], r.[ResType], r.[FileName],\n" +
+    "select t.[Id], t.[ResourceId], r.[ResType], r.[FileName],\n" +
     "  t.[CompType], t.[StartTime], t.[Duration], t.[Content] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
@@ -126,7 +126,7 @@ const EPISODE_MYSQL_TOC_REQ =
     "where e.`Id` = <%= id %>\n" +
     "order by t.`Number`";
 const EPISODE_MYSQL_CONT_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`,\n" +
+    "select t.`Id`, t.`ResourceId`, r.`ResType`, r.`FileName`,\n" +
     "  t.`CompType`, t.`StartTime`, t.`Duration`, t.`Content` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
