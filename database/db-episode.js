@@ -478,9 +478,9 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 toc_collection._del(toc_list[key].obj)
                             else {
                                 for (let field in toc_list[key].data.toc)
-                                    toc_list[key].obj[self._genGetterName(field)](toc_list[key].data.toc[field]);
+                                    toc_list[key].obj[this._genGetterName(field)](toc_list[key].data.toc[field]);
                                 for (let field in toc_list[key].data.lng)
-                                    toc_list[key].lngObj[self._genGetterName(field)](toc_list[key].data.lng[field]);
+                                    toc_list[key].lngObj[this._genGetterName(field)](toc_list[key].data.lng[field]);
                             }
 
                         for (let key in content_list)
@@ -488,7 +488,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 content_collection._del(content_list[key].obj)
                             else {
                                 for (let field in content_list[key].data)
-                                    content_list[key].obj[self._genGetterName(field)](content_list[key].data[field]);
+                                    content_list[key].obj[this._genGetterName(field)](content_list[key].data[field]);
                             }
                     })
                     .then(() => {
@@ -499,7 +499,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 }, opts)
                                     .then((result) => {
                                         let new_toc_obj = this._db.getObj(result.newObject);
-                                        let root_toc_lng = new_toc_obj.getDataRoot("EpisodeLng");
+                                        let root_toc_lng = new_toc_obj.getDataRoot("EpisodeTocLng");
                                         return root_toc_lng.newObject({
                                             fields: elem.lng
                                         }, opts);
