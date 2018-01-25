@@ -20,7 +20,7 @@ export const getCourses = ()=> {
             payload: null
         });
 
-        fetch("/api/courses", {credentials: 'include'})
+        fetch("/api/adm/courses", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -55,7 +55,7 @@ export const selectCourse = (id) => {
 
 export const deleteCourse = (id) => {
     return (dispatch) => {
-        fetch("/api/courses/" + id,
+        fetch("/api/adm/courses/" + id,
             {
                 method: "DELETE",
                 credentials: 'include'
