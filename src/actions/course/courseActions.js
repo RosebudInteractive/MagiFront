@@ -50,7 +50,7 @@ export const get = (id)=> {
             payload: null
         });
 
-        fetch("/api/courses/" + id, {credentials: 'include'})
+        fetch("/api/adm/courses/" + id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -101,7 +101,7 @@ export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/courses";
+        let _url = "/api/adm/courses";
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id
         }
@@ -302,7 +302,7 @@ export const getCourseAuthors = (courseId) => {
             payload: null
         });
 
-        fetch("/api/courses/" + courseId + '/authors', {credentials: 'include'})
+        fetch("/api/adm/courses/" + courseId + '/authors', {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

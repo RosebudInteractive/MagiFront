@@ -2,7 +2,7 @@
 let { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
-    app.get('/api/courses', (req, res, next) => {
+    app.get('/api/adm/courses', (req, res, next) => {
         CoursesService()
             .getAll()
             .then(rows => {
@@ -13,7 +13,7 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/courses/:id', (req, res, next) => {
+    app.get('/api/adm/courses/:id', (req, res, next) => {
         CoursesService()
             .get(parseInt(req.params.id))
             .then(rows => {
@@ -24,7 +24,7 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/courses/:id/authors', (req, res, next) => {
+    app.get('/api/adm/courses/:id/authors', (req, res, next) => {
         CoursesService()
             .getAuthors(parseInt(req.params.id))
             .then(rows => {
@@ -35,7 +35,7 @@ function setupCourses(app) {
             });
     });
 
-    app.post('/api/courses', (req, res, next) => {
+    app.post('/api/adm/courses', (req, res, next) => {
         CoursesService()
             .insert(req.body)
             .then(rows => {
@@ -46,7 +46,7 @@ function setupCourses(app) {
             });
     });
 
-    app.put('/api/courses/:id', (req, res, next) => {
+    app.put('/api/adm/courses/:id', (req, res, next) => {
         CoursesService()
             .update(parseInt(req.params.id), req.body)
             .then(rows => {
@@ -57,7 +57,7 @@ function setupCourses(app) {
             });
     });
 
-    app.delete('/api/courses/:id', (req, res, next) => {
+    app.delete('/api/adm/courses/:id', (req, res, next) => {
         CoursesService()
             .del(parseInt(req.params.id))
             .then(() => {
