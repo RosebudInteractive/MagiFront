@@ -435,6 +435,8 @@ namespace MagImport
             public string Name { get; set; }
             public string ShortDescription { get; set; }
             public string FullDescription { get; set; }
+            public int? Duration { get; set; }
+            public string DurationFmt { get; set; }
         };
 
         public class LessonLng : DataObjTyped<LessonLngFields, LessonLngRoot>
@@ -538,6 +540,7 @@ namespace MagImport
             public string AudioMeta { get; set; }
             public string RawAudioMeta { get; set; }
             public string Structure { get; set; }
+            public int? Duration { get; set; }
         };
 
         public class EpisodeLng : DataObjTyped<EpisodeLngFields, EpisodeLngRoot>
@@ -1428,6 +1431,7 @@ namespace MagImport
                 // Audio file
                 //
                 int audio_duration = 0;
+                string audio_duration_fmt = "00:00";
                 if (audio_id != 0)
                 {
                     JSObject meta = null;
@@ -1440,9 +1444,14 @@ namespace MagImport
                         episode_lng.Fields.RawAudioMeta = fn;
                         AudioFileDescriptionObj audio_dsc = new AudioFileDescriptionObj(meta);
                         audio_duration = audio_dsc.length;
+                        audio_duration_fmt = audio_dsc.length_formatted;
                         episode_lng.Fields.AudioMeta = audio_dsc.ToJSONString();
                     }
                 }
+
+                lesson_lng.Fields.Duration = audio_duration;
+                lesson_lng.Fields.DurationFmt = audio_duration_fmt;
+                episode_lng.Fields.Duration = audio_duration;
 
                 // Pictures
                 //

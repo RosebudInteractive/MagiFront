@@ -113,8 +113,10 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false })
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("ShortDescription", { type: "string", allowNull: false })
-            .addField("FullDescription", { type: "string", allowNull: true });
-
+            .addField("FullDescription", { type: "string", allowNull: true })
+            .addField("Duration", { type: "int", allowNull: true })
+            .addField("DurationFmt", { type: "string", length: 15, allowNull: true });
+        
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
@@ -144,7 +146,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Audio", { type: "string", length: 255, allowNull: true })
             .addField("AudioMeta", { type: "string", allowNull: true })
             .addField("RawAudioMeta", { type: "string", allowNull: true })
-            .addField("Structure", { type: "string", allowNull: true });
+            .addField("Structure", { type: "string", allowNull: true })
+            .addField("Duration", { type: "int", allowNull: true });
 
         metaDataMgr.addModel("EpisodeLesson", "94d10a1d-d902-489b-8243-5c2dfea57174", "RootEpisodeLesson", "83abc96a-5184-4ed2-a9f2-ccd64733a22e")
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false })
