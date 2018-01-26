@@ -194,7 +194,8 @@ const LESSON_MSSQL_TOC_REQ =
     "select e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
     "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
-    "where e.[LessonId] = <%= id %>\n" +
+    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "where pl.[LessonId] = <%= id %>\n" +
     "order by e.[Id], t.[Number]";
 const LESSON_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
@@ -202,15 +203,17 @@ const LESSON_MSSQL_CONTENT_REQ =
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
-    "where e.[LessonId] = <%= id %>\n" +
-    "order by e.[Id], t.[StartTime]";
+    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "where pl.[LessonId] = <%= id %>\n" +
+    "order by pl.[Number], e.[Id], t.[StartTime]";
 const LESSON_MSSQL_ASSETS_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
     "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
-    "where e.[LessonId] = <%= id %>";
+    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "where pl.[LessonId] = <%= id %>";
 
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
@@ -230,7 +233,8 @@ const LESSON_MYSQL_TOC_REQ =
     "select e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
     "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
-    "where e.`LessonId` = <%= id %>\n" +
+    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "where pl.`LessonId` = <%= id %>\n" +
     "order by e.`Id`, t.`Number`";
 const LESSON_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
@@ -238,15 +242,17 @@ const LESSON_MYSQL_CONTENT_REQ =
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
-    "where e.`LessonId` = <%= id %>\n" +
-    "order by e.`Id`, t.`StartTime`";
+    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "where pl.`LessonId` = <%= id %>\n" +
+    "order by pl.`Number`, e.`Id`, t.`StartTime`";
 const LESSON_MYSQL_ASSETS_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
     "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
-    "where e.`LessonId` = <%= id %>";
+    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "where pl.`LessonId` = <%= id %>";
 
 const EPISODE_MSSQL_DELETE_SCRIPT =
     [
