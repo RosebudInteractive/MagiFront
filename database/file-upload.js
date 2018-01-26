@@ -1,5 +1,6 @@
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const formidable = require('formidable')
+const { DbUtils } = require('./db-utils');
 
 const path = require('path')
 const fs = require('fs')
@@ -18,15 +19,6 @@ const icon_sz = 150;
 
 const HTTP_OK = 200;
 const HTTP_SERVER_ERR = 500;
-
-function intFmtWithLeadingZeros(val, width) {
-    let res = val.toString();
-    let rest = width - res.length;
-    if (rest > 0)
-        for (let i = 0; i < rest; i++)
-            res = "0" + res;
-    return res;
-}
 
 function processOther(file_name, mime_type, size, dir, dir_suffix, files, all_files) {
 
@@ -55,8 +47,7 @@ function processAudio(file_name, mime_type, size, dir, dir_suffix, files, all_fi
                     file_info.dataformat = metadata.format.dataformat;
                     file_info.bitrate = metadata.format.bitrate;
                     file_info.length = Math.ceil(metadata.format.duration);
-                    file_info.length_formatted = intFmtWithLeadingZeros((file_info.length / 60) ^ 0, 2) +
-                        ":" + intFmtWithLeadingZeros(file_info.length - ((file_info.length / 60) ^ 0) * 60, 2);
+                    file_info.length_formatted = DbUtils.fmtDuration(file_info.length);
                     files.push(file_desc);
                 })
         );
@@ -155,7 +146,7 @@ exports.FileUpload = {
             let result = Promise.resolve();
             let now = new Date();
             let dir_year_suffix = now.getFullYear().toString() + "/";
-            let dir_suffix = dir_year_suffix + intFmtWithLeadingZeros(now.getMonth() + 1, 2) + "/";
+            let dir_suffix = dir_year_suffix + DbUtils.intFmtWithLeadingZeros(now.getMonth() + 1, 2) + "/";
             let year_path = path.join(uploadDir, dir_year_suffix);
             let full_path = path.join(uploadDir, dir_suffix);
 
