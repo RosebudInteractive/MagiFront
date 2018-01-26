@@ -1231,7 +1231,7 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                         }
                         let fields = { LessonId: newId, State: inpFields.State, Number: Number };
-                        if (parent_lc_id === -1)
+                        if (parent_lc_id !== -1)
                             fields.ParentId = parent_lc_id;
                         if (typeof (inpFields["ReadyDate"]) !== "undefined")
                             fields["ReadyDate"] = inpFields["ReadyDate"];
