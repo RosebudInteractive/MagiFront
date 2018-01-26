@@ -186,9 +186,9 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[LanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
     "  join[ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
-    "  left join [Language] ll on ll.[Id] = r.[LanguageId]\n" +
+    "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
 const LESSON_MSSQL_TOC_REQ =
     "select e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
@@ -222,9 +222,9 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`LanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
-    "  left join `Language` ll on ll.`Id` = r.`LanguageId`\n" +
+    "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
 const LESSON_MYSQL_TOC_REQ =
     "select e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
@@ -790,9 +790,12 @@ const DbLesson = class DbLesson extends DbObject {
                                         FileName: elem.FileName
                                     },
                                     lng: {
-                                        Name: elem.Name ? elem.Name : ""
+                                        Name: elem.Name ? elem.Name : "",
+                                        LanguageId: LANGUAGE_ID
                                     }
                                 };
+                                if (typeof (elem.ResLanguageId) !== "undefined")
+                                    data.res.ResLanguageId = elem.ResLanguageId;
                                 if (typeof (elem.Description) !== "undefined")
                                     data.lng.Description = elem.Description;
                                 if (typeof (elem.Id) === "number") {
@@ -1181,6 +1184,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     fields["ResType"] = elem["ResType"];
                                 if (typeof (elem["FileName"]) !== "undefined")
                                     fields["FileName"] = elem["FileName"];
+                                if (typeof (elem["ResLanguageId"]) !== "undefined")
+                                    fields["ResLanguageId"] = elem["ResLanguageId"];
                                 return root_res.newObject({
                                     fields: fields
                                 }, opts)
@@ -1203,8 +1208,8 @@ const DbLesson = class DbLesson extends DbObject {
                         let root_lsn = course_obj.getDataRoot("LessonCourse");
                         let collection = root_lsn.getCol("DataElements");
                         let Number = collection.count() + 1;
+                        let parent_lc_id = -1;
                         if (hasParent) {
-                            let parent_lc_id = -1;
                             for (let i = 0; i < collection.count(); i++){
                                 if (collection.get(i).lessonId() === parent_id) {
                                     parent_lc_id = collection.get(i).id();
@@ -1220,6 +1225,8 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                         }
                         let fields = { LessonId: newId, State: inpFields.State, Number: Number };
+                        if (parent_lc_id === -1)
+                            fields.ParentId = parent_lc_id;
                         if (typeof (inpFields["ReadyDate"]) !== "undefined")
                             fields["ReadyDate"] = inpFields["ReadyDate"];
                         return root_lsn.newObject({

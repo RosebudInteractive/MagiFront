@@ -184,7 +184,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("Resource", "89e7a678-5414-498f-b635-b172bf402816", "RootResource", "5c605246-56ff-4b40-9c27-242e678899e4")
             .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
             .addField("EntityId", { type: "dataRef", model: "Entity", refAction: "parentRestrict", allowNull: true })
-            .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
+            .addField("ResLanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("ResType", { type: "enum", values: ["P", "V"], allowNull: false })
             .addField("FileName", { type: "string", length: 255, allowNull: false });
 

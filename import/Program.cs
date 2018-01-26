@@ -633,7 +633,7 @@ namespace MagImport
         {
             public int LessonId { get; set; }
             public int? EntityId { get; set; }
-            public int? LanguageId { get; set; }
+            public int? ResLanguageId { get; set; }
             public string ResType { get; set; }
             public string FileName { get; set; }
         };
