@@ -118,6 +118,10 @@ export default class ObjectEditor extends React.Component {
         this.objectActions.cancelChanges();
     }
 
+    _getMainDivClassName(){
+        return "object-content";
+    }
+
     render() {
         const {
             fetching,
@@ -126,7 +130,7 @@ export default class ObjectEditor extends React.Component {
             hasChanges
         } = this.props;
         return (
-            <div className="object-content">
+            <div className={this._getMainDivClassName()}>
                 {
                     fetching ?
                         <p>Загрузка...</p>

@@ -1,16 +1,26 @@
 import {
-    CREATE_TOC,
     SELECT_TOC,
+    INSERT_TOC,
+    UPDATE_TOC,
     REMOVE_TOC,
     MOVE_TOC_UP,
     MOVE_TOC_DOWN,
-} from '../../constants/episode/episodeToc';
+} from '../../constants/episode/episode-tocs';
 
-export const create = () => {
+export const insert = (value) => {
     return (dispatch) => {
         dispatch({
-            type: CREATE_TOC,
-            payload: null
+            type: INSERT_TOC,
+            payload: value
+        });
+    }
+};
+
+export const update = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: UPDATE_TOC,
+            payload: value
         });
     }
 };

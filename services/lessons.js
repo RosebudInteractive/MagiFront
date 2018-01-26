@@ -36,7 +36,7 @@ function setupLessons(app) {
             });
     });
 
-    app.post('/api/lessons/:courseId', (req, res, next) => {
+    app.post('/api/lessons/:courseId/:parentId', (req, res, next) => {
         LessonsService()
             .insert(req.body, parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {
@@ -47,7 +47,7 @@ function setupLessons(app) {
             });
     });
 
-    app.put('/api/lessons/:id/:courseId', (req, res, next) => {
+    app.put('/api/lessons/:id/:courseId/:parentId', (req, res, next) => {
         LessonsService()
             .update(parseInt(req.params.id), parseInt(req.params.courseId), req.body, req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {

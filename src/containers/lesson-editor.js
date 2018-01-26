@@ -1,27 +1,34 @@
-import React  from 'react';
+import React from 'react';
 import Webix from '../components/Webix';
 
-import * as singleLessonActions from "../actions/lesson/lessonActions";
-import * as singleCourseActions from "../actions/course/courseActions";
-import * as referenceActions from '../actions/ReferencesActions';
-import * as subLessonsActions from '../actions/subLessonsActions';
-import * as lessonResourcesActions from '../actions/lesson/lessonResourcesActions';
+import * as singleLessonActions from "../actions/lesson/lesson-actions";
+import * as lessonMainEpisodesActions from '../actions/lesson/lessonMainEpisodesActions'
+import * as lessonCommonRefsActions from '../actions/lesson/lessonCommonRefsActions'
+import * as lessonRecommendedRefsActions from '../actions/lesson/lessonRecommendedRefsActions'
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import * as singleCourseActions from "../actions/course/courseActions";
+import * as referenceActions from '../actions/references-actions';
+import * as resourcesActions from '../actions/resources-actions';
+import * as subLessonsActions from '../actions/subLessonsActions';
+import * as lessonResourcesActions from '../actions/lesson/lesson-resources-actions';
+import * as parentLessonActions from '../actions/lesson/parent-lesson-actions';
+
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import {
     LessonEpisodes,
     LessonReferences,
     LessonSubLessons,
     LessonResources
 } from '../components/lessonGrids';
-import ReferenceForm from '../components/ReferenceForm';
+import ReferenceForm from '../components/reference-form';
 import {EDIT_MODE_INSERT, EDIT_MODE_EDIT} from '../constants/Common'
 
-import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
-import ObjectEditor, {labelWidth, } from './objectEditor';
+import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
+import ObjectEditor, {labelWidth,} from './object-editor';
+import ResourceForm from "../components/resource-form";
 
-class LessonEditor extends ObjectEditor {
+export class LessonEditor extends ObjectEditor {
 
     constructor(props) {
         super(props);
@@ -51,15 +58,15 @@ class LessonEditor extends ObjectEditor {
     }
 
     _getEditRout() {
-        return this.isSubLesson ? '/sub-lessons/edit/' : '/lessons/edit/';
+        return '/lessons/edit/';
     }
 
     _getInsertRout() {
-        return this.isSubLesson ? '/sub-lessons/new' : '/lessons/new';
+        return '/lessons/new';
     }
 
     get objectIdPropName() {
-        return this.isSubLesson ? 'subLessonId' : 'lessonId';
+        return 'lessonId';
     }
 
     get objectName() {
@@ -70,14 +77,13 @@ class LessonEditor extends ObjectEditor {
         return this.props.lessonActions;
     }
 
-    get isSubLesson() {
-        return (this.props.subLessonId > 0) || ((this.props.lessonId > 0) && (this.props.subLessonId === 0))
+    get parentId() {
+        return null
     }
 
-    _initEditMode(){
+    _initEditMode() {
         this.editMode = EDIT_MODE_EDIT;
-        let _parentId = this.isSubLesson ? this.props.lessonId : null;
-        this.objectActions.get(this.objectId, this.props.courseId, _parentId);
+        this.objectActions.get(this.objectId, this.props.courseId, this.parentId);
     }
 
     _initInsertMode() {
@@ -120,12 +126,15 @@ class LessonEditor extends ObjectEditor {
             ReadyDate: value.DT_ReadyDate,
             ShortDescription: value.ShortDescription,
             FullDescription: value.FullDescription,
+            ParentId: value.CurrParentId,
             Episodes: [],
             References: [],
+            Resources:[],
         };
 
         this._fillEpisodes(_obj.Episodes);
         this._fillReferences(_obj.References);
+        this._fillResources(_obj.Resources);
 
         super._save(_obj)
     }
@@ -140,16 +149,6 @@ class LessonEditor extends ObjectEditor {
                 Supp: false,
             })
         });
-
-        this.props.suppEpisodes.map((episode) => {
-            array.push({
-                Id: episode.Id,
-                Name: episode.Name,
-                State: episode.State,
-                Number: episode.Number,
-                Supp: true,
-            })
-        })
     }
 
     _fillReferences(array) {
@@ -180,6 +179,19 @@ class LessonEditor extends ObjectEditor {
         })
     }
 
+    _fillResources(array) {
+        this.props.resources.map((resource) => {
+            array.push({
+                Id: resource.Id,
+                Description: resource.Description,
+                LanguageId: resource.LanguageId,
+                FileName: resource.FileName,
+                Name: resource.Name,
+                ResType: resource.ResType,
+            })
+        });
+    }
+
     hideAddAuthorDialog() {
         this.props.courseActions.hideAddAuthorDialog()
     }
@@ -205,50 +217,27 @@ class LessonEditor extends ObjectEditor {
     }
 
     _moveMainEpisodeDown(episodeId) {
-        this.props.lessonActions.moveMainEpisodeDown(episodeId)
+        this.props.lessonMainEpisodesActions.moveDown(episodeId)
     }
 
     _moveMainEpisodeUp(episodeId) {
-        this.props.lessonActions.moveMainEpisodeUp(episodeId)
+        this.props.lessonMainEpisodesActions.moveUp(episodeId)
     }
 
     _removeMainEpisode(episodeId) {
-        this.props.lessonActions.removeMainEpisode(episodeId)
+        this.props.lessonMainEpisodesActions.remove(episodeId)
     }
 
     _selectMainEpisode(id) {
-        this.props.lessonActions.selectMainEpisode(id)
+        this.props.lessonMainEpisodesActions.select(id)
     }
 
     _newMainEpisode() {
         this.props.history.push(this.currentUrl + '/episodes/new');
     }
 
-    // _newSuppEpisode() {
-    //     this.props.history.push(
-    //         '/courses/edit/' + this.props.courseId +
-    //         '/lessons/edit/' + this.props.lessonId +
-    //         '/supp-episodes/new/');
-    // }
-
     _editEpisode(episodeId) {
         this.props.history.push(this.currentUrl + '/episodes/edit/' + episodeId)
-    }
-
-    _selectSuppEpisode(id) {
-        this.props.lessonActions.selectSuppEpisode(id)
-    }
-
-    _moveSuppEpisodeDown(episodeId) {
-        this.props.lessonActions.moveSuppEpisodeDown(episodeId)
-    }
-
-    _moveSuppEpisodeUp(episodeId) {
-        this.props.lessonActions.moveSuppEpisodeUp(episodeId)
-    }
-
-    _removeSuppEpisode(episodeId) {
-        this.props.lessonActions.removeSuppEpisode(episodeId)
     }
 
     _createRecommendedReference() {
@@ -264,7 +253,7 @@ class LessonEditor extends ObjectEditor {
     }
 
     _selectCommonReference(id) {
-        this.props.lessonActions.selectCommonReference(id)
+        this.props.lessonCommonRefsActions.select(id)
     }
 
     _createCommonReference() {
@@ -280,31 +269,31 @@ class LessonEditor extends ObjectEditor {
     }
 
     _selectRecommendedReference(id) {
-        this.props.lessonActions.selectRecommendedReference(id)
+        this.props.lessonRecommendedRefsActions.select(id)
     }
 
     _removeRecommendedReference(refId) {
-        this.props.lessonActions.removeRecommendedReference(refId)
+        this.props.lessonRecommendedRefsActions.remove(refId)
     }
 
     _moveRecommendedReferenceUp(refId) {
-        this.props.lessonActions.moveRecommendedReferenceUp(refId)
+        this.props.lessonRecommendedRefsActions.moveUp(refId)
     }
 
     _moveRecommendedReferenceDown(refId) {
-        this.props.lessonActions.moveRecommendedReferenceDown(refId)
+        this.props.lessonRecommendedRefsActions.moveDown(refId)
     }
 
     _removeCommonReference(refId) {
-        this.props.lessonActions.removeCommonReference(refId)
+        this.props.lessonCommonRefsActions.remove(refId)
     }
 
     _moveCommonReferenceUp(refId) {
-        this.props.lessonActions.moveCommonReferenceUp(refId)
+        this.props.lessonCommonRefsActions.moveUp(refId)
     }
 
     _moveCommonReferenceDown(refId) {
-        this.props.lessonActions.moveCommonReferenceDown(refId)
+        this.props.lessonCommonRefsActions.moveDown(refId)
     }
 
     _cancelEditReference() {
@@ -312,12 +301,12 @@ class LessonEditor extends ObjectEditor {
     }
 
     _saveReference(value) {
-        let {lessonActions, referenceEditMode} = this.props;
+        let {lessonRecommendedRefsActions, lessonCommonRefsActions, referenceEditMode} = this.props;
 
         if (value.Recommended) {
-            (referenceEditMode === EDIT_MODE_EDIT) ? lessonActions.updateRecommendedReference(value) : lessonActions.insertRecommendedReference(value);
+            (referenceEditMode === EDIT_MODE_EDIT) ? lessonRecommendedRefsActions.update(value) : lessonRecommendedRefsActions.insert(value);
         } else {
-            (referenceEditMode === EDIT_MODE_EDIT) ? lessonActions.updateCommonReference(value) : lessonActions.insertCommonReference(value);
+            (referenceEditMode === EDIT_MODE_EDIT) ? lessonCommonRefsActions.update(value) : lessonCommonRefsActions.insert(value);
         }
 
         this.props.referenceActions.clearReference();
@@ -332,26 +321,13 @@ class LessonEditor extends ObjectEditor {
     _checkEpisodesState(newState) {
         if (newState === 'R') {
 
-
-            // let _suppEpisodesReady = (this.props.suppEpisodes.length > 0) && this.props.suppEpisodes.every((episode) => {
-            //     return episode.State === 'R'
-            // });
-
             return (this.props.mainEpisodes.length > 0) && this.props.mainEpisodes.every((episode) => {
                 return episode.State === 'R'
-            }) ;
+            });
         } else {
             return true
         }
     }
-
-    // _selectSubLesson(id) {
-    //     this.props.subLessonsActions.select(id)
-    // }
-
-    // _removeSubLesson(id) {
-    //     this.props.subLessonsActions.remove(id)
-    // }
 
     _moveSubLessonUp(id) {
         this.props.subLessonsActions.moveUp(id);
@@ -362,6 +338,13 @@ class LessonEditor extends ObjectEditor {
     }
 
     _newSubLesson() {
+        let {
+            lesson,
+            parentLessonActions
+        } = this.props;
+
+        parentLessonActions.set({id: lesson.id, name: lesson.Name});
+        this._clearObjectInStorage();
         this.props.history.push(
             '/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
@@ -376,19 +359,45 @@ class LessonEditor extends ObjectEditor {
     }
 
     _selectResource(id) {
-        this.props.resourcesActions.select(id);
+        this.props.lessonResourcesActions.select(id);
     }
 
     _removeResource(id) {
-        this.props.resourcesActions.remove(id);
+        this.props.lessonResourcesActions.remove(id);
     }
 
     _createResource() {
-
+        this.props.resourcesActions.create()
     }
 
-    _getWebixForm(){
+    _editResource(id) {
+        let _resource = this.props.resources.find((item) => {
+            return item.id === parseInt(id)
+        });
 
+        this.props.resourcesActions.edit(_resource);
+    }
+
+    _saveResource(value) {
+        let {lessonResourcesActions, resourceEditMode} = this.props;
+        (resourceEditMode === EDIT_MODE_EDIT) ? lessonResourcesActions.update(value) : lessonResourcesActions.insert(value);
+
+        this.props.resourcesActions.clear();
+    }
+
+    _cancelEditResource() {
+        this.props.resourcesActions.clear();
+    }
+
+    _getAdditionalTab() {
+        return <TabLink to="tab2">Дополнительные лекции</TabLink>
+    }
+
+    _getMainDivClassName(){
+        return "lesson-content";
+    }
+
+    _getWebixForm() {
         const {
             mainEpisodes,
             subLessons,
@@ -401,18 +410,21 @@ class LessonEditor extends ObjectEditor {
             selectedRecommendedRef,
             selectedResource,
             subLessonsActions,
-            resourcesActions,
+            lessonResourcesActions,
         } = this.props;
 
         let _data = this.getObject();
         return [
-            <Webix ui={::this.getUI()} data={_data} key='webix1'/>,
+            <div className={this._getMainDivClassName()+'webix'}>
+                <Webix ui={::this.getUI()} data={_data} key='webix1'/>
+            </div>,
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
                     <TabLink to="tab1">Эпизоды</TabLink>
-                    {
-                        !this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''
-                    }
+                    {/*{*/}
+                        {/*!this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''*/}
+                    {/*}*/}
+                    {this._getAdditionalTab()}
 
                     <TabLink to="tab3">Список литературы</TabLink>
                     <TabLink to="tab4">Рекомендуемая литература</TabLink>
@@ -436,16 +448,16 @@ class LessonEditor extends ObjectEditor {
                     </TabContent>
                     <TabContent for="tab2">
                         <LessonSubLessons message={'Дополнительные эпизоды'}
-                                        divName={'SuppEpisodesDiv'}
-                                        selectAction={subLessonsActions.select}
-                                        createAction={::this._newSubLesson}
-                                        editAction={::this._editSubLesson}
-                                        removeAction={subLessonsActions.remove}
-                                        // moveUpAction={::this._moveSubLessonUp}
-                                        // moveDownAction={::this._moveSubLessonDown}
-                                        editMode={this.editMode}
-                                        selected={selectedSubLesson}
-                                        data={subLessons}
+                                          divName={'SuppEpisodesDiv'}
+                                          selectAction={subLessonsActions.select}
+                                          createAction={::this._newSubLesson}
+                                          editAction={::this._editSubLesson}
+                                          removeAction={subLessonsActions.remove}
+                            // moveUpAction={::this._moveSubLessonUp}
+                            // moveDownAction={::this._moveSubLessonDown}
+                                          editMode={this.editMode}
+                                          selected={selectedSubLesson}
+                                          data={subLessons}
                         />
                     </TabContent>
                     <TabContent for="tab3">
@@ -476,10 +488,10 @@ class LessonEditor extends ObjectEditor {
                     </TabContent>
                     <TabContent for="tab5">
                         <LessonResources message={'Ресурсы'}
-                                         selectAction={resourcesActions.select}
+                                         selectAction={lessonResourcesActions.select}
                                          createAction={::this._createResource}
-                                         // editAction={::this._editRecommendedReference}
-                                         removeAction={resourcesActions.remove}
+                                         editAction={::this._editResource}
+                                         removeAction={lessonResourcesActions.remove}
                                          editMode={this.editMode}
                                          selected={selectedResource}
                                          data={resources}
@@ -487,7 +499,7 @@ class LessonEditor extends ObjectEditor {
                     </TabContent>
                 </div>
             </Tabs>
-            ]
+        ]
     }
 
     _getExtDialogs() {
@@ -500,6 +512,15 @@ class LessonEditor extends ObjectEditor {
             />)
         }
 
+        if (this.props.showResourceEditor) {
+            _dialogs.push(<ResourceForm
+                cancel={::this._cancelEditResource}
+                save={::this._saveResource}
+                data={this.props.resource}
+            />)
+        }
+
+
         return _dialogs;
     }
 
@@ -510,7 +531,7 @@ class LessonEditor extends ObjectEditor {
             {
                 view: "text",
                 name: "CourseName",
-                label: "Название курса",
+                label: "Курс",
                 readonly: true,
                 labelWidth: labelWidth,
                 disabled: true
@@ -578,7 +599,9 @@ class LessonEditor extends ObjectEditor {
                     {id: 'A', value: 'Архив'}
                 ],
                 labelWidth: labelWidth,
-                validate: function (value) { return that._checkEpisodesState(value) },
+                validate: function (value) {
+                    return that._checkEpisodesState(value)
+                },
                 invalidMessage: 'Недопустимое состояние',
                 on: {
                     onChange: function () {
@@ -611,20 +634,7 @@ class LessonEditor extends ObjectEditor {
                             width: 0,
                             name: "ShortDescription",
                         },
-                        // collapsed:true,
                     },
-                    // {
-                    //     view: "accordionitem",
-                    //     headerHeight: 40,
-                    //     header: "Полное описание",
-                    //     body: {
-                    //         view: "richtext",
-                    //         labelWidth: 0,
-                    //         height: 150,
-                    //         width: 0,
-                    //         name: "FullDescription",
-                    //     },
-                    // },
                 ]
             },
         ];
@@ -633,27 +643,37 @@ class LessonEditor extends ObjectEditor {
 
 function mapStateToProps(state, ownProps) {
     return {
-        authors: state.courseAuthors.authors,
+        authors: state.courseAuthorsList.authors,
         lesson: state.singleLesson.current,
-        mainEpisodes: state.singleLesson.mainEpisodes,
-        suppEpisodes: state.singleLesson.suppEpisodes,
-        recommendedRef: state.singleLesson.recommendedRef,
-        commonRef: state.singleLesson.commonRef,
+
+        mainEpisodes: state.lessonMainEpisodes.current,
+        recommendedRef: state.lessonRecommendedRefs.current,
+        commonRef: state.lessonCommonRefs.current,
+        subLessons: state.subLessons.current,
+        resources: state.lessonResources.current,
+        // parentLesson: state.parentLesson,
+
+        selectedMainEpisode: state.lessonMainEpisodes.selected,
+        selectedCommonRef: state.lessonCommonRefs.selected,
+        selectedRecommendedRef: state.lessonRecommendedRefs.selected,
+        selectedSubLesson: state.subLessons.selected,
+        selectedResource: state.lessonResources.selected,
+
         showReferenceEditor: state.references.showEditor,
         reference: state.references.reference,
-        referenceEditMode : state.references.editMode,
+        referenceEditMode: state.references.editMode,
         course: state.singleCourse.current,
-        hasChanges : state.singleLesson.hasChanges || state.subLessons.hasChanges || state.lessonResources.hasChanges,
-        selectedMainEpisode: state.lessonEpisodes.mainSelected,
-        // selectedSuppEpisode: state.lessonEpisodes.suppSelected,
-        selectedCommonRef: state.lessonRefs.commonSelected,
-        selectedRecommendedRef: state.lessonRefs.recommendedSelected,
 
-        subLessons: state.subLessons.current,
-        selectedSubLesson : state.subLessons.selected,
+        showResourceEditor: state.resources.showEditor,
+        resource: state.resources.object,
+        resourceEditMode: state.resources.editMode,
 
-        resources: state.lessonResources.current,
-        selectedResource: state.lessonResources.selected,
+        hasChanges: state.singleLesson.hasChanges ||
+                    state.subLessons.hasChanges ||
+                    state.lessonResources.hasChanges ||
+                    state.lessonMainEpisodes.hasChanges ||
+                    state.lessonCommonRefs.hasChanges ||
+                    state.lessonRecommendedRefs.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -664,17 +684,22 @@ function mapStateToProps(state, ownProps) {
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching,
 
-        ownProps : ownProps,
+        ownProps: ownProps,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
+        lessonMainEpisodesActions: bindActionCreators(lessonMainEpisodesActions, dispatch),
+        lessonCommonRefsActions: bindActionCreators(lessonCommonRefsActions, dispatch),
+        lessonRecommendedRefsActions: bindActionCreators(lessonRecommendedRefsActions, dispatch),
         singleCourseActions: bindActionCreators(singleCourseActions, dispatch),
-        referenceActions : bindActionCreators(referenceActions, dispatch),
-        subLessonsActions : bindActionCreators(subLessonsActions, dispatch),
-        resourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
+        referenceActions: bindActionCreators(referenceActions, dispatch),
+        subLessonsActions: bindActionCreators(subLessonsActions, dispatch),
+        lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
+        resourcesActions: bindActionCreators(resourcesActions, dispatch),
+        parentLessonActions: bindActionCreators(parentLessonActions, dispatch),
     }
 }
 

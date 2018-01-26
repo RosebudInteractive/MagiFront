@@ -16,12 +16,15 @@ import singleCourse from './course/singleCourse';
 import courseAuthors from './course/courseAuthors';
 import courseCategories from './course/courseCategories';
 import courseLessons from './course/courseLessons';
+import courseAuthorsList from './course/courseAuthorsList';
 // Lesson
 import singleLesson from './lesson/singleLesson';
 import subLessons from './lesson/subLessons';
-import lessonResources from './lesson/lessonResources';
-import lessonEpisodes from './lesson/lessonEpisodes';
-import lessonRefs from './lesson/lessonRefs';
+import lessonResources from './lesson/lesson-resources';
+import lessonMainEpisodes from './lesson/lessonMainEpisodes';
+import lessonRecommendedRefs from './lesson/lessonRecommendedRefs';
+import lessonCommonRefs from './lesson/lessonCommonRefs';
+import parentLesson from './lesson/parent-lesson';
 // Episode
 import singleEpisode from './episode/singleEpisode';
 import episodeToc from './episode/episodeToc';
@@ -29,6 +32,9 @@ import episodeContent from './episode/episodeContent';
 // Common
 import languages from './languages';
 import references from './references';
+import resources from './resources';
+import toc from './toc';
+import content from './content';
 
 export default combineReducers({
     page,
@@ -44,16 +50,22 @@ export default combineReducers({
     courses,
     singleCourse,
     courseAuthors,
+    courseAuthorsList,
     courseCategories,
     courseLessons,
     singleLesson,
     subLessons,
     lessonResources,
+    parentLesson,
     references,
     singleEpisode,
-    lessonEpisodes,
-    lessonRefs,
+    lessonMainEpisodes,
+    lessonRecommendedRefs,
+    lessonCommonRefs,
     episodeToc,
     episodeContent,
+    resources,
+    toc,
+    content,
     routing: routerReducer,
 })

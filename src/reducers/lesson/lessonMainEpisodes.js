@@ -1,18 +1,18 @@
 import {
-    CREATE_NEW_COURSE,
-    GET_SINGLE_COURSE_REQUEST,
-    GET_SINGLE_COURSE_SUCCESS,
-    CANCEL_CHANGE_COURSE_DATA,
-    CLEAR_COURSE,
-    SAVE_COURSE_DATA,
-} from '../../constants/course/singleCourse';
+    SELECT_MAIN_EPISODE,
+    REMOVE_MAIN_EPISODE,
+    MOVE_MAIN_EPISODE_UP,
+    MOVE_MAIN_EPISODE_DOWN,
+} from '../../constants/lesson/lessonMainEpisodes';
 
 import {
-    REMOVE_LESSON,
-    SELECT_COURSE_LESSON,
-    MOVE_LESSON_UP,
-    MOVE_LESSON_DOWN,
-} from '../../constants/course/courseLessons'
+    CREATE_NEW_LESSON,
+    GET_SINGLE_LESSON_REQUEST,
+    GET_SINGLE_LESSON_SUCCESS,
+    SAVE_LESSON_SUCCESS,
+    CANCEL_CHANGE_LESSON_DATA,
+    CLEAR_LESSON,
+} from '../../constants/lesson/singleLesson';
 
 import * as tools from '../tools';
 
@@ -23,17 +23,17 @@ const initialState = {
     hasChanges: false,
 };
 
-export default function courseLessons(state = initialState, action) {
+export default function lessonCommonRefs(state = initialState, action) {
 
     switch (action.type) {
-        case CREATE_NEW_COURSE:
+        case CREATE_NEW_LESSON:
             return initialState;
 
-        case GET_SINGLE_COURSE_REQUEST:
+        case GET_SINGLE_LESSON_REQUEST:
             return initialState;
 
-        case GET_SINGLE_COURSE_SUCCESS: {
-            let _data = action.payload.Lessons;
+        case GET_SINGLE_LESSON_SUCCESS: {
+            let _data = action.payload.mainEpisodes;
 
             if (!_data) {
                 return initialState
@@ -46,13 +46,13 @@ export default function courseLessons(state = initialState, action) {
                     hasChanges: false,
                 }
             }
+
         }
 
-        case SELECT_COURSE_LESSON : {
-            return { ...state, selected: action.payload}
-        }
+        case SELECT_MAIN_EPISODE:
+            return {...state, selected: action.payload};
 
-        case REMOVE_LESSON: {
+        case REMOVE_MAIN_EPISODE: {
             let _result = tools.removeObject(state.current, action.payload);
             return {
                 ...state,
@@ -62,17 +62,17 @@ export default function courseLessons(state = initialState, action) {
             };
         }
 
-        case  MOVE_LESSON_UP : {
+        case MOVE_MAIN_EPISODE_UP: {
             let _result = tools.moveObjectUp(state.current, action.payload);
             return {...state, current: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
         }
 
-        case MOVE_LESSON_DOWN : {
+        case MOVE_MAIN_EPISODE_DOWN: {
             let _result = tools.moveObjectDown(state.current, action.payload);
             return {...state, current: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
         }
 
-        case CANCEL_CHANGE_COURSE_DATA : {
+        case CANCEL_CHANGE_LESSON_DATA: {
             return {
                 ...state,
                 current: [...state.initial],
@@ -80,11 +80,10 @@ export default function courseLessons(state = initialState, action) {
             }
         }
 
-        case CLEAR_COURSE: {
+        case CLEAR_LESSON:
             return initialState;
-        }
 
-        case SAVE_COURSE_DATA: {
+        case SAVE_LESSON_SUCCESS: {
             return {
                 ...state,
                 initial: [...state.current],

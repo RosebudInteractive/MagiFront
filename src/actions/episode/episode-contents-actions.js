@@ -1,15 +1,35 @@
 import {
     SELECT_EPISODE_CONTENT,
+    INSERT_EPISODE_CONTENT,
+    UPDATE_EPISODE_CONTENT,
     REMOVE_EPISODE_CONTENT,
     MOVE_EPISODE_CONTENT_UP,
     MOVE_EPISODE_CONTENT_DOWN,
-} from '../../constants/episode/episodeContent';
+} from '../../constants/episode/episode-сontents';
 
 export const select = (id) => {
     return (dispatch) => {
         dispatch({
             type: SELECT_EPISODE_CONTENT,
             payload: id
+        });
+    }
+};
+
+export const insert = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: INSERT_EPISODE_CONTENT,
+            payload: value
+        });
+    }
+};
+
+export const update = (value) => {
+    return (dispatch) => {
+        dispatch({
+            type: UPDATE_EPISODE_CONTENT,
+            payload: value
         });
     }
 };

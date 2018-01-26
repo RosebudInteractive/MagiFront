@@ -2,17 +2,22 @@ import React from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 
-import * as singleEpisodeActions from "../actions/episode/episodeActions";
-import * as singleLessonActions from "../actions/lesson/lessonActions";
-import * as episodeTocActions from '../actions/episode/episodeTocActions';
-import * as contentActions from '../actions/episode/episodeContentActions'
+import * as singleEpisodeActions from "../actions/episode/episode-actions";
+import * as singleLessonActions from "../actions/lesson/lesson-actions";
+import * as episodeTocActions from '../actions/episode/episode-tocs-actions';
+import * as episodeContentActions from '../actions/episode/episode-contents-actions';
+import * as tocActions from '../actions/toc-actions';
+import * as contentActions from '../actions/content-actions';
+
 import {EpisodeToc, EpisodeContent} from '../components/episodeGrids'
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {EDIT_MODE_EDIT} from '../constants/Common';
-import ObjectEditor, {labelWidth,} from './objectEditor';
+import ObjectEditor, {labelWidth,} from './object-editor';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
+import EpisodeTocForm from "../components/episode-toc-form";
+import EpisodeResourceForm from "../components/episode-content-form";
 
 class EpisodeEditor extends ObjectEditor {
 
@@ -77,17 +82,86 @@ class EpisodeEditor extends ObjectEditor {
             EpisodeType: value.EpisodeType,
             Transcript: value.Transcript,
             Supp: !!+value.Supp,
+            Toc: [],
+            Content: [],
         };
 
+        this._fillToc(_obj.Toc);
+        this._fillContent(_obj.Content);
+
         super._save(_obj)
+    }
+
+    _fillToc(array) {
+        this.props.episodeToc.map((item) => {
+            array.push({
+                Id: item.Id,
+                Number: item.Number,
+                StartTime: item.StartTime,
+                Topic: item.Topic,
+            })
+        });
+    }
+
+    _fillContent(array) {
+        this.props.content.map((item) => {
+            array.push({
+                Id: item.Id,
+                Content: item.Content,
+                StartTime: item.StartTime,
+                Duration: item.Duration,
+                Topic: item.Topic,
+                ResourceId: item.ResourceId,
+            })
+        });
+    }
+
+    _editToc(id) {
+        let _toc = this.props.episodeToc.find((item) => {
+            return item.id === parseInt(id)
+        });
+
+        this.props.tocActions.edit(_toc);
+    }
+
+    _saveToc(value) {
+        let {episodeTocActions, tocEditMode} = this.props;
+        (tocEditMode === EDIT_MODE_EDIT) ? episodeTocActions.update(value) : episodeTocActions.insert(value);
+
+        this.props.tocActions.clear();
+    }
+
+    _cancelEditToc() {
+        this.props.tocActions.clear();
+    }
+
+    _editContentItem(id) {
+        let _contentItem = this.props.content.find((item) => {
+            return item.id === parseInt(id)
+        });
+
+        this.props.contentActions.edit(_contentItem);
+    }
+
+    _saveContentItem(value) {
+        let {episodeContentActions, contentEditMode} = this.props;
+        (contentEditMode === EDIT_MODE_EDIT) ? episodeContentActions.update(value) : episodeContentActions.insert(value);
+
+        this.props.contentActions.clear();
+    }
+
+    _cancelEditContentItem() {
+        this.props.contentActions.clear();
     }
 
     _getWebixForm() {
         let {
             tocActions,
+            episodeTocActions,
             selectedToc,
             episodeToc,
             contentActions,
+            episodeContentActions,
             content,
             selectedContent,
         } = this.props;
@@ -102,24 +176,24 @@ class EpisodeEditor extends ObjectEditor {
                 </div>
                 <div className="content">
                     <TabContent for="tabToc">
-                        <EpisodeToc selectAction={tocActions.select}
-                            // createAction={::this._createRecommendedReference}
-                            // editAction={::this._editRecommendedReference}
-                                    removeAction={tocActions.remove}
-                                    moveUpAction={tocActions.moveUp}
-                                    moveDownAction={tocActions.moveDown}
+                        <EpisodeToc selectAction={episodeTocActions.select}
+                                    createAction={tocActions.create}
+                                    editAction={::this._editToc}
+                                    removeAction={episodeTocActions.remove}
+                                    moveUpAction={episodeTocActions.moveUp}
+                                    moveDownAction={episodeTocActions.moveDown}
                                     editMode={this.editMode}
                                     selected={selectedToc}
                                     data={episodeToc}
                         />
                     </TabContent>
                     <TabContent for="tabContent">
-                        <EpisodeContent selectAction={contentActions.select}
-                            // createAction={::this._newSuppEpisode}
-                            // editAction={::this._editEpisode}
-                                        removeAction={contentActions.remove}
-                                        moveUpAction={contentActions.moveUp}
-                                        moveDownAction={contentActions.moveDown}
+                        <EpisodeContent selectAction={episodeContentActions.select}
+                                        createAction={contentActions.create}
+                                        editAction={::this._editContentItem}
+                                        removeAction={episodeContentActions.remove}
+                                        moveUpAction={episodeContentActions.moveUp}
+                                        moveDownAction={episodeContentActions.moveDown}
                                         editMode={this.editMode}
                                         selected={selectedContent}
                                         data={content}
@@ -129,6 +203,30 @@ class EpisodeEditor extends ObjectEditor {
             </Tabs>
         ]
     }
+
+    _getExtDialogs() {
+        let _dialogs = [];
+        if (this.props.showTocEditor) {
+            _dialogs.push(<EpisodeTocForm
+                cancel={::this._cancelEditToc}
+                save={::this._saveToc}
+                data={this.props.toc}
+            />)
+        }
+
+        if (this.props.showResourceEditor) {
+            _dialogs.push(<EpisodeResourceForm
+                cancel={::this._cancelEditContentItem}
+                save={::this._saveContentItem}
+                data={this.props.contentItem}
+                lessonId={this.props.lessonId}
+            />)
+        }
+
+
+        return _dialogs;
+    }
+
 
     _getExtElements() {
         let that = this;
@@ -221,6 +319,13 @@ function mapStateToProps(state, ownProps) {
 
         episodeToc: state.episodeToc.current,
         selectedToc: state.episodeToc.selected,
+        showTocEditor: state.toc.showEditor,
+        toc: state.toc.object,
+        tocEditMode: state.toc.editMode,
+
+        showResourceEditor: state.content.showEditor,
+        contentItem: state.content.object,
+        contentEditMode: state.content.editMode,
 
         content: state.episodeContent.current,
         selectedContent: state.episodeContent.selected,
@@ -245,7 +350,9 @@ function mapDispatchToProps(dispatch) {
     return {
         episodeActions: bindActionCreators(singleEpisodeActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
-        tocActions: bindActionCreators(episodeTocActions, dispatch),
+        episodeTocActions: bindActionCreators(episodeTocActions, dispatch),
+        tocActions: bindActionCreators(tocActions, dispatch),
+        episodeContentActions: bindActionCreators(episodeContentActions, dispatch),
         contentActions: bindActionCreators(contentActions, dispatch),
     }
 }

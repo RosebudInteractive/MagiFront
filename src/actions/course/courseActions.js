@@ -3,28 +3,17 @@ import {
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
     GET_SINGLE_COURSE_FAIL,
-    SHOW_ADD_AUTHOR_DIALOG,
-    SELECT_COURSE_AUTHOR,
-    ADD_AUTHOR,
-    REMOVE_AUTHOR,
-    HIDE_ADD_AUTHOR_DIALOG,
-    SHOW_ADD_CATEGORY_DIALOG,
-    SELECT_COURSE_CATEGORY,
-    ADD_CATEGORY,
-    REMOVE_CATEGORY,
-    HIDE_ADD_CATEGORY_DIALOG,
     CHANGE_COURSE_DATA,
     CANCEL_CHANGE_COURSE_DATA,
-    SELECT_COURSE_LESSON,
-    REMOVE_LESSON,
-    MOVE_LESSON_UP,
-    MOVE_LESSON_DOWN,
-    GET_COURSE_AUTHORS_REQUEST,
-    GET_COURSE_AUTHORS_SUCCESS,
-    GET_COURSE_AUTHORS_FAIL,
     CLEAR_COURSE,
     SAVE_COURSE_DATA,
 } from '../../constants/course/singleCourse'
+
+import {
+    GET_COURSE_AUTHORS_REQUEST,
+    GET_COURSE_AUTHORS_SUCCESS,
+    GET_COURSE_AUTHORS_FAIL,
+} from '../../constants/course/courseAuthorsList';
 
 import {
     EDIT_MODE_INSERT,
@@ -60,27 +49,6 @@ export const get = (id)=> {
                     type: GET_SINGLE_COURSE_SUCCESS,
                     payload: data
                 });
-
-                if (data.Authors.length > 0) {
-                    dispatch({
-                        type: SELECT_COURSE_AUTHOR,
-                        payload: data.Authors[0]
-                    });
-                }
-
-                if (data.Categories.length > 0) {
-                    dispatch({
-                        type: SELECT_COURSE_CATEGORY,
-                        payload: data.Categories[0]
-                    });
-                }
-
-                if (data.Lessons.length > 0) {
-                    dispatch({
-                        type: SELECT_COURSE_LESSON,
-                        payload: data.Lessons[0].id
-                    });
-                }
             })
             .catch((err) => {
                 dispatch({
@@ -155,142 +123,6 @@ export const clear = ()=> {
         dispatch({
             type: CLEAR_COURSE,
             payload: null
-        });
-    }
-};
-
-export const showAddAuthorDialog = () => {
-    return (dispatch) => {
-        dispatch({
-            type: SHOW_ADD_AUTHOR_DIALOG,
-            payload: null
-        });
-    }
-};
-
-export const selectAuthor = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: SELECT_COURSE_AUTHOR,
-            payload: id
-        });
-    }
-};
-
-export const addAuthor = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: ADD_AUTHOR,
-            payload: id
-        });
-
-        dispatch({
-            type: SELECT_COURSE_AUTHOR,
-            payload: id
-        });
-    }
-};
-
-export const removeAuthor = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: REMOVE_AUTHOR,
-            payload: id
-        });
-    }
-};
-
-export const hideAddAuthorDialog = () => {
-    return (dispatch) => {
-        dispatch({
-            type: HIDE_ADD_AUTHOR_DIALOG,
-            payload: null
-        });
-    }
-};
-
-export const showAddCategoryDialog = () => {
-    return (dispatch) => {
-        dispatch({
-            type: SHOW_ADD_CATEGORY_DIALOG,
-            payload: null
-        });
-    }
-};
-
-export const selectCategory = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: SELECT_COURSE_CATEGORY,
-            payload: id
-        });
-    }
-}
-
-export const addCategory = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: ADD_CATEGORY,
-            payload: id
-        });
-
-        dispatch({
-            type: SELECT_COURSE_CATEGORY,
-            payload: id
-        });
-    }
-};
-
-export const removeCategory = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: REMOVE_CATEGORY,
-            payload: id
-        });
-    }
-};
-
-export const hideAddCategoryDialog = () => {
-    return (dispatch) => {
-        dispatch({
-            type: HIDE_ADD_CATEGORY_DIALOG,
-            payload: null
-        });
-    }
-};
-
-export const selectLesson = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: SELECT_COURSE_LESSON,
-            payload: id
-        });
-    }
-}
-
-export const removeLesson = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: REMOVE_LESSON,
-            payload: id
-        });
-    }
-};
-
-export const moveLessonUp = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: MOVE_LESSON_UP,
-            payload: id
-        });
-    }
-};
-
-export const moveLessonDown = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: MOVE_LESSON_DOWN,
-            payload: id
         });
     }
 };

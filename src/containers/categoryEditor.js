@@ -5,7 +5,7 @@ import * as categoryActions from "../actions/categoryActions";
 import * as categoriesActions from "../actions/categoriesListActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import ObjectEditor, {labelWidth, } from './objectEditor';
+import ObjectEditor, {labelWidth, } from './object-editor';
 
 class CategoryForm extends ObjectEditor {
 

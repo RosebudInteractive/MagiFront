@@ -158,7 +158,7 @@ const handleEpisode = (episode) => {
             _obj.Description = '';
         }
 
-        item.Name = _obj.Name;
-        item.Description = _obj.Description;
+        item.Name = _obj.title;
+        item.Description = _obj.title2;
     });
 };

@@ -1,11 +1,11 @@
 import {
-    // CREATE_TOC,
-    // EDIT_TOC,
     SELECT_TOC,
     REMOVE_TOC,
     MOVE_TOC_UP,
     MOVE_TOC_DOWN,
-} from '../../constants/episode/episodeToc';
+    INSERT_TOC,
+    UPDATE_TOC,
+} from '../../constants/episode/episode-tocs';
 
 import {
     CREATE_NEW_EPISODE,
@@ -58,9 +58,36 @@ export default function episodeToc(state = initialState, action) {
 
         }
 
-        // case CREATE_TOC: {
-        //
-        // }
+        case INSERT_TOC: {
+            let _array = [...state.current, action.payload];
+            tools.setObjectsRank(_array);
+
+            return {...state, current: _array, hasChanges: true};
+        }
+
+        case UPDATE_TOC: {
+            let _array = [];
+            let _replaced = false;
+            state.current.forEach((item) => {
+                if (item.Id !== action.payload.Id) {
+                    _array.push({...item})
+                } else {
+                    _array.push(action.payload);
+                    _replaced = true;
+                }
+            });
+
+            if (!_replaced) {
+                _array.push(action.payload)
+            }
+
+            return {
+                ...state,
+                current: _array,
+                hasChanges: true
+            };
+        }
+
 
         case SELECT_TOC:
             return {...state, selected: action.payload};

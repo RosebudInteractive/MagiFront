@@ -11,10 +11,10 @@ import AuthorForm from './authorEditor';
 import Categories from './Categories';
 import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
-import CourseEditor from './courseEditor';
-import LessonEditor from './lessonEditor';
-import SubLessonEditor from './subLessonEditor';
-import EpisodeEditor from './episodeEditor';
+import CourseEditor from './course-editor';
+import LessonEditor from './lesson-editor';
+import SubLessonEditor from './subLesson-editor';
+import EpisodeEditor from './episode-editor';
 
 class App extends Component {
     render() {
@@ -60,7 +60,10 @@ class App extends Component {
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId' component={SubLessonEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId'
+                                   component={SubLessonEditor}/>
+                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/new'
+                                   component={SubLessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
                             <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>
                             <Route path='/courses/edit/:id' component={CourseEditor}/>

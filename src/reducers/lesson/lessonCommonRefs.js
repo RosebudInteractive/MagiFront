@@ -1,20 +1,20 @@
 import {
-    SELECT_EPISODE_CONTENT,
-    INSERT_EPISODE_CONTENT,
-    UPDATE_EPISODE_CONTENT,
-    REMOVE_EPISODE_CONTENT,
-    MOVE_EPISODE_CONTENT_UP,
-    MOVE_EPISODE_CONTENT_DOWN,
-} from '../../constants/episode/episode-сontents';
+    SELECT_COMMON_REFERENCE,
+    INSERT_COMMON_REFERENCE,
+    UPDATE_COMMON_REFERENCE,
+    REMOVE_COMMON_REFERENCE,
+    MOVE_COMMON_REFERENCE_UP,
+    MOVE_COMMON_REFERENCE_DOWN,
+} from '../../constants/lesson/lessonCommonRefs';
 
 import {
-    CREATE_NEW_EPISODE,
-    GET_SINGLE_EPISODE_REQUEST,
-    GET_SINGLE_EPISODE_SUCCESS,
-    SAVE_EPISODE_SUCCESS,
-    CANCEL_CHANGE_EPISODE_DATA,
-    CLEAR_EPISODE,
-} from '../../constants/episode/singleEpisode';
+    CREATE_NEW_LESSON,
+    GET_SINGLE_LESSON_REQUEST,
+    GET_SINGLE_LESSON_SUCCESS,
+    SAVE_LESSON_SUCCESS,
+    CANCEL_CHANGE_LESSON_DATA,
+    CLEAR_LESSON,
+} from '../../constants/lesson/singleLesson';
 
 import * as tools from '../tools';
 
@@ -25,17 +25,17 @@ const initialState = {
     hasChanges: false,
 };
 
-export default function episodeContent(state = initialState, action) {
+export default function lessonCommonRefs(state = initialState, action) {
 
     switch (action.type) {
-        case CREATE_NEW_EPISODE:
+        case CREATE_NEW_LESSON:
             return initialState;
 
-        case GET_SINGLE_EPISODE_REQUEST:
+        case GET_SINGLE_LESSON_REQUEST:
             return initialState;
 
-        case GET_SINGLE_EPISODE_SUCCESS: {
-            let _data = action.payload.Content;
+        case GET_SINGLE_LESSON_SUCCESS: {
+            let _data = action.payload.commonRef;
 
             if (!_data) {
                 return initialState
@@ -48,19 +48,20 @@ export default function episodeContent(state = initialState, action) {
                     hasChanges: false,
                 }
             }
+
         }
 
-        case SELECT_EPISODE_CONTENT:
+        case SELECT_COMMON_REFERENCE:
             return {...state, selected: action.payload};
 
-        case INSERT_EPISODE_CONTENT: {
+        case INSERT_COMMON_REFERENCE: {
             let _array = [...state.current, action.payload];
             tools.setObjectsRank(_array);
 
             return {...state, current: _array, hasChanges: true};
         }
 
-        case UPDATE_EPISODE_CONTENT: {
+        case UPDATE_COMMON_REFERENCE: {
             let _array = [];
             let _replaced = false;
             state.current.forEach((item) => {
@@ -83,7 +84,7 @@ export default function episodeContent(state = initialState, action) {
             };
         }
 
-        case REMOVE_EPISODE_CONTENT: {
+        case REMOVE_COMMON_REFERENCE: {
             let _result = tools.removeObject(state.current, action.payload);
             return {
                 ...state,
@@ -93,17 +94,17 @@ export default function episodeContent(state = initialState, action) {
             };
         }
 
-        case MOVE_EPISODE_CONTENT_UP: {
+        case MOVE_COMMON_REFERENCE_UP: {
             let _result = tools.moveObjectUp(state.current, action.payload);
             return {...state, current: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
         }
 
-        case MOVE_EPISODE_CONTENT_DOWN: {
+        case MOVE_COMMON_REFERENCE_DOWN: {
             let _result = tools.moveObjectDown(state.current, action.payload);
             return {...state, current: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
         }
 
-        case CANCEL_CHANGE_EPISODE_DATA: {
+        case CANCEL_CHANGE_LESSON_DATA: {
             return {
                 ...state,
                 current: [...state.initial],
@@ -111,10 +112,10 @@ export default function episodeContent(state = initialState, action) {
             }
         }
 
-        case CLEAR_EPISODE:
+        case CLEAR_LESSON:
             return initialState;
 
-        case SAVE_EPISODE_SUCCESS: {
+        case SAVE_LESSON_SUCCESS: {
             return {
                 ...state,
                 initial: [...state.current],

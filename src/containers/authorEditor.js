@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 //     EDIT_MODE_EDIT
 // } from '../constants/Common';
 
-import ObjectEditor, {labelWidth, } from './objectEditor';
+import ObjectEditor, {labelWidth, } from './object-editor';
 
 class AuthorEditor extends ObjectEditor {
 

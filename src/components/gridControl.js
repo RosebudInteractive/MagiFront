@@ -115,9 +115,9 @@ export default class GridControl extends Component {
             <div className="dlg-btn-bar">
                 {this._configButtons()}
             </div>
-            <div className="tab-scroll-box">
+            {/*<div className="tab-scroll-box">*/}
                 <Webix ui={::this.getUI()} data={data}/>
-            </div>
+            {/*</div>*/}
         </div>
     }
 
@@ -134,8 +134,9 @@ export default class GridControl extends Component {
 
         return {
             view: "datatable",
-            scroll: false,
-            autoheight: true,
+            scroll: 'y',
+            height: 300,
+            // autoheight: true,
             select: true,
             width: 0,
             editable: false,

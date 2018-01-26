@@ -2,7 +2,9 @@ export const moveObjectUp = (array, objectId) => {
     let _array = [];
     let _modified = false;
 
-    let _index = array.findIndex((item) => {return item.id == objectId});
+    let _index = array.findIndex((item) => {
+        return item.id == objectId
+    });
     if (_index > 0) {
         let _deleted = array.splice(_index - 1, 1);
         array.splice(_index, 0, _deleted[0]);
@@ -15,7 +17,7 @@ export const moveObjectUp = (array, objectId) => {
 
     _array.push(...array);
 
-    return {modified : _modified, resultArray : _array};
+    return {modified: _modified, resultArray: _array};
 };
 
 export const moveObjectDown = (array, objectId) => {
@@ -37,14 +39,16 @@ export const moveObjectDown = (array, objectId) => {
 
     _array.push(...array);
 
-    return {modified : _modified, resultArray : _array};
+    return {modified: _modified, resultArray: _array};
 };
 
 export const removeObject = (array, objectId) => {
     let _array = [];
     let _modified = false;
 
-    let _index = array.findIndex((item) => {return item.id === objectId});
+    let _index = array.findIndex((item) => {
+        return item.id === objectId
+    });
     if (_index > -1) {
         _modified = true;
         array.splice(_index, 1);
@@ -67,12 +71,12 @@ export const removeObject = (array, objectId) => {
         setObjectsRank(_array);
     }
 
-    return {modified : _modified, resultArray : _array, selected : _selected};
+    return {modified: _modified, resultArray: _array, selected: _selected};
 };
 
 export const setObjectsRank = (array) => {
     array.forEach((item, index) => {
-        item.Number = index +1
+        item.Number = index + 1
     })
 };
 
@@ -99,5 +103,24 @@ export const deleteObject = (array, objectId) => {
             :
             null;
 
-    return {resultArray : _array, selected : _selected}
+    return {resultArray: _array, selected: _selected}
+};
+
+export const addObjectRef = (array, refId) => {
+    let _array = [];
+    let _modified = false;
+    if (!array.includes(refId)) {
+        _modified = true;
+        array.push(refId)
+    }
+
+    if (_modified) {
+        _array.push(...array)
+    } else {
+        _array = array
+    }
+
+    let _selected = _modified ? refId : null;
+
+    return {modified: _modified, resultArray: _array, selected: _selected};
 };

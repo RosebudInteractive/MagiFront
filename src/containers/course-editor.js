@@ -2,18 +2,22 @@ import React from 'react'
 import Webix from '../components/Webix';
 
 import * as singleCourseActions from "../actions/course/courseActions";
+import * as courseAuthorsActions from '../actions/course/courseAuthorsActions';
+import * as courseCategoriesActions from '../actions/course/courseCategoriesActions';
+import * as courseLessonsActions from '../actions/course/courseLessonsActions';
+
 import * as coursesActions from '../actions/coursesListActions';
 import * as authorsActions from "../actions/authorsListActions";
 import * as categoriesActions from "../actions/categoriesListActions";
-import * as languagesActions from "../actions/LanguagesActions";
+import * as languagesActions from "../actions/languages-actions";
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 
-import { CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
+import {CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
 import LookupDialog from '../components/LookupDialog';
-import { Tabs, TabLink, TabContent } from 'react-tabs-redux';
-import ObjectEditor, {labelWidth, } from './objectEditor';
+import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
+import ObjectEditor, {labelWidth,} from './object-editor';
 
 class CourseEditor extends ObjectEditor {
 
@@ -62,8 +66,8 @@ class CourseEditor extends ObjectEditor {
             URL: value.URL,
             Description: value.Description,
             Authors: [],
-            Categories : [],
-            Lessons:[],
+            Categories: [],
+            Lessons: [],
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
@@ -83,25 +87,25 @@ class CourseEditor extends ObjectEditor {
         })
     }
 
-    showAddAuthorLookup(){
-        this.props.courseActions.showAddAuthorDialog()
+    showAddAuthorLookup() {
+        this.props.courseAuthorsActions.showAddDialog()
     }
 
     hideAddAuthorDialog() {
-        this.props.courseActions.hideAddAuthorDialog()
+        this.props.courseAuthorsActions.hideAddDialog()
     }
 
     addAuthorAction(id) {
-        this.props.courseActions.addAuthor(id);
-        this.props.courseActions.hideAddAuthorDialog();
+        this.props.courseAuthorsActions.add(id);
+        // this.props.courseAuthorsActions.hideAddDialog();
     }
 
     _removeAuthorFromCourse(id) {
-        this.props.courseActions.removeAuthor(id)
+        this.props.courseAuthorsActions.remove(id)
     }
 
     _selectAuthor(id) {
-        this.props.courseActions.selectAuthor(id)
+        this.props.courseAuthorsActions.select(id)
     }
 
     _getCourseAuthors() {
@@ -142,24 +146,24 @@ class CourseEditor extends ObjectEditor {
     }
 
     showAddCategoryLookup() {
-        this.props.courseActions.showAddCategoryDialog();
+        this.props.courseCategoriesActions.showAddDialog();
     }
 
     hideAddCategoryDialog() {
-        this.props.courseActions.hideAddCategoryDialog()
+        this.props.courseCategoriesActions.hideAddDialog()
     }
 
     addCategoryAction(id) {
-        this.props.courseActions.hideAddCategoryDialog();
-        this.props.courseActions.addCategory(id);
+        // this.props.courseCategoriesActions.hideAddCategoryDialog();
+        this.props.courseCategoriesActions.add(id);
     }
 
     _removeCategoryFromCourse(id) {
-        this.props.courseActions.removeCategory(id)
+        this.props.courseCategoriesActions.remove(id)
     }
 
     _selectCategory(id) {
-        this.props.courseActions.selectCategory(id)
+        this.props.courseCategoriesActions.select(id)
     }
 
     _getCourseCategories() {
@@ -198,8 +202,8 @@ class CourseEditor extends ObjectEditor {
         })
     }
 
-    _selectLesson(id){
-        this.props.courseActions.selectLesson(id)
+    _selectLesson(id) {
+        this.props.courseLessonsActions.select(id)
     }
 
     _editLesson(id) {
@@ -211,18 +215,18 @@ class CourseEditor extends ObjectEditor {
     }
 
     _moveUpLesson(id) {
-        this.props.courseActions.moveLessonUp(id);
+        this.props.courseLessonsActions.moveUp(id);
     }
 
     _moveDownLesson(id) {
-        this.props.courseActions.moveLessonDown(id);
+        this.props.courseLessonsActions.moveDown(id);
     }
 
     _removeLessonFromCourse(id) {
-        this.props.courseActions.removeLesson(id)
+        this.props.courseLessonsActions.remove(id)
     }
 
-    _checkLessonsState(newState){
+    _checkLessonsState(newState) {
         if (newState === 'P') {
             return this.props.courseLessons.some((lesson) => {
                 return lesson.State === 'R'
@@ -232,13 +236,13 @@ class CourseEditor extends ObjectEditor {
         }
     }
 
-    getLanguagesArray(){
+    getLanguagesArray() {
         return this.props.languages.map((elem) => {
             return {id: elem.id, value: elem.Language};
         })
     }
 
-    _getWebixForm(){
+    _getWebixForm() {
         const {
             courseLessons,
             selectedAuthor,
@@ -301,12 +305,12 @@ class CourseEditor extends ObjectEditor {
         }
 
         if (this.props.showAddCategoryDialog) {
-           _dialogs.push(<LookupDialog
-               message='Категориии'
-               data={::this._getCategories()}
-               yesAction={::this.addCategoryAction}
-               noAction={::this.hideAddCategoryDialog}
-           />)
+            _dialogs.push(<LookupDialog
+                message='Категориии'
+                data={::this._getCategories()}
+                yesAction={::this.addCategoryAction}
+                noAction={::this.hideAddCategoryDialog}
+            />)
         }
 
         return _dialogs;
@@ -352,9 +356,11 @@ class CourseEditor extends ObjectEditor {
                     {id: 'D', value: 'Черновик'},
                     {id: 'P', value: 'Опубликованный'},
                     {id: 'A', value: 'Архив'}
-                    ],
+                ],
                 labelWidth: labelWidth,
-                validate: function(value){ return that._checkLessonsState(value) },
+                validate: function (value) {
+                    return that._checkLessonsState(value)
+                },
                 invalidMessage: 'Недопустимое состояние',
                 on: {
                     onChange: function () {
@@ -395,20 +401,27 @@ class CourseEditor extends ObjectEditor {
 
 function mapStateToProps(state, ownProps) {
     return {
+        course: state.singleCourse.current,
+
         authors: state.authorsList.authors,
+        categories: state.categoriesList.categories,
+
+        courseAuthors: state.courseAuthors.current,
+        courseCategories: state.courseCategories.current,
+        courseLessons: state.courseLessons.current,
+
         selectedAuthor: state.courseAuthors.selected,
         selectedCategory: state.courseCategories.selected,
         selectedLesson: state.courseLessons.selected,
-        categories: state.categoriesList.categories,
-        course: state.singleCourse.current,
-        courseAuthors: state.singleCourse.authors,
-        courseCategories: state.singleCourse.categories,
-        courseLessons: state.singleCourse.lessons,
+
         editMode: state.courses.editMode,
         languages: state.languages.languages,
-        showAddAuthorDialog: state.singleCourse.showAddAuthorDialog,
-        showAddCategoryDialog: state.singleCourse.showAddCategoryDialog,
-        hasChanges : state.singleCourse.hasChanges,
+        showAddAuthorDialog: state.courseAuthors.showAddDialog,
+        showAddCategoryDialog: state.courseCategories.showAddDialog,
+        hasChanges: state.singleCourse.hasChanges ||
+        state.courseAuthors.hasChanges ||
+        state.courseCategories.hasChanges ||
+        state.courseLessons.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -422,6 +435,10 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         courseActions: bindActionCreators(singleCourseActions, dispatch),
+        courseAuthorsActions: bindActionCreators(courseAuthorsActions, dispatch),
+        courseCategoriesActions: bindActionCreators(courseCategoriesActions, dispatch),
+        courseLessonsActions: bindActionCreators(courseLessonsActions, dispatch),
+
         authorsActions: bindActionCreators(authorsActions, dispatch),
         categoriesActions: bindActionCreators(categoriesActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
