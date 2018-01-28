@@ -116,7 +116,7 @@ const LESSON_UPD_TREE = {
 
 const LESSON_MSSQL_ID_REQ =
     "select l.[Id], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
-    "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], lc.[Number], lc.[ReadyDate],\n"+
+    "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId] and ll.[LanguageId] = <%= languageId %>\n" +
     "  join [LessonCourse] lc on l.[Id] = lc.[LessonId]\n" +
@@ -132,7 +132,7 @@ const LESSON_MSSQL_ID_REQ =
 
 const LESSON_MSSQL_CHLD_REQ =
     "select l.[Id], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
-    "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], lc.[Number], lc.[ReadyDate],\n" +
+    "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId] and ll.[LanguageId] = <%= languageId %>\n" +
     "  join [LessonCourse] lc on l.[Id] = lc.[LessonId]\n" +
@@ -147,7 +147,7 @@ const LESSON_MSSQL_CHLD_REQ =
 
 const LESSON_MYSQL_ID_REQ =
     "select l.`Id`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
-    "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId` and ll.`LanguageId` = <%= languageId %>\n" +
     "  join `LessonCourse` lc on l.`Id` = lc.`LessonId`\n" +
@@ -163,7 +163,7 @@ const LESSON_MYSQL_ID_REQ =
 
 const LESSON_MYSQL_CHLD_REQ =
     "select l.`Id`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
-    "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId` and ll.`LanguageId` = <%= languageId %>\n" +
     "  join `LessonCourse` lc on l.`Id` = lc.`LessonId`\n" +
@@ -187,7 +187,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
-    "  join[ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join [ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
 const LESSON_MSSQL_TOC_REQ =
@@ -804,6 +804,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     data.res.ResLanguageId = elem.ResLanguageId;
                                 if (typeof (elem.Description) !== "undefined")
                                     data.lng.Description = elem.Description;
+                                if (typeof (elem.MetaData) !== "undefined")
+                                    data.lng.MetaData = elem.MetaData;
                                 if (typeof (elem.Id) === "number") {
                                     if (res_list[elem.Id]) {
                                         res_list[elem.Id].deleted = false;
@@ -894,6 +896,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_obj.lessonType(inpFields["LessonType"]);
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             lsn_obj.cover(inpFields["Cover"]);
+                        if (typeof (inpFields["CoverMeta"]) !== "undefined")
+                            lsn_obj.coverMeta(inpFields["CoverMeta"]);
                         if (typeof (inpFields["URL"]) !== "undefined")
                             lsn_obj.uRL(inpFields["URL"]);
 
@@ -1107,6 +1111,8 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["LessonType"] = inpFields["LessonType"];
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             fields["Cover"] = inpFields["Cover"];
+                        if (typeof (inpFields["CoverMeta"]) !== "undefined")
+                            fields["CoverMeta"] = inpFields["CoverMeta"];
                         if (typeof (inpFields["URL"]) !== "undefined")
                             fields["URL"] = inpFields["URL"];
                         return root_obj.newObject({
@@ -1203,6 +1209,8 @@ const DbLesson = class DbLesson extends DbObject {
                                             fields["Name"] = elem["Name"];
                                         if (typeof (elem["Description"]) !== "undefined")
                                             fields["Description"] = elem["Description"];
+                                        if (typeof (elem["MetaData"]) !== "undefined")
+                                            fields["MetaData"] = elem["MetaData"];
                                         return root_res_lng.newObject({
                                             fields: fields
                                         }, opts);

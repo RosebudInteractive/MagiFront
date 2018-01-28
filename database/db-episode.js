@@ -470,6 +470,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             epi_lng_obj.transcript(inpFields["Transcript"]);
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             epi_lng_obj.audio(inpFields["Audio"]);
+                        if (typeof (inpFields["AudioMeta"]) !== "undefined")
+                            epi_lng_obj.audioMeta(inpFields["AudioMeta"]);
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
 
@@ -606,6 +608,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             fields["Transcript"] = inpFields["Transcript"];
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             fields["Audio"] = inpFields["Audio"];
+                        if (typeof (inpFields["AudioMeta"]) !== "undefined")
+                            fields["AudioMeta"] = inpFields["AudioMeta"];
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             fields["Structure"] = inpFields["Structure"];
 

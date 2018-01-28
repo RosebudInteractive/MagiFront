@@ -210,6 +210,8 @@ namespace MagImport
             public int? AccountId { get; set; }
             public string Portrait { get; set; }
             public string PortraitMeta { get; set; }
+            public string RawPortraitMeta { get; set; }
+            public string URL { get; set; }
         };
 
         public class Author : DataObjTyped<AuthorFields, AuthorRoot>
@@ -235,7 +237,6 @@ namespace MagImport
             public string FirstName { get; set; }
             public string LastName { get; set; }
             public string Description { get; set; }
-            public string Alias { get; set; }
         };
 
         public class AuthorLng : DataObjTyped<AuthorLngFields, AuthorLngRoot>
@@ -282,6 +283,7 @@ namespace MagImport
             public string State { get; set; }
             public string Cover { get; set; }
             public string CoverMeta { get; set; }
+            public string RawCoverMeta { get; set; }
             public int? Color { get; set; }
             public int? LanguageId { get; set; }
             public bool? OneLesson { get; set; }
@@ -334,6 +336,7 @@ namespace MagImport
         {
             public int? AccountId { get; set; }
             public int? ParentId { get; set; }
+            public string URL { get; set; }
         };
 
         public class Category : DataObjTyped<CategoryFields, CategoryRoot>
@@ -358,7 +361,6 @@ namespace MagImport
             public int? LanguageId { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }
-            public string Alias { get; set; }
         };
 
         public class CategoryLng : DataObjTyped<CategoryLngFields, CategoryLngRoot>
@@ -407,6 +409,7 @@ namespace MagImport
             public string LessonType { get; set; }
             public string Cover { get; set; }
             public string CoverMeta { get; set; }
+            public string RawCoverMeta { get; set; }
             public string URL { get; set; }
         };
 
@@ -1003,13 +1006,13 @@ namespace MagImport
                 int db_id = rdr.GetInt32("id");
                 Category cat = new Category();
                 cat.Fields.AccountId = ACCOUNT_ID;
+                cat.Fields.URL = String.IsNullOrEmpty(rdr.GetString("alias")) ? null : rdr.GetString("alias");
 
                 CategoryLng cat_lng = new CategoryLng();
                 cat_lng.Fields.CategoryId = cat.Fields.Id;
                 cat_lng.Fields.LanguageId = LANGUAGE_ID;
                 cat_lng.Fields.Name = rdr.GetString("name");
                 cat_lng.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
-                cat_lng.Fields.Alias = String.IsNullOrEmpty(rdr.GetString("alias")) ? null : rdr.GetString("alias");
 
                 categoriesDB.Add(db_id, new Tuple<Category, CategoryLng>(cat, cat_lng));
             }
@@ -1031,6 +1034,7 @@ namespace MagImport
                 int db_id = rdr.GetInt32("id");
                 Author au = new Author();
                 au.Fields.AccountId = ACCOUNT_ID;
+                au.Fields.URL = String.IsNullOrEmpty(rdr.GetString("alias")) ? null : rdr.GetString("alias");
 
                 AuthorLng au_lng = new AuthorLng();
                 au_lng.Fields.AuthorId = au.Fields.Id;
@@ -1041,7 +1045,6 @@ namespace MagImport
                 au_lng.Fields.FirstName = names[0];
                 au_lng.Fields.LastName = names[1];
                 au_lng.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
-                au_lng.Fields.Alias = String.IsNullOrEmpty(rdr.GetString("alias")) ? null : rdr.GetString("alias");
 
                 authorsDB.Add(db_id, new Tuple<Author, AuthorLng>(au, au_lng));
             }
@@ -1075,12 +1078,17 @@ namespace MagImport
                 rdr.Close();
                 if (photo_id != 0)
                 {
-                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    JSObject meta = null;
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id, out meta);
                     string fn;
                     if (file_desc.TryGetValue("FileName", out fn))
                         au.Fields.Portrait = fn;
                     if (file_desc.TryGetValue("MetaData", out fn))
-                        au.Fields.PortraitMeta = fn;
+                    {
+                        au.Fields.RawPortraitMeta = fn;
+                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                        au.Fields.PortraitMeta = pict.ToJSONString();
+                    }
                 }
             }
 
@@ -1199,12 +1207,17 @@ namespace MagImport
                 rdr.Close();
                 if (photo_id != 0)
                 {
-                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    JSObject meta = null;
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id, out meta);
                     string fn;
                     if (file_desc.TryGetValue("FileName", out fn))
                         course.Fields.Cover = fn;
                     if (file_desc.TryGetValue("MetaData", out fn))
-                        course.Fields.CoverMeta = fn;
+                    {
+                        course.Fields.RawCoverMeta = fn;
+                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                        course.Fields.CoverMeta = pict.ToJSONString(); ;
+                    }
                 }
             }
 
@@ -1482,7 +1495,7 @@ namespace MagImport
                                     else
                                     {
                                         JSObject meta = null;
-                                        Dictionary<string, string> file_desc = getFileDecription(picture_id,out meta);
+                                        Dictionary<string, string> file_desc = getFileDecription(picture_id, out meta);
                                         string fn;
                                         if (file_desc.TryGetValue("FileName", out fn))
                                         {
@@ -1572,12 +1585,17 @@ namespace MagImport
                 //
                 if (photo_id != 0)
                 {
-                    Dictionary<string, string> file_desc = getFileDecription(photo_id);
+                    JSObject meta = null;
+                    Dictionary<string, string> file_desc = getFileDecription(photo_id, out meta);
                     string fn;
                     if (file_desc.TryGetValue("FileName", out fn))
                         lesson.Fields.Cover = fn;
                     if (file_desc.TryGetValue("MetaData", out fn))
-                        lesson.Fields.CoverMeta = fn;
+                    {
+                        lesson.Fields.RawCoverMeta = fn;
+                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                        lesson.Fields.CoverMeta = pict.ToJSONString();
+                    }
                 }
             }
 

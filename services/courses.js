@@ -2,6 +2,17 @@
 let { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
+    app.get('/api/courses', (req, res, next) => {
+        CoursesService()
+            .getAllPublic()
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/courses', (req, res, next) => {
         CoursesService()
             .getAll()

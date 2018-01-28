@@ -67,12 +67,12 @@ const ACCOUNT_ID = 1;
 const LANGUAGE_ID = 1;
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[Color], c.[Cover], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
+    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %> and cl.[LanguageId] = <%= languageId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`Color`, c.`Cover`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
+    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %> and cl.`LanguageId` = <%= languageId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -189,6 +189,52 @@ const COURSE_LESSONS_MSSQL =
 const COURSE_LESSONS_MYSQL =
     "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
+const COURSE_MSSQL_ALL_PUBLIC_REQ =
+    "select c.[Id], l.[Id] as [LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "lc.[State], l.[Cover] as [LCover], l.[CoverMeta] as [LCoverMeta], l.[URL] as [LURL],\n" +
+    "ll.[Name] as [LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], al.[FirstName], al.[LastName], a.[URL] as [AURL] from [Course] c\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
+    "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
+    "  join[AuthorLng] al on a.[Id] = al.[AuthorId] and al.[LanguageId] = <%= languageId %>\n" +
+    "where c.[AccountId] = <%= accountId %> and c.[State] = 'P'\n" +
+    "order by c.[Id]";
+const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
+    "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from [AuthorToCourse] ac\n" +
+    "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
+    "  join[AuthorLng] l on l.[AuthorId] = a.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "order by ac.[CourseId]";
+const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
+    "select cc.[CourseId], c.[Id], l.[Name], c.[URL] from [CourseCategory] cc\n" +
+    "  join[Category] c on c.[Id] = cc.[CategoryId]\n" +
+    "  join[CategoryLng] l on l.[CategoryId] = c.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "order by cc.[CourseId]";
+
+const COURSE_MYSQL_ALL_PUBLIC_REQ =
+    "select c.`Id`, l.`Id` as `LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "lc.`State`, l.`Cover` as `LCover`, l.`CoverMeta` as `LCoverMeta`, l.`URL` as `LURL`,\n" +
+    "ll.`Name` as `LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, al.`FirstName`, al.`LastName`, a.`URL` as `AURL` from `Course` c\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
+    "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
+    "  join`AuthorLng` al on a.`Id` = al.`AuthorId` and al.`LanguageId` = <%= languageId %>\n" +
+    "where c.`AccountId` = <%= accountId %> and c.`State` = 'P'\n" +
+    "order by c.`Id`";
+const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
+    "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from `AuthorToCourse` ac\n" +
+    "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
+    "  join`AuthorLng` l on l.`AuthorId` = a.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "order by ac.`CourseId`";
+const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
+    "select cc.`CourseId`, c.`Id`, l.`Name`, c.`URL` from `CourseCategory` cc\n" +
+    "  join`Category` c on c.`Id` = cc.`CategoryId`\n" +
+    "  join`CategoryLng` l on l.`CategoryId` = c.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "order by cc.`CourseId`";
+
 const DbCourse = class DbCourse extends DbObject {
 
     constructor(options) {
@@ -211,6 +257,113 @@ const DbCourse = class DbCourse extends DbObject {
                 }, {})
                     .then((result) => {
                         return result.detail;
+                    })
+            );
+        })
+    }
+
+    getAllPublic() {
+        let courses = [];
+        let crs = {};
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(COURSE_MYSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID }),
+                        mssql: _.template(COURSE_MSSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let crs_id = -1;
+                            let curr_course;
+                            result.detail.forEach((elem) => {
+                                if (elem.Id !== crs_id) {
+                                    crs_id = elem.Id;
+                                    curr_course = {
+                                        Id: elem.Id,
+                                        Cover: elem.Cover,
+                                        CoverMeta: elem.CoverMeta,
+                                        Color: elem.Color,
+                                        Name: elem.Name,
+                                        URL: elem.URL,
+                                        Authors: [],
+                                        Categories: [],
+                                        Lessons: []
+                                    };
+                                    crs[elem.Id] = curr_course;
+                                    courses.push(curr_course);
+                                };
+                                curr_course.Lessons.push({
+                                    Id: elem.LessonId,
+                                    Number: elem.Number,
+                                    ReadyDate: elem.ReadyDate,
+                                    State: elem.State,
+                                    Cover: elem.LCover,
+                                    CoverMeta: elem.LCoverMeta,
+                                    URL: elem.LURL,
+                                    Name: elem.LName,
+                                    ShortDescription: elem.ShortDescription,
+                                    Duration: elem.Duration,
+                                    DurationFmt: elem.DurationFmt,
+                                    Author: {
+                                        FirstName: elem.FirstName,
+                                        LastName: elem.LastName,
+                                        URL: elem.AURL
+                                    }
+                                });
+                            })
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ)({ languageId: LANGUAGE_ID }),
+                                    mssql: _.template(AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ)({ languageId: LANGUAGE_ID })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let crs_id = -1;
+                            let curr_course;
+                            result.detail.forEach((elem) => {
+                                if (elem.CourseId !== crs_id) {
+                                    crs_id = elem.CourseId;
+                                    curr_course = crs[crs_id];
+                                };
+                                if (curr_course)
+                                    curr_course.Authors.push({
+                                        Id: elem.Id,
+                                        FirstName: elem.FirstName,
+                                        LastName: elem.LastName,
+                                        URL: elem.URL
+                                    });
+                            })
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ)({ languageId: LANGUAGE_ID }),
+                                    mssql: _.template(CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ)({ languageId: LANGUAGE_ID })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let crs_id = -1;
+                            let curr_course;
+                            result.detail.forEach((elem) => {
+                                if (elem.CourseId !== crs_id) {
+                                    crs_id = elem.CourseId;
+                                    curr_course = crs[crs_id];
+                                };
+                                if (curr_course)
+                                    curr_course.Categories.push({
+                                        Id: elem.Id,
+                                        Name: elem.Name,
+                                        URL: elem.URL
+                                    });
+                            })
+                        }
+                        return courses;
                     })
             );
         })
@@ -498,6 +651,8 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_obj.color(inpFields["Color"]);
                         if (inpFields["Cover"])
                             crs_obj.cover(inpFields["Cover"]);
+                        if (inpFields["CoverMeta"])
+                            crs_obj.coverMeta(inpFields["CoverMeta"]);
                         if (inpFields["State"])
                             crs_obj.state(inpFields["State"]);
                         if (inpFields["LanguageId"])
@@ -670,6 +825,8 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["Color"] = inpFields["Color"];
                         if (inpFields["Cover"])
                             fields["Cover"] = inpFields["Cover"];
+                        if (inpFields["CoverMeta"])
+                            fields["CoverMeta"] = inpFields["CoverMeta"];
                         if (inpFields["State"])
                             fields["State"] = inpFields["State"];
                         if (inpFields["LanguageId"])
