@@ -81,9 +81,20 @@ class ResourceForm extends React.Component {
         return _lang ? _lang.Language : '';
     }
 
+    _handleFiles() {
+        let fileList = this.files; /* теперь вы можете работь со списком файлов */
+        fileList.forEach((file) => {
+            console.log(file)
+        })
+    }
+
     getUI(save, cancel) {
+
+
         return {
-            view: "form", width: 400, elements: [
+            view: "form",
+            width: 400,
+            elements: [
                 {
                     view: "text",
                     labelPosition: "top",
@@ -102,13 +113,80 @@ class ResourceForm extends React.Component {
                     placeholder: "Введите описание"
                 },
                 {
-                    view: "text",
-                    labelPosition: "top",
-                    name: "FileName",
-                    label: "Имя файла",
-                    placeholder: "Введите URL",
-                    validate: window.webix.rules.isNotEmpty,
-                    invalidMessage: "Значение не может быть пустым",
+                    view: "uploader",
+                    id: "uploader_1",
+                    // value: "Upload file",
+                    type: "iconButton",
+                    icon: 'upload',
+                    link: "mylist",
+                    upload: "/upload",
+                    multiple: false,
+                    datatype: "json",
+                    accept:"image/png, image/gif, image/jpeg",
+                    autosend: true,
+                    on: {
+                        onChange: (e)=> {
+                            alert(e)
+                        },
+                    }
+                },
+                {
+                    view:"list",
+                    id:"mylist",
+                    type:"uploader",
+                    autoheight:true,
+                    borderless:true
+                },
+
+                {
+                    cols: [
+                        {
+                            view: "text",
+                            labelPosition: "top",
+                            name: "FileName",
+                            label: "Имя файла",
+                            placeholder: "Введите URL",
+                            validate: window.webix.rules.isNotEmpty,
+                            invalidMessage: "Значение не может быть пустым",
+                            width: 329,
+                        },
+                        {
+                            rows: [
+                                {
+                                    template: () => {
+                                        return '<input type="file" id="input" onchange="this._handleFiles()">'
+                                    },
+                                    height: 100,
+                                    // hidden: true,
+                                    on: {
+                                        onChange: {
+                                            upload: (e, id) => {
+                                                alert(id.row);
+                                            }
+                                        },
+                                        onAfterRender: function () {
+                                            // this.input.attachEvent("onChange",function(){
+                                            //     alert(2);
+                                            // })
+                                        }
+                                    }
+
+                                },
+                                {
+                                    view: "button",
+                                    type:"iconButton",
+                                    icon: 'upload',
+                                    // value: "R",
+                                    // background
+                                    height: 38,
+                                    click: function () {
+                                        this._refreshLanguages()
+                                    }
+                                }
+                            ]
+
+                        }
+                    ]
                 },
                 {
                     cols: [
@@ -176,7 +254,14 @@ class ResourceForm extends React.Component {
                         }
                     ]
                 }
-            ]
+            ],
+            on:{
+                onValues: function () {
+                    // this.getItem('upload').attachEvent("onChange",function(){
+                    //     this.alert(2);
+                    // })
+                }
+            }
         }
     }
 }
