@@ -298,15 +298,27 @@ const LESSON_MYSQL_DELETE_SCRIPT =
         "delete from`Lesson` where `Id` = <%= id %>"
     ];
 
+const GET_LESSON_DURATION_MSSQL =
+    "select coalesce(sum(coalesce(l.[Duration], 0)), 0) as dt from [EpisodeLesson] el\n" +
+    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "where el.[LessonId] = <%= id %>";
+
+const GET_LESSON_DURATION_MYSQL =
+    "select coalesce(sum(coalesce(l.`Duration`, 0)), 0) as dt from `EpisodeLesson` el\n" +
+    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "where el.`LessonId` = <%= id %>";
+
 const DbLesson = class DbLesson extends DbObject {
 
     constructor(options) {
         super(options);
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         var exp = expression || LESSON_REQ_TREE;
-        return super._getObjById(id, exp);
+        return super._getObjById(id, exp, options);
     }
 
     get(id, course_id, parent_id) {
@@ -520,6 +532,59 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
+    _updateLessonDuration(lesson_id, options) {
+        return new Promise((resolve) => {
+            let res;
+            let root_obj;
+            let lesson_lng_obj
+            let duration = 0;
+            res = this._getObjById(lesson_id,
+                {
+                    expr: {
+                        model: {
+                            name: "Lesson",
+                            childs: [
+                                {
+                                    dataObject: {
+                                        name: "LessonLng"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, options)
+                .then((result) => {
+                    root_obj = result;
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new Error("Lesson (Id = " + lesson_id + ") doesn't exist.");
+                    collection = collection.get(0).getDataRoot("LessonLng").getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new Error("Lesson (Id = " + lesson_id + ") has inconsistent \"LNG\" part.");
+                    lesson_lng_obj = collection.get(0);
+                    return root_obj.edit();
+                })
+                .then(() => {
+                    return $data.execSql({
+                        dialect: {
+                            mysql: _.template(GET_LESSON_DURATION_MYSQL)({ languageId: LANGUAGE_ID, id: lesson_id }),
+                            mssql: _.template(GET_LESSON_DURATION_MSSQL)({ languageId: LANGUAGE_ID, id: lesson_id })
+                        }
+                    }, options);
+                })
+                .then((result) => {
+                    if (result && result.detail && (result.detail.length === 1)) {
+                        if (typeof (result.detail[0].dt) === "number")
+                            duration = result.detail[0].dt;
+                    }
+                    lesson_lng_obj.duration(duration);
+                    lesson_lng_obj.durationFmt(DbUtils.fmtDuration(duration));
+                    return root_obj.save(options);
+                });
+            resolve(res);
+        });
+    }
+
     del(id, course_id, parent_id) {
         return new Promise((resolve, reject) => {
             let root_obj;
@@ -698,6 +763,7 @@ const DbLesson = class DbLesson extends DbObject {
 
             let ls_course_obj = null;
             let hasParent = typeof (parent_id) === "number";
+            let isDurationChanged = false;
 
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
@@ -952,6 +1018,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (epi_list[key].isOwner)
                                     needToDeleteOwn = true;
                                 epi_collection._del(epi_list[key].obj);
+                                isDurationChanged = true;
                             }
                             else {
                                 for (let field in epi_list[key].data)
@@ -994,6 +1061,7 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then(() => {
                         if (epi_new && (epi_new.length > 0)) {
+                            isDurationChanged = true;
                             return Utils.seqExec(epi_new, (elem) => {
                                 return root_epi.newObject({
                                     fields: elem
@@ -1051,6 +1119,10 @@ const DbLesson = class DbLesson extends DbObject {
                             });
                     })
                     .then(() => {
+                        if (isDurationChanged)
+                            return this._updateLessonDuration(id, opts);
+                    })
+                    .then(() => {
                         console.log("Lesson updated: Id=" + id + ".");
                         return { result: "OK" };
                     })
@@ -1086,6 +1158,8 @@ const DbLesson = class DbLesson extends DbObject {
             let inpFields = data || {};
             let transactionId = null;
             let hasParent = typeof (parent_id) === "number";
+            let isDurationChanged = false;
+
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
                     .then((result) => {
@@ -1190,6 +1264,7 @@ const DbLesson = class DbLesson extends DbObject {
                     .then(() => {
                         let root_res = new_lng_obj.getDataRoot("Resource");
                         if (inpFields.Resources && (inpFields.Resources.length > 0)) {
+                            isDurationChanged = true;
                             return Utils.seqExec(inpFields.Resources, (elem) => {
                                 let fields = { ResType: "P" };
                                 if (typeof (elem["ResType"]) !== "undefined")
@@ -1204,7 +1279,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     .then((result) => {
                                         new_res_obj = this._db.getObj(result.newObject);
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
-                                        let fields = { Name: "", LanguageId: LANGUAGE_ID };
+                                        let fields = { Name: "", LanguageId: LANGUAGE_ID, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
                                             fields["Name"] = elem["Name"];
                                         if (typeof (elem["Description"]) !== "undefined")
@@ -1268,6 +1343,10 @@ const DbLesson = class DbLesson extends DbObject {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
                                 return root_obj.save(opts);
+                            })
+                            .then(() => {
+                                if (isDurationChanged)
+                                    this._updateLessonDuration(newId, opts);
                             })
                             .then(() => {
                                 return course_obj.save(opts);

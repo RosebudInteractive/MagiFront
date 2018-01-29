@@ -241,9 +241,9 @@ const DbCourse = class DbCourse extends DbObject {
         super(options);
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         var exp = expression || COURSE_REQ_TREE;
-        return super._getObjById(id, exp);
+        return super._getObjById(id, exp, options);
     }
 
     getAll() {

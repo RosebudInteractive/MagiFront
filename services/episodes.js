@@ -50,8 +50,8 @@ function setupEpisodes(app) {
     app.delete('/api/episodes/:id/:lessonId', (req, res, next) => {
         EpisodesService()
             .del(parseInt(req.params.id), parseInt(req.params.lessonId))
-            .then(() => {
-                res.send({});
+            .then((result) => {
+                res.send(result);
             })
             .catch(err => {
                 next(err);

@@ -21,6 +21,21 @@ const LESSON_REQ_TREE = {
     }
 };
 
+const ALL_LESSONS_REQ_TREE = {
+    expr: {
+        model: {
+            name: "Lesson",
+            childs: [
+                {
+                    dataObject: {
+                        name: "LessonLng"
+                    }
+                }
+            ]
+        }
+    }
+};
+
 const EPISODE_REQ_TREE = {
     expr: {
         model: {
@@ -151,15 +166,23 @@ const EPISODE_MYSQL_DELETE_SCRIPT =
         "where e.`Id` = <%= id %>",
     ];
 
+const EPISODE_MSSQL_LESSONS =
+    "select distinct [LessonId] from [EpisodeLesson]\n" +
+    "where[EpisodeId] = <%= id %>";
+
+const EPISODE_MYSQL_LESSONS =
+    "select distinct `LessonId` from `EpisodeLesson`\n" +
+    "where`EpisodeId` = <%= id %>";
+
 const DbEpisode = class DbEpisode extends DbObject {
 
     constructor(options) {
         super(options);
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         var exp = expression || EPISODE_REQ_TREE;
-        return super._getObjById(id, exp);
+        return super._getObjById(id, exp, options);
     }
 
     get(id, lesson_id) {
@@ -217,6 +240,52 @@ const DbEpisode = class DbEpisode extends DbObject {
         })
     }
 
+    _updateLessonDuration(episode_id, duration_delta, options) {
+        return new Promise((resolve) => {
+            let res;
+            let root_obj;
+            let collection;
+            if (duration_delta !== 0) { //EPISODE_MSSQL_LESSONS
+                res = $data.execSql(
+                    {
+                        dialect: {
+                            mysql: _.template(EPISODE_MYSQL_LESSONS)({ id: episode_id }),
+                            mssql: _.template(EPISODE_MSSQL_LESSONS)({ id: episode_id })
+                        }
+                    }, options)
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let ids = [];
+                            result.detail.forEach((elem) => ids.push(elem.LessonId));
+                            return this._getObjects(ALL_LESSONS_REQ_TREE, { field: "Id", op: "in", value: ids }, options);
+                        }
+                    })
+                    .then((result) => {
+                        if (result) {
+                            root_obj = result;
+                            collection = root_obj.getCol("DataElements");
+                            return root_obj.edit();
+                        }
+                    })
+                    .then(() => {
+                        if (collection) {
+                            for (let i = 0; i < collection.count(); i++) {
+                                let lng_col = collection.get(i).getDataRoot("LessonLng").getCol("DataElements");
+                                if (lng_col.count() != 1)
+                                    throw new Error("Lesson (Id = " + lesson_col.get(0).id() + ") has inconsistent \"LNG\" part.");
+                                let lesson_lng_obj = lng_col.get(0);
+                                let duration = lesson_lng_obj.duration() + duration_delta;
+                                lesson_lng_obj.duration(duration);
+                                lesson_lng_obj.durationFmt(DbUtils.fmtDuration(duration));
+                            }
+                            return root_obj.save(options);
+                        }
+                    });
+            }
+            resolve(res);
+        });
+    }
+
     del(id, lesson_id) {
         return new Promise((resolve, reject) => {
             let root_obj;
@@ -231,6 +300,7 @@ const DbEpisode = class DbEpisode extends DbObject {
 
             let hasDeleted = false;
             let transactionId = null;
+            let duration = 0;
 
             resolve(
                 this._getObjById(lesson_id, LESSON_REQ_TREE)
@@ -256,7 +326,14 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 return this._getObjById(id, {
                                     expr: {
                                         model: {
-                                            name: "Episode"
+                                            name: "Episode",
+                                            childs: [
+                                                {
+                                                    dataObject: {
+                                                        name: "EpisodeLng",
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 });
@@ -267,6 +344,14 @@ const DbEpisode = class DbEpisode extends DbObject {
                         collection = root_obj.getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Episode (Id = " + id + ") doesn't exist.");
+
+                        let lng_collection = collection.get(0).getDataRoot("EpisodeLng").getCol("DataElements");
+                        if (lng_collection.count() != 1)
+                            throw new Error("Episode (Id = " + id + ") has inconsistent \"LNG\" part.");
+                        
+                        duration = lng_collection.get(0).duration();
+                        duration = typeof (duration) === "number" ? duration : 0;
+
                         return result.edit()
                     })
                     .then(() => {
@@ -289,7 +374,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
-                                return lesson_obj.save(opts);
+                                return this._updateLessonDuration(id, 0 - duration, opts)
+                                    .then(() => {
+                                        return lesson_obj.save(opts);
+                                    });
                             })
                             .then(() => {
                                 if (hasDeleted) {
@@ -354,6 +442,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             let inpFields = data || {};
             
             let transactionId = null;
+            let durationDelta = 0;
 
             resolve(
                 this._getObjById(id)
@@ -470,8 +559,15 @@ const DbEpisode = class DbEpisode extends DbObject {
                             epi_lng_obj.transcript(inpFields["Transcript"]);
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             epi_lng_obj.audio(inpFields["Audio"]);
-                        if (typeof (inpFields["AudioMeta"]) !== "undefined")
+                        if (typeof (inpFields["AudioMeta"]) !== "undefined") {
                             epi_lng_obj.audioMeta(inpFields["AudioMeta"]);
+                            let oldDuration = epi_lng_obj.duration();
+                            try {
+                                let meta = JSON.parse(inpFields["AudioMeta"]);
+                                if (typeof (meta.length) === "number")
+                                    durationDelta = meta.length - oldDuration;
+                            } catch (err) { };
+                        }
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
 
@@ -525,6 +621,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 opts = { transactionId: transactionId };
                                 return epi_obj.save(opts)
                                     .then(() => {
+                                        if (durationDelta !== 0)
+                                            return this._updateLessonDuration(id, durationDelta, opts);
+                                    })    
+                                    .then(() => {
                                         if (root_toc)
                                             return root_toc.save(opts);
                                     })
@@ -569,6 +669,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             let new_lng_obj = null;
             let inpFields = data || {};
             let transactionId = null;
+            let duration = 0;
             resolve(
                 this._getObjById(lesson_id, LESSON_REQ_TREE)
                     .then((result) => {
@@ -608,8 +709,15 @@ const DbEpisode = class DbEpisode extends DbObject {
                             fields["Transcript"] = inpFields["Transcript"];
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             fields["Audio"] = inpFields["Audio"];
-                        if (typeof (inpFields["AudioMeta"]) !== "undefined")
+                        if (typeof (inpFields["AudioMeta"]) !== "undefined") {
                             fields["AudioMeta"] = inpFields["AudioMeta"];
+                            try {
+                                let meta = JSON.parse(inpFields["AudioMeta"]);
+                                if (typeof (meta.length) === "number")
+                                    duration = meta.length;
+                            } catch (err) { };
+                        }
+                        fields.Duration = duration;
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             fields["Structure"] = inpFields["Structure"];
 
@@ -681,6 +789,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 opts = { transactionId: transactionId };
                                 return root_obj.save(opts);
                             })
+                            .then(() => {
+                                if (duration !== 0)
+                                    return this._updateLessonDuration(newId, duration, opts);
+                            })    
                             .then(() => {
                                 return lesson_obj.save(opts);
                             });
