@@ -42,7 +42,7 @@
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
     "moment": "^2.20.1",
-    "music-metadata": "^0.8.7",
+    "music-metadata": "^0.8.8",
     "mysql": "^2.15.0",
     "npm-install-webpack-plugin": "^4.0.5",
     "prop-types": "^15.6.0",

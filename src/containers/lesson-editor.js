@@ -192,6 +192,8 @@ export class LessonEditor extends ObjectEditor {
         });
     }
 
+
+
     hideAddAuthorDialog() {
         this.props.courseActions.hideAddAuthorDialog()
     }
