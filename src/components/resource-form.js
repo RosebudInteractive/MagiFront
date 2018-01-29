@@ -125,9 +125,16 @@ class ResourceForm extends React.Component {
                     accept:"image/png, image/gif, image/jpeg",
                     autosend: true,
                     on: {
-                        onChange: (e)=> {
-                            alert(e)
+                        onBeforeFileAdd: (item)=> {
+                            var type = item.type.toLowerCase();
+                            if (type != "jpg" && type != "png"){
+                                window.webix.message("Only PNG or JPG images are supported");
+                                return false;
+                            }
                         },
+                        onUploadComplete: (response) => {
+                            window.webix.message(response)
+                        }
                     }
                 },
                 {
