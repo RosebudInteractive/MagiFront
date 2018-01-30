@@ -584,11 +584,78 @@ export class LessonEditor extends ObjectEditor {
                 },
             },
             {
-                template: (obj) => {
-                    return '<img src="' + obj.src + '" />'
-                },
-                data: {src: "/assets/images/avatar.png"},
-                height: 100,
+                cols: [
+                    {
+                        rows: [
+                            {
+                                view:"label",
+                                label: "Обложка лекции",
+                                width: labelWidth,
+                                height: 38,
+                            }
+                        ]
+
+                    },
+                    {
+
+                        view: 'template',
+                        type: 'image',
+                        image:"/assets/images/avatar.png",
+                        labelWidth: labelWidth,
+                        label: 'Обложка лекции',
+
+                        id: 'cover',
+                        template: (obj) => {
+                            return '<img class="cover" src="' + obj.src + '" />'
+                        },
+                        data: {src: "/assets/images/avatar.png"},
+                        height: 360,
+                        borderless: true,
+                        on: {
+                            onBeforeRender: (object) => {
+                                console.log(object)
+                            }
+                        }
+
+                    },
+                    {
+                        view: "uploader",
+                        id: "file-uploader",
+                        type: "iconButton",
+                        icon: 'upload',
+                        // link: "file-list",
+                        upload: "/upload",
+                        multiple: false,
+                        datatype: "json",
+                        accept: "image/*",
+                        validate: window.webix.rules.isNotEmpty,
+                        invalidMessage: "Значение не может быть пустым",
+                        inputHeight:38,
+                        width: 38,
+                        on: {
+                            onBeforeFileAdd: (item)=> {
+                                let _type = item.file.type.toLowerCase();
+                                if (!_type) {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                let _metaType = _type.split('/')[0];
+                                if (_metaType !== "image") {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                window.$$('btnOk').disable();
+                                window.$$('btnCancel').disable();
+                            },
+                            onUploadComplete: (response) => {
+                                window.$$('cover').setValue('/data/' + response[0].file);
+                            },
+
+                        }
+                    },
+                ]
             },
             {
                 view: "combo",

@@ -215,15 +215,26 @@ export default class ObjectEditor extends React.Component {
                     {},
                     {},
                     {
-                        view: "button", value: "ОК", name: 'btnOk',
+                        view: "button", value: "ОК", name: 'btnOk', id: 'btnOk',
                         click: function () {
                             if (this.getFormView().validate()) {
-                                that._save(this.getFormView().getValues());
+                                let _obj = this.getFormView().getValues();
+
+                                let _uploader = window.$$('file-uploader');
+                                if (_uploader) {
+                                    let _id = window.$$('file-uploader').files.data.order[0];
+                                    let _file = window.$$('file-uploader').files.getItem(_id);
+                                    if (_file) {
+                                        _obj.fileInfo = _file[0];
+                                    }
+                                }
+
+                                that._save(_obj);
                             }
                         }
                     },
                     {
-                        view: "button", value: "Отмена", name: 'btnCancel',
+                        view: "button", value: "Отмена", name: 'btnCancel', id: 'btnCancel',
                         click: function () {
                             this.getFormView().clearValidation();
                             that._cancel();
