@@ -48,6 +48,11 @@
     vertical-align: top;
 }
 
+.cover {
+    width: 360px;
+    display: inline-block;
+}
+
 .tabs-1 .tab-links {
     margin: 0;
     padding: 0;

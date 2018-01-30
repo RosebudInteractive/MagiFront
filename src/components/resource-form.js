@@ -95,6 +95,7 @@ class ResourceForm extends React.Component {
             view: "form",
             width: 400,
             elements: [
+
                 {
                     view: "text",
                     labelPosition: "top",
@@ -115,59 +116,9 @@ class ResourceForm extends React.Component {
                 {
                     cols: [
                         {
-                            view:"list",
-                            // name: "FileName",
-                            id:"file-list",
-                            type:"uploader",
-                            label: "Имя файла",
-                            placeholder: "Введите URL",
-                            validate: window.webix.rules.isNotEmpty,
-                            invalidMessage: "Значение не может быть пустым",
-                            width: 326,
-                            height:32,
-                            scroll: false,
-                            // borderless:true
-                        },
-                        {
-                            view: "uploader",
-                            id: "uploader_1",
-                            type: "iconButton",
-                            icon: 'upload',
-                            link: "file-list",
-                            upload: "/upload",
-                            multiple: false,
-                            datatype: "json",
-                            accept:"image/png, image/gif, image/jpeg",
-                            validate: window.webix.rules.isNotEmpty,
-                            invalidMessage: "Значение не может быть пустым",
-                            // autosend: true,
-                            on: {
-                                onBeforeFileAdd: ()=> {
-                                    // todo : ЗДЕСЬ ДОЛЖНА БЫТЬ ПРОВЕРКА ТИПА ФАЙЛА
-                                    // let type = item.type.toLowerCase();
-                                    // if (type !== "jpg" && type !== "png"){
-                                    //     window.webix.message("Only PNG or JPG images are supported");
-                                    //     return false;
-                                    // }
-                                },
-                                onUploadComplete: () => {
-                                    // window.webix.message(response)
-                                },
-
-                            }
-                        },
-
-                    ]
-                },
-
-
-
-                {
-                    cols: [
-                        {
-                            view: "textarea",
+                            view: "text",
                             labelPosition: "top",
-                            id:'text1',
+                            id:'file-name',
                             name: "FileName",
                             label: "Имя файла",
                             placeholder: "Введите URL",
@@ -180,21 +131,62 @@ class ResourceForm extends React.Component {
                                 {
                                 },
                                 {
-                                    view: "button",
-                                    type:"iconButton",
+                                    view: "uploader",
+                                    id: "file-uploader",
+                                    apiOnly: true,
+                                    upload: "/upload",
+                                    multiple: false,
+                                    datatype: "json",
+                                    accept: "image/*",
+                                    // accept: "image/*, video/*",
+                                    type: "iconButton",
                                     icon: 'upload',
-                                    // value: "R",
-                                    // background
                                     height: 38,
-                                    click: function () {
-                                        this._refreshLanguages()
-                                    }
-                                }
-                            ]
+                                    on: {
+                                        onBeforeFileAdd: (item) => {
+                                            let _type = item.file.type.toLowerCase();
+                                            if (!_type) {
+                                                window.webix.message("Поддерживаются только изображения");
+                                                return false;
+                                            }
 
+                                            let _metaType = _type.split('/')[0];
+                                            if (_metaType !== "image") { // && _metaType !== 'video') {
+                                                window.webix.message("Поддерживаются только изображения");
+                                                return false;
+                                            }
+
+                                            window.$$('res-form-btnOk').disable();
+                                            window.$$('res-form-btnCancel').disable();
+                                        },
+                                        onUploadComplete: (response) => {
+                                            window.$$('file-name').setValue(response[0].file);
+
+                                            let _type = response[0].info['mime-type'].toLowerCase();
+                                            if (_type) {
+                                                let _metaType = _type.split('/')[0];
+                                                if (_metaType === "image") {
+                                                    window.$$('ResType').setValue('P');
+                                                }
+                                                if (_metaType === 'video') {
+                                                    window.$$('ResType').setValue('V');
+                                                }
+                                            }
+                                        },
+                                        onFileUpload: () => {
+                                            window.$$('res-form-btnOk').enable();
+                                            window.$$('res-form-btnCancel').enable();
+                                        },
+                                        onFileUploadError: () => {
+                                            window.$$('res-form-btnOk').enable();
+                                            window.$$('res-form-btnCancel').enable();
+                                        }
+                                    }
+                                },
+                            ]
                         },
-                    ],
-                    hidden: true,
+
+                    ]
                 },
                 {
                     cols: [
@@ -227,48 +219,51 @@ class ResourceForm extends React.Component {
                         }
                     ]
                 },
-
                 {
                     view: "combo",
                     labelPosition: "top",
                     name: "ResType",
+                    id: 'ResType',
                     label: "Тип ресурса",
                     placeholder: "Введите категорию",
                     options: [{id: 'P', value: 'Изображение'}, {id: 'V', value: 'Видео'},],
                     validate: window.webix.rules.isNotEmpty,
                     invalidMessage: "Значение не может быть пустым",
+                    disabled: true,
                 },
                 {
                     cols: [
                         {},
                         {
-                            view: "button", value: "ОК", click: function () {
-                            if (save)
-                                if (this.getFormView().validate()) {
-                                    let _obj = this.getFormView().getValues();
-                                    let _id = window.$$('uploader_1').files.data.order[0];
-                                    let _file = window.$$('uploader_1').files.getItem(_id);
-                                    if (_file) {
-                                        _obj.FileName = _file[0].file;
-                                        _obj.MetaData = _file[0].info;
-                                    }
+                            view: "button", value: "ОК", id: 'res-form-btnOk',
+                            click: function () {
+                                if (save)
+                                    if (this.getFormView().validate()) {
+                                        let _obj = this.getFormView().getValues();
+                                        let _id = window.$$('file-uploader').files.data.order[0];
+                                        let _file = window.$$('file-uploader').files.getItem(_id);
+                                        if (_file) {
+                                            _obj.FileName = _file[0].file;
+                                            _obj.MetaData = JSON.stringify(_file[0].info);
+                                        }
 
-                                    save(_obj);
-                                }
-                        }
+                                        save(_obj);
+                                    }
+                            }
                         },
                         {
-                            view: "button", value: "Отмена", click: function () {
-                            if (cancel)
-                                cancel();
-                        }
+                            view: "button", value: "Отмена", id: 'res-form-btnCancel',
+                            click: function () {
+                                if (cancel)
+                                    cancel();
+                            }
                         }
                     ]
                 }
             ],
             on:{
                 onValues: function () {
-                    window.$$('uploader_1').files.attachEvent("onBeforeDelete", function(id){
+                    window.$$('file-uploader').files.attachEvent("onBeforeDelete", function(id){
                         // todo : ОТПРАВКА СООБЩЕНИЯ СЕРВЕРУ ОБ УДАЛЕНИИ ФАЙЛА
                         let _item = window.$$('uploader_1').files.getItem(id);
                         window.webix.message('Удален ' + _item[0].file);

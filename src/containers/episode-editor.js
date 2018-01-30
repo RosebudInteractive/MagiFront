@@ -71,6 +71,12 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _save(value) {
+        let _file = value.fileInfo ? value.fileInfo.file : null;
+        let _meta = value.fileInfo ? value.fileInfo.info : null;
+        if (_meta) {
+            _meta = JSON.stringify(_meta);
+        }
+
         let _obj = {
             id: value.id,
             LessonId: this.props.lessonId,
@@ -78,7 +84,8 @@ class EpisodeEditor extends ObjectEditor {
             Id: value.id,
             Name: value.Name,
             State: value.State,
-            Audio: value.Audio,
+            Audio: _file,
+            AudioMeta: _meta,
             EpisodeType: value.EpisodeType,
             Transcript: value.Transcript,
             Supp: !!+value.Supp,
@@ -263,18 +270,61 @@ class EpisodeEditor extends ObjectEditor {
                 labelWidth: labelWidth,
             },
             {
-                view: "text",
-                name: "Audio",
-                label: "Аудио-контент",
-                placeholder: "",
-                labelWidth: labelWidth,
-                validate: window.webix.rules.isNotEmpty,
-                invalidMessage: "Значение не может быть пустым",
-                on: {
-                    onChange: function () {
-                        that._externalValidate(this);
+                cols: [
+                    {
+                        view: "text",
+                        name: "Audio",
+                        label: "Аудио-контент",
+                        id: 'file-name',
+                        placeholder: "",
+                        labelWidth: labelWidth,
+                        validate: window.webix.rules.isNotEmpty,
+                        invalidMessage: "Значение не может быть пустым",
+                        on: {
+                            onChange: function () {
+                                that._externalValidate(this);
+                            },
+                        },
                     },
-                },
+                    {
+                        view: "uploader",
+                        id: "file-uploader",
+                        type: "iconButton",
+                        icon: 'upload',
+                        // link: "file-list",
+                        upload: "/upload",
+                        multiple: false,
+                        datatype: "json",
+                        accept:"audio/*",
+                        validate: window.webix.rules.isNotEmpty,
+                        invalidMessage: "Значение не может быть пустым",
+                        inputHeight:38,
+                        width: 38,
+                        on: {
+                            onBeforeFileAdd: (item)=> {
+                                // todo : ЗДЕСЬ ДОЛЖНА БЫТЬ ПРОВЕРКА ТИПА ФАЙЛА
+                                let _type = item.file.type.toLowerCase();
+                                if (!_type) {
+                                    window.webix.message("Поддерживаются только аудио файлы");
+                                    return false;
+                                }
+
+                                let _metaType = _type.split('/')[0];
+                                if (_metaType !== "audio"){
+                                    window.webix.message("Поддерживаются только аудио файлы");
+                                    return false;
+                                }
+
+                                window.$$('btnOk').disable();
+                                window.$$('btnCancel').disable();
+                            },
+                            onUploadComplete: (response) => {
+                                window.$$('file-name').setValue(response[0].file);
+                            },
+
+                        }
+                    },
+                ]
             },
             {
                 view: "checkbox",
