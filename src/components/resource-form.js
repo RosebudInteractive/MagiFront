@@ -113,43 +113,61 @@ class ResourceForm extends React.Component {
                     placeholder: "Введите описание"
                 },
                 {
-                    view: "uploader",
-                    id: "uploader_1",
-                    // value: "Upload file",
-                    type: "iconButton",
-                    icon: 'upload',
-                    link: "mylist",
-                    upload: "/upload",
-                    multiple: false,
-                    datatype: "json",
-                    accept:"image/png, image/gif, image/jpeg",
-                    autosend: true,
-                    on: {
-                        onBeforeFileAdd: (item)=> {
-                            var type = item.type.toLowerCase();
-                            if (type != "jpg" && type != "png"){
-                                window.webix.message("Only PNG or JPG images are supported");
-                                return false;
+                    cols: [
+                        {
+                            view:"list",
+                            // name: "FileName",
+                            id:"file-list",
+                            type:"uploader",
+                            label: "Имя файла",
+                            placeholder: "Введите URL",
+                            validate: window.webix.rules.isNotEmpty,
+                            invalidMessage: "Значение не может быть пустым",
+                            width: 326,
+                            height:32,
+                            scroll: false,
+                            // borderless:true
+                        },
+                        {
+                            view: "uploader",
+                            id: "uploader_1",
+                            type: "iconButton",
+                            icon: 'upload',
+                            link: "file-list",
+                            upload: "/upload",
+                            multiple: false,
+                            datatype: "json",
+                            accept:"image/png, image/gif, image/jpeg",
+                            validate: window.webix.rules.isNotEmpty,
+                            invalidMessage: "Значение не может быть пустым",
+                            // autosend: true,
+                            on: {
+                                onBeforeFileAdd: ()=> {
+                                    // todo : ЗДЕСЬ ДОЛЖНА БЫТЬ ПРОВЕРКА ТИПА ФАЙЛА
+                                    // let type = item.type.toLowerCase();
+                                    // if (type !== "jpg" && type !== "png"){
+                                    //     window.webix.message("Only PNG or JPG images are supported");
+                                    //     return false;
+                                    // }
+                                },
+                                onUploadComplete: () => {
+                                    // window.webix.message(response)
+                                },
+
                             }
                         },
-                        onUploadComplete: (response) => {
-                            window.webix.message(response)
-                        }
-                    }
+
+                    ]
                 },
-                {
-                    view:"list",
-                    id:"mylist",
-                    type:"uploader",
-                    autoheight:true,
-                    borderless:true
-                },
+
+
 
                 {
                     cols: [
                         {
-                            view: "text",
+                            view: "textarea",
                             labelPosition: "top",
+                            id:'text1',
                             name: "FileName",
                             label: "Имя файла",
                             placeholder: "Введите URL",
@@ -160,24 +178,6 @@ class ResourceForm extends React.Component {
                         {
                             rows: [
                                 {
-                                    template: () => {
-                                        return '<input type="file" id="input" onchange="this._handleFiles()">'
-                                    },
-                                    height: 100,
-                                    // hidden: true,
-                                    on: {
-                                        onChange: {
-                                            upload: (e, id) => {
-                                                alert(id.row);
-                                            }
-                                        },
-                                        onAfterRender: function () {
-                                            // this.input.attachEvent("onChange",function(){
-                                            //     alert(2);
-                                            // })
-                                        }
-                                    }
-
                                 },
                                 {
                                     view: "button",
@@ -192,8 +192,9 @@ class ResourceForm extends React.Component {
                                 }
                             ]
 
-                        }
-                    ]
+                        },
+                    ],
+                    hidden: true,
                 },
                 {
                     cols: [
@@ -236,11 +237,6 @@ class ResourceForm extends React.Component {
                     options: [{id: 'P', value: 'Изображение'}, {id: 'V', value: 'Видео'},],
                     validate: window.webix.rules.isNotEmpty,
                     invalidMessage: "Значение не может быть пустым",
-                    // on: {
-                    //     onChange: function () {
-                    //         that._externalValidate(this);
-                    //     },
-                    // },
                 },
                 {
                     cols: [
@@ -249,7 +245,15 @@ class ResourceForm extends React.Component {
                             view: "button", value: "ОК", click: function () {
                             if (save)
                                 if (this.getFormView().validate()) {
-                                    save(this.getFormView().getValues());
+                                    let _obj = this.getFormView().getValues();
+                                    let _id = window.$$('uploader_1').files.data.order[0];
+                                    let _file = window.$$('uploader_1').files.getItem(_id);
+                                    if (_file) {
+                                        _obj.FileName = _file[0].file;
+                                        _obj.MetaData = _file[0].info;
+                                    }
+
+                                    save(_obj);
                                 }
                         }
                         },
@@ -264,9 +268,13 @@ class ResourceForm extends React.Component {
             ],
             on:{
                 onValues: function () {
-                    // this.getItem('upload').attachEvent("onChange",function(){
-                    //     this.alert(2);
-                    // })
+                    window.$$('uploader_1').files.attachEvent("onBeforeDelete", function(id){
+                        // todo : ОТПРАВКА СООБЩЕНИЯ СЕРВЕРУ ОБ УДАЛЕНИИ ФАЙЛА
+                        let _item = window.$$('uploader_1').files.getItem(id);
+                        window.webix.message('Удален ' + _item[0].file);
+                        //return false to block operation
+                        return true;
+                    });
                 }
             }
         }

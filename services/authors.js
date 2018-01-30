@@ -8,7 +8,7 @@ function setupAuthors(app) {
                 res.send(rows);
             })
             .catch(err => {
-                next(err);
+                res.status(500).send(err.message);//next(err);
             });
     });
 
