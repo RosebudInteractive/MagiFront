@@ -52,15 +52,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("Author", "47b13680-c656-4ba4-82e6-3bd14badfcef", "RootAuthor", "065a0fce-be87-45db-8aa6-0581e7846c83")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
             .addField("Portrait", { type: "string", length: 255, allowNull: true })
-            .addField("PortraitMeta", { type: "string", allowNull: true });
+            .addField("PortraitMeta", { type: "string", allowNull: true })
+            .addField("RawPortraitMeta", { type: "string", allowNull: true })
+            .addField("URL", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("AuthorLng", "2efeead7-684d-46fa-b11b-555ffb2da5a6", "RootAuthorLng", "e306cc09-7c70-4dda-b428-a361eae7e1a2")
             .addField("AuthorId", { type: "dataRef", model: "Author", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("FirstName", { type: "string", length: 255, allowNull: false })
             .addField("LastName", { type: "string", length: 255, allowNull: false })
-            .addField("Description", { type: "string", allowNull: true })
-            .addField("Alias", { type: "string", length: 255, allowNull: true });
+            .addField("Description", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("AuthorToCourse", "2f0ce749-4169-4ec0-9a87-0ffd405a4337", "RootAuthorToCourse", "feebc518-1fa6-4051-b39e-7958ed30feb7")
             .addField("AuthorId", { type: "dataRef", model: "Author", refAction: "parentRestrict", allowNull: false })
@@ -71,6 +72,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("State", { type: "enum", values: ["D", "P", "A"], allowNull: false })
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("CoverMeta", { type: "string", allowNull: true })
+            .addField("RawCoverMeta", { type: "string", allowNull: true })
             .addField("Color", { type: "int", allowNull: true })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("OneLesson", { type: "boolean", allowNull: false })
@@ -85,14 +87,14 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("Category", "fa44e670-4ee6-4227-ab4d-083924a92d8a", "RootCategory", "6479905e-bdc3-45a8-8690-568ce3e698b9")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
-            .addField("ParentId", { type: "dataRef", model: "Category", refAction: "parentRestrict", allowNull: true });
+            .addField("ParentId", { type: "dataRef", model: "Category", refAction: "parentRestrict", allowNull: true })
+            .addField("URL", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("CategoryLng", "6bae1b6a-82d4-4f54-a953-080edf274588", "RootCategoryLng", "bd317677-91f9-44b2-b449-d368e42a2b6a")
             .addField("CategoryId", { type: "dataRef", model: "Category", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("Name", { type: "string", length: 255, allowNull: false })
-            .addField("Description", { type: "string", length: 255, allowNull: true })
-            .addField("Alias", { type: "string", length: 255, allowNull: true });
+            .addField("Description", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("CourseCategory", "61e14112-019b-42ac-9834-073af99a1597", "RootCourseCategory", "6b65ee98-e1fa-4580-9f90-ad835349a8e5")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
@@ -105,6 +107,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("LessonType", { type: "enum", values: ["L", "T"], allowNull: false })
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("CoverMeta", { type: "string", allowNull: true })
+            .addField("RawCoverMeta", { type: "string", allowNull: true })
             .addField("URL", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("LessonLng", "7012a967-e186-43d8-b39c-1409b7f198b1", "RootLessonLng", "4dde1122-7556-4929-a81c-5c7679a5bbee")

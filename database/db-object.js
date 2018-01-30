@@ -16,7 +16,7 @@ exports.DbObject = class DbObject {
         return res;
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         return new MemDbPromise(this._db, (resolve) => {
             if (!expression)
                 throw new Error("DbObject::_getObjById: Invalid parameter \"expression\": " + JSON.stringify(expression));
@@ -29,7 +29,7 @@ exports.DbObject = class DbObject {
             this._db._deleteRoot(predicate.getRoot());
 
             resolve(
-                this._db.getData(Utils.guid(), null, null, exp_filtered)
+                this._db.getData(Utils.guid(), null, null, exp_filtered, options)
                     .then((result) => {
                         if (result && result.guids && (result.guids.length === 1)) {
                             let obj = this._db.getObj(result.guids[0]);
@@ -44,7 +44,7 @@ exports.DbObject = class DbObject {
         });
     }
 
-    _getObjects(expression, simple_condition) {
+    _getObjects(expression, simple_condition, options) {
         return new MemDbPromise(this._db, (resolve) => {
             if (!expression)
                 throw new Error("DbObject::_getObjects: Invalid parameter \"expression\": " + JSON.stringify(expression));
@@ -58,7 +58,7 @@ exports.DbObject = class DbObject {
                 this._db._deleteRoot(predicate.getRoot());
             }
             resolve(
-                this._db.getData(Utils.guid(), null, null, exp_filtered)
+                this._db.getData(Utils.guid(), null, null, exp_filtered, options)
                     .then((result) => {
                         if (result && result.guids && (result.guids.length === 1)) {
                             let obj = this._db.getObj(result.guids[0]);

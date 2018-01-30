@@ -19,11 +19,11 @@ const ACCOUNT_ID = 1;
 const LANGUAGE_ID = 1;
 
 const AUTHOR_MSSQL_ALL_REQ =
-    "select a.[Id], l.[FirstName], l.[LastName], a.[Portrait], l.[Description] from [Author] a\n" +
+    "select a.[Id], l.[FirstName], l.[LastName], a.[URL], a.[Portrait], a.[PortraitMeta], l.[Description] from [Author] a\n" +
     "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and a.[AccountId] = <%= accountId %> and l.[LanguageId] = <%= languageId %>";
 
 const AUTHOR_MYSQL_ALL_REQ =
-    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, l.`Description` from `Author` a\n" +
+    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`URL`, a.`Portrait`, a.`PortraitMeta`, l.`Description` from `Author` a\n" +
     "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and a.`AccountId` = <%= accountId %> and l.`LanguageId` = <%= languageId %>";
 
 const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
@@ -35,9 +35,9 @@ const DbAuthor = class DbAuthor extends DbObject {
         super(options);
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         var exp = expression || AUTHOR_REQ_TREE;
-        return super._getObjById(id, exp);
+        return super._getObjById(id, exp, options);
     }
 
     getAll() {
@@ -134,8 +134,12 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return auth_obj.edit()
                     })
                     .then(() => {
+                        if (inpFields["URL"])
+                            auth_obj.uRL(inpFields["URL"]);
                         if (inpFields["Portrait"])
                             auth_obj.portrait(inpFields["Portrait"]);
+                        if (inpFields["PortraitMeta"])
+                            auth_obj.portraitMeta(inpFields["PortraitMeta"]);
                         if (inpFields["FirstName"])
                             auth_lng_obj.firstName(inpFields["FirstName"]);
                         if (inpFields["LastName"])
@@ -176,8 +180,12 @@ const DbAuthor = class DbAuthor extends DbObject {
                     })
                     .then(() => {
                         let fields = { AccountId: ACCOUNT_ID };
+                        if (inpFields["URL"])
+                            fields["URL"] = inpFields["URL"];
                         if (inpFields["Portrait"])
                             fields["Portrait"] = inpFields["Portrait"];
+                        if (inpFields["PortraitMeta"])
+                            fields["PortraitMeta"] = inpFields["PortraitMeta"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);

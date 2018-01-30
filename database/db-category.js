@@ -19,13 +19,13 @@ const ACCOUNT_ID = 1;
 const LANGUAGE_ID = 1;
 
 const CATEGORY_MSSQL_ALL_REQ =
-    "select c.[Id], c.[ParentId], l.[Name], lp.[Name] as [ParentName] from [Category] c\n" +
+    "select c.[Id], c.[ParentId], c.[URL], l.[Name], lp.[Name] as [ParentName] from [Category] c\n" +
     "  join [CategoryLng] l on c.[Id] = l.[CategoryId] and l.[LanguageId] = <%= languageId %>\n"+
     "  left join [CategoryLng] lp on c.[ParentId] = lp.[CategoryId] and lp.[LanguageId] = <%= languageId %>\n" +
     "where c.[AccountId] = <%= accountId %>";
 
 const CATEGORY_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`ParentId`, l.`Name`, lp.`Name` as `ParentName` from `Category` c\n" +
+    "select c.`Id`, c.`ParentId`, c.`URL`, l.`Name`, lp.`Name` as `ParentName` from `Category` c\n" +
     "  join `CategoryLng` l on c.`Id` = l.`CategoryId` and l.`LanguageId` = <%= languageId %>\n" +
     "  left join `CategoryLng` lp on c.`ParentId` = lp.`CategoryId` and lp.`LanguageId` = <%= languageId %>\n" +
     "where c.`AccountId` = <%= accountId %>";
@@ -39,9 +39,9 @@ const DbCategory = class DbCategory extends DbObject {
         super(options);
     }
 
-    _getObjById(id, expression) {
+    _getObjById(id, expression, options) {
         var exp = expression || CATEGORY_REQ_TREE;
-        return super._getObjById(id, exp);
+        return super._getObjById(id, exp, options);
     }
 
     getAll() {
@@ -140,6 +140,8 @@ const DbCategory = class DbCategory extends DbObject {
                     .then(() => {
                         if (inpFields["ParentId"])
                             ctg_obj.parentId(inpFields["ParentId"]);
+                        if (inpFields["URL"])
+                            ctg_obj.uRL(inpFields["URL"]);
                         if (inpFields["Name"])
                             ctg_lng_obj.name(inpFields["Name"]);
                         return ctg_obj.save(opts);
@@ -178,6 +180,8 @@ const DbCategory = class DbCategory extends DbObject {
                         let fields = { AccountId: ACCOUNT_ID };
                         if (inpFields["ParentId"])
                             fields["ParentId"] = inpFields["ParentId"];
+                        if (inpFields["URL"])
+                            fields["URL"] = inpFields["URL"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
