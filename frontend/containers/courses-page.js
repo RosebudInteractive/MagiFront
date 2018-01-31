@@ -2,252 +2,82 @@ import React  from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
+import * as coursesActions from '../actions/courses-page-actions';
 
-export default class CoursesPage extends React.Component {
+import CourseModule from '../components/course/course-module'
+
+
+class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
-    }
-
-    getObject() {
-        throw 'Undefined object'
-    }
-
-    getRootRout() {
-        throw 'Undefined rout'
-    }
-
-    get objectIdPropName() {
-        throw 'Undefined object prop name'
-    }
-
-    get objectName() {
-        throw 'Undefined object name'
-    }
-
-    get objectActions() {
-        throw 'Undefined object actions'
-    }
-
-    get objectId() {
-        return this.props[this.objectIdPropName];
-    }
-
-    get editMode() {
-        return this._editMode;
-    }
-
-    set editMode(value) {
-        this._editMode = value
-    }
-
-    get currentUrl() {
-        return this.props.ownProps ? this.props.ownProps.location.pathname : '';
-    }
-
-    _initEditMode(){
-        this.editMode = EDIT_MODE_EDIT;
-        this.objectActions.get(this.objectId);
-    }
-
-    _initInsertMode() {
-        this.editMode = EDIT_MODE_INSERT;
-        this.objectActions.create(this._getInitStateOfNewObject(this.props))
-    }
-
-    _getInitStateOfNewObject(){
-        return null
+        this.props.coursesActions.getCourses();
     }
 
     componentDidUpdate() {
-        let _newObjectId = this.props[this.objectName] ? this.props[this.objectName].id : null;
-        let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (!!+_newObjectId);
-
-        if (_isNeedSwitchMode) {
-            this._switchToEditObject(_newObjectId)
-        }
-    }
-
-    _switchToEditObject(objId){
-        let _newRout = this.getRootRout() + this._getEditRout() + objId;
-        this.editMode = EDIT_MODE_EDIT;
-        this.props.history.push(_newRout);
-    }
-
-    _getEditRout() {
-        return '/edit/';
+        // let _newObjectId = this.props[this.objectName] ? this.props[this.objectName].id : null;
+        // let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (!!+_newObjectId);
+        //
+        // if (_isNeedSwitchMode) {
+        //     this._switchToEditObject(_newObjectId)
+        // }
     }
 
     componentWillUnmount() {
-        this._clearObjectInStorage()
+        // this._clearObjectInStorage()
     }
 
-    _clearObjectInStorage() {
-        this.objectActions.clear();
-    }
-
-    _goBack(){
-        this.props.history.push(this.getRootRout());
-    }
-
-    _save(values) {
-        this.objectActions.save(values, this.editMode);
-    }
-
-    _changeData(obj) {
-        this.objectActions.changeData(obj);
-    }
-
-    _cancel() {
-        this._dataLoaded = false;
-        this.objectActions.cancelChanges();
-    }
-
-    _getMainDivClassName(){
-        return "object-content";
+    _getCoursesBundles() {
+        return this.props.courses.map((course, index) => {
+            return <CourseModule index={index} key={index}/>
+        })
     }
 
     render() {
         const {
             fetching,
-            message,
-            errorDlgShown,
-            hasChanges
+            // message,
+            // errorDlgShown,
+            // hasChanges
         } = this.props;
         return (
-            <div className={this._getMainDivClassName()}>
+            <div>
                 {
                     fetching ?
                         <p>Загрузка...</p>
                         :
                         <div>
-                            <Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>
-                            {this._getWebixForm()}
-                        </div>
+                             {/*<Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>*/}
+                             {this._getCoursesBundles()}
+                         </div>
                 }
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                        />
-                        :
-                        ""
-                }
-                {this._getExtDialogs()}
+
             </div>
         )
     }
+}
 
-    _notifyDataLoaded() {
-        this._dataLoaded = true;
-    }
 
-    _hasChanges() {
-        return this.props.hasChanges;
-    }
+function mapStateToProps(state) {
+    return {
+        fetching: state.courses.fetching,
+        courses: state.courses.items,
 
-    _enableApplyChanges() {
-        let _array = Object.values(this._validateResult);
-        return _array.every((value) => {
-            return value === true
-        })
-    }
-
-    _getWebixForm(){}
-
-    getUI() {
-        let that = this;
-
-        return {
-            view: "form",
-            width: 1000,
-            elements: that._getElements(),
-            on: {
-                onChange: function () {
-                    that._changeData(::this.getValues());
-                },
-                onValues: function () {
-                    that._notifyDataLoaded();
-
-                    that._hasChanges() ?
-                        this.elements.btnCancel.enable() : this.elements.btnCancel.disable();
-
-                    (that._hasChanges() && that._enableApplyChanges()) ?
-                        this.elements.btnOk.enable() : this.elements.btnOk.disable();
-                },
-            }
-        }
-    }
-
-    _getElements() {
-        let that = this;
-        let _elems = [];
-
-        _elems.push(
-            {
-                view: "button", name: 'btnOk', value: '<<< Назад',
-                click: () => {
-                    this._goBack();
-                }
-            },
-        );
-
-        _elems.push(...this._getExtElements());
-
-        _elems.push(
-            {
-                cols: [
-                    {},
-                    {},
-                    {
-                        view: "button", value: "ОК", name: 'btnOk', id: 'btnOk',
-                        click: function () {
-                            if (this.getFormView().validate()) {
-                                let _obj = this.getFormView().getValues();
-
-                                let _uploader = window.$$('file-uploader');
-                                if (_uploader) {
-                                    let _id = window.$$('file-uploader').files.data.order[0];
-                                    let _file = window.$$('file-uploader').files.getItem(_id);
-                                    if (_file) {
-                                        _obj.fileInfo = _file[0];
-                                    }
-                                }
-
-                                that._save(_obj);
-                            }
-                        }
-                    },
-                    {
-                        view: "button", value: "Отмена", name: 'btnCancel', id: 'btnCancel',
-                        click: function () {
-                            this.getFormView().clearValidation();
-                            that._cancel();
-                        }
-                    }
-                ]
-            }
-        );
-
-        return _elems;
-    }
-
-    _getExtElements() {
-        return [];
-    }
-
-    _externalValidate(field) {
-        if (this._dataLoaded) {
-            this._validateResult[field.data.name] = field.validate();
-        }
-    }
-
-    _getExtDialogs() {
-        return []
-    }
-
-    _formatDate(data) {
-        let fn = window.webix.Date.dateToStr("%d.%m.%Y", false);
-        return data ? fn(new Date(data)) : null;
+        // selected: state.courses.selected,
+        // editDlgShown: state.courses.editDlgShown,
+        // editMode: state.courses.editMode,
+        //
+        // hasError: state.commonDlg.hasError,
+        // message: state.commonDlg.message,
+        // deleteDlgShown: state.commonDlg.deleteDlgShown,
+        // errorDlgShown: state.commonDlg.errorDlgShown,
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        coursesActions: bindActionCreators(coursesActions, dispatch),
+        // commonDlgActions: bindActionCreators(commonDlgActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);

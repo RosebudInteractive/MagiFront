@@ -10,6 +10,19 @@ class FiltersRow extends React.Component {
         this.props.pageHeaderActions.hideFiltersForm();
     }
 
+    _getFilters() {
+        return this.props.filters.map((item, index) => {
+            return (
+                <li key={index}>
+                    <div className="filter-btn" key={index}>
+                        <span className="filter-btn__title">{item.name + ' '}<span
+                            className="filter-btn__index">{item.count}</span></span>
+                    </div>
+                </li>
+            )
+        })
+    }
+
     render() {
         // let that = this;
         // let _className = 'search-block' + (this.props.showSearchForm ? ' opened' : '');
@@ -20,11 +33,13 @@ class FiltersRow extends React.Component {
                     <div className="filters-row__inner">
                         <p className="filters-row__label">Сбросить фильтры</p>
                         <ul className="filters-list">
-                            <li>
-                                <a href="#" className="filter-btn">
-                                    <span className="filter-btn__title">Литература <span className="filter-btn__index">12</span></span>
-                                </a>
-                            </li>
+                            {/*<li>*/}
+                                {/*<div className="filter-btn">*/}
+                                    {/*<span className="filter-btn__title">Литература <span className="filter-btn__index">12</span></span>*/}
+                                {/*</div>*/}
+
+                            {/*</li>*/}
+                            {this._getFilters()}
                         </ul>
                     </div>
                 </div>
@@ -37,6 +52,7 @@ function mapStateToProps(state) {
     return {
         showSearchForm: state.pageHeader.showSearchForm,
         pageHeader: state.pageHeader,
+        filters: state.filters.items,
     }
 }
 

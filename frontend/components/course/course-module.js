@@ -1,7 +1,10 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import './course-module.css';
 import InfoBlock from './info-block';
 import ImageBlock from './image-block';
+import PropTypes from 'prop-types';
+// import { bindActionCreators } from 'redux';
+import {connect} from 'react-redux';
 
 const size = {
     xxs: 'xxs-size',
@@ -13,12 +16,12 @@ const size = {
     xxl: 'xxl-size'
 };
 
-export default class CourseModule extends Component {
+class CourseModule extends Component {
 
     constructor() {
         super();
         this.state = {
-            width:  800,
+            width: 800,
             height: 182
         }
     }
@@ -27,12 +30,12 @@ export default class CourseModule extends Component {
      * Calculate & Update state of new dimensions
      */
     updateDimensions() {
-        if(window.innerWidth < 500) {
-            this.setState({ width: 450, height: 102 });
+        if (window.innerWidth < 500) {
+            this.setState({width: 450, height: 102});
         } else {
-            let update_width  = window.innerWidth-100;
-            let update_height = Math.round(update_width/4.4);
-            this.setState({ width: update_width, height: update_height });
+            let update_width = window.innerWidth - 100;
+            let update_height = Math.round(update_width / 4.4);
+            this.setState({width: update_width, height: update_height});
         }
     }
 
@@ -76,12 +79,14 @@ export default class CourseModule extends Component {
     }
 
     render() {
+        let _course = this.props.courses[this.props.index];
         return (
             <main className="courses">
                 <div className={this._getCourseModuleClassName()}>
                     <InfoBlock size={this._getSize()}
-                               title={' Ассирия – первый опыт создания «мировой империи» и его провал'}
+                               title={' ' + _course.Name}
                                width={this.state.width}
+                               courseIndex={this.props.index}
                     />
                     <ImageBlock size={this._getSize()}/>
                 </div>
@@ -89,3 +94,26 @@ export default class CourseModule extends Component {
         );
     }
 }
+
+CourseModule.propTypes = {
+    index: PropTypes.number.isRequired,
+};
+
+
+function mapStateToProps(state) {
+    return {
+        // fetching: state.courses.fetching,
+        courses: state.courses.items,
+
+        // selected: state.courses.selected,
+        // editDlgShown: state.courses.editDlgShown,
+        // editMode: state.courses.editMode,
+        //
+        // hasError: state.commonDlg.hasError,
+        // message: state.commonDlg.message,
+        // deleteDlgShown: state.commonDlg.deleteDlgShown,
+        // errorDlgShown: state.commonDlg.errorDlgShown,
+    }
+}
+
+export default connect(mapStateToProps)(CourseModule)

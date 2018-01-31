@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import './page-header.css';
-import CourseModule from './components/course/course-module'
+import CoursePage from './containers/courses-page'
 import PageHeaderRow from './components/page-header/page-header-row';
 import {connect} from 'react-redux';
 // import FiltersRow from './components/page-header/filters-row';
@@ -20,8 +20,8 @@ class App extends Component {
         return (
             <div className="App">
                 <PageHeaderRow/>
-                <CourseModule/>
-                <CourseModule/>
+                <CoursePage/>
+                {/*<CourseModule/>*/}
             </div>
         );
     }

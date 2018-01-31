@@ -86,6 +86,7 @@
     border-radius: 4px;
     -webkit-transition: background-color 0.4s ease;
     transition: background-color 0.4s ease;
+    cursor: pointer;
 }
 
 @media (max-width: 899px) {

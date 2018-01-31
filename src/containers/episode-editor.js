@@ -71,8 +71,8 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _save(value) {
-        let _file = value.fileInfo ? value.fileInfo.file : null;
-        let _meta = value.fileInfo ? value.fileInfo.info : null;
+        let _file = value.fileInfo ? value.fileInfo.file : value.Audio;
+        let _meta = value.fileInfo ? value.fileInfo.info : value.AudioMeta;
         if (_meta) {
             _meta = JSON.stringify(_meta);
         }
@@ -322,6 +322,18 @@ class EpisodeEditor extends ObjectEditor {
                                 window.$$('file-name').setValue(response[0].file);
                             },
 
+                        }
+                    },
+                    {
+                        view: "button",
+                        type: "iconButton",
+                        icon: 'trash',
+                        inputHeight:38,
+                        width: 38,
+                        on: {
+                            onClick: ()=> {
+
+                            },
                         }
                     },
                 ]

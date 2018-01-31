@@ -21,9 +21,9 @@ export default class InfoBlock extends React.Component {
             <div className={this._getClassName()}>
                 <div className="course-module__header">
                     <Header size={size} title={title}/>
-                    <Info size={size}/>
+                    <Info size={size} courseIndex={this.props.courseIndex}/>
                 </div>
-                <CourseBody size={size} width={width}/>
+                <CourseBody size={size} width={width} courseIndex={this.props.courseIndex}/>
             </div>
         );
     }

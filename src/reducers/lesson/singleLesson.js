@@ -29,7 +29,7 @@ export default function singleLesson(state = initialState, action) {
                 CourseId: action.payload.CourseId,
                 CourseName: action.payload.CourseName,
                 Number: action.payload.Number,
-                State:'D',
+                State: 'D',
                 LessonType: action.payload.LessonType,
                 CurrParentName: action.payload.CurrParentName,
                 CurrParentId: action.payload.CurrParentId,
@@ -59,7 +59,7 @@ export default function singleLesson(state = initialState, action) {
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
 
         }
@@ -68,8 +68,9 @@ export default function singleLesson(state = initialState, action) {
             return initialState;
 
         case SAVE_LESSON_SUCCESS: {
-            state.current.id = action.payload.id;
-            state.current.Id = action.payload.id;
+            let _id = action.payload.id ? action.payload.id : state.current.id;
+            state.current.id = _id;
+            state.current.Id = _id;
 
             let _newInitialLesson = Object.assign({}, state.current);
 
@@ -77,7 +78,7 @@ export default function singleLesson(state = initialState, action) {
                 ...state,
                 initialLesson: _newInitialLesson,
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
@@ -93,31 +94,39 @@ export default function singleLesson(state = initialState, action) {
 
         case MOVE_SUPP_EPISODE_UP: {
             let _result = tools.moveObjectUp(state.suppEpisodes, action.payload);
-            return {...state, suppEpisodes: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                suppEpisodes: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges
+            };
         }
 
         case MOVE_SUPP_EPISODE_DOWN: {
             let _result = tools.moveObjectDown(state.suppEpisodes, action.payload);
-            return {...state, suppEpisodes: _result.resultArray, hasChanges: _result.modified ? true : state.hasChanges};
+            return {
+                ...state,
+                suppEpisodes: _result.resultArray,
+                hasChanges: _result.modified ? true : state.hasChanges
+            };
         }
 
         case CHANGE_LESSON_DATA : {
             let _object = Object.assign({}, action.payload);
 
-            return {...state, current: _object, hasChanges: true };
+            return {...state, current: _object, hasChanges: true};
         }
 
         case CANCEL_CHANGE_LESSON_DATA: {
 
             return {
                 ...state,
-                current: Object.assign({},state.initial),
+                current: Object.assign({}, state.initial),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
-        case CLEAR_LESSON:{
+        case CLEAR_LESSON: {
             return initialState
         }
 

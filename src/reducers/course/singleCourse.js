@@ -57,8 +57,9 @@ export default function singleCourse(state = initialState, action) {
             return initialState;
 
         case SAVE_COURSE_DATA : {
-            state.current.id = action.payload.id;
-            state.current.Id = action.payload.id;
+            let _id = action.payload.id ? action.payload.id : state.current.id;
+            state.current.id = _id;
+            state.current.Id = _id;
 
             return {
                 ...state,
