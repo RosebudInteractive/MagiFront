@@ -559,15 +559,19 @@ const DbEpisode = class DbEpisode extends DbObject {
                             epi_lng_obj.transcript(inpFields["Transcript"]);
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             epi_lng_obj.audio(inpFields["Audio"]);
+
                         if (typeof (inpFields["AudioMeta"]) !== "undefined") {
+                            let oldDuration = typeof (epi_lng_obj.duration()) === "number" ? epi_lng_obj.duration() : 0;
+                            let newDuration = 0;
                             epi_lng_obj.audioMeta(inpFields["AudioMeta"]);
-                            let oldDuration = epi_lng_obj.duration();
                             try {
                                 let meta = JSON.parse(inpFields["AudioMeta"]);
                                 if (typeof (meta.length) === "number")
-                                    durationDelta = meta.length - oldDuration;
+                                    newDuration = meta.length - oldDuration;
                             } catch (err) { };
+                            durationDelta = newDuration - oldDuration;
                         }
+                        
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
 
