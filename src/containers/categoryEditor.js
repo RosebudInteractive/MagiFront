@@ -14,7 +14,7 @@ class CategoryForm extends ObjectEditor {
     }
 
     getRootRout() {
-        return '/categories'
+        return '/adm/categories'
     }
 
     get objectIdPropName() {

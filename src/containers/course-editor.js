@@ -39,7 +39,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     getRootRout() {
-        return '/courses'
+        return '/adm/courses'
     }
 
     get objectIdPropName() {
@@ -207,11 +207,11 @@ class CourseEditor extends ObjectEditor {
     }
 
     _editLesson(id) {
-        this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/edit/' + id);
+        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/edit/' + id);
     }
 
     _createLesson() {
-        this.props.history.push('/courses/edit/' + this.props.courseId + '/lessons/new/');
+        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
     }
 
     _moveUpLesson(id) {

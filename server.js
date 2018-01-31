@@ -47,6 +47,10 @@ Promise.resolve()
             res.sendFile(__dirname + '/FileUploadTest.html');
         });
 
+        app.get("/adm/*", function (req, res) {
+            res.sendFile(__dirname + '/adm-index.html');
+        });
+
         app.get("/*", function (req, res) {
             res.sendFile(__dirname + '/index.html');
         });
@@ -55,9 +59,9 @@ Promise.resolve()
             next(new Error('Random error!'));
         });
 
-        app.get("/", function (req, res) {
-            res.sendFile(__dirname + '/index.html');
-        });
+        // app.get("/", function (req, res) {
+        //     res.sendFile(__dirname + '/adm-index.html');
+        // });
 
         app.post('/upload', FileUpload.getFileUploadProc());
 

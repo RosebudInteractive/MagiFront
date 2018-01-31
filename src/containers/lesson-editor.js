@@ -348,14 +348,14 @@ export class LessonEditor extends ObjectEditor {
         parentLessonActions.set({id: lesson.id, name: lesson.Name});
         this._clearObjectInStorage();
         this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
+            '/adm/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
             '/sub-lessons/new');
     }
 
     _editSubLesson(id) {
         this.props.history.push(
-            '/courses/edit/' + this.props.courseId +
+            '/adm/courses/edit/' + this.props.courseId +
             '/lessons/edit/' + this.props.lessonId +
             '/sub-lessons/edit/' + id);
     }

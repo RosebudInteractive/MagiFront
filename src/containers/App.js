@@ -5,7 +5,7 @@ import { Switch, Route, withRouter, } from 'react-router-dom'
 
 import Menu from "../components/Menu"
 import Home from "../components/Home"
-import Episodes from "./Episodes"
+// import Episodes from "./Episodes"
 import Authors from "./Authors"
 import AuthorForm from './authorEditor';
 import Categories from './Categories';
@@ -18,6 +18,8 @@ import EpisodeEditor from './episode-editor';
 
 class App extends Component {
     render() {
+        let _homePath = '/adm';
+
         return <div className="app">
             <div className="left bar-bgcolor">
                 <div className="toolbar top-bar-size">
@@ -35,39 +37,39 @@ class App extends Component {
                     </div>
                     <div className="main-area">
                         <Switch>
-                            <Route exact path='/' component={Home}/>
-                            <Route path="/episodes" component={Episodes}/>
-                            <Route path='/authors/new' component={AuthorForm}/>
-                            <Route path='/authors/edit/:id' component={AuthorForm}/>
-                            <Route path='/authors' component={Authors}/>
-                            <Route path='/categories/new' component={CategoriesForm}/>
-                            <Route path='/categories/edit/:id' component={CategoriesForm}/>
-                            <Route path='/categories' component={Categories}/>
-                            <Route path='/courses/new' component={CourseEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episodes/edit/:id'
+                            <Route exact path={_homePath} component={Home}/>
+                            {/*<Route path={_homePath + "/episodes"} component={Episodes}/>*/}
+                            <Route path={_homePath + '/authors/new'} component={AuthorForm}/>
+                            <Route path={_homePath + '/authors/edit/:id'} component={AuthorForm}/>
+                            <Route path={_homePath + '/authors'} component={Authors}/>
+                            <Route path={_homePath + '/categories/new'} component={CategoriesForm}/>
+                            <Route path={_homePath + '/categories/edit/:id'} component={CategoriesForm}/>
+                            <Route path={_homePath + '/categories'} component={Categories}/>
+                            <Route path={_homePath + '/courses/new'} component={CourseEditor}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:lessonId/episodes/edit/:id'}
                                    component={EpisodeEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/episodes/new'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:lessonId/episodes/new'}
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={false} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/edit/:id'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/edit/:id'}
                                    component={EpisodeEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/new'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:lessonId/sub-lessons/edit/:subLessonId/episodes/new'}
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={false} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:lessonId/supp-episodes/new'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:lessonId/supp-episodes/new'}
                                    render={(props) => (
                                        <EpisodeEditor {...props} isSupp={true} />
                                    )}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:id/sub-lessons/edit/:subLessonId'}
                                    component={SubLessonEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id/sub-lessons/new'
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:id/sub-lessons/new'}
                                    component={SubLessonEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/edit/:id' component={LessonEditor}/>
-                            <Route path='/courses/edit/:courseId/lessons/new' component={LessonEditor}/>
-                            <Route path='/courses/edit/:id' component={CourseEditor}/>
-                            <Route path='/courses' component={Courses}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/edit/:id'} component={LessonEditor}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/lessons/new'} component={LessonEditor}/>
+                            <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
+                            <Route path={_homePath + '/courses'} component={Courses}/>
                         </Switch>
                     </div>
                 </div>

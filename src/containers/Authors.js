@@ -15,11 +15,11 @@ class Authors extends React.Component {
     }
 
     onAddBtnClick() {
-        this.props.history.push('/authors/new');
+        this.props.history.push('/adm/authors/new');
     }
 
     onEditBtnClick() {
-        this.props.history.push('/authors/edit/' + this.props.selected);
+        this.props.history.push('/adm/authors/edit/' + this.props.selected);
     }
 
     deleteAuthor() {

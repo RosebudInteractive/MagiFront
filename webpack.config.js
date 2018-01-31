@@ -6,14 +6,17 @@ var precss = require('precss')
 
 module.exports = {
     devtool: 'cheap-module-eval-source-map',
-    entry: [
-        'webpack-hot-middleware/client',
-        'babel-polyfill',
-        './src/index'
-    ],
+    entry: {
+        'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
+        'babel-polyfill': 'babel-polyfill',
+
+        main: './frontend/index',
+        adm: './src/index',
+    },
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'bundle.js',
+        // filename: 'bundle.js',
+        filename: '[name].js',
         publicPath: '/static/'
     },
     plugins: [
@@ -29,12 +32,14 @@ module.exports = {
                 loaders: ['eslint-loader'],
                 include: [
                     path.resolve(__dirname, "src"),
+                    path.resolve(__dirname, "frontend"),
                 ],
             },
             {
                 loaders: ['react-hot-loader/webpack', 'babel-loader?plugins[]=transform-runtime'], //добавили loader 'react-hot'
                 include: [
                     path.resolve(__dirname, "src"),
+                    path.resolve(__dirname, "frontend"),
                 ],
                 test: /\.js$/
             },

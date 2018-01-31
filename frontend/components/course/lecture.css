@@ -1,0 +1,311 @@
+.lectures-wrapper-s-size {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-left: -33px;
+    padding-left: 33px;
+    padding-bottom: 20px;
+    min-width: 100%;
+    overflow: auto;
+}
+
+.lectures-wrapper-xxs-size {
+    padding-bottom: 17px;
+}
+
+.lecture {
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding-top: 27px;
+    display: none;
+}
+
+.lecture__tooltip, .lecture__action-tooltip {
+    position: absolute;
+    top: -webkit-calc(100% + 10px);
+    top: calc(100% + 10px);
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    padding: 6px 9px;
+    min-width: 56px;
+    text-align: center;
+    font-family: "Fira Sans", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 16px;
+    color: #fff;
+    background-color: #2f2f2f;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 2px 12px 0 rgba(47, 47, 47, 0.2);
+    box-shadow: 0 2px 12px 0 rgba(47, 47, 47, 0.2);
+    opacity: 0;
+    z-index: -100;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+}
+
+.lecture__tooltip:before, .lecture__action-tooltip:before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 4px 7px 4px;
+    border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #2f2f2f rgba(255, 255, 255, 0);
+}
+
+.lecture__image-wrapper {
+    width: 126px;
+    height: 126px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.lecture__loader {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    border-color: #c8684c #c8684c #c8684c rgba(255, 255, 255, 0);
+    border-width: 3px;
+    border-style: solid;
+    border-radius: 50%;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.lecture__action {
+    position: absolute;
+    top: 0;
+    right: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    background-color: #fff;
+    border: 1px solid #c8684c;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 3px 12px 0 rgba(200, 104, 76, 0.3);
+    box-shadow: 0 3px 12px 0 rgba(200, 104, 76, 0.3);
+    cursor: pointer;
+}
+
+.lecture__action:hover .lecture__action-tooltip {
+    opacity: 1;
+    z-index: 1;
+}
+
+.lecture__action-loader {
+    position: absolute;
+    top: -1px;
+    bottom: 0;
+    left: -1px;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    border-color: #c8684c #c8684c #c8684c rgba(255, 255, 255, 0);
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 50%;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.lecture__action-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    max-width: 14px;
+}
+
+.lecture:first-child {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+@media (max-width: 1899px) {
+    .lecture {
+        padding-top: 20px;
+    }
+}
+
+@media (max-width: 1279px) {
+    .lecture {
+        padding-top: 7px;
+    }
+}
+
+.lecture-s-size {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 246px;
+    max-width: 246px;
+    padding-top: 17px;
+    padding-left: 19px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    border: 1px solid rgba(47, 47, 47, 0.15);
+    border-right: none;
+}
+
+.lecture-s-size:last-child {
+    border-right: 1px solid rgba(47, 47, 47, 0.15);
+}
+
+.lecture-xs-size {
+        min-width: 240px;
+        max-width: 240px;
+    }
+
+.lecture-xxs-size {
+        padding-bottom: 17px;
+    }
+
+.lecture__play-block {
+    position: relative;
+    margin-right: 18px;
+    width: 126px;
+    min-width: 126px;
+    height: 126px;
+    border-radius: 50%;
+}
+
+.lecture__play-block img {
+    display: block;
+    width: 100%;
+}
+
+@media (max-width: 899px) {
+    .lecture__play-block {
+        margin-bottom: 20px;
+    }
+}
+
+.lecture__btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    font-size: 0;
+}
+
+.lecture__btn:hover + .lecture__tooltip {
+    opacity: 1;
+    z-index: 1;
+}
+
+.lecture__btn svg {
+    display: block;
+    width: 40px;
+}
+
+.lecture__descr {
+    margin: 0;
+    padding-top: 6px;
+    max-width: 340px;
+    font-size: 17px;
+    line-height: 23px;
+}
+
+/*@media (max-width: 1023px) {*/
+    /*.lecture__descr {*/
+        /*line-height: 22px;*/
+    /*}*/
+/*}*/
+
+/*@media (max-width: 1023px) {*/
+    /*.lecture__descr {*/
+        /*position: relative;*/
+        /*min-width: 340px;*/
+        /*z-index: 1;*/
+    /*}*/
+/*}*/
+
+@media (max-width: 899px) {
+    .lecture__descr {
+        margin-top: auto;
+        min-width: 1px;
+        max-width: 100%;
+        font-size: 15px;
+        line-height: 19px;
+    }
+}
+
+.lecture__descr h3 {
+    margin: 0 0 2px 0;
+    font-family: "Fira Sans", Arial, sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 24px;
+}
+
+@media (max-width: 899px) {
+    .lecture__descr h3 {
+        display: inline;
+        font-size: 15px;
+        line-height: 19px;
+    }
+}
+
+.lecture__descr p {
+    margin: 0;
+}
+
+@media (max-width: 899px) {
+    .lecture__descr p {
+        display: inline;
+    }
+}
+
+.lecture .number {
+    color: #c8684c;
+}
+
+.lecture .duration {
+    position: absolute;
+    top: -2px;
+    left: -6px;
+    -webkit-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+    font-family: "Fira Sans", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    color: rgba(47, 47, 47, 0.6);
+}

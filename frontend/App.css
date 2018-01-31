@@ -1,0 +1,106 @@
+.App {
+    text-align: center;
+}
+
+.App-logo {
+    animation: App-logo-spin infinite 20s linear;
+    height: 80px;
+}
+
+.App-header {
+    background-color: #222;
+    height: 150px;
+    padding: 20px;
+    color: white;
+}
+
+.App-title {
+    font-size: 1.5em;
+}
+
+.App-intro {
+    font-size: large;
+}
+
+@keyframes App-logo-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+html {
+    width: 100%;
+}
+
+html * {
+    max-height: 1000000px;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    min-width: 1900px;
+    font-family: "PT Serif", serif;
+    font-size: 16px;
+    line-height: 21px;
+    color: #2f2f2f;
+    background-color: #fff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 1899px) {
+    body {
+        min-width: 1400px;
+    }
+}
+
+@media (max-width: 1399px) {
+    body {
+        min-width: 1280px;
+    }
+}
+
+@media (max-width: 1279px) {
+    body {
+        min-width: 1024px;
+    }
+}
+
+@media (max-width: 1023px) {
+    body {
+        min-width: 900px;
+    }
+}
+
+@media (max-width: 899px) {
+    body {
+        min-width: 768px;
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        min-width: 640px;
+    }
+}
+
+@media (max-width: 639px) {
+    body {
+        min-width: 500px;
+    }
+}
+
+@media (max-width: 499px) {
+    body {
+        min-width: 320px;
+    }
+}
+
+body.overflow {
+    height: 100%;
+    overflow: hidden;
+}

@@ -19,7 +19,7 @@ class AuthorEditor extends ObjectEditor {
     }
 
     getRootRout() {
-        return '/authors'
+        return '/adm/authors'
     }
 
     get objectIdPropName() {

@@ -16,10 +16,10 @@ import {
 const initialState = {
     selected: MENU_ITEM_NONE,
     items: [
-        {id: 'HOME', name: "Домой", url: "/"},
-        {id: MENU_ITEM_AUTHOR, name: "Авторы", url:'/authors'},
-        {id: MENU_ITEM_CATEGORIES, name : 'Категории' , url : '/categories'},
-        {id: MENU_ITEM_COURSES, name : 'Курсы' , url : '/courses'},
+        {id: 'HOME', name: "Домой", url: "/adm"},
+        {id: MENU_ITEM_AUTHOR, name: "Авторы", url:'/adm/authors'},
+        {id: MENU_ITEM_CATEGORIES, name : 'Категории' , url : '/adm/categories'},
+        {id: MENU_ITEM_COURSES, name : 'Курсы' , url : '/adm/courses'},
         // {id: MENU_ITEM_EPISODES, name: "Эпизоды", url: "/episodes"},
         // {id: MENU_ITEM_OTHER, name: "Что-то еще", url: "/photos"}
     ]

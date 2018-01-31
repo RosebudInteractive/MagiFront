@@ -161,4 +161,8 @@ const handleEpisode = (episode) => {
         item.Name = _obj.title;
         item.Description = _obj.title2;
     });
+
+    if (episode.AudioMeta) {
+        episode.AudioMeta = JSON.parse(episode.AudioMeta)
+    }
 };

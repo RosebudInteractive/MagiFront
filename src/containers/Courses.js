@@ -16,11 +16,11 @@ class Coureses extends React.Component {
     }
 
     onAddBtnClick() {
-        this.props.history.push('/courses/new');
+        this.props.history.push('/adm/courses/new');
     }
 
     onEditBtnClick() {
-        this.props.history.push('/courses/edit/' + this.props.selected);
+        this.props.history.push('/adm/courses/edit/' + this.props.selected);
     }
 
     deleteCourse() {
