@@ -1264,6 +1264,7 @@ namespace MagImport
                 lesson_course.Fields.LessonId = lesson.Fields.Id;
                 lesson_course.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson_course.Fields.State = "R";
+                lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_modified");
 
                 Episode episode = new Episode();
                 episode.Fields.LessonId = lesson.Fields.Id;
@@ -1330,14 +1331,11 @@ namespace MagImport
                     if (!String.IsNullOrEmpty(val))
                     {
                         lesson_course.Fields.ReadyDate = _monthYearToDate(val);
+                        lesson_course.Fields.State = "D";
+                        lesson_lng.Fields.State = "D";
+                        episode_lng.Fields.State = "D";
+                        pair.Value.Item7.Fields.State = "D"; // CourseLng
                     }
-                }
-                if (lesson_course.Fields.ReadyDate.HasValue)
-                {
-                    lesson_course.Fields.State = "D";
-                    lesson_lng.Fields.State = "D";
-                    episode_lng.Fields.State = "D";
-                    pair.Value.Item7.Fields.State = "D"; // CourseLng
                 }
 
                 if (lesson.HasParent)
@@ -1941,7 +1939,7 @@ namespace MagImport
         const string sql_get_lessons =
             "select `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name`,\n" +
             "  `p`.`id` as `lesson_id`, coalesce(`pm`.`meta_value`,'0') `is_ext`, `p`.`post_title` as `lesson_name`, `p`.`post_content`, `p`.`post_excerpt`,\n" +
-            "  `p`.`post_status`, `p`.`comment_status`, `p`.`ping_status`, `p`.`post_name` from `wp_terms` `t`\n" +
+            "  `p`.`post_status`, `p`.`comment_status`, `p`.`ping_status`, `p`.`post_name`, `p`.`post_modified` from `wp_terms` `t`\n" +
             "  join `wp_term_taxonomy` `m` on `t`.`term_id` = `m`.`term_id` and `m`.`taxonomy` = 'autor'\n" +
             "  join `wp_term_relationships` `r` on `r`.`term_taxonomy_id` = `m`.`term_taxonomy_id`\n" +
             "  join `wp_posts` `p` on `p`.`id` = `r`.`object_id`\n" +
