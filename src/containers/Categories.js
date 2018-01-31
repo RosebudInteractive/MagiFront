@@ -16,11 +16,11 @@ class Categories extends React.Component {
     }
 
     onAddBtnClick() {
-        this.props.history.push('/categories/new');
+        this.props.history.push('/adm/categories/new');
     }
 
     onEditBtnClick() {
-        this.props.history.push('/categories/edit/' + this.props.selected);
+        this.props.history.push('/adm/categories/edit/' + this.props.selected);
     }
 
     deleteCategory() {
