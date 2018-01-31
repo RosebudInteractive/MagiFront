@@ -1264,7 +1264,7 @@ namespace MagImport
                 lesson_course.Fields.LessonId = lesson.Fields.Id;
                 lesson_course.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson_course.Fields.State = "R";
-                lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_modified");
+                lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_modified").Date;
 
                 Episode episode = new Episode();
                 episode.Fields.LessonId = lesson.Fields.Id;

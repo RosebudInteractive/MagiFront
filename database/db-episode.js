@@ -567,11 +567,12 @@ const DbEpisode = class DbEpisode extends DbObject {
                             try {
                                 let meta = JSON.parse(inpFields["AudioMeta"]);
                                 if (typeof (meta.length) === "number")
-                                    newDuration = meta.length - oldDuration;
+                                    newDuration = meta.length;
                             } catch (err) { };
                             durationDelta = newDuration - oldDuration;
+                            epi_lng_obj.duration(newDuration);
                         }
-                        
+
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
 
