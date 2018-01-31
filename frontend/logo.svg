@@ -1,0 +1,14 @@
+<svg width="70" height="38" viewBox="0 0 70 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>logo_black</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-14988 1229)">
+<g id="logo_black">
+<g id="Vector">
+<use xlink:href="#path0_fill" transform="translate(14988 -1226.19)"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 0 35.1912L 4.38094 35.1912L 4.38094 0L 0 0L 0 35.1912ZM 42.8426 35.1912L 47.2223 35.1912L 47.2223 0L 42.8426 0L 42.8426 35.1912ZM 51.6032 35.1912L 55.9855 35.1912L 55.9855 0L 51.6032 0L 51.6032 35.1912ZM 17.0628 35.1912L 21.4451 35.1912L 11.7587 0L 7.37773 0L 17.0628 35.1912ZM 23.9796 26.3924L 26.147 18.7977L 20.7517 0L 16.3708 0L 23.9796 26.3924ZM 39.8445 0L 35.4636 0L 25.7798 35.1912L 30.1594 35.1912L 39.8445 0Z"/>
+</defs>
+</svg>
