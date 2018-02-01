@@ -112,6 +112,11 @@ export class LessonEditor extends ObjectEditor {
         }
     }
 
+    _getCoverPath() {
+        let _lesson = this.getObject();
+        return _lesson ? ('/data/' + _lesson.Cover) : null
+    }
+
     _save(value) {
         let _obj = {
             id: value.id,
@@ -129,7 +134,7 @@ export class LessonEditor extends ObjectEditor {
             ParentId: value.CurrParentId,
             Episodes: [],
             References: [],
-            Resources:[],
+            Resources: [],
         };
 
         this._fillEpisodes(_obj.Episodes);
@@ -191,7 +196,6 @@ export class LessonEditor extends ObjectEditor {
             })
         });
     }
-
 
 
     hideAddAuthorDialog() {
@@ -395,7 +399,7 @@ export class LessonEditor extends ObjectEditor {
         return <TabLink to="tab2">Дополнительные лекции</TabLink>
     }
 
-    _getMainDivClassName(){
+    _getMainDivClassName() {
         return "lesson-content";
     }
 
@@ -417,14 +421,14 @@ export class LessonEditor extends ObjectEditor {
 
         let _data = this.getObject();
         return [
-            <div className={this._getMainDivClassName()+'webix'}>
+            <div className={this._getMainDivClassName() + 'webix'}>
                 <Webix ui={::this.getUI()} data={_data} key='webix1'/>
             </div>,
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
                     <TabLink to="tab1">Эпизоды</TabLink>
                     {/*{*/}
-                        {/*!this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''*/}
+                    {/*!this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''*/}
                     {/*}*/}
                     {this._getAdditionalTab()}
 
@@ -588,7 +592,7 @@ export class LessonEditor extends ObjectEditor {
                     {
                         rows: [
                             {
-                                view:"label",
+                                view: "label",
                                 label: "Обложка лекции",
                                 width: labelWidth,
                                 height: 38,
@@ -597,27 +601,34 @@ export class LessonEditor extends ObjectEditor {
 
                     },
                     {
+                        rows: [
+                            {
 
-                        view: 'template',
-                        type: 'image',
-                        image:"/assets/images/avatar.png",
-                        labelWidth: labelWidth,
-                        label: 'Обложка лекции',
+                                view: 'template',
+                                type: 'image',
+                                labelWidth: labelWidth,
+                                label: 'Обложка лекции',
+                                name: 'Cover',
+                                id: 'cover',
+                                template: (obj) => {
+                                    return '<img class="cover" src="' + obj.src + '" />'
+                                },
+                                height: 360,
+                                width: 360,
+                                borderless: true,
+                                autoheight: true,
+                                on: {
+                                    onBeforeRender: (object) => {
+                                        object.src = that._getCoverPath();
+                                    },
+                                }
 
-                        id: 'cover',
-                        template: (obj) => {
-                            return '<img class="cover" src="' + obj.src + '" />'
-                        },
-                        data: {src: "/assets/images/avatar.png"},
-                        height: 360,
-                        borderless: true,
-                        on: {
-                            onBeforeRender: (object) => {
-                                console.log(object)
-                            }
-                        }
+                            },
+                            {}
+                        ]
 
                     },
+
                     {
                         view: "uploader",
                         id: "file-uploader",
@@ -630,10 +641,10 @@ export class LessonEditor extends ObjectEditor {
                         accept: "image/*",
                         validate: window.webix.rules.isNotEmpty,
                         invalidMessage: "Значение не может быть пустым",
-                        inputHeight:38,
+                        inputHeight: 38,
                         width: 38,
                         on: {
-                            onBeforeFileAdd: (item)=> {
+                            onBeforeFileAdd: (item) => {
                                 let _type = item.file.type.toLowerCase();
                                 if (!_type) {
                                     window.webix.message("Поддерживаются только изображения");
@@ -738,11 +749,11 @@ function mapStateToProps(state, ownProps) {
         resourceEditMode: state.resources.editMode,
 
         hasChanges: state.singleLesson.hasChanges ||
-                    state.subLessons.hasChanges ||
-                    state.lessonResources.hasChanges ||
-                    state.lessonMainEpisodes.hasChanges ||
-                    state.lessonCommonRefs.hasChanges ||
-                    state.lessonRecommendedRefs.hasChanges,
+        state.subLessons.hasChanges ||
+        state.lessonResources.hasChanges ||
+        state.lessonMainEpisodes.hasChanges ||
+        state.lessonCommonRefs.hasChanges ||
+        state.lessonRecommendedRefs.hasChanges,
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
