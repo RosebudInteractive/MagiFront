@@ -31,7 +31,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("SNetWorkId", { type: "string", length: 50, allowNull: true })
             .addField("SubsBegin", { type: "datetime", allowNull: true })
             .addField("SubsEnd", { type: "datetime", allowNull: true })
-            .addField("Params", { type: "string", allowNull: true });
+            .addField("PData", { type: "string", allowNull: true })
+            .addField("Profile", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("UserRole", "86e022dd-13d9-4c9d-811c-76b2ac807cff", "RootUserRole", "87c43f07-15f7-47d3-9309-263c14d71959")
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })

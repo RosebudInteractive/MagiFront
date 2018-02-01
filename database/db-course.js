@@ -192,7 +192,7 @@ const COURSE_LESSONS_MYSQL =
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as [LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "lc.[State], l.[Cover] as [LCover], l.[CoverMeta] as [LCoverMeta], l.[URL] as [LURL],\n" +
-    "ll.[Name] as [LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], al.[FirstName], al.[LastName], a.[URL] as [AURL] from [Course] c\n" +
+    "ll.[Name] as [LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
@@ -215,7 +215,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as `LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "lc.`State`, l.`Cover` as `LCover`, l.`CoverMeta` as `LCoverMeta`, l.`URL` as `LURL`,\n" +
-    "ll.`Name` as `LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, al.`FirstName`, al.`LastName`, a.`URL` as `AURL` from `Course` c\n" +
+    "ll.`Name` as `LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
@@ -264,7 +264,12 @@ const DbCourse = class DbCourse extends DbObject {
 
     getAllPublic() {
         let courses = [];
-        let crs = {};
+        let authors = [];
+        let categories = [];
+        let courses_list = {};
+        let authors_list = {};
+        let categories_list = {};
+
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -291,7 +296,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Categories: [],
                                         Lessons: []
                                     };
-                                    crs[elem.Id] = curr_course;
+                                    courses_list[elem.Id] = curr_course;
                                     courses.push(curr_course);
                                 };
                                 curr_course.Lessons.push({
@@ -306,11 +311,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     ShortDescription: elem.ShortDescription,
                                     Duration: elem.Duration,
                                     DurationFmt: elem.DurationFmt,
-                                    Author: {
-                                        FirstName: elem.FirstName,
-                                        LastName: elem.LastName,
-                                        URL: elem.AURL
-                                    }
+                                    AuthorId: elem.AuthorId
                                 });
                             })
                             return $data.execSql({
@@ -328,15 +329,20 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 if (elem.CourseId !== crs_id) {
                                     crs_id = elem.CourseId;
-                                    curr_course = crs[crs_id];
+                                    curr_course = courses_list[crs_id];
                                 };
                                 if (curr_course)
-                                    curr_course.Authors.push({
+                                    curr_course.Authors.push(elem.Id);
+                                if (!authors_list[elem.Id]) {
+                                    let author = {
                                         Id: elem.Id,
                                         FirstName: elem.FirstName,
                                         LastName: elem.LastName,
                                         URL: elem.URL
-                                    });
+                                    };
+                                    authors.push(author);
+                                    authors_list[elem.Id] = author;
+                                }
                             })
                             return $data.execSql({
                                 dialect: {
@@ -353,17 +359,29 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 if (elem.CourseId !== crs_id) {
                                     crs_id = elem.CourseId;
-                                    curr_course = crs[crs_id];
+                                    curr_course = courses_list[crs_id];
                                 };
                                 if (curr_course)
-                                    curr_course.Categories.push({
+                                    curr_course.Categories.push(elem.Id);
+                                let category = categories_list[elem.Id];
+                                if (!category) {
+                                    category = {
                                         Id: elem.Id,
                                         Name: elem.Name,
-                                        URL: elem.URL
-                                    });
+                                        URL: elem.URL,
+                                        Counter: 0
+                                    };
+                                    categories.push(category);
+                                    categories_list[elem.Id] = category;
+                                }
+                                category.Counter++;
                             })
                         }
-                        return courses;
+                        return {
+                            Authors: authors,
+                            Categories: categories,
+                            Courses: courses
+                        };
                     })
             );
         })
