@@ -2,7 +2,7 @@
  * Created by levan.kiknadze on 22/11/2017.
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
 import 'webix/webix';
@@ -15,31 +15,32 @@ class Webix extends Component {
         );
     }
 
-    setWebixData(data){
+    setWebixData(data) {
         const ui = this.ui;
-        if (ui.setValues)
+        if (ui.setValues) {
             ui.setValues(data);
-        else if (ui.parse) {
-            ui.clearAll()
-            ui.parse(data)
+        } else if (ui.parse) {
+            ui.clearAll();
+            ui.parse(data);
             ui.refresh()
-        } else if (ui.setValue)
+        } else if (ui.setValue) {
             ui.setValue(data);
+        }
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this.ui.destructor();
         this.ui = null;
     }
 
-    componentWillUpdate(props){
+    componentWillUpdate(props) {
         if (props.data)
             this.setWebixData(props.data);
         if (props.select)
             this.select(props.select);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.ui = window.webix.ui(
             this.props.ui,
             ReactDOM.findDOMNode(this.refs.root)
