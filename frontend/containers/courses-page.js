@@ -45,10 +45,10 @@ class CoursesPage extends React.Component {
                     fetching ?
                         <p>Загрузка...</p>
                         :
-                        <div>
+                        <main className="courses">
                              {/*<Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>*/}
                              {this._getCoursesBundles()}
-                         </div>
+                         </main>
                 }
 
             </div>

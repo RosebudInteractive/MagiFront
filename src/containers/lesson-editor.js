@@ -610,6 +610,7 @@ export class LessonEditor extends ObjectEditor {
                         },
                         data: {src: "/assets/images/avatar.png"},
                         height: 360,
+                        width: 360,
                         borderless: true,
                         on: {
                             onBeforeRender: (object) => {

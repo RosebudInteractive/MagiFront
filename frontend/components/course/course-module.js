@@ -81,16 +81,15 @@ class CourseModule extends Component {
     render() {
         let _course = this.props.courses[this.props.index];
         return (
-            <main className="courses">
-                <div className={this._getCourseModuleClassName()}>
-                    <InfoBlock size={this._getSize()}
-                               title={' ' + _course.Name}
-                               width={this.state.width}
-                               courseIndex={this.props.index}
-                    />
-                    <ImageBlock size={this._getSize()}/>
-                </div>
-            </main>
+
+            <div className={this._getCourseModuleClassName()}>
+                <InfoBlock size={this._getSize()}
+                           title={' ' + _course.Name}
+                           width={this.state.width}
+                           courseIndex={this.props.index}
+                />
+                <ImageBlock size={this._getSize()}/>
+            </div>
         );
     }
 }

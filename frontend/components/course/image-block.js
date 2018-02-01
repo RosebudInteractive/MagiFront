@@ -1,6 +1,6 @@
 import React from 'react';
-import img1 from '../../assets/images/bg-lecture01.png';
-import img2 from '../../assets/images/bg-lecture01@2x.png';
+// import img1 from '../../assets/images/bg-lecture01.png';
+// import img2 from '../../assets/images/bg-lecture01@2x.png';
 
 export default class InfoBlock extends React.Component {
 
@@ -28,10 +28,11 @@ export default class InfoBlock extends React.Component {
         return (
             <div className={this._getClassName()}>
                 <img className={this._getImageClassName()}
-                     src={img1}
-                     srcSet={img2}
-                     width="662"
-                     height="680"
+                     src={'./data/images/bg-lecture01.png'}
+                     // src={"=('images/bg-lecture01.png') %>"}
+                     srcSet={"<%= asset_url('images/bg-lecture01@2x.png') %>"}
+                    // width="662"
+                    // height="680"
                      alt=""/>
             </div>
         );
