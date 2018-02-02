@@ -11,13 +11,22 @@ export default class CourseModuleHeader extends Component {
         return _name;
     }
 
+    _getLabelClassName() {
+        let _name = 'course-module__label';
+        this.props.size.forEach((size) => {
+            _name = _name + ' label-' + size
+        });
+
+        return _name;
+    }
+
     render() {
         let {title} = this.props;
 
         return (
 
             <h1 className={this._getTitleClassName()}>
-                <p className="course-module__label">Курс:</p>
+                <p className={this._getLabelClassName()}>Курс:</p>
                 {title}
             </h1>
         );

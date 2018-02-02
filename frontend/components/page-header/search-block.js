@@ -28,7 +28,7 @@ class SearchBlock extends React.Component {
         return (
                 <div className={_className} >
                     <button type="button" className="search-block__trigger">
-                        <div width="20" height="21">
+                        <div width="20" height="21" style={{marginTop: 5}}>
                             <img src={'/data/images/svg/search.svg'} onClick={that._showForm.bind(this)}/>
                         </div>
                     </button>

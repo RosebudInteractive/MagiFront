@@ -28,7 +28,7 @@ export default class InfoBlock extends React.Component {
         return (
             <div className={this._getClassName()}>
                 <img className={this._getImageClassName()}
-                     src={'./data/' + cover}
+                     src={'/data/' + cover}
                      // src={"=('images/bg-lecture01.png') %>"}
                      // srcSet={"<%= asset_url('images/bg-lecture01@2x.png') %>"}
                     // width="662"
