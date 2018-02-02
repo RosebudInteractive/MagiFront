@@ -14,10 +14,10 @@ export default function filters(state = initialState, action) {
         case LOAD_FILTER_VALUES: {
             let _items = [];
             let _filters = action.payload;
-            Object.keys(_filters).forEach((item) => {
+            _filters.forEach((item) => {
                 _items.push({
-                    name: item,
-                    count: _filters[item],
+                    Name: item,
+                    Counter: _filters[item],
                     selected: false
                 })
             });
