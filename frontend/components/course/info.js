@@ -16,8 +16,8 @@ class Info extends Component {
     render() {
         let _course = this.props.courses[this.props.courseIndex];
 
-        const _name = _course.Authors[0].FirstName;
-        const _surname = _course.Authors[0].LastName;
+        const _name = _course.Authors[0].FirstName + ' ' + _course.Authors[0].LastName;
+        // const _surname = _course.Authors[0].LastName;
         const _category = _course.Categories[0].Name;
 
         return (
@@ -25,7 +25,7 @@ class Info extends Component {
                 <div className={this._getClassName('course-module__info-col', 'info-col')}>
                     <p className={this._getClassName('course-module__info-col-header', 'info-col-header')}>Лектор</p>
                     <p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_name}</p>
-                    <p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_surname}</p>
+                    {/*<p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_surname}</p>*/}
                 </div>
                 <div className={this._getClassName('course-module__info-col', 'info-col')}>
                     <p className={this._getClassName('course-module__info-col-header', 'info-col-header')}>Категория</p>

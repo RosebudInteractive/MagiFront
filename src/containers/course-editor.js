@@ -61,6 +61,7 @@ class CourseEditor extends ObjectEditor {
             Name: value.Name,
             State: value.State,
             Cover: value.Cover,
+            CoverMeta: JSON.stringify(this.coverMeta),
             Color: parseInt(value.ColorHex.substr(1), 16),
             LanguageId: value.LanguageId,
             URL: value.URL,
@@ -75,6 +76,32 @@ class CourseEditor extends ObjectEditor {
         this._fillLessons(_obj.Lessons);
 
         super._save(_obj);
+    }
+
+    get coverMeta() {
+        return this._coverMeta;
+    }
+
+    set coverMeta(value) {
+        if ((!!value) && (typeof (value) === 'string')) {
+            this._coverMeta = JSON.parse(value)
+        } else {
+            this._coverMeta = value
+        }
+    }
+
+    _onUpdate() {
+        let _course = this.getObject();
+        this.cover = _course ? _course.Cover : null;
+        this.coverMeta = _course ? _course.CoverMeta : null;
+    }
+
+    _getCoverInfo() {
+        let _meta = this.coverMeta;
+        return {
+            path: _meta ? ('/data/' + _meta.path + _meta.content.s) : null,
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+        };
     }
 
     _fillLessons(array) {
@@ -379,6 +406,121 @@ class CourseEditor extends ObjectEditor {
                         that._externalValidate(this);
                     },
                 },
+            },
+            {
+                cols: [
+                    {
+                        rows: [
+                            {
+                                view: "label",
+                                label: "Обложка лекции",
+                                width: labelWidth,
+                                height: 38,
+                            }
+                        ]
+
+                    },
+                    {
+                        rows: [
+                            {
+                                view: 'text',
+                                name: 'Cover',
+                                id: 'cover-file',
+                                validate: window.webix.rules.isNotEmpty,
+                                invalidMessage: "Значение не может быть пустым",
+                                readonly: true,
+                                width: 360,
+                                on: {
+                                    onChange: function () {
+                                        that._externalValidate(this);
+                                        let _coverTemplate = window.$$('cover_template');
+                                        if (!this.getValue()) {
+                                            this.show();
+                                            _coverTemplate.hide()
+                                        } else {
+                                            this.hide();
+                                            _coverTemplate.show()
+                                        }
+                                    },
+                                },
+                            },
+                            {
+                                view: 'text',
+                                name: 'CoverMeta',
+                                id: 'cover-meta',
+                                hidden: true,
+                            },
+                            {
+                                view: 'template',
+                                datatype: 'image',
+                                id: 'cover_template',
+                                template: (obj) => {
+                                    return '<img class="cover" src="' + obj.src + '" />'
+                                },
+                                width: 360,
+                                borderless: true,
+                                on: {
+                                    onBeforeRender: (object) => {
+                                        let _coverInfo = that._getCoverInfo();
+                                        object.src = _coverInfo.path;
+                                        let _width = window.$$('cover_template').config.width;
+                                        window.$$('cover_template').config.height = _width * _coverInfo.heightRatio;
+                                        window.$$('cover_template').resize()
+                                    },
+                                    validate: function (value) {
+                                        return that._checkEpisodesState(value)
+                                    },
+                                }
+
+                            },
+                            {}
+                        ]
+
+
+                    },
+                    {
+                        width: 10,
+                    },
+                    {
+                        view: "uploader",
+                        id: "file-uploader",
+                        type: "iconButton",
+                        icon: 'upload',
+                        upload: "/upload",
+                        multiple: false,
+                        datatype: "json",
+                        accept: "image/*",
+                        validate: window.webix.rules.isNotEmpty,
+                        invalidMessage: "Значение не может быть пустым",
+                        inputHeight: 38,
+                        width: 38,
+                        on: {
+                            onBeforeFileAdd: (item) => {
+                                let _type = item.file.type.toLowerCase();
+                                if (!_type) {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                let _metaType = _type.split('/')[0];
+                                if (_metaType !== "image") {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                window.$$('btnOk').disable();
+                                window.$$('btnCancel').disable();
+                            },
+                            onUploadComplete: (response) => {
+                                let _coverMeta = JSON.stringify(response[0].info);
+                                window.$$('cover-meta').setValue(_coverMeta);
+                                window.$$('cover-file').setValue(response[0].file);
+                                window.$$('cover_template').refresh();
+                            },
+
+                        }
+                    },
+                ]
             },
             {
                 view: "richtext",

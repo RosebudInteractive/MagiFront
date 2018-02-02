@@ -1,5 +1,5 @@
 import React from 'react';
-import SvgSearch from '../../assets/images/svg/search.svg'
+// import SvgSearch from '../../assets/images/svg/search.svg'
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as pageHeaderActions from "../../actions/page-header-actions";
@@ -28,8 +28,8 @@ class SearchBlock extends React.Component {
         return (
                 <div className={_className} >
                     <button type="button" className="search-block__trigger">
-                        <div width="20" height="21">
-                            <img src={SvgSearch} onClick={that._showForm.bind(this)}/>
+                        <div width="20" height="21" style={{marginTop: 5}}>
+                            <img src={'/data/images/svg/search.svg'} onClick={that._showForm.bind(this)}/>
                         </div>
                     </button>
 

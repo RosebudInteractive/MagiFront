@@ -33,7 +33,7 @@ class CourseModule extends Component {
         if (window.innerWidth < 500) {
             this.setState({width: 450, height: 102});
         } else {
-            let update_width = window.innerWidth - 100;
+            let update_width = window.innerWidth;
             let update_height = Math.round(update_width / 4.4);
             this.setState({width: update_width, height: update_height});
         }
@@ -88,7 +88,7 @@ class CourseModule extends Component {
                            width={this.state.width}
                            courseIndex={this.props.index}
                 />
-                <ImageBlock size={this._getSize()}/>
+                <ImageBlock size={this._getSize()} cover={_course.Cover}/>
             </div>
         );
     }

@@ -22,11 +22,11 @@
 }
 
 .module-l-size {
-    min-height: 825px;
+    min-height: 733px;
 }
 
 .module-m-size {
-    min-height: 750px;
+    min-height: 747px;
 }
 
 .module-s-size {
@@ -114,24 +114,24 @@
     left: -27px;
     width: 14px;
     height: 23px;
-    background-image: url("../../assets/images/svg/flag.svg");
+    background-image: url("/data/images/svg/flag.svg");
     opacity: 0.2;
 }
 
-.course-module__label:before .xxl-size {
+.label-xxl-size:before {
     top: 10px;
 }
 
-.course-module__label:before .m-size {
+.label-m-size:before {
     left: -40px;
 }
 
-.course-module__label:before .s-size {
+.label-s-size:before {
     left: -4px;
     top: 2px;
 }
 
-.course-module__label .s-size {
+.label-s-size {
     padding-left: 30px;
 }
 

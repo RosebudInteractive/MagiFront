@@ -1,6 +1,6 @@
 import React from 'react';
-import SvgLogoFull from '../../assets/images/svg/logo.svg';
-import SvgLogo from '../../assets/images/svg/logo-mob.svg';
+// import SvgLogoFull from '../../assets/images/svg/logo.svg';
+// import SvgLogo from '../../assets/images/svg/.svg';
 
 export default class Logo extends React.Component {
 
@@ -11,11 +11,11 @@ export default class Logo extends React.Component {
 
             isFull ?
                 <div width="130" height="31" className='logo'>
-                    <img src={SvgLogoFull}/>
+                    <img src={'./data/images/svg/logo.svg'}/>
                 </div>
                 :
                 <div width="70" height="38" className='logo-mobile'>
-                    <img src={SvgLogo}/>
+                    <img src={'./data/images/svg/logo-mob.svg'}/>
                 </div>
 
 

@@ -106,6 +106,7 @@ export const save = (values, mode) => {
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/lessons";
+        // let _parentPosfix = values.ParentId ? '/' + values.ParentId : '/0';
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id + '/' + values.CourseId + '/' + values.ParentId
         } else {
@@ -238,6 +239,10 @@ const handleLesson = (lesson) => {
             handleLesson(child)
         })
     }
+
+    // if (lesson.CoverMeta) {
+    //     lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
+    // }
 };
 
 const handleLessonResources = (resources) => {

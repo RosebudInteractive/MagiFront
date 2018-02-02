@@ -24,13 +24,13 @@ export default class InfoBlock extends React.Component {
 
 
     render() {
-        // const {size, title} = this.props;
+        const {cover} = this.props;
         return (
             <div className={this._getClassName()}>
                 <img className={this._getImageClassName()}
-                     src={'./data/images/bg-lecture01.png'}
+                     src={'/data/' + cover}
                      // src={"=('images/bg-lecture01.png') %>"}
-                     srcSet={"<%= asset_url('images/bg-lecture01@2x.png') %>"}
+                     // srcSet={"<%= asset_url('images/bg-lecture01@2x.png') %>"}
                     // width="662"
                     // height="680"
                      alt=""/>
