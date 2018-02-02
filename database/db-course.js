@@ -197,9 +197,7 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
-    "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
-    "  join[AuthorLng] al on a.[Id] = al.[AuthorId] and al.[LanguageId] = <%= languageId %>\n" +
-    "where c.[AccountId] = <%= accountId %> and c.[State] = 'P'\n" +
+    "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and (l.[ParentId] is NULL)\n" +
     "order by c.[Id]";
 const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from [AuthorToCourse] ac\n" +
@@ -220,9 +218,7 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
-    "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
-    "  join`AuthorLng` al on a.`Id` = al.`AuthorId` and al.`LanguageId` = <%= languageId %>\n" +
-    "where c.`AccountId` = <%= accountId %> and c.`State` = 'P'\n" +
+    "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and (l.`ParentId` is NULL)\n" +
     "order by c.`Id`";
 const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from `AuthorToCourse` ac\n" +
