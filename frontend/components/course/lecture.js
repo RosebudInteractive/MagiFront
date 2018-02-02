@@ -1,7 +1,7 @@
 import BaseComponent, {Size,} from '../base-component';
 import React from 'react';
 import './lecture.css';
-import img from '../../assets/images/lecture01.png';
+// import img from '../../assets/images/lecture01.png';
 import PropTypes from 'prop-types';
 
 export class Counter extends BaseComponent {
@@ -46,7 +46,7 @@ class LargeLecture extends BaseComponent {
         let {lesson} = this.props;
         return (
             <div className='lecture'>
-                <PlayBlock/>
+                <PlayBlock cover={'/data/'+lesson.Cover} />
                 <div className='lecture__descr'>
                     <h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3>
                     <p>{lesson.ShortDescription}</p>
@@ -131,7 +131,7 @@ class PlayBlock extends BaseComponent {
     render() {
         return (
             <div className="lecture__play-block">
-                <img src={img} width="126" height="126" alt=""/>
+                <img src={this.props.cover} width="126" height="126" alt=""/>
             </div>
         )
     }

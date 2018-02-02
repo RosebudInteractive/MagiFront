@@ -112,9 +112,38 @@ export class LessonEditor extends ObjectEditor {
         }
     }
 
-    _getCoverPath() {
+    get cover() {
+        return this._cover;
+    }
+
+    set cover(value) {
+        this._cover = value;
+    }
+
+    get coverMeta() {
+        return this._coverMeta;
+    }
+
+    set coverMeta(value) {
+        if ((!!value) && (typeof (value) === 'string')) {
+            this._coverMeta = JSON.parse(value)
+        } else {
+            this._coverMeta = value
+        }
+    }
+
+    _onUpdate() {
         let _lesson = this.getObject();
-        return _lesson ? ('/data/' + _lesson.Cover) : null
+        this.cover = _lesson ? _lesson.Cover : null;
+        this.coverMeta = _lesson ? _lesson.CoverMeta : null;
+    }
+
+    _getCoverInfo() {
+        let _meta = this.coverMeta;
+        return {
+            path: _meta ? ('/data/' + _meta.path + _meta.content.s) : null,
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+        };
     }
 
     _save(value) {
@@ -125,7 +154,8 @@ export class LessonEditor extends ObjectEditor {
             Name: value.Name,
             State: value.State,
             AuthorId: value.AuthorId,
-            Cover: value.Cover,
+            Cover: this.cover,
+            CoverMeta: JSON.stringify(this.coverMeta),
             URL: value.URL,
             LessonType: value.LessonType,
             ReadyDate: value.DT_ReadyDate,
@@ -196,7 +226,6 @@ export class LessonEditor extends ObjectEditor {
             })
         });
     }
-
 
     hideAddAuthorDialog() {
         this.props.courseActions.hideAddAuthorDialog()
@@ -421,7 +450,7 @@ export class LessonEditor extends ObjectEditor {
 
         let _data = this.getObject();
         return [
-            <div className={this._getMainDivClassName() + 'webix'}>
+            <div className={this._getMainDivClassName() + 'webix'} key='webix'>
                 <Webix ui={::this.getUI()} data={_data} key='webix1'/>
             </div>,
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
@@ -603,23 +632,52 @@ export class LessonEditor extends ObjectEditor {
                     {
                         rows: [
                             {
-
-                                view: 'template',
-                                type: 'image',
-                                labelWidth: labelWidth,
-                                label: 'Обложка лекции',
+                                view: 'text',
                                 name: 'Cover',
-                                id: 'cover',
+                                id: 'cover-file',
+                                validate: window.webix.rules.isNotEmpty,
+                                invalidMessage: "Значение не может быть пустым",
+                                readonly: true,
+                                width: 360,
+                                on: {
+                                    onChange: function () {
+                                        that._externalValidate(this);
+                                        let _coverTemplate = window.$$('cover_template');
+                                        if (!this.getValue()) {
+                                            this.show();
+                                            _coverTemplate.hide()
+                                        } else {
+                                            this.hide();
+                                            _coverTemplate.show()
+                                        }
+                                    },
+                                },
+                            },
+                            {
+                                view: 'text',
+                                name: 'CoverMeta',
+                                id: 'cover-meta',
+                                hidden: true,
+                            },
+                            {
+                                view: 'template',
+                                datatype: 'image',
+                                id: 'cover_template',
                                 template: (obj) => {
                                     return '<img class="cover" src="' + obj.src + '" />'
                                 },
-                                height: 360,
                                 width: 360,
                                 borderless: true,
-                                autoheight: true,
                                 on: {
                                     onBeforeRender: (object) => {
-                                        object.src = that._getCoverPath();
+                                        let _coverInfo = that._getCoverInfo();
+                                        object.src = _coverInfo.path;
+                                        let _width = window.$$('cover_template').config.width;
+                                        window.$$('cover_template').config.height = _width * _coverInfo.heightRatio;
+                                        window.$$('cover_template').resize()
+                                    },
+                                    validate: function (value) {
+                                        return that._checkEpisodesState(value)
                                     },
                                 }
 
@@ -627,14 +685,16 @@ export class LessonEditor extends ObjectEditor {
                             {}
                         ]
 
-                    },
 
+                    },
+                    {
+                        width: 10,
+                    },
                     {
                         view: "uploader",
                         id: "file-uploader",
                         type: "iconButton",
                         icon: 'upload',
-                        // link: "file-list",
                         upload: "/upload",
                         multiple: false,
                         datatype: "json",
@@ -661,7 +721,10 @@ export class LessonEditor extends ObjectEditor {
                                 window.$$('btnCancel').disable();
                             },
                             onUploadComplete: (response) => {
-                                window.$$('cover').setValue('/data/' + response[0].file);
+                                let _coverMeta = JSON.stringify(response[0].info);
+                                window.$$('cover-meta').setValue(_coverMeta);
+                                window.$$('cover-file').setValue(response[0].file);
+                                window.$$('cover_template').refresh();
                             },
 
                         }

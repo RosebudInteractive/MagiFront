@@ -1,5 +1,5 @@
 import React from 'react';
-import SvgFilter from '../../assets/images/svg/filter.svg';
+// import SvgFilter from '../../assets/images/svg/filter.svg';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as pageHeaderActions from "../../actions/page-header-actions";
@@ -34,7 +34,7 @@ class Navigation extends React.Component {
                         <li className="filter">
                             <a>
                                 <div width="22" height="21" className='logo'>
-                                    <img src={SvgFilter} onClick={this._switchShowFilterForm.bind(this)}/>
+                                    <img src={'./data/images/svg/filter.svg'} onClick={this._switchShowFilterForm.bind(this)}/>
                                 </div>
                             </a>
                         </li>

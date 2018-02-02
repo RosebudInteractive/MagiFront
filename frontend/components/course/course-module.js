@@ -88,7 +88,7 @@ class CourseModule extends Component {
                            width={this.state.width}
                            courseIndex={this.props.index}
                 />
-                <ImageBlock size={this._getSize()}/>
+                <ImageBlock size={this._getSize()} cover={_course.Cover}/>
             </div>
         );
     }
