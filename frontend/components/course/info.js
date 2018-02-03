@@ -16,9 +16,9 @@ class Info extends Component {
     render() {
         let _course = this.props.courses[this.props.courseIndex];
 
-        const _name = _course.Authors[0].FirstName + ' ' + _course.Authors[0].LastName;
+        const _name = _course.AuthorsObj[0].FirstName + ' ' + _course.AuthorsObj[0].LastName;
         // const _surname = _course.Authors[0].LastName;
-        const _category = _course.Categories[0].Name;
+        const _category = _course.CategoriesObj[0].Name;
 
         return (
             <div className={this._getClassName("course-module__info", 'info')}>
