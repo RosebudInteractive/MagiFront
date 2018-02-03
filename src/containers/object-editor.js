@@ -81,7 +81,11 @@ export default class ObjectEditor extends React.Component {
         if (_isNeedSwitchMode) {
             this._switchToEditObject(_newObjectId)
         }
+
+        this._onUpdate();
     }
+
+    _onUpdate() {}
 
     _switchToEditObject(objId){
         let _newRout = this.getRootRout() + this._getEditRout() + objId;
@@ -93,7 +97,8 @@ export default class ObjectEditor extends React.Component {
         return '/edit/';
     }
 
-    componentWillUnmount() {
+    // componentWillUnmount() {
+    componentWillMount() {
         this._clearObjectInStorage()
     }
 

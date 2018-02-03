@@ -19,7 +19,7 @@ export default function courses(state = initialState, action) {
             // let _list = action.payload;
             // let _selected = (_list.length > 0) ? _list[0].id : null;
 
-            return {...state, items: action.payload, fetching: false};
+            return {...state, items: action.payload.Courses, fetching: false};
         }
 
         case GET_COURSES_FAIL:

@@ -13,18 +13,8 @@ class CoursesPage extends React.Component {
         this.props.coursesActions.getCourses();
     }
 
-    componentDidUpdate() {
-        // let _newObjectId = this.props[this.objectName] ? this.props[this.objectName].id : null;
-        // let _isNeedSwitchMode = (this.editMode === EDIT_MODE_INSERT) && (!!+_newObjectId);
-        //
-        // if (_isNeedSwitchMode) {
-        //     this._switchToEditObject(_newObjectId)
-        // }
-    }
 
-    componentWillUnmount() {
-        // this._clearObjectInStorage()
-    }
+
 
     _getCoursesBundles() {
         return this.props.courses.map((course, index) => {

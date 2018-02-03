@@ -23,7 +23,7 @@ export const getCourses = ()=> {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                let _filters = handleCourses(data);
+                handleCourses(data);
                 // data.forEach((course) => handleCourse(course));
 
                 dispatch({
@@ -33,7 +33,7 @@ export const getCourses = ()=> {
 
                 dispatch({
                     type: LOAD_FILTER_VALUES,
-                    payload: _filters
+                    payload: data.Categories
                 })
             })
             .catch((err) => {
@@ -121,16 +121,33 @@ const parseJSON = (response) => {
 //     return course;
 // };
 
-const handleCourses = (data) => {
-    let _categories = {};
+const _getAuthor = (array, id) => {
+    return array.find((item) => {
+        return item.Id === id
+    })
+};
 
-    data.forEach((item) => {
+const _getCategory = (array, id) => {
+    return array.find((item) => {
+        return item.Id === id
+    })
+};
+
+const handleCourses = (data) => {
+
+    data.Courses.forEach((item) => {
+        item.CategoriesObj = [];
+        item.AuthorsObj = [];
+
         item.Categories.forEach((category) => {
-            _categories[category.Name] ? _categories[category.Name]++ : _categories[category.Name] = 1
+            let _category = _getCategory(data.Categories, category);
+            item.CategoriesObj.push(_category)
+        });
+
+        item.Authors.forEach((author) => {
+            item.AuthorsObj.push(_getAuthor(data.Authors, author))
         });
 
         item.ColorHex = '#' + item.Color.toString(16);
     });
-
-    return _categories;
 };
