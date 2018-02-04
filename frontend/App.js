@@ -64,10 +64,6 @@ class App extends Component {
             <div className="App" onScroll={this._handleScroll}>
                 <ReactCSSTransitionGroup
                     transitionName="example"
-                    // transitionAppear={true}
-                    // transitionAppearTimeout={100}
-                    // transitionEnter={false}
-                    // transitionLeave={true}
                 >
                     {this._getHeader()}
                 </ReactCSSTransitionGroup>
