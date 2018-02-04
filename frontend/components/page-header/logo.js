@@ -11,11 +11,11 @@ export default class Logo extends React.Component {
 
             isFull ?
                 <div width="130" height="31" className='logo'>
-                    <img src={'./data/images/svg/logo.svg'}/>
+                    <img src={'/assets/svg/logo.svg'}/>
                 </div>
                 :
                 <div width="70" height="38" className='logo-mobile'>
-                    <img src={'./data/images/svg/logo-mob.svg'}/>
+                    <img src={'/assets/svg/logo-mob.svg'}/>
                 </div>
 
 

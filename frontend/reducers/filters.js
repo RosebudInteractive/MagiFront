@@ -16,8 +16,8 @@ export default function filters(state = initialState, action) {
             let _filters = action.payload;
             _filters.forEach((item) => {
                 _items.push({
-                    Name: item,
-                    Counter: _filters[item],
+                    name: item.Name,
+                    count: item.Counter,
                     selected: false
                 })
             });

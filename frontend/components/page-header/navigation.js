@@ -34,7 +34,7 @@ class Navigation extends React.Component {
                         <li className="filter">
                             <a>
                                 <div width="22" height="21" className='logo'>
-                                    <img src={'./data/images/svg/filter.svg'} onClick={this._switchShowFilterForm.bind(this)}/>
+                                    <img src={'/assets/svg/filter.svg'} onClick={this._switchShowFilterForm.bind(this)}/>
                                 </div>
                             </a>
                         </li>

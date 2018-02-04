@@ -4,6 +4,7 @@ import './page-header.css';
 import CoursePage from './containers/courses-page'
 import PageHeaderRow from './components/page-header/page-header-row';
 import {connect} from 'react-redux';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 // import FiltersRow from './components/page-header/filters-row';
 // import { bindActionCreators } from 'redux'
 // import { connect } from 'react-redux'
@@ -51,15 +52,25 @@ class App extends Component {
         }
     }
 
+    _getHeader() {
+        return this.state.showHeader ?
+            <PageHeaderRow/>
+            :
+            null
+    }
+
     render() {
         return (
             <div className="App" onScroll={this._handleScroll}>
-                {
-                    this.state.showHeader ?
-                        <PageHeaderRow/>
-                        :
-                        ''
-                }
+                <ReactCSSTransitionGroup
+                    transitionName="example"
+                    // transitionAppear={true}
+                    // transitionAppearTimeout={100}
+                    // transitionEnter={false}
+                    // transitionLeave={true}
+                >
+                    {this._getHeader()}
+                </ReactCSSTransitionGroup>
                 <CoursePage/>
                 {/*<CourseModule/>*/}
             </div>

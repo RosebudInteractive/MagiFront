@@ -24,7 +24,7 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
         if (window.innerWidth < 500) {
             this.setState({width: 450, height: 102});
         } else {
-            let update_width = window.innerWidth - 100;
+            let update_width = window.innerWidth;
             let update_height = Math.round(update_width / 4.4);
             this.setState({width: update_width, height: update_height});
         }
@@ -69,7 +69,12 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
                             {!showSearchForm ? <UserBlock/> : ''}
                         </div>
                     </div>
-                    {showFiltersForm ? <FiltersRow/> : ''}
+                    {
+                        showFiltersForm ?
+                            <FiltersRow/>
+                            :
+                            ''
+                    }
                 </div>
                 :
                 <div className='page-header'>

@@ -1,3 +1,39 @@
+.example-appear {
+    opacity: 0.01;
+}
+
+.example-appear.example-appear-active {
+    opacity: 1;
+    transition: opacity .5s ease-in;
+}
+
+.example-enter {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+.example-enter.example-enter-active {
+    opacity: 1;
+    transition: opacity 1s ease;
+    transform: translateY(-100%);
+    transition-property: transform, opacity;
+    transition-duration: 50ms;
+    transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear;
+}
+
+.example-leave {
+    opacity: 1;
+    transform: translateY(100%);
+    transition-property: transform, opacity;
+    transition-duration: 50ms;
+    transition-timing-function: cubic-bezier(0.175, 0.665, 0.320, 1), linear;
+}
+
+.example-leave.example-leave-active {
+    opacity: 0;
+    transform: translateY(-100%);
+}
+
+
 html {
     font-family: sans-serif;
     -ms-text-size-adjust: 100%;
