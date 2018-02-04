@@ -1,0 +1,133 @@
+.ws-assets-background
+  background-color #3E3E3E
+  height 100%
+  display flex
+  flex-direction column
+.ws-assets-top
+  width 100%
+  height 2.5em
+  margin-bottom 1px
+  flex none
+  position relative
+  padding-top 0.5834em
+  padding-left 1em
+  input
+    display none
+.ws-assets-icon
+  display block
+  float left
+.ws-assets-caption
+  font-family "PT Sans Caption"
+  font-style normal
+  font-weight normal
+  font-size 1.1667em
+  line-height 100%
+  color #FFFFFF
+  opacity 0.80
+  padding-left 0.5em
+  float left
+  padding-top 0.125em
+.ws-assets-content
+  flex 1 0 1px
+  overflow-y hidden
+  position relative
+  .list
+    height auto
+.ws-assets-panel
+  background-color #4D4D4D
+  padding-top 0.41667em
+
+.ws-assets-plus
+.ws-assets-disk
+  /* + ⛁ */
+  font-family "DejaVu Sans"
+  font-size 1.75em
+  line-height 100%
+  color rgba(255, 255, 255, 0.5)
+  float right
+  padding-right 0.75em
+.ws-assets-item
+  display block
+  height 4.33333em
+  overflow-x hidden
+  overflow-y hidden
+  position relative
+  white-space nowrap
+  &:hover
+    background-color #717171
+    .ws-assets-item-menu
+      display block
+  .ws-assets-item-icon
+    width 4em
+    height 3.5em
+    display block
+    float left
+    margin-left 1.75em
+    margin-top 0.41667em
+    padding-bottom 0.25em
+  .ws-assets-text
+    font-family "PT Sans Caption"
+    font-style normal
+    font-weight normal
+    font-size 0.9166em
+    color #FFFFFF
+    opacity 1.00
+    float left
+    line-height 1.5em
+    padding-top 0.5em
+    padding-bottom 0.5em
+    padding-left 0.75em
+    white-space nowrap
+    width 15.95em
+    overflow-x hidden
+    margin-left 0.41667em
+    margin-top 0.41667em
+  .ws-shadow
+    /* Градиент */
+    background linear-gradient(180deg, #4D4D4D 23.61%, rgba(77, 77, 77, 0) 100%)
+    opacity 1.00;
+    transform matrix(0, 1, -1, 0, 0, 0)
+    position absolute
+    right -0.76em
+    top 0.7em
+    width 4.3334em
+    height 3em
+  .ws-assets-item-menu
+    display none
+    position absolute
+    bottom 0.5em
+    left 0.75em
+  .ws-assets-item-num
+    position absolute
+    right 19.375em
+    margin-top 0.41667em
+    .ws-assets-item-num-cont
+      font-family "PT Sans Caption"
+      font-style normal
+      font-weight normal
+      font-size 0.9166em
+      line-height 100%
+      color rgba(255, 255, 255, 0.5)
+      opacity 1.00
+.ws-assets-item.focused
+  background-color #00DBFF
+  &:hover
+    background-color #00DBFF
+  .ws-assets-item-num-cont, .ws-assets-text
+    color #2F2F2F
+  .ws-assets-item-menu
+    background-color #00DBFF
+  .ws-shadow
+    background linear-gradient(180deg, #00DBFF 23.61%, rgba(77, 77, 77, 0) 100%)
+.ws-audio-icon
+  /* ♫ */
+  font-family: "DejaVu Sans";
+  font-size: 3em;
+  line-height: 100%;
+  color: #FFFFFF;
+  opacity: 0.50;
+  width 100%
+  height 100%
+  background-color #686868
+  padding-left 0.17em
+
