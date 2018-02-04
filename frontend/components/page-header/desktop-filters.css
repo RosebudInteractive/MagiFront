@@ -89,6 +89,10 @@
     cursor: pointer;
 }
 
+.filter-btn img {
+    cursor: pointer;
+}
+
 @media (max-width: 899px) {
     .filter-btn {
         margin-bottom: 14px;

@@ -67,32 +67,32 @@
     margin-bottom: 36px;
 }
 
-.title-xl-size {
+.title-l-size {
     margin-bottom: 25px;
     line-height: 51px;
     letter-spacing: -1.4px;
 }
 
-.title-l-size {
+.title-m-size {
     margin-bottom: 16px;
 }
 
-.title-m-size {
+.title-s-size {
     margin-bottom: 50px;
     font-size: 29px;
     line-height: 31px;
 }
 
-.title-s-size {
+.title-xs-size {
     margin-bottom: 19px;
 }
 
-.title-xs-size {
+.title-xxs-size {
     margin-bottom: 13px;
     line-height: 32px;
 }
 
-.title-xxs-size {
+.title-mobile {
     margin-bottom: 21px;
     line-height: 31px;
 }
@@ -190,10 +190,15 @@
 }
 
 .course-module__image-block {
+    object-fit: cover;
     display: inline-block;
-    vertical-align: top;
+    /*vertical-align: top;*/
+    vertical-align: middle;
     width: 41.632%;
     overflow: hidden;
+    margin-top: 44.76px;
+    margin-left: 51.05px;
+    margin-bottom: 82.53px;
 }
 
 .image-block-l-size {

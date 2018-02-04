@@ -1,6 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import './desktop-filters.css';
 import * as pageHeaderActions from "../../actions/page-header-actions";
 
@@ -14,13 +14,17 @@ class FiltersRow extends React.Component {
         return this.props.filters.map((item, index) => {
             return (
                 <li key={index}>
-                    <div className="filter-btn" key={index}>
+                    <div className="filter-btn" key={index} onClick={this._onClick}>
                         <span className="filter-btn__title">{item.name + ' '}<span
                             className="filter-btn__index">{item.count}</span></span>
                     </div>
                 </li>
             )
         })
+    }
+
+    _onClick(){
+
     }
 
     render() {
@@ -34,9 +38,9 @@ class FiltersRow extends React.Component {
                         <p className="filters-row__label">Сбросить фильтры</p>
                         <ul className="filters-list">
                             {/*<li>*/}
-                                {/*<div className="filter-btn">*/}
-                                    {/*<span className="filter-btn__title">Литература <span className="filter-btn__index">12</span></span>*/}
-                                {/*</div>*/}
+                            {/*<div className="filter-btn">*/}
+                            {/*<span className="filter-btn__title">Литература <span className="filter-btn__index">12</span></span>*/}
+                            {/*</div>*/}
 
                             {/*</li>*/}
                             {this._getFilters()}

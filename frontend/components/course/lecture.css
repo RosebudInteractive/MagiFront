@@ -205,7 +205,8 @@
 }
 
 .lecture__play-block img {
-    display: block;
+    /*display: block;*/
+    object-fit: cover;
     width: 100%;
     border-radius: 100%;
 }
