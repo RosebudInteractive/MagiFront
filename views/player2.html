@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="/scripts/lib/jquery/jquery-1.12.4.js"></script>
+    <script>
+        $(function () {
+            console.log("bebe");
+            var secMp3 = "/data/2016/09/Nasonov_Bach_Cantatas_03_Weimar_BWV_54_61_Stereo_128Kbps_May_26_2016.mp3";
+
+            var $p1 = $("#a1");
+            var $p2 = $("#a2");
+            var p1 = $p1[0];
+            var p2 = $p2[0];
+
+            var dur = 0;
+            var once = true;
+
+            $p1.on("loadeddata", function () {
+                dur = this.duration;
+                p1.currentTime = dur - 20;
+                p2.muted = true;
+            }).on("timeupdate", function (e) {
+                if (once && this.duration - this.currentTime < 15) {
+                    once = false;
+                    p2.src = secMp3;
+                    p2.play();
+                }
+            }).on("ended", function(e) {
+                p2.currentTime = 0;
+                p2.muted = false;
+            });
+
+            p1.play();
+
+            $p2.preload = true
+
+        });
+    </script>
+</head>
+<body>
+    <audio id="a1" src="/data/2016/09/Nasonov_Bach_Cantatas_02_Early-01_BWV-4_Stereo_128Kbps_May_16_2016.mp3"></audio>
+    <audio id="a2" src=""></audio>
+</body>
+</html>
