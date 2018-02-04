@@ -13,7 +13,7 @@
     display: -moz-box;
     display: -ms-flexbox;
     display: flex;
-    min-height: 635px;
+    /*min-height: 635px;*/
     border-bottom: 1px solid rgba(47, 47, 47, 0.15);
 }
 
@@ -41,6 +41,10 @@
     -moz-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
+}
+
+.course-module__body {
+
 }
 
 .course-body-s-size {
@@ -202,15 +206,21 @@
 }
 
 .image-block-l-size {
+    margin-top: 0;
     padding-top: 90px;
 }
 
 .image-block-m-size {
     padding-top: 0;
+    margin-top: 44.76px;
+    margin-left: 51.05px;
+    margin-bottom: 82.53px;
 }
 
 .image-block-s-size {
+    margin-top: 0;
     padding-top: 20px;
+    max-height: 330px;
 }
 
 .image-block-xs-size {

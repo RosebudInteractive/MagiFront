@@ -3,6 +3,8 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import './desktop-filters.css';
 import * as pageHeaderActions from "../../actions/page-header-actions";
+import * as filtersActions from '../../actions/filters-actions';
+import filters from "../../reducers/filters";
 
 class FiltersRow extends React.Component {
 
@@ -13,18 +15,23 @@ class FiltersRow extends React.Component {
     _getFilters() {
         return this.props.filters.map((item, index) => {
             return (
-                <li key={index}>
-                    <div className="filter-btn" key={index} onClick={this._onClick}>
-                        <span className="filter-btn__title">{item.name + ' '}<span
-                            className="filter-btn__index">{item.count}</span></span>
+                <li key={index} className={item.selected ? 'active' : null}>
+                    <div className="filter-btn" key={index} onClick={::this._onClick} data-id={item.id}>
+                        <span className="filter-btn__title" data-id={item.id}>{item.name + ' '}
+                            <span className="filter-btn__index" data-id={item.id}>{item.count}</span>
+                        </span>
                     </div>
                 </li>
             )
         })
     }
 
-    _onClick(){
+    _onClick(e){
+        this.props.filtersActions.switchFilter(e.target.dataset.id)
+    }
 
+    _clearFilter() {
+        this.props.filtersActions.clear()
     }
 
     render() {
@@ -35,7 +42,7 @@ class FiltersRow extends React.Component {
             <div className="page-header__row filters-row opened">
                 <div className="page-header__wrapper filters-row__wrapper">
                     <div className="filters-row__inner">
-                        <p className="filters-row__label">Сбросить фильтры</p>
+                        <p className="filters-row__label" onClick={::this._clearFilter}>Сбросить фильтры</p>
                         <ul className="filters-list">
                             {/*<li>*/}
                             {/*<div className="filter-btn">*/}
@@ -63,6 +70,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        filtersActions: bindActionCreators(filtersActions, dispatch),
     }
 }
 

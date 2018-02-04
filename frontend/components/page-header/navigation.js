@@ -31,10 +31,10 @@ class Navigation extends React.Component {
                         <li>
                             <a>Календарь</a>
                         </li>
-                        <li className="filter">
+                        <li className={"filter" + (this.props.showFiltersForm ? ' active' : '')} onClick={::this._switchShowFilterForm}>
                             <a>
-                                <div width="22" height="21" className='logo'>
-                                    <img src={'/assets/svg/filter.svg'} onClick={this._switchShowFilterForm.bind(this)}/>
+                                <div width="22" height="21">
+                                    <img src={'/assets/svg/filter.svg'}/>
                                 </div>
                             </a>
                         </li>

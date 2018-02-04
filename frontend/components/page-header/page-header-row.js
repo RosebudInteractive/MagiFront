@@ -6,7 +6,7 @@ import SearchBlock from './search-block'
 import UserBlock from './user-block';
 import {connect} from 'react-redux';
 import FiltersRow from './filters-row';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+// import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const PageHeaderRow = class PageHeaderRow extends React.Component {
 

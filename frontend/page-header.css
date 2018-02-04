@@ -283,7 +283,9 @@ button::-moz-focus-inner {
     margin-right: 23px;
     -webkit-transition: opacity 0.4s ease;
     transition: opacity 0.4s ease;
-    opacity: 0.6; }
+    opacity: 0.6;
+    cursor: pointer;
+}
 
 .navigation ul li:hover {
     opacity: 0.8; }
@@ -294,7 +296,8 @@ button::-moz-focus-inner {
 }
 
 .navigation ul li.filter {
-    opacity: 1; }
+    opacity: 1;
+}
 .navigation ul li.filter:hover {
     opacity: 1; }
 .navigation ul li.filter a {
@@ -303,14 +306,14 @@ button::-moz-focus-inner {
     box-sizing: border-box;
     padding: 10px 11px;
     max-height: 36px; }
-.navigation ul li.filter svg {
+.navigation ul li.filter img {
     fill: #2f2f2f;
-    opacity: 0.6;
+    opacity: 0.5;
     -webkit-transition: opacity 0.4s ease;
     transition: opacity 0.4s ease; }
 .navigation ul li.filter:hover {
     opacity: 1; }
-.navigation ul li.filter.active svg {
+.navigation ul li.filter.active img {
     opacity: 1; }
 .navigation ul a {
     display: block;

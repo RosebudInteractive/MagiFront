@@ -42,11 +42,14 @@ export class Wrapper extends BaseComponent {
 }
 
 class LargeLecture extends BaseComponent {
+
     render() {
+        let _className = this._getClassName('lecture');
+
         let {lesson, size} = this.props;
         return (
-            <div className='lecture'>
-                <PlayBlock cover={'/data/'+lesson.Cover} size={size}/>
+            <div className={_className}>
+                <PlayBlock cover={'/data/'+lesson.Cover} duration={lesson.DurationFmt} size={size}/>
                 <div className={this._getClassName("lecture__descr")}>
                     <h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3>
                     <p>{lesson.ShortDescription}</p>
@@ -75,9 +78,11 @@ class SmallLectures extends BaseComponent {
 
 
         return this.props.lessons.map((item, index) => {
+            let _className = this._getClassName('lecture');
+
             return (
-                <section className='lecture lecture-s-size' key={index}>
-                    <PlayBlock cover={'/data/'+item.Cover} size={this.props.size}/>
+                <section className={_className} key={index}>
+                    <PlayBlock cover={'/data/'+item.Cover} duration={item.DurationFmt} size={this.props.size}/>
                     <div className={this._getClassName("lecture__descr")}>
                         <h3><span className="number">{item.Number}.</span>{' ' + item.Name + ' '}</h3>
                         <p>{item.ShortDescription}</p>
@@ -109,9 +114,11 @@ class ExtraSmallLectures extends BaseComponent {
         // ];
 
         return this.props.lessons.map((item, index) => {
+            let _className = this._getClassName('lecture');
+
             return (
-                <section className='lecture lecture-s-size lecture-xs-size lecture-xs-size' key={index}>
-                    <PlayBlock cover={'/data/'+item.Cover} size={this.props.size}/>
+                <section className={_className} key={index}>
+                    <PlayBlock cover={'/data/'+item.Cover} duration={item.DurationFmt} size={this.props.size}/>
                     <div className={this._getClassName("lecture__descr")}>
                         <h3><span className="number">{item.Number}.</span>{' ' + item.Name + ' '}</h3>
                         <p>{item.ShortDescription}</p>
@@ -129,13 +136,43 @@ class ExtraSmallLectures extends BaseComponent {
 
 class PlayBlock extends BaseComponent {
 
+    constructor(props) {
+        super(props);
+        this.state = { flipped: null };
+    }
+
+    _mouseEnter() {
+        this.setState({flipped: true});
+    }
+
+    _mouseLeave() {
+        this.setState({flipped: false});
+    }
 
     render() {
         let _className = this._getClassName("lecture__play-block", 'play-block');
 
         return (
-            <div className={_className}>
+            <div className={_className} onMouseEnter={::this._mouseEnter} onMouseLeave={::this._mouseLeave}>
+                <div className="lecture__btn">
+                    <svg width="41" height="36">
+                        <svg id="play" viewBox="0 0 41 36" width="100%" height="100%">
+                            <title>Смотреть</title>
+                            <g fill="#FFF" fillOpacity="0.8">
+                                <path id="play-a" d="M0 0l40.415 17.29L0 35.66V0z"/>
+                            </g>
+                        </svg>
+                    </svg>
+                </div>
+                <div className="lecture__loader" id="cont" data-pct="50">
+                    <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                        <circle r="97" cx="100" cy="100" fill="transparent" strokeDasharray="620" strokeDashoffset="0"/>
+                        <circle className="bar" id="bar" r="97" cx="100" cy="100" fill="transparent" strokeDasharray="383.274" strokeDashoffset="157.142"/>
+                    </svg>
+                </div>
                 <img src={this.props.cover} width="126" height="126" alt=""/>
+                {this.state.flipped ? <div className={'image-hover'}/> : null}
+                <div className='duration'>{this.props.duration}</div>
             </div>
         )
     }

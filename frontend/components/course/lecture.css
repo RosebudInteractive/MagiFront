@@ -23,7 +23,7 @@
     display: -ms-flexbox;
     display: flex;
     padding-top: 27px;
-    display: none;
+    /*display: none;*/
 }
 
 .lecture__tooltip, .lecture__action-tooltip {
@@ -79,15 +79,34 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 120px;
-    height: 120px;
-    border-color: #c8684c #c8684c #c8684c rgba(255, 255, 255, 0);
-    border-width: 3px;
-    border-style: solid;
-    border-radius: 50%;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    transform: rotate(45deg);
+    width: 126px;
+    height: 126px;
+    /*border: 3px solid #c8684c;*/
+    /*border-left-color: rgba(255, 255, 255, 0);*/
+    /*border-radius: 50%;*/
+    /*-webkit-transform: rotate(45deg);*/
+    /*-ms-transform: rotate(45deg);*/
+    /*transform: rotate(45deg);*/
+}
+
+.lecture__loader .svg-loader {
+    width: 126px;
+    height: 126px;
+}
+
+.lecture__loader .svg-loader circle {
+    stroke-dashoffset: 0;
+    -webkit-transition: stroke-dashoffset 1s linear;
+    transition: stroke-dashoffset 1s linear;
+    stroke: #666;
+    stroke-width: 4px;
+    /*r: 61;*/
+    /*cx: 50%;*/
+    /*cy: 50%;*/
+}
+
+.lecture__loader .svg-loader .bar {
+    stroke: #c8684c;
 }
 
 .lecture__action {
@@ -147,17 +166,14 @@
     display: flex;
 }
 
-@media (max-width: 1899px) {
-    .lecture {
-        padding-top: 20px;
-    }
+.lecture-xxl-size {
+    padding-top: 20px;
+    padding-bottom: 30px;
 }
 
-@media (max-width: 1279px) {
-    .lecture {
-        padding-top: 7px;
-    }
-}
+/*.lecture-l-size {*/
+    /*padding-top: 7px;*/
+/*}*/
 
 .lecture-s-size {
     display: -webkit-box;
@@ -223,16 +239,19 @@
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     font-size: 0;
+    z-index: 1;
 }
 
 .lecture__btn:hover + .lecture__tooltip {
     opacity: 1;
-    z-index: 1;
+    /*z-index: 1;*/
 }
 
 .lecture__btn svg {
+    /*opacity: 1.4;*/
     display: block;
     width: 40px;
+    /*z-index: 10;*/
 }
 
 .lecture__descr {
@@ -298,4 +317,17 @@
     font-size: 14px;
     line-height: 18px;
     color: rgba(47, 47, 47, 0.6);
+}
+
+.lecture__play-block .image-hover {
+    width: 126px;
+    height: 126px;
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(200, 104, 76, 0.3);
+    border-radius: 50%;
 }

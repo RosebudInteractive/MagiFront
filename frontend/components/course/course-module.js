@@ -81,7 +81,6 @@ class CourseModule extends Component {
     render() {
         let _course = this.props.courses[this.props.index];
         return (
-
             <div className={this._getCourseModuleClassName()}>
                 <InfoBlock size={this._getSize()}
                            title={' ' + _course.Name}
@@ -101,17 +100,7 @@ CourseModule.propTypes = {
 
 function mapStateToProps(state) {
     return {
-        // fetching: state.courses.fetching,
         courses: state.courses.items,
-
-        // selected: state.courses.selected,
-        // editDlgShown: state.courses.editDlgShown,
-        // editMode: state.courses.editMode,
-        //
-        // hasError: state.commonDlg.hasError,
-        // message: state.commonDlg.message,
-        // deleteDlgShown: state.commonDlg.deleteDlgShown,
-        // errorDlgShown: state.commonDlg.errorDlgShown,
     }
 }
 

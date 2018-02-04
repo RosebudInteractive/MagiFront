@@ -46,6 +46,7 @@
     font-size: 14px;
     line-height: 22px;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .filters-row__label:after {

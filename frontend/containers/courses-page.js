@@ -13,12 +13,29 @@ class CoursesPage extends React.Component {
         this.props.coursesActions.getCourses();
     }
 
-
-
-
     _getCoursesBundles() {
+        let {filters} = this.props;
+
+        let _cleanFilter = filters.every((filter) => {
+            return !filter.selected;
+        });
+
         return this.props.courses.map((course, index) => {
-            return <CourseModule index={index} key={index}/>
+            let _inFilter = false;
+
+            if (_cleanFilter) {
+                _inFilter = true
+            } else {
+                _inFilter = course.Categories.some((categoryId) => {
+                    let _filter = filters.find((item) => {
+                        return item.id === categoryId
+                    });
+
+                    return _filter ? _filter.selected : false;
+                });
+            }
+
+            return (_inFilter ? <CourseModule index={index} key={index}/> : null)
         })
     }
 
@@ -51,6 +68,7 @@ function mapStateToProps(state) {
     return {
         fetching: state.courses.fetching,
         courses: state.courses.items,
+        filters: state.filters.items,
 
         // selected: state.courses.selected,
         // editDlgShown: state.courses.editDlgShown,
