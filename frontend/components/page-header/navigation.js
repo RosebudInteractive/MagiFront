@@ -44,10 +44,10 @@ class Navigation extends React.Component {
                 <nav className="navigation navigation-mobile">
                     <ul>
                         <li className="current">
-                            <a href="#">Курсы</a>
+                            <a>Курсы</a>
                         </li>
                         <li>
-                            <a href="#">Календарь</a>
+                            <a>Календарь</a>
                         </li>
                     </ul>
                 </nav>

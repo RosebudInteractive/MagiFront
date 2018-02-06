@@ -6,6 +6,7 @@ import SearchBlock from './search-block'
 import UserBlock from './user-block';
 import {connect} from 'react-redux';
 import FiltersRow from './filters-row';
+import MenuTrigger from "./menu-trigger";
 // import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const PageHeaderRow = class PageHeaderRow extends React.Component {
@@ -55,7 +56,7 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
     }
 
     render() {
-        let {showSearchForm, showFiltersForm} = this.props;
+        let {showSearchForm, showFiltersForm, showMenu} = this.props. pageHeaderState;
 
         return (
             this._isFullSize() ?
@@ -80,13 +81,19 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
                             null
                     }
                     {/*</ReactCSSTransitionGroup>*/}
+                    {
+                        showMenu ?
+                            null : null
+
+                    }
                 </div>
                 :
-                <div className='page-header'>
+                <div className={'page-header page-header-s-size' + (showMenu ? ' opened' : '')}>
                     <div className='menu-mobile'>
                         {/*<div className='container'>*/}
                         <Logo isFull={this._isFullSize()}/>
                         <Navigation isFull={this._isFullSize()}/>
+                        <MenuTrigger />
                         {/*</div>*/}
                     </div>
                 </div>
@@ -96,8 +103,7 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        showSearchForm: state.pageHeader.showSearchForm,
-        showFiltersForm: state.pageHeader.showFiltersForm,
+        pageHeaderState: state.pageHeader,
     }
 }
 

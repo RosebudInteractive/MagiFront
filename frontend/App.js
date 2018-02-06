@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import './page-header.css';
+import './components/page-header/page-header.css';
 import CoursePage from './containers/courses-page'
 import PageHeaderRow from './components/page-header/page-header-row';
 import {connect} from 'react-redux';

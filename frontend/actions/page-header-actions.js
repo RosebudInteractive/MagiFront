@@ -3,6 +3,8 @@ import {
     HIDE_SEARCH_FORM,
     SHOW_FILTERS_FORM,
     HIDE_FILTER_FORM,
+    SHOW_MENU,
+    HIDE_MENU,
 } from '../constants/page-header'
 
 
@@ -37,6 +39,24 @@ export const hideFiltersForm = () => {
     return (dispatch) => {
         dispatch({
             type: HIDE_FILTER_FORM,
+            payload: null
+        });
+    }
+};
+
+export const showMenu = () => {
+    return (dispatch) => {
+        dispatch({
+            type: SHOW_MENU,
+            payload: null
+        });
+    }
+};
+
+export const hideMenu = () => {
+    return (dispatch) => {
+        dispatch({
+            type: HIDE_MENU,
             payload: null
         });
     }

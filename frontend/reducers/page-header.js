@@ -3,11 +3,14 @@ import {
     HIDE_SEARCH_FORM,
     SHOW_FILTERS_FORM,
     HIDE_FILTER_FORM,
+    SHOW_MENU,
+    HIDE_MENU,
 } from '../constants/page-header'
 
 const initialState = {
     showSearchForm: false,
-    showFiltersForm : false,
+    showFiltersForm: false,
+    showMenu: false,
 };
 
 export default function pageHeader(state = initialState, action) {
@@ -24,6 +27,12 @@ export default function pageHeader(state = initialState, action) {
 
         case HIDE_FILTER_FORM:
             return {...state, showFiltersForm: false};
+
+        case SHOW_MENU:
+            return {...state, showMenu: true};
+
+        case HIDE_MENU:
+            return {...state, showMenu: false};
 
         default:
             return state;

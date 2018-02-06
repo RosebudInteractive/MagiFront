@@ -1,7 +1,6 @@
 import BaseComponent, {Size,} from '../base-component';
 import React from 'react';
 import './lecture.css';
-// import img from '../../assets/images/lecture01.png';
 import PropTypes from 'prop-types';
 
 export class Counter extends BaseComponent {
