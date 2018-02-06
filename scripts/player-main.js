@@ -170,6 +170,7 @@ $(document).ready(function () {
 
         function renderContent(content) {
             var ul = $(".text-content").find("ul");
+            ul.empty();
             for (var i = 0; i < content.length; i++) {
                 c = content[i];
                 (function (cnt) {
@@ -181,6 +182,23 @@ $(document).ready(function () {
                     ul.append(li);
                 })(c);
             }
+        }
+
+        function getData(id) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: "/api/lessons/play/" + id,
+                    type: "GET",
+                    dataType: "json",
+                    responseType: 'json',
+                    success: function (result) {
+                        resolve(result);
+                    },
+                    fail: function (err) {
+                        reject(err);
+                    }
+                });
+            })
         }
 
         $(".ctl-buttons").find("button").click(function () {
@@ -226,5 +244,20 @@ $(document).ready(function () {
             if (!!v) pl.setVideoOn();
             else pl.setVideoOff()
         });
+
+        $(".ctl-buttons").find("input[role='lecture-id']").change(function () {
+            var v = $(this).val();
+            getData(v)
+                .then((result) => {
+                    pl.setData(result);
+                    var content = pl.getLectureContent();
+                    renderContent(content);
+
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+        });
+
     });
 });
