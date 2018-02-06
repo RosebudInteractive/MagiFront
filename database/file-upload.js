@@ -5,7 +5,7 @@ const { DbUtils } = require('./db-utils');
 const path = require('path')
 const fs = require('fs')
 
-const sharp = require('sharp');
+//const sharp = require('sharp');
 //const sizeOf = require('image-size');
 
 const audioMeta = require('music-metadata');
