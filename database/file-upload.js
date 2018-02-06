@@ -8,6 +8,9 @@ const fs = require('fs')
 const sharp = require('sharp');
 //const sizeOf = require('image-size');
 
+// Supported image formats
+//console.log(sharp.format);
+
 const audioMeta = require('music-metadata');
 
 const std_sizes = [
