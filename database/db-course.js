@@ -245,7 +245,12 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  join [LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
     "where c.[AccountId] = <%= accountId %> and(l.[ParentId] is NULL) and c.[URL] = '<%= courseUrl %>'\n" +
     "order by lc.[Number]";
-const AUTHOR_COURSE_MSSQL_WHERE = "where ac.[CourseId] = <%= courseId %>\n";
+const AUTHOR_COURSE_MSSQL_PUBLIC_REQ =
+    "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] from [AuthorToCourse] ac\n" +
+    "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
+    "  join[AuthorLng] l on l.[AuthorId] = a.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "where ac.[CourseId] = <%= courseId %>\n" +
+    "order by ac.[CourseId]";
 const CATEGORY_COURSE_MSSQL_WHERE = "where cc.[CourseId] = <%= courseId %>\n";
 const COURSE_SUBL_MSSQL_PUBLIC_REQ =
     "select l.[Id], count(ll.[Id]) as [NSub] from [Course] c\n" +
@@ -282,7 +287,12 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
     "where c.`AccountId` = <%= accountId %> and(l.`ParentId` is NULL) and c.`URL` = '<%= courseUrl %>'\n" +
     "order by lc.`Number`";
-const AUTHOR_COURSE_MYSQL_WHERE = "where ac.`CourseId` = <%= courseId %>\n";
+const AUTHOR_COURSE_MYSQL_PUBLIC_REQ =
+    "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` from `AuthorToCourse` ac\n" +
+    "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
+    "  join`AuthorLng` l on l.`AuthorId` = a.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "where ac.`CourseId` = <%= courseId %>\n" +
+    "order by ac.`CourseId`";
 const CATEGORY_COURSE_MYSQL_WHERE = "where cc.`CourseId` = <%= courseId %>\n";
 const COURSE_SUBL_MYSQL_PUBLIC_REQ =
     "select l.`Id`, count(ll.`Id`) as `NSub` from `Course` c\n" +
@@ -520,15 +530,15 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ)(
+                                    mysql: _.template(AUTHOR_COURSE_MYSQL_PUBLIC_REQ)(
                                         {
                                             languageId: LANGUAGE_ID,
-                                            whereClause: _.template(AUTHOR_COURSE_MYSQL_WHERE)({ courseId: courseId })
+                                            courseId: courseId
                                         }),
-                                    mssql: _.template(AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ)(
+                                    mssql: _.template(AUTHOR_COURSE_MSSQL_PUBLIC_REQ)(
                                         {
                                             languageId: LANGUAGE_ID,
-                                            whereClause: _.template(AUTHOR_COURSE_MSSQL_WHERE)({ courseId: courseId })
+                                            courseId: courseId
                                         })
                                 }
                             }, {});
@@ -541,6 +551,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
+                                    Portrait: elem.Portrait,
+                                    PortraitMeta: elem.PortraitMeta,
                                     URL: elem.URL
                                 };
                                 course.Authors.push(author);
