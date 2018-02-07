@@ -135,3 +135,81 @@
     font-size: 9px;
     line-height: 13px;
 }
+
+.filters-mobile {
+    display: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+.filters-mobile .filters-row__label {
+    margin-left: 0;
+    margin-right: 0;
+    padding-top: 2px;
+    font-family: "Fira Sans", Arial, sans-serif; }
+.filters-mobile .filter-btn {
+    margin-bottom: 12px; }
+.filters-mobile__trigger {
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 13px; }
+.filters-mobile__trigger:after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    right: 25px;
+    width: 11px;
+    height: 11px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-left: none;
+    border-top: none;
+    -webkit-transition: -webkit-transform 0.3s ease;
+    transition: -webkit-transform 0.3s ease;
+    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, -webkit-transform 0.3s ease; }
+.filters-mobile__label {
+    text-transform: uppercase;
+    font-family: "Fira Sans", Arial, sans-serif;
+    line-height: 50px;
+    letter-spacing: 1px; }
+.filters-mobile__icon {
+    display: block;
+    margin-right: 15px;
+    fill: #fff; }
+.filters-mobile .filters-list {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.3s ease;
+    transition: max-height 0.3s ease; }
+.filters-mobile .filters-list li {
+    margin-right: 14px; }
+.filters-mobile .filters-list li:last-child {
+    margin-bottom: 5px; }
+@media (max-width: 899px) {
+    .filters-mobile .filters-list {
+        -webkit-flex-wrap: wrap;
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap; } }
+@media (max-width: 899px) {
+    .filters-mobile {
+        display: block; } }
+.filters-mobile.opened .filters-list {
+    max-height: 1000px; }
+.filters-mobile.opened .filters-mobile__trigger:after {
+    top: 19px;
+    -webkit-transform: rotate(-135deg);
+    -ms-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+    border: 2px solid white;
+    border-left: none;
+    border-top: none; }

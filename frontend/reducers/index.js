@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import pageHeader from './page-header';
 import courses from './courses';
 import filters from './filters';
+import app from './app';
 // import { routerReducer } from 'react-router-redux';
 
 
@@ -11,6 +12,7 @@ export default combineReducers({
     pageHeader,
     courses,
     filters,
+    app,
     // browser: responsiveStateReducer({
     //     mobile: 500,
     //     xxs: 640,

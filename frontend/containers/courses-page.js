@@ -10,6 +10,10 @@ import CourseModule from '../components/course/course-module'
 class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
+        // this.props.coursesActions.getCourses();
+    }
+
+    componentWillMount() {
         this.props.coursesActions.getCourses();
     }
 
@@ -42,9 +46,6 @@ class CoursesPage extends React.Component {
     render() {
         const {
             fetching,
-            // message,
-            // errorDlgShown,
-            // hasChanges
         } = this.props;
         return (
             <div>
@@ -57,7 +58,6 @@ class CoursesPage extends React.Component {
                              {this._getCoursesBundles()}
                          </main>
                 }
-
             </div>
         )
     }

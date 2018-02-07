@@ -76,3 +76,41 @@
         display: block;
     }
 }
+
+.menu-mobile {
+    position: relative;
+}
+
+@media (max-width: 899px) {
+    .menu-mobile {
+        position: fixed;
+        top: 64px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        -webkit-transform: translateX(2000px);
+        -ms-transform: translateX(2000px);
+        transform: translateX(2000px);
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        -moz-box-orient: vertical;
+        -moz-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        padding: 0 18px 15px 18px;
+        color: #fff;
+        background-color: #2f2f2f;
+        -webkit-transition: -webkit-transform 0.2s ease;
+        transition: -webkit-transform 0.2s ease;
+        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, -webkit-transform 0.2s ease;
+        z-index: 100;
+    }
+
+    .opened .menu-mobile {
+        -webkit-transform: translateX(0);
+        -ms-transform: translateX(0);
+        transform: translateX(0);
+    }
+}

@@ -7,6 +7,7 @@ import UserBlock from './user-block';
 import {connect} from 'react-redux';
 import FiltersRow from './filters-row';
 import MenuTrigger from "./menu-trigger";
+import MenuMobile from './menu-mobile';
 // import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 const PageHeaderRow = class PageHeaderRow extends React.Component {
@@ -89,11 +90,12 @@ const PageHeaderRow = class PageHeaderRow extends React.Component {
                 </div>
                 :
                 <div className={'page-header page-header-s-size' + (showMenu ? ' opened' : '')}>
-                    <div className='menu-mobile'>
+                    <div className='menu-row'>
                         {/*<div className='container'>*/}
                         <Logo isFull={this._isFullSize()}/>
                         <Navigation isFull={this._isFullSize()}/>
                         <MenuTrigger />
+                        <MenuMobile/>
                         {/*</div>*/}
                     </div>
                 </div>
