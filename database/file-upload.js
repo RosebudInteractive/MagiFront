@@ -8,6 +8,9 @@ const fs = require('fs')
 const sharp = require('sharp');
 //const sizeOf = require('image-size');
 
+// Supported image formats
+//console.log(sharp.format);
+
 const audioMeta = require('music-metadata');
 
 const std_sizes = [
@@ -128,6 +131,7 @@ exports.FileUpload = {
             let all_files = [];
 
             const processErr = (err) => {
+                let error = err instanceof Error ? err.message : err.toString();
                 return Utils.seqExec(all_files, (elem) => {
                     return new Promise((resolve, reject) => {
                         fs.unlink(elem, (err) => {
@@ -136,10 +140,11 @@ exports.FileUpload = {
                     });
                 })
                     .then(() => {
-                        res.status(HTTP_SERVER_ERR).json({ error: err });                    
+                        res.status(HTTP_SERVER_ERR).json({ error: error });                    
                     })
                     .catch((err_io) => {
-                        res.status(HTTP_SERVER_ERR).json({ error: err, error2: err_io });
+                        let error2 = err_io instanceof Error ? err_io.message : err_io.toString();
+                        res.status(HTTP_SERVER_ERR).json({ error: error, error2: error2 });
                     })
             };
 

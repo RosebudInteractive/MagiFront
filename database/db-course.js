@@ -198,7 +198,7 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
     "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and (l.[ParentId] is NULL)\n" +
-    "order by c.[Id]";
+    "order by lc.[State] desc, lc.[ReadyDate] desc";
 const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from [AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -219,7 +219,7 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
     "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and (l.`ParentId` is NULL)\n" +
-    "order by c.`Id`";
+    "order by lc.`State` desc, lc.`ReadyDate` desc";
 const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from `AuthorToCourse` ac\n" +
     "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
@@ -281,19 +281,22 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 if (elem.Id !== crs_id) {
                                     crs_id = elem.Id;
-                                    curr_course = {
-                                        Id: elem.Id,
-                                        Cover: elem.Cover,
-                                        CoverMeta: elem.CoverMeta,
-                                        Color: elem.Color,
-                                        Name: elem.Name,
-                                        URL: elem.URL,
-                                        Authors: [],
-                                        Categories: [],
-                                        Lessons: []
-                                    };
-                                    courses_list[elem.Id] = curr_course;
-                                    courses.push(curr_course);
+                                    curr_course = courses_list[elem.Id];
+                                    if (!curr_course) {
+                                        curr_course = {
+                                            Id: elem.Id,
+                                            Cover: elem.Cover,
+                                            CoverMeta: elem.CoverMeta,
+                                            Color: elem.Color,
+                                            Name: elem.Name,
+                                            URL: elem.URL,
+                                            Authors: [],
+                                            Categories: [],
+                                            Lessons: []
+                                        };
+                                        courses_list[elem.Id] = curr_course;
+                                        courses.push(curr_course);
+                                    }
                                 };
                                 curr_course.Lessons.push({
                                     Id: elem.LessonId,

@@ -198,7 +198,7 @@ const LESSON_MSSQL_TOC_REQ =
     "where pl.[LessonId] = <%= id %>\n" +
     "order by e.[Id], t.[Number]";
 const LESSON_MSSQL_CONTENT_REQ =
-    "select e.[Id] Episode, t.[Id], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
+    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
     "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
@@ -237,7 +237,7 @@ const LESSON_MYSQL_TOC_REQ =
     "where pl.`LessonId` = <%= id %>\n" +
     "order by e.`Id`, t.`Number`";
 const LESSON_MYSQL_CONTENT_REQ =
-    "select e.`Id` Episode, t.`Id`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
+    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
     "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
@@ -480,6 +480,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (curr_id !== elem.Episode) {
                                     curr_episode = {
                                         id: elem.Episode,
+                                        title: elem.Name,
                                         elements: [],
                                         audio: {
                                             file: elem.Audio,
