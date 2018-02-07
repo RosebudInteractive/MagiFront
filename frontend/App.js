@@ -3,8 +3,11 @@ import './App.css';
 import './components/page-header/page-header.css';
 import CoursePage from './containers/courses-page'
 import PageHeaderRow from './components/page-header/page-header-row';
+import PageFooter from './components/page-footer/page-footer';
 import {connect} from 'react-redux';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
+
 // import FiltersRow from './components/page-header/filters-row';
 // import { bindActionCreators } from 'redux'
 // import { connect } from 'react-redux'
@@ -69,6 +72,7 @@ class App extends Component {
                 </ReactCSSTransitionGroup>
                 <CoursePage/>
                 {/*<CourseModule/>*/}
+                <PageFooter/>
             </div>
         );
     }
