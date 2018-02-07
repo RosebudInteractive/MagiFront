@@ -1,0 +1,1 @@
+export const SWITCH_SIZE_TO = 'SWITCH_SIZE_TO';

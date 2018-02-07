@@ -51,12 +51,7 @@ export const getCourses = ()=> {
     }
 };
 
-// export const selectCourse = (id) => {
-//     return {
-//         type: SELECT_COURSE,
-//         payload: id
-//     }
-// };
+
 //
 // export const deleteCourse = (id) => {
 //     return (dispatch) => {

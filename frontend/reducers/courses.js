@@ -16,9 +16,6 @@ export default function courses(state = initialState, action) {
             return {...state, items: [], fetching: true};
 
         case GET_COURSES_SUCCESS: {
-            // let _list = action.payload;
-            // let _selected = (_list.length > 0) ? _list[0].id : null;
-
             return {...state, items: action.payload.Courses, fetching: false};
         }
 
