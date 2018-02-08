@@ -191,10 +191,12 @@ const LESSON_MSSQL_RESOURCE_REQ =
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
 const LESSON_MSSQL_TOC_REQ =
-    "select e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
+    "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
     "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
     "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
-    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "  join[EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]\n" +
+    "  join[Lesson] ls on ls.[Id] = pl.[LessonId]\n" +
+    "  join[LessonLng] lls on lls.[LessonId] = ls.[Id] and  lls.[LanguageId] = <%= languageId %>\n" +
     "where pl.[LessonId] = <%= id %>\n" +
     "order by e.[Id], t.[Number]";
 const LESSON_MSSQL_CONTENT_REQ =
@@ -230,10 +232,12 @@ const LESSON_MYSQL_RESOURCE_REQ =
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
 const LESSON_MYSQL_TOC_REQ =
-    "select e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
+    "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
     "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
-    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "  join`EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`\n" +
+    "  join`Lesson` ls on ls.`Id` = pl.`LessonId`\n" +
+    "  join`LessonLng` lls on lls.`LessonId` = ls.`Id` and  lls.`LanguageId` = <%= languageId %>\n" +
     "where pl.`LessonId` = <%= id %>\n" +
     "order by e.`Id`, t.`Number`";
 const LESSON_MYSQL_CONTENT_REQ =
@@ -515,6 +519,7 @@ const DbLesson = class DbLesson extends DbObject {
                         let curr_episode = null;;
                         if (result && result.detail && (result.detail.length > 0)) {
                             result.detail.forEach((elem) => {
+                                data.title = elem.Name;
                                 if (curr_id !== elem.Episode) {
                                     curr_episode = epi_list[elem.Episode];
                                     if (!curr_episode)
