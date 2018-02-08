@@ -1,0 +1,40 @@
+<svg width="22" height="21" viewBox="0 0 22 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Group</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-6781 378)">
+<g id="Group">
+<g id="Rectangle 5.3">
+<use xlink:href="#path0_fill" transform="translate(6782 -375)"/>
+</g>
+<g id="Rectangle 5.6">
+<use xlink:href="#path1_fill" transform="translate(6798 -375)"/>
+</g>
+<g id="Rectangle 5.4">
+<use xlink:href="#path0_fill" transform="translate(6790 -368)"/>
+</g>
+<g id="Rectangle 5.5">
+<use xlink:href="#path0_fill" transform="translate(6782 -361)"/>
+</g>
+<g id="Rectangle 6">
+<use xlink:href="#path2_fill" transform="translate(6794 -377)"/>
+</g>
+<g id="Rectangle 5.7">
+<use xlink:href="#path1_fill" transform="translate(6798 -361)"/>
+</g>
+<g id="Rectangle 5.8">
+<use xlink:href="#path1_fill" transform="translate(6782 -368)"/>
+</g>
+<g id="Rectangle 6.1">
+<use xlink:href="#path2_fill" transform="translate(6794 -363)"/>
+</g>
+<g id="Rectangle 6.2">
+<use xlink:href="#path2_fill" transform="translate(6786 -370)"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 0 0L 12 0L 12 2L 0 2L 0 0Z"/>
+<path id="path1_fill" d="M 0 0L 4 0L 4 2L 0 2L 0 0Z"/>
+<path id="path2_fill" d="M 0 0L 2 0L 2 6L 0 6L 0 0Z"/>
+</defs>
+</svg>
