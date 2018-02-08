@@ -17,7 +17,8 @@ define (
                     loadAudioQueue: [],
                     loading: {},
                     loadingAudio: {},
-                    loaderInt: null
+                    loaderInt: null,
+                    disableChange: false
                 }
 
                 /*
@@ -122,12 +123,21 @@ define (
             }
 
             setPosition(position) {
+                if (this._state.disableChange) return;
                 if (this._position != position) {
                     if (Math.abs(this._position - position) > 1) {
                         this._recheck = true;
                     }
                     this._position = position;
                 }
+            }
+
+            disableChangePosition() {
+                this._state.disableChange = true;
+            }
+
+            enableChangePosition() {
+                this._state.disableChange = false;
             }
 
             getAsset(id) {
