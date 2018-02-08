@@ -2,8 +2,9 @@ import {
     GET_COURSES_REQUEST,
     GET_COURSES_SUCCESS,
     GET_COURSES_FAIL,
-    // SELECT_COURSE,
-    // DELETE_COURSE_SUCCESS,
+    GET_SINGLE_COURSE_REQUEST,
+    GET_SINGLE_COURSE_SUCCESS,
+    GET_SINGLE_COURSE_FAIL,
 } from '../constants/courses'
 
 import {
@@ -24,7 +25,6 @@ export const getCourses = ()=> {
             .then(parseJSON)
             .then(data => {
                 handleCourses(data);
-                // data.forEach((course) => handleCourse(course));
 
                 dispatch({
                     type: GET_COURSES_SUCCESS,
@@ -41,63 +41,37 @@ export const getCourses = ()=> {
                     type: GET_COURSES_FAIL,
                     payload: err
                 });
+            });
+    }
+};
 
-                // dispatch({
-                //     type: SHOW_ERROR_DIALOG,
-                //     payload: err.message
-                // })
+export const getCourse = (url) => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_SINGLE_COURSE_REQUEST,
+            payload: null
+        });
+
+        fetch("/api/courses/" + url, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                handleCourse(data);
+
+                dispatch({
+                    type: GET_SINGLE_COURSE_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_SINGLE_COURSE_FAIL,
+                    payload: err
+                });
             });
 
     }
 };
-
-// export const selectCourse = (id) => {
-//     return {
-//         type: SELECT_COURSE,
-//         payload: id
-//     }
-// };
-//
-// export const deleteCourse = (id) => {
-//     return (dispatch) => {
-//         fetch("/api/adm/courses/" + id,
-//             {
-//                 method: "DELETE",
-//                 credentials: 'include'
-//             })
-//             .then(checkStatus)
-//             .then(parseJSON)
-//             .then(() => {
-//                 dispatch({
-//                     type: DELETE_COURSE_SUCCESS,
-//                     payload: id
-//                 })
-//             })
-//             .then(() => {
-//                 dispatch({
-//                     type: HIDE_DELETE_DLG,
-//                     payload: null,
-//                 })
-//             })
-//             .catch((err) => {
-//                 dispatch({
-//                     type: SHOW_ERROR_DIALOG,
-//                     payload: err.message
-//                 })
-//             });
-//
-//     }
-// };
-
-// export const cancelDelete = () => {
-//     return (dispatch) => {
-//         dispatch({
-//             type: HIDE_DELETE_DLG,
-//             payload: null,
-//         })
-//     }
-//
-// };
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {
@@ -151,3 +125,50 @@ const handleCourses = (data) => {
         item.ColorHex = '#' + item.Color.toString(16);
     });
 };
+
+const handleCourse = (data) => {
+
+    if (data.CoverMeta){
+        data.CoverMeta = JSON.parse(data.CoverMeta)
+    }
+
+    data.Authors.forEach((author)=>{
+        if (author.PortraitMeta) {
+            author.PortraitMeta = JSON.parse(author.PortraitMeta)
+        }
+    });
+
+    let _lessonCount = 0,
+        _readyLessonCount = 0;
+
+    data.Lessons.forEach((lesson) => {
+        if (lesson.State === 'R') {
+            _lessonCount++;
+            _readyLessonCount++
+        } else {
+            _lessonCount++
+        }
+
+        let _readyDate = new Date(lesson.ReadyDate);
+        lesson.readyYear = _readyDate.getFullYear();
+        lesson.readyMonth = Months[_readyDate.getMonth()];
+    });
+
+    data.lessonCount = _lessonCount;
+    data.readyLessonCount = _readyLessonCount;
+};
+
+const Months = [
+    'Январь',
+    'Февраль',
+    'Март',
+    'Апрель',
+    'Май',
+    'Июнь',
+    'Июль',
+    'Август',
+    'Сентябрь',
+    'Октябрь',
+    'Ноябрь',
+    'Декабрь',
+];

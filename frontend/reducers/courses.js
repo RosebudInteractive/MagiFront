@@ -7,19 +7,17 @@ import {
 const initialState = {
     items: [],
     fetching: false,
+    loaded: false,
 };
 
 export default function courses(state = initialState, action) {
 
     switch (action.type) {
         case GET_COURSES_REQUEST:
-            return {...state, items: [], fetching: true};
+            return {...state, items: [], fetching: true, loaded: false};
 
         case GET_COURSES_SUCCESS: {
-            // let _list = action.payload;
-            // let _selected = (_list.length > 0) ? _list[0].id : null;
-
-            return {...state, items: action.payload.Courses, fetching: false};
+            return {...state, items: action.payload.Courses, fetching: false, loaded: true};
         }
 
         case GET_COURSES_FAIL:

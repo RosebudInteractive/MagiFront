@@ -1,0 +1,18 @@
+<svg width="16" height="16" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Logout</title>
+<desc>Created using Figma</desc>
+<g id="Canvas" transform="translate(-14480 1330)">
+<g id="Logout">
+<g id="Vector">
+<use xlink:href="#path0_fill" transform="translate(14485 -1330)"/>
+</g>
+<g id="Vector">
+<use xlink:href="#path1_fill" transform="translate(14480 -1326)"/>
+</g>
+</g>
+</g>
+<defs>
+<path id="path0_fill" d="M 11 16L 0 16L 0 13L 2 13L 2 14L 9 14L 9 2L 2 2L 2 3L 0 3L 6.85453e-06 0L 11 0L 11 16Z"/>
+<path id="path1_fill" d="M 11 3L 3.828 3.00025L 5.121 1.70725C 5.512 1.31625 5.512 0.68425 5.121 0.29325C 4.73 -0.09775 4.098 -0.09775 3.707 0.29325L 0 4.00025L 3.707 7.70725C 3.902 7.90225 4.158 8.00025 4.414 8.00025C 4.67 8.00025 4.926 7.90225 5.121 7.70725C 5.512 7.31625 5.512 6.68425 5.121 6.29325L 3.828 5.00025L 11 5L 11 3Z"/>
+</defs>
+</svg>

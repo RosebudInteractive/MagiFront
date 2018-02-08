@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './course-module.css';
+// import './course-module-ext.css';
 import InfoBlock from './info-block';
 import ImageBlock from './image-block';
 import PropTypes from 'prop-types';
@@ -78,17 +78,27 @@ class CourseModule extends Component {
         return _name;
     }
 
+    // _onUrlClick(url){
+    //     this.props.history.push(url);
+    // }
+
     render() {
         let _course = this.props.courses[this.props.index];
         return (
-            <div className={this._getCourseModuleClassName()}>
-                <InfoBlock size={this._getSize()}
-                           title={' ' + _course.Name}
-                           width={this.state.width}
-                           courseIndex={this.props.index}
-                />
-                <ImageBlock size={this._getSize()} cover={_course.Cover}/>
-            </div>
+            (this.props.courses.length > 0) ?
+                <div className={this._getCourseModuleClassName()}>
+                    <InfoBlock size={this._getSize()}
+                               title={' ' + _course.Name}
+                               url={_course.URL}
+                               width={this.state.width}
+                               courseIndex={this.props.index}
+                               course={_course}
+                               onUrlClick={this.props.onUrlClick}
+                    />
+                    <ImageBlock size={this._getSize()} cover={_course.Cover}/>
+                </div>
+                :
+                ''
         );
     }
 }
@@ -98,9 +108,10 @@ CourseModule.propTypes = {
 };
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         courses: state.courses.items,
+        ownProps,
     }
 }
 

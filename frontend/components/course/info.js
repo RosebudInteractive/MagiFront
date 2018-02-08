@@ -1,35 +1,39 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
-class Info extends Component {
-
-    _getClassName(mainName, added) {
-        let _name = mainName;
-        this.props.size.forEach((size) => {
-            _name = _name + ' ' + added + '-' + size
-        });
-
-        return _name;
-    }
+export default class Info extends React.Component {
 
     render() {
-        let _course = this.props.courses[this.props.courseIndex];
+        let _multipleAuthors = this.props.authors.length > 1;
+        let _multipleCategories = this.props.categories.length > 1;
 
-        const _name = _course.AuthorsObj[0].FirstName + ' ' + _course.AuthorsObj[0].LastName;
-        // const _surname = _course.Authors[0].LastName;
-        const _category = _course.CategoriesObj[0].Name;
+        let _authors = this.props.authors.map((author) => {
+            return author.FirstName + ' ' + author.LastName;
+        }).join(', ');
 
+        const _categories = this.props.categories.map((category) => {
+            return category.Name
+        }).join('\n');
+
+        const _portrait = this.props.authors[0] ? "data/" + this.props.authors[0].Portrait : null;
         return (
-            <div className={this._getClassName("course-module__info", 'info')}>
-                <div className={this._getClassName('course-module__info-col', 'info-col')}>
-                    <p className={this._getClassName('course-module__info-col-header', 'info-col-header')}>Лектор</p>
-                    <p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_name}</p>
-                    {/*<p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_surname}</p>*/}
+            <div className='course-module__info'>
+                <div className='course-module__info-col'>
+                    {
+                        this.props.showPhoto && !_multipleAuthors && _portrait ?
+                            <div className='course-module__info-col-img'>
+                                <img src={_portrait} width="59" height="59" alt=""/>
+                            </div>
+                            :
+                                null
+
+                    }
+                    <p className='course-module__info-col-header'>{_multipleAuthors ? 'Авторы' : 'Автор'}</p>
+                    <p className='course-module__info-col-descr'>{_authors}</p>
                 </div>
-                <div className={this._getClassName('course-module__info-col', 'info-col')}>
-                    <p className={this._getClassName('course-module__info-col-header', 'info-col-header')}>Категория</p>
-                    <p className={this._getClassName('course-module__info-col-descr', 'info-col-descr')}>{_category}</p>
+                <div className='course-module__info-col'>
+                    <p className='course-module__info-col-header'>{_multipleCategories ? 'Категории' : 'Категория'}</p>
+                    <p className='course-module__info-col-descr'>{_categories}</p>
                 </div>
             </div>
         );
@@ -37,13 +41,7 @@ class Info extends Component {
 }
 
 Info.propTypes = {
-    courseIndex: PropTypes.number.isRequired,
+    authors: PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
+    showPhoto: PropTypes.bool,
 };
-
-function mapStateToProps(state) {
-    return {
-        courses: state.courses.items,
-    }
-}
-
-export default connect(mapStateToProps)(Info)
