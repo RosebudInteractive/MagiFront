@@ -1,7 +1,8 @@
 import BaseComponent, {Size,} from '../base-component';
 import React from 'react';
-import './lecture.css';
+// import './lecture.css';
 import PropTypes from 'prop-types';
+import * as svg from '../../tools/svg-paths';
 
 export class Counter extends BaseComponent {
     render() {
@@ -154,19 +155,14 @@ class PlayBlock extends BaseComponent {
         return (
             <div className={_className} onMouseEnter={::this._mouseEnter} onMouseLeave={::this._mouseLeave}>
                 <div className="lecture__btn">
-                    <svg width="41" height="36">
-                        <svg id="play" viewBox="0 0 41 36" width="100%" height="100%">
-                            <title>Смотреть</title>
-                            <g fill="#FFF" fillOpacity="0.8">
-                                <path id="play-a" d="M0 0l40.415 17.29L0 35.66V0z"/>
-                            </g>
-                        </svg>
+                    <svg width="41" height="36" opacity={0.8}>
+                        {svg.play}
                     </svg>
                 </div>
                 <div className="lecture__loader" id="cont" data-pct="50">
                     <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <circle r="97" cx="100" cy="100" fill="transparent" strokeDasharray="620" strokeDashoffset="0"/>
-                        <circle className="bar" id="bar" r="97" cx="100" cy="100" fill="transparent" strokeDasharray="383.274" strokeDashoffset="157.142"/>
+                        <circle r="98.25" cx="100" cy="100" fill="transparent" strokeDasharray="620" strokeDashoffset="0"/>
+                        <circle className="bar" id="bar" r="98.25" cx="100" cy="100" fill="transparent" strokeDasharray="383.274" strokeDashoffset="157.142"/>
                     </svg>
                 </div>
                 <img src={this.props.cover} width="126" height="126" alt=""/>

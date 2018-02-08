@@ -1,5 +1,5 @@
 import React from 'react';
-import './page-footer.css';
+// import './page-footer.css';
 import * as svg from '../../tools/svg-paths';
 
 export default class PageFooter extends React.Component {

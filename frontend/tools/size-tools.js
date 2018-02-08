@@ -34,3 +34,7 @@ export function narrowerThan(size) {
 export function widthBetween(min, max) {
     return this ? (this.narrowerThan(max) && this.widerThan(min)) : false
 }
+
+export function isMobile() {
+    return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
+}

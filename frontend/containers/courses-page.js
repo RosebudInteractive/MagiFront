@@ -10,21 +10,24 @@ import CourseModule from '../components/course/course-module'
 class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
-        // this.props.coursesActions.getCourses();
     }
 
     componentWillMount() {
-        this.props.coursesActions.getCourses();
+        if (!this.props.courses.loaded) {
+            this.props.coursesActions.getCourses();
+        }
+
     }
 
     _getCoursesBundles() {
         let {filters} = this.props;
+        let _courses = this.props.courses.items;
 
         let _cleanFilter = filters.every((filter) => {
             return !filter.selected;
         });
 
-        return this.props.courses.map((course, index) => {
+        return _courses.map((course, index) => {
             let _inFilter = false;
 
             if (_cleanFilter) {
@@ -50,19 +53,15 @@ class CoursesPage extends React.Component {
     render() {
         const {
             fetching,
-        } = this.props;
+        } = this.props.courses;
         return (
-            <div>
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        <main className="courses">
-                             {/*<Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>*/}
-                             {this._getCoursesBundles()}
-                         </main>
-                }
-            </div>
+            fetching ?
+                <p>Загрузка...</p>
+                :
+                <main className="courses">
+                    {/*<Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>*/}
+                    {this._getCoursesBundles()}
+                </main>
         )
     }
 }
@@ -70,8 +69,7 @@ class CoursesPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        fetching: state.courses.fetching,
-        courses: state.courses.items,
+        courses: state.courses,
         filters: state.filters.items,
 
         // selected: state.courses.selected,

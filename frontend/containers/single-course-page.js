@@ -1,5 +1,9 @@
 import React from 'react';
 import Cover from '../components/course-extended/cover-extended';
+import Content from '../components/course-extended/content-extended';
+import CourseLessons from '../components/course-extended/course-lessons';
+import CourseBooks from '../components/course-extended/course-books';
+
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as coursesActions from '../actions/courses-page-actions';
@@ -10,24 +14,45 @@ class Main extends React.Component {
     constructor(props) {
         super(props);
         // this.props.coursesActions.getCourses();
-        console.log('Main')
+
+    }
+
+    componentWillMount() {
+        this.props.coursesActions.getCourse(this.props.courseUrl)
     }
 
 
     render() {
+        let {
+            course,
+            fetching
+        } = this.props;
+
         return (
-            <main className="courses" style="padding-top: 64px;">
-                <CourseModuleExt/>
-            </main>
+            <div>
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
+                        :
+                        course ?
+                            <main className="courses">
+                                <CourseModuleExt title={course.Name}/>
+                                <CourseTabs
+                                    lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
+                                    books={{total: course.Books.length}}
+                                />
+                            </main> : null
+                }
+            </div>
         )
     }
 }
 
 class CourseModuleExt extends React.Component {
-    render () {
+    render() {
         return (
             <div className="course-module course-module--extended">
-                <TitleWrapper title={'Довоенная советская литература'}/>
+                <TitleWrapper title={this.props.title}/>
                 <Inner/>
             </div>
         )
@@ -38,7 +63,8 @@ class TitleWrapper extends React.Component {
     render() {
         return (
             <div className="course-module__title-wrapper">
-                <h1 className="course-module__title"><p className="course-module__label">Курс:</p>{' ' + this.props.title}</h1>
+                <h1 className="course-module__title"><p className="course-module__label">
+                    Курс:</p>{' ' + this.props.title}</h1>
             </div>
         )
     }
@@ -49,7 +75,96 @@ class Inner extends React.Component {
         return (
             <div className="course-module__inner">
                 <Cover/>
+                <Content/>
             </div>
+        )
+    }
+}
+
+const CourseTabsName = {
+    lessons: 'lesson',
+    books: 'books'
+};
+
+class CourseTabs extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            activeTab: CourseTabsName.lessons
+        }
+    }
+
+    _onSetActiveTab(tabName) {
+        if (tabName !== this.state.activeTab) {
+            this.setState({activeTab: tabName})
+        }
+    }
+
+    _getList() {
+        return (
+            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons/> : <CourseBooks/>
+        )
+    }
+
+    render() {
+        return (
+            <div className="course-tabs">
+                <ul className="course-tab-controls">
+                    <LessonsTab
+                        total={this.props.lessons.total}
+                        ready={this.props.lessons.ready}
+                        onClick={::this._onSetActiveTab}
+                        active={this.state.activeTab === CourseTabsName.lessons}/>
+                    <BooksTab
+                        total={this.props.books.total}
+                        onClick={::this._onSetActiveTab}
+                        active={this.state.activeTab === CourseTabsName.books}/>
+                </ul>
+                <ul className="course-tabs-list">
+                    {this._getList()}
+                </ul>
+            </div>
+        )
+    }
+}
+
+class LessonsTab extends React.Component {
+    _onClick() {
+        this.props.onClick(CourseTabsName.lessons)
+    }
+
+    render() {
+        return (
+            <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
+                <span className="course-tab-control__title">Лекции</span>
+                <span className="course-tab-control__label">Вышло</span>
+                <span className="course-tab-control__actual">{this.props.ready}</span>
+                <span className="course-tab-control__total">/{this.props.total}</span>
+            </li>
+        )
+    }
+}
+
+class BooksTab extends React.Component {
+    _onClick() {
+        this.props.onClick(CourseTabsName.books)
+    }
+
+    render() {
+        return (
+            <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
+                <span className="course-tab-control__title _desktop">Список для чтения:</span>
+                {/*{*/}
+                    {/*this.props.total ?*/}
+                        {/*<div>*/}
+                            <span className="course-tab-control__title _mobile">Книги</span>
+                            <span className="course-tab-control__actual"> {this.props.total + ' '}</span>
+                            <span className="course-tab-control__label">книги</span>
+                    {/*</div>
+                        :
+                        null*/}
+            </li>
         )
     }
 }
@@ -57,21 +172,14 @@ class Inner extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.url,
-        // fetching: state.authorsList.fetching,
+        fetching: state.singleCourse.fetching,
+        course: state.singleCourse.object,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
-        // courseAuthorsActions: bindActionCreators(courseAuthorsActions, dispatch),
-        // courseCategoriesActions: bindActionCreators(courseCategoriesActions, dispatch),
-        // courseLessonsActions: bindActionCreators(courseLessonsActions, dispatch),
-        //
-        // authorsActions: bindActionCreators(authorsActions, dispatch),
-        // categoriesActions: bindActionCreators(categoriesActions, dispatch),
-        // languagesActions: bindActionCreators(languagesActions, dispatch),
-        // coursesActions: bindActionCreators(coursesActions, dispatch),
     }
 }
 

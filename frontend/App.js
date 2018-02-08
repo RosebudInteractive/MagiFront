@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import './App.css';
-import './components/page-header/page-header.css';
+// import './components/page-header/page-header.css';
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 
-// import MenuMobile from './components/page-header/menu-mobile';
-import PageHeaderRow from './components/page-header/page-header-row';
+import PageHeader from './components/page-header/page-header-row';
 import PageFooter from './components/page-footer/page-footer';
 import {connect} from 'react-redux';
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+// import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as tools from './tools/size-tools';
 import * as appActions from './actions/app-actions';
 import {bindActionCreators} from "redux";
@@ -79,22 +78,20 @@ class App extends Component {
                 showHeader: true,
                 lastScrollPos:event.target.scrollingElement.scrollTop
             });
-            console.log('top');
         } else if(this.state.lastScrollPos < event.target.scrollingElement.scrollTop) {
             this.setState({
                 direction:'bottom',
                 showHeader: false,
                 lastScrollPos:event.target.scrollingElement.scrollTop
             });
-            console.log('bottom');
         }
     }
 
     _getHeader() {
-        return this.state.showHeader ?
-            <PageHeaderRow/>
-            :
-            null
+        // return this.state.showHeader ?
+        //     <PageHeaderRow/>
+        //     :
+        //     null
     }
 
     _showMobileMenu() {
@@ -116,13 +113,8 @@ class App extends Component {
 
     render() {
         return (
-            <div className="App" onScroll={this._handleScroll}>
-                <ReactCSSTransitionGroup
-                    transitionName="example"
-                >
-                    {this._getHeader()}
-                </ReactCSSTransitionGroup>
-
+            <div className="App global-wrapper" onScroll={this._handleScroll}>
+                <PageHeader/>
                 { this._getMainDiv()}
                 <PageFooter/>
             </div>

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import './course-module-ext.css';
+// import './course-module-ext.css';
 import InfoBlock from './info-block';
 import ImageBlock from './image-block';
 import PropTypes from 'prop-types';
