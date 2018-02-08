@@ -13,6 +13,17 @@ function setupCourses(app) {
             });
     });
 
+    app.get('/api/courses/:url', (req, res, next) => {
+        CoursesService()
+            .getPublic(req.params.url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/courses', (req, res, next) => {
         CoursesService()
             .getAll()
