@@ -3,13 +3,13 @@ import rootReducer from '../reducers'
 import {createLogger} from 'redux-logger'
 import thunk from 'redux-thunk';
 // import {responsiveStoreEnhancer} from 'redux-responsive'
-// import { routerMiddleware } from 'react-router-redux'
+import { routerMiddleware } from 'react-router-redux'
 
 export const store = configureStore();
 
 function configureStore(initialState) {
     const logger = createLogger();
-    // const routerMiddl = routerMiddleware(history);
+    const routerMiddl = routerMiddleware(history);
 
     const store = createStore(
         rootReducer,
@@ -17,7 +17,7 @@ function configureStore(initialState) {
         compose(
             // responsiveStoreEnhancer,
             applyMiddleware(thunk, logger),
-            // applyMiddleware(routerMiddl)
+            applyMiddleware(routerMiddl)
         )
     );
 

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import './components/page-header/page-header.css';
 import CoursePage from './containers/courses-page';
+import SingleCoursePage from './containers/single-course-page';
+
 // import MenuMobile from './components/page-header/menu-mobile';
 import PageHeaderRow from './components/page-header/page-header-row';
 import PageFooter from './components/page-footer/page-footer';
@@ -10,6 +12,8 @@ import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import * as tools from './tools/size-tools';
 import * as appActions from './actions/app-actions';
 import {bindActionCreators} from "redux";
+
+import { Switch, Route, withRouter, } from 'react-router-dom'
 
 // import FiltersRow from './components/page-header/filters-row';
 // import { bindActionCreators } from 'redux'
@@ -99,8 +103,14 @@ class App extends Component {
     }
 
     _getMainDiv() {
+        let _homePath = '/';
+
         return (
-            this._showMobileMenu() ? null : <CoursePage/>
+            this._showMobileMenu() ? null :
+                <Switch>
+                    <Route exact path={_homePath} component={CoursePage}/>
+                    <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                </Switch>
         )
     }
 
@@ -120,11 +130,12 @@ class App extends Component {
     }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         showFiltersForm: state.pageHeader.showFiltersForm,
         showMenu: state.pageHeader.showMenu,
         size: state.app.size,
+        ownProps,
     }
 }
 
@@ -134,4 +145,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

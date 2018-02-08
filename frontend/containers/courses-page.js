@@ -39,8 +39,12 @@ class CoursesPage extends React.Component {
                 });
             }
 
-            return (_inFilter ? <CourseModule index={index} key={index}/> : null)
+            return (_inFilter ? <CourseModule index={index} key={index} onUrlClick={::this._onUrlClick}/> : null)
         })
+    }
+
+    _onUrlClick(url){
+        this.props.history.push('/category/' + url);
     }
 
     render() {
@@ -64,7 +68,7 @@ class CoursesPage extends React.Component {
 }
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         fetching: state.courses.fetching,
         courses: state.courses.items,
@@ -78,6 +82,7 @@ function mapStateToProps(state) {
         // message: state.commonDlg.message,
         // deleteDlgShown: state.commonDlg.deleteDlgShown,
         // errorDlgShown: state.commonDlg.errorDlgShown,
+        ownProps,
     }
 }
 

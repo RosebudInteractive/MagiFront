@@ -20,12 +20,15 @@ export default class CourseModuleHeader extends Component {
         return _name;
     }
 
+    _onClick() {
+        this.props.onUrlClick(this.props.url)
+    }
+
     render() {
         let {title} = this.props;
 
         return (
-
-            <h1 className={this._getTitleClassName()}>
+            <h1 className={this._getTitleClassName()} onClick={::this._onClick}>
                 <p className={this._getLabelClassName()}>Курс:</p>
                 {title}
             </h1>

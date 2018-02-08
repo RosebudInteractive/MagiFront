@@ -16,12 +16,15 @@ export default class InfoBlock extends React.Component {
 
 
     render() {
-        const {size, title, width} = this.props;
+        const {size, title, width, url, onUrlClick} = this.props;
+
         return (
             <div className={this._getClassName()}>
                 <div className="course-module__header">
-                    <Header size={size} title={title}/>
-                    <Info size={size} courseIndex={this.props.courseIndex}/>
+                    <Header size={size} title={title} url={url} onUrlClick={onUrlClick}/>
+                    <Info size={size}
+                          authors={this.props.course ? this.props.course.AuthorsObj:[]}
+                          categories={this.props.course ? this.props.course.CategoriesObj:[]}/>
                 </div>
                 <CourseBody size={size} width={width} courseIndex={this.props.courseIndex}/>
             </div>
