@@ -2308,6 +2308,9 @@ li.fancybox-thumbs-loading {
     border-bottom: 1px solid rgba(47, 47, 47, 0.15);
   }
 
+  .page-header a {
+    cursor: pointer;
+  }
 
 
 .logo {

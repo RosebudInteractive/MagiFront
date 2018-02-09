@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-// import './components/page-header/page-header.css';
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 
-import PageHeader from './components/page-header/page-header-row';
+import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
 import {connect} from 'react-redux';
 // import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
@@ -114,7 +113,7 @@ class App extends Component {
     render() {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
-                <PageHeader/>
+                <PageHeader visible={this.state.showHeader}/>
                 { this._getMainDiv()}
                 <PageFooter/>
             </div>

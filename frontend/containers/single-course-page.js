@@ -155,15 +155,16 @@ class BooksTab extends React.Component {
         return (
             <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
                 <span className="course-tab-control__title _desktop">Список для чтения:</span>
-                {/*{*/}
-                    {/*this.props.total ?*/}
-                        {/*<div>*/}
+                {
+                    this.props.total ?
+                        <div>
                             <span className="course-tab-control__title _mobile">Книги</span>
                             <span className="course-tab-control__actual"> {this.props.total + ' '}</span>
                             <span className="course-tab-control__label">книги</span>
-                    {/*</div>
+                        </div>
                         :
-                        null*/}
+                        null
+                }
             </li>
         )
     }
