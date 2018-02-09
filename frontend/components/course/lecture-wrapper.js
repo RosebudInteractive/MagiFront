@@ -27,11 +27,28 @@ Wrapper.propTypes = {
 
 
 class SingleLecture extends React.Component {
+
+
     render() {
         let {lesson} = this.props;
+
+        let _cover = lesson.CoverMeta ?
+            (
+                lesson.CoverMeta.icon ?
+                    lesson.CoverMeta.icon :
+                    (
+                        lesson.CoverMeta.content ?
+                        lesson.CoverMeta.content :
+                        null
+                    )
+
+            ) : null;
+
+        _cover = '/data/' +  (_cover ? (lesson.CoverMeta.path + _cover) : lesson.Cover);
+
         return (
             <section className="lecture">
-                <PlayBlock cover={'/data/'+lesson.Cover} duration={lesson.DurationFmt}/>
+                <PlayBlock cover={_cover} duration={lesson.DurationFmt}/>
                 <div className='lecture__descr'>
                     <h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3>
                     <p>{lesson.ShortDescription}</p>

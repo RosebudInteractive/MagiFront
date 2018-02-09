@@ -53,10 +53,12 @@ class SocialButton extends React.Component {
 }
 
 class Description extends React.Component {
+    createMarkup() { return {__html: this.props.descr}; }
+
     render() {
         return (
             <div className="course-module__course-descr">
-                <p>{this.props.descr}</p>
+                <p dangerouslySetInnerHTML={this.createMarkup()}/>
             </div>
         )
     }

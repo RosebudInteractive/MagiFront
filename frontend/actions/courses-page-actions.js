@@ -123,6 +123,12 @@ const handleCourses = (data) => {
         });
 
         item.ColorHex = '#' + item.Color.toString(16);
+
+        item.Lessons.forEach((lesson) => {
+            if (lesson.CoverMeta) {
+                lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
+            }
+        })
     });
 };
 

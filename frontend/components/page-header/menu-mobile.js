@@ -1,6 +1,6 @@
 import React from 'react';
 
-import FiltersRow from './filters-mobile';
+import FiltersRow from './mobile-filters';
 
 import * as svg from '../../tools/svg-paths';
 

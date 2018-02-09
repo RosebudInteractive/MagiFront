@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 
 import DesktopHeaderRow from './desktop-header';
-import FilterRow from './filters-row';
+import FilterRow from './desktop-filters';
 import MenuMobile from './menu-mobile';
 
 import * as tools from '../../tools/size-tools';
@@ -23,7 +23,7 @@ class Header extends React.Component {
 
     render() {
         let _menuOpened = this.props.pageHeaderState.showMenu;
-        let _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!this.props.visible ? ' _animate' : ''))
+        let _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!this.props.visible ? ' _animate' : ''));
 
         return (
 
