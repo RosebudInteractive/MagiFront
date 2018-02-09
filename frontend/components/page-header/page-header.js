@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 
 import DesktopHeaderRow from './desktop-header';
-// import FilterRow from './filters-row';
+import FilterRow from './filters-row';
 import MenuMobile from './menu-mobile';
 
 import * as tools from '../../tools/size-tools';
@@ -36,7 +36,7 @@ class Header extends React.Component {
                     :
                     <div>
                         <DesktopHeaderRow/>
-                        {/*<FilterRow/>*/}
+                        <FilterRow/>
                     </div>
                 }
             </header>
