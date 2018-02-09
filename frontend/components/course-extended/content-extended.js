@@ -1,7 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import * as svg from '../../tools/svg-paths';
-// import '../../css/social-block.css'
 
 class Content extends React.Component {
 

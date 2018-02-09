@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 
-import Info from '../course/info';
+import Info from '../course/course-module-info';
 
 // import CourseBody from './body';
 

@@ -1,33 +1,53 @@
 import React from 'react';
-import Header from './header';
-import Info from './info';
-import CourseBody from './body';
+import PropTypes from 'prop-types';
+
+import Info from './course-module-info';
+import CourseModuleBody from './course-module-body';
 
 export default class InfoBlock extends React.Component {
 
-    _getClassName() {
-        let _name = 'course-module__info-block';
-        this.props.size.forEach((size) => {
-            _name = _name + ' info-block-' + size
-        });
-
-        return _name;
-    }
-
-
     render() {
-        const {size, title, width, url, onUrlClick} = this.props;
+        const {title, url, onUrlClick, course, isMobile} = this.props;
 
         return (
-            <div className={this._getClassName()}>
+            <div className='course-module__info-block'>
                 <div className="course-module__header">
-                    <Header size={size} title={title} url={url} onUrlClick={onUrlClick}/>
-                    <Info size={size}
-                          authors={this.props.course ? this.props.course.AuthorsObj:[]}
-                          categories={this.props.course ? this.props.course.CategoriesObj:[]}/>
+                    <Header title={title} url={url} onUrlClick={onUrlClick}/>
+                    <Info authors={course ? course.AuthorsObj:[]}
+                          categories={course ? course.CategoriesObj:[]}/>
                 </div>
-                <CourseBody size={size} width={width} courseIndex={this.props.courseIndex}/>
+                <CourseModuleBody course={course} isMobile={isMobile}/>
             </div>
         );
     }
 }
+
+InfoBlock.propTypes = {
+    course: PropTypes.object.isRequired,
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    onUrlClick: PropTypes.func.isRequired,
+    isMobile: PropTypes.bool.isRequired,
+};
+
+class Header extends React.Component {
+
+    _onClick() {
+        this.props.onUrlClick(this.props.url)
+    }
+
+    render() {
+        return (
+            <h1 className="course-module__title"  onClick={::this._onClick}>
+                <p className="course-module__label">Курс:</p>
+                {' ' + this.props.title}
+            </h1>
+        );
+    }
+}
+
+Header.propTypes = {
+    title: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    onUrlClick: PropTypes.func.isRequired,
+};

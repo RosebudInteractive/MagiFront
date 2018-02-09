@@ -2856,7 +2856,7 @@ li.fancybox-thumbs-loading {
           max-height: 36px; }
         .navigation ul li.filter svg {
           fill: #2f2f2f;
-          opacity: 0.6;
+          opacity: 0.78;
           -webkit-transition: opacity 0.4s ease;
           transition: opacity 0.4s ease; }
         .navigation ul li.filter:hover {
@@ -3010,7 +3010,8 @@ li.fancybox-thumbs-loading {
       .search-block__trigger {
         margin-left: -7px;
         margin-right: 1px;
-        padding-top: 12px; } }
+        padding-top: 12px;
+        cursor: pointer;} }
     .search-block__trigger:focus {
       outline: none; }
     .search-block__trigger svg {
@@ -3415,7 +3416,8 @@ ul.user-tooltip {
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
     line-height: 22px;
-    white-space: nowrap; }
+    white-space: nowrap;
+    cursor: pointer;}
     .filters-row__label:after {
       content: "";
       position: absolute;
@@ -3449,7 +3451,8 @@ ul.user-tooltip {
   background-color: rgba(200, 104, 76, 0.3);
   border-radius: 4px;
   -webkit-transition: background-color 0.4s ease;
-  transition: background-color 0.4s ease; }
+  transition: background-color 0.4s ease;
+  cursor: pointer;}
   @media (max-width: 899px) {
     .filter-btn {
       margin-bottom: 14px; } }
@@ -3486,7 +3489,8 @@ ul.user-tooltip {
     margin-left: 0;
     margin-right: 0;
     padding-top: 2px;
-    font-family: "Fira Sans", Arial, sans-serif; }
+    font-family: "Fira Sans", Arial, sans-serif;
+    cursor: pointer;}
   .filters-mobile .filter-btn {
     margin-bottom: 12px; }
   .filters-mobile__trigger {
@@ -4420,8 +4424,21 @@ ul.user-tooltip {
     height: 126px;
     border-radius: 50%; }
     .lecture__play-block img {
-      display: block;
-      width: 100%; }
+      object-fit: cover;
+      width: 100%;
+      border-radius: 100%;}
+    .lecture__play-block .image-hover {
+      width: 126px;
+      height: 126px;
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(200, 104, 76, 0.3);
+      border-radius: 50%;
+    }
     .lecture__play-block .duration {
       position: absolute;
       top: -2px;
@@ -4449,7 +4466,8 @@ ul.user-tooltip {
       z-index: 1; }
     .lecture__btn svg {
       display: block;
-      width: 40px; }
+      width: 40px;
+      cursor: pointer;}
   .lecture__descr {
     margin: 0;
     padding-top: 6px;
@@ -4466,7 +4484,7 @@ ul.user-tooltip {
         z-index: 1; } }
     @media (max-width: 899px) {
       .lecture__descr {
-        margin-top: auto;
+        /*margin-top: auto;*/
         min-width: 1px;
         max-width: 100%;
         font-size: 15px;

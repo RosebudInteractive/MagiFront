@@ -1,7 +1,36 @@
 import React from 'react';
-import * as svg from '../../tools/svg-paths';
+import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
 
-export class DesktopLogo extends React.Component {
+import * as svg from '../../tools/svg-paths';
+import * as pageHeaderActions from "../../actions/page-header-actions";
+
+class DesktopHeaderRow extends React.Component {
+    constructor(props){
+        super(props);
+    }
+
+    _onFilterClick(){
+        this.props.pageHeaderState.showFiltersForm ?
+            this.props.pageHeaderActions.hideFiltersForm()
+            :
+            this.props.pageHeaderActions.showFiltersForm()
+    }
+
+    render() {
+        return (
+            <div className="page-header__wrapper menu-mobile row">
+                <Logo/>
+                <Navigator onFilterClick={::this._onFilterClick} filterActive={this.props.pageHeaderState.showFiltersForm}/>
+                <Languages/>
+                <Search/>
+                <User/>
+            </div>
+        )
+    }
+}
+
+class Logo extends React.Component {
     render() {
         return (
             <a className="logo">
@@ -13,7 +42,7 @@ export class DesktopLogo extends React.Component {
     }
 }
 
-export class DesktopNavigator extends  React.Component {
+class Navigator extends  React.Component {
     render() {
         return(
             <nav className="navigation">
@@ -24,7 +53,7 @@ export class DesktopNavigator extends  React.Component {
                     <li>
                         <a>Календарь</a>
                     </li>
-                    <li className="filter ">
+                    <li className={"filter" + (this.props.filterActive ? ' active' : '')} onClick={this.props.onFilterClick}>
                         <a>
                             <span className="hidden">Фильтры</span>
                             <svg width="22" height="21">
@@ -39,7 +68,7 @@ export class DesktopNavigator extends  React.Component {
 
 }
 
-export class DesktopLanguages extends React.Component {
+class Languages extends React.Component {
     constructor(props){
         super(props);
 
@@ -74,7 +103,7 @@ export class DesktopLanguages extends React.Component {
 
 }
 
-export class DesktopSearch extends React.Component {
+class Search extends React.Component {
 
     constructor(props){
         super(props);
@@ -114,7 +143,7 @@ export class DesktopSearch extends React.Component {
     }
 }
 
-export class DesktopUser extends React.Component {
+class User extends React.Component {
 
     constructor(props){
         super(props);
@@ -155,3 +184,17 @@ export class DesktopUser extends React.Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        pageHeaderState: state.pageHeader,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DesktopHeaderRow);

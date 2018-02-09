@@ -1,9 +1,15 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
+
+import DesktopHeaderRow from './desktop-header';
+import FilterRow from './filters-row';
+import MenuMobile from './menu-mobile';
+
 import * as tools from '../../tools/size-tools';
 import * as svg from '../../tools/svg-paths';
-// import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
-import {DesktopLogo, DesktopNavigator, DesktopLanguages, DesktopSearch, DesktopUser} from './desktop-header';
+
+import * as pageHeaderActions from "../../actions/page-header-actions";
 
 class Header extends React.Component {
     constructor(props) {
@@ -11,35 +17,38 @@ class Header extends React.Component {
         this._isMobile = tools.isMobile.bind(this);
     }
 
+    _onClickMenuTrigger() {
+        this.props.pageHeaderState.showMenu ? this.props.pageHeaderActions.hideMenu() : this.props.pageHeaderActions.showMenu();
+    }
+
     render() {
+        let _menuOpened = this.props.pageHeaderState.showMenu;
+
         return (
-            <header className={"page-header _fixed" + (!this.props.visible ? ' _animate' : '')}>
-                {this._isMobile() ? <MobileHeaderRow/> : <DesktopHeaderRow />}
+
+            <header className={'page-header' + (_menuOpened ? ' opened' : '_fixed' + (!this.props.visible ? ' _animate' : ''))}>
+                {this._isMobile() ?
+                    <div>
+                        <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}/>
+                        <MenuMobile/>
+                    </div>
+                    :
+                    <div>
+                        <DesktopHeaderRow/>
+                        <FilterRow/>
+                    </div>
+                }
             </header>
         )
     }
 
 }
 
-class DesktopHeaderRow extends React.Component {
-    render() {
-        return (
-            <div className="page-header__wrapper menu-mobile row">
-                <DesktopLogo/>
-                <DesktopNavigator/>
-                <DesktopLanguages/>
-                <DesktopSearch/>
-                <DesktopUser/>
-            </div>
-        )
-    }
-}
-
 class MobileHeaderRow extends React.Component {
     render() {
         return (
             <div className="page-header__menu-mobile">
-                <button type="button" className="menu-trigger"><span>Меню</span></button>
+                <button type="button" className="menu-trigger" onClick={this.props.onClickMenuTrigger}><span>Меню</span></button>
                 <a href="#" className="logo-mobile">
                     <svg width="70" height="38">
                         {svg.logoMob}
@@ -67,4 +76,10 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(Header);
+function mapDispatchToProps(dispatch) {
+    return {
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

@@ -1,15 +1,10 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import './desktop-filters.css';
-import * as pageHeaderActions from "../../actions/page-header-actions";
+
 import * as filtersActions from '../../actions/filters-actions';
 
 class FiltersRow extends React.Component {
-
-    _hideForm() {
-        this.props.pageHeaderActions.hideFiltersForm();
-    }
 
     _getFilters() {
         return this.props.filters.map((item, index) => {
@@ -35,7 +30,7 @@ class FiltersRow extends React.Component {
 
     render() {
         return (
-            <div className="page-header__row filters-row opened">
+            <div className={'page-header__row filters-row' + (this.props.showFiltersForm ? ' opened' : '')}>
                 <div className="page-header__wrapper filters-row__wrapper">
                     <div className="filters-row__inner">
                         <p className="filters-row__label" onClick={::this._clearFilter}>Сбросить фильтры</p>
@@ -51,15 +46,13 @@ class FiltersRow extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        showSearchForm: state.pageHeader.showSearchForm,
-        pageHeader: state.pageHeader,
+        showFiltersForm: state.pageHeader.showFiltersForm,
         filters: state.filters.items,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         filtersActions: bindActionCreators(filtersActions, dispatch),
     }
 }
