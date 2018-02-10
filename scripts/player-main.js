@@ -169,19 +169,38 @@ $(document).ready(function () {
         }
 
         function renderContent(content) {
-            var ul = $(".text-content").find("ul");
-            ul.empty();
+            var cDiv = $(".text-content");
+            cDiv.empty();
+
+            var length = 0;
+
             for (var i = 0; i < content.length; i++) {
-                c = content[i];
-                (function (cnt) {
-                    var li = $("<li/>");
-                    li.text(cnt.title);
-                    li.click(function (e) {
-                        pl.setPosition(cnt.begin);
-                    });
-                    ul.append(li);
-                })(c);
+                var epContent = content[i];
+                length += epContent.duration;
+                var title = $("<div/>")
+                title.text(epContent.title + " (" + epContent.duration_formated + ")");
+                cDiv.append(title);
+                var ul = $("<ul/>");
+
+                for (var j = 0; j < epContent.content.length; j++) {
+                    var c = epContent.content[j];
+                    (function (cnt) {
+                        var li = $("<li/>");
+                        li.text(cnt.title);
+                        li.click(function (e) {
+                            pl.setPosition(cnt.begin);
+                        });
+                        ul.append(li);
+                    })(c);
+                }
+
+                cDiv.append(ul);
             }
+
+            var info = $(".general-info");
+            var durStr = Math.trunc(length/60) + ":" + length % 60;
+            info.append("<div>Duration: " + durStr + "</div><br/>");
+
         }
 
         function getData(id) {
@@ -227,8 +246,8 @@ $(document).ready(function () {
             pl.setMute(!v);
         });
 
-        $(".ctl-buttons").find("input[role='position']").change(function () {
-            var v = $(this).val();
+        $(".ctl-buttons").find("input[role='position-btn']").click(function () {
+            var v = $(".ctl-buttons").find("input[role='position']").val();
             pl.setPosition(+v || 0);
         });
 
@@ -245,8 +264,8 @@ $(document).ready(function () {
             else pl.setVideoOff()
         });
 
-        $(".ctl-buttons").find("input[role='lecture-id']").change(function () {
-            var v = $(this).val();
+        $(".ctl-buttons").find("input[role='lecture-id-btn']").click(function () {
+            var v = $(".ctl-buttons").find("input[role='lecture-id']").val();
             getData(v)
                 .then((result) => {
                     pl.setData(result);

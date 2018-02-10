@@ -581,13 +581,22 @@ define(
 
                 for (var i = 0; i < data.episodes.length; i++) {
                     var episode = data.episodes[i];
+                    var epContent = {
+                        title: episode.title,
+                        duration: episode.audio.info.length,
+                        duration_formated: episode.audio.info.length_formatted,
+                        content: []
+                    }
+
                     var cont = episode.contents;
                     var epStart = epStarts[episode.id];
                     for (var j = 0; j < cont.length; j++) {
                         var resCont = {...cont[j]};
                         resCont.begin += epStart.start;
-                        result.push(resCont);
+                        epContent.content.push(resCont);
                     }
+
+                    result.push(epContent);
                 }
 
                 return result;
