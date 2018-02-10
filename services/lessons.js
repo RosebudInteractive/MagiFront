@@ -1,9 +1,10 @@
 //let { LessonsService } = require('./../database/lessons');
 let { LessonsService } = require('./../database/db-lesson');
+let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupLessons(app) {
 
-    app.get('/api/lessons/:id/:courseId/:parentId', (req, res, next) => {
+    app.get('/api/lessons/:id/:courseId/:parentId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .get(parseInt(req.params.id), parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {
@@ -14,7 +15,7 @@ function setupLessons(app) {
             });
     });
 
-    app.get('/api/lessons/resources/:id', (req, res, next) => {
+    app.get('/api/lessons/resources/:id', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .getResources(parseInt(req.params.id))
             .then(rows => {
@@ -36,7 +37,7 @@ function setupLessons(app) {
             });
     });
 
-    app.post('/api/lessons/:courseId/:parentId', (req, res, next) => {
+    app.post('/api/lessons/:courseId/:parentId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .insert(req.body, parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {
@@ -47,7 +48,7 @@ function setupLessons(app) {
             });
     });
 
-    app.put('/api/lessons/:id/:courseId/:parentId', (req, res, next) => {
+    app.put('/api/lessons/:id/:courseId/:parentId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .update(parseInt(req.params.id), parseInt(req.params.courseId), req.body, req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(rows => {
@@ -58,7 +59,7 @@ function setupLessons(app) {
             });
     });
 
-    app.delete('/api/lessons/:id/:courseId', (req, res, next) => {
+    app.delete('/api/lessons/:id/:courseId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .del(parseInt(req.params.id), parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
             .then(() => {

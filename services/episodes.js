@@ -4,9 +4,10 @@
 
 //let { EpisodesService } = require("../database/episodes");
 let { EpisodesService } = require("../database/db-episode");
+let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupEpisodes(app) {
-    app.get('/api/episodes/:id/:lessonId', (req, res, next) => {
+    app.get('/api/episodes/:id/:lessonId', AuthenticateJWT(app), (req, res, next) => {
         EpisodesService()
             .get(parseInt(req.params.id), parseInt(req.params.lessonId))
             .then(rows => {
@@ -25,7 +26,7 @@ function setupEpisodes(app) {
     //     });
     // });
 
-    app.post('/api/episodes/:lessonId', (req, res, next) => {
+    app.post('/api/episodes/:lessonId', AuthenticateJWT(app), (req, res, next) => {
         EpisodesService()
             .insert(req.body, parseInt(req.params.lessonId))
             .then(rows => {
@@ -36,7 +37,7 @@ function setupEpisodes(app) {
             });
     });
 
-    app.put('/api/episodes/:id/:lessonId', (req, res, next) => {
+    app.put('/api/episodes/:id/:lessonId', AuthenticateJWT(app), (req, res, next) => {
         EpisodesService()
             .update(parseInt(req.params.id), parseInt(req.params.lessonId), req.body)
             .then(rows => {
@@ -47,7 +48,7 @@ function setupEpisodes(app) {
             });
     });
 
-    app.delete('/api/episodes/:id/:lessonId', (req, res, next) => {
+    app.delete('/api/episodes/:id/:lessonId', AuthenticateJWT(app), (req, res, next) => {
         EpisodesService()
             .del(parseInt(req.params.id), parseInt(req.params.lessonId))
             .then((result) => {

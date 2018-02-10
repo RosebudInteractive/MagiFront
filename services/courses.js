@@ -1,5 +1,6 @@
 //let { CoursesService } = require('./../database/courses');
 let { CoursesService } = require('./../database/db-course');
+let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupCourses(app) {
     app.get('/api/courses', (req, res, next) => {
@@ -24,7 +25,7 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/adm/courses', (req, res, next) => {
+    app.get('/api/adm/courses', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .getAll()
             .then(rows => {
@@ -35,7 +36,7 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/adm/courses/:id', (req, res, next) => {
+    app.get('/api/adm/courses/:id', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .get(parseInt(req.params.id))
             .then(rows => {
@@ -46,7 +47,7 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/adm/courses/:id/authors', (req, res, next) => {
+    app.get('/api/adm/courses/:id/authors', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .getAuthors(parseInt(req.params.id))
             .then(rows => {
@@ -57,7 +58,7 @@ function setupCourses(app) {
             });
     });
 
-    app.post('/api/adm/courses', (req, res, next) => {
+    app.post('/api/adm/courses', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .insert(req.body)
             .then(rows => {
@@ -68,7 +69,7 @@ function setupCourses(app) {
             });
     });
 
-    app.put('/api/adm/courses/:id', (req, res, next) => {
+    app.put('/api/adm/courses/:id', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .update(parseInt(req.params.id), req.body)
             .then(rows => {
@@ -79,7 +80,7 @@ function setupCourses(app) {
             });
     });
 
-    app.delete('/api/adm/courses/:id', (req, res, next) => {
+    app.delete('/api/adm/courses/:id', AuthenticateJWT(app), (req, res, next) => {
         CoursesService()
             .del(parseInt(req.params.id))
             .then(() => {
