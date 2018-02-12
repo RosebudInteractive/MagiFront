@@ -33,7 +33,7 @@ $(document).ready(function () {
         //var o2 = getPlayerOptions();
         //var o3 = getPlayerOptions();
         var pl1 = new Player($("#pl1"), o1);
-        //var pl2 = new Player($("#pl2"), o2);
+        var pl2 = new Player($("#pl2"), o1);
         //var pl3 = new Player($("#pl3"), o3);
 
         var pl = pl1;
@@ -45,11 +45,11 @@ $(document).ready(function () {
             responseType: 'json',
             success: function (result) {
                 pl1.render();
-                //pl2.render();
+                pl2.render();
                 //pl3.render();
 
                 pl1.setData(result);
-                //pl2.setData(result);
+                pl2.setData(result);
                 //pl3.setData(result);
 
                 var content = pl1.getLectureContent();
@@ -75,7 +75,6 @@ $(document).ready(function () {
                                 loadAudio(audioObj).then(function (audio) {
                                     pl1.setAudio(audio);
                                     pl2.setAudio(audio);
-                                    pl3.setAudio(audio);
                                 });
                             }
 
@@ -253,9 +252,21 @@ $(document).ready(function () {
 
         $(".ctl-buttons").find("select[role='player']").change(function () {
             var plNum = $(this).find("option:selected").val();
-            if (+plNum == 1) pl = pl1;
-            else if (+plNum == 2) pl = pl2;
-            else pl = pl3;
+            var oldPl = null;
+            if (+plNum == 1) {
+                pl = pl1;
+                oldPl = pl2;
+            }
+            else {
+                pl = pl2;
+                oldPl = pl1;
+            }
+
+            pl.setPosition(oldPl.getPosition());
+            if (!oldPl.getStopped()) {
+                oldPl.pause();
+                pl.play();
+            }
         });
 
         $(".ctl-buttons").find("input[role='video']").change(function () {

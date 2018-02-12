@@ -51,7 +51,7 @@ define (
             }
 
             setData(data) {
-                this._state.data = {...data};
+                this._state.data = $.extend(true, {}, data);
 
                 this._state.episodeStarts = {};
                 var cur = 0;
