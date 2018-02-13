@@ -33,7 +33,7 @@ $(document).ready(function () {
         //var o2 = getPlayerOptions();
         //var o3 = getPlayerOptions();
         var pl1 = new Player($("#pl1"), o1);
-        //var pl2 = new Player($("#pl2"), o2);
+        var pl2 = new Player($("#pl2"), o1);
         //var pl3 = new Player($("#pl3"), o3);
 
         var pl = pl1;
@@ -45,11 +45,11 @@ $(document).ready(function () {
             responseType: 'json',
             success: function (result) {
                 pl1.render();
-                //pl2.render();
+                pl2.render();
                 //pl3.render();
 
                 pl1.setData(result);
-                //pl2.setData(result);
+                pl2.setData(result);
                 //pl3.setData(result);
 
                 var content = pl1.getLectureContent();
@@ -75,7 +75,6 @@ $(document).ready(function () {
                                 loadAudio(audioObj).then(function (audio) {
                                     pl1.setAudio(audio);
                                     pl2.setAudio(audio);
-                                    pl3.setAudio(audio);
                                 });
                             }
 
@@ -169,19 +168,38 @@ $(document).ready(function () {
         }
 
         function renderContent(content) {
-            var ul = $(".text-content").find("ul");
-            ul.empty();
+            var cDiv = $(".text-content");
+            cDiv.empty();
+
+            var length = 0;
+
             for (var i = 0; i < content.length; i++) {
-                c = content[i];
-                (function (cnt) {
-                    var li = $("<li/>");
-                    li.text(cnt.title);
-                    li.click(function (e) {
-                        pl.setPosition(cnt.begin);
-                    });
-                    ul.append(li);
-                })(c);
+                var epContent = content[i];
+                length += epContent.duration;
+                var title = $("<div/>")
+                title.text(epContent.title + " (" + epContent.duration_formated + ")");
+                cDiv.append(title);
+                var ul = $("<ul/>");
+
+                for (var j = 0; j < epContent.content.length; j++) {
+                    var c = epContent.content[j];
+                    (function (cnt) {
+                        var li = $("<li/>");
+                        li.text(cnt.title);
+                        li.click(function (e) {
+                            pl.setPosition(cnt.begin);
+                        });
+                        ul.append(li);
+                    })(c);
+                }
+
+                cDiv.append(ul);
             }
+
+            var info = $(".general-info");
+            var durStr = Math.trunc(length/60) + ":" + length % 60;
+            info.append("<div>Duration: " + durStr + "</div><br/>");
+
         }
 
         function getData(id) {
@@ -227,16 +245,28 @@ $(document).ready(function () {
             pl.setMute(!v);
         });
 
-        $(".ctl-buttons").find("input[role='position']").change(function () {
-            var v = $(this).val();
+        $(".ctl-buttons").find("input[role='position-btn']").click(function () {
+            var v = $(".ctl-buttons").find("input[role='position']").val();
             pl.setPosition(+v || 0);
         });
 
         $(".ctl-buttons").find("select[role='player']").change(function () {
             var plNum = $(this).find("option:selected").val();
-            if (+plNum == 1) pl = pl1;
-            else if (+plNum == 2) pl = pl2;
-            else pl = pl3;
+            var oldPl = null;
+            if (+plNum == 1) {
+                pl = pl1;
+                oldPl = pl2;
+            }
+            else {
+                pl = pl2;
+                oldPl = pl1;
+            }
+
+            pl.setPosition(oldPl.getPosition());
+            if (!oldPl.getStopped()) {
+                oldPl.pause();
+                pl.play();
+            }
         });
 
         $(".ctl-buttons").find("input[role='video']").change(function () {
@@ -245,8 +275,8 @@ $(document).ready(function () {
             else pl.setVideoOff()
         });
 
-        $(".ctl-buttons").find("input[role='lecture-id']").change(function () {
-            var v = $(this).val();
+        $(".ctl-buttons").find("input[role='lecture-id-btn']").click(function () {
+            var v = $(".ctl-buttons").find("input[role='lecture-id']").val();
             getData(v)
                 .then((result) => {
                     pl.setData(result);

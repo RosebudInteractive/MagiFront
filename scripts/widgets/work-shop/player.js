@@ -61,17 +61,18 @@ define(
             }
 
             setData(data) {
-                this._options.loader.setData(data);
+                var data2 = $.extend(true, {}, data)
+                this._options.loader.setData(data2);
                 this._prepareElements();
 
                 var audioId = null;
-                if (data.episodes.length > 0) {
-                    var episode = data.episodes[0];
+                if (data2.episodes.length > 0) {
+                    var episode = data2.episodes[0];
                     this._audioState.currentEpisode = 0;
                     this._options.loader
                         .getAudioResource(episode.audio.file)
                         .then((a) => {
-                            var inf = {...episode.audio.info};
+                            var inf = $.extend(true, {}, episode.audio.info);
                             inf.data = a.data;
                             this._setAudio(inf)
                         });
@@ -351,6 +352,7 @@ define(
                     if (!that._audioState.stopped) {
                         that._playElements(that._audioState.globalTime);
                     }
+                    console.log("timeupdate", that._audioState.globalTime);
                     that._options.loader.setPosition(that._audioState.globalTime)
 
                 }).on("volumechange", function(e) {
@@ -363,7 +365,7 @@ define(
                         that._options.loader
                             .getAudioResource(episode.audio.file)
                             .then((a) => {
-                                var inf = {...episode.audio.info};
+                                var inf = $.extend(true, {}, episode.audio.info);
                                 inf.data = a.data;
                                 that._setAudio(inf)
                             });
@@ -490,14 +492,16 @@ define(
                         this._audioState.audio.pause();
                         this._options.loader.setPosition(position);
                         this._options.loader.disableChangePosition();
-                        var savedState = {...this._audioState};
+                        console.log("Set position 1", this._audioState)
+                        var savedState = $.extend(true, {}, this._audioState);
                         this._options.loader
                             .getAudioResource(newStart.episode.audio.file)
                             .then((a) => {
-                                var inf = {...newStart.episode.audio.info};
+                                var inf = $.extend(true, {}, newStart.episode.audio.info);
                                 inf.data = a.data;
                                 this._audioState.currentEpisode = epIdx;
 
+                                console.log("Set position 2", this._audioState)
                                 this._setAudio(inf)
 
                                 this._audioState.audio.currentTime = savedState.currentTime;
@@ -506,6 +510,7 @@ define(
                                 this._audioState.currentTime = savedState.currentTime;
                                 this._audioState.baseTime = savedState.baseTime;
 
+                                console.log("Set position 3", this._audioState)
                                 this._setElementsPosition(position);
                                 this._playElements(position);
                                 if (this._audioState.stopped) this._pauseElements();
@@ -524,6 +529,14 @@ define(
                         this._playElements(position)
                     }
                 }
+            }
+
+            getPosition() {
+                return this._audioState.audio.globalTime;
+            }
+
+            getStopped () {
+                return this._audioState.stopped;
             }
 
             getCurrent() {
@@ -581,13 +594,22 @@ define(
 
                 for (var i = 0; i < data.episodes.length; i++) {
                     var episode = data.episodes[i];
+                    var epContent = {
+                        title: episode.title,
+                        duration: episode.audio.info.length,
+                        duration_formated: episode.audio.info.length_formatted,
+                        content: []
+                    }
+
                     var cont = episode.contents;
                     var epStart = epStarts[episode.id];
                     for (var j = 0; j < cont.length; j++) {
-                        var resCont = {...cont[j]};
+                        var resCont = $.extend(true, {}, cont[j]);
                         resCont.begin += epStart.start;
-                        result.push(resCont);
+                        epContent.content.push(resCont);
                     }
+
+                    result.push(epContent);
                 }
 
                 return result;
@@ -871,7 +893,7 @@ define(
                 }
 
                 if (trackElData.assetId) {
-                    oldData.asset = {...this._getAsset(trackElData.assetId)};
+                    oldData.asset = $.extend(true, {}, this._getAsset(trackElData.assetId));
                 } else
                     oldData.asset = null;
 

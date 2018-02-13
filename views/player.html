@@ -26,9 +26,8 @@
 <div class="ctl-buttons">
     Select player
     <select role="player">
-        <option value="1" selected>Player 1</option>
-        <option value="2">Player 2</option>
-        <option value="3">Player 3</option>
+        <option value="1" selected>Viewport 1</option>
+        <option value="2">Viewport 2</option>
     </select>
     <br/>
     <button role="play">Play</button>
@@ -38,9 +37,11 @@
     Rate
     <select role="rate">
         <option value="0.5">0.5</option>
+        <option value="0.75">0.5</option>
         <option value="1" selected>1</option>
+        <option value="1.25">0.5</option>
+        <option value="1.5">0.5</option>
         <option value="2">2</option>
-        <option value="4">4</option>
     </select>
     <br/>
     Volume
@@ -60,19 +61,23 @@
     <br/>
     Position (Sec)
     <input type="text" role="position" value="0">
+    <input type="button" role="position-btn" value="Ok"/>
     <br/>
     Video
     <input type="checkbox" checked role="video"/>
     <br/>
     Lecture Id
     <input type="text" role="lecture-id" value="1">
-    <div class="text-content">
-        <ul>
-        </ul>
-    </div>
+    <input type="button" role="lecture-id-btn" value="Ok"/>
+    <br/>
+    <br/>
+    <div class="general-info"  style="width: 100%; height: 100px"></div>
+    <br/><br/>
+    <div class="text-content"></div>
 </div>
 <div id="pl1" class="ws-container"></div>
-<div id="pl2" class="ws-container"></div>
-<div id="pl3" class="ws-container-mini"></div>
+<div id="pl2" class="ws-container-mini"></div>
+<!--div id="pl2" class="ws-container"></div>
+<div id="pl3" class="ws-container-mini"></div-->
 </body>
 </html>
