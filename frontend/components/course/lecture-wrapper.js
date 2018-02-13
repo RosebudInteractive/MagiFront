@@ -88,7 +88,6 @@ class PlayBlock extends React.Component {
 
                     <div className="lecture__image-wrapper">
                         <img src={this.props.cover} width="126" height="126" alt=""/>
-                        {/*{this.state.flipped ? <div className={'image-hover'}/> : null}*/}
                     </div>
                     <div className="lecture__loader" id="cont" data-pct="100">
                         <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg">

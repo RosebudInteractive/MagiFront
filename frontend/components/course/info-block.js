@@ -40,7 +40,7 @@ class Header extends React.Component {
         return (
             <h1 className="course-module__title"  onClick={::this._onClick}>
                 <p className="course-module__label">Курс:</p>
-                {' ' + this.props.title}
+                <span>{this.props.title}</span>
             </h1>
         );
     }

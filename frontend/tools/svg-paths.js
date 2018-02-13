@@ -177,3 +177,7 @@ export const logout = <svg id="logout" viewBox="0 0 16 16" width="100%" height="
               d="M11 3H3.828l1.293-1.293A.999.999 0 1 0 3.707.293L0 4l3.707 3.707a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414L3.828 5H11V3z"/>
     </g>
 </svg>
+
+export const getRandomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};

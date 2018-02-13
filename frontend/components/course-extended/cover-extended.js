@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import Info from '../course/course-module-info';
+import * as svg from '../../tools/svg-paths';
 
 class Cover extends React.Component {
 
@@ -38,12 +39,20 @@ class Header extends React.Component {
 }
 
 class Body extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            maskNumber : svg.getRandomInt(1, 12).toString().padStart(2, '0')
+        }
+    }
+
     render() {
-        const _image = '<image xlink:href="' +  this.props.cover + '"/>';
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  this.props.cover + '" width="724" height="503"/>';
 
         return (
             <div className="course-module__body">
-                <div className="course-module__image-block _mask01">
+                <div className={"course-module__image-block _mask" + this.state.maskNumber}>
                     <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </div>
