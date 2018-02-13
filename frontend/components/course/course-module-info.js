@@ -15,7 +15,7 @@ export default class Info extends React.Component {
             return category.Name
         }).join('\n');
 
-        const _portrait = this.props.authors[0] ? "data/" + this.props.authors[0].Portrait : null;
+        const _portrait = this.props.authors[0] ? "/data/" + this.props.authors[0].Portrait : null;
         return (
             <div className='course-module__info'>
                 <div className='course-module__info-col'>

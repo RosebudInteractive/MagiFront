@@ -2,14 +2,14 @@ import React  from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import * as coursesActions from '../actions/courses-page-actions';
-
 import CourseModule from '../components/course/course-module'
-
+import * as coursesActions from '../actions/courses-page-actions';
+import * as tools from '../tools/size-tools';
 
 class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
+        this._isMobile = tools.isMobile.bind(this);
     }
 
     componentWillMount() {
@@ -42,7 +42,7 @@ class CoursesPage extends React.Component {
                 });
             }
 
-            return (_inFilter ? <CourseModule index={index} key={index} onUrlClick={::this._onUrlClick}/> : null)
+            return (_inFilter ? <CourseModule course={course} key={index} onUrlClick={::this._onUrlClick} isMobile={this._isMobile()}/> : null)
         })
     }
 
@@ -59,7 +59,6 @@ class CoursesPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 <main className="courses">
-                    {/*<Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>*/}
                     {this._getCoursesBundles()}
                 </main>
         )
@@ -71,15 +70,7 @@ function mapStateToProps(state, ownProps) {
     return {
         courses: state.courses,
         filters: state.filters.items,
-
-        // selected: state.courses.selected,
-        // editDlgShown: state.courses.editDlgShown,
-        // editMode: state.courses.editMode,
-        //
-        // hasError: state.commonDlg.hasError,
-        // message: state.commonDlg.message,
-        // deleteDlgShown: state.commonDlg.deleteDlgShown,
-        // errorDlgShown: state.commonDlg.errorDlgShown,
+        size: state.app.size,
         ownProps,
     }
 }
@@ -87,7 +78,6 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
-        // commonDlgActions: bindActionCreators(commonDlgActions, dispatch),
     }
 }
 
