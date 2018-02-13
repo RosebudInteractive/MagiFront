@@ -1,7 +1,8 @@
 let { AuthorsService } = require('./../database/db-author');
+let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupAuthors(app) {
-    app.get('/api/authors', (req, res, next) => {
+    app.get('/api/authors', AuthenticateJWT(app), (req, res, next) => {
         AuthorsService()
             .getAll()
             .then(rows => {
@@ -12,7 +13,7 @@ function setupAuthors(app) {
             });
     });
 
-    app.get('/api/authors/:id', (req, res, next) => {
+    app.get('/api/authors/:id', AuthenticateJWT(app), (req, res, next) => {
         AuthorsService()
             .get(parseInt(req.params.id))
             .then(rows => {
@@ -23,7 +24,7 @@ function setupAuthors(app) {
             });
     });
 
-    app.post('/api/authors', (req, res, next) => {
+    app.post('/api/authors', AuthenticateJWT(app), (req, res, next) => {
         AuthorsService()
             .insert(req.body)
             .then(rows => {
@@ -34,7 +35,7 @@ function setupAuthors(app) {
             });
     });
 
-    app.put('/api/authors/:id', (req, res, next) => {
+    app.put('/api/authors/:id', AuthenticateJWT(app), (req, res, next) => {
         AuthorsService()
             .update(parseInt(req.params.id), req.body)
             .then(rows => {
@@ -45,7 +46,7 @@ function setupAuthors(app) {
             });
     });
 
-    app.delete('/api/authors/:id', (req, res, next) => {
+    app.delete('/api/authors/:id', AuthenticateJWT(app), (req, res, next) => {
         AuthorsService()
             .del(parseInt(req.params.id))
             .then(() => {

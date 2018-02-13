@@ -1,6 +1,8 @@
 const uccelloDir = '../../Uccello2';
 const path = require('path');
 
+const USER_MODEL_NAME = "User";
+
 exports.DbEngineInit = class DbEngineInit {
     constructor(options) {
 
@@ -239,6 +241,7 @@ exports.DbEngineInit = class DbEngineInit {
         const Resman = require(uccelloDir + '/resman/resman');
         const Dataman = require(uccelloDir + '/dataman/dataman');
         const CompmanExt = require(uccelloDir + '/components/compmanext');
+        const DbUser = require(uccelloDir + '/user/db-user');
 
         if (typeof ($debug) === "undefined")
             global.$debug = {};
@@ -258,6 +261,7 @@ exports.DbEngineInit = class DbEngineInit {
         UCCELLO_CONFIG.dataman.createTypeData = true;
         new Dataman(router, rpc, memDbController, $constructors);
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
+        global.$dbUser = new DbUser(USER_MODEL_NAME);
 
         // "AuthorsService" tests
         if (false) {
