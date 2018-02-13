@@ -33,7 +33,7 @@ export const getResources = (lessonId) => {
             payload: null
         });
 
-        fetch('/api/lessons/resources/' + lessonId, {credentials: 'include'})
+        fetch('/api/adm/lessons/resources/' + lessonId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -66,7 +66,7 @@ export const get = (id, courseId, parentLessonId)=> {
             payload: null
         });
 
-        fetch("/api/lessons/" + id + '/' + courseId + '/' + parentLessonId, {credentials: 'include'})
+        fetch("/api/adm/lessons/" + id + '/' + courseId + '/' + parentLessonId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -105,7 +105,7 @@ export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/lessons";
+        let _url = "/api/adm/lessons";
         // let _parentPosfix = values.ParentId ? '/' + values.ParentId : '/0';
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id + '/' + values.CourseId + '/' + values.ParentId

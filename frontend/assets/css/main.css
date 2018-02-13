@@ -3681,14 +3681,9 @@ ul.user-tooltip {
         padding-left: 20px;
         width: 100%; } }
   .course-module__image-block {
-    margin-top: 44.76px;
-    margin-left: 51.05px;
-    margin-bottom: 82.53px;
     display: inline-block;
     vertical-align: top;
-    /*width: 41.632%;*/
-    width: 664px;
-    height: 682px;
+    width: 41.632%;
     overflow: hidden; }
     @media (max-width: 1279px) {
       .course-module__image-block {
