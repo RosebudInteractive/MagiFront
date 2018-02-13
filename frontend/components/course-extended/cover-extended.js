@@ -3,8 +3,6 @@ import {connect} from 'react-redux';
 
 import Info from '../course/course-module-info';
 
-// import CourseBody from './body';
-
 class Cover extends React.Component {
 
     render() {
@@ -41,48 +39,17 @@ class Header extends React.Component {
 
 class Body extends React.Component {
     render() {
+        const _image = '<image xlink:href="' +  this.props.cover + '"/>';
+
         return (
             <div className="course-module__body">
-                <div className="course-module__image-block">
-                    <div width="560" height="628" className="course-module__masked-image">
-                        <img src={this.props.cover} width="560" height="372"/>
-
-                        {/*<symbol id="s-mask-circles">*/}
-                            {/*<g stroke="gray" strokeWidth={12} fill="white">*/}
-                                {/*<circle cx="33%" cy="20%" r="20%"/>*/}
-                                {/*<circle cx="72%" cy="33%" r="25%"/>*/}
-                            {/*</g>*/}
-                        {/*</symbol>*/}
-
-                        {/*<mask id="svgmask01">*/}
-                            {/*/!*<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#s-mask-circles"></use>*!/*/}
-                        {/*</mask>*/}
-
-                        {/*<g mask="url(#svgmask01)">*/}
-                            {/*<image xlinkHref={this.props.cover} width="560" height="372"/>*/}
-                        {/*</g>*/}
-                    </div>
-                    {/**/}
+                <div className="course-module__image-block _mask01">
+                    <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </div>
         )
     }
 }
-
-// {/*<svg width="560" height="628" className="course-module__masked-image">*/}
-// {/*<symbol id="s-mask-circles">*/}
-// {/*<g stroke="gray" strokeWidth="12" fill="white">*/}
-// {/*<circle cx="33%" cy="20%" r="20%"/>*/}
-// {/*<circle cx="72%" cy="33%" r="25%"/>*/}
-// {/*</g>*/}
-// {/*</symbol>*/}
-// {/*<mask id="svgmask01">*/}
-// {/*<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#s-mask-circles"></use>*/}
-// {/*</mask>*/}
-// {/*<g mask="url(#svgmask01)">*/}
-// {/*<image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="assets/images/bg-frame01.png" width="560" height="372"></image>*/}
-// {/*</g>*/}
-// {/*</svg>*/}
 
 function mapStateToProps(state) {
     return {

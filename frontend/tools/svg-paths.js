@@ -150,11 +150,8 @@ export const social = {
 };
 
 export const masks = {
-    's-mask-circles': <svg id="s-mask-circles" width="100%" height="100%">
-        <g stroke="gray" stroke-width="12" fill="white">
-            <circle cx="33%" cy="20%" r="20%"></circle>
-            <circle cx="72%" cy="33%" r="25%"></circle>
-        </g>
+    mask01: <svg viewBox="0 0 574 503" width="574" height="503">
+        <image xlinkHref="assets/images/bg-frame01.png"/>
     </svg>
 };
 

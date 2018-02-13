@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import InfoBlock from './info-block';
+import * as svg from '../../tools/svg-paths';
 
 export default class CourseModule extends React.Component {
 
@@ -37,14 +38,11 @@ class ImageBlock extends React.Component {
 
     render() {
         const {cover} = this.props;
+        const _image = '<image xlink:href="/data/' + cover + '"/>';
+
         return (
-            <div className='course-module__image-block'>
-                <img className="course-module__image"
-                     src={'/data/' + cover}
-                     // srcset="assets/images/bg-lecture01@2x.png 2x"
-                     width="662"
-                     height="680"
-                     alt=""/>
+            <div className='course-module__image-block _mask02'>
+                <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{ __html: _image }}/>
             </div>
         );
     }
