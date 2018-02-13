@@ -85,15 +85,6 @@ class PlayBlock extends React.Component {
                     </div>
                     <div className="play-block__tooltip">Смотреть</div>
                     <div className="play-block__duration">{this.props.duration}</div>
-                    <div className="play-block__action">
-                        <div className="play-block__action-loader"></div>
-                        <div className="play-block__action-btn">
-                            <svg className="action-btn" width="14" height="14">
-                                {svg.reloadSmall}
-                            </svg>
-                        </div>
-                        <div className="play-block__action-tooltip">С начала</div>
-                    </div>
                 </div>
             </div>
         )
