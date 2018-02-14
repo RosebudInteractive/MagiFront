@@ -1,5 +1,6 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
+const { AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -217,6 +218,22 @@ const LESSON_MSSQL_ASSETS_REQ =
     "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
     "where pl.[LessonId] = <%= id %>";
 
+const LESSON_MSSQL_REQ =
+    "select lc.[CourseId], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  lch.[Id] as[IdCh], llch.[Name] as[NameCh], llch.[ShortDescription] as[ShortDescriptionCh],\n" +
+    "  lcch.[State] as[StateCh], lcch.[ReadyDate] as[ReadyDateCh], lch.[Cover] as[CoverCh], lch.[CoverMeta] as[CoverMetaCh],\n" +
+    "  llch.[Duration] as[DurationCh], lcch.[Number] as[NumberCh],\n" +
+    "  llch.[DurationFmt] as[DurationFmtCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh] from [LessonCourse] lc\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
+    "  left join[LessonCourse] lcch on lcch.[ParentId] = lc.[Id]\n" +
+    "  left join[Lesson] lch on lch.[Id] = lcch.[LessonId]\n" +
+    "  left join[LessonLng] llch on llch.[LessonId] = lch.[Id] and llch.[LanguageId] = <%= languageId %>\n" +
+    "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'\n" +
+    "order by lcch.[Number]";
+
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
@@ -257,6 +274,22 @@ const LESSON_MYSQL_ASSETS_REQ =
     "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
     "where pl.`LessonId` = <%= id %>";
+
+const LESSON_MYSQL_REQ =
+    "select lc.`CourseId`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  lch.`Id` as`IdCh`, llch.`Name` as`NameCh`, llch.`ShortDescription` as`ShortDescriptionCh`,\n" +
+    "  lcch.`State` as`StateCh`, lcch.`ReadyDate` as`ReadyDateCh`, lch.`Cover` as`CoverCh`, lch.`CoverMeta` as`CoverMetaCh`,\n" +
+    "  llch.`Duration` as`DurationCh`, lcch.`Number` as`NumberCh`,\n" +
+    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh` from `LessonCourse` lc\n" +
+    "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
+    "  left join`LessonCourse` lcch on lcch.`ParentId` = lc.`Id`\n" +
+    "  left join`Lesson` lch on lch.`Id` = lcch.`LessonId`\n" +
+    "  left join`LessonLng` llch on llch.`LessonId` = lch.`Id` and llch.`LanguageId` = <%= languageId %>\n" +
+    "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'\n" +
+    "order by lcch.`Number`";
 
 const EPISODE_MSSQL_DELETE_SCRIPT =
     [
@@ -313,6 +346,30 @@ const GET_LESSON_DURATION_MYSQL =
     "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id` and l.`LanguageId` = <%= languageId %>\n" +
     "where el.`LessonId` = <%= id %>";
+
+const LESSONS_ALL_MSSQL_REQ =
+    "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
+    "  lc.[Number], lc.[ReadyDate],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
+    "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from [Course] c\n" +
+    "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join [LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = cl.[LanguageId]\n" +
+    "where c.[URL] = '<%= courseUrl %>'\n" +
+    "order by lc.[ParentId], lc.[Number]";
+
+const LESSONS_ALL_MYSQL_REQ =
+    "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
+    "  lc.`Number`, lc.`ReadyDate`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
+    "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from `Course` c\n" +
+    "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = cl.`LanguageId`\n" +
+    "where c.`URL` = '<%= courseUrl %>'\n" +
+    "order by lc.`ParentId`, lc.`Number`";
 
 const DbLesson = class DbLesson extends DbObject {
 
@@ -431,6 +488,199 @@ const DbLesson = class DbLesson extends DbObject {
                             resources = result.detail;
                         }
                         return resources;
+                    })
+            );
+        })
+    }
+
+    getLessonsAll(course_url, lesson_url) {
+        let lc_list = {};
+        let lessons = [];
+        let currLesson = [];
+
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(LESSONS_ALL_MYSQL_REQ)({ courseUrl: course_url }),
+                        mssql: _.template(LESSONS_ALL_MSSQL_REQ)({ courseUrl: course_url })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let isFirst = true;
+                            let authors_list = {};
+                            result.detail.forEach((elem) => {
+                                let lsn = {
+                                    Id: elem.LessonId,
+                                    Number: elem.Number,
+                                    ReadyDate: elem.ReadyDate,
+                                    State: elem.State,
+                                    Cover: elem.LCover,
+                                    CoverMeta: elem.LCoverMeta,
+                                    URL: elem.LURL,
+                                    Name: elem.LName,
+                                    Duration: elem.Duration,
+                                    DurationFmt: elem.DurationFmt,
+                                    AuthorId: elem.AuthorId,
+                                    Lessons: []
+                                };
+                                authors_list[elem.AuthorId] = true;
+                                let isCurrent = lesson_url === elem.LURL;
+                                if (!elem.ParentId) {
+                                    lc_list[elem.LcId] = { lesson: lsn, idx: lessons.length };
+                                    if (isCurrent)
+                                        currLesson = [lessons.length];
+                                    lessons.push(lsn);
+                                }
+                                else {
+                                    let parent = lc_list[elem.ParentId];
+                                    if (parent) {
+                                        if (isCurrent)
+                                            currLesson = [parent.idx, parent.lesson.Lessons.length];
+                                        parent.lesson.Lessons.push(lsn);
+                                    }
+                                }
+                            })
+                            let authors = "";
+                            isFirst = true;
+                            for (let author in authors_list) {
+                                if (!isFirst)
+                                    authors += ",";
+                                authors += author;
+                                isFirst = false;
+                            }
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(AUTHORS_BY_ID_MYSQL_PUBLIC_REQ)(
+                                        {
+                                            languageId: LANGUAGE_ID,
+                                            authors: authors
+                                        }),
+                                    mssql: _.template(AUTHORS_BY_ID_MSSQL_PUBLIC_REQ)(
+                                        {
+                                            languageId: LANGUAGE_ID,
+                                            authors: authors
+                                        })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        let authors = [];
+                        if ((lessons.length > 0) && result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let author = {
+                                    Id: elem.Id,
+                                    FirstName: elem.FirstName,
+                                    LastName: elem.LastName,
+                                    Portrait: elem.Portrait,
+                                    PortraitMeta: elem.PortraitMeta,
+                                    URL: elem.URL
+                                };
+                                authors.push(author);
+                            })
+                        }
+                        return { CurrLesson: currLesson, Authors: authors, Lessons: lessons };
+                    })
+            );
+        })
+    }
+
+    getLesson(course_url, lesson_url) {
+        let data = { Authors: [] };
+        let lesson = null;
+
+        return new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(LESSON_MYSQL_REQ)({ languageId: LANGUAGE_ID, course_url: course_url, lesson_url: lesson_url }),
+                        mssql: _.template(LESSON_MSSQL_REQ)({ languageId: LANGUAGE_ID, course_url: course_url, lesson_url: lesson_url })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let authors_list = {};
+                            let isFirst = true;
+                            result.detail.forEach((elem) => {
+                                if (isFirst) {
+                                    lesson = {
+                                        Id: elem.Id,
+                                        Name: elem.Name,
+                                        Cover: elem.Cover,
+                                        CoverMeta: elem.CoverMeta,
+                                        State: elem.State,
+                                        ReadyDate: elem.ReadyDate,
+                                        Duration: elem.Duration,
+                                        DurationFmt: elem.DurationFmt,
+                                        URL: elem.URL,
+                                        AuthorId: elem.AuthorId,
+                                        Number: elem.Number,
+                                        ShortDescription: elem.ShortDescription,
+                                        Lessons: []
+                                    };
+                                    isFirst = false;
+                                    authors_list[elem.AuthorId] = true;
+                                }
+                                if (elem.IdCh) {
+                                    lesson.Lessons.push({
+                                        Id: elem.IdCh,
+                                        Name: elem.NameCh,
+                                        Cover: elem.CoverCh,
+                                        CoverMeta: elem.CoverMetaCh,
+                                        State: elem.StateCh,
+                                        ReadyDate: elem.ReadyDateCh,
+                                        Duration: elem.DurationCh,
+                                        DurationFmt: elem.DurationFmtCh,
+                                        URL: elem.URLCh,
+                                        AuthorId: elem.AuthorIdCh,
+                                        Number: elem.NumberCh,
+                                        ShortDescription: elem.ShortDescriptionCh
+                                    });
+                                    authors_list[elem.AuthorIdCh] = true;
+                                }
+                            });
+                            let authors = "";
+                            isFirst = true;
+                            for (let author in authors_list) {
+                                if (!isFirst)
+                                    authors += ",";
+                                authors += author;
+                                isFirst = false;
+                            }
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(AUTHORS_BY_ID_MYSQL_PUBLIC_REQ)(
+                                        {
+                                            languageId: LANGUAGE_ID,
+                                            authors: authors
+                                        }),
+                                    mssql: _.template(AUTHORS_BY_ID_MSSQL_PUBLIC_REQ)(
+                                        {
+                                            languageId: LANGUAGE_ID,
+                                            authors: authors
+                                        })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let author = {
+                                    Id: elem.Id,
+                                    FirstName: elem.FirstName,
+                                    LastName: elem.LastName,
+                                    Portrait: elem.Portrait,
+                                    PortraitMeta: elem.PortraitMeta,
+                                    URL: elem.URL
+                                };
+                                data.Authors.push(author);
+                            })
+                        }
+                        data.Lesson = lesson;
+                        return data;
                     })
             );
         })
