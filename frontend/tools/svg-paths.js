@@ -150,11 +150,8 @@ export const social = {
 };
 
 export const masks = {
-    's-mask-circles': <svg id="s-mask-circles" width="100%" height="100%">
-        <g stroke="gray" stroke-width="12" fill="white">
-            <circle cx="33%" cy="20%" r="20%"></circle>
-            <circle cx="72%" cy="33%" r="25%"></circle>
-        </g>
+    mask01: <svg viewBox="0 0 574 503" width="574" height="503">
+        <image xlinkHref="assets/images/bg-frame01.png"/>
     </svg>
 };
 
@@ -180,3 +177,33 @@ export const logout = <svg id="logout" viewBox="0 0 16 16" width="100%" height="
               d="M11 3H3.828l1.293-1.293A.999.999 0 1 0 3.707.293L0 4l3.707 3.707a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414L3.828 5H11V3z"/>
     </g>
 </svg>
+
+export const eps = <svg id="eps" viewBox="0 0 18 18" width="100%" height="100%">
+    <g fill="#2F2F2F" fillOpacity=".4">
+        <path id="eps-a" d="M18 8h-8V0H8v8H0v2h8v8h2v-8h8V8z"/>
+    </g>
+</svg>
+
+export const lit = <svg id="lit" viewBox="0 0 18 18" width="100%" height="100%">
+    <g fill="#2F2F2F" fillOpacity=".4">
+        <path id="lit-a" d="M7 11H2a1 1 0 0 1 0-2h5V8c0-3 3-3 3-3V0H2C1 0 0 1 0 2v8c0 1 1 2 2 2h5v-1z"/>
+    </g>
+    <g transform="translate(8 6)" fill="#2F2F2F" fillOpacity=".4">
+        <path id="lit-b" d="M2 11a1 1 0 0 1 0-2h8V0H2C1 0 0 1 0 2v8c0 1 1 2 2 2h8v-1H2z"/>
+    </g>
+</svg>
+
+export const book = <svg id="books" viewBox="0 0 18 18" width="100%" height="100%">
+    <desc>Created using Figma</desc>
+    <g fill="#2F2F2F" fillOpacity=".4">
+        <path id="books-a" d="M9 4S7 0 4 0 0 1 0 1v14s1-1 4-1 5 4 5 4V4z"/>
+    </g>
+    <g transform="translate(9)" fill="#2F2F2F" fillOpacity=".4">
+        <path id="books-b"
+              d="M5 2c.922 0 1.571.112 2 .231v9.915A12.89 12.89 0 0 0 5 12c-2 0-5 2-5 3V7c0-2 3.843-5 5-5zm0-2C2 0 0 4 0 4v14s2-4 5-4 4 1 4 1V1S8 0 5 0z"/>
+    </g>
+</svg>
+
+export const getRandomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};

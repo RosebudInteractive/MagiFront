@@ -1,24 +1,26 @@
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
 import Cover from '../components/course-extended/cover-extended';
 import Content from '../components/course-extended/content-extended';
 import CourseLessons from '../components/course-extended/course-lessons';
 import CourseBooks from '../components/course-extended/course-books';
 
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import * as coursesActions from '../actions/courses-page-actions';
+import * as pageHeaderActions from '../actions/page-header-actions';
 
-// import * as svg from '../../tools/svg-paths';
+import {pages} from '../tools/page-tools';
 
 class Main extends React.Component {
     constructor(props) {
         super(props);
         // this.props.coursesActions.getCourses();
-
     }
 
     componentWillMount() {
-        this.props.coursesActions.getCourse(this.props.courseUrl)
+        this.props.coursesActions.getCourse(this.props.courseUrl);
+        this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
 
 
@@ -181,6 +183,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
     }
 }
 

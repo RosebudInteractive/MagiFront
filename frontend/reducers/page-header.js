@@ -5,12 +5,16 @@ import {
     HIDE_FILTER_FORM,
     SHOW_MENU,
     HIDE_MENU,
-} from '../constants/page-header'
+    SET_CURRENT_PAGE,
+} from '../constants/page-header';
+
+import {pages} from '../tools/page-tools';
 
 const initialState = {
     showSearchForm: false,
     showFiltersForm: false,
     showMenu: false,
+    currentPage: pages.courses,
 };
 
 export default function pageHeader(state = initialState, action) {
@@ -33,6 +37,9 @@ export default function pageHeader(state = initialState, action) {
 
         case HIDE_MENU:
             return {...state, showMenu: false};
+
+        case SET_CURRENT_PAGE :
+            return {...state, currentPage: action.payload};
 
         default:
             return state;

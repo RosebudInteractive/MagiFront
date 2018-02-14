@@ -7,7 +7,7 @@ export default class CourseModuleBody extends React.Component {
     render() {
         let {course, isMobile} = this.props;
         let _lessonsCount = course.Lessons.length;
-        let _current = _lessonsCount ? course.Lessons[0].Number : 0;
+        let _current = course.readyLessonCount;
 
         return (
             <div className='course-module__body'>
@@ -30,7 +30,7 @@ class Counter extends React.Component {
         return (
             <div className='lectures-counter'>
                 <p>Лекции
-                    <span className='current'>{current}</span>
+                    <span className='current'>{' ' + current}</span>
                     <span className='total'>/{total}</span>
                 </p>
             </div>

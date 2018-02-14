@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import InfoBlock from './info-block';
+import * as svg from '../../tools/svg-paths';
 
 export default class CourseModule extends React.Component {
 
@@ -34,17 +35,23 @@ CourseModule.propTypes = {
 
 
 class ImageBlock extends React.Component {
+    constructor(props) {
+        super(props);
+        let _number = svg.getRandomInt(1, 12);
+        _number = _number.toString().padStart(2, '0');
+
+        this.state = {
+            maskNumber : _number
+        }
+    }
 
     render() {
         const {cover} = this.props;
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" width="724" height="503"/>';
+
         return (
-            <div className='course-module__image-block'>
-                <img className="course-module__image"
-                     src={'/data/' + cover}
-                     // srcset="assets/images/bg-lecture01@2x.png 2x"
-                     width="662"
-                     height="680"
-                     alt=""/>
+            <div className={'course-module__image-block _mask' + this.state.maskNumber}>
+                <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{ __html: _image }}/>
             </div>
         );
     }

@@ -2,8 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import Info from '../course/course-module-info';
-
-// import CourseBody from './body';
+import * as svg from '../../tools/svg-paths';
 
 class Cover extends React.Component {
 
@@ -40,49 +39,26 @@ class Header extends React.Component {
 }
 
 class Body extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            maskNumber : svg.getRandomInt(1, 12).toString().padStart(2, '0')
+        }
+    }
+
     render() {
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  this.props.cover + '" width="724" height="503"/>';
+
         return (
             <div className="course-module__body">
-                <div className="course-module__image-block">
-                    <div width="560" height="628" className="course-module__masked-image">
-                        <img src={this.props.cover} width="560" height="372"/>
-
-                        {/*<symbol id="s-mask-circles">*/}
-                            {/*<g stroke="gray" strokeWidth={12} fill="white">*/}
-                                {/*<circle cx="33%" cy="20%" r="20%"/>*/}
-                                {/*<circle cx="72%" cy="33%" r="25%"/>*/}
-                            {/*</g>*/}
-                        {/*</symbol>*/}
-
-                        {/*<mask id="svgmask01">*/}
-                            {/*/!*<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#s-mask-circles"></use>*!/*/}
-                        {/*</mask>*/}
-
-                        {/*<g mask="url(#svgmask01)">*/}
-                            {/*<image xlinkHref={this.props.cover} width="560" height="372"/>*/}
-                        {/*</g>*/}
-                    </div>
-                    {/**/}
+                <div className={"course-module__image-block _mask" + this.state.maskNumber}>
+                    <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </div>
         )
     }
 }
-
-// {/*<svg width="560" height="628" className="course-module__masked-image">*/}
-// {/*<symbol id="s-mask-circles">*/}
-// {/*<g stroke="gray" strokeWidth="12" fill="white">*/}
-// {/*<circle cx="33%" cy="20%" r="20%"/>*/}
-// {/*<circle cx="72%" cy="33%" r="25%"/>*/}
-// {/*</g>*/}
-// {/*</symbol>*/}
-// {/*<mask id="svgmask01">*/}
-// {/*<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#s-mask-circles"></use>*/}
-// {/*</mask>*/}
-// {/*<g mask="url(#svgmask01)">*/}
-// {/*<image xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="assets/images/bg-frame01.png" width="560" height="372"></image>*/}
-// {/*</g>*/}
-// {/*</svg>*/}
 
 function mapStateToProps(state) {
     return {

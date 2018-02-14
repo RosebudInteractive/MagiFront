@@ -3,8 +3,11 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
 import CourseModule from '../components/course/course-module'
+
 import * as coursesActions from '../actions/courses-page-actions';
-import * as tools from '../tools/size-tools';
+import * as pageHeaderActions from '../actions/page-header-actions';
+
+import * as tools from '../tools/page-tools';
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -17,6 +20,7 @@ class CoursesPage extends React.Component {
             this.props.coursesActions.getCourses();
         }
 
+        this.props.pageHeaderActions.setCurrentPage(tools.pages.courses);
     }
 
     _getCoursesBundles() {
@@ -78,6 +82,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
     }
 }
 

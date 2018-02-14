@@ -38,3 +38,8 @@ export function widthBetween(min, max) {
 export function isMobile() {
     return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
 }
+
+export const pages = {
+    courses : {name : 'courses', url:'/'},
+    singleCourse : {name: 'singleCourse', url: null},
+}

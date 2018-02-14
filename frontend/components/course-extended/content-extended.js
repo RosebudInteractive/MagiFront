@@ -71,10 +71,10 @@ class BookCard extends React.Component {
         return (
             <div className="book-card _desktop">
                 <div className="book-card__inner">
-                    <div className="book-card__image">
-                        <img src="/assets/images/book02.png" width="145" height="222" alt=""/>
+                    <div className="book-card__image" style={{visibility:'hidden'}}>
+                        <img src="/assets/images/book02.png" width={145} height={222} alt=""/>
                     </div>
-                    <div className="book-card__info">
+                    <div className="book-card__info"  hidden={true}>
                         <h3 className="book-card__title">Обними меня крепче </h3>
                         <p className="book-card__author">Сью Джонсон</p>
                         <a href="#" className="btn btn--gray book-card__btn">
