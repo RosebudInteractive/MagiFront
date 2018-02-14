@@ -1,6 +1,7 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const { AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const _ = require('lodash');
 
 const COURSE_REQ_TREE = {
@@ -236,15 +237,16 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "order by cc.`CourseId`";
 
 const COURSE_MSSQL_PUBLIC_REQ =
-    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
-    "ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
-    "  join [CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
-    "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
-    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "  join [LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
-    "where c.[AccountId] = <%= accountId %> and(l.[ParentId] is NULL) and c.[URL] = '<%= courseUrl %>'\n" +
-    "order by lc.[Number]";
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
+    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
+    "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
+    "where c.[URL] = '<%= courseUrl %>'\n" +
+    "order by lc.[ParentId], lc.[Number]";
 const AUTHOR_COURSE_MSSQL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] from [AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -252,14 +254,6 @@ const AUTHOR_COURSE_MSSQL_PUBLIC_REQ =
     "where ac.[CourseId] = <%= courseId %>\n" +
     "order by ac.[CourseId]";
 const CATEGORY_COURSE_MSSQL_WHERE = "where cc.[CourseId] = <%= courseId %>\n";
-const COURSE_SUBL_MSSQL_PUBLIC_REQ =
-    "select l.[Id], count(ll.[Id]) as [NSub] from [Course] c\n" +
-    "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
-    "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "  join [LessonCourse] llc on llc.[ParentId] = lc.[Id]\n" +
-    "  join [Lesson] ll on ll.[Id] = llc.[LessonId]\n" +
-    "where c.[Id] = <%= courseId %> and(l.[ParentId] is NULL)\n" +
-    "group by l.[Id]";
 const COURSE_REF_MSSQL_PUBLIC_REQ =
     "select l.[Id], count(r.[Id]) as [NRef] from [Course] c\n" +
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -278,30 +272,17 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
     "order by l.[Id]";
     
 const COURSE_MYSQL_PUBLIC_REQ =
-    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
-    "ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
-    "  join `CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
-    "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
-    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
-    "where c.`AccountId` = <%= accountId %> and(l.`ParentId` is NULL) and c.`URL` = '<%= courseUrl %>'\n" +
-    "order by lc.`Number`";
-const AUTHOR_COURSE_MYSQL_PUBLIC_REQ =
-    "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` from `AuthorToCourse` ac\n" +
-    "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
-    "  join`AuthorLng` l on l.`AuthorId` = a.`Id` and l.`LanguageId` = <%= languageId %>\n" +
-    "where ac.`CourseId` = <%= courseId %>\n" +
-    "order by ac.`CourseId`";
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
+    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
+    "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
+    "where c.`URL` = '<%= courseUrl %>'\n" +
+    "order by lc.`ParentId`, lc.`Number`";
 const CATEGORY_COURSE_MYSQL_WHERE = "where cc.`CourseId` = <%= courseId %>\n";
-const COURSE_SUBL_MYSQL_PUBLIC_REQ =
-    "select l.`Id`, count(ll.`Id`) as `NSub` from `Course` c\n" +
-    "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
-    "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "  join `LessonCourse` llc on llc.`ParentId` = lc.`Id`\n" +
-    "  join `Lesson` ll on ll.`Id` = llc.`LessonId`\n" +
-    "where c.`Id` = <%= courseId %> and(l.`ParentId` is NULL)\n" +
-    "group by l.`Id`";
 const COURSE_REF_MYSQL_PUBLIC_REQ =
     "select l.`Id`, count(r.`Id`) as `NRef` from `Course` c\n" +
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -478,18 +459,20 @@ const DbCourse = class DbCourse extends DbObject {
         let course = null;
         let courseId = 0;
         let lsn_list = {};
+        let lc_list = {};
         
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, courseUrl: url }),
-                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, courseUrl: url })
+                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ languageId: LANGUAGE_ID, courseUrl: url }),
+                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ languageId: LANGUAGE_ID, courseUrl: url })
                     }
                 }, {})
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
-                            let isFirst = true;;
+                            let isFirst = true;
+                            let authors_list = {};
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
                                     isFirst = false;
@@ -523,22 +506,42 @@ const DbCourse = class DbCourse extends DbObject {
                                     AuthorId: elem.AuthorId,
                                     NSub: 0,
                                     NRefBooks: 0,
-                                    NBooks: 0
+                                    NBooks: 0,
+                                    Lessons: []
                                 };
-                                course.Lessons.push(lsn);
+                                authors_list[elem.AuthorId] = true;
+                                if (!elem.ParentId) {
+                                    course.Lessons.push(lsn);                                   
+                                    lc_list[elem.LcId] = lsn;
+                                }
+                                else {
+                                    let parent = lc_list[elem.ParentId];
+                                    if (parent) {
+                                        parent.Lessons.push(lsn);
+                                        parent.NSub++;
+                                    }
+                                }
                                 lsn_list[elem.LessonId] = lsn;
                             })
+                            let authors = "";
+                            isFirst = true;
+                            for (let author in authors_list) {
+                                if (!isFirst)
+                                    authors += ",";
+                                authors += author;
+                                isFirst = false;
+                            }
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(AUTHOR_COURSE_MYSQL_PUBLIC_REQ)(
+                                    mysql: _.template(AUTHORS_BY_ID_MYSQL_PUBLIC_REQ)(
                                         {
                                             languageId: LANGUAGE_ID,
-                                            courseId: courseId
+                                            authors: authors
                                         }),
-                                    mssql: _.template(AUTHOR_COURSE_MSSQL_PUBLIC_REQ)(
+                                    mssql: _.template(AUTHORS_BY_ID_MSSQL_PUBLIC_REQ)(
                                         {
                                             languageId: LANGUAGE_ID,
-                                            courseId: courseId
+                                            authors: authors
                                         })
                                 }
                             }, {});
@@ -583,22 +586,6 @@ const DbCourse = class DbCourse extends DbObject {
                                     URL: elem.URL
                                 };
                                 course.Categories.push(category);
-                            })
-                        }
-                        if (course)
-                            return $data.execSql({
-                                dialect: {
-                                    mysql: _.template(COURSE_SUBL_MYSQL_PUBLIC_REQ)({ courseId: courseId }),
-                                    mssql: _.template(COURSE_SUBL_MSSQL_PUBLIC_REQ)({ courseId: courseId })
-                                }
-                            }, {});
-                    })
-                    .then((result) => {
-                        if (course && result && result.detail && (result.detail.length > 0)) {
-                            result.detail.forEach((elem) => {
-                                let lsn = lsn_list[elem.Id]
-                                if (lsn)
-                                    lsn.NSub = elem.NSub;
                             })
                         }
                         if (course)
