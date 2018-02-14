@@ -4350,7 +4350,8 @@ ul.user-tooltip {
     font-variant-numeric: oldstyle-nums;
     -moz-font-feature-settings: 'onum';
     -webkit-font-feature-settings: 'onum';
-    font-feature-settings: 'onum' on; }
+    font-feature-settings: 'onum' on;
+    padding-left: 7px;}
     @media (max-width: 1899px) {
       .lectures-counter .current {
         padding-right: 5px;

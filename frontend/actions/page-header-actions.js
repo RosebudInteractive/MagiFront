@@ -5,8 +5,8 @@ import {
     HIDE_FILTER_FORM,
     SHOW_MENU,
     HIDE_MENU,
+    SET_CURRENT_PAGE,
 } from '../constants/page-header'
-
 
 export const showSearchForm = () => {
     return (dispatch) => {
@@ -61,4 +61,13 @@ export const hideMenu = () => {
         });
     }
 };
+
+export const setCurrentPage = (page) => {
+    return (dispatch) => {
+        dispatch({
+            type: SET_CURRENT_PAGE,
+            payload: page
+        });
+    }
+}
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import * as svg from '../../tools/svg-paths';
 
 export default class Wrapper extends React.Component {
@@ -30,6 +31,9 @@ class SingleLecture extends React.Component {
 
     render() {
         let {lesson} = this.props;
+        if (lesson.State === 'D') {
+            return null
+        }
 
         let _cover = lesson.CoverMeta ?
             (

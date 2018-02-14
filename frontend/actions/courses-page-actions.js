@@ -124,11 +124,19 @@ const handleCourses = (data) => {
 
         item.ColorHex = '#' + item.Color.toString(16);
 
+        let _readyLessonCount = 0;
+
         item.Lessons.forEach((lesson) => {
             if (lesson.CoverMeta) {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
-        })
+
+            if (lesson.State === 'R') {
+                _readyLessonCount++
+            }
+        });
+
+        item.readyLessonCount = _readyLessonCount;
     });
 };
 

@@ -1,27 +1,16 @@
 import React from 'react';
-import {connect} from 'react-redux';
-import {bindActionCreators} from "redux";
+import PropTypes from 'prop-types';
 
 import * as svg from '../../tools/svg-paths';
-import * as pageHeaderActions from "../../actions/page-header-actions";
+import * as tools from '../../tools/page-tools';
 
-class DesktopHeaderRow extends React.Component {
-    constructor(props){
-        super(props);
-    }
-
-    _onFilterClick(){
-        this.props.pageHeaderState.showFiltersForm ?
-            this.props.pageHeaderActions.hideFiltersForm()
-            :
-            this.props.pageHeaderActions.showFiltersForm()
-    }
+export default class DesktopHeaderRow extends React.Component {
 
     render() {
         return (
             <div className="page-header__wrapper menu-mobile row">
                 <Logo/>
-                <Navigator onFilterClick={::this._onFilterClick} filterActive={this.props.pageHeaderState.showFiltersForm}/>
+                <Navigator {...this.props}/>
                 <Languages/>
                 <Search/>
                 <User/>
@@ -29,6 +18,13 @@ class DesktopHeaderRow extends React.Component {
         )
     }
 }
+
+DesktopHeaderRow.propTypes = {
+    filterActive: PropTypes.bool.isRequired,
+    currentPage: PropTypes.string.isRequired,
+    onFilterClick: PropTypes.func.isRequired,
+    onNavigateClick: PropTypes.func.isRequired,
+};
 
 class Logo extends React.Component {
     render() {
@@ -43,11 +39,16 @@ class Logo extends React.Component {
 }
 
 class Navigator extends  React.Component {
+
+    _goToCourses(){
+        this.props.onNavigateClick(tools.pages.courses)
+    }
+
     render() {
         return(
             <nav className="navigation">
                 <ul>
-                    <li className="current">
+                    <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''} onClick={::this._goToCourses}>
                         <a>Курсы</a>
                     </li>
                     <li>
@@ -65,8 +66,16 @@ class Navigator extends  React.Component {
             </nav>
         )
     }
-
 }
+
+DesktopHeaderRow.propTypes = {
+    filterActive: PropTypes.bool.isRequired,
+    currentPage: PropTypes.object.isRequired,
+    onFilterClick: PropTypes.func.isRequired,
+    onNavigateClick: PropTypes.func.isRequired,
+};
+
+
 
 class Languages extends React.Component {
     constructor(props){
@@ -184,17 +193,3 @@ class User extends React.Component {
         )
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        pageHeaderState: state.pageHeader,
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(DesktopHeaderRow);

@@ -11,7 +11,7 @@ import SingleCoursePage from './containers/single-course-page';
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
 
-import * as tools from './tools/size-tools';
+import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 
 class App extends Component {
@@ -78,24 +78,13 @@ class App extends Component {
         }
     }
 
-    _getHeader() {
-        // return this.state.showHeader ?
-        //     <PageHeaderRow/>
-        //     :
-        //     null
-    }
-
-    // _showMobileMenu() {
-    //     let _mobileFormat = this._narrowerThan(tools.Size.s);
-    //     return _mobileFormat && this.props.showMenu
-    // }
-
     _getMainDiv() {
         let _homePath = '/';
 
         return (
             // this._showMobileMenu() ? null :
             <Switch>
+                {/*<PageHeader visible={this.state.showHeader}/>*/}
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
             </Switch>

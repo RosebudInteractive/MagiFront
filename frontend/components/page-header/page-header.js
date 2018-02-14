@@ -6,7 +6,7 @@ import DesktopHeaderRow from './desktop-header';
 import FilterRow from './desktop-filters';
 import MenuMobile from './menu-mobile';
 
-import * as tools from '../../tools/size-tools';
+import * as tools from '../../tools/page-tools';
 import * as svg from '../../tools/svg-paths';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
@@ -19,6 +19,19 @@ class Header extends React.Component {
 
     _onClickMenuTrigger() {
         this.props.pageHeaderState.showMenu ? this.props.pageHeaderActions.hideMenu() : this.props.pageHeaderActions.showMenu();
+    }
+
+    _onFilterClick(){
+        this.props.pageHeaderState.showFiltersForm ?
+            this.props.pageHeaderActions.hideFiltersForm()
+            :
+            this.props.pageHeaderActions.showFiltersForm()
+    }
+
+    _onNavigateClick(page) {
+        if (page.url) {
+            this.props.history.push(page.url);
+        }
     }
 
     render() {
@@ -35,7 +48,11 @@ class Header extends React.Component {
                     </div>
                     :
                     <div>
-                        <DesktopHeaderRow/>
+                        <DesktopHeaderRow
+                            onFilterClick={::this._onFilterClick}
+                            onNavigateClick={::this._onNavigateClick}
+                            currentPage={this.props.pageHeaderState.currentPage}
+                            filterActive={this.props.pageHeaderState.showFiltersForm}/>
                         <FilterRow/>
                     </div>
                 }
@@ -70,10 +87,11 @@ class MobileHeaderRow extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
         pageHeaderState: state.pageHeader,
         size: state.app.size,
+        ownProps,
     }
 }
 

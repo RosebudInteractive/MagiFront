@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+
 import * as svg from '../../tools/svg-paths'
 
 class CourseLessons extends React.Component {
@@ -105,6 +106,7 @@ class InfoBlock extends React.Component {
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
                                                              {/*xlink:href="#eps"></use>*/}
+                                                        {svg.eps}
                                                     </svg>
                                                 </span>
                         <p className="lecture-full__info-table-label">Доп. эпизоды</p>
@@ -115,6 +117,7 @@ class InfoBlock extends React.Component {
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
                                                              {/*xlink:href="#lit"></use>*/}
+                                                        {svg.lit}
                                                     </svg>
                                                 </span>
                         <p className="lecture-full__info-table-label">Источники</p>
@@ -125,6 +128,7 @@ class InfoBlock extends React.Component {
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
                                                              {/*xlink:href="#books"></use>*/}
+                                                        {svg.book}
                                                     </svg>
                                                 </span>
                         <p className="lecture-full__info-table-label">Книги</p>
