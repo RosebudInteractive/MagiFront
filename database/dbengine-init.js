@@ -263,6 +263,13 @@ exports.DbEngineInit = class DbEngineInit {
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
         global.$dbUser = new DbUser(USER_MODEL_NAME);
 
+        if (autoImportFlag) {
+            const { FileUpload } = require("./file-upload");
+            FileUpload.importImages(impDir)
+                .then(() => { console.log("### Images import finished!"); })
+                .catch((err) => { console.error("ERROR: " + err); });
+        }
+
         // "AuthorsService" tests
         if (false) {
             let { AuthorsService } = require("./db-author");

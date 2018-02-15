@@ -781,7 +781,7 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    update(id, data) {
+    update(id, data, options) {
         let self = this;
         return new Promise((resolve, reject) => {
             let root_obj;
@@ -797,7 +797,7 @@ const DbCourse = class DbCourse extends DbObject {
             let auth_list = {};
             let ctg_list = {};
             let ls_list = {};
-            let opts = {};
+            let opts = options || {};
             let inpFields = data || {};
             
             let auth_new = [];
@@ -812,10 +812,25 @@ const DbCourse = class DbCourse extends DbObject {
             let lc_deleted = {};
             let lc_child_deleted = [];
 
+            let req;
+            if (opts.byUrl && (typeof (opts.byUrl) === "string"))
+                req = this._getObjects(COURSE_REQ_TREE, { field: "URL", op: "=", value: opts.byUrl })
+            else
+                if (typeof (id) === "number")
+                    req = this._getObjById(id)
+                else
+                    throw new Error("DbCourse::update: Incorrect course \"id\" parameter: " + id);
             resolve(
-                this._getObjById(id)
+                req
                     .then((result) => {
                         root_obj = result;
+
+                        let collection = root_obj.getCol("DataElements");
+                        if (collection.count() != 1)
+                            throw new Error("Course (Id = " + id + ") doesn't exist.");
+                        crs_obj = collection.get(0);
+                        id = crs_obj.id();
+
                         return $data.execSql({
                             dialect: {
                                 mysql: _.template(COURSE_LESSONS_MYSQL)({ id: id }),
@@ -828,11 +843,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (result && result.detail && (result.detail.length > 0))
                             ls_own_collection = result.detail;
 
-                        let collection = root_obj.getCol("DataElements");
-                        if (collection.count() != 1)
-                            throw new Error("Course (Id = " + id + ") doesn't exist.");
-                        crs_obj = collection.get(0);
-                        collection = crs_obj.getDataRoot("CourseLng").getCol("DataElements");
+                        let collection = crs_obj.getDataRoot("CourseLng").getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Course (Id = " + id + ") has inconsistent \"LNG\" part.");
                         crs_lng_obj = collection.get(0);
@@ -908,28 +919,28 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(() => {
 
-                        if (inpFields["Color"])
+                        if (typeof (inpFields["Color"]) !== "undefined")
                             crs_obj.color(inpFields["Color"]);
-                        if (inpFields["Cover"])
+                        if (typeof (inpFields["Cover"]) !== "undefined")
                             crs_obj.cover(inpFields["Cover"]);
-                        if (inpFields["CoverMeta"])
+                        if (typeof (inpFields["CoverMeta"]) !== "undefined")
                             crs_obj.coverMeta(inpFields["CoverMeta"]);
-                        if (inpFields["State"])
+                        if (typeof (inpFields["State"]) !== "undefined")
                             crs_obj.state(inpFields["State"]);
-                        if (inpFields["LanguageId"])
+                        if (typeof (inpFields["LanguageId"]) !== "undefined")
                             crs_obj.languageId(inpFields["LanguageId"]);
-                        if (inpFields["URL"])
+                        if (typeof (inpFields["URL"]) !== "undefined")
                             crs_obj.uRL(inpFields["URL"]);
 
                         crs_obj.oneLesson(false);
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             crs_obj.oneLesson(inpFields["OneLesson"]);
                         
-                        if (inpFields["State"])
+                        if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
-                        if (inpFields["Name"])
+                        if (typeof (inpFields["Name"]) !== "undefined")
                             crs_lng_obj.name(inpFields["Name"]);
-                        if (inpFields["Description"])
+                        if (typeof (inpFields["Description"]) !== "undefined")
                             crs_lng_obj.description(inpFields["Description"]);
 
                         for (let key in auth_list)
@@ -1082,17 +1093,17 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(() => {
                         let fields = { AccountId: ACCOUNT_ID };
-                        if (inpFields["Color"])
+                        if (typeof (inpFields["Color"]) !== "undefined")
                             fields["Color"] = inpFields["Color"];
-                        if (inpFields["Cover"])
+                        if (typeof (inpFields["Cover"]) !== "undefined")
                             fields["Cover"] = inpFields["Cover"];
-                        if (inpFields["CoverMeta"])
+                        if (typeof (inpFields["CoverMeta"]) !== "undefined")
                             fields["CoverMeta"] = inpFields["CoverMeta"];
-                        if (inpFields["State"])
+                        if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
-                        if (inpFields["LanguageId"])
+                        if (typeof (inpFields["LanguageId"]) !== "undefined")
                             fields["LanguageId"] = inpFields["LanguageId"];
-                        if (inpFields["URL"])
+                        if (typeof (inpFields["URL"]) !== "undefined")
                             fields["URL"] = inpFields["URL"];
                         fields["OneLesson"] = false;
                         if (typeof (inpFields["OneLesson"]) === "boolean")
@@ -1107,12 +1118,12 @@ const DbCourse = class DbCourse extends DbObject {
                         let root_lng = new_obj.getDataRoot("CourseLng");
 
                         let fields = { LanguageId: LANGUAGE_ID };
-                        if (inpFields["State"])
+                        if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"] === "P" ? "R" : inpFields["State"];
 
-                        if (inpFields["Name"])
+                        if (typeof (inpFields["Name"]) !== "undefined")
                             fields["Name"] = inpFields["Name"];
-                        if (inpFields["Description"])
+                        if (typeof (inpFields["Description"]) !== "undefined")
                             fields["Description"] = inpFields["Description"];
 
                         return root_lng.newObject({

@@ -43,6 +43,7 @@
     "jsonwebtoken": "^8.1.1",
     "lodash": "^4.17.4",
     "method-override": "^2.3.10",
+    "mime": "^2.2.0",
     "moment": "^2.20.1",
     "music-metadata": "^0.8.8",
     "mysql": "^2.15.0",
