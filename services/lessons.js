@@ -37,6 +37,39 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/lessons-text/:course_url/:lesson_url', (req, res, next) => {
+        LessonsService()
+            .getLessonText(req.params.course_url, req.params.lesson_url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/lessons-all/:course_url/:lesson_url', (req, res, next) => {
+        LessonsService()
+            .getLessonsAll(req.params.course_url, req.params.lesson_url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/lessons/:course_url/:lesson_url', (req, res, next) => {
+        LessonsService()
+            .getLesson(req.params.course_url, req.params.lesson_url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.post('/api/adm/lessons/:courseId/:parentId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
             .insert(req.body, parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)

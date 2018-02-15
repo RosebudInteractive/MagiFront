@@ -3,8 +3,10 @@ let { CoursesService } = require('./../database/db-course');
 let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupCourses(app) {
+    // app.get('/api/courses-lng/:lessonId', (req, res, next) => {
     app.get('/api/courses', (req, res, next) => {
         CoursesService()
+            // .getAllPublic(parseInt(req.params.lessonId))
             .getAllPublic()
             .then(rows => {
                 res.send(rows);
