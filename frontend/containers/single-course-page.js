@@ -150,22 +150,27 @@ class LessonsTab extends React.Component {
 
 class BooksTab extends React.Component {
     _onClick() {
-        this.props.onClick(CourseTabsName.books)
+        if (this.props) {
+            this.props.onClick(CourseTabsName.books)
+        }
     }
 
     render() {
         return (
             <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
                 <span className="course-tab-control__title _desktop">Список для чтения:</span>
+                <span className="course-tab-control__title _mobile">Книги</span>
                 {
                     this.props.total ?
                         <div>
-                            <span className="course-tab-control__title _mobile">Книги</span>
-                            <span className="course-tab-control__actual"> {this.props.total + ' '}</span>
+                            <span className="course-tab-control__actual">{this.props.total + ' '}</span>
                             <span className="course-tab-control__label">книги</span>
                         </div>
                         :
-                        null
+                        <div>
+                            <span className="course-tab-control__empty _desktop">пока пуст</span>
+                            <span className="course-tab-control__empty _mobile">0</span>
+                        </div>
                 }
             </li>
         )

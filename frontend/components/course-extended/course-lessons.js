@@ -80,7 +80,7 @@ class PlayBlock extends React.Component {
                         </svg>
                     </div>
                     <div className="play-block__btn">
-                        <svg width="41" height="36" opacity={0.8}>
+                        <svg width="41" height="36">
                             {svg.play}
                         </svg>
                     </div>
