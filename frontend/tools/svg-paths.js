@@ -156,7 +156,7 @@ export const masks = {
 };
 
 export const play = <svg id="play" viewBox="0 0 41 36" width="100%" height="100%">
-    <g fill="#FFF" fillOpacity=".8">
+    <g fill="#FFF">
         <path id="play-a" d="M0 0l40.415 17.29L0 35.66V0z"/>
     </g>
 </svg>;
