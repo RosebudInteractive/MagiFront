@@ -37,6 +37,17 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/lessons-text/:course_url/:lesson_url', (req, res, next) => {
+        LessonsService()
+            .getLessonText(req.params.course_url, req.params.lesson_url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/lessons-all/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
             .getLessonsAll(req.params.course_url, req.params.lesson_url)

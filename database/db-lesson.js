@@ -193,11 +193,11 @@ const LESSON_MSSQL_RESOURCE_REQ =
     "where r.[LessonId] = <%= id %>";
 const LESSON_MSSQL_TOC_REQ =
     "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
-    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id]\n" +
     "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
     "  join[EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]\n" +
     "  join[Lesson] ls on ls.[Id] = pl.[LessonId]\n" +
-    "  join[LessonLng] lls on lls.[LessonId] = ls.[Id] and  lls.[LanguageId] = <%= languageId %>\n" +
+    "  join[LessonLng] lls on lls.[LessonId] = ls.[Id]\n" +
     "where pl.[LessonId] = <%= id %>\n" +
     "order by e.[Id], t.[Number]";
 const LESSON_MSSQL_CONTENT_REQ =
@@ -209,30 +209,52 @@ const LESSON_MSSQL_CONTENT_REQ =
     "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
     "where pl.[LessonId] = <%= id %>\n" +
     "order by pl.[Number], e.[Id], t.[StartTime]";
+
 const LESSON_MSSQL_ASSETS_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
-    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
-    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
     "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
     "where pl.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_REQ =
-    "select lc.[CourseId], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
+    "select lc.[CourseId], c.[URL] as[CURL], cl.[Name] as[CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
     "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[URL], l.[AuthorId], lc.[Number],\n" +
     "  lch.[Id] as[IdCh], llch.[Name] as[NameCh], llch.[ShortDescription] as[ShortDescriptionCh],\n" +
     "  lcch.[State] as[StateCh], lcch.[ReadyDate] as[ReadyDateCh], lch.[Cover] as[CoverCh], lch.[CoverMeta] as[CoverMetaCh],\n" +
     "  llch.[Duration] as[DurationCh], lcch.[Number] as[NumberCh],\n" +
-    "  llch.[DurationFmt] as[DurationFmtCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh] from [LessonCourse] lc\n" +
+    "  llch.[DurationFmt] as[DurationFmtCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh]\n" +
+    "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
     "  left join[LessonCourse] lcch on lcch.[ParentId] = lc.[Id]\n" +
     "  left join[Lesson] lch on lch.[Id] = lcch.[LessonId]\n" +
-    "  left join[LessonLng] llch on llch.[LessonId] = lch.[Id] and llch.[LanguageId] = <%= languageId %>\n" +
+    "  left join[LessonLng] llch on llch.[LessonId] = lch.[Id]\n" +
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'\n" +
     "order by lcch.[Number]";
+
+const PARENT_MSSQL_REQ =
+    "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
+    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[Name] as[CName]\n" +
+    "from[LessonCourse] lc\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
+    "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
+    "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
+
+const LESSON_MSSQL_TRANSCRIPT_REQ =
+    "select pl.[Number], e.[Id], l.[Name], l.[Transcript]\n" +
+    "from[EpisodeLesson] pl\n" +
+    "  join[Episode] e on e.[Id] = pl.[EpisodeId]\n" +
+    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
+    "where pl.[LessonId] = <%= id %>\n" +
+    "order by pl.[Number], e.[Id]";
 
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
@@ -250,11 +272,11 @@ const LESSON_MYSQL_RESOURCE_REQ =
     "where r.`LessonId` = <%= id %>";
 const LESSON_MYSQL_TOC_REQ =
     "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
-    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id`\n" +
     "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
     "  join`EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`\n" +
     "  join`Lesson` ls on ls.`Id` = pl.`LessonId`\n" +
-    "  join`LessonLng` lls on lls.`LessonId` = ls.`Id` and  lls.`LanguageId` = <%= languageId %>\n" +
+    "  join`LessonLng` lls on lls.`LessonId` = ls.`Id`\n" +
     "where pl.`LessonId` = <%= id %>\n" +
     "order by e.`Id`, t.`Number`";
 const LESSON_MYSQL_CONTENT_REQ =
@@ -268,28 +290,49 @@ const LESSON_MYSQL_CONTENT_REQ =
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
 const LESSON_MYSQL_ASSETS_REQ =
     "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
-    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
-    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
     "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
     "where pl.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_REQ =
-    "select lc.`CourseId`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
+    "select lc.`CourseId`, c.`URL` as`CURL`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
     "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
     "  lch.`Id` as`IdCh`, llch.`Name` as`NameCh`, llch.`ShortDescription` as`ShortDescriptionCh`,\n" +
     "  lcch.`State` as`StateCh`, lcch.`ReadyDate` as`ReadyDateCh`, lch.`Cover` as`CoverCh`, lch.`CoverMeta` as`CoverMetaCh`,\n" +
     "  llch.`Duration` as`DurationCh`, lcch.`Number` as`NumberCh`,\n" +
-    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh` from `LessonCourse` lc\n" +
+    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh`\n" +
+    "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
     "  left join`LessonCourse` lcch on lcch.`ParentId` = lc.`Id`\n" +
     "  left join`Lesson` lch on lch.`Id` = lcch.`LessonId`\n" +
-    "  left join`LessonLng` llch on llch.`LessonId` = lch.`Id` and llch.`LanguageId` = <%= languageId %>\n" +
+    "  left join`LessonLng` llch on llch.`LessonId` = lch.`Id`\n" +
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'\n" +
     "order by lcch.`Number`";
+
+const PARENT_MYSQL_REQ =
+    "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
+    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`Name` as`CName`\n" +
+    "from`LessonCourse` lc\n" +
+    "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
+    "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
+    "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
+
+const LESSON_MYSQL_TRANSCRIPT_REQ =
+    "select pl.`Number`, e.`Id`, l.`Name`, l.`Transcript`\n" +
+    "from`EpisodeLesson` pl\n" +
+    "  join`Episode` e on e.`Id` = pl.`EpisodeId`\n" +
+    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
+    "where pl.`LessonId` = <%= id %>\n" +
+    "order by pl.`Number`, e.`Id`";
 
 const EPISODE_MSSQL_DELETE_SCRIPT =
     [
@@ -590,21 +633,40 @@ const DbLesson = class DbLesson extends DbObject {
     getLesson(course_url, lesson_url) {
         let data = { Authors: [] };
         let lesson = null;
+        let course = null;
+        let curLesson = null;
+        let parentUrl = lesson_url;
 
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_REQ)({ languageId: LANGUAGE_ID, course_url: course_url, lesson_url: lesson_url }),
-                        mssql: _.template(LESSON_MSSQL_REQ)({ languageId: LANGUAGE_ID, course_url: course_url, lesson_url: lesson_url })
+                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
+                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
                     }
                 }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length == 1))
+                            if (result.detail[0].URL)
+                                parentUrl = result.detail[0].URL;
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_REQ)({ course_url: course_url, lesson_url: parentUrl }),
+                                mssql: _.template(LESSON_MSSQL_REQ)({ course_url: course_url, lesson_url: parentUrl })
+                            }
+                        }, {})
+                    })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let authors_list = {};
                             let isFirst = true;
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
+                                    course = {
+                                        Id: elem.CourseId,
+                                        Name: elem.CName,
+                                        URL: elem.CURL
+                                    };
                                     lesson = {
                                         Id: elem.Id,
                                         Name: elem.Name,
@@ -624,6 +686,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     authors_list[elem.AuthorId] = true;
                                 }
                                 if (elem.IdCh) {
+                                    if (elem.URLCh === lesson_url)
+                                        curLesson = lesson.Lessons.length;
                                     lesson.Lessons.push({
                                         Id: elem.IdCh,
                                         Name: elem.NameCh,
@@ -679,7 +743,136 @@ const DbLesson = class DbLesson extends DbObject {
                                 data.Authors.push(author);
                             })
                         }
+                        data.Course = course;
                         data.Lesson = lesson;
+                        if (typeof (curLesson) === "number")
+                            data.SubLessonIdx = curLesson;
+                        return data;
+                    })
+            );
+        })
+    }
+
+    getLessonText(course_url, lesson_url) {
+        let data = { Galery: [], Episodes: [], Refs: [], Books: [] };
+        let epi_list = {};
+        let assets_list = {};
+        let parentUrl = lesson_url;
+        let id;
+
+        return new Promise((resolve, reject) => {
+            resolve(
+
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
+                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length == 1)) {
+                            let elem = result.detail[0];
+                            if (elem.URL)
+                                parentUrl = elem.URL;
+                            id = elem.Id;
+                            data.Course = {
+                                Id: elem.CId,
+                                Name: elem.CName,
+                                URL: elem.CURL
+                            };
+                        }
+                        else
+                            throw new Error("Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
+
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ id: id })
+                            }
+                        }, {})
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (!assets_list[elem.Id]) {
+                                    let asset = {
+                                        Id: elem.Id,
+                                        FileName: elem.FileName,
+                                        MetaData: elem.MetaData
+                                    };
+                                    if (elem.Name)
+                                        asset.Name = elem.Name;
+                                    if (elem.Description)
+                                        asset.Description = elem.Description;
+                                    assets_list[elem.Id] = asset;
+                                    data.Galery.push(asset);
+                                }
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TRANSCRIPT_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_TRANSCRIPT_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let curr_episode = {
+                                    Id: elem.Id,
+                                    Number: elem.Number,
+                                    Name: elem.Name,
+                                    Transcript: elem.Transcript,
+                                    Toc: []
+                                };
+                                data.Episodes.push(curr_episode);
+                                epi_list[elem.Id] = curr_episode;
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = epi_list[elem.Episode];
+                                    if (!curr_episode)
+                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");
+                                }
+                                curr_episode.Toc.push({
+                                    Id: elem.Id,
+                                    Topic: elem.Topic,
+                                    StartTime: elem.StartTime
+                                });
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_REFERENCE_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_REFERENCE_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let item = { Number: elem.Number, Description: elem.Description, URL: elem.URL };
+                                if (elem.Recommended)
+                                    data.Books.push(item)
+                                else
+                                    data.Refs.push(item);
+                            });
+                        }
                         return data;
                     })
             );
@@ -695,8 +888,8 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                        mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ languageId: LANGUAGE_ID, id: id })
+                        mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
+                        mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ id: id })
                     }
                 }, {})
                     .then((result) => {
@@ -759,8 +952,8 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ id: id })
                             }
                         }, {});
                     })
