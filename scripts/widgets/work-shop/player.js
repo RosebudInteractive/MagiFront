@@ -430,9 +430,26 @@ define(
 
             /* from 0.1 to 1 */
             setVolume(volume) {
-              this._audioState.audio.volume = volume;
-              this._audioState.volume = volume;
+                if (this._audioState.audio.volume == volume) return;
+                var oldVol = +this._audioState.audio.volume;
+                this._audioState.volume = volume;
+                var volDiff = volume - oldVol;
+                var part = volDiff / 300;
+                var start = performance.now();
+                requestAnimationFrame(function _changeVolumeCallback(time) {
+                    var diffTime = time - start;
+                    if (diffTime > 300) {
+                        that._audioState.audio.volume = volume;
+                        return
+                    }
+
+                    that._audioState.audio.volume = oldVol + part * diffTime;
+                    requestAnimationFrame(_changeVolumeCallback);
+                });
+
+                var that = this;
             }
+
 
             setRate(rate) {
                 this._audioState.audio.playbackRate = +rate;
