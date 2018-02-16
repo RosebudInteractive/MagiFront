@@ -1043,7 +1043,9 @@ namespace MagImport
                 if (names.Length < 2)
                     throw new Exception(String.Format("Author name (Id={0}, name=\"{1}\") is incorrect!", db_id, rdr.GetString("name")));
                 au_lng.Fields.FirstName = names[0];
-                au_lng.Fields.LastName = names[1];
+                au_lng.Fields.LastName = "";
+                for (int i = 1; i < names.Length; i++)
+                    au_lng.Fields.LastName += (i > 1 ? " " : "") + names[i];
                 au_lng.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
 
                 authorsDB.Add(db_id, new Tuple<Author, AuthorLng>(au, au_lng));
@@ -1095,7 +1097,7 @@ namespace MagImport
             //
             // Read Author to Course relationship
             //
-            Dictionary<int, Tuple<Author, AuthorLng>> authorToCourseDB = new Dictionary<int, Tuple<Author, AuthorLng>>();
+            Dictionary<int, Dictionary<int, Tuple<Author, AuthorLng>>> authorToCourseDB = new Dictionary<int, Dictionary<int, Tuple<Author, AuthorLng>>>();
 
             cmd = new MySqlCommand(sql_get_author_to_course, conn);
             rdr = cmd.ExecuteReader();
@@ -1106,7 +1108,13 @@ namespace MagImport
                 Tuple<Author, AuthorLng> author;
                 if (!authorsDB.TryGetValue(author_id, out author))
                     throw new Exception(String.Format("Can't find author (Id={0}) for course (Id={1}).", author_id, course_id));
-                authorToCourseDB.Add(course_id, author);
+                Dictionary<int, Tuple<Author, AuthorLng>> authors;
+                if (!authorToCourseDB.TryGetValue(course_id, out authors))
+                {
+                    authors = new Dictionary<int, Tuple<Author, AuthorLng>>();
+                    authorToCourseDB.Add(course_id, authors);
+                }
+                authors.Add(author_id, author);
             }
             rdr.Close();
 
@@ -1147,13 +1155,16 @@ namespace MagImport
                 CourseCategory course_category = new CourseCategory();
                 course_category.Fields.CourseId = course.Fields.Id;
 
-                Tuple<Author, AuthorLng> author;
-                if (!authorToCourseDB.TryGetValue(db_id, out author))
+                Dictionary<int, Tuple<Author, AuthorLng>> authors;
+                if (!authorToCourseDB.TryGetValue(db_id, out authors))
                     throw new Exception(String.Format("Course \"{0}\" (Id={1}) doesn't have an author.", course_lng.Fields.Name, db_id));
 
-                AuthorToCourse author_to_course = new AuthorToCourse();
-                author_to_course.Fields.CourseId = course.Fields.Id;
-                author_to_course.Fields.AuthorId = author.Item1.Fields.Id;
+                foreach (KeyValuePair<int, Tuple<Author, AuthorLng>> kv in authors)
+                {
+                    AuthorToCourse author_to_course = new AuthorToCourse();
+                    author_to_course.Fields.CourseId = course.Fields.Id;
+                    author_to_course.Fields.AuthorId = kv.Value.Item1.Fields.Id;
+                }
 
                 coursesDB.Add(db_id, new Tuple<Course, CourseLng, CourseCategory>(course, course_lng, course_category));
             }
