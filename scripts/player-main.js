@@ -279,7 +279,8 @@ $(document).ready(function () {
             var v = $(".ctl-buttons").find("input[role='lecture-id']").val();
             getData(v)
                 .then((result) => {
-                    pl.setData(result);
+                    pl1.setData(result);
+                    pl2.setData(result);
                     var content = pl.getLectureContent();
                     renderContent(content);
 
