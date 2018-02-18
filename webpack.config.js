@@ -1,10 +1,34 @@
-var path = require('path')
-var webpack = require('webpack')
-var NpmInstallPlugin = require('npm-install-webpack-plugin')
-var autoprefixer = require('autoprefixer')
-var precss = require('precss')
+let path = require('path');
+let webpack = require('webpack');
+let NpmInstallPlugin = require('npm-install-webpack-plugin');
 
-module.exports = {
+const NODE_ENV = process.env.NODE_ENV || 'prod';
+
+const _prodConfig = {
+    entry: './frontend/index',
+    output: {
+        path: path.join(__dirname, 'static'),
+        filename: 'bundle.js',
+    },
+    module: {
+        rules: [
+            {
+                loaders: ['babel-loader'],
+                include: [
+                    path.resolve(__dirname, "frontend"),
+                ],
+                // language=JSRegexp
+                test: /\.js$/
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
+            },
+        ]
+    }
+};
+
+const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
@@ -14,8 +38,7 @@ module.exports = {
         adm: './src/index',
     },
     output: {
-        path: path.join(__dirname, 'dist'),
-        // filename: 'bundle.js',
+        path: path.join(__dirname, 'static'),
         filename: '[name].js',
         publicPath: '/static/'
     },
@@ -66,15 +89,6 @@ module.exports = {
             {
                 test: /\.(gif|jpe?g|png|ico)$/,
                 loader: "url-loader?limit=10000&mimetype=image/png+ico"
-                // use: [
-                //     {
-                //         loader: 'file-loader',
-                //         options: {
-                //             name: '[path][name].[ext]',
-                //             outputPath: 'images/'
-                //         }
-                //     }
-                // ]
             },
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
@@ -82,4 +96,6 @@ module.exports = {
             }
         ]
     }
-}
+};
+
+module.exports = NODE_ENV === 'development' ? _devConfig : _prodConfig;

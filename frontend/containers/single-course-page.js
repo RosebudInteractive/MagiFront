@@ -150,7 +150,7 @@ class LessonsTab extends React.Component {
 
 class BooksTab extends React.Component {
     _onClick() {
-        if (this.props) {
+        if ((this.props) && (this.props.total)) {
             this.props.onClick(CourseTabsName.books)
         }
     }

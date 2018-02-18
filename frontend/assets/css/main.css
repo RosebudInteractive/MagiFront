@@ -3858,12 +3858,13 @@ ul.user-tooltip {
       .course-module__title {
         margin-bottom: 21px;
         line-height: 31px; } }
-    .course-module__title span {
+    .course-module__title span a {
       padding-left: 4px;
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       -webkit-transition: border-color 0.3s ease;
-      transition: border-color 0.3s ease; }
-    .course-module__title:hover span {
+      transition: border-color 0.3s ease;
+      color: #2f2f2f;}
+    .course-module__title:hover span a {
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
   .course-module__label {
     position: relative;
