@@ -5,16 +5,20 @@ let NpmInstallPlugin = require('npm-install-webpack-plugin');
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 const _prodConfig = {
-    entry: './frontend/index',
+    entry: {
+        main: './frontend/index',
+        adm: './src/index'
+    },
     output: {
         path: path.join(__dirname, 'static'),
-        filename: 'bundle.js',
+        filename: '[name].js',
     },
     module: {
         rules: [
             {
                 loaders: ['babel-loader'],
                 include: [
+                    path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
                 ],
                 // language=JSRegexp
