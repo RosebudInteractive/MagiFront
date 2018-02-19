@@ -101,7 +101,7 @@ class PlayBlock extends React.Component {
                                 strokeDasharray="383.274" strokeDashoffset="157.142"/>
                     </svg>
                 </div>
-                <input className="loader-field" id="percent" name="percent" value="75"/>
+                <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
                 <a className="lecture__btn">
                     <svg width="41" height="36">
                         {svg.play}

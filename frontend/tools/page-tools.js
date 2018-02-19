@@ -9,10 +9,13 @@ export const Size = {
     mobile: {width: 500, name: 'mobile'}
 };
 
-export const getSize = (width) => {
-    let _size = Object.keys(Size).find((item) => {
-        return width > Size[item].width
-    });
+// export const getSize = (width) => {
+export const getSize = () => {
+    // let _size = Object.keys(Size).find((item) => {
+    //     return width > Size[item].width
+    // });
+
+    let _size = Size.xl;
 
     if (!_size) {
         _size = Size.mobile;

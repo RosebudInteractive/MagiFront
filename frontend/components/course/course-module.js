@@ -38,7 +38,8 @@ class ImageBlock extends React.Component {
     constructor(props) {
         super(props);
         let _number = svg.getRandomInt(1, 12);
-        _number = _number.toString().padStart(2, '0');
+        // _number = _number.toString().padStart(2, '0');
+        _number = '01';
 
         this.state = {
             maskNumber : _number

@@ -24,12 +24,16 @@ class CoursesPage extends React.Component {
     }
 
     _getCoursesBundles() {
+
+
         let {filters} = this.props;
         let _courses = this.props.courses.items;
 
         let _cleanFilter = filters.every((filter) => {
             return !filter.selected;
         });
+
+        console.log('render bundle ' + _courses.length);
 
         return _courses.map((course, index) => {
             let _inFilter = false;
@@ -55,6 +59,8 @@ class CoursesPage extends React.Component {
     }
 
     render() {
+        console.log('courses render');
+
         const {
             fetching,
         } = this.props.courses;
@@ -62,9 +68,9 @@ class CoursesPage extends React.Component {
             fetching ?
                 <p>Загрузка...</p>
                 :
-                <main className="courses">
+                <div className="courses">
                     {this._getCoursesBundles()}
-                </main>
+                </div>
         )
     }
 }

@@ -20,7 +20,7 @@ const fetch = (url) => {
 
         xhr.open("GET", url, true);
 
-        xhr.onload = function() {
+        xhr.onload = function () {
             resolve(this.responseText);
         };
 
@@ -30,7 +30,7 @@ const fetch = (url) => {
     })
 };
 
-export const getCourses = ()=> {
+export const getCourses = () => {
     return (dispatch) => {
         dispatch({
             type: GET_COURSES_REQUEST,
@@ -38,16 +38,19 @@ export const getCourses = ()=> {
         });
 
         fetch("/api/courses", {credentials: 'include'})
-            // .then(checkStatus)
+        // .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                console.log(data.Courses.length);
                 handleCourses(data);
 
+                console.log('GET_COURSES_SUCCESS');
                 dispatch({
                     type: GET_COURSES_SUCCESS,
                     payload: data
                 });
 
+                console.log('LOAD_FILTER_VALUES');
                 dispatch({
                     type: LOAD_FILTER_VALUES,
                     payload: data.Categories
@@ -70,7 +73,7 @@ export const getCourse = (url) => {
         });
 
         fetch("/api/courses/" + url, {credentials: 'include'})
-            // .then(checkStatus)
+        // .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 handleCourse(data);
@@ -117,80 +120,94 @@ const parseJSON = (data) => {
 // };
 
 const _getAuthor = (array, id) => {
-    return array.find((item) => {
+    return array.some((item) => {
         return item.Id === id
     })
 };
 
 const _getCategory = (array, id) => {
-    return array.find((item) => {
+    return array.some((item) => {
         return item.Id === id
     })
 };
 
 const handleCourses = (data) => {
+    console.log('Enter!')
+    try {
+        data.Courses.forEach((item) => {
+            item.CategoriesObj = [];
+            item.AuthorsObj = [];
 
-    data.Courses.forEach((item) => {
-        item.CategoriesObj = [];
-        item.AuthorsObj = [];
+            item.Categories.forEach((category) => {
+                let _category = _getCategory(data.Categories, category);
+                item.CategoriesObj.push(_category)
+            });
 
-        item.Categories.forEach((category) => {
-            let _category = _getCategory(data.Categories, category);
-            item.CategoriesObj.push(_category)
+            item.Authors.forEach((author) => {
+                item.AuthorsObj.push(_getAuthor(data.Authors, author))
+            });
+
+            item.ColorHex = '#' + item.Color.toString(16);
+
+            let _readyLessonCount = 0;
+
+            item.Lessons.forEach((lesson) => {
+                if (lesson.CoverMeta) {
+                    lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
+                }
+
+                if (lesson.State === 'R') {
+                    _readyLessonCount++
+                }
+            });
+
+            item.readyLessonCount = _readyLessonCount;
         });
 
-        item.Authors.forEach((author) => {
-            item.AuthorsObj.push(_getAuthor(data.Authors, author))
-        });
-
-        item.ColorHex = '#' + item.Color.toString(16);
-
-        let _readyLessonCount = 0;
-
-        item.Lessons.forEach((lesson) => {
-            if (lesson.CoverMeta) {
-                lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
-            }
-
-            if (lesson.State === 'R') {
-                _readyLessonCount++
-            }
-        });
-
-        item.readyLessonCount = _readyLessonCount;
-    });
+        console.log('exit');
+    }
+    catch (err) {
+        console.error('ERR: ' + err.message);
+    }
 };
 
 const handleCourse = (data) => {
+    console.log('Enter!')
 
-    if (data.CoverMeta){
-        data.CoverMeta = JSON.parse(data.CoverMeta)
+    try {
+        if (data.CoverMeta) {
+            data.CoverMeta = JSON.parse(data.CoverMeta)
+        }
+
+        data.Authors.forEach((author) => {
+            if (author.PortraitMeta) {
+                author.PortraitMeta = JSON.parse(author.PortraitMeta)
+            }
+        });
+
+        let _lessonCount = 0,
+            _readyLessonCount = 0;
+
+        data.Lessons.forEach((lesson) => {
+            if (lesson.State === 'R') {
+                _lessonCount++;
+                _readyLessonCount++
+            } else {
+                _lessonCount++
+            }
+
+            let _readyDate = new Date(lesson.ReadyDate);
+            lesson.readyYear = _readyDate.getFullYear();
+            lesson.readyMonth = Months[_readyDate.getMonth()];
+        });
+
+        data.lessonCount = _lessonCount;
+        data.readyLessonCount = _readyLessonCount;
+        console.log('exit');
     }
-
-    data.Authors.forEach((author)=>{
-        if (author.PortraitMeta) {
-            author.PortraitMeta = JSON.parse(author.PortraitMeta)
-        }
-    });
-
-    let _lessonCount = 0,
-        _readyLessonCount = 0;
-
-    data.Lessons.forEach((lesson) => {
-        if (lesson.State === 'R') {
-            _lessonCount++;
-            _readyLessonCount++
-        } else {
-            _lessonCount++
-        }
-
-        let _readyDate = new Date(lesson.ReadyDate);
-        lesson.readyYear = _readyDate.getFullYear();
-        lesson.readyMonth = Months[_readyDate.getMonth()];
-    });
-
-    data.lessonCount = _lessonCount;
-    data.readyLessonCount = _readyLessonCount;
+    catch (err) {
+        console.error('ERR: ' + err.message);
+    }
 };
 
 const Months = [

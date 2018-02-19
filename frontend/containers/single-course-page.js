@@ -37,13 +37,13 @@ class Main extends React.Component {
                         <p>Загрузка...</p>
                         :
                         course ?
-                            <main className="courses">
+                            <div className="courses">
                                 <CourseModuleExt title={course.Name}/>
                                 <CourseTabs
                                     lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                     books={{total: course.Books.length}}
                                 />
-                            </main> : null
+                            </div> : null
                 }
             </div>
         )

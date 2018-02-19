@@ -76,7 +76,7 @@ class PlayBlock extends React.Component {
                                     strokeDashoffset={0}/>
                             <circle className="bar" id="bar" r={98.75} cx="100" cy="100" fill="transparent"
                                     strokeDasharray={565.48} strokeDashoffset={0}
-                                    />
+                            />
                         </svg>
                     </div>
                     <div className="play-block__btn">
@@ -105,7 +105,7 @@ class InfoBlock extends React.Component {
                                                 <span className="icon">
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
-                                                             {/*xlink:href="#eps"></use>*/}
+                                                        {/*xlink:href="#eps"></use>*/}
                                                         {svg.eps}
                                                     </svg>
                                                 </span>
@@ -116,7 +116,7 @@ class InfoBlock extends React.Component {
                                                 <span className="icon">
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
-                                                             {/*xlink:href="#lit"></use>*/}
+                                                        {/*xlink:href="#lit"></use>*/}
                                                         {svg.lit}
                                                     </svg>
                                                 </span>
@@ -127,7 +127,7 @@ class InfoBlock extends React.Component {
                                                 <span className="icon">
                                                     <svg width="18" height="18">
                                                         {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
-                                                             {/*xlink:href="#books"></use>*/}
+                                                        {/*xlink:href="#books"></use>*/}
                                                         {svg.book}
                                                     </svg>
                                                 </span>
