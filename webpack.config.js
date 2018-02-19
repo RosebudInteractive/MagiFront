@@ -6,6 +6,7 @@ const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 const _prodConfig = {
     entry: {
+        "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
         adm: './src/index'
     },
@@ -16,7 +17,7 @@ const _prodConfig = {
     module: {
         rules: [
             {
-                loaders: ['babel-loader'],
+                loaders: ['babel-loader?plugins[]=transform-object-assign'],
                 include: [
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
@@ -87,7 +88,7 @@ const _devConfig = {
                 ],
             },
             {
-                loaders: ['react-hot-loader/webpack', 'babel-loader?plugins[]=transform-runtime'], //добавили loader 'react-hot'
+                loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
                 include: [
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
