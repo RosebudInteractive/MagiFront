@@ -1,0 +1,1030 @@
+{
+  "assets": [
+    {
+      "id": 48,
+      "file": "2016/09/Pushkin-by-Vivien-1826.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 300,
+          "height": 440
+        },
+        "content": {},
+        "icon": "Pushkin-by-Vivien-1826-150x150.jpg"
+      },
+      "title": "«Портрет Пушкина» (1826)",
+      "title2": "Бумага, итальянский карандаш, белила. Художник – Иосиф-Евстафий Иосифович Вивьен де Шатобрен (фр. Joseph Eustache Vivien de Châteaubrun; 1793 — 1852)"
+    },
+    {
+      "id": 49,
+      "file": "2016/09/KaramzinNM.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 927,
+          "height": 1080
+        },
+        "content": {
+          "m": "KaramzinNM-768x895.jpg",
+          "s": "KaramzinNM-360x419.jpg"
+        },
+        "icon": "KaramzinNM-150x150.jpg"
+      },
+      "title": "Николай Михайлович Карамзин (1766 – 1826)"
+    },
+    {
+      "id": 50,
+      "file": "2016/09/Inzov_Ivan_Nikitich.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 943,
+          "height": 1079
+        },
+        "content": {
+          "m": "Inzov_Ivan_Nikitich-768x879.jpg",
+          "s": "Inzov_Ivan_Nikitich-360x412.jpg"
+        },
+        "icon": "Inzov_Ivan_Nikitich-150x150.jpg"
+      },
+      "title": "Иван Никитич Инзов, генерал от инфантерии (1768 – 1845)",
+      "title2": "Портрет кисти английского художника Джорджа Доу (George Dawe; 1781 — 1829)  "
+    },
+    {
+      "id": 51,
+      "file": "2016/09/Pushkin_wounded.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 960,
+          "height": 707
+        },
+        "content": {
+          "m": "Pushkin_wounded-768x566.jpg",
+          "s": "Pushkin_wounded-360x265.jpg"
+        },
+        "icon": "Pushkin_wounded-150x150.jpg"
+      },
+      "title": "«Прибытие раненого Пушкина» (1885)",
+      "title2": "Художник – Борель Петр Федорович (1829 – 1898)"
+    },
+    {
+      "id": 52,
+      "file": "2016/09/Zavtrak.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 474,
+          "height": 325
+        },
+        "content": {
+          "s": "Zavtrak-360x247.jpg"
+        },
+        "icon": "Zavtrak-150x150.jpg"
+      },
+      "title": "«Завтрак путешественников на почтовой станции»",
+      "title2": "Литография К. Кольмана, 1825 год"
+    },
+    {
+      "id": 53,
+      "file": "2016/09/Risunok-A.S.-Pushkina.-Kazak-i-cherkes-kurgan-so-storozhevym-postom-nad-rekoj.-1820g..jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1066,
+          "height": 1069
+        },
+        "content": {
+          "m": "Risunok-A.S.-Pushkina.-Kazak-i-cherkes-kurgan-so-storozhevym-postom-nad-rekoj.-1820g.-768x770.jpg",
+          "s": "Risunok-A.S.-Pushkina.-Kazak-i-cherkes-kurgan-so-storozhevym-postom-nad-rekoj.-1820g.-360x361.jpg"
+        },
+        "icon": "Risunok-A.S.-Pushkina.-Kazak-i-cherkes-kurgan-so-storozhevym-postom-nad-rekoj.-1820g.-150x150.jpg"
+      },
+      "title": "Казак и черкес, курган со сторожевым постом над рекой",
+      "title2": "Рисунок А.С. Пушкина, 1820 г."
+    },
+    {
+      "id": 54,
+      "file": "2016/09/Bratia_razboiniki.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1001,
+          "height": 485
+        },
+        "content": {
+          "m": "Bratia_razboiniki-768x372.jpg",
+          "s": "Bratia_razboiniki-360x174.jpg"
+        },
+        "icon": "Bratia_razboiniki-150x150.jpg"
+      },
+      "title": "Владимир Вольховский на черновике поэмы «Братья разбойники»",
+      "title2": "(над строкой «Нас было двое брат и я»)"
+    },
+    {
+      "id": 55,
+      "file": "2016/09/Rajevskij_N_N.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 940,
+          "height": 1076
+        },
+        "content": {
+          "m": "Rajevskij_N_N-768x879.jpg",
+          "s": "Rajevskij_N_N-360x412.jpg"
+        },
+        "icon": "Rajevskij_N_N-150x150.jpg"
+      },
+      "title": "Николай Николаевич Раевский (1771—1829)",
+      "title2": "Герой Отечественной войны 1812 года, генерал от кавалерии. Портрет кисти Джона Доу"
+    },
+    {
+      "id": 56,
+      "file": "2016/09/Kavkaz_Zankovsky.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1484,
+          "height": 1075
+        },
+        "content": {
+          "l": "Kavkaz_Zankovsky-1366x990.jpg",
+          "m": "Kavkaz_Zankovsky-768x556.jpg",
+          "s": "Kavkaz_Zankovsky-360x261.jpg"
+        },
+        "icon": "Kavkaz_Zankovsky-150x150.jpg"
+      },
+      "title": "«Горы Кавказа»",
+      "title2": "Художник –  Занковский Илья Николаевич (1832–1919)"
+    },
+    {
+      "id": 57,
+      "file": "2016/09/Holman_The_Tabernacle_in_the_Wilderness.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1444,
+          "height": 1064
+        },
+        "content": {
+          "l": "Holman_The_Tabernacle_in_the_Wilderness-1366x1007.jpg",
+          "m": "Holman_The_Tabernacle_in_the_Wilderness-768x566.jpg",
+          "s": "Holman_The_Tabernacle_in_the_Wilderness-360x265.jpg"
+        },
+        "icon": "Holman_The_Tabernacle_in_the_Wilderness-150x150.jpg"
+      },
+      "title": "«Скиния в пустыне»",
+      "title2": "Иллюстрация из холмановской Библии (Holman Bible), 1890 г."
+    },
+    {
+      "id": 58,
+      "file": "2016/09/Buran.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 795,
+          "height": 630
+        },
+        "content": {
+          "m": "Buran-768x609.jpg",
+          "s": "Buran-360x285.jpg"
+        },
+        "icon": "Buran-150x150.jpg"
+      },
+      "title": "«Пугачев указывает дорогу Гриневу»",
+      "title2": "Рисунок А. Серебрякова "
+    },
+    {
+      "id": 59,
+      "file": "2016/09/Krym_Levitan.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1400,
+          "height": 1074
+        },
+        "content": {
+          "l": "Krym_Levitan-1366x1048.jpg",
+          "m": "Krym_Levitan-768x589.jpg",
+          "s": "Krym_Levitan-360x276.jpg"
+        },
+        "icon": "Krym_Levitan-150x150.jpg"
+      },
+      "title": "«В Крымских горах» (1886)",
+      "title2": "Художник – Исаак Левитан (1860 – 1900)"
+    },
+    {
+      "id": 60,
+      "file": "2016/09/Pushkin_na_Ai-Petri.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1777,
+          "height": 1080
+        },
+        "content": {
+          "l": "Pushkin_na_Ai-Petri-1366x830.jpg",
+          "m": "Pushkin_na_Ai-Petri-768x467.jpg",
+          "s": "Pushkin_na_Ai-Petri-360x219.jpg"
+        },
+        "icon": "Pushkin_na_Ai-Petri-150x150.jpg"
+      },
+      "title": "«А.С. Пушкин на вершине Ай-Петри при восходе солнца»",
+      "title2": "Художник – Иван Константинович Айвазовский (арм. Հովհաննես Այվազյան, Ованнес Айвазян; 1817 — 1900)"
+    },
+    {
+      "id": 61,
+      "file": "2016/09/Gebhard_Fugel_An_den_Wassern_Babylons.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1584,
+          "height": 1080
+        },
+        "content": {
+          "l": "Gebhard_Fugel_An_den_Wassern_Babylons-1366x931.jpg",
+          "m": "Gebhard_Fugel_An_den_Wassern_Babylons-768x524.jpg",
+          "s": "Gebhard_Fugel_An_den_Wassern_Babylons-360x245.jpg"
+        },
+        "icon": "Gebhard_Fugel_An_den_Wassern_Babylons-150x150.jpg"
+      },
+      "title": "«На реках Вавилонских» (ок. 1920 г.)",
+      "title2": "Художник – Гебхард Фугель (Gebhard Fugel, 1863 – 1939)"
+    },
+    {
+      "id": 62,
+      "file": "2016/09/Chi-in-u_1889_1.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 715,
+          "height": 496
+        },
+        "content": {
+          "s": "Chi-in-u_1889_1-360x250.jpg"
+        },
+        "icon": "Chi-in-u_1889_1-150x150.jpg"
+      },
+      "title": "Кишинев в XIX веке",
+      "title2": "Фото 1889 г."
+    },
+    {
+      "id": 63,
+      "file": "2016/09/Ruslan_i_Ludmila_1920_2.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 900,
+          "height": 731
+        },
+        "content": {
+          "m": "Ruslan_i_Ludmila_1920_2-768x624.jpg",
+          "s": "Ruslan_i_Ludmila_1920_2-360x292.jpg"
+        },
+        "icon": "Ruslan_i_Ludmila_1920_2-150x150.jpg"
+      },
+      "title": "Первое издание «Руслана и Людмилы»"
+    },
+    {
+      "id": 64,
+      "file": "2016/09/Titulnyj_list_pervogo_izdaniya_Bahchisarajskogo_fontana.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 315,
+          "height": 459
+        },
+        "content": {},
+        "icon": "Titulnyj_list_pervogo_izdaniya_Bahchisarajskogo_fontana-150x150.jpg"
+      },
+      "title": "Титульный лист первого издания  поэмы «Бахчисарайский фонтан»",
+      "title2": "1824 год"
+    },
+    {
+      "id": 65,
+      "file": "2016/09/Bakchisaraisky_Brullov.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1363,
+          "height": 1078
+        },
+        "content": {
+          "m": "Bakchisaraisky_Brullov-768x607.jpg",
+          "s": "Bakchisaraisky_Brullov-360x285.jpg"
+        },
+        "icon": "Bakchisaraisky_Brullov-150x150.jpg"
+      },
+      "title": "«Бахчисарайский фонтан» (1849)",
+      "title2": "Художник – Карл Павлович Брюллов (1794–1881), музей А.С.Пушкина, Москва "
+    },
+    {
+      "id": 66,
+      "file": "2016/09/Gipsy_Encampment_Zhukovsky.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1460,
+          "height": 1069
+        },
+        "content": {
+          "l": "Gipsy_Encampment_Zhukovsky-1366x1000.jpg",
+          "m": "Gipsy_Encampment_Zhukovsky-768x562.jpg",
+          "s": "Gipsy_Encampment_Zhukovsky-360x264.jpg"
+        },
+        "icon": "Gipsy_Encampment_Zhukovsky-150x150.jpg"
+      },
+      "title": "«Цыганский табор»",
+      "title2": "Художник – Рудольф Казимирович Жуковский (1814 — 1886)"
+    },
+    {
+      "id": 67,
+      "file": "2016/09/Latin_Poet_Ovid.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 428,
+          "height": 500
+        },
+        "content": {
+          "s": "Latin_Poet_Ovid-360x421.jpg"
+        },
+        "icon": "Latin_Poet_Ovid-150x150.jpg"
+      },
+      "title": "Публий Овидий Назон",
+      "title2": "лат. Publius Ovidius Naso, 43 г. до н.э. — 17 или 18 г. н.э."
+    },
+    {
+      "id": 68,
+      "file": "2016/09/Rymnik.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 600,
+          "height": 276
+        },
+        "content": {
+          "s": "Rymnik-360x166.jpg"
+        },
+        "icon": "Rymnik-150x150.jpg"
+      },
+      "title": "«Сражение при Рымнике»",
+      "title2": "Гравюра Х.Г.Шютца, Австрия. Кон. XVIII в."
+    },
+    {
+      "id": 69,
+      "file": "2016/09/Napoleon.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1171,
+          "height": 1069
+        },
+        "content": {
+          "m": "Napoleon-768x701.jpg",
+          "s": "Napoleon-360x329.jpg"
+        },
+        "icon": "Napoleon-150x150.jpg"
+      },
+      "title": "«Наполеон на смертном одре» (1826)",
+      "title2": "Художник – Орас Верне (1789 – 1863)"
+    },
+    {
+      "id": 70,
+      "file": "2016/09/Inzov2.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 449,
+          "height": 646
+        },
+        "content": {
+          "s": "Inzov2-360x518.jpg"
+        },
+        "icon": "Inzov2-150x150.jpg"
+      },
+      "title": "Иван Никитич Инзов (1768 – 1845)",
+      "title2": "Литография с рис. М. Клюквина по портрету Джорджа Доу"
+    },
+    {
+      "id": 71,
+      "file": "2016/09/Delvig.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 989,
+          "height": 1080
+        },
+        "content": {
+          "m": "Delvig-768x839.jpg",
+          "s": "Delvig-360x393.jpg"
+        },
+        "icon": "Delvig-150x150.jpg"
+      },
+      "title": "Антон Антонович Дельвиг (1798 – 1831)",
+      "title2": "Гравюра Ф.П. Бореля"
+    },
+    {
+      "id": 72,
+      "file": "2016/09/Catherine_II_by_J.B.Lampi_1793_Hermitage.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 750,
+          "height": 1054
+        },
+        "content": {
+          "s": "Catherine_II_by_J.B.Lampi_1793_Hermitage-360x506.jpg"
+        },
+        "icon": "Catherine_II_by_J.B.Lampi_1793_Hermitage-150x150.jpg"
+      },
+      "title": "Екатерина II (1793)",
+      "title2": "Художник –Иоганн Баптист Лампи Старший (нем. Johann Baptist von Lampi, 1751 — 1830)"
+    },
+    {
+      "id": 73,
+      "file": "2016/09/Pestel_Pavel_Ivanovich_1824_g.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 696,
+          "height": 1044
+        },
+        "content": {
+          "s": "Pestel_Pavel_Ivanovich_1824_g-360x540.jpg"
+        },
+        "icon": "Pestel_Pavel_Ivanovich_1824_g-150x150.jpg"
+      },
+      "title": "Павел Иванович Пестель (1793 – 1926)",
+      "title2": "Руководитель Южного общества декабристов. Потрет 1824 г."
+    },
+    {
+      "id": 74,
+      "file": "2016/09/Epanastasi.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 726,
+          "height": 1000
+        },
+        "content": {
+          "s": "Epanastasi-360x496.jpg"
+        },
+        "icon": "Epanastasi-150x150.jpg"
+      },
+      "title": "«Митрополит Герман благословляет знамя восставших в монастыре Агиа Лавра» (1865)",
+      "title2": "Событие из истории греческого восстания 1821 г. Художник – Теодорос Вризакис (1814 – 1878)"
+    },
+    {
+      "id": 75,
+      "file": "2016/09/Gavriliada_Brusov.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 900,
+          "height": 909
+        },
+        "content": {
+          "m": "Gavriliada_Brusov-768x776.jpg",
+          "s": "Gavriliada_Brusov-360x364.jpg"
+        },
+        "icon": "Gavriliada_Brusov-150x150.jpg"
+      },
+      "title": "«Гаврилiада» (1918)",
+      "title2": "издание Валерия Брюсова (1873 – 1924)"
+    },
+    {
+      "id": 76,
+      "file": "2016/09/Magic_Lantern_raree-show-with-imprintlow.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1694,
+          "height": 1035
+        },
+        "content": {
+          "l": "Magic_Lantern_raree-show-with-imprintlow-1366x835.jpg",
+          "m": "Magic_Lantern_raree-show-with-imprintlow-768x469.jpg",
+          "s": "Magic_Lantern_raree-show-with-imprintlow-360x220.jpg"
+        },
+        "icon": "Magic_Lantern_raree-show-with-imprintlow-150x150.jpg"
+      },
+      "title": "«Богатая лондонская семья смотрит картинки волшебного фонаря о китайском императоре» (1822)",
+      "title2": "“The Gallantee Show”, статья в журнале The Magic Lantern (Vol. 1, no. 1)"
+    },
+    {
+      "id": 77,
+      "file": "2016/09/Byron.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 861,
+          "height": 1024
+        },
+        "content": {
+          "m": "Byron-768x913.jpg",
+          "s": "Byron-360x428.jpg"
+        },
+        "icon": "Byron-150x150.jpg"
+      },
+      "title": "Лорд Байрон в албанской национальной одежде (1813)",
+      "title2": "Художник – Томас Филлипс (1770 – 1845) "
+    },
+    {
+      "id": 78,
+      "file": "2016/09/Odessa.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 528,
+          "height": 351
+        },
+        "content": {
+          "s": "Odessa-360x239.jpg"
+        },
+        "icon": "Odessa-150x150.jpg"
+      },
+      "title": "Приморский бульвар в Одессе",
+      "title2": "Литография Гординского. Начало XIX века"
+    },
+    {
+      "id": 79,
+      "file": "2016/09/Ni_blesk_uma.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 764,
+          "height": 425
+        },
+        "content": {
+          "s": "Ni_blesk_uma-360x200.jpg"
+        },
+        "icon": "Ni_blesk_uma-150x150.jpg"
+      },
+      "title": "Автограф стихотворения «Ни блеск ума, ни стройность платья...»"
+    },
+    {
+      "id": 80,
+      "file": "2016/09/Georges_dAnth-s_1830_bw.jpg",
+      "info": {
+        "path": "2016/09/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 600,
+          "height": 460
+        },
+        "content": {
+          "s": "Georges_dAnth-s_1830_bw-360x276.jpg"
+        },
+        "icon": "Georges_dAnth-s_1830_bw-150x150.jpg"
+      },
+      "title": "Жорж Шарль Дантес",
+      "title2": "Фрагмент литографии с портрета работы неизвестного художника. Около 1830 г."
+    }
+  ],
+  "episodes": [
+    {
+      "id": 2,
+      "title": "Южная ссылка",
+      "elements": [
+        {
+          "id": 48,
+          "assetId": 48,
+          "start": 0,
+          "content": {
+            "title": "«Портрет Пушкина» (1826)",
+            "title2": "Бумага, итальянский карандаш, белила. Художник – Иосиф-Евстафий Иосифович Вивьен де Шатобрен (фр. Joseph Eustache Vivien de Châteaubrun; 1793 — 1852)",
+            "track": 1,
+            "duration": 33
+          }
+        },
+        {
+          "id": 49,
+          "assetId": 49,
+          "start": 33,
+          "content": {
+            "title": "Николай Михайлович Карамзин (1766 – 1826)",
+            "track": 1,
+            "duration": 42
+          }
+        },
+        {
+          "id": 50,
+          "assetId": 50,
+          "start": 75,
+          "content": {
+            "title": "Иван Никитич Инзов, генерал от инфантерии (1768 – 1845)",
+            "title2": "Портрет кисти английского художника Джорджа Доу (George Dawe; 1781 — 1829)  ",
+            "track": 1,
+            "duration": 30
+          }
+        },
+        {
+          "id": 51,
+          "assetId": 51,
+          "start": 105,
+          "content": {
+            "title": "«Прибытие раненого Пушкина» (1885)",
+            "title2": "Художник – Борель Петр Федорович (1829 – 1898)",
+            "track": 1,
+            "duration": 43
+          }
+        },
+        {
+          "id": 52,
+          "assetId": 52,
+          "start": 148,
+          "content": {
+            "title": "«Завтрак путешественников на почтовой станции»",
+            "title2": "Литография К. Кольмана, 1825 год",
+            "track": 1,
+            "duration": 80
+          }
+        },
+        {
+          "id": 53,
+          "assetId": 53,
+          "start": 228,
+          "content": {
+            "title": "Казак и черкес, курган со сторожевым постом над рекой",
+            "title2": "Рисунок А.С. Пушкина, 1820 г.",
+            "track": 1,
+            "duration": 60
+          }
+        },
+        {
+          "id": 54,
+          "assetId": 54,
+          "start": 288,
+          "content": {
+            "title": "Владимир Вольховский на черновике поэмы «Братья разбойники»",
+            "title2": "(над строкой «Нас было двое брат и я»)",
+            "track": 1,
+            "duration": 48
+          }
+        },
+        {
+          "id": 55,
+          "assetId": 55,
+          "start": 336,
+          "content": {
+            "title": "Николай Николаевич Раевский (1771—1829)",
+            "title2": "Герой Отечественной войны 1812 года, генерал от кавалерии. Портрет кисти Джона Доу",
+            "track": 1,
+            "duration": 78
+          }
+        },
+        {
+          "id": 56,
+          "assetId": 56,
+          "start": 414,
+          "content": {
+            "title": "«Горы Кавказа»",
+            "title2": "Художник –  Занковский Илья Николаевич (1832–1919)",
+            "track": 1,
+            "duration": 80
+          }
+        },
+        {
+          "id": 57,
+          "assetId": 57,
+          "start": 494,
+          "content": {
+            "title": "«Скиния в пустыне»",
+            "title2": "Иллюстрация из холмановской Библии (Holman Bible), 1890 г.",
+            "track": 1,
+            "duration": 87
+          }
+        },
+        {
+          "id": 58,
+          "assetId": 58,
+          "start": 581,
+          "content": {
+            "title": "«Пугачев указывает дорогу Гриневу»",
+            "title2": "Рисунок А. Серебрякова ",
+            "track": 1,
+            "duration": 77
+          }
+        },
+        {
+          "id": 59,
+          "assetId": 59,
+          "start": 658,
+          "content": {
+            "title": "«В Крымских горах» (1886)",
+            "title2": "Художник – Исаак Левитан (1860 – 1900)",
+            "track": 1,
+            "duration": 80
+          }
+        },
+        {
+          "id": 60,
+          "assetId": 60,
+          "start": 738,
+          "content": {
+            "title": "«А.С. Пушкин на вершине Ай-Петри при восходе солнца»",
+            "title2": "Художник – Иван Константинович Айвазовский (арм. Հովհաննես Այվազյան, Ованнес Айвазян; 1817 — 1900)",
+            "track": 1,
+            "duration": 38
+          }
+        },
+        {
+          "id": 61,
+          "assetId": 61,
+          "start": 776,
+          "content": {
+            "title": "«На реках Вавилонских» (ок. 1920 г.)",
+            "title2": "Художник – Гебхард Фугель (Gebhard Fugel, 1863 – 1939)",
+            "track": 1,
+            "duration": 130
+          }
+        },
+        {
+          "id": 62,
+          "assetId": 62,
+          "start": 906,
+          "content": {
+            "title": "Кишинев в XIX веке",
+            "title2": "Фото 1889 г.",
+            "track": 1,
+            "duration": 66
+          }
+        },
+        {
+          "id": 63,
+          "assetId": 63,
+          "start": 972,
+          "content": {
+            "title": "Первое издание «Руслана и Людмилы»",
+            "track": 1,
+            "duration": 66
+          }
+        },
+        {
+          "id": 64,
+          "assetId": 64,
+          "start": 1038,
+          "content": {
+            "title": "Титульный лист первого издания  поэмы «Бахчисарайский фонтан»",
+            "title2": "1824 год",
+            "track": 1,
+            "duration": 34.5
+          }
+        },
+        {
+          "id": 65,
+          "assetId": 65,
+          "start": 1072.5,
+          "content": {
+            "title": "«Бахчисарайский фонтан» (1849)",
+            "title2": "Художник – Карл Павлович Брюллов (1794–1881), музей А.С.Пушкина, Москва ",
+            "track": 1,
+            "duration": 47.5
+          }
+        },
+        {
+          "id": 66,
+          "assetId": 66,
+          "start": 1120,
+          "content": {
+            "title": "«Цыганский табор»",
+            "title2": "Художник – Рудольф Казимирович Жуковский (1814 — 1886)",
+            "track": 1,
+            "duration": 39
+          }
+        },
+        {
+          "id": 67,
+          "assetId": 67,
+          "start": 1159,
+          "content": {
+            "title": "Публий Овидий Назон",
+            "title2": "лат. Publius Ovidius Naso, 43 г. до н.э. — 17 или 18 г. н.э.",
+            "track": 1,
+            "duration": 50
+          }
+        },
+        {
+          "id": 68,
+          "assetId": 68,
+          "start": 1209,
+          "content": {
+            "title": "«Сражение при Рымнике»",
+            "title2": "Гравюра Х.Г.Шютца, Австрия. Кон. XVIII в.",
+            "track": 1,
+            "duration": 28
+          }
+        },
+        {
+          "id": 69,
+          "assetId": 69,
+          "start": 1237,
+          "content": {
+            "title": "«Наполеон на смертном одре» (1826)",
+            "title2": "Художник – Орас Верне (1789 – 1863)",
+            "track": 1,
+            "duration": 106
+          }
+        },
+        {
+          "id": 70,
+          "assetId": 70,
+          "start": 1343,
+          "content": {
+            "title": "Иван Никитич Инзов (1768 – 1845)",
+            "title2": "Литография с рис. М. Клюквина по портрету Джорджа Доу",
+            "track": 1,
+            "duration": 54
+          }
+        },
+        {
+          "id": 71,
+          "assetId": 71,
+          "start": 1397,
+          "content": {
+            "title": "Антон Антонович Дельвиг (1798 – 1831)",
+            "title2": "Гравюра Ф.П. Бореля",
+            "track": 1,
+            "duration": 87
+          }
+        },
+        {
+          "id": 72,
+          "assetId": 72,
+          "start": 1484,
+          "content": {
+            "title": "Екатерина II (1793)",
+            "title2": "Художник –Иоганн Баптист Лампи Старший (нем. Johann Baptist von Lampi, 1751 — 1830)",
+            "track": 1,
+            "duration": 74
+          }
+        },
+        {
+          "id": 73,
+          "assetId": 73,
+          "start": 1558,
+          "content": {
+            "title": "Павел Иванович Пестель (1793 – 1926)",
+            "title2": "Руководитель Южного общества декабристов. Потрет 1824 г.",
+            "track": 1,
+            "duration": 35
+          }
+        },
+        {
+          "id": 74,
+          "assetId": 74,
+          "start": 1593,
+          "content": {
+            "title": "«Митрополит Герман благословляет знамя восставших в монастыре Агиа Лавра» (1865)",
+            "title2": "Событие из истории греческого восстания 1821 г. Художник – Теодорос Вризакис (1814 – 1878)",
+            "track": 1,
+            "duration": 72
+          }
+        },
+        {
+          "id": 75,
+          "assetId": 75,
+          "start": 1665,
+          "content": {
+            "title": "«Гаврилiада» (1918)",
+            "title2": "издание Валерия Брюсова (1873 – 1924)",
+            "track": 1,
+            "duration": 110
+          }
+        },
+        {
+          "id": 76,
+          "assetId": 76,
+          "start": 1775,
+          "content": {
+            "title": "«Богатая лондонская семья смотрит картинки волшебного фонаря о китайском императоре» (1822)",
+            "title2": "“The Gallantee Show”, статья в журнале The Magic Lantern (Vol. 1, no. 1)",
+            "track": 1,
+            "duration": 127
+          }
+        },
+        {
+          "id": 77,
+          "assetId": 77,
+          "start": 1902,
+          "content": {
+            "title": "Лорд Байрон в албанской национальной одежде (1813)",
+            "title2": "Художник – Томас Филлипс (1770 – 1845) ",
+            "track": 1,
+            "duration": 56
+          }
+        },
+        {
+          "id": 78,
+          "assetId": 78,
+          "start": 1958,
+          "content": {
+            "title": "Приморский бульвар в Одессе",
+            "title2": "Литография Гординского. Начало XIX века",
+            "track": 1,
+            "duration": 39
+          }
+        },
+        {
+          "id": 79,
+          "assetId": 79,
+          "start": 1997,
+          "content": {
+            "title": "Автограф стихотворения «Ни блеск ума, ни стройность платья...»",
+            "track": 1,
+            "duration": 57
+          }
+        },
+        {
+          "id": 80,
+          "assetId": 80,
+          "start": 2054,
+          "content": {
+            "title": "Жорж Шарль Дантес",
+            "title2": "Фрагмент литографии с портрета работы неизвестного художника. Около 1830 г.",
+            "track": 1,
+            "duration": 56
+          }
+        }
+      ],
+      "audio": {
+        "file": "2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3",
+        "info": {
+          "dataformat": "mp3",
+          "bitrate": 128000,
+          "filesize": 33762478,
+          "mime-type": "audio/mpeg",
+          "length": 2110,
+          "length_formatted": "35:10"
+        }
+      },
+      "contents": [
+        {
+          "id": 14,
+          "title": "На юг",
+          "begin": 0
+        },
+        {
+          "id": 15,
+          "title": "Снежные горы Кавказа",
+          "begin": 414
+        },
+        {
+          "id": 16,
+          "title": "Крымские пещеры",
+          "begin": 658
+        },
+        {
+          "id": 17,
+          "title": "Кишинёвский период",
+          "begin": 776
+        },
+        {
+          "id": 18,
+          "title": "Тени в волшебном фонаре",
+          "begin": 1665
+        },
+        {
+          "id": 19,
+          "title": "Творчество и биография",
+          "begin": 1902
+        }
+      ]
+    }
+  ],
+  "title": "Южная ссылка"
+}

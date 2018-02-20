@@ -48,6 +48,14 @@ Promise.resolve()
         app.use("/scripts", express.static(__dirname + '/scripts'));
         //app.use('/data', express.static(__dirname + '/data'));
 
+        app.get('/genData2', function (req, res) {
+            var obj;
+            fs.readFile(__dirname + "/new_data/data2.json", 'utf8', function (err, data) {
+                if (err) throw err;
+                obj = JSON.parse(data);
+                res.json(obj);
+            });
+        });
         app.get('/genData', function (req, res) {
             var obj;
             fs.readFile(__dirname + "/new_data/data.json", 'utf8', function (err, data) {
@@ -60,13 +68,15 @@ Promise.resolve()
         // обработчик файлов html будет шаблонизатор ejs
         app.engine('html', require('ejs').renderFile);
 
+        app.get('/work-shop', function (req, res) {
+            res.render('index.html', {});
+        });
         app.get('/audio', function (req, res) {
             res.render('audio.html', {});
         });
         app.get('/player', function (req, res) {
             res.render('player.html', {});
         });
-
         app.get('/player2', function (req, res) {
             res.render('player2.html', {});
         });
