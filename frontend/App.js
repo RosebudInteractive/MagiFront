@@ -14,9 +14,15 @@ import PageFooter from './components/page-footer/page-footer';
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 
+import * as Polifyll from './tools/polyfill';
+
+Polifyll.registry();
+
 class App extends Component {
 
     constructor(props) {
+
+
         super(props);
         this.state = {
             direction: '',
