@@ -20,8 +20,8 @@ class Cover extends React.Component {
                 <Header
                     authors={_authors}
                     categories={_categories}
-                    cover={_cover}
                 />
+                <Body cover={_cover}/>
             </div>
         );
     }
@@ -32,7 +32,7 @@ class Header extends React.Component {
         return (
             <div className="course-module__header">
                 <Info authors={this.props.authors} categories={this.props.categories} showPhoto={true}/>
-                <Body cover={this.props.cover}/>
+
             </div>
         )
     }
