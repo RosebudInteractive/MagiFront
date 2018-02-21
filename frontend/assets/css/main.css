@@ -3872,7 +3872,6 @@ ul.user-tooltip {
     letter-spacing: -0.02em;
     cursor: pointer; }
     .course-module__title a {
-      display: block;
       color: #2f2f2f; }
     @media (max-width: 1899px) {
       .course-module__title {

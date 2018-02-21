@@ -32,7 +32,6 @@ class Header extends React.Component {
         return (
             <div className="course-module__header">
                 <Info authors={this.props.authors} categories={this.props.categories} showPhoto={true}/>
-
             </div>
         )
     }
