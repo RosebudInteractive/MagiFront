@@ -140,6 +140,7 @@ namespace MagImport
         public class LanguageFields : BaseFieldsData
         {
             public string Code { get; set; }
+            public string LangTag { get; set; }
             public string Language { get; set; }
         };
 
@@ -960,18 +961,22 @@ namespace MagImport
             Language lang = new Language();
             lang.Fields.Id = LANGUAGE_ID;
             lang.Fields.Code = "RUS";
+            lang.Fields.LangTag = "ru-RU";
             lang.Fields.Language = "Русский";
 
             lang = new Language();
             lang.Fields.Code = "ENG";
+            lang.Fields.LangTag = "en-GB";
             lang.Fields.Language = "English";
 
             lang = new Language();
             lang.Fields.Code = "FRA";
+            lang.Fields.LangTag = "fr-FR";
             lang.Fields.Language = "Français";
 
             lang = new Language();
             lang.Fields.Code = "GER";
+            lang.Fields.LangTag = "de-DE";
             lang.Fields.Language = "Deutsch";
 
             Account.AllData = allData;

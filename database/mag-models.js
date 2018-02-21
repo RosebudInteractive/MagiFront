@@ -6,6 +6,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("Language", "fd4b9b70-514e-4796-9a27-eb0adf8e7944", "RootLanguage", "36ce5c73-0976-4b9e-bbeb-caaefd13bad0")
             .addField("Code", { type: "string", length: 3, allowNull: false })
+            .addField("LangTag", { type: "string", length: 10, allowNull: false })
             .addField("Language", { type: "string", length: 50, allowNull: false });
         
         metaDataMgr.addModel("Role", "e788831c-6f91-4bf6-ae6f-a21f0243d670", "RootRole", "b23a3900-6f89-4df4-b4e4-ca6d475b3d60")
