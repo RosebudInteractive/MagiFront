@@ -1,11 +1,8 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
-const { AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
+const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
-
-const ACCOUNT_ID = 1;
-const LANGUAGE_ID = 1;
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -116,71 +113,71 @@ const LESSON_UPD_TREE = {
 };
 
 const LESSON_MSSQL_ID_REQ =
-    "select l.[Id], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
+    "select l.[Id], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
-    "  join [LessonLng] ll on l.[Id] = ll.[LessonId] and ll.[LanguageId] = <%= languageId %>\n" +
+    "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
     "  join [LessonCourse] lc on l.[Id] = lc.[LessonId]\n" +
     "  join [Author] a on a.[Id] = l.[AuthorId]\n" +
-    "  join [AuthorLng] al on a.[Id] = al.[AuthorId] and al.[LanguageId] = <%= languageId %>\n" +
+    "  join [AuthorLng] al on a.[Id] = al.[AuthorId]\n" +
     "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
-    "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and cl.[LanguageId] = <%= languageId %>\n" +
+    "  join [CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
     "  join [Course] co on co.[Id] = l.[CourseId]\n" +
-    "  join [CourseLng] clo on co.[Id] = clo.[CourseId] and clo.[LanguageId] = <%= languageId %>\n" +
+    "  join [CourseLng] clo on co.[Id] = clo.[CourseId]\n" +
     "  left join [LessonCourse] lcp on lc.[ParentId] = lcp.[Id]\n" +
-    "  left join [LessonLng] lpl on lcp.[LessonId] = lpl.[LessonId] and lpl.[LanguageId] = <%= languageId %>\n" +
+    "  left join [LessonLng] lpl on lcp.[LessonId] = lpl.[LessonId]\n" +
     "where l.[Id] = <%= id %> and lc.[CourseId] = <%= courseId %>";
 
 const LESSON_MSSQL_CHLD_REQ =
     "select l.[Id], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId] from [Lesson] l\n" +
-    "  join [LessonLng] ll on l.[Id] = ll.[LessonId] and ll.[LanguageId] = <%= languageId %>\n" +
+    "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
     "  join [LessonCourse] lc on l.[Id] = lc.[LessonId]\n" +
     "  join [Author] a on a.[Id] = l.[AuthorId]\n" +
-    "  join [AuthorLng] al on a.[Id] = al.[AuthorId] and al.[LanguageId] = <%= languageId %>\n" +
+    "  join [AuthorLng] al on a.[Id] = al.[AuthorId]\n" +
     "  join [Course] c on c.[Id] = lc.[CourseId]\n" +
-    "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and cl.[LanguageId] = <%= languageId %>\n" +
+    "  join [CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
     "  join [Course] co on co.[Id] = l.[CourseId]\n" +
-    "  join [CourseLng] clo on co.[Id] = clo.[CourseId] and clo.[LanguageId] = <%= languageId %>\n" +
+    "  join [CourseLng] clo on co.[Id] = clo.[CourseId]\n" +
     "  join [LessonCourse] lcp on lc.[ParentId] = lcp.[Id]\n" +
     "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>";
 
 const LESSON_MYSQL_ID_REQ =
-    "select l.`Id`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
-    "  join `LessonLng` ll on l.`Id` = ll.`LessonId` and ll.`LanguageId` = <%= languageId %>\n" +
+    "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
     "  join `LessonCourse` lc on l.`Id` = lc.`LessonId`\n" +
     "  join `Author` a on a.`Id` = l.`AuthorId`\n" +
-    "  join `AuthorLng` al on a.`Id` = al.`AuthorId` and al.`LanguageId` = <%= languageId %>\n" +
+    "  join `AuthorLng` al on a.`Id` = al.`AuthorId`\n" +
     "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
-    "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and cl.`LanguageId` = <%= languageId %>\n" +
+    "  join `CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
     "  join `Course` co on co.`Id` = l.`CourseId`\n" +
-    "  join `CourseLng` clo on co.`Id` = clo.`CourseId` and clo.`LanguageId` = <%= languageId %>\n" +
+    "  join `CourseLng` clo on co.`Id` = clo.`CourseId`\n" +
     "  left join `LessonCourse` lcp on lc.`ParentId` = lcp.`Id`\n" +
-    "  left join `LessonLng` lpl on lcp.`LessonId` = lpl.`LessonId` and lpl.`LanguageId` = <%= languageId %>\n" +
+    "  left join `LessonLng` lpl on lcp.`LessonId` = lpl.`LessonId`\n" +
     "where l.`Id` = <%= id %> and lc.`CourseId` = <%= courseId %>";
 
 const LESSON_MYSQL_CHLD_REQ =
     "select l.`Id`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId` from `Lesson` l\n" +
-    "  join `LessonLng` ll on l.`Id` = ll.`LessonId` and ll.`LanguageId` = <%= languageId %>\n" +
+    "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
     "  join `LessonCourse` lc on l.`Id` = lc.`LessonId`\n" +
     "  join `Author` a on a.`Id` = l.`AuthorId`\n" +
-    "  join `AuthorLng` al on a.`Id` = al.`AuthorId` and al.`LanguageId` = <%= languageId %>\n" +
+    "  join `AuthorLng` al on a.`Id` = al.`AuthorId`\n" +
     "  join `Course` c on c.`Id` = lc.`CourseId`\n" +
-    "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and cl.`LanguageId` = <%= languageId %>\n" +
+    "  join `CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
     "  join `Course` co on co.`Id` = l.`CourseId`\n" +
-    "  join `CourseLng` clo on co.`Id` = clo.`CourseId` and clo.`LanguageId` = <%= languageId %>\n" +
+    "  join `CourseLng` clo on co.`Id` = clo.`CourseId`\n" +
     "  join `LessonCourse` lcp on lc.`ParentId` = lcp.`Id`\n" +
     "where lcp.`LessonId` = <%= id %> and lcp.`CourseId` = <%= courseId %>";
 
 const LESSON_MSSQL_EPISODE_REQ =
     "select e.[Id], epl.[Name], el.[Number], epl.[State], el.[Supp] from [EpisodeLesson] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
-    "  join [EpisodeLng] epl on e.[Id] = epl.[EpisodeId] and epl.[LanguageId] = <%= languageId %>\n" +
+    "  join [EpisodeLng] epl on e.[Id] = epl.[EpisodeId]\n" +
     "where el.[LessonId] = <%= id %>";
 const LESSON_MSSQL_REFERENCE_REQ =
     "select r.[Id], r.[Description], r.[Number], r.[URL], r.[Recommended] from [Reference] r\n" +
@@ -188,7 +185,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
-    "  join [ResourceLng] l on l.[ResourceId] = r.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
 const LESSON_MSSQL_TOC_REQ =
@@ -203,7 +200,7 @@ const LESSON_MSSQL_TOC_REQ =
 const LESSON_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
     "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
-    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
     "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
@@ -220,7 +217,7 @@ const LESSON_MSSQL_ASSETS_REQ =
     "where pl.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_REQ =
-    "select lc.[CourseId], c.[URL] as[CURL], cl.[Name] as[CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
+    "select lc.[CourseId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
     "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[URL], l.[AuthorId], lc.[Number],\n" +
     "  lch.[Id] as[IdCh], llch.[Name] as[NameCh], llch.[ShortDescription] as[ShortDescriptionCh],\n" +
     "  lcch.[State] as[StateCh], lcch.[ReadyDate] as[ReadyDateCh], lch.[Cover] as[CoverCh], lch.[CoverMeta] as[CoverMetaCh],\n" +
@@ -239,7 +236,7 @@ const LESSON_MSSQL_REQ =
 
 const PARENT_MSSQL_REQ =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
-    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[Name] as[CName]\n" +
+    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -259,7 +256,7 @@ const LESSON_MSSQL_TRANSCRIPT_REQ =
 const LESSON_MYSQL_EPISODE_REQ =
     "select e.`Id`, epl.`Name`, el.`Number`, epl.`State`, el.`Supp` from `EpisodeLesson` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
-    "  join `EpisodeLng` epl on e.`Id` = epl.`EpisodeId` and epl.`LanguageId` = <%= languageId %>\n" +
+    "  join `EpisodeLng` epl on e.`Id` = epl.`EpisodeId`\n" +
     "where el.`LessonId` = <%= id %>";
 const LESSON_MYSQL_REFERENCE_REQ =
     "select r.`Id`, r.`Description`, r.`Number`, r.`URL`, r.`Recommended` from `Reference` r\n" +
@@ -267,7 +264,7 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "where l.`LessonId` = <%= id %>";
 const LESSON_MYSQL_RESOURCE_REQ =
     "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
-    "  join`ResourceLng` l on l.`ResourceId` = r.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
 const LESSON_MYSQL_TOC_REQ =
@@ -282,7 +279,7 @@ const LESSON_MYSQL_TOC_REQ =
 const LESSON_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
     "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
-    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
     "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
@@ -298,7 +295,7 @@ const LESSON_MYSQL_ASSETS_REQ =
     "where pl.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_REQ =
-    "select lc.`CourseId`, c.`URL` as`CURL`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
+    "select lc.`CourseId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
     "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
     "  lch.`Id` as`IdCh`, llch.`Name` as`NameCh`, llch.`ShortDescription` as`ShortDescriptionCh`,\n" +
     "  lcch.`State` as`StateCh`, lcch.`ReadyDate` as`ReadyDateCh`, lch.`Cover` as`CoverCh`, lch.`CoverMeta` as`CoverMetaCh`,\n" +
@@ -317,7 +314,7 @@ const LESSON_MYSQL_REQ =
 
 const PARENT_MYSQL_REQ =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
-    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`Name` as`CName`\n" +
+    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -381,13 +378,13 @@ const LESSON_MYSQL_DELETE_SCRIPT =
 const GET_LESSON_DURATION_MSSQL =
     "select coalesce(sum(coalesce(l.[Duration], 0)), 0) as dt from [EpisodeLesson] el\n" +
     "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
-    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
     "where el.[LessonId] = <%= id %>";
 
 const GET_LESSON_DURATION_MYSQL =
     "select coalesce(sum(coalesce(l.`Duration`, 0)), 0) as dt from `EpisodeLesson` el\n" +
     "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
-    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
     "where el.`LessonId` = <%= id %>";
 
 const LESSONS_ALL_MSSQL_REQ =
@@ -403,7 +400,7 @@ const LESSONS_ALL_MSSQL_REQ =
     "order by lc.[ParentId], lc.[Number]";
 
 const LESSONS_ALL_MYSQL_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`, ll.`LanguageId`,\n" +
     "  lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from `Course` c\n" +
@@ -413,6 +410,16 @@ const LESSONS_ALL_MYSQL_REQ =
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = cl.`LanguageId`\n" +
     "where c.`URL` = '<%= courseUrl %>'\n" +
     "order by lc.`ParentId`, lc.`Number`";
+
+const GET_COURSE_LANG_MSSQL =
+    "select l.[LanguageId] from [Course] c\n" +
+    "  join [CourseLng] l on l.[CourseId] = c.[Id]\n" +
+    "where c.[Id] = <%= courseId %>";
+
+const GET_COURSE_LANG_MYSQL =
+    "select l.`LanguageId` from `Course` c\n" +
+    "  join `CourseLng` l on l.`CourseId` = c.`Id`\n" +
+    "where c.`Id` = <%= courseId %>";
 
 const DbLesson = class DbLesson extends DbObject {
 
@@ -432,8 +439,8 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_ID_REQ)({ languageId: LANGUAGE_ID, id: id, courseId: course_id }),
-                        mssql: _.template(LESSON_MSSQL_ID_REQ)({ languageId: LANGUAGE_ID, id: id, courseId: course_id })
+                        mysql: _.template(LESSON_MYSQL_ID_REQ)({ id: id, courseId: course_id }),
+                        mssql: _.template(LESSON_MSSQL_ID_REQ)({ id: id, courseId: course_id })
                     }
                 }, {})
                     .then((result) => {
@@ -444,8 +451,8 @@ const DbLesson = class DbLesson extends DbObject {
                         if (!isNotFound)
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(LESSON_MYSQL_EPISODE_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                    mssql: _.template(LESSON_MSSQL_EPISODE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                    mysql: _.template(LESSON_MYSQL_EPISODE_REQ)({ id: id }),
+                                    mssql: _.template(LESSON_MSSQL_EPISODE_REQ)({ id: id })
                                 }
                             }, {});
                     })
@@ -481,8 +488,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lesson.References = references;
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(LESSON_MYSQL_CHLD_REQ)({ languageId: LANGUAGE_ID, id: id, courseId: course_id }),
-                                    mssql: _.template(LESSON_MSSQL_CHLD_REQ)({ languageId: LANGUAGE_ID, id: id, courseId: course_id })
+                                    mysql: _.template(LESSON_MYSQL_CHLD_REQ)({ id: id, courseId: course_id }),
+                                    mssql: _.template(LESSON_MSSQL_CHLD_REQ)({ id: id, courseId: course_id })
                                 }
                             }, {});
                         }
@@ -496,8 +503,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lesson.Childs = childs;
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                    mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                    mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ id: id }),
+                                    mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ id: id })
                                 }
                             }, {});
                         }
@@ -522,8 +529,8 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                        mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ languageId: LANGUAGE_ID, id: id })
+                        mysql: _.template(LESSON_MYSQL_RESOURCE_REQ)({ id: id }),
+                        mssql: _.template(LESSON_MSSQL_RESOURCE_REQ)({ id: id })
                     }
                 }, {})
                     .then((result) => {
@@ -556,6 +563,7 @@ const DbLesson = class DbLesson extends DbObject {
                             result.detail.forEach((elem) => {
                                 let lsn = {
                                     Id: elem.LessonId,
+                                    LanguageId: elem.LanguageId,
                                     Number: elem.Number,
                                     ReadyDate: elem.ReadyDate,
                                     State: elem.State,
@@ -597,12 +605,10 @@ const DbLesson = class DbLesson extends DbObject {
                                 dialect: {
                                     mysql: _.template(AUTHORS_BY_ID_MYSQL_PUBLIC_REQ)(
                                         {
-                                            languageId: LANGUAGE_ID,
                                             authors: authors
                                         }),
                                     mssql: _.template(AUTHORS_BY_ID_MSSQL_PUBLIC_REQ)(
                                         {
-                                            languageId: LANGUAGE_ID,
                                             authors: authors
                                         })
                                 }
@@ -664,6 +670,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (isFirst) {
                                     course = {
                                         Id: elem.CourseId,
+                                        LanguageId: elem.LanguageId,
                                         Name: elem.CName,
                                         URL: elem.CURL
                                     };
@@ -717,12 +724,10 @@ const DbLesson = class DbLesson extends DbObject {
                                 dialect: {
                                     mysql: _.template(AUTHORS_BY_ID_MYSQL_PUBLIC_REQ)(
                                         {
-                                            languageId: LANGUAGE_ID,
                                             authors: authors
                                         }),
                                     mssql: _.template(AUTHORS_BY_ID_MSSQL_PUBLIC_REQ)(
                                         {
-                                            languageId: LANGUAGE_ID,
                                             authors: authors
                                         })
                                 }
@@ -777,6 +782,7 @@ const DbLesson = class DbLesson extends DbObject {
                             id = elem.Id;
                             data.Course = {
                                 Id: elem.CId,
+                                LanguageId: elem.LanguageId,
                                 Name: elem.CName,
                                 URL: elem.CURL
                             };
@@ -912,8 +918,8 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(LESSON_MYSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                mssql: _.template(LESSON_MSSQL_CONTENT_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                mysql: _.template(LESSON_MYSQL_CONTENT_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_CONTENT_REQ)({ id: id })
                             }
                         }, {});
                     })
@@ -1016,8 +1022,8 @@ const DbLesson = class DbLesson extends DbObject {
                 .then(() => {
                     return $data.execSql({
                         dialect: {
-                            mysql: _.template(GET_LESSON_DURATION_MYSQL)({ languageId: LANGUAGE_ID, id: lesson_id }),
-                            mssql: _.template(GET_LESSON_DURATION_MSSQL)({ languageId: LANGUAGE_ID, id: lesson_id })
+                            mysql: _.template(GET_LESSON_DURATION_MYSQL)({ id: lesson_id }),
+                            mssql: _.template(GET_LESSON_DURATION_MSSQL)({ id: lesson_id })
                         }
                     }, options);
                 })
@@ -1045,7 +1051,7 @@ const DbLesson = class DbLesson extends DbObject {
             let lesson_number;
 
             let transactionId = null;
-            let hasParent = typeof (parent_id) === "number";
+            let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let curr_parent_id;
             let lc_parent_id;
 
@@ -1194,6 +1200,7 @@ const DbLesson = class DbLesson extends DbObject {
             let ref_collection;
             let epi_collection;
             let epi_own_collection;
+            let languageId;
             let ch_list = {};
             let res_list = {};
             let ref_list = {};
@@ -1211,7 +1218,7 @@ const DbLesson = class DbLesson extends DbObject {
             let transactionId = null;
 
             let ls_course_obj = null;
-            let hasParent = typeof (parent_id) === "number";
+            let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let isDurationChanged = false;
 
             resolve(
@@ -1249,6 +1256,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Lesson (Id = " + id + ") has inconsistent \"LNG\" part.");
                         lsn_lng_obj = collection.get(0);
+                        languageId = lsn_lng_obj.languageId();
 
                         ch_own_collection = lsn_obj.getDataRoot("Lesson").getCol("DataElements");
                         root_res = lsn_obj.getDataRoot("Resource");
@@ -1312,7 +1320,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     },
                                     lng: {
                                         Name: elem.Name ? elem.Name : "",
-                                        LanguageId: LANGUAGE_ID
+                                        LanguageId: languageId
                                     }
                                 };
                                 if (typeof (elem.ResLanguageId) !== "undefined")
@@ -1606,8 +1614,9 @@ const DbLesson = class DbLesson extends DbObject {
             let new_lng_obj = null;
             let inpFields = data || {};
             let transactionId = null;
-            let hasParent = typeof (parent_id) === "number";
+            let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let isDurationChanged = false;
+            let languageId;
 
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
@@ -1617,10 +1626,23 @@ const DbLesson = class DbLesson extends DbObject {
                             throw new Error("Course (Id = " + course_id + ") doesn't exist.");
                         course_obj = collection.get(0);
 
-                        return course_obj.edit()
-                            .then(() => {
-                                return this._getObjById(-1);
-                            })
+                        return course_obj.edit();
+                    })
+                    .then(() => {
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(GET_COURSE_LANG_MYSQL)({ courseId: course_id }),
+                                mssql: _.template(GET_COURSE_LANG_MSSQL)({ courseId: course_id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length === 1)) {
+                            languageId = result.detail[0].LanguageId;
+                            return this._getObjById(-1);
+                        }
+                        else
+                            throw new Error("Course (Id = " + course_id + ") has inconsistent \"LNG\" part.");
                     })
                     .then((result) => {
                         root_obj = result;
@@ -1647,7 +1669,7 @@ const DbLesson = class DbLesson extends DbObject {
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("LessonLng");
 
-                        let fields = { LanguageId: LANGUAGE_ID };
+                        let fields = { LanguageId: languageId };
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1728,7 +1750,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     .then((result) => {
                                         new_res_obj = this._db.getObj(result.newObject);
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
-                                        let fields = { Name: "", LanguageId: LANGUAGE_ID, Duration: 0, DurationFmt: "00:00" };
+                                        let fields = { Name: "", LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
                                             fields["Name"] = elem["Name"];
                                         if (typeof (elem["Description"]) !== "undefined")

@@ -15,6 +15,7 @@
                 "fields": {
                     "Id": 1,
                     "Code": "RU", 
+                    "LangTag": "ru-RU", 
                     "Language": "Русский"
                 }, 
                 "collections": { }
@@ -26,6 +27,7 @@
                 "fields": {
                     "Id": 2,
                     "Code": "EN",
+                    "LangTag": "en-GB", 
                     "Language": "English"
                 },
                 "collections": {}
@@ -37,6 +39,7 @@
                 "fields": {
                     "Id": 3,
                     "Code": "FR",
+                    "LangTag": "fr-FR", 
                     "Language": "Français"
                 },
                 "collections": {}
@@ -48,6 +51,7 @@
                 "fields": {
                     "Id": 4,
                     "Code": "GE",
+                    "LangTag": "de-DE", 
                     "Language": "Deutsch"
                 },
                 "collections": {}
