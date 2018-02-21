@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 import Info from './course-module-info';
 import CourseModuleBody from './course-module-body';
@@ -13,9 +13,10 @@ export default class InfoBlock extends React.Component {
         return (
             <div className='course-module__info-block'>
                 <div className="course-module__header">
+                    <span className="favourites">В закладки</span>
                     <Header title={title} url={url} onUrlClick={onUrlClick}/>
-                    <Info authors={course ? course.AuthorsObj:[]}
-                          categories={course ? course.CategoriesObj:[]}/>
+                    <Info authors={course ? course.AuthorsObj : []}
+                          categories={course ? course.CategoriesObj : []}/>
                 </div>
                 <CourseModuleBody course={course} isMobile={isMobile}/>
             </div>
@@ -39,9 +40,11 @@ class Header extends React.Component {
 
     render() {
         return (
-            <h1 className="course-module__title"  onClick={::this._onClick}>
-                <p className="course-module__label">Курс:</p>
-                <span><Link to={'/category/' + this.props.url}>{this.props.title}</Link></span>
+            <h1 className="course-module__title" onClick={::this._onClick}>
+                <Link to={'/category/' + this.props.url}>
+                    <p className="course-module__label">Курс:</p>
+                    <span>{this.props.title}</span>
+                </Link>
             </h1>
         );
     }
