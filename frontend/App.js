@@ -7,6 +7,7 @@ import {Switch, Route, withRouter,} from 'react-router-dom'
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
+import LessonPage from './containers/lesson-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -14,9 +15,15 @@ import PageFooter from './components/page-footer/page-footer';
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 
+import * as Polifyll from './tools/polyfill';
+
+Polifyll.registry();
+
 class App extends Component {
 
     constructor(props) {
+
+
         super(props);
         this.state = {
             direction: '',
@@ -87,6 +94,7 @@ class App extends Component {
                 {/*<PageHeader visible={this.state.showHeader}/>*/}
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
             </Switch>
         )
     }

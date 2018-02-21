@@ -1,0 +1,198 @@
+import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import { Link } from 'react-router-dom';
+
+// import Cover from '../components/course-extended/cover-extended';
+// import Content from '../components/course-extended/content-extended';
+// import CourseLessons from '../components/course-extended/course-lessons';
+// import CourseBooks from '../components/course-extended/course-books';
+
+import * as lessonActions from '../actions/lesson-actions';
+import * as pageHeaderActions from '../actions/page-header-actions';
+
+import {pages} from '../tools/page-tools';
+
+class LessonPage extends React.Component {
+    constructor(props) {
+        super(props);
+        // this.props.coursesActions.getCourses();
+    }
+
+    componentWillMount() {
+        let {courseUrl, lessonUrl} = this.props;
+
+        this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+        this.props.pageHeaderActions.setCurrentPage(pages.lesson);
+    }
+
+    _getLessonsBundles() {
+
+    }
+
+    render() {
+        let {
+            course,
+            fetching
+        } = this.props;
+
+        return (
+            <div>
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
+                        :
+                        course ?
+                            <div className="fullpage-wrapper" id="fullpage">
+                                {this._getLessonsBundles()}
+                                <LectureWrapper/>
+                            </div> : null
+                }
+            </div>
+        )
+    }
+}
+
+class LectureWrapper extends React.Component {
+    render() {
+        return (
+            <section className="fullpage-section lecture-wrapper" style={{backgroundImage: 'assets/images/bg-frame02.png'}}>
+                <Link to="lecture-transcript.html" class="link-to-transcript">Транскрипт <br>и материалы</br></Link>
+            </section>
+        )
+    }
+}
+
+// class TitleWrapper extends React.Component {
+//     render() {
+//         return (
+//             <div className="course-module__title-wrapper">
+//                 <h1 className="course-module__title"><p className="course-module__label">
+//                     Курс:</p>{' ' + this.props.title}</h1>
+//             </div>
+//         )
+//     }
+// }
+
+// class Inner extends React.Component {
+//     render() {
+//         return (
+//             <div className="course-module__inner">
+//                 <Cover/>
+//                 <Content/>
+//             </div>
+//         )
+//     }
+// }
+
+// const CourseTabsName = {
+//     lessons: 'lesson',
+//     books: 'books'
+// };
+
+// class CourseTabs extends React.Component {
+//     constructor(props) {
+//         super(props);
+//
+//         this.state = {
+//             activeTab: CourseTabsName.lessons
+//         }
+//     }
+//
+//     _onSetActiveTab(tabName) {
+//         if (tabName !== this.state.activeTab) {
+//             this.setState({activeTab: tabName})
+//         }
+//     }
+//
+//     _getList() {
+//         return (
+//             this.state.activeTab === CourseTabsName.lessons ? <CourseLessons/> : <CourseBooks/>
+//         )
+//     }
+//
+//     render() {
+//         return (
+//             <div className="course-tabs">
+//                 <ul className="course-tab-controls">
+//                     <LessonsTab
+//                         total={this.props.lessons.total}
+//                         ready={this.props.lessons.ready}
+//                         onClick={::this._onSetActiveTab}
+//                         active={this.state.activeTab === CourseTabsName.lessons}/>
+//                     <BooksTab
+//                         total={this.props.books.total}
+//                         onClick={::this._onSetActiveTab}
+//                         active={this.state.activeTab === CourseTabsName.books}/>
+//                 </ul>
+//                 <ul className="course-tabs-list">
+//                     {this._getList()}
+//                 </ul>
+//             </div>
+//         )
+//     }
+// }
+
+// class LessonsTab extends React.Component {
+//     _onClick() {
+//         this.props.onClick(CourseTabsName.lessons)
+//     }
+//
+//     render() {
+//         return (
+//             <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
+//                 <span className="course-tab-control__title">Лекции</span>
+//                 <span className="course-tab-control__label">Вышло</span>
+//                 <span className="course-tab-control__actual">{this.props.ready}</span>
+//                 <span className="course-tab-control__total">/{this.props.total}</span>
+//             </li>
+//         )
+//     }
+// }
+
+// class BooksTab extends React.Component {
+//     _onClick() {
+//         if ((this.props) && (this.props.total)) {
+//             this.props.onClick(CourseTabsName.books)
+//         }
+//     }
+//
+//     render() {
+//         return (
+//             <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
+//                 <span className="course-tab-control__title _desktop">Список для чтения:</span>
+//                 <span className="course-tab-control__title _mobile">Книги</span>
+//                 {
+//                     this.props.total ?
+//                         <div>
+//                             <span className="course-tab-control__actual">{this.props.total + ' '}</span>
+//                             <span className="course-tab-control__label">книги</span>
+//                         </div>
+//                         :
+//                         <div style={{marginBottom: 2}}>
+//                             <span className="course-tab-control__empty _desktop">пока пуст</span>
+//                             <span className="course-tab-control__empty _mobile">0</span>
+//                         </div>
+//                 }
+//             </li>
+//         )
+//     }
+// }
+
+function mapStateToProps(state, ownProps) {
+    return {
+        courseUrl: ownProps.match.params.courseUrl,
+        lessonUrl: ownProps.match.params.lessonUrl,
+        fetching: state.singleCourse.fetching,
+        lesson: state.singleCourse.object,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        lessonActions: bindActionCreators(lessonActions, dispatch),
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LessonPage);

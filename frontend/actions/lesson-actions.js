@@ -1,44 +1,20 @@
 import {
-    GET_COURSES_REQUEST,
-    GET_COURSES_SUCCESS,
-    GET_COURSES_FAIL,
-    GET_SINGLE_COURSE_REQUEST,
-    GET_SINGLE_COURSE_SUCCESS,
-    GET_SINGLE_COURSE_FAIL,
-} from '../constants/courses'
-
-import {
-    LOAD_FILTER_VALUES,
-} from '../constants/filters'
+    GET_LESSON_REQUEST,
+    GET_LESSON_SUCCESS,
+    GET_LESSON_FAIL,
+} from '../constants/lesson'
 
 import 'whatwg-fetch';
 
-
-// const fetch = (url) => {
-//     return new Promise((resolve, reject) => {
-//         const xhr = new XMLHttpRequest();
-//
-//         xhr.open("GET", url, true);
-//
-//         xhr.onload = function () {
-//             resolve(this.responseText);
-//         };
-//
-//         xhr.onerror = reject;
-//
-//         xhr.send();
-//     })
-// };
-
-export const getCourses = () => {
+export const getLesson = (courseUrl, lessonUrl) => {
     return (dispatch) => {
         dispatch({
-            type: GET_COURSES_REQUEST,
+            type: GET_LESSON_REQUEST,
             payload: null
         });
 
-        fetch("/api/courses", {credentials: 'include'})
-        .then(checkStatus)
+        fetch("/api/lessons/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+            .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 console.log(data.Courses.length);
@@ -46,50 +22,16 @@ export const getCourses = () => {
 
                 console.log('GET_COURSES_SUCCESS');
                 dispatch({
-                    type: GET_COURSES_SUCCESS,
-                    payload: data
-                });
-
-                console.log('LOAD_FILTER_VALUES');
-                dispatch({
-                    type: LOAD_FILTER_VALUES,
-                    payload: data.Categories
-                })
-            })
-            .catch((err) => {
-                dispatch({
-                    type: GET_COURSES_FAIL,
-                    payload: err
-                });
-            });
-    }
-};
-
-export const getCourse = (url) => {
-    return (dispatch) => {
-        dispatch({
-            type: GET_SINGLE_COURSE_REQUEST,
-            payload: null
-        });
-
-        fetch("/api/courses/" + url, {credentials: 'include'})
-        .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                handleCourse(data);
-
-                dispatch({
-                    type: GET_SINGLE_COURSE_SUCCESS,
+                    type: GET_LESSON_SUCCESS,
                     payload: data
                 });
             })
             .catch((err) => {
                 dispatch({
-                    type: GET_SINGLE_COURSE_FAIL,
+                    type: GET_LESSON_FAIL,
                     payload: err
                 });
             });
-
     }
 };
 

@@ -50,12 +50,8 @@ class CoursesPage extends React.Component {
                 });
             }
 
-            return (_inFilter ? <CourseModule course={course} key={index} onUrlClick={::this._onUrlClick} isMobile={this._isMobile()}/> : null)
+            return (_inFilter ? <CourseModule course={course} key={index} isMobile={this._isMobile()}/> : null)
         })
-    }
-
-    _onUrlClick(url){
-        this.props.history.push('/category/' + url);
     }
 
     render() {

@@ -42,6 +42,7 @@ class Main extends React.Component {
                                 <CourseTabs
                                     lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                     books={{total: course.Books.length}}
+                                    courseUrl={this.props.courseUrl}
                                 />
                             </div> : null
                 }
@@ -105,7 +106,7 @@ class CourseTabs extends React.Component {
 
     _getList() {
         return (
-            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons/> : <CourseBooks/>
+            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons courseUrl={this.props.courseUrl}/> : <CourseBooks/>
         )
     }
 
@@ -167,7 +168,7 @@ class BooksTab extends React.Component {
                             <span className="course-tab-control__label">книги</span>
                         </div>
                         :
-                        <div>
+                        <div style={{marginBottom: 2}}>
                             <span className="course-tab-control__empty _desktop">пока пуст</span>
                             <span className="course-tab-control__empty _mobile">0</span>
                         </div>

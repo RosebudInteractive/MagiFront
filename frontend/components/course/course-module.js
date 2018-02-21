@@ -7,7 +7,7 @@ import * as svg from '../../tools/svg-paths';
 export default class CourseModule extends React.Component {
 
     render() {
-        let {course, onUrlClick, isMobile} =
+        let {course, isMobile} =
             this.props;
 
         return (
@@ -16,7 +16,6 @@ export default class CourseModule extends React.Component {
                     <InfoBlock title={' ' + course.Name}
                                url={course.URL}
                                course={course}
-                               onUrlClick={onUrlClick}
                                isMobile={isMobile}
                     />
                     <ImageBlock cover={course.Cover}/>
@@ -29,7 +28,6 @@ export default class CourseModule extends React.Component {
 
 CourseModule.propTypes = {
     course: PropTypes.object.isRequired,
-    onUrlClick: PropTypes.func.isRequired,
     isMobile: PropTypes.bool.isRequired,
 };
 
@@ -38,8 +36,8 @@ class ImageBlock extends React.Component {
     constructor(props) {
         super(props);
         let _number = svg.getRandomInt(1, 12);
-        // _number = _number.toString().padStart(2, '0');
-        _number = '01';
+        _number = _number.toString().padStart(2, '0');
+        // _number = '01';
 
         this.state = {
             maskNumber : _number
