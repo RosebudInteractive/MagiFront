@@ -72,22 +72,9 @@ class LecturesList extends React.Component {
 
 class PlayBlock extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {flipped: null};
-    }
-
-    _mouseEnter() {
-        this.setState({flipped: true});
-    }
-
-    _mouseLeave() {
-        this.setState({flipped: false});
-    }
-
     render() {
         return (
-            <div className='lecture__play-block' onMouseEnter={::this._mouseEnter} onMouseLeave={::this._mouseLeave}>
+            <div className='lecture__play-block'>
 
                 <div className="lecture__image-wrapper">
                     <img src={this.props.cover} width="126" height="126" alt=""/>

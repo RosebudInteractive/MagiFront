@@ -92,6 +92,8 @@ class PlayBlock extends React.Component {
     }
 }
 
+{/*<svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}></svg>*/}
+
 class InfoBlock extends React.Component {
     render() {
         return (
