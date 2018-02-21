@@ -11,24 +11,24 @@ import {
     LOAD_FILTER_VALUES,
 } from '../constants/filters'
 
-// import 'whatwg-fetch';
+import 'whatwg-fetch';
 
 
-const fetch = (url) => {
-    return new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-
-        xhr.open("GET", url, true);
-
-        xhr.onload = function () {
-            resolve(this.responseText);
-        };
-
-        xhr.onerror = reject;
-
-        xhr.send();
-    })
-};
+// const fetch = (url) => {
+//     return new Promise((resolve, reject) => {
+//         const xhr = new XMLHttpRequest();
+//
+//         xhr.open("GET", url, true);
+//
+//         xhr.onload = function () {
+//             resolve(this.responseText);
+//         };
+//
+//         xhr.onerror = reject;
+//
+//         xhr.send();
+//     })
+// };
 
 export const getCourses = () => {
     return (dispatch) => {
@@ -38,7 +38,7 @@ export const getCourses = () => {
         });
 
         fetch("/api/courses", {credentials: 'include'})
-        // .then(checkStatus)
+        .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 console.log(data.Courses.length);
@@ -73,7 +73,7 @@ export const getCourse = (url) => {
         });
 
         fetch("/api/courses/" + url, {credentials: 'include'})
-        // .then(checkStatus)
+        .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 handleCourse(data);
@@ -93,23 +93,23 @@ export const getCourse = (url) => {
     }
 };
 
-// const checkStatus = (response) => {
-//     if (response.status >= 200 && response.status < 300) {
-//         return response
-//     } else {
-//         let error = new Error(response.statusText);
-//         error.response = response;
-//         throw error
-//     }
-// };
-
-// const parseJSON = (response) => {
-//     return response.json()
-// };
-
-const parseJSON = (data) => {
-    return JSON.parse(data)
+const checkStatus = (response) => {
+    if (response.status >= 200 && response.status < 300) {
+        return response
+    } else {
+        let error = new Error(response.statusText);
+        error.response = response;
+        throw error
+    }
 };
+
+const parseJSON = (response) => {
+    return response.json()
+};
+
+// const parseJSON = (data) => {
+//     return JSON.parse(data)
+// };
 
 // const handleCourse = (course) => {
 //     // course.id = course.Id;
@@ -120,13 +120,13 @@ const parseJSON = (data) => {
 // };
 
 const _getAuthor = (array, id) => {
-    return array.some((item) => {
+    return array.find((item) => {
         return item.Id === id
     })
 };
 
 const _getCategory = (array, id) => {
-    return array.some((item) => {
+    return array.find((item) => {
         return item.Id === id
     })
 };

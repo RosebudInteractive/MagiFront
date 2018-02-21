@@ -17,10 +17,11 @@ const _prodConfig = {
     module: {
         rules: [
             {
-                loaders: ['babel-loader?plugins[]=transform-object-assign'],
+                loaders: ['babel-loader'],
                 include: [
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
+                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                 ],
                 // language=JSRegexp
                 test: /\.js$/
@@ -92,6 +93,7 @@ const _devConfig = {
                 include: [
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
+                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                 ],
                 test: /\.js$/
             },
