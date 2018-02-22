@@ -204,15 +204,17 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and (l.[ParentId] is NULL)\n" +
     "order by lc.[State] desc, lc.[ReadyDate] desc";
 const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from [AuthorToCourse] ac\n" +
+    "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from[AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
     "  join[AuthorLng] l on l.[AuthorId] = a.[Id]\n" +
+    "  join[Course] cs on cs.[Id] = ac.[CourseId] and cs.[LanguageId] = <%= languageId %>\n" +
     "<%= whereClause %>" +
     "order by ac.[CourseId]";
 const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select cc.[CourseId], c.[Id], l.[Name], c.[URL] from [CourseCategory] cc\n" +
+    "select cc.[CourseId], c.[Id], l.[Name], c.[URL] from[CourseCategory] cc\n" +
     "  join[Category] c on c.[Id] = cc.[CategoryId]\n" +
     "  join[CategoryLng] l on l.[CategoryId] = c.[Id]\n" +
+    "  join[Course] cs on cs.[Id] = cc.[CourseId] and cs.[LanguageId] = <%= languageId %>\n" +
     "<%= whereClause %>" +
     "order by cc.[CourseId]";
 
@@ -227,15 +229,17 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and (l.`ParentId` is NULL)\n" +
     "order by lc.`State` desc, lc.`ReadyDate` desc";
 const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from `AuthorToCourse` ac\n" +
+    "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from`AuthorToCourse` ac\n" +
     "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
     "  join`AuthorLng` l on l.`AuthorId` = a.`Id`\n" +
+    "  join`Course` cs on cs.`Id` = ac.`CourseId` and cs.`LanguageId` = <%= languageId %>\n" +
     "<%= whereClause %>" +
     "order by ac.`CourseId`";
 const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select cc.`CourseId`, c.`Id`, l.`Name`, c.`URL` from `CourseCategory` cc\n" +
+    "select cc.`CourseId`, c.`Id`, l.`Name`, c.`URL` from`CourseCategory` cc\n" +
     "  join`Category` c on c.`Id` = cc.`CategoryId`\n" +
     "  join`CategoryLng` l on l.`CategoryId` = c.`Id`\n" +
+    "  join`Course` cs on cs.`Id` = cc.`CourseId` and cs.`LanguageId` = <%= languageId %>\n" +
     "<%= whereClause %>" +
     "order by cc.`CourseId`";
 
@@ -389,8 +393,8 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ)({ whereClause: "" }),
-                                    mssql: _.template(AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ)({ whereClause: "" })
+                                    mysql: _.template(AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ)({ languageId: languageId, whereClause: "where cs.`State` = 'P'" }),
+                                    mssql: _.template(AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ)({ languageId: languageId, whereClause: "where cs.[State] = 'P'" })
                                 }
                             }, {});
                         }
@@ -419,8 +423,8 @@ const DbCourse = class DbCourse extends DbObject {
                             })
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ)({ whereClause: "" }),
-                                    mssql: _.template(CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ)({ whereClause: "" })
+                                    mysql: _.template(CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ)({ languageId: languageId, whereClause: "where cs.`State` = 'P'" }),
+                                    mssql: _.template(CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ)({ languageId: languageId, whereClause: "where cs.[State] = 'P'" })
                                 }
                             }, {});
                         }
@@ -465,7 +469,8 @@ const DbCourse = class DbCourse extends DbObject {
         let courseId = 0;
         let lsn_list = {};
         let lc_list = {};
-        
+        let languageId;
+
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -481,6 +486,7 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
                                     isFirst = false;
+                                    languageId = elem.LanguageId;
                                     courseId = elem.Id;
                                     course = {
                                         Id: elem.Id,
@@ -570,10 +576,12 @@ const DbCourse = class DbCourse extends DbObject {
                                 dialect: {
                                     mysql: _.template(CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ)(
                                         {
+                                            languageId: languageId,
                                             whereClause: _.template(CATEGORY_COURSE_MYSQL_WHERE)({ courseId: courseId })
                                         }),
                                     mssql: _.template(CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ)(
                                         {
+                                            languageId: languageId,
                                             whereClause: _.template(CATEGORY_COURSE_MSSQL_WHERE)({ courseId: courseId })
                                         })
                                 }
