@@ -89,9 +89,7 @@ class App extends Component {
         let _homePath = '/';
 
         return (
-            // this._showMobileMenu() ? null :
             <Switch>
-                {/*<PageHeader visible={this.state.showHeader}/>*/}
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
@@ -113,7 +111,6 @@ class App extends Component {
 function mapStateToProps(state, ownProps) {
     return {
         showFiltersForm: state.pageHeader.showFiltersForm,
-        // showMenu: state.pageHeader.showMenu,
         size: state.app.size,
         ownProps,
     }

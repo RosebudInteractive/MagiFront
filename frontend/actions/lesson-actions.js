@@ -17,13 +17,11 @@ export const getLesson = (courseUrl, lessonUrl) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                console.log(data.Courses.length);
-                handleCourses(data);
+                // handleCourses(data);
 
-                console.log('GET_COURSES_SUCCESS');
                 dispatch({
                     type: GET_LESSON_SUCCESS,
-                    payload: data
+                    payload: data.Lesson
                 });
             })
             .catch((err) => {
@@ -49,120 +47,66 @@ const parseJSON = (response) => {
     return response.json()
 };
 
-// const parseJSON = (data) => {
-//     return JSON.parse(data)
+// const _getAuthor = (array, id) => {
+//     return array.find((item) => {
+//         return item.Id === id
+//     })
 // };
-
-// const handleCourse = (course) => {
-//     // course.id = course.Id;
-//     course.ColorHex = '#' + course.Color.toString(16);
 //
-//     // course.stateName =
-//     return course;
+// const _getCategory = (array, id) => {
+//     return array.find((item) => {
+//         return item.Id === id
+//     })
+// };
+//
+// const handleLesson = (data) => {
+//     try {
+//         if (data.CoverMeta) {
+//             data.CoverMeta = JSON.parse(data.CoverMeta)
+//         }
+//
+//         data.Authors.forEach((author) => {
+//             if (author.PortraitMeta) {
+//                 author.PortraitMeta = JSON.parse(author.PortraitMeta)
+//             }
+//         });
+//
+//         let _lessonCount = 0,
+//             _readyLessonCount = 0;
+//
+//         data.Lessons.forEach((lesson) => {
+//             if (lesson.State === 'R') {
+//                 _lessonCount++;
+//                 _readyLessonCount++
+//             } else {
+//                 _lessonCount++
+//             }
+//
+//             let _readyDate = new Date(lesson.ReadyDate);
+//             lesson.readyYear = _readyDate.getFullYear();
+//             lesson.readyMonth = Months[_readyDate.getMonth()];
+//         });
+//
+//         data.lessonCount = _lessonCount;
+//         data.readyLessonCount = _readyLessonCount;
+//         console.log('exit');
+//     }
+//     catch (err) {
+//         console.error('ERR: ' + err.message);
+//     }
 // };
 
-const _getAuthor = (array, id) => {
-    return array.find((item) => {
-        return item.Id === id
-    })
-};
-
-const _getCategory = (array, id) => {
-    return array.find((item) => {
-        return item.Id === id
-    })
-};
-
-const handleCourses = (data) => {
-    console.log('Enter!')
-    try {
-        data.Courses.forEach((item) => {
-            item.CategoriesObj = [];
-            item.AuthorsObj = [];
-
-            item.Categories.forEach((category) => {
-                let _category = _getCategory(data.Categories, category);
-                item.CategoriesObj.push(_category)
-            });
-
-            item.Authors.forEach((author) => {
-                item.AuthorsObj.push(_getAuthor(data.Authors, author))
-            });
-
-            item.ColorHex = '#' + item.Color.toString(16);
-
-            let _readyLessonCount = 0;
-
-            item.Lessons.forEach((lesson) => {
-                if (lesson.CoverMeta) {
-                    lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
-                }
-
-                if (lesson.State === 'R') {
-                    _readyLessonCount++
-                }
-            });
-
-            item.readyLessonCount = _readyLessonCount;
-        });
-
-        console.log('exit');
-    }
-    catch (err) {
-        console.error('ERR: ' + err.message);
-    }
-};
-
-const handleCourse = (data) => {
-    console.log('Enter!')
-
-    try {
-        if (data.CoverMeta) {
-            data.CoverMeta = JSON.parse(data.CoverMeta)
-        }
-
-        data.Authors.forEach((author) => {
-            if (author.PortraitMeta) {
-                author.PortraitMeta = JSON.parse(author.PortraitMeta)
-            }
-        });
-
-        let _lessonCount = 0,
-            _readyLessonCount = 0;
-
-        data.Lessons.forEach((lesson) => {
-            if (lesson.State === 'R') {
-                _lessonCount++;
-                _readyLessonCount++
-            } else {
-                _lessonCount++
-            }
-
-            let _readyDate = new Date(lesson.ReadyDate);
-            lesson.readyYear = _readyDate.getFullYear();
-            lesson.readyMonth = Months[_readyDate.getMonth()];
-        });
-
-        data.lessonCount = _lessonCount;
-        data.readyLessonCount = _readyLessonCount;
-        console.log('exit');
-    }
-    catch (err) {
-        console.error('ERR: ' + err.message);
-    }
-};
-
-const Months = [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь',
-];
+// const Months = [
+//     'Январь',
+//     'Февраль',
+//     'Март',
+//     'Апрель',
+//     'Май',
+//     'Июнь',
+//     'Июль',
+//     'Август',
+//     'Сентябрь',
+//     'Октябрь',
+//     'Ноябрь',
+//     'Декабрь',
+// ];

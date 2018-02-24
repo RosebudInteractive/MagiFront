@@ -13,23 +13,6 @@ import {
 
 import 'whatwg-fetch';
 
-
-// const fetch = (url) => {
-//     return new Promise((resolve, reject) => {
-//         const xhr = new XMLHttpRequest();
-//
-//         xhr.open("GET", url, true);
-//
-//         xhr.onload = function () {
-//             resolve(this.responseText);
-//         };
-//
-//         xhr.onerror = reject;
-//
-//         xhr.send();
-//     })
-// };
-
 export const getCourses = () => {
     return (dispatch) => {
         dispatch({
@@ -41,16 +24,13 @@ export const getCourses = () => {
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                console.log(data.Courses.length);
                 handleCourses(data);
 
-                console.log('GET_COURSES_SUCCESS');
                 dispatch({
                     type: GET_COURSES_SUCCESS,
                     payload: data
                 });
 
-                console.log('LOAD_FILTER_VALUES');
                 dispatch({
                     type: LOAD_FILTER_VALUES,
                     payload: data.Categories

@@ -21,7 +21,7 @@ class Header extends React.Component {
         this.props.pageHeaderState.showMenu ? this.props.pageHeaderActions.hideMenu() : this.props.pageHeaderActions.showMenu();
     }
 
-    _onFilterClick(){
+    _onFilterClick() {
         this.props.pageHeaderState.showFiltersForm ?
             this.props.pageHeaderActions.hideFiltersForm()
             :
@@ -39,24 +39,25 @@ class Header extends React.Component {
         let _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!this.props.visible ? ' _animate' : ''));
 
         return (
-
-            <header className={_headerClass}>
-                {this._isMobile() ?
-                    <div>
-                        <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}/>
-                        <MenuMobile/>
-                    </div>
-                    :
-                    <div>
-                        <DesktopHeaderRow
-                            onFilterClick={::this._onFilterClick}
-                            onNavigateClick={::this._onNavigateClick}
-                            currentPage={this.props.pageHeaderState.currentPage}
-                            filterActive={this.props.pageHeaderState.showFiltersForm}/>
-                        <FilterRow/>
-                    </div>
-                }
-            </header>
+            this.props.pageHeaderState.visibility ?
+                <header className={_headerClass}>
+                    {this._isMobile() ?
+                        <div>
+                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}/>
+                            <MenuMobile/>
+                        </div>
+                        :
+                        <div>
+                            <DesktopHeaderRow
+                                onFilterClick={::this._onFilterClick}
+                                onNavigateClick={::this._onNavigateClick}
+                                currentPage={this.props.pageHeaderState.currentPage}
+                                filterActive={this.props.pageHeaderState.showFiltersForm}/>
+                            <FilterRow/>
+                        </div>
+                    }
+                </header>
+                : null
         )
     }
 
@@ -66,7 +67,8 @@ class MobileHeaderRow extends React.Component {
     render() {
         return (
             <div className="page-header__menu-mobile">
-                <button type="button" className="menu-trigger" onClick={this.props.onClickMenuTrigger}><span>Меню</span></button>
+                <button type="button" className="menu-trigger" onClick={this.props.onClickMenuTrigger}><span>Меню</span>
+                </button>
                 <a href="#" className="logo-mobile">
                     <svg width="70" height="38">
                         {svg.logoMob}

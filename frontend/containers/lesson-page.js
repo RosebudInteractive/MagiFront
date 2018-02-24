@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -20,10 +21,21 @@ class LessonPage extends React.Component {
     }
 
     componentWillMount() {
+        this._bodyClassName = document.getElementById('body').className;
+        document.getElementById('body').className = 'fp-viewing-lecture01';
+
+        this._htmlClassName = document.getElementById('html').className;
+        document.getElementById('html').className = 'fp-enabled';
+
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
+    }
+
+    componentWillUnmount() {
+        document.getElementById('body').className = this._bodyClassName;
+        document.getElementById('html').className = this._htmlClassName;
     }
 
     _getLessonsBundles() {
@@ -32,9 +44,17 @@ class LessonPage extends React.Component {
 
     render() {
         let {
-            course,
+            lesson,
             fetching
         } = this.props;
+
+        const _style = {
+            height: "100%",
+            position: "relative",
+            touchAction: "none",
+            transform: "translate3d(0px, 0px, 0px)",
+            transition: "all 700ms ease"
+        };
 
         return (
             <div>
@@ -42,10 +62,12 @@ class LessonPage extends React.Component {
                     fetching ?
                         <p>Загрузка...</p>
                         :
-                        course ?
-                            <div className="fullpage-wrapper" id="fullpage">
+                        lesson ?
+                            <div className="fullpage-wrapper"
+                                 id="fullpage"
+                                 style={_style}>
                                 {this._getLessonsBundles()}
-                                <LectureWrapper/>
+                                <LectureWrapper lesson={lesson}/>
                             </div> : null
                 }
             </div>
@@ -56,9 +78,54 @@ class LessonPage extends React.Component {
 class LectureWrapper extends React.Component {
     render() {
         return (
-            <section className="fullpage-section lecture-wrapper" style={{backgroundImage: 'assets/images/bg-frame02.png'}}>
-                <Link to="lecture-transcript.html" class="link-to-transcript">Транскрипт <br>и материалы</br></Link>
+            <section className="fullpage-section lecture-wrapper" style={{backgroundImage: "url(" + '/data/'+ this.props.lesson.Cover + ")"}}>
+                <div className="fp-tableCell" style={{height: 472}}>
+                    <Menu/>
+                    <Link to="lecture-transcript.html" className="link-to-transcript">Транскрипт <br/>и материалы</Link>
+
+                </div>
             </section>
+        )
+    }
+}
+
+LectureWrapper.props = {
+    lesson: PropTypes.object.isRequired
+};
+
+class Menu extends React.Component {
+    static props = {
+
+    }
+
+
+    render() {
+        const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
+            _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>',
+            _share='<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#share"/>';
+
+
+        return (
+            <div className="lectures-menu js-lectures-menu _dark">
+                <div className="lectures-menu__section">
+                    <Link to={'/'} className="logo-min">
+                        <svg width="75" height="40" dangerouslySetInnerHTML={{ __html: _logoMob }}/>
+                    </Link>
+                    <a href="#" className="lectures-menu__link-back">
+                        <div className="icon">
+                            <svg width="18" height="18" dangerouslySetInnerHTML={{ __html: _linkBack }}/>
+                        </div>
+                        <span><span className="label">Курс:</span> Империи и цивилизации древней Евразии</span>
+                    </a>
+                </div>
+                <div className="lectures-menu__section lectures-list-block">
+                    <button type="button" className="lectures-list-trigger js-lectures-list-trigger"><span>Лекция</span> <span className="num"><span className="current">10</span>/13</span></button>
+
+                </div>
+                <button type="button" className="social-trigger">
+                    <svg width="18" height="18" dangerouslySetInnerHTML={{ __html: _share }}/>
+                </button>
+            </div>
         )
     }
 }
@@ -183,8 +250,8 @@ function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.courseUrl,
         lessonUrl: ownProps.match.params.lessonUrl,
-        fetching: state.singleCourse.fetching,
-        lesson: state.singleCourse.object,
+        fetching: state.singleLesson.fetching,
+        lesson: state.singleLesson.object,
     }
 }
 
