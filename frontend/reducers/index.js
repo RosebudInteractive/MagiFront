@@ -6,6 +6,7 @@ import courses from './courses';
 import filters from './filters';
 import singleCourse from './singleCourse';
 import singleLesson from './singleLesson';
+import lessons from './lessons';
 import app from './app';
 // import { routerReducer } from 'react-router-redux';
 
@@ -18,6 +19,7 @@ export default combineReducers({
     app,
     singleCourse,
     singleLesson,
+    lessons,
     routing: routerReducer,
     // browser: responsiveStateReducer({
     //     mobile: 500,

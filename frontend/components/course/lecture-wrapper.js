@@ -71,7 +71,6 @@ class LecturesList extends React.Component {
 }
 
 class PlayBlock extends React.Component {
-
     render() {
         return (
             <div className='lecture__play-block'>

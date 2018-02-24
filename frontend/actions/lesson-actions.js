@@ -1,7 +1,7 @@
 import {
     GET_LESSON_REQUEST,
     GET_LESSON_SUCCESS,
-    GET_LESSON_FAIL,
+    GET_LESSON_FAIL, GET_LESSONS_ALL_REQUEST, GET_LESSONS_ALL_SUCCESS, GET_LESSONS_ALL_FAIL,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
@@ -21,7 +21,7 @@ export const getLesson = (courseUrl, lessonUrl) => {
 
                 dispatch({
                     type: GET_LESSON_SUCCESS,
-                    payload: data.Lesson
+                    payload: data
                 });
             })
             .catch((err) => {
@@ -32,6 +32,33 @@ export const getLesson = (courseUrl, lessonUrl) => {
             });
     }
 };
+
+export const getLessonsAll = (courseUrl, lessonUrl) => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_LESSONS_ALL_REQUEST,
+            payload: null
+        });
+
+        fetch("/api/lessons-all/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleCourses(data);
+
+                dispatch({
+                    type: GET_LESSONS_ALL_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_LESSONS_ALL_FAIL,
+                    payload: err
+                });
+            });
+    }
+}
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {

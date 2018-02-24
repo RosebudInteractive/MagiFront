@@ -6,6 +6,8 @@ import {
 
 const initialState = {
     object: null,
+    course:  null,
+    authors: [],
     fetching: false,
     loaded: false,
 };
@@ -17,7 +19,14 @@ export default function singleLesson(state = initialState, action) {
             return {...state, object: null, fetching: true, loaded: false};
 
         case GET_LESSON_SUCCESS: {
-            return {...state, object: action.payload, fetching: false, loaded: true};
+            return {
+                ...state,
+                object: action.payload.Lesson,
+                course: action.payload.Course,
+                authors: action.payload.Authors,
+                fetching: false,
+                loaded: true
+            };
         }
 
         case GET_LESSON_FAIL:

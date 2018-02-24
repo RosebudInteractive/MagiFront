@@ -16,6 +16,7 @@ import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 
 import * as Polifyll from './tools/polyfill';
+import {pages} from "./tools/page-tools";
 
 Polifyll.registry();
 
@@ -46,6 +47,14 @@ class App extends Component {
         this.state.width = value
     }
 
+    get height() {
+        return this.state.height
+    }
+
+    set height(value) {
+        this.setState({height: value})
+    }
+
     get size() {
         return this.props.size
     }
@@ -56,6 +65,8 @@ class App extends Component {
         if (_size !== this.size) {
             this.props.appActions.switchSizeTo(_size);
         }
+
+        this.height = window.innerHeight;
     }
 
     componentDidMount() {
@@ -92,7 +103,9 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
-                <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
+                <Route path={_homePath + ':courseUrl/:lessonUrl'} render={(props) => (
+                    <LessonPage {...props} height={this.height}/>
+                )}/>
             </Switch>
         )
     }
@@ -102,7 +115,7 @@ class App extends Component {
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
                 {this._getMainDiv()}
-                <PageFooter/>
+                {this.props.currentPage !== pages.lesson ? <PageFooter/> : null}
             </div>
         );
     }
@@ -111,6 +124,7 @@ class App extends Component {
 function mapStateToProps(state, ownProps) {
     return {
         showFiltersForm: state.pageHeader.showFiltersForm,
+        currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         ownProps,
     }

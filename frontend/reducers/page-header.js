@@ -43,9 +43,6 @@ export default function pageHeader(state = initialState, action) {
             return {...state, currentPage: action.payload, visibility: action.payload !== pages.lesson};
         }
 
-
-
-
         default:
             return state;
     }
