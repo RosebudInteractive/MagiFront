@@ -1,5 +1,7 @@
-const { DbObject } = require('./db-object');
 const _ = require('lodash');
+const { DbObject } = require('./db-object');
+const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
+
 const CATEGORY_REQ_TREE = {
     expr: {
         model: {
@@ -15,19 +17,16 @@ const CATEGORY_REQ_TREE = {
     }
 };
 
-const ACCOUNT_ID = 1;
-const LANGUAGE_ID = 1;
-
 const CATEGORY_MSSQL_ALL_REQ =
     "select c.[Id], c.[ParentId], c.[URL], l.[Name], lp.[Name] as [ParentName] from [Category] c\n" +
-    "  join [CategoryLng] l on c.[Id] = l.[CategoryId] and l.[LanguageId] = <%= languageId %>\n"+
-    "  left join [CategoryLng] lp on c.[ParentId] = lp.[CategoryId] and lp.[LanguageId] = <%= languageId %>\n" +
+    "  join [CategoryLng] l on c.[Id] = l.[CategoryId]\n"+
+    "  left join [CategoryLng] lp on c.[ParentId] = lp.[CategoryId] and lp.[LanguageId] = l.[LanguageId]\n" +
     "where c.[AccountId] = <%= accountId %>";
 
 const CATEGORY_MYSQL_ALL_REQ =
     "select c.`Id`, c.`ParentId`, c.`URL`, l.`Name`, lp.`Name` as `ParentName` from `Category` c\n" +
-    "  join `CategoryLng` l on c.`Id` = l.`CategoryId` and l.`LanguageId` = <%= languageId %>\n" +
-    "  left join `CategoryLng` lp on c.`ParentId` = lp.`CategoryId` and lp.`LanguageId` = <%= languageId %>\n" +
+    "  join `CategoryLng` l on c.`Id` = l.`CategoryId`\n" +
+    "  left join `CategoryLng` lp on c.`ParentId` = lp.`CategoryId` and lp.`LanguageId` = l.`LanguageId`\n" +
     "where c.`AccountId` = <%= accountId %>";
 
 const CATEGORY_MSSQL_ID_REQ = CATEGORY_MSSQL_ALL_REQ + " and c.[Id] = <%= id %>";
@@ -49,8 +48,8 @@ const DbCategory = class DbCategory extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(CATEGORY_MYSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID }),
-                        mssql: _.template(CATEGORY_MSSQL_ALL_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID })
+                        mysql: _.template(CATEGORY_MYSQL_ALL_REQ)({ accountId: ACCOUNT_ID }),
+                        mssql: _.template(CATEGORY_MSSQL_ALL_REQ)({ accountId: ACCOUNT_ID })
                     }
                 }, {})
                     .then((result) => {
@@ -65,8 +64,8 @@ const DbCategory = class DbCategory extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(CATEGORY_MYSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id }),
-                        mssql: _.template(CATEGORY_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, languageId: LANGUAGE_ID, id: id })
+                        mysql: _.template(CATEGORY_MYSQL_ID_REQ)({ accountId: ACCOUNT_ID, id: id }),
+                        mssql: _.template(CATEGORY_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, id: id })
                     }
                 }, {})
                     .then((result) => {
@@ -138,11 +137,11 @@ const DbCategory = class DbCategory extends DbObject {
                         return ctg_obj.edit()
                     })
                     .then(() => {
-                        if (inpFields["ParentId"])
+                        if (typeof (inpFields["ParentId"]) !== "undefined")
                             ctg_obj.parentId(inpFields["ParentId"]);
-                        if (inpFields["URL"])
+                        if (typeof (inpFields["URL"]) !== "undefined")
                             ctg_obj.uRL(inpFields["URL"]);
-                        if (inpFields["Name"])
+                        if (typeof (inpFields["Name"]) !== "undefined")
                             ctg_lng_obj.name(inpFields["Name"]);
                         return ctg_obj.save(opts);
                     })
@@ -178,9 +177,9 @@ const DbCategory = class DbCategory extends DbObject {
                     })
                     .then(() => {
                         let fields = { AccountId: ACCOUNT_ID };
-                        if (inpFields["ParentId"])
+                        if (typeof (inpFields["ParentId"]) !== "undefined")
                             fields["ParentId"] = inpFields["ParentId"];
-                        if (inpFields["URL"])
+                        if (typeof (inpFields["URL"]) !== "undefined")
                             fields["URL"] = inpFields["URL"];
                         return root_obj.newObject({
                             fields: fields
@@ -192,7 +191,9 @@ const DbCategory = class DbCategory extends DbObject {
                         let root_lng = new_obj.getDataRoot("CategoryLng");
 
                         let fields = { LanguageId: LANGUAGE_ID };
-                        if (inpFields["Name"])
+                        if (typeof (inpFields["LanguageId"]) !== "undefined")
+                            fields["LanguageId"] = inpFields["LanguageId"];
+                        if (typeof (inpFields["Name"]) !== "undefined")
                             fields["Name"] = inpFields["Name"];
 
                         return root_lng.newObject({

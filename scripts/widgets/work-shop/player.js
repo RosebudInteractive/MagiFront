@@ -32,7 +32,8 @@ define(
                     playbackRate: '1.0',
                     requestAnimationFrameID: null,
                     videoOff: false,
-                    source: null
+                    source: null,
+                    currentTitles: []
                 };
                 this._elements = {
                     array: [],
@@ -349,9 +350,9 @@ define(
                     that._audioState.currentTime = this.currentTime;
                     that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
                     that._broadcastCurrentTimeChanged();
-                    if (!that._audioState.stopped) {
-                        that._playElements(that._audioState.globalTime);
-                    }
+                    //if (!that._audioState.stopped) {
+                    //    that._playElements(that._audioState.globalTime);
+                    //}
                     console.log("timeupdate", that._audioState.globalTime);
                     that._options.loader.setPosition(that._audioState.globalTime)
 
@@ -375,18 +376,44 @@ define(
             }
 
             _playElements(position) {
+                var newtitles = [];
+                var deleteOld = false;
                 var rate = +(this._audioState.playbackRate || 1);
                 for (var i = 0; i < this._elements.array.length; i++) {
                     var el = this._elements.array[i];
                     if (position >= el.Start && position <= (el.Start + el.Duration)) {
                         el.setRate(rate);
                         el.play();
+                        if (this._audioState.playingNow[el.Id] === undefined) {
+                            if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
+                                deleteOld = true;
+                            }
+                            if (el.Title)
+                                newtitles.push({id: el.Id, title: el.Title})
+                        }
                         this._audioState.playingNow[el.Id] = el;
                     } else if (el.Id in this._audioState.playingNow) {
                         el.stop();
                         delete this._audioState.playingNow[el.Id];
                     }
                 }
+
+                this._recalcTitles(newtitles, deleteOld);
+                this._broadcastChangeTitles();
+            }
+
+            _recalcTitles(newTitles, deleteOld) {
+                if (deleteOld || newTitles.length > 0) {
+                    for (var i = 0; i < this._audioState.currentTitles.length; ) {
+                        if (!(this._audioState.currentTitles[i].id in this._audioState.playingNow)) {
+                            this._audioState.currentTitles.splice(i, 1);
+                        } else {
+                            i++
+                        }
+                    }
+                }
+
+                this._audioState.currentTitles.push(...newTitles)
             }
 
             _broadcastAudioLoaded() {
@@ -640,11 +667,22 @@ define(
             }
 
             _setElementsPosition(position) {
+                var newtitles = [];
+                var deleteOld = false;
                 for (var i = 0; i < this._elements.array.length; i++) {
                     var el = this._elements.array[i];
                     if (position >= el.Start && position <= (el.Start + el.Duration)) {
                         var localPosition = position - el.Start;
                         el.Position = localPosition;
+
+                        if (this._audioState.playingNow[el.Id] === undefined) {
+                            if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
+                                deleteOld = true;
+                            }
+                            if (el.Title)
+                                newtitles.push({id: el.Id, title: el.Title})
+                        }
+
                         this._audioState.playingNow[el.Id] = el;
                     } else {
                         if (el.Id in this._audioState.playingNow) {
@@ -653,6 +691,15 @@ define(
                         }
                         el.Position = 0;
                     }
+                }
+
+                this._recalcTitles(newtitles, deleteOld);
+                this._broadcastChangeTitles();
+            }
+
+            _broadcastChangeTitles() {
+                if (this._options.onChangeTitles) {
+                    this._options.onChangeTitles(this._audioState.currentTitles);
                 }
             }
 
@@ -901,6 +948,10 @@ define(
                     oldData.focused = trackElData.focused;
                     oldData.data = trackElData.data;
                     oldData.content.effects = $.extend(true, {}, trackElData.content.effects);
+                    oldData.content.title = trackElData.content.title;
+                    oldData.content.title2 = trackElData.content.title2;
+                    oldData.content.deleteOldTitles =
+                        trackElData.content.deleteOldTitles === undefined || trackElData.content.deleteOldTitles;
                 } else {
                     oldData = $.extend(true, {}, trackElData);
                     oldData.id = Utils.guid();
