@@ -13,23 +13,6 @@ import {
 
 import 'whatwg-fetch';
 
-
-// const fetch = (url) => {
-//     return new Promise((resolve, reject) => {
-//         const xhr = new XMLHttpRequest();
-//
-//         xhr.open("GET", url, true);
-//
-//         xhr.onload = function () {
-//             resolve(this.responseText);
-//         };
-//
-//         xhr.onerror = reject;
-//
-//         xhr.send();
-//     })
-// };
-
 export const getCourses = () => {
     return (dispatch) => {
         dispatch({
@@ -41,16 +24,13 @@ export const getCourses = () => {
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                console.log(data.Courses.length);
                 handleCourses(data);
 
-                console.log('GET_COURSES_SUCCESS');
                 dispatch({
                     type: GET_COURSES_SUCCESS,
                     payload: data
                 });
 
-                console.log('LOAD_FILTER_VALUES');
                 dispatch({
                     type: LOAD_FILTER_VALUES,
                     payload: data.Categories
@@ -132,7 +112,6 @@ const _getCategory = (array, id) => {
 };
 
 const handleCourses = (data) => {
-    console.log('Enter!')
     try {
         data.Courses.forEach((item) => {
             item.CategoriesObj = [];
@@ -163,8 +142,6 @@ const handleCourses = (data) => {
 
             item.readyLessonCount = _readyLessonCount;
         });
-
-        console.log('exit');
     }
     catch (err) {
         console.error('ERR: ' + err.message);
@@ -172,8 +149,6 @@ const handleCourses = (data) => {
 };
 
 const handleCourse = (data) => {
-    console.log('Enter!')
-
     try {
         if (data.CoverMeta) {
             data.CoverMeta = JSON.parse(data.CoverMeta)
@@ -203,7 +178,6 @@ const handleCourse = (data) => {
 
         data.lessonCount = _lessonCount;
         data.readyLessonCount = _readyLessonCount;
-        console.log('exit');
     }
     catch (err) {
         console.error('ERR: ' + err.message);

@@ -62,11 +62,11 @@ export const hideMenu = () => {
     }
 };
 
-export const setCurrentPage = (page) => {
+export const setCurrentPage = (page, courseUrl, lessonUrl) => {
     return (dispatch) => {
         dispatch({
             type: SET_CURRENT_PAGE,
-            payload: page
+            payload: {page : page, courseUrl: courseUrl, lessonUrl: lessonUrl}
         });
     }
 }

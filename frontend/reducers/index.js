@@ -4,7 +4,10 @@ import { routerReducer } from 'react-router-redux';
 import pageHeader from './page-header';
 import courses from './courses';
 import filters from './filters';
-import singleCourse from './singleCourse'
+import singleCourse from './singleCourse';
+import singleLesson from './singleLesson';
+import lessons from './lessons';
+import lessonText from './lessonText';
 import app from './app';
 // import { routerReducer } from 'react-router-redux';
 
@@ -16,6 +19,9 @@ export default combineReducers({
     filters,
     app,
     singleCourse,
+    singleLesson,
+    lessons,
+    lessonText,
     routing: routerReducer,
     // browser: responsiveStateReducer({
     //     mobile: 500,
