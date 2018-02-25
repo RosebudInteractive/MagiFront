@@ -14,6 +14,8 @@ const initialState = {
     showSearchForm: false,
     showFiltersForm: false,
     showMenu: false,
+    courseUrl: null,
+    lessonUrl: null,
     currentPage: pages.courses,
     visibility: true,
 };
@@ -40,7 +42,12 @@ export default function pageHeader(state = initialState, action) {
             return {...state, showMenu: false};
 
         case SET_CURRENT_PAGE : {
-            return {...state, currentPage: action.payload, visibility: action.payload !== pages.lesson};
+            return {...state,
+                currentPage: action.payload.page,
+                courseUrl: action.payload.courseUrl,
+                lessonUrl: action.payload.lessonUrl,
+                visibility: action.payload !== pages.lesson
+            };
         }
 
         default:

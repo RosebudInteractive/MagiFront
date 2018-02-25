@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
+import { Route } from 'react-router-dom'
+
+import TranscriptPage from './lesson-transcript-page'
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -35,24 +38,36 @@ class LessonPage extends React.Component {
         document.getElementById('html').className = this._htmlClassName;
     }
 
+    componentWillReceiveProps(nextProps) {
+        if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
+        }
+    }
+
     _getLessonsBundles() {
         let {
             object : lesson,
             authors,
         } = this.props.lessonInfo;
 
+        let _bundles = [];
+
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <LectureWrapper
+        let _bundle = <LectureWrapper
             height={this.props.height}
             lesson={lesson}
             lessonUrl={this.props.lessonUrl}
             courseUrl={this.props.course.URL}
             courseTitle={this.props.course.Name}
             lessonCount={this.props.lessons.object.length}
-        />
+        />;
+
+        _bundles.push(_bundle);
+
+        return _bundles;
     }
 
     render() {
@@ -79,8 +94,8 @@ class LessonPage extends React.Component {
                             <div className="fullpage-wrapper"
                                  id="fullpage"
                                  style={_style}>
+                                <Route path='/transcript' component={TranscriptPage}/>
                                 {this._getLessonsBundles()}
-
                             </div> : null
                 }
             </div>
@@ -104,7 +119,7 @@ class LectureWrapper extends React.Component {
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
                 <div className="fp-tableCell" style={{height: this.props.height}}>
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
-                    <Link to="lecture-transcript.html" className="link-to-transcript">Транскрипт <br/>и материалы</Link>
+                    <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и материалы</Link>
                     <LessonFrame lesson={this.props.lesson}/>
                 </div>
             </section>
@@ -154,7 +169,7 @@ class Menu extends React.Component {
                     </Link>
                 </div>
                 <div className="lectures-menu__section lectures-list-block">
-                    <button type="button" className="lectures-list-trigger js-lectures-list-trigger" onClick={::this._switchMenu}><span>Лекция</span>
+                    <button type="button" className="lectures-list-trigger js-lectures-list-trigger" onClick={::this._switchMenu}><span>Лекция </span>
                         <span className="num"><span className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                     <LessonsListWrapper {...this.props}/>
                 </div>

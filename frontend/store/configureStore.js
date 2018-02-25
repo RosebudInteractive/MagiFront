@@ -1,6 +1,5 @@
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
-
 import {createStore, applyMiddleware, compose} from 'redux'
 import rootReducer from '../reducers';
 
@@ -8,6 +7,7 @@ import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
 // import {responsiveStoreEnhancer} from 'redux-responsive'
 import {routerMiddleware} from 'react-router-redux'
+import history from '../history'
 
 export const store = configureStore();
 

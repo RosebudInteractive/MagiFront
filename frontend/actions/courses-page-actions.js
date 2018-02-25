@@ -112,7 +112,6 @@ const _getCategory = (array, id) => {
 };
 
 const handleCourses = (data) => {
-    console.log('Enter!')
     try {
         data.Courses.forEach((item) => {
             item.CategoriesObj = [];
@@ -143,8 +142,6 @@ const handleCourses = (data) => {
 
             item.readyLessonCount = _readyLessonCount;
         });
-
-        console.log('exit');
     }
     catch (err) {
         console.error('ERR: ' + err.message);
@@ -152,8 +149,6 @@ const handleCourses = (data) => {
 };
 
 const handleCourse = (data) => {
-    console.log('Enter!')
-
     try {
         if (data.CoverMeta) {
             data.CoverMeta = JSON.parse(data.CoverMeta)
@@ -183,7 +178,6 @@ const handleCourse = (data) => {
 
         data.lessonCount = _lessonCount;
         data.readyLessonCount = _readyLessonCount;
-        console.log('exit');
     }
     catch (err) {
         console.error('ERR: ' + err.message);

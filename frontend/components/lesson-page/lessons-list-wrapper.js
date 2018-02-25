@@ -10,6 +10,7 @@ class LessonsListWrapper extends React.Component {
     static propTypes = {
         courseUrl: PropTypes.string.isRequired,
         lessonUrl: PropTypes.string.isRequired,
+        isDark: PropTypes.bool,
     };
 
     constructor(props) {
@@ -17,10 +18,10 @@ class LessonsListWrapper extends React.Component {
     }
 
     componentWillMount() {
-        if (!this.props.lessons.loaded) {
+        // if (!this.props.lessons.loaded) {
             let {courseUrl, lessonUrl} = this.props;
             this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl)
-        }
+        // }
     }
 
     _getLessonsList(){
@@ -37,7 +38,7 @@ class LessonsListWrapper extends React.Component {
 
     render(){
         return (
-            <div className="lectures-list-wrapper">
+            <div className={"lectures-list-wrapper"  + (this.props.isDark ? ' _dark' : '')}>
                 <ol className="lectures-list">
                     {this._getLessonsList()}
                 </ol>
@@ -57,12 +58,30 @@ class ListItem extends React.Component {
     render() {
         let {lesson} = this.props;
 
+        return lesson.State !== 'D' ? this._getReadyLesson(lesson) : this._getDraftLesson(lesson)
+    }
+
+    _getReadyLesson(lesson) {
         return (
             <li className={"lectures-list__item" + (this.props.isActive ? ' active' : '')}>
-                <Link to={'../' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
+                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
                     <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover}/>
                 </Link>
+            </li>
+        )
+    }
+
+    _getDraftLesson(lesson) {
+        return(
+            <li className="lectures-list__item lectures-list__item--old">
+                <div className="lectures-list__item-header">
+                    <div className="lectures-list__item-info">
+                        <h3 className="lectures-list__item-title"><span>{lesson.Name}</span></h3>
+                        <p className="lectures-list__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                    </div>
+                    <div className="lectures-list__item-date">{lesson.readyMonth + ' ' + lesson.readyYear}</div>
+                </div>
             </li>
         )
     }

@@ -6625,6 +6625,18 @@ ul.user-tooltip {
     width: 50%;
     min-width: 550px;
     max-width: 750px; }
+  .text-block__wrapper h2 {
+    margin: 0 0 35px 0;
+    font-family: "Fira Sans", Arial, sans-serif;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 32px; }
+  @media (max-width: 1023px) {
+    .text-block__wrapper h2 {
+      margin-bottom: 30px;
+      font-size: 20px;
+      line-height: 26px; } }
+
     @media (max-width: 1023px) {
       .text-block__wrapper {
         width: 49%;
