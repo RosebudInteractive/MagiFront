@@ -84,8 +84,9 @@ class TableOfContents extends React.Component {
 
         return this.props.episodes.map((episode, episodeIndex) => {
             return episode.Toc.map((item, index) => {
-                return <li className="menu-nav-sublist__item current" key={episodeIndex + '-' + index}>
-                    <a href="#" className="menu-nav-sublist__link">{item.Topic}</a>
+                const _id = episodeIndex + '-' + index;
+                return <li className="menu-nav-sublist__item current" key={_id}>
+                    <Link to={"#" + _id} className="menu-nav-sublist__link">{item.Topic}</Link>
                 </li>
             })
         })
