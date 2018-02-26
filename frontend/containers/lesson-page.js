@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 // import {Route} from 'react-router-dom'
-import {SectionsContainer, Section,} from 'react-fullpage';
+import {ScrollToTopOnMount, SectionsContainer, Section,} from 'react-fullpage';
 
 // import TranscriptPage from './lesson-transcript-page'
 
@@ -28,8 +28,8 @@ class LessonPage extends React.Component {
     }
 
     componentWillMount() {
-        this._bodyClassName = document.getElementById('body').className;
-        document.getElementById('body').className = 'fp-viewing-lecture01';
+        // this._bodyClassName = document.getElementById('body').className;
+        // document.getElementById('body').className = 'fp-viewing-lecture01';
 
         this._htmlClassName = document.getElementById('html').className;
         document.getElementById('html').className = 'fp-enabled';
@@ -41,7 +41,7 @@ class LessonPage extends React.Component {
     }
 
     componentWillUnmount() {
-        document.getElementById('body').className = this._bodyClassName;
+        // document.getElementById('body').className = this._bodyClassName;
         document.getElementById('html').className = this._htmlClassName;
     }
 
@@ -51,14 +51,14 @@ class LessonPage extends React.Component {
         }
     }
 
-    _createBundle(lesson) {
+    _createBundle(lesson, anchor) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <Section>
+        return <Section id={anchor}>
             <LectureWrapper
                 height={this.props.height}
                 lesson={lesson}
@@ -76,11 +76,11 @@ class LessonPage extends React.Component {
 
         if (!lesson) return _bundles;
 
-        _bundles.push(this._createBundle(lesson));
+        _bundles.push(this._createBundle(lesson, 'lesson0'));
 
         if (lesson.Lessons) {
-            lesson.Lessons.forEach((lesson) => {
-                _bundles.push(this._createBundle(lesson))
+            lesson.Lessons.forEach((lesson, index) => {
+                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1)))
             });
         }
 
@@ -89,21 +89,43 @@ class LessonPage extends React.Component {
         });
     }
 
+    _getAnchors() {
+        let {object: lesson} = this.props.lessonInfo;
+
+        let _anchors = [];
+        _anchors.push({name: 'lesson0', title: lesson.Name});
+
+        lesson.Lessons.forEach((lesson, index) => {
+            _anchors.push({name: 'lesson' + (index + 1), title: lesson.Name})
+        })
+
+        return _anchors
+    }
+
+    _getSectionOptions() {
+        let _anchors = this._getAnchors().map((anchor) => {
+            return anchor.name
+        });
+
+        return {
+            className: 'fullpage-wrapper',
+            sectionClassName: 'fp-section',
+            anchors: _anchors,
+            delay: 700,
+            scrollBar: false,
+            navigation: true,
+            arrowNavigation: true,
+            // navigationClass: 'right',
+            // navigationAnchorClass: 'fp-tooltip right',
+        };
+    }
+
     render() {
         let {
             lessonInfo,
             fetching
         } = this.props;
 
-        let options = {
-            className: 'fullpage-wrapper',
-            sectionClassName: 'fp-section fp-table fp-completely',
-            anchors: ['sectionOne', 'sectionTwo'],
-            delay:700,
-            scrollBar: false,
-            navigation: false,
-            arrowNavigation: true
-        };
 
         return (
             <div>
@@ -112,9 +134,17 @@ class LessonPage extends React.Component {
                         <p>Загрузка...</p>
                         :
                         lessonInfo.object ?
-                            <SectionsContainer {...options}>
-                                {this._getLessonsBundles()}
-                            </SectionsContainer>
+                            <div>
+                                <SectionsContainer {...this._getSectionOptions()}>
+                                    {this._getLessonsBundles()}
+                                </SectionsContainer>
+                                {
+                                    lessonInfo.object.Lessons.length ?
+                                        <Navigator anchors={this._getAnchors()}/>
+                                        :
+                                        null
+                                }
+                            </div>
                             :
                             null
                 }
@@ -199,6 +229,31 @@ class Menu extends React.Component {
                 <button type="button" className="social-trigger">
                     <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _share}}/>
                 </button>
+            </div>
+        )
+    }
+}
+
+class Navigator extends React.Component {
+    static propTypes = {
+        anchors: PropTypes.array.isRequired
+
+    }
+
+    _getList() {
+        return this.props.anchors.map((anchor, index) => {
+            return <li key={index}><Link to={'#' + anchor.name}><span/></Link>
+                <div className="fp-tooltip right">{anchor.title}</div>
+            </li>
+        })
+    }
+
+    render() {
+        return (
+            <div id="fp-nav" className="right" style={{marginTop: '-66px;'}}>
+                <ul>
+                    {this._getList()}
+                </ul>
             </div>
         )
     }
