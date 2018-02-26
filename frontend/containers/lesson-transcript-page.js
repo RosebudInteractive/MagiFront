@@ -25,10 +25,47 @@ class LessonPage extends React.Component {
 
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.transcript, courseUrl, lessonUrl);
+
+        window.addEventListener('scroll', this._handleScroll);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this._handleScroll);
     }
 
     _lessonLoaded() {
         return false
+    }
+
+    _handleScroll() {
+        let _link = document.getElementById('link-to-lecture');
+        const _recommend = document.getElementById('recommend');
+
+        if (_link && _recommend) {
+            let coordTop = _recommend.offsetTop;
+
+            if ((document.documentElement.scrollTop + 550) >= coordTop) {
+                _link.style.setProperty('position', 'absolute')
+                _link.style.setProperty('top', coordTop + 'px')
+                _link.style.setProperty('margin-top', '-100px');
+            } else {
+                _link.style.setProperty('position', 'fixed')
+                _link.style.setProperty('top', '50%')
+                _link.style.setProperty('margin-top', '0');
+            }
+
+            if (document.innerWidth < 768 ) {
+                if ((document.documentElement.scrollTop + 650) >= coordTop) {
+                    _link.style.setProperty('position', 'absolute')
+                    _link.style.setProperty('top', coordTop+'px')
+                    _link.style.setProperty('margin-top', '-100px');
+                } else {
+                    _link.style.setProperty('position', 'fixed')
+                    _link.style.setProperty('top', 'auto')
+                    _link.style.setProperty('margin-top', '0');
+                }
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -49,6 +86,7 @@ class LessonPage extends React.Component {
             <div>
                 <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
                       className="link-to-lecture"
+                      id='link-to-lecture'
                       style={{
                           position: 'fixed',
                           top: '50%',

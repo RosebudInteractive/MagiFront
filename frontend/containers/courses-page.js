@@ -33,8 +33,6 @@ class CoursesPage extends React.Component {
             return !filter.selected;
         });
 
-        console.log('render bundle ' + _courses.length);
-
         return _courses.map((course, index) => {
             let _inFilter = false;
 
@@ -55,8 +53,6 @@ class CoursesPage extends React.Component {
     }
 
     render() {
-        console.log('courses render');
-
         const {
             fetching,
         } = this.props.courses;

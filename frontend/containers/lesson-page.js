@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import { Route } from 'react-router-dom'
+// import {Route} from 'react-router-dom'
+import {SectionsContainer, Section,} from 'react-fullpage';
 
-import TranscriptPage from './lesson-transcript-page'
+// import TranscriptPage from './lesson-transcript-page'
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -33,8 +34,6 @@ class LessonPage extends React.Component {
         this._htmlClassName = document.getElementById('html').className;
         document.getElementById('html').className = 'fp-enabled';
 
-        window.addEventListener('scroll', this._handleScroll);
-
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
@@ -44,26 +43,6 @@ class LessonPage extends React.Component {
     componentWillUnmount() {
         document.getElementById('body').className = this._bodyClassName;
         document.getElementById('html').className = this._htmlClassName;
-        window.removeEventListener('scroll', this._handleScroll);
-    }
-
-    _handleScroll() {
-        if (this.state.lastScrollPos > event.target.scrollingElement.scrollTop) {
-            if (this.state.current > 0) {
-                this.setState({
-                    current: this.state.current - 1,
-                    lastScrollPos: event.target.scrollingElement.scrollTop
-                });
-            }
-
-        } else if (this.state.lastScrollPos < event.target.scrollingElement.scrollTop) {
-            if (this.state.current < (this.state.total - 1)) {
-                this.setState({
-                    current: this.state.current + 1,
-                    lastScrollPos: event.target.scrollingElement.scrollTop
-                });
-            }
-        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -73,25 +52,29 @@ class LessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let { authors } = this.props.lessonInfo;
+        let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <LectureWrapper
-            height={this.props.height}
-            lesson={lesson}
-            lessonUrl={this.props.lessonUrl}
-            courseUrl={this.props.course.URL}
-            courseTitle={this.props.course.Name}
-            lessonCount={this.props.lessons.object.length}
-        />;
+        return <Section>
+            <LectureWrapper
+                height={this.props.height}
+                lesson={lesson}
+                lessonUrl={this.props.lessonUrl}
+                courseUrl={this.props.course.URL}
+                courseTitle={this.props.course.Name}
+                lessonCount={this.props.lessons.object.length}
+            />
+        </Section>
     }
 
     _getLessonsBundles() {
-        let { object : lesson } = this.props.lessonInfo;
+        let {object: lesson} = this.props.lessonInfo;
         let _bundles = [];
+
+        if (!lesson) return _bundles;
 
         _bundles.push(this._createBundle(lesson));
 
@@ -101,9 +84,9 @@ class LessonPage extends React.Component {
             });
         }
 
-        this.setState({total: _bundles.length});
-
-        return _bundles;
+        return _bundles.map((bundle) => {
+            return bundle
+        });
     }
 
     render() {
@@ -112,12 +95,14 @@ class LessonPage extends React.Component {
             fetching
         } = this.props;
 
-        const _style = {
-            height: "100%",
-            position: "relative",
-            touchAction: "none",
-            transform: "translate3d(0px, "+ this.state.current * this.props.height + "px, 0px)",
-            transition: "all 700ms ease"
+        let options = {
+            className: 'fullpage-wrapper',
+            sectionClassName: 'fp-section fp-table fp-completely',
+            anchors: ['sectionOne', 'sectionTwo'],
+            delay:700,
+            scrollBar: false,
+            navigation: false,
+            arrowNavigation: true
         };
 
         return (
@@ -127,12 +112,11 @@ class LessonPage extends React.Component {
                         <p>Загрузка...</p>
                         :
                         lessonInfo.object ?
-                            <div className="fullpage-wrapper"
-                                 id="fullpage"
-                                 style={_style}>
-                                <Route path='/transcript' component={TranscriptPage}/>
+                            <SectionsContainer {...options}>
                                 {this._getLessonsBundles()}
-                            </div> : null
+                            </SectionsContainer>
+                            :
+                            null
                 }
             </div>
         )
@@ -151,11 +135,12 @@ class LectureWrapper extends React.Component {
 
     render() {
         return (
-            <section className="fullpage-section lecture-wrapper"
+            <section className='fullpage-section lecture-wrapper'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
                 <div className="fp-tableCell" style={{height: this.props.height}}>
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
-                    <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и материалы</Link>
+                    <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
+                        материалы</Link>
                     <LessonFrame lesson={this.props.lesson}/>
                 </div>
             </section>
@@ -169,7 +154,7 @@ class Menu extends React.Component {
         super(props);
 
         this.state = {
-            opened : false
+            opened: false
         }
     }
 
@@ -205,8 +190,10 @@ class Menu extends React.Component {
                     </Link>
                 </div>
                 <div className="lectures-menu__section lectures-list-block">
-                    <button type="button" className="lectures-list-trigger js-lectures-list-trigger" onClick={::this._switchMenu}><span>Лекция </span>
-                        <span className="num"><span className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
+                    <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
+                            onClick={::this._switchMenu}><span>Лекция </span>
+                        <span className="num"><span
+                            className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                     <LessonsListWrapper {...this.props}/>
                 </div>
                 <button type="button" className="social-trigger">
