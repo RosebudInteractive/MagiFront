@@ -8,13 +8,13 @@ import CourseModuleBody from './course-module-body';
 export default class InfoBlock extends React.Component {
 
     render() {
-        const {title, url, onUrlClick, course, isMobile} = this.props;
+        const {title, url, course, isMobile} = this.props;
 
         return (
             <div className='course-module__info-block'>
                 <div className="course-module__header">
                     <span className="favourites">В закладки</span>
-                    <Header title={title} url={url} onUrlClick={onUrlClick}/>
+                    <Header title={title} url={url}/>
                     <Info authors={course ? course.AuthorsObj : []}
                           categories={course ? course.CategoriesObj : []}/>
                 </div>
@@ -28,23 +28,16 @@ InfoBlock.propTypes = {
     course: PropTypes.object.isRequired,
     title: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
-    onUrlClick: PropTypes.func.isRequired,
     isMobile: PropTypes.bool.isRequired,
 };
 
 class Header extends React.Component {
 
-    _onClick() {
-        // this.props.onUrlClick(this.props.url)
-    }
-
     render() {
         return (
-            <h1 className="course-module__title" onClick={::this._onClick}>
-                <Link to={'/category/' + this.props.url}>
-                    <p className="course-module__label">Курс:</p>
-                    <span>{this.props.title}</span>
-                </Link>
+            <h1 className="course-module__title">
+                <p className="course-module__label">Курс:</p>
+                <span><Link to={'/category/' + this.props.url}>{this.props.title}</Link></span>
             </h1>
         );
     }
@@ -53,5 +46,4 @@ class Header extends React.Component {
 Header.propTypes = {
     title: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
-    onUrlClick: PropTypes.func.isRequired,
 };

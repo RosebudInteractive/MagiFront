@@ -43,7 +43,8 @@ export function isMobile() {
 }
 
 export const pages = {
-    courses : {name : 'courses', url:'/'},
-    singleCourse : {name: 'singleCourse', url: null},
-    lecture: {name: 'lecture', url: null},
+    courses: {name: 'courses', url: '/'},
+    singleCourse: {name: 'singleCourse', url: null},
+    lesson: {name: 'lesson', url: null},
+    transcript: {name: 'transcript', url: null},
 }
