@@ -432,7 +432,7 @@ const DbLesson = class DbLesson extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
-    get(id, course_id, parent_id) {
+    get(id, course_id) {
         let lesson = {};
         let isNotFound = true;
         return new Promise((resolve, reject) => {
