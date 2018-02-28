@@ -1,6 +1,7 @@
 'use strict'
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
+const USER_UPD_TIME = (1 * 3600 + 15 * 60) * 1000;
 
 exports.UsersBaseCache = class UsersBaseCache {
     constructor(userFields, opts) {
@@ -9,6 +10,7 @@ exports.UsersBaseCache = class UsersBaseCache {
         let options = opts || {};
         this._tokenExpTime = options.tokenExpTime ? options.tokenExpTime : TOKEN_EXP_TIME;
         this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TOKEN_UPD_TIME;
+        this._userUpdTime = options.userUpdTime ? options.userUpdTime : USER_UPD_TIME;
         this._convUserDataFn = typeof (options.convUserDataFn) === "function" ? options.convUserDataFn : null;
     }
 
