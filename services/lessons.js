@@ -4,9 +4,9 @@ let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupLessons(app) {
 
-    app.get('/api/adm/lessons/:id/:courseId/:parentId', AuthenticateJWT(app), (req, res, next) => {
+    app.get('/api/adm/lessons/:id/:courseId', AuthenticateJWT(app), (req, res, next) => {
         LessonsService()
-            .get(parseInt(req.params.id), parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
+            .get(parseInt(req.params.id), parseInt(req.params.courseId))
             .then(rows => {
                 res.send(rows);
             })

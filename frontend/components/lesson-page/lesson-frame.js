@@ -13,7 +13,7 @@ export default class LessonFrame extends React.Component{
             <div className="lecture-frame">
                 <div className="lecture-frame__header">
                     <a href="#" className="lecture-frame__play-link">
-                        <button type="button" className="lecture-frame__plus">Доп. эпизод</button>
+                        {/*<button type="button" className="lecture-frame__plus">Доп. эпизод</button>*/}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                             <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>

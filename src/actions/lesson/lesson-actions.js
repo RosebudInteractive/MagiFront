@@ -59,14 +59,14 @@ export const getResources = (lessonId) => {
     }
 };
 
-export const get = (id, courseId, parentLessonId)=> {
+export const get = (id, courseId)=> {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_LESSON_REQUEST,
             payload: null
         });
 
-        fetch("/api/adm/lessons/" + id + '/' + courseId + '/' + parentLessonId, {credentials: 'include'})
+        fetch("/api/adm/lessons/" + id + '/' + courseId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

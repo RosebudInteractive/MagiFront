@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-// import {Route} from 'react-router-dom'
-import {ScrollToTopOnMount, SectionsContainer, Section,} from 'react-fullpage';
-
-// import TranscriptPage from './lesson-transcript-page'
+import { SectionsContainer, Section,} from 'react-fullpage';
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -28,9 +25,6 @@ class LessonPage extends React.Component {
     }
 
     componentWillMount() {
-        // this._bodyClassName = document.getElementById('body').className;
-        // document.getElementById('body').className = 'fp-viewing-lecture01';
-
         this._htmlClassName = document.getElementById('html').className;
         document.getElementById('html').className = 'fp-enabled';
 
@@ -41,7 +35,6 @@ class LessonPage extends React.Component {
     }
 
     componentWillUnmount() {
-        // document.getElementById('body').className = this._bodyClassName;
         document.getElementById('html').className = this._htmlClassName;
     }
 
@@ -165,7 +158,7 @@ class LectureWrapper extends React.Component {
 
     render() {
         return (
-            <section className='fullpage-section lecture-wrapper'
+            <section className='fullpage-section lecture-wrapper fp-section active fp-table fp-completely'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
                 <div className="fp-tableCell" style={{height: this.props.height}}>
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
