@@ -50,8 +50,8 @@ class TextBlock extends React.Component {
             _content = _content.trim();
 
             _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                <h2 key={_toc.Id}>{_matches[1]}</h2>
-                <p>{_content}</p>
+                <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
+                <p dangerouslySetInnerHTML={{__html: _content}}/>
             </div>)
         }
 

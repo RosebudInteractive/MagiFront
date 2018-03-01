@@ -5,7 +5,6 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
 import * as lessonActions from '../../actions/lesson-actions';
-import subLessons from "../../../src/reducers/lesson/subLessons";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
