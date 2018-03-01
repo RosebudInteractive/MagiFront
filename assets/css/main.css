@@ -2420,6 +2420,7 @@ li.fancybox-thumbs-loading {
       fill: #fff; }
 
 .page-footer {
+  margin-top: auto;
   padding-top: 60px; }
   @media (min-width: 900px) {
     .page-footer {
@@ -7685,7 +7686,7 @@ ul.user-tooltip {
     .course-tab-control.active .course-tab-control__title {
       color: #2f2f2f; }
 
-  .course-tab-control__empty {
+.course-tab-control__empty {
       font-family: "Fira Sans", Arial, sans-serif;
       font-variant-numeric: oldstyle-nums;
       -moz-font-feature-settings: 'onum';
@@ -7698,10 +7699,10 @@ ul.user-tooltip {
     @media (max-width: 639px) {
       .course-tab-control__empty._desktop {
           display: none; } }
-    .course-tab-control__empty._mobile {
+  .course-tab-control__empty ._mobile {
       display: none; }
     @media (max-width: 639px) {
-        .course-tab-control__empty._mobile {
+      .course-tab-control__empty ._mobile {
         display: block;
         font-size: 29px;
         line-height: 24px;
@@ -11675,7 +11676,6 @@ ul.lectures-tab {
         position: static; } }
 
 ._registration {
-  position: fixed;
   padding-bottom: 50px;
   background-color: #2f2f2f;
   background-image: url("../images/logo-big.png");

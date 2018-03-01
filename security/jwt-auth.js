@@ -4,6 +4,7 @@ const passport = require("passport");
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
+const { UsersRedisCache } = require("./users-redis-cache");
 
 const allowUnathorizedAccess = true;
 
@@ -16,8 +17,9 @@ class AuthJWT {
         const jwtOptions = {}
         jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
         jwtOptions.secretOrKey = 'tasmanianDevil';
-        this._usersCache = new UsersMemCache(["Id", "Name", "PData"],
+        this._usersCache = new UsersRedisCache(["Id", "Name", "PData"],
             {
+                host: "dragonegg",
                 convUserDataFn:
                     (rawUser) => {
                         try {
@@ -29,7 +31,7 @@ class AuthJWT {
             });
         const strategy = new JwtStrategy(jwtOptions,
             ((jwt_payload, next) => {
-                console.log('payload received', jwt_payload);
+                // console.log('payload received', jwt_payload);
                 var user = this._usersCache.getUserInfoById(jwt_payload.id)
                     .then((result) => {
                         next(null, result);
