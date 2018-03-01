@@ -25,10 +25,20 @@ class TextBlock extends React.Component {
         episodes: PropTypes.array.isRequired,
     };
 
+    _parseTranscript(text) {
+        const _re = /<h2>(.*?)<\/h2>/
+        // const _reg = new RegExp("<h/[0-9]/>", 'i');
+        if (_re.test(text)) {
+            let _matches = _re.exec(text);
+            console.log(_matches)
+        }
+    }
+
     _getText(){
         let _text = '';
 
         this.props.episodes.forEach((episode) => {
+            this._parseTranscript(episode.Transcript)
             _text = _text + episode.Transcript;
         });
 
@@ -48,7 +58,6 @@ class TextBlock extends React.Component {
 }
 
 class Refs extends React.Component {
-
 
     _getList() {
         return this.props.refs.map((ref, index) => {

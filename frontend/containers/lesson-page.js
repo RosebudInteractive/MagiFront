@@ -3,10 +3,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-// import {Route} from 'react-router-dom'
-import {ScrollToTopOnMount, SectionsContainer, Section,} from 'react-fullpage';
-
-// import TranscriptPage from './lesson-transcript-page'
+import {SectionsContainer, Section,} from 'react-fullpage';
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
