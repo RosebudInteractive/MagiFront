@@ -53,11 +53,12 @@ export default class Menu extends React.Component {
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                         <LessonsListWrapper {...this.props} isDark={true}/>
                     </div>
-                    <section className="lectures-menu__section lectures-menu-nav ">
+                    <section className="lectures-menu__section lectures-menu-nav" style={{width: 350.109}}>
                         <button className="lectures-menu-nav__trigger">Меню</button>
                         <div className="lectures-menu-nav__list">
                             <ul className="menu-nav-list">
-                                <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')} onClick={::this._switchToc}>
+                                <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
+                                    onClick={::this._switchToc}>
                                     <div className="menu-nav-list__item-head">Оглавление</div>
                                     <TableOfContents episodes={this.props.episodes}/>
                                 </li>
@@ -77,23 +78,27 @@ export default class Menu extends React.Component {
 }
 
 class TableOfContents extends React.Component {
-    _getList(){
+
+    _getList() {
         if (!this.props.episodes) {
             return
         }
 
-        return this.props.episodes.map((episode, episodeIndex) => {
-            return episode.Toc.map((item, index) => {
-                const _id = episodeIndex + '-' + index;
-                return <li className="menu-nav-sublist__item current" key={_id}>
-                    <Link to={"#" + _id} className="menu-nav-sublist__link">{item.Topic}</Link>
+        // return this.props.episodes.map((episode, episodeIndex) => {
+        return this.props.episodes.map((episode) => {
+            // return episode.Toc.map((item, index) => {
+            return episode.Toc.map((item) => {
+                // const _id = episodeIndex + '-' + index;
+                const _id = 'toc' + item.Id;
+                return <li className="menu-nav-sublist__item current " key={_id}>
+                    <a href={"#" + _id} className="menu-nav-sublist__link js-scroll-link">{item.Topic}</a>
                 </li>
             })
         })
     }
 
-    render(){
-        return(
+    render() {
+        return (
             <ol className="menu-nav-sublist" style={{top: 44}}>
                 {this._getList()}
             </ol>

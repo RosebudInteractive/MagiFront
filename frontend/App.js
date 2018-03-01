@@ -82,6 +82,10 @@ class App extends Component {
     }
 
     _handleScroll(event) {
+        if (!event.target.scrollingElement) {
+            return
+        }
+
         if (this.state.lastScrollPos > event.target.scrollingElement.scrollTop) {
             this.setState({
                 direction: 'top',

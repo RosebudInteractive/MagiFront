@@ -4867,6 +4867,8 @@ ul.user-tooltip {
       font-weight: 700;
       font-size: 17px;
       line-height: 24px; }
+    .lecture__descr a h3 {
+      color: #000000 }
       @media (max-width: 899px) {
         .lecture__descr h3 {
           display: inline;
@@ -6709,7 +6711,7 @@ ul.user-tooltip {
 
 .text-block {
   padding-bottom: 79px;
-  border-bottom: 2px solid rgba(47, 47, 47, 0.2); }
+  /*border-bottom: 2px solid rgba(47, 47, 47, 0.2);*/}
   @media (max-width: 1023px) {
     .text-block {
       padding-bottom: 26px;
