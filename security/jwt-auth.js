@@ -19,7 +19,9 @@ class AuthJWT {
         jwtOptions.secretOrKey = 'tasmanianDevil';
         this._usersCache = new UsersRedisCache(["Id", "Name", "PData"],
             {
-                host: "dragonegg",
+                redis: {
+                    host: "dragonegg"
+                },
                 convUserDataFn:
                     (rawUser) => {
                         try {
