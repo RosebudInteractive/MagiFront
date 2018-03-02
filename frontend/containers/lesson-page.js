@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import { SectionsContainer, Section,} from 'react-fullpage';
+import {SectionsContainer, Section,} from 'react-fullpage';
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -51,7 +51,7 @@ class LessonPage extends React.Component {
             return author.Id === lesson.AuthorId
         });
 
-        return <Section id={anchor}>
+        return <Section id={anchor} key={anchor}>
             <LectureWrapper
                 height={this.props.height}
                 lesson={lesson}
@@ -100,10 +100,9 @@ class LessonPage extends React.Component {
             return anchor.name
         });
 
-        return {
+        let _props = {
             className: 'fullpage-wrapper',
-            sectionClassName: 'fp-section',
-            anchors: _anchors,
+            sectionClassName: 'fp-section fp-table',
             delay: 700,
             scrollBar: false,
             navigation: true,
@@ -111,6 +110,31 @@ class LessonPage extends React.Component {
             // navigationClass: 'right',
             // navigationAnchorClass: 'fp-tooltip right',
         };
+
+        if (_anchors.length > 1) {
+            _props.anchors = _anchors
+        }
+
+        return _props
+    }
+
+    _getFullPageOptions() {
+        const _options = {
+            // for mouse/wheel events
+            // represents the level of force required to generate a slide change on non-mobile, 10 is default
+            scrollSensitivity: 0,
+
+            // for touchStart/touchEnd/mobile scrolling
+            // represents the level of force required to generate a slide change on mobile, 10 is default
+            touchSensitivity: 0,
+            scrollSpeed: 300,
+            hideScrollBars: true,
+            enableArrowKeys: true
+        }
+
+        _options.slides = this._getLessonsBundles()
+
+        return _options;
     }
 
     render() {
@@ -131,12 +155,6 @@ class LessonPage extends React.Component {
                                 <SectionsContainer {...this._getSectionOptions()}>
                                     {this._getLessonsBundles()}
                                 </SectionsContainer>
-                                {
-                                    lessonInfo.object.Lessons.length ?
-                                        <Navigator anchors={this._getAnchors()}/>
-                                        :
-                                        null
-                                }
                             </div>
                             :
                             null
@@ -158,7 +176,7 @@ class LectureWrapper extends React.Component {
 
     render() {
         return (
-            <section className='fullpage-section lecture-wrapper fp-section active fp-table fp-completely'
+            <section className='fullpage-section lecture-wrapper fp-section fp-table'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
                 <div className="fp-tableCell" style={{height: this.props.height}}>
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
@@ -227,30 +245,30 @@ class Menu extends React.Component {
     }
 }
 
-class Navigator extends React.Component {
-    static propTypes = {
-        anchors: PropTypes.array.isRequired
-
-    }
-
-    _getList() {
-        return this.props.anchors.map((anchor, index) => {
-            return <li key={index}><Link to={'#' + anchor.name}><span/></Link>
-                <div className="fp-tooltip right">{anchor.title}</div>
-            </li>
-        })
-    }
-
-    render() {
-        return (
-            <div id="fp-nav" className="right" style={{marginTop: '-66px;'}}>
-                <ul>
-                    {this._getList()}
-                </ul>
-            </div>
-        )
-    }
-}
+// class Navigator extends React.Component {
+//     static propTypes = {
+//         anchors: PropTypes.array.isRequired
+//
+//     }
+//
+//     _getList() {
+//         return this.props.anchors.map((anchor, index) => {
+//             return <li key={index}><Link to={'#' + anchor.name}><span/></Link>
+//                 <div className="fp-tooltip right">{anchor.title}</div>
+//             </li>
+//         })
+//     }
+//
+//     render() {
+//         return (
+//             <div id="fp-nav" className="right" style={{marginTop: '-66px;'}}>
+//                 <ul>
+//                     {this._getList()}
+//                 </ul>
+//             </div>
+//         )
+//     }
+// }
 
 function mapStateToProps(state, ownProps) {
     return {

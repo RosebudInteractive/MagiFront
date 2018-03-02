@@ -1,9 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
 
 import * as svg from '../../tools/svg-paths';
 
 export default class Wrapper extends React.Component {
+
+    static propTypes = {
+        courseUrl: PropTypes.string.isRequired,
+        lessons: PropTypes.array.isRequired,
+        isMobile: PropTypes.bool.isRequired,
+    };
+
     render() {
         let {lessons, isMobile} = this.props;
 
@@ -11,23 +19,21 @@ export default class Wrapper extends React.Component {
             <div className='lectures-wrapper'>
                 {
                     isMobile ?
-                        <LecturesList lessons={lessons}/>
+                        <LecturesList lessons={lessons} courseUrl={this.props.courseUrl}/>
                         :
-                        <SingleLecture lesson={lessons[0]}/>
+                        <SingleLecture lesson={lessons[0]} courseUrl={this.props.courseUrl}/>
                 }
             </div>
         )
     }
 }
 
-Wrapper.propTypes = {
-    lessons: PropTypes.array.isRequired,
-    isMobile: PropTypes.bool.isRequired,
-};
-
-
 class SingleLecture extends React.Component {
 
+    static propTypes = {
+        lesson: PropTypes.object.isRequired,
+        courseUrl: PropTypes.string.isRequired,
+    }
 
     render() {
         let {lesson} = this.props;
@@ -53,7 +59,7 @@ class SingleLecture extends React.Component {
             <section className="lecture">
                 <PlayBlock cover={_cover} duration={lesson.DurationFmt}/>
                 <div className='lecture__descr'>
-                    <h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3>
+                    <Link to={this.props.courseUrl + '/' + lesson.URL}><h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3></Link>
                     <p>{lesson.ShortDescription}</p>
                 </div>
             </section>
@@ -63,9 +69,14 @@ class SingleLecture extends React.Component {
 
 class LecturesList extends React.Component {
 
+    static propTypes = {
+        lessons: PropTypes.array.isRequired,
+        courseUrl: PropTypes.string.isRequired,
+    }
+
     render() {
         return this.props.lessons.map((item, index) => {
-            return <SingleLecture lesson={item} key={index}/>
+            return <SingleLecture lesson={item} key={index} courseUrl={this.props.courseUrl}/>
         })
     }
 }

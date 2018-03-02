@@ -39,7 +39,8 @@ class LessonPage extends React.Component {
 
     _handleScroll() {
         let _link = document.getElementById('link-to-lecture');
-        const _recommend = document.getElementById('recommend');
+        // const _recommend = document.getElementById('recommend');
+        const _recommend = document.getElementById('gallery');
 
         if (_link && _recommend) {
             let coordTop = _recommend.offsetTop;

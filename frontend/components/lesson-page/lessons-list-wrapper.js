@@ -19,26 +19,33 @@ class LessonsListWrapper extends React.Component {
 
     componentWillMount() {
         // if (!this.props.lessons.loaded) {
-            let {courseUrl, lessonUrl} = this.props;
-            this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl)
+        let {courseUrl, lessonUrl} = this.props;
+        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl)
         // }
     }
 
-    _getLessonsList(){
-        const {object : lessons, authors} = this.props.lessons;
+    _getLessonsList() {
+        const {object: lessons, authors} = this.props.lessons;
 
         return lessons.map((lesson, index) => {
             lesson.Author = authors.find((author) => {
                 return author.Id === lesson.AuthorId
             });
 
-           return <ListItem {...this.props} isActive={lesson.Number === this.props.current} lesson={lesson} key={index}/>
+            lesson.Lessons.forEach((subLesson) => {
+                subLesson.Author = authors.find((author) => {
+                    return author.Id === subLesson.AuthorId
+                });
+            })
+
+            return <ListItem {...this.props} isActive={lesson.Number === this.props.current} lesson={lesson}
+                             key={index}/>
         });
     }
 
-    render(){
+    render() {
         return (
-            <div className={"lectures-list-wrapper"  + (this.props.isDark ? ' _dark' : '')}>
+            <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
                 <ol className="lectures-list">
                     {this._getLessonsList()}
                 </ol>
@@ -68,12 +75,13 @@ class ListItem extends React.Component {
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
                     <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover}/>
                 </Link>
+                <SubList subLessons={lesson.Lessons} parentNumber={lesson.Number} courseUrl={this.props.courseUrl}/>
             </li>
         )
     }
 
     _getDraftLesson(lesson) {
-        return(
+        return (
             <li className="lectures-list__item lectures-list__item--old">
                 <div className="lectures-list__item-header">
                     <div className="lectures-list__item-info">
@@ -90,7 +98,7 @@ class ListItem extends React.Component {
 class ListItemInfo extends React.Component {
     static propTypes = {
         title: PropTypes.string.isRequired,
-        author: PropTypes.string.isRequired
+        author: PropTypes.object.isRequired
     };
 
     render() {
@@ -103,7 +111,6 @@ class ListItemInfo extends React.Component {
         )
     }
 }
-
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -148,6 +155,46 @@ class PlayBlock extends React.Component {
             </div>
 
         )
+    }
+}
+
+class SubList extends React.Component {
+
+    static propTypes = {
+        subLessons: PropTypes.array.isRequired,
+        parentNumber: PropTypes.number.isRequired,
+        courseUrl: PropTypes.string.isRequired
+    };
+
+    _getItems() {
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
+
+        return this.props.subLessons.map((lesson, index) => {
+            return <li className="lectures-sublist__item" key={index}>
+                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
+                    <h4 className="lectures-sublist__title">{lesson.Name}</h4>
+                </Link>
+                <div className="lectures-sublist__item-info">
+                    <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                    <div className="lectures-sublist__play-block">
+                        <button type="button" className="play-btn-small">
+                            <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                            <span>Воспроизвести</span>
+                        </button>
+                        <span className="lectures-sublist__item-duration">{lesson.DurationFmt}</span>
+                    </div>
+                </div>
+            </li>
+        })
+    }
+
+    render() {
+        return this.props.subLessons.length > 0 ?
+            <ol start={this.props.parentNumber} className="lectures-item__body lectures-sublist">
+                {this._getItems()}
+            </ol>
+            :
+            null
     }
 }
 

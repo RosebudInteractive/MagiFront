@@ -36,8 +36,11 @@ class Header extends React.Component {
     render() {
         return (
             <h1 className="course-module__title">
-                <p className="course-module__label">Курс:</p>
-                <span><Link to={'/category/' + this.props.url}>{this.props.title}</Link></span>
+                <span className="favourites">В закладки</span>
+                <Link to={'/category/' + this.props.url}>
+                    <p className="course-module__label">Курс:</p>
+                    <span>{this.props.title}</span>
+                </Link>
             </h1>
         );
     }
