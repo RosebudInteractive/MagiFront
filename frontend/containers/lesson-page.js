@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
-import {SectionsContainer, Section,} from 'react-fullpage';
+// import {SectionsContainer, Section,} from 'react-fullpage';
+
+import $ from 'jquery'
+import 'fullpage.js/dist/jquery.fullpage'  // || import 'fullpage.js'
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -14,6 +17,7 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import {pages} from '../tools/page-tools';
 
 class LessonPage extends React.Component {
+
     constructor(props) {
         super(props);
 
@@ -25,17 +29,29 @@ class LessonPage extends React.Component {
     }
 
     componentWillMount() {
-        this._htmlClassName = document.getElementById('html').className;
-        document.getElementById('html').className = 'fp-enabled';
+        // this._htmlClassName = document.getElementById('html').className;
+        // document.getElementById('html').className = 'fp-enabled';
 
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
+
+
+        let that = this;
+        $(document).ready(function() {
+            const _options = that._getFullpageOptions();
+            $('#fullpage').fullpage(_options)//(0 , _jquery2.default)(...).fullpage is not a function
+        })
     }
+
+    // componentDidMount(){
+    //     document.getElementById('fullpage').fullpage(this._getFullpageOptions())
+    // }
 
     componentWillUnmount() {
         document.getElementById('html').className = this._htmlClassName;
+        $.fn.fullpage.destroy('all');
     }
 
     componentWillReceiveProps(nextProps) {
@@ -44,23 +60,21 @@ class LessonPage extends React.Component {
         }
     }
 
-    _createBundle(lesson, anchor) {
+    _createBundle(lesson) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <Section id={anchor} key={anchor}>
-            <LectureWrapper
-                height={this.props.height}
+        return <LectureWrapper
+                // height={this.props.height}
                 lesson={lesson}
                 lessonUrl={this.props.lessonUrl}
                 courseUrl={this.props.course.URL}
                 courseTitle={this.props.course.Name}
                 lessonCount={this.props.lessons.object.length}
             />
-        </Section>
     }
 
     _getLessonsBundles() {
@@ -95,46 +109,27 @@ class LessonPage extends React.Component {
         return _anchors
     }
 
-    _getSectionOptions() {
-        let _anchors = this._getAnchors().map((anchor) => {
-            return anchor.name
-        });
+    _getFullpageOptions() {
+        let _anchors = this._getAnchors();
 
-        let _props = {
-            className: 'fullpage-wrapper',
-            sectionClassName: 'fp-section fp-table',
-            delay: 700,
-            scrollBar: false,
-            navigation: true,
-            arrowNavigation: true,
-            // navigationClass: 'right',
-            // navigationAnchorClass: 'fp-tooltip right',
-        };
 
-        if (_anchors.length > 1) {
-            _props.anchors = _anchors
+        return {
+            normalScrollElements: '.lectures-list-wrapper',
+            anchors: _anchors.map((anchor) => {
+                return anchor.name
+            }),
+            navigation: _anchors.length > 1,
+            navigationTooltips: _anchors.map((anchor) => {
+                return anchor.title
+            }),
+            css3: true,
+            keyboardScrolling: true,
+            animateAnchor: true,
+            recordHistory: true,
+            sectionSelector: '.fullpage-section',
+            slideSelector: '.fullpage-slide',
+            lazyLoading: true,
         }
-
-        return _props
-    }
-
-    _getFullPageOptions() {
-        const _options = {
-            // for mouse/wheel events
-            // represents the level of force required to generate a slide change on non-mobile, 10 is default
-            scrollSensitivity: 0,
-
-            // for touchStart/touchEnd/mobile scrolling
-            // represents the level of force required to generate a slide change on mobile, 10 is default
-            touchSensitivity: 0,
-            scrollSpeed: 300,
-            hideScrollBars: true,
-            enableArrowKeys: true
-        }
-
-        _options.slides = this._getLessonsBundles()
-
-        return _options;
     }
 
     render() {
@@ -145,21 +140,15 @@ class LessonPage extends React.Component {
 
 
         return (
-            <div>
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        lessonInfo.object ?
-                            <div>
-                                <SectionsContainer {...this._getSectionOptions()}>
-                                    {this._getLessonsBundles()}
-                                </SectionsContainer>
-                            </div>
-                            :
-                            null
-                }
-            </div>
+            fetching ?
+                <p>Загрузка...</p>
+                :
+                lessonInfo.object ?
+                    <div className='fullpage-wrapper' id='fullpage'>
+                        {this._getLessonsBundles()}
+                    </div>
+                    :
+                    null
         )
     }
 }
@@ -168,7 +157,7 @@ class LectureWrapper extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
-        height: PropTypes.number.isRequired,
+        // height: PropTypes.number.isRequired,
         courseUrl: PropTypes.string.isRequired,
         lessonUrl: PropTypes.string.isRequired,
         lessonCount: PropTypes.number.isRequired,
@@ -178,7 +167,7 @@ class LectureWrapper extends React.Component {
         return (
             <section className='fullpage-section lecture-wrapper fp-section fp-table'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
-                <div className="fp-tableCell" style={{height: this.props.height}}>
+                <div className="fp-tableCell">
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
                     <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
                         материалы</Link>
@@ -213,8 +202,8 @@ class Menu extends React.Component {
 
     render() {
         const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
-            _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>',
-            _share = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#share"/>';
+            _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>';
+        // _share = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#share"/>';
 
 
         return (
@@ -237,12 +226,17 @@ class Menu extends React.Component {
                             className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                     <LessonsListWrapper {...this.props}/>
                 </div>
-                <button type="button" className="social-trigger">
-                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _share}}/>
-                </button>
+
             </div>
         )
     }
+}
+
+{/*<button type="button" className="social-trigger">*/
+}
+{/*<svg width="18" height="18" dangerouslySetInnerHTML={{__html: _share}}/>*/
+}
+{/*</button>*/
 }
 
 // class Navigator extends React.Component {

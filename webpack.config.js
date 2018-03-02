@@ -94,6 +94,7 @@ const _devConfig = {
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                    path.resolve(__dirname, 'node_modules/fullpage.js'),
                 ],
                 test: /\.js$/
             },
