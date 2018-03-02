@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom';
 // import {SectionsContainer, Section,} from 'react-fullpage';
 
 import $ from 'jquery'
-import 'fullpage.js/dist/jquery.fullpage'  // || import 'fullpage.js'
+import 'fullpage.js'
 
 import LessonsListWrapper from '../components/lesson-page/lessons-list-wrapper';
 import LessonFrame from '../components/lesson-page/lesson-frame';
@@ -20,34 +20,38 @@ class LessonPage extends React.Component {
 
     constructor(props) {
         super(props);
+        this._mountGuard = false;
 
         this.state = {
             total: 0,
             current: 0,
             lastScrollPos: 0
         }
+
+
     }
 
     componentWillMount() {
-        // this._htmlClassName = document.getElementById('html').className;
-        // document.getElementById('html').className = 'fp-enabled';
-
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
-
-
-        let that = this;
-        $(document).ready(function() {
-            const _options = that._getFullpageOptions();
-            $('#fullpage').fullpage(_options)//(0 , _jquery2.default)(...).fullpage is not a function
-        })
     }
 
-    // componentDidMount(){
-    //     document.getElementById('fullpage').fullpage(this._getFullpageOptions())
-    // }
+    _mountFullpage() {
+        let _container = $('#fullpage');
+        if ((!this._mountGuard) && (_container.length > 0)) {
+            const _options = this._getFullpageOptions();
+            _container.fullpage(_options)
+            this._mountGuard = true;
+        }
+    }
+
+    componentDidMount() {
+        $(document).ready(() => {
+            this._mountFullpage();
+        });
+    }
 
     componentWillUnmount() {
         document.getElementById('html').className = this._htmlClassName;
@@ -99,6 +103,10 @@ class LessonPage extends React.Component {
     _getAnchors() {
         let {object: lesson} = this.props.lessonInfo;
 
+        if (!lesson) {
+            return []
+        }
+
         let _anchors = [];
         _anchors.push({name: 'lesson0', title: lesson.Name});
 
@@ -138,6 +146,9 @@ class LessonPage extends React.Component {
             fetching
         } = this.props;
 
+        if (lessonInfo.object) {
+            this._mountFullpage()
+        }
 
         return (
             fetching ?
