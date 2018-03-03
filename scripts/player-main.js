@@ -105,6 +105,9 @@ Utils.guid = function () {
                         }
 
                         $("#titles-place").html(html);
+                    },
+                    onChangeContent: function (content) {
+                        console.log(content);
                     }
                 };
             }
