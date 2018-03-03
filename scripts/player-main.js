@@ -75,6 +75,20 @@ $(document).ready(function () {
                 onSetTextData: function (e) {
                 },
                 onAddElement: function (e) {
+                },
+                onChangeTitles: function (titles) {
+                    var html = "";
+                    for (var i = 0; i < titles.length; i++) {
+                        if (titles[i].title) {
+                            if (html != "") html += "<br/>";
+                            html += titles[i].title;
+                        }
+                    }
+
+                    $("#titles-place").html(html);
+                },
+                onChangeContent: function (content) {
+                    console.log(content);
                 }
             };
         }

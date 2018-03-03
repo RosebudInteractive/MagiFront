@@ -225,6 +225,12 @@ define(
                 }
             }
 
+            _broadcastChangeContent(content) {
+                if (this._options.onChangeContent) {
+                    this._options.onChangeContent($.extend(true, {}, content));
+                }
+            }
+
             _findFreeSpace() {
                 var pos = this._audioState.currentTime;
                 var pNow = this._audioState.playingNow;
@@ -352,9 +358,9 @@ define(
                     //if (!that._audioState.stopped) {
                     //    that._playElements(that._audioState.globalTime);
                     //}
-                    console.log("timeupdate", that._audioState.globalTime);
+                    //console.log("timeupdate", that._audioState.globalTime);
                     that._options.loader.setPosition(that._audioState.globalTime)
-
+                    that._chechAndFireContentChanged();
                 }).on("volumechange", function() {
                     that._audioState.volume = this.volume;
                 }).on("ended", function () {
@@ -372,6 +378,33 @@ define(
                     }
                 });
 
+            }
+
+            _chechAndFireContentChanged() {
+                var episodesContent = this.getLectureContent();
+                var curCont = null;
+                for (var i = 0; i < episodesContent.length; i++) {
+                    var epContent = episodesContent[i].content;
+                    for (var j = 0; j < epContent.length; j++) {
+                        var epCont = epContent[j];
+                        if (epCont.begin <= this._audioState.globalTime) {
+                            curCont = epCont;
+                        }
+                    }
+                }
+
+                if ((curCont && !this._audioState.currentContent) ||
+                    (!curCont && this._audioState.currentContent)
+                ) {
+                    this._audioState.currentContent = curCont;
+                    this._broadcastChangeContent(curCont);
+                } else {
+                    if (this._audioState.currentContent.title != curCont.title ||
+                        this._audioState.currentContent.begin != curCont.begin) {
+                        this._audioState.currentContent = curCont;
+                        this._broadcastChangeContent(curCont);
+                    }
+                }
             }
 
             _playElements(position) {
