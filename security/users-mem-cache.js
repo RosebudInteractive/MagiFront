@@ -1,43 +1,28 @@
 'use strict'
-const TOKEN_EXP_TIME = 24 * 3600 * 1000;
-const TOKEN_UPD_TIME = 1 * 3600 * 1000;
+const { UsersBaseCache }= require('./users-base-cache');
 
-exports.UsersMemCache = class UsersMemCache {
+exports.UsersMemCache = class UsersMemCache extends UsersBaseCache {
+
     constructor(userFields, opts) {
+        super(userFields, opts);
         this._users = {};
-        this._userFields = userFields || ["Id"];
-        let options = opts || {};
-        this._tokenExpTime = options.tokenExpTime ? options.tokenExpTime : TOKEN_EXP_TIME;
-        this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TOKEN_UPD_TIME;
-        this._convUserDataFn = typeof (options.convUserDataFn) === "function" ? options.convUserDataFn : null;
     }
 
-    authUser(login, password) {
-        return $dbUser.checkUser(login, password, this._userFields)
-            .then(((result) => {
-                let res = this._convUserDataFn ? this._convUserDataFn(result.fields) : result.fields;
-                this._users["uid:" + res.Id] = res;
-                return res;
-            }).bind(this));
-    }
-
-    getUserInfoById(id) {
-        return new Promise((resolve, reject) => {
-            let uid = "uid:" + id;
-            let user = this._users[uid];
-            if (!user)
-                user = $dbUser.getUser(id, this._userFields)
-                    .then(((result) => {
-                        let res = this._convUserDataFn ? this._convUserDataFn(result) : result;
-                        this._users[uid] = res;
-                        return res;
-                    }).bind(this));
+    _storeUser(user) {
+        return new Promise(((resolve) => {
+            this._users["uid:" + user.Id] = user;
             resolve(user);
-        });
+        }).bind(this));
     }
 
-    checkToken(token, isNew) {
-        return new Promise((resolve, reject) => {
+    _getUser(id) {
+        return new Promise(((resolve) => {
+            resolve(this._users["uid:" + id]);
+        }).bind(this));
+    }
+
+    _checkToken(token, isNew) {
+        return new Promise(((resolve, reject) => {
             let res = this._users[token];
             let now = (new Date()) - 0;
             if (!res && isNew)
@@ -55,6 +40,6 @@ exports.UsersMemCache = class UsersMemCache {
                         }
                 }
             resolve(res ? true : false);
-        });
+        }).bind(this));
     }
 }

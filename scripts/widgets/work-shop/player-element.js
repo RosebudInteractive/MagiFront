@@ -61,6 +61,18 @@ define(
                 this._options.data = value;
             }
 
+            get DeleteOldTitles() {
+                return this._options.data.content.deleteOldTitles === undefined || this._options.data.content.deleteOldTitles;
+            }
+
+            get Title() {
+                return this._options.data.content.title;
+            }
+
+            get Title2() {
+                return this._options.data.content.title2;
+            }
+
             setRate(rate) {
                 if (this._playState.rate == +rate) return
                 this._playState.rate = +rate;

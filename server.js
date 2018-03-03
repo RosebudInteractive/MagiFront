@@ -3,17 +3,19 @@
  */
 
 //var webpack = require('webpack');
-var webpack = require('webpack')
-var webpackDevMiddleware = require('webpack-dev-middleware');
-var webpackHotMiddleware = require('webpack-hot-middleware');
-var config = require('./webpack.config');
+let webpack = require('webpack')
+let webpackDevMiddleware = require('webpack-dev-middleware');
+let webpackHotMiddleware = require('webpack-hot-middleware');
+let config = require('./webpack.config');
+
+const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 // init DB if needed
-var { DatabaseBuilder } = require("./database/builder");
-var { magisteryConfig } = require("./etc/config")
-var bld = new DatabaseBuilder(magisteryConfig)
+let { DatabaseBuilder } = require("./database/builder");
+let { magisteryConfig } = require("./etc/config")
+let bld = new DatabaseBuilder(magisteryConfig)
 
-var log = require('./logger/log')(module);
+let log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const { FileUpload } = require("./database/file-upload");
@@ -22,29 +24,38 @@ const { FileUpload } = require("./database/file-upload");
 Promise.resolve()
     .then(() => {
         // log.info("Init Db succeded!")
+        let path = require('path');
 
         // Prepare http server
-        var express = require('express');
-        var app = new express();
-        var port = magisteryConfig.http.port;
+        let express = require('express');
+        let app = new express();
+        let port = magisteryConfig.http.port;
 
-        var compiler = webpack(config);
-        try {
-            app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: config.output.publicPath }));
-            app.use(webpackHotMiddleware(compiler));
-        }
-        catch (e) {
-            console.log(e)
+        if (NODE_ENV === 'development') {
+            let compiler = webpack(config);
+            try {
+                app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
+                app.use(webpackHotMiddleware(compiler));
+            }
+            catch (e) {
+                console.log(e)
+            }
         }
 
         //////////////////////////////////////////
         // player begin
         //////////////////////////////////////////
-        var fs = require('fs');
+        let fs = require('fs');
+
+        if (NODE_ENV !== 'development') {
+            app.use('/static', express.static(path.join(__dirname, 'static')));
+        }
 
         app.use("/images", express.static(__dirname + '/images'));
         app.use("/fonts", express.static(__dirname + '/fonts'));
         app.use("/css", express.static(__dirname + '/css'));
+        app.use("/css", express.static(path.join(__dirname, 'assets', 'css')));
+        app.use("/images", express.static(path.join(__dirname, 'assets', 'images')));
         app.use("/scripts", express.static(__dirname + '/scripts'));
         //app.use('/data', express.static(__dirname + '/data'));
 
@@ -88,7 +99,7 @@ Promise.resolve()
         app.use('/assets', express.static('assets'));
         app.use('/data', express.static('../uploads'));
 
-        var { setupAPI } = require("./services/setup");
+        let { setupAPI } = require("./services/setup");
         setupAPI(express, app);
 
         app.get("/testupload", function (req, res) {

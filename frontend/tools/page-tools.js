@@ -10,9 +10,12 @@ export const Size = {
 };
 
 export const getSize = (width) => {
+// export const getSize = () => {
     let _size = Object.keys(Size).find((item) => {
         return width > Size[item].width
     });
+
+    // let _size = Size.xl;
 
     if (!_size) {
         _size = Size.mobile;
@@ -40,6 +43,8 @@ export function isMobile() {
 }
 
 export const pages = {
-    courses : {name : 'courses', url:'/'},
-    singleCourse : {name: 'singleCourse', url: null},
+    courses: {name: 'courses', url: '/'},
+    singleCourse: {name: 'singleCourse', url: null},
+    lesson: {name: 'lesson', url: null},
+    transcript: {name: 'transcript', url: null},
 }

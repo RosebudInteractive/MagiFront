@@ -8,6 +8,7 @@ exports.DbEngineInit = class DbEngineInit {
 
         var debugFlag = false;
         var autoImportFlag = false;
+        var autoImportImgFlag = false;
 
         var impDir = __dirname + "/data/";
         var is_impDir_next = false;
@@ -140,6 +141,15 @@ exports.DbEngineInit = class DbEngineInit {
 
                 case "-autoimport":
                     autoImportFlag = true;
+                    autoImportImgFlag = true;
+                    break;
+
+                case "-autoimportDb":
+                    autoImportFlag = true;
+                    break;
+
+                case "-autoimportImg":
+                    autoImportImgFlag = true;
                     break;
 
                 case "-sqlTrace":
@@ -263,7 +273,7 @@ exports.DbEngineInit = class DbEngineInit {
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
         global.$dbUser = new DbUser(USER_MODEL_NAME);
 
-        if (autoImportFlag) {
+        if (autoImportImgFlag) {
             const { FileUpload } = require("./file-upload");
             FileUpload.importImages(impDir)
                 .then(() => { console.log("### Images import finished!"); })

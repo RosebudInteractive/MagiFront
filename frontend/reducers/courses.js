@@ -17,6 +17,7 @@ export default function courses(state = initialState, action) {
             return {...state, items: [], fetching: true, loaded: false};
 
         case GET_COURSES_SUCCESS: {
+            console.log(action.payload.Courses.length);
             return {...state, items: action.payload.Courses, fetching: false, loaded: true};
         }
 

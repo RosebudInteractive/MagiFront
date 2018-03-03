@@ -1,10 +1,64 @@
-var path = require('path')
-var webpack = require('webpack')
-var NpmInstallPlugin = require('npm-install-webpack-plugin')
-var autoprefixer = require('autoprefixer')
-var precss = require('precss')
+let path = require('path');
+let webpack = require('webpack');
+let NpmInstallPlugin = require('npm-install-webpack-plugin');
 
-module.exports = {
+const NODE_ENV = process.env.NODE_ENV || 'prod';
+
+const _prodConfig = {
+    entry: {
+        "babel-polyfill": "babel-polyfill",
+        main: './frontend/index',
+        adm: './src/index'
+    },
+    output: {
+        path: path.join(__dirname, 'static'),
+        filename: '[name].js',
+    },
+    module: {
+        rules: [
+            {
+                loaders: ['babel-loader'],
+                include: [
+                    path.resolve(__dirname, "src"),
+                    path.resolve(__dirname, "frontend"),
+                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                ],
+                // language=JSRegexp
+                test: /\.js$/
+            },
+            {
+                test: /\.css$/,
+                loader: 'style-loader!css-loader'
+            },
+            {
+                test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url-loader?limit=10000&mimetype=application/font-woff"
+            },
+            {
+                test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url-loader?limit=10000&mimetype=application/font-woff"
+            },
+            {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url-loader?limit=10000&mimetype=application/octet-stream"
+            },
+            {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "file-loader"
+            },
+            {
+                test: /\.(gif|jpe?g|png|ico)$/,
+                loader: "url-loader?limit=10000&mimetype=image/png+ico"
+            },
+            {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                loader: "url-loader?limit=10000&mimetype=image/svg+xml"
+            }
+        ]
+    }
+};
+
+const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
@@ -14,8 +68,7 @@ module.exports = {
         adm: './src/index',
     },
     output: {
-        path: path.join(__dirname, 'dist'),
-        // filename: 'bundle.js',
+        path: path.join(__dirname, 'static'),
         filename: '[name].js',
         publicPath: '/static/'
     },
@@ -36,10 +89,12 @@ module.exports = {
                 ],
             },
             {
-                loaders: ['react-hot-loader/webpack', 'babel-loader?plugins[]=transform-runtime'], //добавили loader 'react-hot'
+                loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
                 include: [
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
+                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                    path.resolve(__dirname, 'node_modules/fullpage.js'),
                 ],
                 test: /\.js$/
             },
@@ -66,15 +121,6 @@ module.exports = {
             {
                 test: /\.(gif|jpe?g|png|ico)$/,
                 loader: "url-loader?limit=10000&mimetype=image/png+ico"
-                // use: [
-                //     {
-                //         loader: 'file-loader',
-                //         options: {
-                //             name: '[path][name].[ext]',
-                //             outputPath: 'images/'
-                //         }
-                //     }
-                // ]
             },
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
@@ -82,4 +128,6 @@ module.exports = {
             }
         ]
     }
-}
+};
+
+module.exports = NODE_ENV === 'development' ? _devConfig : _prodConfig;

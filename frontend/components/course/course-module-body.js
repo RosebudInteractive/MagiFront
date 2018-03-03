@@ -12,7 +12,7 @@ export default class CourseModuleBody extends React.Component {
         return (
             <div className='course-module__body'>
                 <Counter current={_current} total={_lessonsCount}/>
-                <LectureWrapper lessons={course.Lessons} isMobile={isMobile}/>
+                <LectureWrapper lessons={course.Lessons}  isMobile={isMobile} courseUrl={course.URL}/>
             </div>
         );
     }

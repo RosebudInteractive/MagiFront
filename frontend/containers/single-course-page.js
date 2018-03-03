@@ -37,13 +37,14 @@ class Main extends React.Component {
                         <p>Загрузка...</p>
                         :
                         course ?
-                            <main className="courses">
+                            <div className="courses">
                                 <CourseModuleExt title={course.Name}/>
                                 <CourseTabs
                                     lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                     books={{total: course.Books.length}}
+                                    courseUrl={this.props.courseUrl}
                                 />
-                            </main> : null
+                            </div> : null
                 }
             </div>
         )
@@ -65,8 +66,12 @@ class TitleWrapper extends React.Component {
     render() {
         return (
             <div className="course-module__title-wrapper">
-                <h1 className="course-module__title"><p className="course-module__label">
-                    Курс:</p>{' ' + this.props.title}</h1>
+                <h1 className="course-module__title">
+                    <span className="favourites">В закладки</span>
+                    <a href="#">
+                        <p className="course-module__label">Курс:</p> <span>{' ' + this.props.title}</span>
+                    </a>
+                </h1>
             </div>
         )
     }
@@ -105,7 +110,7 @@ class CourseTabs extends React.Component {
 
     _getList() {
         return (
-            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons/> : <CourseBooks/>
+            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons courseUrl={this.props.courseUrl}/> : <CourseBooks/>
         )
     }
 
@@ -150,7 +155,7 @@ class LessonsTab extends React.Component {
 
 class BooksTab extends React.Component {
     _onClick() {
-        if (this.props) {
+        if ((this.props) && (this.props.total)) {
             this.props.onClick(CourseTabsName.books)
         }
     }
@@ -167,7 +172,7 @@ class BooksTab extends React.Component {
                             <span className="course-tab-control__label">книги</span>
                         </div>
                         :
-                        <div>
+                        <div style={{marginBottom: 2}}>
                             <span className="course-tab-control__empty _desktop">пока пуст</span>
                             <span className="course-tab-control__empty _mobile">0</span>
                         </div>

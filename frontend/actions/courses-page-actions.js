@@ -13,7 +13,7 @@ import {
 
 import 'whatwg-fetch';
 
-export const getCourses = ()=> {
+export const getCourses = () => {
     return (dispatch) => {
         dispatch({
             type: GET_COURSES_REQUEST,
@@ -21,7 +21,7 @@ export const getCourses = ()=> {
         });
 
         fetch("/api/courses", {credentials: 'include'})
-            .then(checkStatus)
+        .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 handleCourses(data);
@@ -53,7 +53,7 @@ export const getCourse = (url) => {
         });
 
         fetch("/api/courses/" + url, {credentials: 'include'})
-            .then(checkStatus)
+        .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 handleCourse(data);
@@ -87,6 +87,10 @@ const parseJSON = (response) => {
     return response.json()
 };
 
+// const parseJSON = (data) => {
+//     return JSON.parse(data)
+// };
+
 // const handleCourse = (course) => {
 //     // course.id = course.Id;
 //     course.ColorHex = '#' + course.Color.toString(16);
@@ -108,68 +112,76 @@ const _getCategory = (array, id) => {
 };
 
 const handleCourses = (data) => {
+    try {
+        data.Courses.forEach((item) => {
+            item.CategoriesObj = [];
+            item.AuthorsObj = [];
 
-    data.Courses.forEach((item) => {
-        item.CategoriesObj = [];
-        item.AuthorsObj = [];
+            item.Categories.forEach((category) => {
+                let _category = _getCategory(data.Categories, category);
+                item.CategoriesObj.push(_category)
+            });
 
-        item.Categories.forEach((category) => {
-            let _category = _getCategory(data.Categories, category);
-            item.CategoriesObj.push(_category)
+            item.Authors.forEach((author) => {
+                item.AuthorsObj.push(_getAuthor(data.Authors, author))
+            });
+
+            item.ColorHex = '#' + item.Color.toString(16);
+
+            let _readyLessonCount = 0;
+
+            item.Lessons.forEach((lesson) => {
+                if (lesson.CoverMeta) {
+                    lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
+                }
+
+                if (lesson.State === 'R') {
+                    _readyLessonCount++
+                }
+            });
+
+            item.readyLessonCount = _readyLessonCount;
         });
-
-        item.Authors.forEach((author) => {
-            item.AuthorsObj.push(_getAuthor(data.Authors, author))
-        });
-
-        item.ColorHex = '#' + item.Color.toString(16);
-
-        let _readyLessonCount = 0;
-
-        item.Lessons.forEach((lesson) => {
-            if (lesson.CoverMeta) {
-                lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
-            }
-
-            if (lesson.State === 'R') {
-                _readyLessonCount++
-            }
-        });
-
-        item.readyLessonCount = _readyLessonCount;
-    });
+    }
+    catch (err) {
+        console.error('ERR: ' + err.message);
+    }
 };
 
 const handleCourse = (data) => {
+    try {
+        if (data.CoverMeta) {
+            data.CoverMeta = JSON.parse(data.CoverMeta)
+        }
 
-    if (data.CoverMeta){
-        data.CoverMeta = JSON.parse(data.CoverMeta)
+        data.Authors.forEach((author) => {
+            if (author.PortraitMeta) {
+                author.PortraitMeta = JSON.parse(author.PortraitMeta)
+            }
+        });
+
+        let _lessonCount = 0,
+            _readyLessonCount = 0;
+
+        data.Lessons.forEach((lesson) => {
+            if (lesson.State === 'R') {
+                _lessonCount++;
+                _readyLessonCount++
+            } else {
+                _lessonCount++
+            }
+
+            let _readyDate = new Date(lesson.ReadyDate);
+            lesson.readyYear = _readyDate.getFullYear();
+            lesson.readyMonth = Months[_readyDate.getMonth()];
+        });
+
+        data.lessonCount = _lessonCount;
+        data.readyLessonCount = _readyLessonCount;
     }
-
-    data.Authors.forEach((author)=>{
-        if (author.PortraitMeta) {
-            author.PortraitMeta = JSON.parse(author.PortraitMeta)
-        }
-    });
-
-    let _lessonCount = 0,
-        _readyLessonCount = 0;
-
-    data.Lessons.forEach((lesson) => {
-        if (lesson.State === 'R') {
-            _lessonCount++;
-            _readyLessonCount++
-        } else {
-            _lessonCount++
-        }
-
-        let _readyDate = new Date(lesson.ReadyDate);
-        lesson.readyYear = _readyDate.getFullYear();
-        lesson.readyMonth = Months[_readyDate.getMonth()];
-    });
-
-    data.lessonCount = _lessonCount;
-    data.readyLessonCount = _readyLessonCount;
+    catch (err) {
+        console.error('ERR: ' + err.message);
+    }
 };
 
 const Months = [

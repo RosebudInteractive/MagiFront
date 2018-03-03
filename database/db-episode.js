@@ -1,10 +1,8 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const { ACCOUNT_ID } = require('../const/sql-req-common');
 const _ = require('lodash');
-
-const ACCOUNT_ID = 1;
-const LANGUAGE_ID = 1;
 
 const LESSON_REQ_TREE = {
     expr: {
@@ -110,43 +108,43 @@ const EPISODE_INS_TREE = {
 
 const EPISODE_MSSQL_ID_REQ =
     "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[AudioMeta], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
-    "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId] and el.[LanguageId] = <%= languageId %>\n" +
+    "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
     "  join [EpisodeLesson] els on e.[Id] = els.[EpisodeId]\n" +
     "where e.[Id] = <%= id %> and els.[LessonId] = <%= lessonId %>";
 const EPISODE_MSSQL_TOC_REQ =
     "select t.[Id], t.[Number], l.[Topic], l.[StartTime] from [EpisodeToc] t\n" +
-    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id]\n" +
     "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
     "where e.[Id] = <%= id %>\n" +
     "order by t.[Number]";
 const EPISODE_MSSQL_CONT_REQ =
     "select t.[Id], t.[ResourceId], r.[ResType], r.[FileName],\n" +
     "  t.[CompType], t.[StartTime], t.[Duration], t.[Content] from [EpisodeContent] t\n" +
-    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId] and l.[LanguageId] = <%= languageId %>\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
-    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id] and rl.[LanguageId] = <%= languageId %>\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
     "where e.[Id] = <%= id %>\n" +
     "order by t.[StartTime]";
 
 const EPISODE_MYSQL_ID_REQ =
     "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`AudioMeta`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
-    "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId` and el.`LanguageId` = <%= languageId %>\n" +
+    "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
     "  join `EpisodeLesson` els on e.`Id` = els.`EpisodeId`\n" +
     "where e.`Id` = <%= id %> and els.`LessonId` = <%= lessonId %>";
 const EPISODE_MYSQL_TOC_REQ =
     "select t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from `EpisodeToc` t\n" +
-    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id`\n" +
     "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
     "where e.`Id` = <%= id %>\n" +
     "order by t.`Number`";
 const EPISODE_MYSQL_CONT_REQ =
     "select t.`Id`, t.`ResourceId`, r.`ResType`, r.`FileName`,\n" +
     "  t.`CompType`, t.`StartTime`, t.`Duration`, t.`Content` from `EpisodeContent` t\n" +
-    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId` and l.`LanguageId` = <%= languageId %>\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
-    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id` and rl.`LanguageId` = <%= languageId %>\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
     "where e.`Id` = <%= id %>\n" +
     "order by t.`StartTime`";
 
@@ -174,6 +172,16 @@ const EPISODE_MYSQL_LESSONS =
     "select distinct `LessonId` from `EpisodeLesson`\n" +
     "where`EpisodeId` = <%= id %>";
 
+const GET_LESSON_LANG_MSSQL =
+    "select l.[LanguageId] from [Lesson] c\n" +
+    "  join [LessonLng] l on l.[LessonId] = c.[Id]\n" +
+    "where c.[Id] = <%= lessonId %>";
+
+const GET_LESSON_LANG_MYSQL =
+    "select l.`LanguageId` from `Lesson` c\n" +
+    "  join `LessonLng` l on l.`LessonId` = c.`Id`\n" +
+    "where c.`Id` = <%= lessonId %>";
+
 const DbEpisode = class DbEpisode extends DbObject {
 
     constructor(options) {
@@ -192,8 +200,8 @@ const DbEpisode = class DbEpisode extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(EPISODE_MYSQL_ID_REQ)({ languageId: LANGUAGE_ID, id: id, lessonId: lesson_id }),
-                        mssql: _.template(EPISODE_MSSQL_ID_REQ)({ languageId: LANGUAGE_ID, id: id, lessonId: lesson_id })
+                        mysql: _.template(EPISODE_MYSQL_ID_REQ)({ id: id, lessonId: lesson_id }),
+                        mssql: _.template(EPISODE_MSSQL_ID_REQ)({ id: id, lessonId: lesson_id })
                     }
                 }, {})
                     .then((result) => {
@@ -205,8 +213,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             if (!isNotFound)
                                 return $data.execSql({
                                     dialect: {
-                                        mysql: _.template(EPISODE_MYSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                        mssql: _.template(EPISODE_MSSQL_TOC_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                        mysql: _.template(EPISODE_MYSQL_TOC_REQ)({ id: id }),
+                                        mssql: _.template(EPISODE_MSSQL_TOC_REQ)({ id: id })
                                     }
                                 }, {});
                         }
@@ -220,8 +228,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             episode.Toc = toc;
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(EPISODE_MYSQL_CONT_REQ)({ languageId: LANGUAGE_ID, id: id }),
-                                    mssql: _.template(EPISODE_MSSQL_CONT_REQ)({ languageId: LANGUAGE_ID, id: id })
+                                    mysql: _.template(EPISODE_MYSQL_CONT_REQ)({ id: id }),
+                                    mssql: _.template(EPISODE_MSSQL_CONT_REQ)({ id: id })
                                 }
                             }, {});
                         }
@@ -443,6 +451,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             
             let transactionId = null;
             let durationDelta = 0;
+            let languageId;
 
             resolve(
                 this._getObjById(id)
@@ -457,6 +466,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Episode (Id = " + id + ") has inconsistent \"LNG\" part.");
                         epi_lng_obj = collection.get(0);
+                        languageId = epi_lng_obj.languageId();
 
                         return epi_obj.edit()
                     })
@@ -484,7 +494,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                                                 Number: Number++
                                             },
                                             lng: {
-                                                LanguageId: LANGUAGE_ID
+                                                LanguageId: languageId
                                             }
                                         };
                                         if (typeof (elem.Topic) !== "undefined")
@@ -666,6 +676,7 @@ const DbEpisode = class DbEpisode extends DbObject {
 
     insert(data, lesson_id) {
         return new Promise((resolve, reject) => {
+
             let root_obj;
             let lesson_obj;
             let opts = {};
@@ -675,6 +686,8 @@ const DbEpisode = class DbEpisode extends DbObject {
             let inpFields = data || {};
             let transactionId = null;
             let duration = 0;
+            let languageId;
+
             resolve(
                 this._getObjById(lesson_id, LESSON_REQ_TREE)
                     .then((result) => {
@@ -683,10 +696,23 @@ const DbEpisode = class DbEpisode extends DbObject {
                             throw new Error("Lesson (Id = " + lesson_id + ") doesn't exist.");
                         lesson_obj = collection.get(0);
 
-                        return lesson_obj.edit()
-                            .then(() => {
-                                return this._getObjById(-1, EPISODE_INS_TREE);
-                            })
+                        return lesson_obj.edit();
+                    })
+                    .then(() => {
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(GET_LESSON_LANG_MYSQL)({ lessonId: lesson_id }),
+                                mssql: _.template(GET_LESSON_LANG_MSSQL)({ lessonId: lesson_id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length === 1)) {
+                            languageId = result.detail[0].LanguageId;
+                            return this._getObjById(-1, EPISODE_INS_TREE);
+                        }
+                        else
+                            throw new Error("Lesson (Id = " + lesson_id + ") has inconsistent \"LNG\" part.");
                     })
                     .then((result) => {
                         root_obj = result;
@@ -705,7 +731,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("EpisodeLng");
 
-                        let fields = { LanguageId: LANGUAGE_ID };
+                        let fields = { LanguageId: languageId };
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -764,7 +790,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                                     .then((result) => {
                                         let new_toc_obj = this._db.getObj(result.newObject);
                                         let root_lng = new_lng_obj.getDataRoot("EpisodeTocLng");
-                                        let fields_lng = { LanguageId: LANGUAGE_ID };
+                                        let fields_lng = { LanguageId: languageId };
                                         if (typeof (elem["Topic"]) !== "undefined")
                                             fields_lng["Topic"] = elem["Topic"];
                                         if (typeof (elem["StartTime"]) !== "undefined")

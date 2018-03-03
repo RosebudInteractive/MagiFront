@@ -4,6 +4,8 @@ import {
 
 const initialState = {
     size: null,
+    showBoxContainer: false,
+
 };
 
 export default function app(state = initialState, action) {

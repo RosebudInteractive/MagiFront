@@ -4,7 +4,8 @@
   "description": "Magistery workshop & admin site",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +33,8 @@
   },
   "dependencies": {
     "amdefine": "^1.0.1",
+    "babel-plugin-es6-promise": "^1.1.1",
+    "babel-plugin-transform-object-assign": "^6.22.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-react": "^6.24.1",
     "babel-runtime": "^6.26.0",
@@ -39,6 +42,7 @@
     "ejs": "^2.5.7",
     "express-logger": "0.0.3",
     "formidable": "^1.1.1",
+    "hiredis": "^0.5.0",
     "history": "^4.7.2",
     "jsonwebtoken": "^8.1.1",
     "lodash": "^4.17.4",
@@ -60,6 +64,7 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^4.0.8",
     "react-tabs-redux": "^2.0.1",
+    "redis": "^2.8.0",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
@@ -67,6 +72,7 @@
     "url-loader": "^0.6.2",
     "webix": "^5.1.1",
     "whatwg-fetch": "^2.0.3",
-    "winston": "^2.4.0"
+    "winston": "^2.4.0",
+    "jquery": "latest"
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import * as svg from '../../tools/svg-paths';
 import * as tools from '../../tools/page-tools';
@@ -41,7 +42,7 @@ class Logo extends React.Component {
 class Navigator extends  React.Component {
 
     _goToCourses(){
-        this.props.onNavigateClick(tools.pages.courses)
+        // this.props.onNavigateClick(tools.pages.courses)
     }
 
     render() {
@@ -49,7 +50,7 @@ class Navigator extends  React.Component {
             <nav className="navigation">
                 <ul>
                     <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''} onClick={::this._goToCourses}>
-                        <a>Курсы</a>
+                        <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
                     <li>
                         <a>Календарь</a>

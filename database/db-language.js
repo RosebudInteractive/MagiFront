@@ -9,10 +9,10 @@ const LANGUAGE_REQ_TREE = {
 };
 
 const LANGUAGE_MSSQL_ALL_REQ =
-    "select [Id], [Code], [Language] from [Language]";
+    "select [Id], [Code], [LangTag], [Language] from [Language]";
 
 const LANGUAGE_MYSQL_ALL_REQ =
-    "select `Id`, `Code`, `Language` from `Language`";
+    "select `Id`, `Code`, `LangTag`, `Language` from `Language`";
 
 const LANGUAGE_MSSQL_ID_REQ = LANGUAGE_MSSQL_ALL_REQ + "\nwhere [Id] = <%= id %>";
 const LANGUAGE_MYSQL_ID_REQ = LANGUAGE_MYSQL_ALL_REQ + "\nwhere `Id` = <%= id %>";

@@ -24,6 +24,8 @@ class CoursesPage extends React.Component {
     }
 
     _getCoursesBundles() {
+
+
         let {filters} = this.props;
         let _courses = this.props.courses.items;
 
@@ -46,12 +48,8 @@ class CoursesPage extends React.Component {
                 });
             }
 
-            return (_inFilter ? <CourseModule course={course} key={index} onUrlClick={::this._onUrlClick} isMobile={this._isMobile()}/> : null)
+            return (_inFilter ? <CourseModule course={course} key={index} isMobile={this._isMobile()}/> : null)
         })
-    }
-
-    _onUrlClick(url){
-        this.props.history.push('/category/' + url);
     }
 
     render() {
@@ -62,9 +60,9 @@ class CoursesPage extends React.Component {
             fetching ?
                 <p>Загрузка...</p>
                 :
-                <main className="courses">
+                <div className="courses">
                     {this._getCoursesBundles()}
-                </main>
+                </div>
         )
     }
 }
