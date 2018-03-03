@@ -31,29 +31,33 @@ Utils.guid = function () {
         require(["work-shop/work-shop"], function (WS) {
             var options = initOptions();
             var ws = new WS($(".ws-container"), options);
+            ws.render();
 
-            $.ajax({
-                url: "/genData2",
-                type: "GET",
-                dataType: "json",
-                responseType: 'json',
-                success: function (result) {
-                    ws.render();
-                },
-                fail: function (err) {
-                    console.error(err);
-                }
-            });
+            function onGetData() {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        url: "/genData2",
+                        type: "GET",
+                        dataType: "json",
+                        responseType: 'json',
+                        success: function (result) {
+                            resolve(result)
+                        },
+                        fail: function (err) {
+                            reject(err);
+                        }
+                    });
+                });
+            }
 
             function initOptions() {
                 var result = {
+                    data: onGetData,
                     assets: {
-                        data: getAssetsList,
                         onAddAsset: onAddAsset,
                         onDeleteAsset: onDeleteAsset
                     },
                     tracks: {
-                        data: getTracksList,
                         onAddTrack: onAddTrack,
                         onDeleteTrack: onDeleteTrack,
                         onGetAudio: onGetAudio,
@@ -63,7 +67,6 @@ Utils.guid = function () {
                         onAddAsset: onAddAssetFromTrack
                     },
                     player: {
-                        onGetAssets: getAssets,
                         onSetElementPosition: setPlayerElementPosition,
                         onElementFocused: setPlayerElementFocused
                     }
@@ -87,14 +90,6 @@ Utils.guid = function () {
                             reject();
                         }
                     });
-                });
-            }
-
-            function getAssetsList() {
-                return new Promise((resolve, fail) => {
-                    setTimeout(function () {
-                        resolve(assetsList);
-                    }, 0);
                 });
             }
 

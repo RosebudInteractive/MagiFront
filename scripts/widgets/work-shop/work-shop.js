@@ -24,14 +24,18 @@
 
 define(
     ["./ws-base", "./ws-assets", "./ws-tracks", "./player", "./ws-prop-editor-image",
-      "./ws-prop-editor-text", 'text!./templates/work-shop.html'],
-    function (CWSBase, CWSAssets, CWSTracks, CWSPlayer, CWSPropEditorImage, CWSPropEditorText, tpl) {
+      "./ws-prop-editor-text", "work-shop/resource-loader", 'text!./templates/work-shop.html'],
+    function (CWSBase, CWSAssets, CWSTracks, CWSPlayer, CWSPropEditorImage, CWSPropEditorText, Loader, tpl) {
         return class CWorkShop extends CWSBase {
 
             constructor(container, options) {
-                super(container, tpl)
+                super(container, tpl);
+                options.assets.data = this._getAssets.bind(this);
+                options.tracks.data = this._getTracks.bind(this);
                 this._options = options;
+                this._data = {};
             }
+
 
             createItem() {
                 super.createItem();
@@ -45,6 +49,54 @@ define(
                 this._playerWidget = new CWSPlayer(this._playerContainer, this._getPlayerOptions());
 
                 this._setEvents();
+
+                this._readData();
+            }
+
+            _readData() {
+                if (this._options.data) {
+                    this._readDataProperty(this._options.data)
+                        .then(result => {
+                            this._playerWidget.setData(result);
+                            this._data = result;
+                            this._makeTracks(result.episodes);
+                            this.render();
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        })
+                }
+            }
+
+            _makeTracks(episodes) {
+                for (var i = 0; i < episodes.length; i++) {
+                    var episode = episodes[i];
+                    var start = 0;
+                    var tracks = [];
+                    var tracksIdx = {};
+                    for (var j = 0; j < episode.elements.length; j++) {
+                        var el = episode.elements[j];
+                        var tId = el.content.track;
+                        var track = null;
+                        if (tracksIdx[tId] === undefined) {
+                            track = {id : tId, elements: []};
+                            tracksIdx[tId] = tracks.length;
+                            tracks.push(track);
+                        } else {
+                            track = tracks[tracksIdx[tId]];
+                        }
+
+                        track.elements.push(el);
+                        el.start = start + el.start;
+                    }
+
+                    tracks.sort((a, b) => {
+                        return Math.sign(a.id - b.id);
+                    });
+
+                    episode.tracks = tracks;
+                    episode.tractsIdx = tracksIdx;
+                }
             }
 
             _setEvents() {
@@ -77,7 +129,9 @@ define(
                 var tracks = this._options.tracks.data;
                 var that = this;
                 this._readDataProperty(tracks).then(function (tracks) {
+                    console.log("render tracks begin")
                     that._tracksWidget.render(tracks);
+                    console.log("render tracks success")
                 }).catch(function (err) {
                     console.error(err)
                 });
@@ -135,7 +189,7 @@ define(
                         if ($.isFunction(option)) {
                             option = option(e);
                         }
-                        if ($.isFunction(option.then)) {
+                        if (option && $.isFunction(option.then)) {
                             option.then(function (assets) {
                                 resolve(assets);
                             });
@@ -150,6 +204,18 @@ define(
                         }, 0);
                     }
                 });
+            }
+
+            _getAssets () {
+                if (this._data && this._data.assets) return this._data.assets;
+                else return [];
+            }
+
+            _getTracks() {
+                if (this._data && this._data.episodes && this._data.episodes[0].tracks)
+                    return this._data.episodes[0].tracks;
+                else
+                    return [];
             }
 
             _getAssetsOptions() {
@@ -236,18 +302,7 @@ define(
                 var that = this;
                 return {
                     designMode: true,
-                    onGetAssets: function (e) {
-                        if (that._options.player.onGetAssets)
-                            return new Promise((resolve, reject) => {
-                                that._readDataProperty(that._options.player.onGetAssets, e).then((assets) => {
-                                    that._tracksWidget.assetsLoaded(assets);
-                                    resolve(assets);
-                                }).catch((err) => {
-                                    console.error(err)
-                                    reject(err);
-                                });
-                            });
-                    },
+                    loader: new Loader(),
                     onCurrentTimeChanged: function (e) {
                         that._tracksWidget.renderAudioState(e);
                     },

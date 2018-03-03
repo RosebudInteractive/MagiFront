@@ -5,6 +5,7 @@
 define(
     ["./ws-base", 'text!./templates/work-shop.html'],
     function (CWSBase, tpl) {
+        const URL_PREFIX = "/data/";
         return class CWSAssets extends CWSBase {
 
             constructor(container, options){
@@ -35,11 +36,11 @@ define(
                 assets = assets || [];
                 for (var i = 0; i < assets.length; i++) {
                     var asset = assets[i];
-                    assetsGuids[asset.id] = true;
-                    var item = this._list.find("#" + asset.id);
+                    assetsGuids["a_" + asset.id] = true;
+                    var item = this._list.find("#a_" + asset.id);
                     if (item.length == 0) {
                         item = $(template);
-                        item.attr("id", asset.id);
+                        item.attr("id", "a_" + asset.id);
                         if (asset.type == "MP3") item.attr("role", "audio");
                         this._list.append(item);
                         this._setAssetItemEvents(item);
@@ -59,10 +60,10 @@ define(
                             div.addClass("ws-audio-icon").text("♫");
                         }
                     } else {
-                        title = asset.title + "<br>" + asset.size.width + "x" + asset.size.height;
+                        title = asset.title + "<br>" + asset.info.size.width + "x" + asset.info.size.height;
                         item.find(".ws-assets-item-icon")
                             .css({
-                                "background": "url(" + asset.icon + ") no-repeat center center",
+                                "background": "url(" + URL_PREFIX + asset.info.path + asset.info.icon + ") no-repeat center center",
                                 "-webkit-background-size" : "cover",
                                 "-moz-background-size: cover" : "cover",
                                 "-o-background-size: cover" : "cover",

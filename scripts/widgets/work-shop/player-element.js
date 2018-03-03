@@ -171,6 +171,8 @@ define(
 
             _getItem() {
                 var item = $("#" + this.Id);
+                var ass = this.Asset
+
                 if (item.length == 0) {
                     var pos = this._options.data.content.position;
                     if (!pos) {
@@ -191,8 +193,6 @@ define(
                     this._container.append(item);
 
                     var cont = item.find(".ws-player-elem-content");
-
-                    var ass = this.Asset
 
                     if (ass) {
                         var imgDiv = null;
@@ -338,8 +338,6 @@ define(
                     }
 
                 } else {
-                    var ass = this.Asset;
-
                     this._options.loader
                         .getAssetResources(ass.id)
                         .then((assData) => {
@@ -388,7 +386,7 @@ define(
 
             _setEvents(item) {
                 item.draggable({
-                    start: (event, ui) => {
+                    start: (/*event, ui*/) => {
                         item.css({
                             bottom: null,
                             right: null,
@@ -400,7 +398,7 @@ define(
                         this._options.data.focused = true;
                         this._broadcastFocused();
                     },
-                    stop: (event, ui) => {
+                    stop: (/*event, ui*/) => {
                         item.css({
                             bottom: this._options.data.content.position.bottom + "%",
                             right: this._options.data.content.position.right + "%",
@@ -430,7 +428,7 @@ define(
                         });
                         this._broadcastPosition();
                     }
-                }).click((e) => {
+                }).click(() => {
                     this._options.data.focused = true;
                     this._broadcastFocused();
                 });
@@ -452,11 +450,11 @@ define(
                     var h = ass.info.size.height,
                         w = ass.info.size.width;
                     var pictRatio = w ? h / w : 1;
-                    var w = 100;
+                    w = 100;
                     var actualWidth = 160 * 1;
                     var actualHeight = actualWidth * pictRatio;
                     // calculate actualHeight's %
-                    var h = actualHeight / 90 * 100;
+                    h = actualHeight / 90 * 100;
 
                     if (h > 100) {
                         h = 100;

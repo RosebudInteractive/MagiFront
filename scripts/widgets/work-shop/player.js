@@ -29,7 +29,7 @@ define(
                     playingNow: {},
                     volume: 0.3,
                     muted: false,
-                    playbackRate: '1.0',
+                    playbackRate: 1,
                     requestAnimationFrameID: null,
                     videoOff: false,
                     source: null
@@ -65,7 +65,6 @@ define(
                 this._options.loader.setData(data2);
                 this._prepareElements();
 
-                var audioId = null;
                 if (data2.episodes.length > 0) {
                     var episode = data2.episodes[0];
                     this._audioState.currentEpisode = 0;
@@ -345,7 +344,7 @@ define(
                     // that._audioState.audio.muted = that._audioState.muted;
                     that._broadcastAudioLoaded();
                     //that._options.loader.setPosition(0)
-                }).on("timeupdate", function (e) {
+                }).on("timeupdate", function () {
                     that._audioState.currentTime = this.currentTime;
                     that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
                     that._broadcastCurrentTimeChanged();
@@ -355,7 +354,7 @@ define(
                     console.log("timeupdate", that._audioState.globalTime);
                     that._options.loader.setPosition(that._audioState.globalTime)
 
-                }).on("volumechange", function(e) {
+                }).on("volumechange", function() {
                     that._audioState.volume = this.volume;
                 }).on("ended", function () {
                     var data = that._options.loader.getData();
@@ -660,8 +659,6 @@ define(
 
               console.log('_setTextToolsEvents')
 
-              var textToolsDiv = $('.ws-text-element-tools');
-
               $('.ws-text-element-tools-a1').on('click', (e) => {
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -779,14 +776,12 @@ define(
                 // Удалим элементы плеера, которые относятся к уже не существующим элементам трека
                 this._deleteUnusedElements(data);
 
-                var starts = this._options.loader.getEpisodesStartTimes();
-
                 for (var epIdx = 0; epIdx < data.episodes.length; epIdx++) {
                     var episode = data.episodes[epIdx];
                     for (var i = 0; i < episode.tracks.length; i++) {
                         var track = episode.tracks[i];
                         for (var j = 0; j < track.elements.length; j++) {
-                            var elData = this._decodeElData(track.elements[j], i + 1, starts[episode.id].start);
+                            var elData = this._decodeElData(track.elements[j], i + 1);
                             var elem = null;
                             if (elData.trackElement in this._elements.trackElIdx) {
                                 elem = this._elements.trackElIdx[elData.trackElement];
@@ -885,7 +880,7 @@ define(
                 }
             }
 
-            _decodeElData(trackElData, zIndex, episodeStart) {
+            _decodeElData(trackElData, zIndex) {
                 var oldData = null;
                 if (trackElData.id in this._elements.trackElIdx) {
                     oldData = this._elements.trackElIdx[trackElData.id].Data;
@@ -896,7 +891,6 @@ define(
                         right: trackElData.content.position.right
                     };
                     oldData.content.duration = trackElData.duration;
-                    //oldData.start = episodeStart + trackElData.start;
                     oldData.zIndex = zIndex;
                     oldData.focused = trackElData.focused;
                     oldData.data = trackElData.data;
@@ -905,7 +899,6 @@ define(
                     oldData = $.extend(true, {}, trackElData);
                     oldData.id = Utils.guid();
                     oldData.trackElement = trackElData.id;
-                    //oldData.start = episodeStart + trackElData.start
                     oldData.zIndex = zIndex;
                 }
 

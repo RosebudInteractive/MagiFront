@@ -61,29 +61,9 @@ $(document).ready(function () {
         });
 
         function getPlayerOptions() {
-            var that = this;
             return {
                 designMode: true,
                 loader: new Loader(),
-                onGetAssets: function (e) {
-                    return new Promise((resolve, reject) => {
-                        readDataProperty(getAssets, e).then((assets) => {
-                            resolve(assets);
-
-                            var audioObj = findAudio(assetsList);
-                            if (audioObj) {
-                                loadAudio(audioObj).then(function (audio) {
-                                    pl1.setAudio(audio);
-                                    pl2.setAudio(audio);
-                                });
-                            }
-
-                        }).catch((err) => {
-                            console.error(err)
-                            reject(err);
-                        });
-                    });
-                },
                 onCurrentTimeChanged: function (e) {
                 },
                 onAudioLoaded: function (e) {
