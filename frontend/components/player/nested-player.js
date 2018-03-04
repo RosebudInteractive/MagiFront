@@ -22,17 +22,18 @@ export default class NestedPlayer {
         this.o1 = this._getPlayerOptions();
         // let _div = $("#" + div)
         this.pl1 = new Player(div, this.o1);
-        // this.pl = this.pl1;
+        this.pl = this.pl1;
         this.assetsList = data.assets;
         this.pl1.render();
 
         this.pl1.setData(data);
         let content = this.pl1.getLectureContent();
         this._renderContent(content);
+        this.pl.play();
     }
 
     _renderContent() {
-        // var cDiv = $(".text-content");
+        // var cDiv = $(".contents-tooltip");
         // cDiv.empty();
         //
         // var length = 0;
