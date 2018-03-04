@@ -18,6 +18,7 @@ Utils.guid = function () {
 window.Utils = Utils;
 
 export default class NestedPlayer {
+
     constructor(data, div) {
         this.o1 = this._getPlayerOptions();
         // let _div = $("#" + div)
@@ -30,6 +31,10 @@ export default class NestedPlayer {
         let content = this.pl1.getLectureContent();
         this._renderContent(content);
         // this.pl.play();
+    }
+
+    pause() {
+        this.pl.pause()
     }
 
     _renderContent() {

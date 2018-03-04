@@ -46,7 +46,7 @@ class Player extends React.Component {
     _mountPlayer() {
         let _container = $('#player');
         if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object)) {
-            new NestedPlayer(this.props.lessonPlayInfo.object, _container)
+            this._player = new NestedPlayer(this.props.lessonPlayInfo.object, _container)
             this._mountPlayerGuard = true;
         }
     }
@@ -86,7 +86,14 @@ class Player extends React.Component {
             courseUrl={this.props.course.URL}
             courseTitle={this.props.course.Name}
             lessonCount={this.props.lessons.object.length}
+            onPause={::this._handlePause}
         />
+    }
+
+    _handlePause(){
+        if (this._player) {
+            this._player.pause()
+        }
     }
 
     _getBundles() {
@@ -155,7 +162,7 @@ class Player extends React.Component {
         } = this.props;
 
         if (lessonInfo.object) {
-            this._mountFullpage()
+            this._mountFullpage();
             this._mountPlayer();
         }
 

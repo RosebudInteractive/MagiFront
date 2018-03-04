@@ -10,6 +10,7 @@ class Wrapper extends Component {
         courseUrl: PropTypes.string.isRequired,
         lessonUrl: PropTypes.string.isRequired,
         lessonCount: PropTypes.number.isRequired,
+        onPause: PropTypes.func,
     };
 
     render() {
@@ -17,7 +18,7 @@ class Wrapper extends Component {
             <section className='fullpage-section lecture-wrapper'>
                 <div className="fp-tableCell">
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
-                    <PlayerFrame lesson={this.props.lesson}/>
+                    <PlayerFrame lesson={this.props.lesson} onPause={this.props.onPause}/>
                 </div>
             </section>
         )

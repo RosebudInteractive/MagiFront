@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 export default class Frame extends Component {
     static propTypes = {
         lesson: PropTypes.object.isRequired,
+        onPause: PropTypes.func,
     };
 
     render() {
@@ -40,7 +41,7 @@ export default class Frame extends Component {
                             <button type="button" className="backwards">
                                 <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _backwards}}/>
                             </button>
-                            <button type="button" className="play-button">
+                            <button type="button" className="play-button" onClick={this.props.onPause}>
                                 <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: _pause}}/>
                             </button>
                             <button type="button" className="sound-button">
