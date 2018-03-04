@@ -8,11 +8,12 @@ import 'fullpage.js'
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 
-import LectureWrapper from '../components/lesson-page/lesson-wrapper'
+import PlayerWrapper from '../components/player/wrapper'
+import NestedPlayer from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
 
-class LessonPage extends React.Component {
+class Player extends React.Component {
 
     constructor(props) {
         super(props);
@@ -22,13 +23,15 @@ class LessonPage extends React.Component {
             total: 0,
             current: 0,
         }
+
+        this._lessonId = 0;
     }
 
     componentWillMount() {
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-        this.props.pageHeaderActions.setCurrentPage(pages.lesson);
+        this.props.pageHeaderActions.setCurrentPage(pages.player);
     }
 
     _mountFullpage() {
@@ -37,6 +40,14 @@ class LessonPage extends React.Component {
             const _options = this._getFullpageOptions();
             _container.fullpage(_options)
             this._mountGuard = true;
+        }
+    }
+
+    _mountPlayer() {
+        let _container = $('#player');
+        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object)) {
+            new NestedPlayer(this.props.lessonPlayInfo.object, _container)
+            this._mountPlayerGuard = true;
         }
     }
 
@@ -55,36 +66,40 @@ class LessonPage extends React.Component {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
         }
+
+        if ((nextProps.lessonInfo.object) && (nextProps.lessonInfo.object.Id !== this._lessonId)) {
+            this._lessonId = nextProps.lessonInfo.object.Id;
+            this.props.lessonActions.getLessonPlayInfo(this._lessonId)
+        }
     }
 
-    _createBundle(lesson, key, isMain) {
+    _createBundle(lesson) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <LectureWrapper key={key}
-                               lesson={lesson}
-                               lessonUrl={this.props.lessonUrl}
-                               courseUrl={this.props.course.URL}
-                               courseTitle={this.props.course.Name}
-                               lessonCount={this.props.lessons.object.length}
-                               isMain={isMain}
+        return <PlayerWrapper
+            lesson={lesson}
+            lessonUrl={this.props.lessonUrl}
+            courseUrl={this.props.course.URL}
+            courseTitle={this.props.course.Name}
+            lessonCount={this.props.lessons.object.length}
         />
     }
 
-    _getLessonsBundles() {
+    _getBundles() {
         let {object: lesson} = this.props.lessonInfo;
         let _bundles = [];
 
         if (!lesson) return _bundles;
 
-        _bundles.push(this._createBundle(lesson, 'lesson0'), true);
+        _bundles.push(this._createBundle(lesson, 'lesson0'));
 
         if (lesson.Lessons) {
             lesson.Lessons.forEach((lesson, index) => {
-                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
+                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1)))
             });
         }
 
@@ -141,6 +156,7 @@ class LessonPage extends React.Component {
 
         if (lessonInfo.object) {
             this._mountFullpage()
+            this._mountPlayer();
         }
 
         return (
@@ -149,7 +165,7 @@ class LessonPage extends React.Component {
                 :
                 lessonInfo.object ?
                     <div className='fullpage-wrapper' id='fullpage'>
-                        {this._getLessonsBundles()}
+                        {this._getBundles()}
                     </div>
                     :
                     null
@@ -163,6 +179,7 @@ function mapStateToProps(state, ownProps) {
         lessonUrl: ownProps.match.params.lessonUrl,
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
+        lessonPlayInfo: state.lessonPlayInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
     }
@@ -175,4 +192,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LessonPage);
+export default connect(mapStateToProps, mapDispatchToProps)(Player);

@@ -14,6 +14,15 @@ const _prodConfig = {
         path: path.join(__dirname, 'static'),
         filename: '[name].js',
     },
+    resolve: {
+        alias: {
+            "text": './scripts/lib/text',
+            "underscore": './scripts/lib/underscore',
+            "lodash": './scripts/lib/lodash.min',
+            "template": '/scripts/lib/template',
+            "work-shop": '/scripts/widgets/work-shop'
+        }
+    },
     module: {
         rules: [
             {
@@ -75,7 +84,11 @@ const _devConfig = {
     plugins: [
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new NpmInstallPlugin()
+        new NpmInstallPlugin(),
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery"
+        })
     ],
     module: {
         rules: [
@@ -87,6 +100,9 @@ const _devConfig = {
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
                 ],
+                exclude: [
+                    path.resolve(__dirname, 'scripts')
+                ]
             },
             {
                 loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
@@ -127,6 +143,20 @@ const _devConfig = {
                 loader: "url-loader?limit=10000&mimetype=image/svg+xml"
             }
         ]
+    },
+    resolve: {
+        alias: {
+            "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
+            "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
+            "template": path.resolve(__dirname, 'scripts/lib/template'),
+            "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
+        }
+    },
+    resolveLoader: {
+        alias: {
+            // 'text': path.resolve(__dirname, 'scripts/lib/text'),
+            'text': 'raw-loader',
+        }
     }
 };
 

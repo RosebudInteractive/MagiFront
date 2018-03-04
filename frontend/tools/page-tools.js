@@ -46,5 +46,6 @@ export const pages = {
     courses: {name: 'courses', url: '/'},
     singleCourse: {name: 'singleCourse', url: null},
     lesson: {name: 'lesson', url: null},
+    player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
 }

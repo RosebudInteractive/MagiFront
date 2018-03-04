@@ -57,7 +57,7 @@ class SingleLecture extends React.Component {
 
         return (
             <section className="lecture">
-                <PlayBlock cover={_cover} duration={lesson.DurationFmt}/>
+                <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}/>
                 <div className='lecture__descr'>
                     <Link to={this.props.courseUrl + '/' + lesson.URL}><h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3></Link>
                     <p>{lesson.ShortDescription}</p>
@@ -82,6 +82,12 @@ class LecturesList extends React.Component {
 }
 
 class PlayBlock extends React.Component {
+
+    static propTypes = {
+        lessonUrl: PropTypes.string.isRequired,
+        courseUrl: PropTypes.string.isRequired
+    }
+
     render() {
         return (
             <div className='lecture__play-block'>
@@ -99,11 +105,11 @@ class PlayBlock extends React.Component {
                     </svg>
                 </div>
                 <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
-                <a className="lecture__btn">
+                <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="lecture__btn">
                     <svg width="41" height="36">
                         {svg.play}
                     </svg>
-                </a>
+                </Link>
                 <div className="lecture__tooltip">Смотреть</div>
                 <div className='duration'>{this.props.duration}</div>
             </div>
