@@ -147,7 +147,6 @@ Utils.guid = function () {
                 });
             }
 
-
             function getAssets(ids) {
                 ids = ids || [];
                 if (!Array.isArray(ids)) ids = [ids];

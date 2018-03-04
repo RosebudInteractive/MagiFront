@@ -1,19 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-export default class LessonFrame extends React.Component{
+export default class LessonFrame extends React.Component {
     static propTypes = {
         lesson: PropTypes.object.isRequired,
+        isMain: PropTypes.bool,
     };
 
-    render(){
+    static defaultProps = {
+        isMain: true
+    };
+
+    render() {
         let {lesson} = this.props;
 
-        return(
+        return (
             <div className="lecture-frame">
                 <div className="lecture-frame__header">
                     <a href="#" className="lecture-frame__play-link">
-                        {/*<button type="button" className="lecture-frame__plus">Доп. эпизод</button>*/}
+                        {this.props.isMain ? null :
+                            <button type="button" className="lecture-frame__plus">Доп. эпизод</button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                             <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
@@ -37,15 +43,15 @@ export default class LessonFrame extends React.Component{
     }
 }
 
-class SocialBlock extends React.Component{
-    render(){
+class SocialBlock extends React.Component {
+    render() {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>'
 
 
-        return(
+        return (
             <div className="social-block">
                 <a href="#" className="social-btn">
                     <div className="social-btn__icon">
