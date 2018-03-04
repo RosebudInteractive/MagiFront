@@ -29,7 +29,7 @@ export default class NestedPlayer {
         this.pl1.setData(data);
         let content = this.pl1.getLectureContent();
         this._renderContent(content);
-        this.pl.play();
+        // this.pl.play();
     }
 
     _renderContent() {
@@ -98,6 +98,7 @@ export default class NestedPlayer {
             onCurrentTimeChanged: function () {
             },
             onAudioLoaded: function () {
+                that.pl.play()
             },
             onSetPosition: function () {
             },
