@@ -141,6 +141,7 @@ namespace MagImport
         {
             public string Code { get; set; }
             public string LangTag { get; set; }
+            public string ShortName { get; set; }
             public string Language { get; set; }
         };
 
@@ -640,6 +641,7 @@ namespace MagImport
             public int? ResLanguageId { get; set; }
             public string ResType { get; set; }
             public string FileName { get; set; }
+            public bool? ShowInGalery { get; set; }
         };
 
         public class Resource : DataObjTyped<ResourceFields, ResourceRoot>
@@ -962,21 +964,25 @@ namespace MagImport
             lang.Fields.Id = LANGUAGE_ID;
             lang.Fields.Code = "RUS";
             lang.Fields.LangTag = "ru-RU";
+            lang.Fields.ShortName = "Рус";
             lang.Fields.Language = "Русский";
 
             lang = new Language();
             lang.Fields.Code = "ENG";
             lang.Fields.LangTag = "en-GB";
+            lang.Fields.ShortName = "Eng";
             lang.Fields.Language = "English";
 
             lang = new Language();
             lang.Fields.Code = "FRA";
             lang.Fields.LangTag = "fr-FR";
+            lang.Fields.ShortName = "Fra";
             lang.Fields.Language = "Français";
 
             lang = new Language();
             lang.Fields.Code = "GER";
             lang.Fields.LangTag = "de-DE";
+            lang.Fields.ShortName = "Deu";
             lang.Fields.Language = "Deutsch";
 
             Account.AllData = allData;
@@ -1493,6 +1499,8 @@ namespace MagImport
                             string att_id = String.Format(att_lsn_rc_id_name, i);
                             string att_time = String.Format(att_lsn_rc_tm_name, i);
                             string att_time_ms = String.Format(att_lsn_rc_tms_name, i);
+                            string att_show_flag = String.Format(att_lsn_rc_show_name, i);
+
                             int picture_id;
                             if (lesson_prop_value.TryGetValue(att_id, out val))
                             {
@@ -1517,6 +1525,11 @@ namespace MagImport
                                             resource.Fields.LessonId = lesson.Fields.Id;
                                             resource.Fields.ResType = "P";
                                             resource.Fields.FileName = fn;
+                                            int show_flag = 1;
+                                            if(lesson_prop_value.TryGetValue(att_show_flag, out val))
+                                                Int32.TryParse(val, out show_flag);
+                                            resource.Fields.ShowInGalery = show_flag == 1;
+
                                             res_lng = new ResourceLng();
                                             res_lng.Fields.ResourceId = resource.Fields.Id;
                                             res_lng.Fields.LanguageId = LANGUAGE_ID;
@@ -1951,6 +1964,7 @@ namespace MagImport
         const string att_lsn_rc_id_name = "иллюстрации_лекции_(слайды)_{0}_картинка";
         const string att_lsn_rc_tm_name = "иллюстрации_лекции_(слайды)_{0}_время";
         const string att_lsn_rc_tms_name = "иллюстрации_лекции_(слайды)_{0}_время_миллисекунды";
+        const string att_lsn_rc_show_name = "иллюстрации_лекции_(слайды)_{0}_выводить_в_галереи";
 
         const string sql_get_lessons =
             "select `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name`,\n" +

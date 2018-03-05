@@ -184,7 +184,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
@@ -208,7 +208,7 @@ const LESSON_MSSQL_CONTENT_REQ =
     "order by pl.[Number], e.[Id], t.[StartTime]";
 
 const LESSON_MSSQL_ASSETS_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
@@ -263,7 +263,7 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
@@ -286,7 +286,7 @@ const LESSON_MYSQL_CONTENT_REQ =
     "where pl.`LessonId` = <%= id %>\n" +
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
 const LESSON_MYSQL_ASSETS_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
@@ -514,6 +514,9 @@ const DbLesson = class DbLesson extends DbObject {
                             let resources = [];
                             if (result && result.detail && (result.detail.length > 0)) {
                                 resources = result.detail;
+                                resources.forEach((elem) => {
+                                    elem.ShowInGalery = elem.ShowInGalery ? true : false;
+                                });
                             }
                             lesson.Resources = resources;
                         }
@@ -536,6 +539,9 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             resources = result.detail;
+                            resources.forEach((elem) => {
+                                elem.ShowInGalery = elem.ShowInGalery ? true : false;
+                            });
                         }
                         return resources;
                     })
@@ -811,7 +817,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     if (elem.Description)
                                         asset.Description = elem.Description;
                                     assets_list[elem.Id] = asset;
-                                    data.Galery.push(asset);
+                                    if (elem.ShowInGalery)
+                                        data.Galery.push(asset);
                                 }
                             });
                         }
@@ -1325,6 +1332,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 };
                                 if (typeof (elem.ResLanguageId) !== "undefined")
                                     data.res.ResLanguageId = elem.ResLanguageId;
+                                if (typeof (elem.ShowInGalery) !== "undefined")
+                                    data.res.ShowInGalery = elem.ShowInGalery;
                                 if (typeof (elem.Description) !== "undefined")
                                     data.lng.Description = elem.Description;
                                 if (typeof (elem.MetaData) !== "undefined")
@@ -1744,6 +1753,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     fields["FileName"] = elem["FileName"];
                                 if (typeof (elem["ResLanguageId"]) !== "undefined")
                                     fields["ResLanguageId"] = elem["ResLanguageId"];
+                                if (typeof (elem["ShowInGalery"]) !== "undefined")
+                                    fields["ShowInGalery"] = elem["ShowInGalery"];
                                 return root_res.newObject({
                                     fields: fields
                                 }, opts)
