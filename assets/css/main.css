@@ -7701,10 +7701,10 @@ ul.user-tooltip {
     @media (max-width: 639px) {
       .course-tab-control__empty._desktop {
           display: none; } }
-  .course-tab-control__empty ._mobile {
+  .course-tab-control__empty._mobile {
       display: none; }
     @media (max-width: 639px) {
-      .course-tab-control__empty ._mobile {
+      .course-tab-control__empty._mobile {
         display: block;
         font-size: 29px;
         line-height: 24px;

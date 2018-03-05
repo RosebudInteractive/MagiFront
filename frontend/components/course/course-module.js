@@ -44,6 +44,10 @@ class ImageBlock extends React.Component {
         }
     }
 
+    static propTypes = {
+        course: PropTypes.object.isRequired,
+    }
+
     render() {
         const {cover} = this.props;
         const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" width="724" height="503"/>';
@@ -55,8 +59,3 @@ class ImageBlock extends React.Component {
         );
     }
 }
-
-InfoBlock.propTypes = {
-    course: PropTypes.object.isRequired,
-    onUrlClick: PropTypes.func.isRequired,
-};

@@ -66,8 +66,12 @@ class TitleWrapper extends React.Component {
     render() {
         return (
             <div className="course-module__title-wrapper">
-                <h1 className="course-module__title"><p className="course-module__label">
-                    Курс:</p>{' ' + this.props.title}</h1>
+                <h1 className="course-module__title">
+                    <span className="favourites">В закладки</span>
+                    <a href="#">
+                        <p className="course-module__label">Курс:</p> <span>{' ' + this.props.title}</span>
+                    </a>
+                </h1>
             </div>
         )
     }

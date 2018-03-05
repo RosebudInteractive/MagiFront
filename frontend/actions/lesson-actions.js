@@ -8,6 +8,9 @@ import {
     GET_LESSON_TEXT_REQUEST,
     GET_LESSON_TEXT_SUCCESS,
     GET_LESSON_TEXT_FAIL,
+    GET_LESSON_PLAY_INFO_REQUEST,
+    GET_LESSON_PLAY_INFO_SUCCESS,
+    GET_LESSON_PLAY_INFO_FAIL,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
@@ -92,6 +95,35 @@ export const getLessonText = (courseUrl, lessonUrl) => {
             });
     }
 }
+
+
+export const getLessonPlayInfo = (lessonId) => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_LESSON_PLAY_INFO_REQUEST,
+            payload: null
+        });
+
+        fetch('/api/lessons/play/' + lessonId, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleTextData(data);
+
+                dispatch({
+                    type: GET_LESSON_PLAY_INFO_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_LESSON_PLAY_INFO_FAIL,
+                    payload: err
+                });
+            });
+    }
+}
+
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {
