@@ -22,6 +22,8 @@ class Player extends React.Component {
         this.state = {
             total: 0,
             current: 0,
+            currentContents: [],
+            playTime: 0,
         }
 
         this._lessonId = 0;
@@ -46,7 +48,14 @@ class Player extends React.Component {
     _mountPlayer() {
         let _container = $('#player');
         if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object)) {
-            this._player = new NestedPlayer(this.props.lessonPlayInfo.object, _container)
+            let _options = {
+                data: this.props.lessonPlayInfo.object,
+                div: _container,
+                onRenderContent: (content) => {this.setState({currentContents : content})},
+                onCurrentTimeChanged: (e) => {this.setState({playTime : e})}
+            }
+
+            this._player = new NestedPlayer(_options);
             this._mountPlayerGuard = true;
         }
     }
@@ -87,12 +96,28 @@ class Player extends React.Component {
             courseTitle={this.props.course.Name}
             lessonCount={this.props.lessons.object.length}
             onPause={::this._handlePause}
+            onPlay={::this._handlePlay}
+            content={this.state.currentContents}
+            onGoToContent={::this._handleGoToContent}
+            playTime={this.state.playTime}
         />
     }
 
     _handlePause(){
         if (this._player) {
             this._player.pause()
+        }
+    }
+
+    _handlePlay(){
+        if (this._player) {
+            this._player.play()
+        }
+    }
+
+    _handleGoToContent(position) {
+        if (this._player) {
+            this._player.setPosition(position)
         }
     }
 

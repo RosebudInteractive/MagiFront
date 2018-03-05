@@ -2,6 +2,7 @@ import $ from 'jquery'
 
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader"
+import 'webpack-jquery-ui';
 
 var Utils = {};
 
@@ -19,57 +20,35 @@ window.Utils = Utils;
 
 export default class NestedPlayer {
 
-    constructor(data, div) {
+    constructor(options) {
         this.o1 = this._getPlayerOptions();
-        // let _div = $("#" + div)
-        this.pl1 = new Player(div, this.o1);
+        this.pl1 = new Player(options.div, this.o1);
         this.pl = this.pl1;
-        this.assetsList = data.assets;
+        this.assetsList = options.data.assets;
         this.pl1.render();
 
-        this.pl1.setData(data);
+        this.pl1.setData(options.data);
         let content = this.pl1.getLectureContent();
+        this._onRenderCotent = options.onRenderContent;
+        this._onCurrentTimeChanged = options.onCurrentTimeChanged;
         this._renderContent(content);
-        // this.pl.play();
     }
 
     pause() {
         this.pl.pause()
     }
 
-    _renderContent() {
-        // var cDiv = $(".contents-tooltip");
-        // cDiv.empty();
-        //
-        // var length = 0;
-        //
-        // for (var i = 0; i < content.length; i++) {
-        //     var epContent = content[i];
-        //     length += epContent.duration;
-        //     var title = $("<div/>")
-        //     title.text(epContent.title + " (" + epContent.duration_formated + ")");
-        //     cDiv.append(title);
-        //     var ul = $("<ul/>");
-        //
-        //     for (var j = 0; j < epContent.content.length; j++) {
-        //         var c = epContent.content[j];
-        //         (function (cnt) {
-        //             var li = $("<li/>");
-        //             li.text(cnt.title);
-        //             li.click(function (e) {
-        //                 pl.setPosition(cnt.begin);
-        //             });
-        //             ul.append(li);
-        //         })(c);
-        //     }
-        //
-        //     cDiv.append(ul);
-        // }
-        //
-        // var info = $(".general-info");
-        // var durStr = Math.trunc(length/60) + ":" + length % 60;
-        // info.append("<div>Duration: " + durStr + "</div><br/>");
+    play() {
+        this.pl.play()
+    }
 
+    setPosition(begin) {
+        this.pl.setPosition(begin)
+    }
+
+
+    _renderContent(content) {
+        this._onRenderCotent(content)
     }
 
     _getPlayerOptions(assetsList) {
@@ -100,7 +79,10 @@ export default class NestedPlayer {
                         });
                 });
             },
-            onCurrentTimeChanged: function () {
+            onCurrentTimeChanged: (e) => {
+                if (that._onCurrentTimeChanged) {
+                    that._onCurrentTimeChanged(e.currentTime)
+                }
             },
             onAudioLoaded: function () {
                 that.pl.play()
@@ -156,21 +138,11 @@ export default class NestedPlayer {
 
         let idsMap = {};
 
-        // for (let i = 0; i < ids.length; i++) {
-        //     idsMap[ids[i]] = true;
-        // }
-
         ids.forEach((id) => {
             idsMap[id] = true
         });
 
         let result = [];
-        // for (var i = 0; i < assetsList.length; i++) {
-        //     var asset = assetsList[i];
-        //     if (asset.id in idsMap) {
-        //         result.push(asset);
-        //     }
-        // }
         this.assetsList.forEach((asset) => {
             if (asset.id in idsMap) {
                 result.push(asset);

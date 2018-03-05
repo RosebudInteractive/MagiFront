@@ -1,6 +1,7 @@
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
+// require('webpack-jquery-ui');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
@@ -70,6 +71,7 @@ const _prodConfig = {
 const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
+        // "webpack-jquery-ui": "webpack-jquery-ui",
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         'babel-polyfill': 'babel-polyfill',
 
@@ -87,7 +89,7 @@ const _devConfig = {
         new NpmInstallPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
-            jQuery: "jquery"
+            jQuery: "jquery",
         })
     ],
     module: {
@@ -116,7 +118,7 @@ const _devConfig = {
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                loader: ["style-loader","css-loader"]
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
@@ -150,6 +152,7 @@ const _devConfig = {
             "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
+            'jquery-ui': path.resolve(__dirname, 'node_modules/jquery-ui')
         }
     },
     resolveLoader: {
