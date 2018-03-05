@@ -7,6 +7,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("Language", "fd4b9b70-514e-4796-9a27-eb0adf8e7944", "RootLanguage", "36ce5c73-0976-4b9e-bbeb-caaefd13bad0")
             .addField("Code", { type: "string", length: 3, allowNull: false })
             .addField("LangTag", { type: "string", length: 10, allowNull: false })
+            .addField("ShortName", { type: "string", length: 10, allowNull: false })
             .addField("Language", { type: "string", length: 50, allowNull: false });
         
         metaDataMgr.addModel("Role", "e788831c-6f91-4bf6-ae6f-a21f0243d670", "RootRole", "b23a3900-6f89-4df4-b4e4-ca6d475b3d60")
@@ -191,7 +192,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("EntityId", { type: "dataRef", model: "Entity", refAction: "parentRestrict", allowNull: true })
             .addField("ResLanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("ResType", { type: "enum", values: ["P", "V"], allowNull: false })
-            .addField("FileName", { type: "string", length: 255, allowNull: false });
+            .addField("FileName", { type: "string", length: 255, allowNull: false })
+            .addField("ShowInGalery", { type: "boolean", allowNull: true });
 
         metaDataMgr.addModel("ResourceLng", "08fc5411-e11e-48be-bbb4-b7638a600f71", "RootResourceLng", "4f1238b4-c65c-4c19-bea8-b67413d724aa")
             .addField("ResourceId", { type: "dataRef", model: "Resource", refAction: "parentCascade", allowNull: false })
