@@ -2,7 +2,9 @@ import $ from 'jquery'
 
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader"
-import 'webpack-jquery-ui';
+import 'jquery-ui/jquery-ui.js';
+import 'script-lib/binary-transport.js';
+
 
 var Utils = {};
 

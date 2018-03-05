@@ -152,7 +152,9 @@ const _devConfig = {
             "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
-            'jquery-ui': path.resolve(__dirname, 'node_modules/jquery-ui')
+            'jquery': path.resolve(__dirname, 'scripts/lib/jquery/jquery-1.12.4'),
+            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
+            'script-lib': path.resolve(__dirname, 'scripts/lib')
         }
     },
     resolveLoader: {
