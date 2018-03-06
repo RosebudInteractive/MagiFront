@@ -282,8 +282,8 @@ define (
                 var nearestIds = this._getNearestAssets();
                 var notLoadedIds = this._getNotLoaded(nearestIds);
                 // if there was critical changes, then immediately load these assets
-                if (notLoadedIds.length > 0)
-                    console.log("push to queue", notLoadedIds)
+                // if (notLoadedIds.length > 0)
+                //     console.log("push to queue", notLoadedIds)
                 this._pushToQueue(this._recheck, notLoadedIds);
                 this._recheck = false;
 

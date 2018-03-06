@@ -8,7 +8,8 @@ import {Switch, Route, } from 'react-router-dom'
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import LessonPage from './containers/lesson-page';
-import TranscriptPage from './containers/lesson-transcript-page'
+import TranscriptPage from './containers/lesson-transcript-page';
+import Player from './containers/player';
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -108,12 +109,11 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl'} component={Player}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
-                <Route path={_homePath + ':courseUrl/:lessonUrl'} render={(props) => (
-                    <LessonPage {...props} height={this.height}/>
-                )}/>
+                <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
             </Switch>
         )
     }

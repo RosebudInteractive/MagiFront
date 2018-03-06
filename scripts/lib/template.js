@@ -2,13 +2,8 @@ define (
     ['lodash'],
     function(_) {
 
-        var CTemplate = Class.extend( {
-
-            init: function() {
-
-            },
-
-            parseTemplate: function(template) {
+        class CTemplate {
+            parseTemplate(template) {
                 var i, name, names, regEx, templateBodies, templateBody, templateName, templates;
 
                 regEx = /\<\!--\s+?template:\s+?(.+)\s?--\>/gi;
@@ -40,13 +35,13 @@ define (
                     return _results;
                 })();
                 return templates;
-            },
+            }
 
-            template: function(tmpl, params) {
+            template(tmpl, params) {
                 return _.template(tmpl, params);
             }
 
-        });
+        };
 
         return new CTemplate();
     }

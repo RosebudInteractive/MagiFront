@@ -17,5 +17,8 @@ html div {
 .ws-container {
   width: 100%;
   height: 100%;
-  background-color: #e7e7e7;
+  background-color: #2f2f2f;
+  padding-top: 48px;
+  /*background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);*/
+  /*background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%); }*/
 }

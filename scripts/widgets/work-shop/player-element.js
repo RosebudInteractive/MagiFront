@@ -324,7 +324,7 @@ define(
                                 .then((assData) => {
                                     var imgData = assData[0].file.body;
                                     var imgDiv = $('<img src="'+imgData+'" />');
-                                    imgDiv.load(function() {
+                                    imgDiv.on('load', () => {
                                         var width = this.naturalWidth;
                                         var height = this.naturalHeight;
                                     });

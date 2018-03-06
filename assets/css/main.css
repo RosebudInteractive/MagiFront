@@ -3026,7 +3026,7 @@ li.fancybox-thumbs-loading {
           max-height: 36px; }
         .navigation ul li.filter svg {
           fill: #2f2f2f;
-          opacity: 0.78;
+          opacity: 0.6;
           -webkit-transition: opacity 0.4s ease;
           transition: opacity 0.4s ease; }
         .navigation ul li.filter:hover {
@@ -5460,6 +5460,13 @@ ul.user-tooltip {
     .lectures-menu .play-block {
       display: none; } }
 
+body[data-page="fullpage"] .lectures-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10; }
+
 .logo-min {
   display: block;
   margin-top: 14px;
@@ -5678,19 +5685,22 @@ ul.user-tooltip {
       border-bottom: 1px solid rgba(47, 47, 47, 0.2); }
       ._dark .lectures-list__item:after {
         border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
-    .lectures-list__item.active > * {
+    .lectures-list__item.active .lectures-list__item-header {
+      position: relative; }
+      .lectures-list__item.active .lectures-list__item-header > * {
       position: relative;
       z-index: 1; }
-    .lectures-list__item.active:after {
+      .lectures-list__item.active .lectures-list__item-header:before {
+        content: "";
       position: absolute;
       top: 0;
       bottom: 0;
       right: -17px;
-      left: -16px;
+        left: -80px;
       background-color: #fff;
       border-bottom: none; }
       @media (max-width: 1023px) {
-        .lectures-list__item.active:after {
+          .lectures-list__item.active .lectures-list__item-header:before {
           right: -16px; } }
     .lectures-list__item.active .lectures-list__item-title {
       color: #2f2f2f; }
@@ -5701,6 +5711,16 @@ ul.user-tooltip {
     .lectures-list__item.active:before {
       color: #2f2f2f;
       z-index: 1; }
+    .lectures-list__item.active .lectures-sublist__title {
+      color: #2f2f2f; }
+    .lectures-list__item.active .sublist-num {
+      color: rgba(47, 47, 47, 0.6); }
+    .lectures-list__item.active .lectures-sublist__item-author {
+      color: rgba(47, 47, 47, 0.6); }
+    .lectures-list__item.active .lectures-sublist__item-duration {
+      color: rgba(47, 47, 47, 0.6); }
+    .lectures-list__item.active .lectures-sublist__item {
+      border-top: 1px solid rgba(47, 47, 74, 0.2); }
     .lectures-list__item--old .lectures-list__item-title {
       font-size: 17px;
       line-height: 23px;
@@ -5793,9 +5813,7 @@ ul.user-tooltip {
       border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
     ._dark .lectures-sublist__item {
       border-top: 1px solid rgba(255, 255, 255, 0.2); }
-    .lectures-sublist__item:before {
-      content: "1." counter(li) ".";
-      counter-increment: li;
+    .lectures-sublist__item .sublist-num {
       position: absolute;
       top: 8px;
       left: 0;
@@ -5804,14 +5822,17 @@ ul.user-tooltip {
       line-height: 23px;
       letter-spacing: 1.5px; }
       @media (max-width: 599px) {
-        .lectures-sublist__item:before {
+        .lectures-sublist__item .sublist-num {
           top: 5px; } }
   .lectures-sublist__title {
+    display: inline-block;
+    vertical-align: top;
     margin: 0;
     font-weight: 400;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 17px;
     line-height: 23px;
+    color: #fff;
     border-bottom: 1px solid rgba(255, 255, 255, 0);
     -webkit-transition: border-color 0.3s ease;
     transition: border-color 0.3s ease;
@@ -7232,6 +7253,16 @@ ul.user-tooltip {
   padding: 13px;
   height: 100%;
   min-height: 352px; }
+  .gallery-item__preview._long-descr:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#fff), to(rgba(255, 255, 255, 0)));
+    background-image: -webkit-linear-gradient(bottom, #fff, rgba(255, 255, 255, 0));
+    background-image: linear-gradient(to top, #fff, rgba(255, 255, 255, 0)); }
   @media (max-width: 1279px) {
     .gallery-item__preview {
       position: relative;
@@ -7255,13 +7286,18 @@ ul.user-tooltip {
       display: none; } }
 
 .gallery-item__image {
-  margin-left: 27px;
-  margin-right: auto; }
+  margin-left: auto;
+  margin-right: auto;
+  max-height: 207px;
+  overflow: hidden; }
+  @media (max-width: 1279px) {
+    .gallery-item__image {
+      max-height: 100%; } }
 
 .gallery-item img {
   display: block;
   width: auto;
-  height: 207px; }
+  max-height: 207px; }
   @media (max-width: 1279px) {
     .gallery-item img {
       position: absolute;
@@ -7273,7 +7309,8 @@ ul.user-tooltip {
       height: auto;
       width: auto;
       min-width: 100%;
-      min-height: 100%; } }
+      min-height: 100%;
+      max-height: 100%; } }
 
 .gallery-item__caption {
   margin: auto 0 0 0;
@@ -9639,8 +9676,8 @@ ul.lectures-tab {
   -moz-box-orient: vertical;
   -moz-box-direction: normal;
   -ms-flex-direction: column;
-  flex-direction: column;
-  padding-top: 48px; }
+  flex-direction: column; }
+  /*padding-top: 48px; }*/
   @media (max-width: 900px) {
     .player-frame {
       -webkit-box-sizing: border-box;
@@ -11678,6 +11715,7 @@ ul.lectures-tab {
         position: static; } }
 
 ._registration {
+  position: fixed;
   padding-bottom: 50px;
   background-color: #2f2f2f;
   background-image: url("../images/logo-big.png");

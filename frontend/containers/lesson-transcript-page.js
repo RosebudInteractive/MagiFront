@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
-import TranscriptPage from '../components/lesson-page/transcript-page';
+import TranscriptPage from '../components/transcript-page/transcript-page';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';

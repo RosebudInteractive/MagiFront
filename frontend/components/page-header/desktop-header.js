@@ -7,6 +7,12 @@ import * as tools from '../../tools/page-tools';
 
 export default class DesktopHeaderRow extends React.Component {
 
+    static propTypes = {
+        filterActive: PropTypes.bool.isRequired,
+        currentPage: PropTypes.object.isRequired,
+        onFilterClick: PropTypes.func.isRequired,
+    }
+
     render() {
         return (
             <div className="page-header__wrapper menu-mobile row">
@@ -20,36 +26,27 @@ export default class DesktopHeaderRow extends React.Component {
     }
 }
 
-DesktopHeaderRow.propTypes = {
-    filterActive: PropTypes.bool.isRequired,
-    currentPage: PropTypes.string.isRequired,
-    onFilterClick: PropTypes.func.isRequired,
-    onNavigateClick: PropTypes.func.isRequired,
-};
-
 class Logo extends React.Component {
     render() {
+        const _logo = '<use xlink:href="#logo"/>'
+
         return (
-            <a className="logo">
-                <svg width="130" height="31">
-                    {svg.logo}
-                </svg>
-            </a>
+            <Link to={'/'} className="logo">
+                <svg width="130" height="31" dangerouslySetInnerHTML={{__html: _logo}}/>
+            </Link>
         )
     }
 }
 
 class Navigator extends  React.Component {
 
-    _goToCourses(){
-        // this.props.onNavigateClick(tools.pages.courses)
-    }
-
     render() {
+        const _filter = '<use xlink:href="#filter"/>'
+
         return(
             <nav className="navigation">
                 <ul>
-                    <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''} onClick={::this._goToCourses}>
+                    <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''}>
                         <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
                     <li>
@@ -58,9 +55,7 @@ class Navigator extends  React.Component {
                     <li className={"filter" + (this.props.filterActive ? ' active' : '')} onClick={this.props.onFilterClick}>
                         <a>
                             <span className="hidden">Фильтры</span>
-                            <svg width="22" height="21">
-                                {svg.filter}
-                            </svg>
+                            <svg width="22" height="21" dangerouslySetInnerHTML={{__html: _filter}}/>
                         </a>
                     </li>
                 </ul>
@@ -68,15 +63,6 @@ class Navigator extends  React.Component {
         )
     }
 }
-
-DesktopHeaderRow.propTypes = {
-    filterActive: PropTypes.bool.isRequired,
-    currentPage: PropTypes.object.isRequired,
-    onFilterClick: PropTypes.func.isRequired,
-    onNavigateClick: PropTypes.func.isRequired,
-};
-
-
 
 class Languages extends React.Component {
     constructor(props){
@@ -132,6 +118,8 @@ class Search extends React.Component {
     }
 
     render() {
+        const _search = '<use xlink:href="#search"/>'
+
         return(
             <div className={"search-block" + (this.state.showForm ? ' opened' : '')}>
                 {
@@ -143,9 +131,7 @@ class Search extends React.Component {
                         </form>
                         :
                         <button type="button" className="search-block__trigger" onClick={::this._showForm}>
-                            <svg width="20" height="21">
-                                {svg.search}
-                            </svg>
+                            <svg width="20" height="21" dangerouslySetInnerHTML={{__html: _search}}/>
                         </button>
                 }
             </div>
