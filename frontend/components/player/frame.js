@@ -1,11 +1,16 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import Progress from "./progress";
+import Controls from "./controls";
+
+import * as tools from '../../tools/time-tools'
 
 export default class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
         content: PropTypes.array.isRequired,
+        currentContent: PropTypes.number,
         onPause: PropTypes.func,
         onPlay: PropTypes.func,
         onSetRate:  PropTypes.func,
@@ -25,6 +30,7 @@ export default class Frame extends Component {
             totalDuration: 0,
             content: [],
             currentToc: 0,
+            currentRate: 1,
         }
     }
 
@@ -37,11 +43,7 @@ export default class Frame extends Component {
         this.setState({showRate : !this.state.showRate})
     }
 
-    _hideTooltips(e) {
-        if (e.target.className === "content-button js-contents-trigger") {
-            return
-        }
-
+    _hideTooltips() {
         // this.setState({
         //     showContent : false,
         //     showRate: false,
@@ -52,15 +54,40 @@ export default class Frame extends Component {
         let that = this;
 
         return this.state.content.map((item, index) => {
-               return <li className={(this.state.currentToc === index) ? 'active' : ''} key={index} onClick={() => that._goToContent(item.begin, index)}>
+               return <li className={(this.state.currentToc === item.id) ? 'active' : ''} key={index} onClick={() => that._goToContent(item.begin, item.id)}>
                    <a href='#'>{item.title}</a>
                </li>
+        })
+    }
+
+    _getRates() {
+        let that = this;
+        const _rates = [
+            {value: 0.25}, // Todo : надо убрать 0.25
+            {value: 0.5},
+            {value: 0.75},
+            {value: 1, title:'Обычная'},
+            {value: 1.25},
+            {value: 1.5},
+            {value: 2},
+        ];
+
+        return _rates.map((item, index) => {
+            return <li className={(this.state.currentRate === item.value) ? 'active' : ''} key={index} onClick={() => that._setRate(item.value)}>
+                {item.title ? item.title : item.value}
+            </li>
         })
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.content !== nextProps.content) {
             this._calcContent(nextProps.content)
+        }
+
+        if (this.state.currentToc !== nextProps.currentContent) {
+            this.setState({
+                currentToc: nextProps.currentContent
+            })
         }
     }
 
@@ -71,28 +98,17 @@ export default class Frame extends Component {
             length += episodeContent.duration;
 
             episodeContent.content.forEach((item) => {
-                _items.push({title : item.title, begin: item.begin})
+                _items.push({id: item.id, title : item.title, begin: item.begin})
             })
         })
 
-        let _total = this._getTimeFmt(length);
+        let _total = tools.getTimeFmt(length);
 
         this.setState({
             totalDurationFmt: _total,
             totalDuration: length,
             content: _items,
         })
-    }
-
-    _getTimeFmt(time) {
-        let date = new Date(time * 1000),
-            hh = date.getUTCHours(),
-            mm = date.getUTCMinutes(),
-            ss = date.getSeconds();
-
-        return (hh ? (hh.toString() + ':') : '') +
-            (hh ? mm.toString().padStart(2, '0') : mm.toString()) + ':' +
-            ss.toString().padStart(2, '0')
     }
 
     _goToContent(begin, index) {
@@ -115,21 +131,30 @@ export default class Frame extends Component {
         })
     }
 
+    _onBackward() {
+        let _newPosition = (this.props.playTime < 10) ? 0 : (this.props.playTime - 10);
+        this.props.onGoToContent(_newPosition);
+    }
+
+    _setRate(value) {
+        if (this.props.onSetRate) {
+            this.props.onSetRate(value)
+            this.setState({currentRate: value})
+        }
+    }
+
+    _onSetCurrentPosition(value) {
+        this.props.onGoToContent(value);
+    }
+
     render() {
-        let {playTime} = this.props;
+        let _playTimeFrm = tools.getTimeFmt(this.props.playTime)
 
-        let _playTimeFrm = this._getTimeFmt(playTime),
-            _playPercent = this.state.totalDuration ? ((playTime * 100)/this.state.totalDuration) : 0;
-
-        const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
-            _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
-            _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
-            _sound = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sound"/>',
+        const
             _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
             _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen"/>',
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
-
 
         return (
             <div className="player-frame" onClick={::this._hideTooltips}>
@@ -138,22 +163,9 @@ export default class Frame extends Component {
                     </div>
                 </div>
                 <div className="player-block">
-                    <div className="player-block__progress">
-                        <div className="player-block__play" style={{width: _playPercent + '%'}}><span className="indicator"/></div>
-                        <div className="player-block__time" style={{left: "30%"}}>{_playTimeFrm}</div>
-                    </div>
+                    <Progress total={this.state.totalDuration} current={this.props.playTime} content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
                     <div className="player-block__row">
-                        <div className="player-block__controls">
-                            <button type="button" className="backwards">
-                                <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _backwards}}/>
-                            </button>
-                            <button type="button" className="play-button" onClick={::this._onPause}>
-                                <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: (this.state.pause ? _playSmall : _pause)}}/>
-                            </button>
-                            <button type="button" className="sound-button">
-                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _sound}}/>
-                            </button>
-                        </div>
+                        <Controls pause={this.state.pause} handlePauseClick={::this._onPause} handleBackwardClick={::this._onBackward}/>
                         <div className="player-block__stats">
                             <div className="player-block__info">
                                 <span className="played-time">{_playTimeFrm}</span>
@@ -184,13 +196,7 @@ export default class Frame extends Component {
                                 <p className="speed-tooltip__title">Скорость</p>
                             </header>
                             <ul className="speed-tooltip__body">
-                                <li>0.25</li>
-                                <li>0.5</li>
-                                <li>0.75</li>
-                                <li className="active">Обычная</li>
-                                <li>1.25</li>
-                                <li>1.5</li>
-                                <li>2</li>
+                                {this._getRates()}
                             </ul>
                         </div>
                     </div>

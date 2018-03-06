@@ -46,6 +46,8 @@ class NestedPlayer {
         this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
+        this._onChangeTitle = options.onChangeTitle;
+        this._onChangeContent = options.onChangeContent;
     }
 
     _applyData(data) {
@@ -65,6 +67,10 @@ class NestedPlayer {
 
     setPosition(begin) {
         this.pl.setPosition(begin)
+    }
+
+    setRate(value) {
+        this.pl.setRate(value)
     }
 
 
@@ -126,6 +132,11 @@ class NestedPlayer {
                 }
 
                 $("#titles-place").html(html);
+            },
+            onChangeContent: (content) => {
+                if (this._onChangeContent) {
+                    this._onChangeContent(content)
+                }
             }
         };
     }

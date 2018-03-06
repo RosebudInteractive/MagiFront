@@ -24,6 +24,7 @@ class Player extends React.Component {
             current: 0,
             currentContents: [],
             playTime: 0,
+            content: 0
         }
 
         this._lessonId = 0;
@@ -34,6 +35,7 @@ class Player extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.player);
+        $('body').attr('data-page', 'fullpage');
     }
 
     _mountFullpage() {
@@ -52,8 +54,9 @@ class Player extends React.Component {
                 data: this.props.lessonPlayInfo.object,
                 div: _container,
                 onRenderContent: (content) => {this.setState({currentContents : content})},
-                onCurrentTimeChanged: (e) => {this.setState({playTime : e})}
-            }
+                onCurrentTimeChanged: (e) => {this.setState({playTime : e})},
+                onChangeContent: (e) => {this.setState({content: e.id})}
+            };
 
             this._player = NestedPlayer(_options);
             this._mountPlayerGuard = true;
@@ -69,6 +72,7 @@ class Player extends React.Component {
     componentWillUnmount() {
         document.getElementById('html').className = this._htmlClassName;
         $.fn.fullpage.destroy('all');
+        $('body').removeAttr('data-page');
     }
 
     componentWillReceiveProps(nextProps) {
@@ -98,7 +102,9 @@ class Player extends React.Component {
             onPause={::this._handlePause}
             onPlay={::this._handlePlay}
             content={this.state.currentContents}
+            currentContent={this.state.content}
             onGoToContent={::this._handleGoToContent}
+            onSetRate={::this._handleSetRate}
             playTime={this.state.playTime}
         />
     }
@@ -112,6 +118,12 @@ class Player extends React.Component {
     _handlePlay(){
         if (this._player) {
             this._player.play()
+        }
+    }
+
+    _handleSetRate(value) {
+        if (this._player) {
+            this._player.setRate(value)
         }
     }
 
@@ -163,6 +175,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
+            fixedElements: '.js-lectures-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),

@@ -9722,8 +9722,9 @@ ul.lectures-tab {
     color: rgba(255, 255, 255, 0.6); }
   .player-frame__poster {
     width: 100%;
-    height: -webkit-calc(100vh - 149px);
-    height: calc(100vh - 149px);
+    /*height: -webkit-calc(100vh - 149px);*/
+    height: 100vh;
+    /*height: calc(100vh - 149px);*/
     overflow: hidden; }
     @media (max-width: 600px) {
       .player-frame__poster {
