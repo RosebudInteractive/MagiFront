@@ -120,13 +120,13 @@ define(
                 for (var i = 0; i < tracks.length; i++) {
                     var track = tracks[i];
                     trackGuids[track.id] = true;
-                    var item = this._list.find("#" + track.id);
+                    var item = this._list.find("#t_" + track.id);
                     if (item.length == 0) {
                         item = $(template);
-                        item.attr("id", track.id);
+                        item.attr("id", "t_" + track.id);
                         this._list.prepend(item);
                         var delBtn = $(closeTpl);
-                        delBtn.attr("id", "close_" + track.id).attr("data-track", track.id);
+                        delBtn.attr("id", "close_t_" + track.id).attr("data-track", track.id);
                         this._closeButtonsList.append(delBtn);
                         this._setDeleteBtnEvents(delBtn);
                         this._setTrackEvents(item);
@@ -137,10 +137,10 @@ define(
                 }
 
                 this._list.children().each(function () {
-                    var id = $(this).attr("id");
+                    var id = $(this).attr("id").replace(/^t_/, '');
                     if (!trackGuids[id]) {
                         $(this).remove();
-                        that._closeButtonsList.find("#close_" + id).remove();
+                        that._closeButtonsList.find("#close_t_" + id).remove();
                     }
                 });
 
@@ -347,7 +347,7 @@ define(
                     var oldElItem = $(this);
                     var found = false;
                     for (var i = 0; i < elements.length; i++) {
-                        if (elements[i].id == oldElItem.attr("id")) {
+                        if (elements[i].id == oldElItem.attr("id").replace(/^te_/, '')) {
                             found = true;
                             break;
                         }
@@ -360,24 +360,24 @@ define(
 
                 for (var i = 0; i < elements.length; i++) {
                     var element = elements[i];
-                    var elItem = $("#" + element.id);
+                    var elItem = $("#te_" + element.id);
 
-                    if (elItem.length > 0 && elItem.data("parentId") != item.attr("id")) {
+                    if (elItem.length > 0 && elItem.data("parentId") != item.attr("id").replace(/^t_/, '')) {
                         elItem.remove();
                         elItem = {length: 0};
                     }
 
                     if (elItem.length == 0) {
                         elItem = $(template).css("top", "0px");
-                        elItem.attr("id", element.id)
+                        elItem.attr("id", "te_" + element.id);
                         cont.append(elItem);
                         this._setElementEvents(item, elItem);
                     }
                     elItem.data("data", element);
-                    elItem.data("parentId", item.attr("id"));
+                    elItem.data("parentId", item.attr("id").replace(/^t_/, ''));
 
                     var left = p.pixelsInSencond * element.start + p.offset;
-                    var width = p.pixelsInSencond * element.duration;
+                    var width = p.pixelsInSencond * element.content.duration;
                     css.left = left;
                     css.width = width;
 
@@ -397,14 +397,23 @@ define(
                     if (width >= 60) elItem.removeClass("no-title");
                     else elItem.addClass("no-title");
 
-                    var resource = element.asset && element.asset.body ?
-                        element.asset.body : element.data;
+                    var resource = null;
+                    if (element.asset) {
+                        resource = element.asset;
+                    } else if (this._options.onGetAsset) {
+                        resource = this._options.onGetAsset(element.assetId);
+                        element.asset = resource;
+                    }
 
                     if (resource) {
                       // console.log(resource);
                         elItem.find(".ws-element-text").text(resource.title);
                         var bk = null;
-                        if (resource.icon) bk = "url(" + resource.icon + ") no-repeat center center";
+
+                        if (resource.info.icon) {
+                            var iconPath = "/data/" + resource.info.path + resource.info.icon;
+                            if (resource.info.icon) bk = "url(" + iconPath + ") no-repeat center center";
+                        }
                         elItem.find(".ws-element-pict").css({
                             "background": bk,
                             "-webkit-background-size" : "cover",
@@ -449,7 +458,7 @@ define(
                     start: (event, ui) => {
                         var uiHelper = $(ui.helper);
                         uiHelper.addClass("focused");
-                        uiHelper.data = function(v) { return {start: elItem.data('data').start, duration: elItem.data('data').duration}};
+                        uiHelper.data = function(v) { return {start: elItem.data('data').start, duration: elItem.data('data').content.duration}};
                         that._setSideTime.bind(this, uiHelper)();
                         elItem.hide();
                     },
@@ -489,7 +498,7 @@ define(
                       var stepParams = this._getStepParams();
 
                       var startPos = (this._scrollerDiv.scrollerData.scrollX + ui.position.left - this._container.find('.ws-track-tools-background').width() - stepParams.offset)/stepParams.pixelsInSencond;
-                      var endPos = elItem.data('data').duration;
+                      var endPos = elItem.data('data').content.duration;
 
                       var uiHelper = $(ui.helper);
                       uiHelper.data = function(v) { return {start: startPos < 0 ? 0 : startPos, duration: endPos}};
@@ -571,7 +580,7 @@ define(
               var st = elItem.find('.ws-element-left-time');
               var et = elItem.find('.ws-element-right-time');
               st.html(msToTime(elData.start*1000));
-              et.html(msToTime((elData.start + elData.duration)*1000));
+              et.html(msToTime((elData.start + elData.content.duration)*1000));
             }
 
             _hideSideTime(elItem) {
@@ -587,7 +596,7 @@ define(
               var elData = elItem.data("data");
               if (elData)elData.focused = true;
               for (var i = 0; i < this._tracks.length; i++) {
-                  var trItem = $("#" + this._tracks[i].id);
+                  var trItem = $("#t_" + this._tracks[i].id);
                   this._broadcastEditElement(trItem, this._tracks[i].elements);
               }
             }
@@ -612,7 +621,7 @@ define(
                 var duration = this._positionToTime(position) - startTime;
 
                 elementData.start = startTime;
-                elementData.duration = duration;
+                elementData.content.duration = duration;
 
                 var success = this._correctElementsIntersection(track, elementData, event.altKey);
 
@@ -647,7 +656,7 @@ define(
                       scrollerData.scrollX = scrollerData.scrollX + deltaX;
                     }
 
-                    if (scrollerData.scrollY + deltaY < 0) {
+                    if (scrollerData.scrollY + deltaY < 0 || scrollerData.scrollMaxHeight() <= scrollerData.viewportHeight()) {
                       scrollerData.scrollY = 0;
                     } else if (scrollerData.scrollMaxHeight() < scrollerData.scrollY + scrollerData.viewportHeight() + deltaY){
                       scrollerData.scrollY = scrollerData.scrollMaxHeight() - scrollerData.viewportHeight();
@@ -668,7 +677,12 @@ define(
                     this._linerList.css("transform", linerTransform);
 
                     var p = this._getStepParams();
-                    this._pointer.css("left", (p.offset + p.pixelsInSencond*this._getAudioState().currentTime - this._pointer.width()/2 - this._scrollerDiv.scrollerData.scrollX -1) + 'px');
+                    let pLeft = "0px";
+                    if (p) {
+                        pLeft = (p.offset + p.pixelsInSencond*this._getAudioState().currentTime -
+                            this._pointer.width()/2 - this._scrollerDiv.scrollerData.scrollX -1) + 'px';
+                    }
+                    this._pointer.css("left", pLeft);
 
                     this._container.find('.ws-scroller-hor-bar')[0].update();
                     this._container.find('.ws-scroller-ver-bar')[0].update();
@@ -963,7 +977,7 @@ define(
                     container: item.offset()
                 };
 
-                var trackId = item.attr("id");
+                var trackId = item.attr("id").replace(/^t_/, '');;
                 var track = this._findTrack(trackId);
 
                 var startTime = this._positionToTime(position);
@@ -973,12 +987,14 @@ define(
                     id: Utils.guid(),
                     asset: null,
                     start: startTime,
-                    duration: p.duration,
                     position: {
                         left: 0,
                         top: 0,
                         right: 30,
                         bottom: 40
+                    },
+                    content: {
+                        duration: p.duration
                     },
                     effects:[
                         {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
@@ -1033,7 +1049,7 @@ define(
                     container: item.offset()
                 };
 
-                var trackId = item.attr("id");
+                var trackId = item.attr("id").replace(/^t_/, '');
                 var track = this._findTrack(trackId);
 
 
@@ -1053,12 +1069,14 @@ define(
                     id: Utils.guid(),
                     asset: {id: ui.draggable.attr("id"), body: null},
                     start: startTime,
-                    duration: p.duration,
                     position: {
                         left: 0,
                         top: 0,
                         right: 100 - 0 - w,
                         bottom: 100 - 0 - h
+                    },
+                    content: {
+                        duration: p.duration
                     },
                     effects:[
                         {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
@@ -1072,7 +1090,7 @@ define(
             _onDropElement(item, event, ui) {
                 var elementData = ui.draggable.data("data");
                 var oldTrackId = ui.draggable.data("parentId");
-                var newTrackId = item.attr("id");
+                var newTrackId = item.attr("id").replace(/^t_/, '');;
                 var oldTrack = this._findTrack(oldTrackId);
                 var newTrack = this._findTrack(newTrackId);
 
@@ -1093,9 +1111,8 @@ define(
                 };
 
                 var startTime = this._positionToTime(position);
-                var p = this._getStepParams();
                 elementData.start = startTime;
-                var newTrackId = item.attr("id");
+                var newTrackId = item.attr("id").replace(/^t_/, '');
 
                 if (this._correctElementsIntersection(newTrack, elementData, event.altKey)) {
                     if (oldTrackId == newTrackId)
@@ -1108,7 +1125,7 @@ define(
             }
 
             _broadcastMoveElement(item, oldTrackId, elementsData, oldTrackElementsData) {
-                var trackId = item.attr("id");
+                var trackId = item.attr("id").replace(/^t_/, '');
                 if (this._options.onMoveElement) {
                     this._options.onMoveElement({
                         track: trackId,
@@ -1120,14 +1137,14 @@ define(
             }
 
             _broadcastEditElement(item, element) {
-                var trackId = item.attr("id");
+                var trackId = item.attr("id").replace(/^t_/, '');
                 if (this._options.onEditElement) {
                     this._options.onEditElement({track: trackId, elements: element});
                 }
             }
 
             _broadcastAddElement(item, elements) {
-                var trackId = item.attr("id");
+                var trackId = item.attr("id").replace(/^t_/, '');
                 if (this._options.onAddElement) {
                     this._options.onAddElement({track: trackId, elements: elements});
                 }
@@ -1255,6 +1272,7 @@ define(
                 var liner = this._container.find(".ws-track-liner");
                 var fSize = liner.css('font-size').replace("px", "");
                 var zoomState = this._zoomState;
+                if (!zoomState) return null;
                 var stepDuration = zoomState.params.step;
                 var stepWidth = zoomState.params.stepWidth;
 
@@ -1439,14 +1457,14 @@ define(
                     // если не зажат Shift, то пытаемся ужать следующий элемент
                     if (!shift && oldStart != element.start) {
                         var delta = element.start - oldStart;
-                        element.duration -= delta;
-                        if (element.duration < 1) element.duration = 1;
+                        element.content.duration -= delta;
+                        if (element.content.duration < 1) element.content.duration = 1;
                     }
 
-                    currentPos = element.start + element.duration;
+                    currentPos = element.start + element.content.duration;
                 }
                 var last = elements[elements.length - 1];
-                if (last.start + last.duration > audioState.duration) {
+                if (last.start + last.content.duration > audioState.duration) {
                     return false;
                 }
 
@@ -1456,7 +1474,7 @@ define(
                         if (track.elements[j].id == el.id) {
                             var tEl = track.elements[j];
                             tEl.start = el.start;
-                            tEl.duration = el.duration;
+                            tEl.content.duration = el.content.duration;
                             break;
                         }
                     }

@@ -582,6 +582,7 @@ define(
 
                 //  масштаб изображения
                 var effects = this.Data.effects;
+                if (!effects) effects = [];
                 if (effects.length != 0){
                     var effect = effects[0];
                     var imgPlayPos = this._playState.position - effect.start;

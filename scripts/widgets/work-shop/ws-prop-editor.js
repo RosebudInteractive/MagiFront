@@ -22,6 +22,11 @@ define(
 
             render(data) {
                 if (data) this._options.data = data;
+                if (!this._options.data.content.position)
+                    this._calcMaxSize();
+                if (!this._options.data.effects)
+                    this._options.data.effects = [];
+
                 var template = CWSPropEditor.template("prop-editor");
                 var item = this._container.children(".ws-prop-editor-main");
                 if (item.length == 0) {
@@ -33,6 +38,42 @@ define(
                 this._setupEditableDivs();
                 this._fillFreeSpace(item);
                 this._iscroll.refresh();
+            }
+
+            _calcMaxSize() {
+                var ass = this._options.data.asset;
+                if (!this._options.data.content.position)
+                    this._options.data.content.position = {};
+
+                if (!ass || !ass.info || ass.info.type === 'text') {
+                    this._options.data.content.position.bottom = 0;
+                    this._options.data.content.position.right = 0;
+                    this._options.data.content.position.left = 0;
+                    this._options.data.content.position.top = 0;
+                } else {
+                    var h = ass.info.size.height,
+                        w = ass.info.size.width;
+                    var pictRatio = w ? h / w : 1;
+                    w = 100;
+                    var actualWidth = 160 * 1;
+                    var actualHeight = actualWidth * pictRatio;
+                    // calculate actualHeight's %
+                    h = actualHeight / 90 * 100;
+
+                    if (h > 100) {
+                        h = 100;
+                        actualHeight = 90 * 1;
+                        actualWidth = actualHeight / pictRatio;
+                        w = actualWidth / 160 * 100;
+                    }
+                    if (!this._options.data.content.position)
+                        this._options.data.content.position = {};
+
+                    this._options.data.content.position.left = 50 - w / 2;
+                    this._options.data.content.position.right = 50 - w / 2;
+                    this._options.data.content.position.top = 50 - h / 2;
+                    this._options.data.content.position.bottom = 50 - h / 2;
+                }
             }
 
             renderProperties(item) {

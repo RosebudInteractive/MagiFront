@@ -35,8 +35,8 @@ define(
                 var title = "";
                 if (resource) {
                     title = resource.title + "<br>" +
-                    resource.size.width + "x" +
-                    resource.size.height;
+                    resource.info.size.width + "x" +
+                    resource.info.size.height;
                 }
                 pItem.empty();
                 pItem.append("<div class='ws-prop-caption'/>");
@@ -47,7 +47,7 @@ define(
                 var ass = elData.asset;
                 var resource = null;
                 if (ass) {
-                    resource = ass.body;
+                    resource = ass;
                 } else if (elData.data) {
                     resource = elData.data;
                 }
@@ -72,7 +72,10 @@ define(
                 var content = pItem.children();
 
                 var bk = null;
-                if (resource && resource.icon) bk = "url(" + resource.icon + ") no-repeat center center";
+                if (resource && resource.info.icon) {
+                    var iconPath = "/data/" + resource.info.path + resource.info.icon;
+                    bk = "url(" + iconPath + ") no-repeat center center";
+                }
 
                 content.find(".icon")
                     .css({
@@ -82,10 +85,10 @@ define(
                       "-o-background-size: cover" : "cover",
                       "background-size": "cover"
                     });
-                content.find(".left div").text(data.position.left.toFixed(2) + "%");
-                content.find(".right div").text(data.position.right.toFixed(2) + "%");
-                content.find(".top div").text(data.position.top.toFixed(2) + "%");
-                content.find(".bottom div").text(data.position.bottom.toFixed(2) + "%");
+                content.find(".left div").text(data.content.position.left.toFixed(2) + "%");
+                content.find(".right div").text(data.content.position.right.toFixed(2) + "%");
+                content.find(".top div").text(data.content.position.top.toFixed(2) + "%");
+                content.find(".bottom div").text(data.content.position.bottom.toFixed(2) + "%");
             }
 
             _renderEffect(parent, effect, i) {
@@ -115,7 +118,7 @@ define(
                 var template = CWSPropEditor.template("prop-editor-panel");
                 var templateEditor = CWSPropEditor.template("prop-editor-desc-panel");
                 var data = this._options.data;
-                data.description = data.description || "";
+                data.content.title = data.content.title || "";
 
                 var pItem = parent.find(".ws-prop-panel[role='description-panel']");
                 if (pItem.length == 0) {
@@ -124,7 +127,7 @@ define(
                     parent.append(pItem);
                 }
 
-                pItem.find("[role='description']").text(data.description)
+                pItem.find("[role='description']").text(data.content.title)
             }
 
             _propChange(role, text) {
@@ -142,7 +145,7 @@ define(
                         result = num;
                     }
                 } else if (role == "description") {
-                    this._options.data.description = result = text;
+                    this._options.data.content.title = result = text;
                 }
 
                 if (this._options.onPropertyChanged) this._options.onPropertyChanged({

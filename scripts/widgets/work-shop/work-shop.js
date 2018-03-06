@@ -42,7 +42,7 @@ define(
                 this._container.append($(CWorkShop.template("work-shop"))).attr("tabindex", "-1");
                 this._assetsContainer = this._container.find(".ws-assets");
                 this._tracksContainer = this._container.find(".ws-tracks-content");
-                this._playerContainer = this._container.find(".ws-player-content");
+                this._playerContainer = this._container.find(".ws-player-place");
                 this._propsContainer = this._container.find(".ws-props-content");
                 this._assetsWidget = new CWSAssets(this._assetsContainer, this._getAssetsOptions());
                 this._tracksWidget = new CWSTracks(this._tracksContainer, this._getTracksOptions());
@@ -57,6 +57,7 @@ define(
                 if (this._options.data) {
                     this._readDataProperty(this._options.data)
                         .then(result => {
+                            this._playerWidget.render();
                             this._playerWidget.setData(result);
                             this._data = result;
                             this._makeTracks(result.episodes);
@@ -249,8 +250,6 @@ define(
                             that._options.tracks.onAddElement(e);
                     },
                     onEditElement: function (e) {
-                        if (that._options.tracks.onEditElement)
-                            that._options.tracks.onEditElement(e);
                         for (var i = 0; i < e.elements.length; i++) {
                             var el = e.elements[i];
                             if (el.focused) {
@@ -258,6 +257,7 @@ define(
                                 break;
                             }
                         }
+                        that.render();
                     },
                     onMoveElement: function (e) {
                         if (that._options.tracks.onMoveElement)
@@ -293,6 +293,16 @@ define(
                     onAddAsset: function (e) {
                         if (that._options.tracks.onAddAsset)
                             return that._options.tracks.onAddAsset(e);
+                    },
+                    onGetAsset: function(assetId) {
+                        var assets = that._getAssets();
+                        for (let i = 0; i < assets.length; i++) {
+                            if (assets[i].id == assetId) {
+                                return assets[i];
+                            }
+                        }
+
+                        return null;
                     },
                     mainContainer: this._container.find(".work-shop")
                 }
@@ -376,7 +386,7 @@ define(
 
             }
 
-            _getPropEditorOptions(elId) {
+            _getPropEditorOptions() {
                 var that = this;
                 return {
                     data: null,

@@ -48,9 +48,9 @@ define(
             }
 
             render() {
-                var template = CWSPlayer.template("player");
+                let template = CWSPlayer.template("player");
 
-                var item = this._container.children();
+                let item = this._container.children();
                 if (item.length == 0) {
                     item = $(template);
                     this._container.append(item);
@@ -62,19 +62,22 @@ define(
             }
 
             setData(data) {
-                var data2 = $.extend(true, {}, data)
+                let data2 = $.extend(true, {}, data);
                 this._options.loader.setData(data2);
                 this._prepareElements();
 
                 if (data2.episodes.length > 0) {
-                    var episode = data2.episodes[0];
+                    let episode = data2.episodes[0];
                     this._audioState.currentEpisode = 0;
                     this._options.loader
                         .getAudioResource(episode.audio.file)
                         .then((a) => {
-                            var inf = $.extend(true, {}, episode.audio.info);
+                            let inf = $.extend(true, {}, episode.audio.info);
                             inf.data = a.data;
-                            this._setAudio(inf)
+                            this._setAudio(inf);
+                            if (this._audioState.audio.readyState >= 1) {
+                                this._onAudioLoadedHandler(this._audioState.audio);
+                            }
                         });
 
                 }
@@ -86,7 +89,7 @@ define(
                     this._setRatio(item);
                 });
 
-                var cont = item.children(".ws-player-content");
+                const cont = item.children(".ws-player-content");
                 cont.droppable({
                     tolerance: "touch",
                     accept: (el) => {
@@ -95,7 +98,7 @@ define(
                         return accept;
                     },
                     drop: ( event, ui ) => {
-                        var freeTrackId = this._findFreeSpace();
+                        let freeTrackId = this._findFreeSpace();
                         if (ui.draggable.hasClass("ws-assets-item") && freeTrackId)
                             this._onDropAsset(freeTrackId, ui);
                     }
@@ -103,10 +106,10 @@ define(
             }
 
             _findTrack(id) {
-                var tracks = this._tracksList;
-                var track = null;
-                for (var i = 0; i < tracks.length; i++) {
-                    var cur = tracks[i];
+                let tracks = this._tracksList;
+                let track = null;
+                for (let i = 0; i < tracks.length; i++) {
+                    let cur = tracks[i];
                     if (cur.id == id) {
                         track = cur;
                         break;
@@ -117,25 +120,25 @@ define(
             }
 
             _onDropAsset(trackId, ui) {
-                var hOffset = ui.helper.offset();
-                var track = this._findTrack(trackId);
+                let hOffset = ui.helper.offset();
+                let track = this._findTrack(trackId);
 
-                var startTime = this._audioState.currentTime;
-                var assData = ui.draggable.data("data");
+                let startTime = this._audioState.currentTime;
+                let assData = ui.draggable.data("data");
                 // player ratio is 16:9
                 // if player width = 160, then 30% is
-                var w = 30;
-                var actualWidth = 160 * (w / 100);
-                var pictRatio = assData.size.height / assData.size.width;
-                var actualHeight = actualWidth * pictRatio;
+                let w = 30;
+                let actualWidth = 160 * (w / 100);
+                let pictRatio = assData.size.height / assData.size.width;
+                let actualHeight = actualWidth * pictRatio;
                 // calculate actualHeight's %
-                var h = actualHeight / 90 * 100;
+                let h = actualHeight / 90 * 100;
 
-                var cont = this._container.find(".ws-player-content");
-                var contOffset = cont.offset();
-                var cw = cont.width();
-                var ch = cont.height();
-                var l = (hOffset.left - contOffset.left) / cw * 100,
+                let cont = this._container.find(".ws-player-content");
+                let contOffset = cont.offset();
+                let cw = cont.width();
+                let ch = cont.height();
+                let l = (hOffset.left - contOffset.left) / cw * 100,
                     t = (hOffset.top - contOffset.top) / ch * 100,
                     r = 100 - l - w,
                     b = 100 - t - h;
@@ -149,7 +152,7 @@ define(
                 }
 
 
-                var element = {
+                let element = {
                     id: Utils.guid(),
                     asset: {id: ui.draggable.attr("id"), body: null},
                     start: startTime,
@@ -341,16 +344,20 @@ define(
                     .off('ended');
             }
 
+            _onAudioLoadedHandler(audio) {
+                this._audioState.duration = audio.duration;
+                this._audioState.currentTime = audio.currentTime;
+                this._audioState.audio.volume = this._audioState.volume;
+                this._audioState.audio.playbackRate = this._audioState.playbackRate;
+                // that._audioState.audio.muted = that._audioState.muted;
+                this._broadcastAudioLoaded();
+                //that._options.loader.setPosition(0)
+            }
+
             _setAudioEvents(audio) {
                 var that = this;
                 audio.on("loadeddata", function () {
-                    that._audioState.duration = this.duration;
-                    that._audioState.currentTime = this.currentTime;
-                    that._audioState.audio.volume = that._audioState.volume;
-                    that._audioState.audio.playbackRate = that._audioState.playbackRate;
-                    // that._audioState.audio.muted = that._audioState.muted;
-                    that._broadcastAudioLoaded();
-                    //that._options.loader.setPosition(0)
+                    that._onAudioLoadedHandler(this);
                 }).on("timeupdate", function () {
                     that._audioState.currentTime = this.currentTime;
                     that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
@@ -374,6 +381,9 @@ define(
                                 var inf = $.extend(true, {}, episode.audio.info);
                                 inf.data = a.data;
                                 that._setAudio(inf)
+                                if (this._audioState.audio.readyState >= 1) {
+                                    this._onAudioLoadedHandler(this._audioState.audio);
+                                }
                             });
                     }
                 });
@@ -463,7 +473,7 @@ define(
                 return result;
             }
 
-            _proccessAnimationFrame(timestamp) {
+            _proccessAnimationFrame() {
               this._audioState.currentTime = this._audioState.audio.currentTime;
               this._audioState.globalTime =  this._audioState.baseTime + this._audioState.currentTime;
               this._broadcastCurrentTimeChanged();
@@ -502,7 +512,11 @@ define(
                         return
                     }
 
-                    that._audioState.audio.volume = oldVol + part * diffTime;
+                    let newVol = oldVol + part * diffTime;
+                    if (newVol < 0) newVol = 0;
+                    if (newVol > 1) newVol = 1;
+
+                    that._audioState.audio.volume = newVol;
                     requestAnimationFrame(_changeVolumeCallback);
                 });
 
@@ -578,13 +592,17 @@ define(
                                 this._audioState.currentEpisode = epIdx;
 
                                 console.log("Set position 2", this._audioState)
-                                this._setAudio(inf)
+                                this._setAudio(inf);
 
                                 this._audioState.audio.currentTime = savedState.currentTime;
                                 this._audioState.currentEpisode = epIdx;
                                 this._audioState.globalTime = savedState.globalTime;
                                 this._audioState.currentTime = savedState.currentTime;
                                 this._audioState.baseTime = savedState.baseTime;
+
+                                if (this._audioState.audio.readyState >= 1) {
+                                    this._onAudioLoadedHandler(this._audioState.audio);
+                                }
 
                                 console.log("Set position 3", this._audioState)
                                 this._setElementsPosition(position);

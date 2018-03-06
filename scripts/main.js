@@ -62,7 +62,6 @@ Utils.guid = function () {
                         onDeleteTrack: onDeleteTrack,
                         onGetAudio: onGetAudio,
                         onAddElement: onAddElement,
-                        onEditElement: onEditElement,
                         onMoveElement: onMoveElement,
                         onAddAsset: onAddAssetFromTrack
                     },
@@ -175,16 +174,6 @@ Utils.guid = function () {
 
                 if (!track) return;
                 track.elements = elemsData;
-                ws.render();
-            }
-
-            function onEditElement(e) {
-                var trackId = e.track;
-                var track = findTrack(trackId);
-
-                if (!track) return;
-
-                track.elements = e.elements;
                 ws.render();
             }
 

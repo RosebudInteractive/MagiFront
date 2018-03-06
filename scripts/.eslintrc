@@ -24,6 +24,6 @@
     "react/jsx-no-undef": 1,
     "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
-    "no-var": "off"
+    "no-var": [0, "fix"]
   }
 }

@@ -19,7 +19,7 @@ Utils.guid = function () {
 
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    };
+    }
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
@@ -55,7 +55,7 @@ $(document).ready(function () {
                 var content = pl1.getLectureContent();
                 renderContent(content);
             },
-            fail: function () {
+            fail: function (err) {
                 console.error(err);
             }
         });
@@ -64,17 +64,17 @@ $(document).ready(function () {
             return {
                 designMode: true,
                 loader: new Loader(),
-                onCurrentTimeChanged: function (e) {
+                onCurrentTimeChanged: function () {
                 },
-                onAudioLoaded: function (e) {
+                onAudioLoaded: function () {
                 },
-                onSetPosition: function (e) {
+                onSetPosition: function () {
                 },
-                onFocused: function (e) {
+                onFocused: function () {
                 },
-                onSetTextData: function (e) {
+                onSetTextData: function () {
                 },
-                onAddElement: function (e) {
+                onAddElement: function () {
                 },
                 onChangeTitles: function (titles) {
                     var html = "";
@@ -91,74 +91,6 @@ $(document).ready(function () {
                     console.log(content);
                 }
             };
-        }
-
-        function readDataProperty(option, e) {
-            return new Promise((resolve, reject) => {
-                if (option) {
-                    if ($.isFunction(option)) {
-                        option = option(e);
-                    }
-                    if ($.isFunction(option.then)) {
-                        option.then(function (assets) {
-                            resolve(assets);
-                        });
-                    } else {
-                        setTimeout(function () {
-                            resolve(option);
-                        }, 0);
-                    }
-                } else {
-                    setTimeout(function () {
-                        reject();
-                    }, 0);
-                }
-            });
-        }
-
-        function loadAudio(audio) {
-            return new Promise((resolve, reject) => {
-                if (!audio || !audio.content) reject();
-                else {
-                    onGetAudio(audio.content)
-                        .then(function (data) {
-                            resolve({id: audio.id, data: data});
-                        }).catch(function (err) {
-                            console.error(err);
-                            reject(err);
-                        });
-                }
-            });
-        }
-
-
-        function getAssets(ids) {
-            ids = ids || [];
-            if (!Array.isArray(ids)) ids = [ids];
-
-            var idsMap = {};
-
-            for (var i = 0; i < ids.length; i++) {
-                idsMap[ids[i]] = true;
-            }
-
-            var result = [];
-            for (var i = 0; i < assetsList.length; i++) {
-                var asset = assetsList[i];
-                if (asset.id in idsMap) {
-                    result.push(asset);
-                }
-            }
-
-            return result;
-        }
-
-        function findAudio(assets) {
-            if (!assets) return null;
-            for (var i = 0; i < assets.length; i++) {
-                if (assets[i].type == "MP3") return assets[i];
-            }
-            return null;
         }
 
         function renderContent(content) {
@@ -180,7 +112,7 @@ $(document).ready(function () {
                     (function (cnt) {
                         var li = $("<li/>");
                         li.text(cnt.title);
-                        li.click(function (e) {
+                        li.click(function () {
                             pl.setPosition(cnt.begin);
                         });
                         ul.append(li);
