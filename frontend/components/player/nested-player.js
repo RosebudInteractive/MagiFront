@@ -6,8 +6,9 @@ import 'jquery-ui/jquery-ui.js';
 import 'script-lib/binary-transport.js';
 import 'work-shop/player-fork.css'
 
+let _instance = null;
 
-var Utils = {};
+let Utils = {};
 
 Utils.guid = function () {
 
@@ -21,19 +22,36 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
-export default class NestedPlayer {
+class NestedPlayer {
 
     constructor(options) {
         this.o1 = this._getPlayerOptions();
         this.pl1 = new Player(options.div, this.o1);
         this.pl = this.pl1;
-        this.assetsList = options.data.assets;
-        this.pl1.render();
 
-        this.pl1.setData(options.data);
-        let content = this.pl1.getLectureContent();
+        this._applyOptions(options);
+        this.pl1.render();
+        this._applyData(options.data);
+    }
+
+    _loadOtherLesson(options) {
+        this.pl1.initContainer(options.div);
+
+        this._applyOptions(options);
+        this.pl1.render();
+        this._applyData(options.data);
+    }
+
+    _applyOptions(options) {
+        this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
+    }
+
+    _applyData(data) {
+        this.pl1.setData(data);
+
+        let content = this.pl1.getLectureContent();
         this._renderContent(content);
     }
 
@@ -183,4 +201,14 @@ export default class NestedPlayer {
     _onGetAudio(content) {
         console.log(content)
     }
+}
+
+export default (options) => {
+    if (!_instance) {
+        _instance = new NestedPlayer(options)
+    } else {
+        _instance._loadOtherLesson(options)
+    }
+
+    return _instance
 }

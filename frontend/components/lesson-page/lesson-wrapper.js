@@ -27,7 +27,7 @@ export default class LessonWrapper extends React.Component {
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
                     <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
                         материалы</Link>
-                    <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain}/>
+                    <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain} courseUrl={this.props.courseUrl}/>
                 </div>
             </section>
         )

@@ -33,7 +33,7 @@ export default class Menu extends React.Component {
 
 
         return (
-            <div className={"lectures-menu _dark" + (this.state.opened ? ' opened' : '')}>
+            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>

@@ -55,7 +55,7 @@ class Player extends React.Component {
                 onCurrentTimeChanged: (e) => {this.setState({playTime : e})}
             }
 
-            this._player = new NestedPlayer(_options);
+            this._player = NestedPlayer(_options);
             this._mountPlayerGuard = true;
         }
     }

@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
 
 export default class LessonFrame extends React.Component {
     static propTypes = {
+        courseUrl: PropTypes.string.isRequired,
         lesson: PropTypes.object.isRequired,
         isMain: PropTypes.bool,
     };
@@ -22,11 +24,14 @@ export default class LessonFrame extends React.Component {
                             <button type="button" className="lecture-frame__plus">Доп. эпизод</button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
+                            <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lesson.URL}>
+                                <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
+                            </Link>
                             <span className="title-text">
                                 <span className="number">{lesson.Number + '.'}</span>
                                 {lesson.Name + '\n'}
                             </span>
+
                         </h2>
                         <div className="lecture-frame__text-block">
                             <p className="lecture-frame__descr">{lesson.ShortDescription}</p>

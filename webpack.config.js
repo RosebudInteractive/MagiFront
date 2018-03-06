@@ -15,15 +15,12 @@ const _prodConfig = {
         path: path.join(__dirname, 'static'),
         filename: '[name].js',
     },
-    resolve: {
-        alias: {
-            "text": './scripts/lib/text',
-            "underscore": './scripts/lib/underscore',
-            "lodash": './scripts/lib/lodash.min',
-            "template": '/scripts/lib/template',
-            "work-shop": '/scripts/widgets/work-shop'
-        }
-    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+        })
+    ],
     module: {
         rules: [
             {
@@ -65,13 +62,27 @@ const _prodConfig = {
                 loader: "url-loader?limit=10000&mimetype=image/svg+xml"
             }
         ]
+    },
+    resolve: {
+        alias: {
+            "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
+            "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
+            "template": path.resolve(__dirname, 'scripts/lib/template'),
+            "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
+            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
+            'script-lib': path.resolve(__dirname, 'scripts/lib')
+        }
+    },
+    resolveLoader: {
+        alias: {
+            'text': 'raw-loader',
+        }
     }
 };
 
 const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
-        // "webpack-jquery-ui": "webpack-jquery-ui",
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         'babel-polyfill': 'babel-polyfill',
 
@@ -153,14 +164,12 @@ const _devConfig = {
             "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
-            // 'jquery': path.resolve(__dirname, 'scripts/lib/jquery/jquery-1.12.4'),
             'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
             'script-lib': path.resolve(__dirname, 'scripts/lib')
         }
     },
     resolveLoader: {
         alias: {
-            // 'text': path.resolve(__dirname, 'scripts/lib/text'),
             'text': 'raw-loader',
         }
     }
