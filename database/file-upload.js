@@ -1,9 +1,10 @@
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
-const formidable = require('formidable')
+const formidable = require('formidable');
 const { DbUtils } = require('./db-utils');
 
-const path = require('path')
-const fs = require('fs')
+const path = require('path');
+const config = require('config');
+const fs = require('fs');
 const mime = require('mime');
 
 const sharp = require('sharp');
@@ -194,7 +195,7 @@ function makeUploadSubDir(uploadDir) {
 };
 
 function getUploadDir(upload_dir) {
-    return upload_dir ? path.join(upload_dir, "/") : path.join(__dirname, "/..", "/..", "/uploads/");
+    return upload_dir ? path.join(upload_dir, path.sep) : config.get('uploadPath');
 }
 
 function importImages(srcDir, dstDir) {

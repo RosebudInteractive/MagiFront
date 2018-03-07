@@ -1,12 +1,11 @@
 'use strict'
 const jwt = require('jsonwebtoken');
 const passport = require("passport");
+const config = require('config');
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
 const { UsersRedisCache } = require("./users-redis-cache");
-
-const allowUnathorizedAccess = true;
 
 class AuthJWT {
 
@@ -16,21 +15,19 @@ class AuthJWT {
 
         const jwtOptions = {}
         jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
-        jwtOptions.secretOrKey = 'tasmanianDevil';
-        this._usersCache = new UsersRedisCache(["Id", "Name", "PData"],
-            {
-                redis: {
-                    host: "dragonegg"
-                },
-                convUserDataFn:
-                    (rawUser) => {
-                        try {
-                            rawUser.PData = JSON.parse(rawUser.PData);
-                        }
-                        catch (e) { rawUser.PData = {}; }
-                        return rawUser;
-                    }
-            });
+        jwtOptions.secretOrKey = config.get('authentication.secret');
+        let convUserDataFn = (rawUser) => {
+            try {
+                rawUser.PData = JSON.parse(rawUser.PData);
+            }
+            catch (e) { rawUser.PData = {}; }
+            return rawUser;
+        };
+        
+        this._usersCache = config.get('authentication.storage') === "redis" ?
+            new UsersRedisCache(["Id", "Name", "PData"], { redis: config.get('connections.redis'), convUserDataFn: convUserDataFn })
+            : new UsersMemCache(["Id", "Name", "PData"], { convUserDataFn: convUserDataFn }); // UsersMemCache can't be used in cluster mode
+        
         const strategy = new JwtStrategy(jwtOptions,
             ((jwt_payload, next) => {
                 // console.log('payload received', jwt_payload);
@@ -78,29 +75,57 @@ class AuthJWT {
     }
 };
 
+const isFeatureEnabled = config.get('authentication.enabled');
 let authJWT = null;
-exports.AuthenticateJWT = (app) => {
-    if (!authJWT)
+
+exports.AuthenticateJWT = (app, isAuthRequired) => {
+    if ((!authJWT) && isFeatureEnabled)
         authJWT = new AuthJWT(app);
     return (req, res, next) => {
-        if (allowUnathorizedAccess) { return next(); }
-        passport.authenticate('jwt', function (err, user, info) {
-            if (err) { return next(err); }
-            if (!user) { return res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid token!" }); }
-            let token = req.headers["authorization"];
-            authJWT.checkToken(token)
-                .then((result) => {
-                    if (result) {
-                        req.user = user;
-                        return next();
-                    }
-                    else
-                        return res.status(HttpCode.ERR_UNAUTH).json({ message: "Token expired or invalid!" });    
-                })
-                .catch((err) => {
-                    return res.status(HttpCode.ERR_INTERNAL)
-                        .json({ message: err.toString() });
-                });
-        })(req, res, next);
+        if (!isFeatureEnabled) { return next(); }
+        if (req.jwtResult) {
+            if ((!req.jwtResult.isSuccess) & isAuthRequired)
+                res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info);
+            else
+                next();
+            return;
+        }
+        req.jwtResult = { isSuccess: false };
+        let token = req.headers["authorization"];
+        if (token)
+            passport.authenticate('jwt', function (err, user, info) {
+                req.jwtResult.info = info;
+                if (err & isAuthRequired) { return next(err); }
+                if ((!user) && isAuthRequired) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
+                if (!err && user)
+                    authJWT.checkToken(token)
+                        .then((result) => {
+                            if (result) {
+                                req.jwtResult.isSuccess = true;
+                                req.user = user;
+                                next();
+                            }
+                            else {
+                                req.jwtResult.info = { message: "Token expired or invalid!" };
+                                if (isAuthRequired)
+                                    res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info)
+                                else
+                                    next();
+                            }
+                        })
+                        .catch((err) => {
+                            res.status(HttpCode.ERR_INTERNAL)
+                                .json({ message: err.toString() });
+                        })
+                else
+                    next();;
+            })(req, res, next)
+        else {
+            req.jwtResult.info = { message: "Missing token!" };
+            if (isAuthRequired)
+                res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info)
+            else
+                next();
+        }
     };
 };
