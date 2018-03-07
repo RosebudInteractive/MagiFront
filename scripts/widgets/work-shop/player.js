@@ -47,6 +47,10 @@ define(
                 this._setTextToolsEvents();
             }
 
+            initContainer(container) {
+                super.initContainer(container, tpl);
+            }
+
             render() {
                 var template = CWSPlayer.template("player");
 

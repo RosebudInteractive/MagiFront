@@ -73,7 +73,7 @@ class ListItem extends React.Component {
             <li className={"lectures-list__item" + (this.props.isActive ? ' active' : '')}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover}/>
+                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}/>
                 </Link>
                 <SubList subLessons={lesson.Lessons} parentNumber={lesson.Number} courseUrl={this.props.courseUrl}/>
             </li>
@@ -115,7 +115,9 @@ class ListItemInfo extends React.Component {
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string.isRequired,
-        duration: PropTypes.string.isRequired
+        duration: PropTypes.string.isRequired,
+        courseUrl : PropTypes.string.isRequired,
+        lessonUrl : PropTypes.string.isRequired,
     };
 
     render() {
@@ -136,9 +138,9 @@ class PlayBlock extends React.Component {
                                     strokeDasharray="565.48" strokeDashoffset="0"/>
                         </svg>
                     </div>
-                    <div className="play-block__btn">
+                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="play-block__btn">
                         <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                    </div>
+                    </Link>
                     <div className="play-block__tooltip">Смотреть</div>
                     <div className="play-block__duration">{this.props.duration}</div>
                 </div>

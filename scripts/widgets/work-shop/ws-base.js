@@ -19,6 +19,13 @@ define(
                 CWSBase.prepareTemplates(tpl)
             }
 
+            initContainer(container, tpl) {
+                this._container = container;
+                CWSBase.prepareTemplates(tpl)
+            }
+
+
+
             render() {
                 if (this._container.children().length == 0)
                     this.createItem();

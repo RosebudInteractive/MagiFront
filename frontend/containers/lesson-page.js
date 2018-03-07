@@ -29,6 +29,7 @@ class LessonPage extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
+        $('body').attr('data-page', 'fullpage');
     }
 
     _mountFullpage() {
@@ -49,6 +50,7 @@ class LessonPage extends React.Component {
     componentWillUnmount() {
         document.getElementById('html').className = this._htmlClassName;
         $.fn.fullpage.destroy('all');
+        $('body').removeAttr('data-page');
     }
 
     componentWillReceiveProps(nextProps) {
@@ -116,6 +118,7 @@ class LessonPage extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
+            fixedElements: '.js-lectures-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -126,7 +129,7 @@ class LessonPage extends React.Component {
             css3: true,
             keyboardScrolling: true,
             animateAnchor: true,
-            recordHistory: true,
+            // recordHistory: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
@@ -148,8 +151,11 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='fullpage-wrapper' id='fullpage'>
-                        {this._getLessonsBundles()}
+                    <div>
+                        <div className='fullpage-wrapper' id='fullpage'>
+                            {this._getLessonsBundles()}
+                        </div>
+
                     </div>
                     :
                     null

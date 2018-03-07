@@ -13,6 +13,8 @@ class CourseLessons extends React.Component {
                 <LessonFull
                     title={lesson.Name}
                     url={'../' + this.props.courseUrl + '/' + lesson.URL}
+                    courseUrl={this.props.courseUrl}
+                    lessonUrl={lesson.URL}
                     descr={lesson.ShortDescription}
                     cover={lesson.Cover}
                     duration={lesson.DurationFmt}
@@ -51,10 +53,7 @@ class LessonFull extends React.Component {
         return (
             <li className="lecture-full">
                 <div className="lecture-full__wrapper">
-                    <PlayBlock
-                        cover={this.props.cover}
-                        duration={this.props.duration}
-                    />
+                    <PlayBlock {...this.props}/>
                     <InfoBlock
                         title={this.props.title}
                         descr={this.props.descr}
@@ -70,6 +69,13 @@ class LessonFull extends React.Component {
 }
 
 class PlayBlock extends React.Component {
+
+    static propTypes = {
+        cover : PropTypes.string.isRequired,
+        courseUrl : PropTypes.string.isRequired,
+        lessonUrl : PropTypes.string.isRequired,
+    }
+
     render() {
         return (
             <div className="lecture-full__play-block">
@@ -85,11 +91,11 @@ class PlayBlock extends React.Component {
                             />
                         </svg>
                     </div>
-                    <div className="play-block__btn">
+                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="play-block__btn">
                         <svg width="41" height="36">
                             {svg.play}
                         </svg>
-                    </div>
+                    </Link>
                     <div className="play-block__tooltip">Смотреть</div>
                     <div className="play-block__duration">{this.props.duration}</div>
                 </div>

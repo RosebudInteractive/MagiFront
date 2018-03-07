@@ -1,6 +1,7 @@
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
+// require('webpack-jquery-ui');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
@@ -14,15 +15,12 @@ const _prodConfig = {
         path: path.join(__dirname, 'static'),
         filename: '[name].js',
     },
-    resolve: {
-        alias: {
-            "text": './scripts/lib/text',
-            "underscore": './scripts/lib/underscore',
-            "lodash": './scripts/lib/lodash.min',
-            "template": '/scripts/lib/template',
-            "work-shop": '/scripts/widgets/work-shop'
-        }
-    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+        })
+    ],
     module: {
         rules: [
             {
@@ -64,6 +62,21 @@ const _prodConfig = {
                 loader: "url-loader?limit=10000&mimetype=image/svg+xml"
             }
         ]
+    },
+    resolve: {
+        alias: {
+            "underscore": path.resolve(__dirname, 'scripts/lib/underscore'),
+            "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
+            "template": path.resolve(__dirname, 'scripts/lib/template'),
+            "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
+            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
+            'script-lib': path.resolve(__dirname, 'scripts/lib')
+        }
+    },
+    resolveLoader: {
+        alias: {
+            'text': 'raw-loader',
+        }
     }
 };
 
@@ -87,7 +100,7 @@ const _devConfig = {
         new NpmInstallPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
-            jQuery: "jquery"
+            jQuery: "jquery",
         })
     ],
     module: {
@@ -111,12 +124,13 @@ const _devConfig = {
                     path.resolve(__dirname, "frontend"),
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
+                    path.resolve(__dirname, 'scripts/lib'),
                 ],
                 test: /\.js$/
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                loader: ["style-loader","css-loader"]
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
@@ -150,11 +164,12 @@ const _devConfig = {
             "lodash": path.resolve(__dirname, 'scripts/lib/lodash.min'),
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
+            'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
+            'script-lib': path.resolve(__dirname, 'scripts/lib')
         }
     },
     resolveLoader: {
         alias: {
-            // 'text': path.resolve(__dirname, 'scripts/lib/text'),
             'text': 'raw-loader',
         }
     }

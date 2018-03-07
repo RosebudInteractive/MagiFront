@@ -3,12 +3,12 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 
 import DesktopHeaderRow from './desktop-header';
+import MobileHeaderRow from './mobile-header';
 import FilterRow from './desktop-filters';
 import MenuMobile from './menu-mobile';
 import TranscriptMenu from '../lesson-page/lesson-transcript-menu';
 
 import * as tools from '../../tools/page-tools';
-import * as svg from '../../tools/svg-paths';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import {pages} from "../../tools/page-tools";
@@ -46,7 +46,7 @@ class Header extends React.Component {
                 <header className={_headerClass}>
                     {this._isMobile() ?
                         <div>
-                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}/>
+                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={this.props.pageHeaderState.currentPage}/>
                             <MenuMobile/>
                         </div>
                         :
@@ -74,32 +74,6 @@ class Header extends React.Component {
         )
     }
 
-}
-
-class MobileHeaderRow extends React.Component {
-    render() {
-        return (
-            <div className="page-header__menu-mobile">
-                <button type="button" className="menu-trigger" onClick={this.props.onClickMenuTrigger}><span>Меню</span>
-                </button>
-                <a href="#" className="logo-mobile">
-                    <svg width="70" height="38">
-                        {svg.logoMob}
-                    </svg>
-                </a>
-                <nav className="navigation navigation-mobile">
-                    <ul>
-                        <li className="current">
-                            <a href="#">Курсы</a>
-                        </li>
-                        <li>
-                            <a href="#">Календарь</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        )
-    }
 }
 
 function mapStateToProps(state, ownProps) {
