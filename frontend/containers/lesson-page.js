@@ -49,13 +49,14 @@ class LessonPage extends React.Component {
         });
     }
 
-    componentWillUnmount() {
-
+    componentDidUnmount() {
+        $.fn.fullpage.destroy('all')
     }
 
     componentWillReceiveProps(nextProps) {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
+            this._mountGuard = false
         }
     }
 

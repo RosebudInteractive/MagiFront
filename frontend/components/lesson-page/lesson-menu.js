@@ -21,6 +21,10 @@ export default class Menu extends React.Component {
         total: PropTypes.number.isRequired,
     };
 
+    componentDidUnmount() {
+        console.log('will unmount')
+    }
+
     _switchMenu() {
         this.setState({opened: !this.state.opened})
     }

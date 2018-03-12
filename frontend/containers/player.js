@@ -102,10 +102,10 @@ class Player extends React.Component {
             courseUrl={this.props.course.URL}
             courseTitle={this.props.course.Name}
             lessonCount={this.props.lessons.object.length}
-            onPause={::this._handlePause}
-            onPlay={::this._handlePlay}
             content={this.state.currentContents}
             currentContent={this.state.content}
+            onPause={::this._handlePause}
+            onPlay={::this._handlePlay}
             onGoToContent={::this._handleGoToContent}
             onSetRate={::this._handleSetRate}
             playTime={this.state.playTime}
