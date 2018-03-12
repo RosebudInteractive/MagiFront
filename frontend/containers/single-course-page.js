@@ -172,7 +172,7 @@ class BooksTab extends React.Component {
                             <span className="course-tab-control__label">книги</span>
                         </div>
                         :
-                        <div style={{marginBottom: 2}}>
+                        <div className='course-tab-control__empty-container'>
                             <span className="course-tab-control__empty _desktop">пока пуст</span>
                             <span className="course-tab-control__empty _mobile">0</span>
                         </div>

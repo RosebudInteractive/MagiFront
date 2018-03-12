@@ -7747,6 +7747,15 @@ body[data-page="fullpage"] .lectures-menu {
         line-height: 24px;
           color: rgba(47, 47, 47, 0.2); } }
 
+.course-tab-control__empty-container {
+  margin-bottom: 2px;}
+  @media (max-width: 900px) {
+    .course-tab-control__empty-container {
+      margin-bottom: 0;
+    }
+  }
+
+
 ol.lectures-tab {
   margin: 0;
   padding: 0;

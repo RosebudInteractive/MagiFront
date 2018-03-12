@@ -23,12 +23,13 @@ export default class LessonWrapper extends React.Component {
         return (
             <section className='fullpage-section lecture-wrapper'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
-                <div className="fp-tableCell">
+                {/*<div className="fp-tableCell">*/}
+
                     <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
                     <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
                         материалы</Link>
                     <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain} courseUrl={this.props.courseUrl}/>
-                </div>
+                {/*</div>*/}
             </section>
         )
     }

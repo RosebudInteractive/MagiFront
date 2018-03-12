@@ -33,11 +33,13 @@ class LessonPage extends React.Component {
     }
 
     _mountFullpage() {
-        let _container = $('#fullpage');
-        if ((!this._mountGuard) && (_container.length > 0)) {
-            const _options = this._getFullpageOptions();
-            _container.fullpage(_options)
-            this._mountGuard = true;
+        if (($(window).width() > 900)) {
+            let _container = $('#fullpage');
+            if ((!this._mountGuard) && (_container.length > 0)) {
+                const _options = this._getFullpageOptions();
+                _container.fullpage(_options)
+                this._mountGuard = true;
+            }
         }
     }
 
@@ -48,9 +50,7 @@ class LessonPage extends React.Component {
     }
 
     componentWillUnmount() {
-        document.getElementById('html').className = this._htmlClassName;
-        $.fn.fullpage.destroy('all');
-        $('body').removeAttr('data-page');
+
     }
 
     componentWillReceiveProps(nextProps) {

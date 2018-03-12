@@ -38,12 +38,12 @@ export default class Menu extends React.Component {
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>
                     </Link>
-                    <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
+                    <a href={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
                         <div className="icon">
                             <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _linkBack}}/>
                         </div>
                         <span><span className="label">Курс:</span>{' ' + this.props.courseTitle}</span>
-                    </Link>
+                    </a>
                 </div>
                 <div className="lectures-menu__section lectures-list-block">
                     <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
