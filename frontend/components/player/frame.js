@@ -5,6 +5,8 @@ import Controls from "./controls";
 
 import * as tools from '../../tools/time-tools'
 
+import $ from 'jquery'
+
 export default class Frame extends Component {
 
     static propTypes = {
@@ -32,6 +34,15 @@ export default class Frame extends Component {
             currentToc: 0,
             currentRate: 1,
         }
+    }
+
+    componentDidMount() {
+        let tooltips = $('.js-speed, .js-contents, .js-share');
+        $(document).mouseup(function (e) {
+            if (tooltips.has(e.target).length === 0){
+                tooltips.removeClass('opened');
+            }
+        });
     }
 
 
