@@ -41,9 +41,10 @@ export default class Menu extends React.Component {
             _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>';
         // _share = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#share"/>';
 
+        let _isMobile = $( window ).width() < 900;
 
         return (
-            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')} id={this.props.id} style={{display: 'none'}}>
+            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')} id={this.props.id} style={(_isMobile && this.props.isMain) ? null : {display: 'none'}}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>
