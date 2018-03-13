@@ -14,6 +14,8 @@ export default class LessonFrame extends React.Component {
     };
 
     render() {
+        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
+
         let {lesson} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
 
@@ -22,7 +24,12 @@ export default class LessonFrame extends React.Component {
                 <div className="lecture-frame__header">
                     <a href="#" className="lecture-frame__play-link">
                         {this.props.isMain ? null :
-                            <button type="button" className="lecture-frame__plus">Доп. эпизод</button>}
+                            <button type="button" className="lecture-frame__plus">
+                                <span className="lecture-frame__plus-icon">
+                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _plus}}/>
+                                </span>
+                                <span className="lecture-frame__plus-text">Доп. эпизод</span>
+                            </button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                             <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lesson.URL}>
