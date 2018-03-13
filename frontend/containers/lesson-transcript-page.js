@@ -12,7 +12,7 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
 
-class LessonPage extends React.Component {
+class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -29,15 +29,15 @@ class LessonPage extends React.Component {
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', LessonPage._handleScroll);
+        window.addEventListener('scroll', TranscriptLessonPage._handleScroll);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', LessonPage._handleScroll);
+        window.removeEventListener('scroll', TranscriptLessonPage._handleScroll);
     }
 
     componentDidUpdate() {
-        LessonPage._handleScroll()
+        TranscriptLessonPage._handleScroll()
     }
 
     _lessonLoaded() {
@@ -146,7 +146,7 @@ class SocialBlock extends React.Component {
                     <div className="social-btn-dark__icon">
                         <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                     </div>
-                    <span className="social-btn-dark__actions"></span>
+                    <span className="social-btn-dark__actions"/>
                 </a>
             </div>
         )
@@ -172,4 +172,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LessonPage);
+export default connect(mapStateToProps, mapDispatchToProps)(TranscriptLessonPage);

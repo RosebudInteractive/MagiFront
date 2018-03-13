@@ -15,7 +15,7 @@ export default class LessonFrame extends React.Component {
 
     render() {
         let {lesson} = this.props;
-        let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.parentNumber + ' ');
+        let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
 
         return (
             <div className="lecture-frame">

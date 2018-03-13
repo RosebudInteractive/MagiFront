@@ -19,7 +19,7 @@ export default class Menu extends React.Component {
     static propTypes = {
         courseTitle: PropTypes.string.isRequired,
         courseUrl: PropTypes.string.isRequired,
-        current: PropTypes.number.isRequired,
+        current: PropTypes.string.isRequired,
         total: PropTypes.number.isRequired,
         episodes: PropTypes.array,
     };
@@ -52,7 +52,7 @@ export default class Menu extends React.Component {
                                 onClick={::this._switchMenu}><span>Лекция </span>
                             <span className="num"><span
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
-                        <LessonsListWrapper {...this.props} isDark={true}/>
+                        <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
                     <section className="lectures-menu__section lectures-menu-nav" style={{width: 350.109}}>
                         <button className="lectures-menu-nav__trigger">Меню</button>

@@ -97,9 +97,7 @@ class LessonPage extends React.Component {
         _bundles.push(this._createBundle(lesson, 'lesson0'), true);
 
         if (lesson.Lessons) {
-            let _parentNumber = lesson.Number;
             lesson.Lessons.forEach((lesson, index) => {
-                lesson.parentNumber = _parentNumber + '.' + lesson.Number;
                 _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
             });
         }
@@ -117,12 +115,11 @@ class LessonPage extends React.Component {
         }
 
         let _anchors = [];
-        let _parentNumber = lesson.Number;
         _anchors.push({
             name: 'lesson0',
             title: lesson.Name,
             id: lesson.Id,
-            number: _parentNumber,
+            number: lesson.Number,
             url: lesson.URL,
         });
 
@@ -131,7 +128,7 @@ class LessonPage extends React.Component {
                 name: 'lesson' + (index + 1),
                 title: lesson.Name,
                 id: lesson.Id,
-                number: _parentNumber + '.' + lesson.Number,
+                number: lesson.Number,
                 url: lesson.URL,
             })
         });
@@ -161,8 +158,16 @@ class LessonPage extends React.Component {
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
-            afterLoad: (anchorLink, index) => {
+            onLeave: (index, nextIndex,) => {
                 $('.js-lectures-menu').hide();
+                let {id, number} = _anchors[nextIndex - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterLoad: (anchorLink, index) => {
                 let {id, number} = _anchors[index - 1];
                 let _activeMenu = $('#lesson-menu-' + id);
                 if (_activeMenu.length > 0) {

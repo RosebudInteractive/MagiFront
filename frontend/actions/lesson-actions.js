@@ -26,7 +26,7 @@ export const getLesson = (courseUrl, lessonUrl) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleCourses(data);
+                handleData(data);
 
                 dispatch({
                     type: GET_LESSON_SUCCESS,
@@ -151,6 +151,14 @@ const parseJSON = (response) => {
 //     })
 // };
 //
+const handleData = (data) => {
+    let _lesson = data.Lesson;
+    let _parentNumber = _lesson.Number;
+    _lesson.Lessons.forEach((lesson) => {
+        lesson.Number = _parentNumber + '.' + lesson.Number
+    })
+};
+
 const handleLessons = (data) => {
     try {
         data.Lessons.forEach((lesson) => {
@@ -161,6 +169,11 @@ const handleLessons = (data) => {
             if (lesson.CoverMeta) {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
+
+            let _parentNumber = lesson.Number;
+            lesson.Lessons.forEach((subLesson) => {
+                subLesson.Number = _parentNumber + '.' + subLesson.Number
+            })
         });
     }
     catch (err) {

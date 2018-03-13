@@ -79,7 +79,7 @@ class ListItem extends React.Component {
                     <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL}
                                courseUrl={this.props.courseUrl}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} parentNumber={lesson.Number} active={this.props.active} courseUrl={this.props.courseUrl}/>
+                <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
             </li>
         )
     }
@@ -169,22 +169,20 @@ class SubList extends React.Component {
 
     static propTypes = {
         subLessons: PropTypes.array.isRequired,
-        parentNumber: PropTypes.number.isRequired,
         courseUrl: PropTypes.string.isRequired,
         active: PropTypes.string.isRequired,
     };
 
     _getItems() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
-        const {parentNumber, active} = this.props;
+        const {active} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
-            let _number = parentNumber + '.' + lesson.Number;
-            let _isActive = _number === active;
+            let _isActive = lesson.Number === active;
 
             return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-sublist__title">
-                    <span className="sublist-num">{_number}</span>{lesson.Name}
+                    <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
                     <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
