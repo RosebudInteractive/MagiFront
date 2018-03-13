@@ -31,16 +31,18 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         $('body').attr('data-page', 'fullpage');
-        window.addEventListener("resize", () => {
-            let _isMobile = window.innerWidth < 900;
-            if (_isMobile !== this.state.isMobile) {
-                if (this._mountGuard) {
-                    $.fn.fullpage.destroy(true)
-                    this._mountGuard = false
-                }
-                this.setState({isMobile: _isMobile})
-            }
-        });
+        // window.addEventListener("resize", () => {
+        //     let _isMobile = window.innerWidth < 900;
+        //     if (_isMobile !== this.state.isMobile) {
+        //         if (this._mountGuard) {
+        //             $.fn.fullpage.destroy(true)
+        //             this._mountGuard = false
+        //             let _menu = $('.js-lectures-menu');
+        //             _menu.hide();
+        //         }
+        //         this.setState({isMobile: _isMobile})
+        //     }
+        // });
     }
 
     _mountFullpage() {
