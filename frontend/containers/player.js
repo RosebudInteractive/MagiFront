@@ -178,7 +178,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
-            fixedElements: '.js-lectures-menu',
+            fixedElements: '.js-lectures-player-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),

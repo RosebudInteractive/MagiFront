@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import $ from 'jquery'
 
 import LessonsListWrapper from '../lesson-page/lessons-list-wrapper';
 
@@ -79,6 +80,30 @@ export default class Menu extends React.Component {
 
 class TableOfContents extends React.Component {
 
+    componentDidUpdate(){
+        let _links = $('.js-scroll-link');
+        _links.prop('onclick',null).off('click');
+
+        _links.on("click", function (e) {
+            let $target = $($(this).attr('href')),
+                targetOffset = $target.offset().top;
+
+            if ($target.length) {
+                e.preventDefault();
+
+                // trigger scroll
+                $('html, body').animate({
+                    scrollTop: targetOffset
+                }, 600);
+            }
+        })
+    }
+
+    componentWillUnmount() {
+        let _links = $('.js-scroll-link');
+        _links.prop('onclick',null).off('click');
+    }
+
     _getList() {
         if (!this.props.episodes) {
             return
@@ -90,7 +115,7 @@ class TableOfContents extends React.Component {
             return episode.Toc.map((item) => {
                 // const _id = episodeIndex + '-' + index;
                 const _id = 'toc' + item.Id;
-                return <li className="menu-nav-sublist__item current " key={_id}>
+                return <li className="menu-nav-sublist__item current" key={_id}>
                     <a href={"#" + _id} className="menu-nav-sublist__link js-scroll-link">{item.Topic}</a>
                 </li>
             })

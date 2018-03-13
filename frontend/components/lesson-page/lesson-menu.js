@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import $ from 'jquery'
 
 import LessonsListWrapper from './lessons-list-wrapper';
 
@@ -17,16 +18,21 @@ export default class Menu extends React.Component {
     static propTypes = {
         courseTitle: PropTypes.string.isRequired,
         courseUrl: PropTypes.string.isRequired,
-        current: PropTypes.number.isRequired,
+        current: PropTypes.string.isRequired,
+        active: PropTypes.string.isRequired,
         total: PropTypes.number.isRequired,
+        id: PropTypes.number.isRequired,
     };
 
-    componentDidUnmount() {
-        console.log('will unmount')
-    }
-
     _switchMenu() {
+        let _newStatIsOpened = !this.state.opened;
+        if (_newStatIsOpened) {
+            $('#fp-nav').toggleClass('hide');
+        } else {
+            $('#fp-nav').removeClass('hide');
+        }
         this.setState({opened: !this.state.opened})
+
     }
 
 
@@ -37,7 +43,7 @@ export default class Menu extends React.Component {
 
 
         return (
-            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')}>
+            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')} id={this.props.id} style={{display: 'none'}}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>

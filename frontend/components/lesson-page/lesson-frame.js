@@ -15,6 +15,7 @@ export default class LessonFrame extends React.Component {
 
     render() {
         let {lesson} = this.props;
+        let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.parentNumber + ' ');
 
         return (
             <div className="lecture-frame">
@@ -28,7 +29,7 @@ export default class LessonFrame extends React.Component {
                                 <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
                             </Link>
                             <span className="title-text">
-                                <span className="number">{lesson.Number + '.'}</span>
+                                <span className="number">{_number}</span>
                                 {lesson.Name + '\n'}
                             </span>
 

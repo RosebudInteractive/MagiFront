@@ -20,7 +20,7 @@ class LessonPage extends React.Component {
 
         this.state = {
             total: 0,
-            current: 0,
+            currentActive: 0,
         }
     }
 
@@ -43,20 +43,30 @@ class LessonPage extends React.Component {
         }
     }
 
+    _unmountFullpage() {
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy(true)
+            this._mountGuard = false
+            let _menu = $('.js-lectures-menu');
+            _menu.remove();
+        }
+    }
+
     componentDidMount() {
         $(document).ready(() => {
             this._mountFullpage();
         });
     }
 
-    componentDidUnmount() {
-        $.fn.fullpage.destroy('all')
+    componentWillUnmount() {
+        this._unmountFullpage();
+        $('body').removeAttr('data-page');
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
-            this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
-            this._mountGuard = false
+    componentDidUpdate(prevProps) {
+        if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(this.props.courseUrl, this.props.lessonUrl);
+            this._unmountFullpage()
         }
     }
 
@@ -74,6 +84,7 @@ class LessonPage extends React.Component {
                                courseTitle={this.props.course.Name}
                                lessonCount={this.props.lessons.object.length}
                                isMain={isMain}
+                               active={this.state.currentActive}
         />
     }
 
@@ -86,7 +97,9 @@ class LessonPage extends React.Component {
         _bundles.push(this._createBundle(lesson, 'lesson0'), true);
 
         if (lesson.Lessons) {
+            let _parentNumber = lesson.Number;
             lesson.Lessons.forEach((lesson, index) => {
+                lesson.parentNumber = _parentNumber + '.' + lesson.Number;
                 _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
             });
         }
@@ -104,11 +117,24 @@ class LessonPage extends React.Component {
         }
 
         let _anchors = [];
-        _anchors.push({name: 'lesson0', title: lesson.Name});
+        let _parentNumber = lesson.Number;
+        _anchors.push({
+            name: 'lesson0',
+            title: lesson.Name,
+            id: lesson.Id,
+            number: _parentNumber,
+            url: lesson.URL,
+        });
 
         lesson.Lessons.forEach((lesson, index) => {
-            _anchors.push({name: 'lesson' + (index + 1), title: lesson.Name})
-        })
+            _anchors.push({
+                name: 'lesson' + (index + 1),
+                title: lesson.Name,
+                id: lesson.Id,
+                number: _parentNumber + '.' + lesson.Number,
+                url: lesson.URL,
+            })
+        });
 
         return _anchors
     }
@@ -128,12 +154,32 @@ class LessonPage extends React.Component {
                 return anchor.title
             }),
             css3: true,
+            lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
-            // recordHistory: true,
+            // recordHistory: false,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
+            afterLoad: (anchorLink, index) => {
+                $('.js-lectures-menu').hide();
+                let {id, number} = _anchors[index - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterRender: () => {
+                let _url = this.props.lessonUrl;
+                let _anchor = _anchors.find((anchor) => {
+                    return anchor.url === _url
+                })
+
+                if (_anchor) {
+                    $.fn.fullpage.silentMoveTo(_anchor.name);
+                }
+            }
         }
     }
 
