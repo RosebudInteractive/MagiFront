@@ -39,11 +39,13 @@ class Player extends React.Component {
     }
 
     _mountFullpage() {
-        let _container = $('#fullpage');
-        if ((!this._mountGuard) && (_container.length > 0)) {
-            const _options = this._getFullpageOptions();
-            _container.fullpage(_options)
-            this._mountGuard = true;
+        if (($(window).width() > 900)) {
+            let _container = $('#fullpage');
+            if ((!this._mountGuard) && (_container.length > 0)) {
+                const _options = this._getFullpageOptions();
+                _container.fullpage(_options)
+                this._mountGuard = true;
+            }
         }
     }
 
@@ -70,9 +72,10 @@ class Player extends React.Component {
     }
 
     componentWillUnmount() {
-        document.getElementById('html').className = this._htmlClassName;
-        $.fn.fullpage.destroy('all');
-        $('body').removeAttr('data-page');
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy('all');
+        }
+
     }
 
     componentWillReceiveProps(nextProps) {
@@ -99,10 +102,10 @@ class Player extends React.Component {
             courseUrl={this.props.course.URL}
             courseTitle={this.props.course.Name}
             lessonCount={this.props.lessons.object.length}
-            onPause={::this._handlePause}
-            onPlay={::this._handlePlay}
             content={this.state.currentContents}
             currentContent={this.state.content}
+            onPause={::this._handlePause}
+            onPlay={::this._handlePlay}
             onGoToContent={::this._handleGoToContent}
             onSetRate={::this._handleSetRate}
             playTime={this.state.playTime}
@@ -175,7 +178,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
-            fixedElements: '.js-lectures-menu',
+            fixedElements: '.js-lectures-player-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),

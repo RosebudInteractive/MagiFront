@@ -20,7 +20,8 @@ class LessonPage extends React.Component {
 
         this.state = {
             total: 0,
-            current: 0,
+            currentActive: 0,
+            isMobile: $(window).width() < 900
         }
     }
 
@@ -30,14 +31,37 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         $('body').attr('data-page', 'fullpage');
+        // window.addEventListener("resize", () => {
+        //     let _isMobile = window.innerWidth < 900;
+        //     if (_isMobile !== this.state.isMobile) {
+        //         if (this._mountGuard) {
+        //             $.fn.fullpage.destroy(true)
+        //             this._mountGuard = false
+        //             let _menu = $('.js-lectures-menu');
+        //             _menu.hide();
+        //         }
+        //         this.setState({isMobile: _isMobile})
+        //     }
+        // });
     }
 
     _mountFullpage() {
-        let _container = $('#fullpage');
-        if ((!this._mountGuard) && (_container.length > 0)) {
-            const _options = this._getFullpageOptions();
-            _container.fullpage(_options)
-            this._mountGuard = true;
+        // if (($(window).width() > 900)) {
+            let _container = $('#fullpage');
+            if ((!this._mountGuard) && (_container.length > 0)) {
+                const _options = this._getFullpageOptions();
+                _container.fullpage(_options)
+                this._mountGuard = true;
+            }
+        // }
+    }
+
+    _unmountFullpage() {
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy(true)
+            this._mountGuard = false
+            let _menu = $('.js-lectures-menu');
+            _menu.remove();
         }
     }
 
@@ -48,14 +72,14 @@ class LessonPage extends React.Component {
     }
 
     componentWillUnmount() {
-        document.getElementById('html').className = this._htmlClassName;
-        $.fn.fullpage.destroy('all');
+        this._unmountFullpage();
         $('body').removeAttr('data-page');
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
-            this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
+    componentDidUpdate(prevProps) {
+        if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(this.props.courseUrl, this.props.lessonUrl);
+            this._unmountFullpage()
         }
     }
 
@@ -73,6 +97,7 @@ class LessonPage extends React.Component {
                                courseTitle={this.props.course.Name}
                                lessonCount={this.props.lessons.object.length}
                                isMain={isMain}
+                               active={this.state.currentActive}
         />
     }
 
@@ -103,11 +128,23 @@ class LessonPage extends React.Component {
         }
 
         let _anchors = [];
-        _anchors.push({name: 'lesson0', title: lesson.Name});
+        _anchors.push({
+            name: 'lesson0',
+            title: lesson.Name,
+            id: lesson.Id,
+            number: lesson.Number,
+            url: lesson.URL,
+        });
 
         lesson.Lessons.forEach((lesson, index) => {
-            _anchors.push({name: 'lesson' + (index + 1), title: lesson.Name})
-        })
+            _anchors.push({
+                name: 'lesson' + (index + 1),
+                title: lesson.Name,
+                id: lesson.Id,
+                number: lesson.Number,
+                url: lesson.URL,
+            })
+        });
 
         return _anchors
     }
@@ -122,17 +159,45 @@ class LessonPage extends React.Component {
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
-            navigation: _anchors.length > 1,
+            navigation: (!this.state.isMobile && (_anchors.length > 1)),
             navigationTooltips: _anchors.map((anchor) => {
                 return anchor.title
             }),
             css3: true,
+            autoScrolling: !this.state.isMobile,
+            lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
-            // recordHistory: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
+            onLeave: (index, nextIndex,) => {
+                $('.js-lectures-menu').hide();
+                let {id, number} = _anchors[nextIndex - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterLoad: (anchorLink, index) => {
+                let {id, number} = _anchors[index - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterRender: () => {
+                let _url = this.props.lessonUrl;
+                let _anchor = _anchors.find((anchor) => {
+                    return anchor.url === _url
+                })
+
+                if (_anchor) {
+                    $.fn.fullpage.silentMoveTo(_anchor.name);
+                }
+            }
         }
     }
 

@@ -26,7 +26,7 @@ export default class Controls extends React.Component {
     render() {
         const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
-            _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
+            _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _sound = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sound"/>';
 
         return (
@@ -34,9 +34,15 @@ export default class Controls extends React.Component {
                 <button type="button" className="backwards" onClick={::this._onBackward}>
                     <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _backwards}}/>
                 </button>
-                <button type="button" className="play-button" onClick={::this._onPause}>
-                    <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: (this.props.pause ? _playSmall : _pause)}}/>
-                </button>
+                {this.props.pause ?
+                    <button type="button" className="play-button" onClick={::this._onPause}>
+                        <svg className="play" width="19" height="19" dangerouslySetInnerHTML={{__html: _play}}/>
+                    </button>
+                    :
+                    <button type="button" className="play-button" onClick={::this._onPause}>
+                        <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: _pause}}/>
+                    </button>
+                }
                 <button type="button" className="sound-button">
                     <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _sound}}/>
                 </button>

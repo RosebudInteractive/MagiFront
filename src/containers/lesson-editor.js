@@ -635,8 +635,8 @@ export class LessonEditor extends ObjectEditor {
                                 view: 'text',
                                 name: 'Cover',
                                 id: 'cover-file',
-                                validate: window.webix.rules.isNotEmpty,
-                                invalidMessage: "Значение не может быть пустым",
+                                // validate: window.webix.rules.isNotEmpty,
+                                // invalidMessage: "Значение не может быть пустым",
                                 readonly: true,
                                 width: 360,
                                 on: {

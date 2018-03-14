@@ -20,6 +20,8 @@ import * as appActions from './actions/app-actions';
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
 
+import $ from 'jquery'
+
 Polifyll.registry();
 
 class App extends Component {
@@ -75,6 +77,13 @@ class App extends Component {
         this.updateDimensions();
         window.addEventListener("resize", this.updateDimensions.bind(this));
         window.addEventListener('scroll', this._handleScroll);
+
+        let tooltips = $('.js-language, .js-user-block, .js-speed, .js-contents, .js-share');
+        $(document).mouseup(function (e) {
+            if (tooltips.has(e.target).length === 0){
+                tooltips.removeClass('opened');
+            }
+        });
     }
 
     componentWillUnmount() {

@@ -10,9 +10,9 @@ export default class LessonWrapper extends React.Component {
     static propTypes = {
         lesson: PropTypes.object.isRequired,
         courseUrl: PropTypes.string.isRequired,
-        lessonUrl: PropTypes.string.isRequired,
         lessonCount: PropTypes.number.isRequired,
         isMain: PropTypes.bool,
+        active: PropTypes.string.isRequired,
     };
 
     static defaultProps = {
@@ -20,15 +20,14 @@ export default class LessonWrapper extends React.Component {
     };
 
     render() {
+
         return (
             <section className='fullpage-section lecture-wrapper'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
-                <div className="fp-tableCell">
-                    <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
-                    <Link to={this.props.lessonUrl + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
+                    <Menu {...this.props} current={this.props.lesson.Number} active={this.props.active} total={this.props.lessonCount} id={'lesson-menu-' + this.props.lesson.Id}/>
+                    <Link to={this.props.lesson.URL + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
                         материалы</Link>
                     <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain} courseUrl={this.props.courseUrl}/>
-                </div>
             </section>
         )
     }

@@ -10,8 +10,9 @@ import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 
 import {pages} from '../tools/page-tools';
+import $ from 'jquery'
 
-class LessonPage extends React.Component {
+class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -25,45 +26,44 @@ class LessonPage extends React.Component {
 
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.transcript, courseUrl, lessonUrl);
+    }
 
-        window.addEventListener('scroll', this._handleScroll);
+    componentDidMount() {
+        window.addEventListener('scroll', TranscriptLessonPage._handleScroll);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', this._handleScroll);
+        window.removeEventListener('scroll', TranscriptLessonPage._handleScroll);
+    }
+
+    componentDidUpdate() {
+        TranscriptLessonPage._handleScroll()
     }
 
     _lessonLoaded() {
         return false
     }
 
-    _handleScroll() {
-        let _link = document.getElementById('link-to-lecture');
-        // const _recommend = document.getElementById('recommend');
-        const _recommend = document.getElementById('gallery');
+    static _handleScroll() {
+        let _link = $('.link-to-lecture');
+        const _recommend = $('#gallery');
 
-        if (_link && _recommend) {
-            let coordTop = _recommend.offsetTop;
+        if ((_link.length) && (_recommend.length)){
+            let coordTop = _recommend.offset().top;
 
-            if ((document.documentElement.scrollTop + 550) >= coordTop) {
-                _link.style.setProperty('position', 'absolute')
-                _link.style.setProperty('top', coordTop + 'px')
-                _link.style.setProperty('margin-top', '-100px');
+            let _scrollTop = $(window).scrollTop();
+
+            if (( _scrollTop + 550) >= coordTop) {
+                _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
             } else {
-                _link.style.setProperty('position', 'fixed')
-                _link.style.setProperty('top', '50%')
-                _link.style.setProperty('margin-top', '0');
+                _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
             }
 
-            if (document.innerWidth < 768 ) {
-                if ((document.documentElement.scrollTop + 650) >= coordTop) {
-                    _link.style.setProperty('position', 'absolute')
-                    _link.style.setProperty('top', coordTop+'px')
-                    _link.style.setProperty('margin-top', '-100px');
+            if ($(window).width() < 768 ) {
+                if ((_scrollTop + 650) >= coordTop) {
+                    _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
                 } else {
-                    _link.style.setProperty('position', 'fixed')
-                    _link.style.setProperty('top', 'auto')
-                    _link.style.setProperty('margin-top', '0');
+                    _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
                 }
             }
         }
@@ -146,7 +146,7 @@ class SocialBlock extends React.Component {
                     <div className="social-btn-dark__icon">
                         <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                     </div>
-                    <span className="social-btn-dark__actions"></span>
+                    <span className="social-btn-dark__actions"/>
                 </a>
             </div>
         )
@@ -172,4 +172,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LessonPage);
+export default connect(mapStateToProps, mapDispatchToProps)(TranscriptLessonPage);

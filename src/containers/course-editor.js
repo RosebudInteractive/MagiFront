@@ -62,7 +62,7 @@ class CourseEditor extends ObjectEditor {
             State: value.State,
             Cover: value.Cover,
             CoverMeta: JSON.stringify(this.coverMeta),
-            Color: parseInt(value.ColorHex.substr(1), 16),
+            Color: value.ColorHex ? parseInt(value.ColorHex.substr(1), 16) : 0,
             LanguageId: value.LanguageId,
             URL: value.URL,
             Description: value.Description,
@@ -254,6 +254,10 @@ class CourseEditor extends ObjectEditor {
     }
 
     _checkLessonsState(newState) {
+        if (!newState) {
+            return false
+        }
+
         if (newState === 'P') {
             return this.props.courseLessons.some((lesson) => {
                 return lesson.State === 'R'
@@ -426,8 +430,8 @@ class CourseEditor extends ObjectEditor {
                                 view: 'text',
                                 name: 'Cover',
                                 id: 'cover-file',
-                                validate: window.webix.rules.isNotEmpty,
-                                invalidMessage: "Значение не может быть пустым",
+                                // validate: window.webix.rules.isNotEmpty,
+                                // invalidMessage: "Значение не может быть пустым",
                                 readonly: true,
                                 width: 360,
                                 on: {

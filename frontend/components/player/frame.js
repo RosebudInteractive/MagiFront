@@ -5,6 +5,9 @@ import Controls from "./controls";
 
 import * as tools from '../../tools/time-tools'
 
+import $ from 'jquery'
+import PauseScreen from "./pause-screen";
+
 export default class Frame extends Component {
 
     static propTypes = {
@@ -34,6 +37,15 @@ export default class Frame extends Component {
         }
     }
 
+    componentDidMount() {
+        let tooltips = $('.js-speed, .js-contents, .js-share');
+        $(document).mouseup(function (e) {
+            if (tooltips.has(e.target).length === 0){
+                tooltips.removeClass('opened');
+            }
+        });
+    }
+
 
     _openContent() {
         this.setState({showContent : !this.state.showContent})
@@ -41,13 +53,6 @@ export default class Frame extends Component {
 
     _openRate() {
         this.setState({showRate : !this.state.showRate})
-    }
-
-    _hideTooltips() {
-        // this.setState({
-        //     showContent : false,
-        //     showRate: false,
-        // })
     }
 
     _getContent() {
@@ -157,11 +162,12 @@ export default class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div className="player-frame" onClick={::this._hideTooltips}>
+            <div className="player-frame">
                 <div className="player-frame__poster">
                     <div className='ws-container' id='player'>
                     </div>
                 </div>
+                {this.state.pause ? <PauseScreen onPlay={::this._onPause}/> : null}
                 <div className="player-block">
                     <Progress total={this.state.totalDuration} current={this.props.playTime} content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
                     <div className="player-block__row">
