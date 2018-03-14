@@ -29,7 +29,11 @@ Promise.resolve()
 
         // Prepare http server
         let express = require('express');
+
         let app = new express();
+        if (NODE_ENV === 'production')
+            app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
+
         let port = magisteryConfig.http.port;
 
         if (NODE_ENV === 'development') {
