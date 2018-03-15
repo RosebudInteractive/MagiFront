@@ -6,6 +6,7 @@ const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
 const { UsersRedisCache } = require("./users-redis-cache");
+const { DestroySession } = require('./local-auth');
 
 class AuthJWT {
 
@@ -24,9 +25,7 @@ class AuthJWT {
             return rawUser;
         };
         
-        this._usersCache = config.get('authentication.storage') === "redis" ?
-            new UsersRedisCache(["Id", "Name", "PData"], { redis: config.get('connections.redis'), convUserDataFn: convUserDataFn })
-            : new UsersMemCache(["Id", "Name", "PData"], { convUserDataFn: convUserDataFn }); // UsersMemCache can't be used in cluster mode
+        this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
         
         const strategy = new JwtStrategy(jwtOptions,
             ((jwt_payload, next) => {
@@ -42,14 +41,23 @@ class AuthJWT {
             }).bind(this));
 
         passport.use(strategy);
-        app.use(passport.initialize());
 
-        app.post("/api/login",
+        app.post("/api/jwtlogin",
             ((req, res) => {
                 if (req.body && req.body.name && req.body.password) {
                     let login = req.body.name;
                     let password = req.body.password;
-                    this._usersCache.authUser(login, password)
+                    let token = req.headers["authorization"];
+                    let promise = Promise.resolve();
+                    if (token)
+                        promise = this._usersCache.destroyToken(token);
+                    promise.
+                        then(() => {
+                            return DestroySession(req);
+                        })
+                        .then(() => {
+                            return this._usersCache.authUser(login, password);
+                        })
                         .then((result) => {
                             let payload = { id: result.Id };
                             let token = jwt.sign(payload, jwtOptions.secretOrKey);
@@ -78,11 +86,18 @@ class AuthJWT {
 const isFeatureEnabled = config.get('authentication.enabled');
 let authJWT = null;
 
-exports.AuthenticateJWT = (app, isAuthRequired) => {
+let AuthJWTInit = (app) => {
     if ((!authJWT) && isFeatureEnabled)
         authJWT = new AuthJWT(app);
+};
+
+exports.AuthJWTInit = AuthJWTInit;
+
+exports.AuthenticateJWT = (app, isAuthRequired) => {
+    AuthJWTInit(app);
     return (req, res, next) => {
         if (!isFeatureEnabled) { return next(); }
+        if (req.user) { return next(); }
         if (req.jwtResult) {
             if ((!req.jwtResult.isSuccess) & isAuthRequired)
                 res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info);
@@ -102,8 +117,21 @@ exports.AuthenticateJWT = (app, isAuthRequired) => {
                         .then((result) => {
                             if (result) {
                                 req.jwtResult.isSuccess = true;
+                                //
+                                // Most likely we don't need to invoke "req.logIn" here, because it'll authorize cookie,
+                                //   but we are using JWT here, so lets keep cookie unathorized, just assign "user" to "req.user"
+                                //
                                 req.user = user;
                                 next();
+                                // req.logIn(user, (err) => {
+                                //     if (err) {
+                                //         return res.status(HttpCode.ERR_INTERNAL).json(
+                                //             {
+                                //                 message: err instanceof Error ? err.message : err.toString()
+                                //             });
+                                //     }
+                                //     next();
+                                // });
                             }
                             else {
                                 req.jwtResult.info = { message: "Token expired or invalid!" };

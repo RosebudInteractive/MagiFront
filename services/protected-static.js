@@ -1,11 +1,10 @@
 const config = require('config');
 const path = require('path');
-const { AuthenticateJWT } = require('../security/jwt-auth');
 
 let uploadPath = config.get('uploadPath');
 
 exports.setupProtectedStatic = (app) => {
-    app.use('/data', AuthenticateJWT(app), (req, res) => {
+    app.use('/data', (req, res) => {
         let isNginxProxy = req.get('X-NginX-Proxy') === "true";
         let nginxStatic = req.get('X-NginX-Static');
         if (isNginxProxy && nginxStatic) {

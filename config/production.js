@@ -7,9 +7,21 @@ module.exports = {
         sqlTrace: false,
         importFileTrace: false
     },
+    session: {
+        name: 'mag.sid',
+        secret: 'vdsadfrwer46546fdgrtj',
+        resave: false,
+        saveUninitialized: false
+    },
+    redisSession: {
+        enabled: false,
+        prefix: 'ses:',
+        scanCount: 100
+    },
     authentication: {
         enabled: false,
-        secret: 'tasmanianDevil',
+        useJWT: false,
+        secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },
     connections: {

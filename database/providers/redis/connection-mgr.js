@@ -47,8 +47,16 @@ class RedisConnection {
             });
         this.setAsync = promisify(this._client.set).bind(this._client);
         this.getAsync = promisify(this._client.get).bind(this._client);
+        this.delAsync = promisify(this._client.del).bind(this._client);
         this.pttlAsync = promisify(this._client.pttl).bind(this._client);
+        this.ttlAsync = promisify(this._client.ttl).bind(this._client);
+        this.scanAsync = promisify(this._client.scan).bind(this._client);
+        this.expireAsync = promisify(this._client.expire).bind(this._client);
+        this.pexpireAsync = promisify(this._client.pexpire).bind(this._client);
+        this.mgetAsync = promisify(this._client.mget).bind(this._client);
     }
+
+    client() { return this._client; }
 
     close() {
         return new Promise((resolve) => {
@@ -60,7 +68,7 @@ class RedisConnection {
     }
 }
 
-const RedisConnectionManager = class RedisConnectionManager extends Base{
+module.exports = class RedisConnectionManager extends Base{
     constructor(engine, options) {
         super(engine, options);
     }
@@ -73,8 +81,3 @@ const RedisConnectionManager = class RedisConnectionManager extends Base{
         return connection.close();
     }
 }
-
-let redisConnectionManager = null;
-module.exports = (engine, options) => {
-    return redisConnectionManager ? redisConnectionManager : redisConnectionManager = new RedisConnectionManager(engine, options);
-};
