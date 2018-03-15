@@ -20,6 +20,7 @@ export default class Frame extends Component {
         onMute:  PropTypes.func,
         onGoToContent: PropTypes.func,
         playTime: PropTypes.number.isRequired,
+        isMain: PropTypes.bool,
     };
 
     constructor(props) {
@@ -167,7 +168,7 @@ export default class Frame extends Component {
                     <div className='ws-container' id='player'>
                     </div>
                 </div>
-                {this.state.pause ? <PauseScreen onPlay={::this._onPause}/> : null}
+                {this.state.pause ? <PauseScreen onPlay={::this._onPause} {...this.props}/> : null}
                 <div className="player-block">
                     <Progress total={this.state.totalDuration} current={this.props.playTime} content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
                     <div className="player-block__row">

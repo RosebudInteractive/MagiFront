@@ -38,6 +38,11 @@ class Player extends React.Component {
         $('body').attr('data-page', 'fullpage');
     }
 
+    componentWillUnmount() {
+        this._unmountFullpage();
+        $('body').removeAttr('data-page');
+    }
+
     _mountFullpage() {
         if (($(window).width() > 900)) {
             let _container = $('#fullpage');
@@ -46,6 +51,15 @@ class Player extends React.Component {
                 _container.fullpage(_options)
                 this._mountGuard = true;
             }
+        }
+    }
+
+    _unmountFullpage() {
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy(true)
+            this._mountGuard = false
+            let _menu = $('.js-lectures-menu');
+            _menu.remove();
         }
     }
 
@@ -69,13 +83,6 @@ class Player extends React.Component {
         $(document).ready(() => {
             this._mountFullpage();
         });
-    }
-
-    componentWillUnmount() {
-        if (this._mountGuard) {
-            $.fn.fullpage.destroy('all');
-        }
-
     }
 
     componentWillReceiveProps(nextProps) {
