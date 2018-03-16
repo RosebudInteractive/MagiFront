@@ -218,8 +218,6 @@ export default class Frame extends Component {
             } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
             }
-
-            // this.setState({fullScreen : true})
         } else {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
@@ -230,7 +228,6 @@ export default class Frame extends Component {
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
             }
-            // this.setState({fullScreen : false})
         }
     }
 
@@ -327,29 +324,4 @@ export default class Frame extends Component {
             </div>
         )
     }
-}
-
-
-{/*<img src={'/data/' + lesson.Cover} width="1025" height="577" alt=""/>*/
-}
-{/*<div className="player-frame__poster-text">*/
-}
-{/*<h2 className="player-frame__poster-title">«Физика» Аристотеля с греческим оригиналом на полях рукописи.</h2>*/
-}
-{/*<p className="player-frame__poster-subtitle">Средневековый латинский манускрипт. Bibliotheca Apostolica Vaticana, Рим.</p>*/
-}
-{/*</div>*/
-}
-
-{/*<li className="active"><a href="#">«К чему эти смехотворные чудовища?»</a></li>*/
-}
-{/*<li><a href="#">Строгие формы аббатства Фонтене</a></li>*/
-}
-{/*<li><a href="#">Танцующие и плачущие святые</a></li>*/
-}
-{/*<li><a href="#">«Эпоха образа до эпохи искусства»</a></li>*/
-}
-{/*<li><a href="#">Категория стиля</a></li>*/
-}
-{/*<li><a href="#">Стиль и политика</a></li>*/
 }

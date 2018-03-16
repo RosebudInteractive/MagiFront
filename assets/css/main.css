@@ -10953,7 +10953,7 @@ ul.lectures-tab {
   .player-frame__screen {
     position: absolute;
     /*top: 97px;*/
-    bottom: 100px;
+    bottom: 0;
     left: 0;
     right: 0;
     display: -webkit-box;
@@ -10974,7 +10974,8 @@ ul.lectures-tab {
     -ms-flex-pack: end;
     justify-content: flex-end;
     background-color: rgba(47, 47, 47, 0.8);
-    height: 100vh;}
+    height: 100vh;
+    padding-bottom: 100px}
     @media (max-width: 600px) {
       .player-frame__screen {
         bottom: 0;
