@@ -340,6 +340,7 @@ export default class CWSPlayer extends CWSBase {
             this._options.loader.setPosition(this._audioState.globalTime);
             if (!this._audioState.stopped) audio.play();
             //this._audioState.audio.load();
+            this._broadcastAudioInitialized()
         }
     }
 
@@ -460,6 +461,11 @@ export default class CWSPlayer extends CWSBase {
     _broadcastAudioLoaded() {
         if (this._options.onAudioLoaded)
             this._options.onAudioLoaded(this.getAudioState());
+    }
+
+    _broadcastAudioInitialized() {
+        if (this._options.onAudioInitialized)
+            this._options.onAudioInitialized(this.getAudioState());
     }
 
     _broadcastCurrentTimeChanged() {

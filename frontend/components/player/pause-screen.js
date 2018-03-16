@@ -7,6 +7,7 @@ export default class PauseScreen extends React.Component{
         onPlay: PropTypes.func,
         duration: PropTypes.string,
         number: PropTypes.number,
+        currentToc: PropTypes.object,
     };
 
     static defaultProps = {
@@ -20,6 +21,10 @@ export default class PauseScreen extends React.Component{
     }
 
     render() {
+        let {lesson} = this.props;
+        let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
+        let _toc = this.props.currentToc ? this.props.currentToc.title : '';
+
         return(
             <div className="player-frame__screen">
                 <div className="lecture-frame">
@@ -27,16 +32,15 @@ export default class PauseScreen extends React.Component{
                         <a href="#" className="lecture-frame__play-link">
                             {!this.props.isMain ? <button type="button" className="lecture-frame__plus">Доп. эпизод</button> : null}
                             <h2 className="lecture-frame__title">
-                                <span className="lecture-frame__duration">10:34</span>
+                                <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                                 <span className="play-btn-big lecture-frame__play-btn" onClick={::this._onPlay}>Воспроизвести</span>
                                 <span className="title-text">
-                                            <span className="number">10.</span> Новизна и своеобразие буддизма в&nbsp;духовной культуре древней Индии.
-                                        </span>
+                                            <span className="number">{_number}</span>{lesson.Name}</span>
                             </h2>
                             <div className="lecture-frame__text-block">
-                                <p className="lecture-frame__descr">Вступительная беседа о достоинствах и недостатках цивилизационного подхода к истории, о критериях или маркерах цивилизации.</p>
-                                <p className="lecture-frame__author">Олег Лекманов</p>
-                                <p className="lecture-frame__chapter">Название главы</p>
+                                <p className="lecture-frame__descr">{lesson.ShortDescription}</p>
+                                <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                                <p className="lecture-frame__chapter">{_toc}</p>
                             </div>
                         </a>
                     </div>

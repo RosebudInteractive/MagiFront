@@ -16,7 +16,7 @@ module.exports = {
         saveUninitialized: false
     },
     redisSession: {
-        enabled: true,
+        enabled: false,
         prefix: 'ses:',
         scanCount: 100
     },

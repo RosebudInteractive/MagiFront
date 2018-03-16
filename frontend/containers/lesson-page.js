@@ -107,7 +107,7 @@ class LessonPage extends React.Component {
 
         if (!lesson) return _bundles;
 
-        _bundles.push(this._createBundle(lesson, 'lesson0'), true);
+        _bundles.push(this._createBundle(lesson, 'lesson0', true));
 
         if (lesson.Lessons) {
             lesson.Lessons.forEach((lesson, index) => {

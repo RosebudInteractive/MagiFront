@@ -24,7 +24,10 @@ class Player extends React.Component {
             current: 0,
             currentContents: [],
             playTime: 0,
-            content: 0
+            content: 0,
+            paused: false,
+            muted: false,
+            volume: 0,
         }
 
         this._lessonId = 0;
@@ -41,6 +44,13 @@ class Player extends React.Component {
     componentWillUnmount() {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
+    }
+
+    componentDidUpdate(prevProps) {
+        if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(this.props.courseUrl, this.props.lessonUrl);
+            this._unmountFullpage()
+        }
     }
 
     _mountFullpage() {
@@ -69,9 +79,23 @@ class Player extends React.Component {
             let _options = {
                 data: this.props.lessonPlayInfo.object,
                 div: _container,
-                onRenderContent: (content) => {this.setState({currentContents : content})},
-                onCurrentTimeChanged: (e) => {this.setState({playTime : e})},
-                onChangeContent: (e) => {this.setState({content: e.id})}
+                onRenderContent: (content) => {
+                    this.setState({currentContents: content})
+                },
+                onCurrentTimeChanged: (e) => {
+                    this.setState({playTime: e})
+                },
+                onChangeContent: (e) => {
+                    this.setState({content: e.id})
+                },
+                onAudioLoaded: (e) => {
+                    console.log('audio loaded')
+                    this.setState({
+                        paused: e.paused,
+                        muted: e.muted,
+                        volume: e.volume,
+                    })
+                }
             };
 
             this._player = NestedPlayer(_options);
@@ -96,38 +120,73 @@ class Player extends React.Component {
         }
     }
 
-    _createBundle(lesson) {
+    _createBundle(lesson, key, isMain) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <PlayerWrapper
-            lesson={lesson}
-            lessonUrl={this.props.lessonUrl}
-            courseUrl={this.props.course.URL}
-            courseTitle={this.props.course.Name}
-            lessonCount={this.props.lessons.object.length}
-            content={this.state.currentContents}
-            currentContent={this.state.content}
-            onPause={::this._handlePause}
-            onPlay={::this._handlePlay}
-            onGoToContent={::this._handleGoToContent}
-            onSetRate={::this._handleSetRate}
-            playTime={this.state.playTime}
+        return <PlayerWrapper key={key}
+                              lesson={lesson}
+                              lessonUrl={this.props.lessonUrl}
+                              courseUrl={this.props.course.URL}
+                              courseTitle={this.props.course.Name}
+                              lessonCount={this.props.lessons.object.length}
+                              isMain={isMain}
+                              active={this.state.currentActive}
+                              content={this.state.currentContents}
+                              currentContent={this.state.content}
+                              onPause={::this._handlePause}
+                              onPlay={::this._handlePlay}
+                              onMute={() => {
+                                  if (this._player) {
+                                      this._player.mute()
+                                      this.setState({
+                                          muted: true
+                                      })
+                                  }
+                              }}
+                              onUnmute={() => {
+                                  if (this._player) {
+                                      this._player.unmute()
+                                      this.setState({
+                                          muted: false
+                                      })
+                                  }
+                              }}
+                              onSetVolume={(value) => {
+                                  if (this._player) {
+                                      this._player.setVolume(value)
+                                      this.setState({
+                                          volume: value
+                                      })
+                                  }
+                              }}
+                              onGoToContent={::this._handleGoToContent}
+                              onSetRate={::this._handleSetRate}
+                              playTime={this.state.playTime}
+                              volume={this.state.volume}
+                              muted={this.state.muted}
+                              paused={this.state.paused}
         />
     }
 
-    _handlePause(){
+    _handlePause() {
         if (this._player) {
             this._player.pause()
+            this.setState({
+                paused: true
+            })
         }
     }
 
-    _handlePlay(){
+    _handlePlay() {
         if (this._player) {
             this._player.play()
+            this.setState({
+                paused: false
+            })
         }
     }
 
@@ -149,11 +208,11 @@ class Player extends React.Component {
 
         if (!lesson) return _bundles;
 
-        _bundles.push(this._createBundle(lesson, 'lesson0'));
+        _bundles.push(this._createBundle(lesson, 'lesson0', true));
 
         if (lesson.Lessons) {
             lesson.Lessons.forEach((lesson, index) => {
-                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1)))
+                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
             });
         }
 
@@ -170,11 +229,23 @@ class Player extends React.Component {
         }
 
         let _anchors = [];
-        _anchors.push({name: 'lesson0', title: lesson.Name});
+        _anchors.push({
+            name: 'lesson0',
+            title: lesson.Name,
+            id: lesson.Id,
+            number: lesson.Number,
+            url: lesson.URL,
+        });
 
         lesson.Lessons.forEach((lesson, index) => {
-            _anchors.push({name: 'lesson' + (index + 1), title: lesson.Name})
-        })
+            _anchors.push({
+                name: 'lesson' + (index + 1),
+                title: lesson.Name,
+                id: lesson.Id,
+                number: lesson.Number,
+                url: lesson.URL,
+            })
+        });
 
         return _anchors
     }
@@ -185,7 +256,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
-            fixedElements: '.js-lectures-player-menu',
+            fixedElements: '.js-lectures-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -194,12 +265,40 @@ class Player extends React.Component {
                 return anchor.title
             }),
             css3: true,
+            lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
             recordHistory: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
+            onLeave: (index, nextIndex,) => {
+                $('.js-lectures-menu').hide();
+                let {id, number} = _anchors[nextIndex - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterLoad: (anchorLink, index) => {
+                let {id, number} = _anchors[index - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterRender: () => {
+                let _url = this.props.lessonUrl;
+                let _anchor = _anchors.find((anchor) => {
+                    return anchor.url === _url
+                })
+
+                if (_anchor) {
+                    $.fn.fullpage.silentMoveTo(_anchor.name);
+                }
+            }
         }
     }
 

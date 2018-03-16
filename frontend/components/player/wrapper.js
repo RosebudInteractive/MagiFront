@@ -15,6 +15,7 @@ class Wrapper extends Component {
         onPause: PropTypes.func,
         onSetRate:  PropTypes.func,
         onMute:  PropTypes.func,
+        onUnmute: PropTypes.func,
         onGoToContent: PropTypes.func,
         onChangeContent: PropTypes.func,
         onChangeTitle: PropTypes.func,
@@ -24,7 +25,12 @@ class Wrapper extends Component {
         return (
             <section className='fullpage-section lecture-wrapper'>
                 <div className="fp-tableCell">
-                    <Menu {...this.props} current={this.props.lesson.Number} total={this.props.lessonCount}/>
+                    <Menu {...this.props}
+                          current={this.props.lesson.Number}
+                          active={this.props.active}
+                          total={this.props.lessonCount}
+                          id={'lesson-menu-' + this.props.lesson.Id}
+                    />
                     <PlayerFrame {...this.props}/>
                 </div>
             </section>
