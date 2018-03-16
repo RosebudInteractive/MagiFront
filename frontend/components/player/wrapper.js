@@ -30,6 +30,7 @@ class Wrapper extends Component {
                           active={this.props.active}
                           total={this.props.lessonCount}
                           id={'lesson-menu-' + this.props.lesson.Id}
+                          parent={'player'}
                     />
                     <PlayerFrame {...this.props}/>
                 </div>

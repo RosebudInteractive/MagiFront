@@ -40,6 +40,7 @@ export default class Frame extends Component {
             content: [],
             currentToc: 0,
             currentRate: 1,
+            fullScreen: false,
         }
     }
 
@@ -56,6 +57,11 @@ export default class Frame extends Component {
             if (tooltips.has(e.target).length === 0) {
                 tooltips.removeClass('opened');
             }
+        });
+
+        $(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', () => {
+            let _isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+            this.setState({fullScreen : _isFullScreen})
         });
 
         // $(".scrollable").mCustomScrollbar();
@@ -200,6 +206,34 @@ export default class Frame extends Component {
         return this.state.content[this.state.currentToc]
     }
 
+    _toggleFullscreen() {
+        if (!document.fullscreenElement &&    // alternative standard method
+            !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+            }
+
+            // this.setState({fullScreen : true})
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+            // this.setState({fullScreen : false})
+        }
+    }
+
 
     render() {
         let _playTimeFrm = tools.getTimeFmt(this.props.playTime)
@@ -244,7 +278,7 @@ export default class Frame extends Component {
                                         onClick={::this._openContent}>
                                     <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
                                 </button>
-                                <button type="button" className="fullscreen-button js-fullscreen">
+                                <button type="button" className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')} onClick={::this._toggleFullscreen}>
                                     <svg className="full" width="20" height="18"
                                          dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                                     <svg className="normal" width="20" height="18"

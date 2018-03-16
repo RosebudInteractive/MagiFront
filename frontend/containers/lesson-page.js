@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import $ from 'jquery'
-import 'fullpage.js'
+// import 'fullpage.js'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -11,6 +11,7 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import LectureWrapper from '../components/lesson-page/lesson-wrapper'
 
 import {pages} from '../tools/page-tools';
+// import FullpageWrapper from '../components/fullpage-wrapper';
 
 class LessonPage extends React.Component {
 
@@ -30,7 +31,7 @@ class LessonPage extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
-        $('body').attr('data-page', 'fullpage');
+
         // window.addEventListener("resize", () => {
         //     let _isMobile = window.innerWidth < 900;
         //     if (_isMobile !== this.state.isMobile) {
@@ -47,10 +48,12 @@ class LessonPage extends React.Component {
 
     _mountFullpage() {
         // if (($(window).width() > 900)) {
-            let _container = $('#fullpage');
-            if ((!this._mountGuard) && (_container.length > 0)) {
+            let _container = $('#fullpage-lesson');
+            if ((!this._mountGuard) &&(_container.length > 0)){
+                $('body').attr('data-page', 'fullpage-lesson');
                 const _options = this._getFullpageOptions();
                 _container.fullpage(_options)
+                // FullpageWrapper.getInstance().mount('lesson', _options);
                 this._mountGuard = true;
             }
         // }
@@ -58,10 +61,24 @@ class LessonPage extends React.Component {
 
     _unmountFullpage() {
         if (this._mountGuard) {
+
             $.fn.fullpage.destroy(true)
+            // FullpageWrapper.getInstance().unmount('lesson');
             this._mountGuard = false
-            let _menu = $('.js-lectures-menu');
+            let _menu = $('.js-lesson-menu');
             _menu.remove();
+            // this._getAnchors().forEach((anchor) => {
+            //     let _menu = $('#lesson-menu-' + anchor.id);
+            //     _menu.remove();
+            // })
+
+            // let {id, number} = _anchors[nextIndex - 1];
+            // let _activeMenu = $('#lesson-menu-' + id);
+            // if (_activeMenu.length > 0) {
+            //     _activeMenu.show()
+            // }
+
+
         }
     }
 
@@ -155,7 +172,7 @@ class LessonPage extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
-            fixedElements: '.js-lectures-menu',
+            fixedElements: '.js-lesson-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -172,7 +189,7 @@ class LessonPage extends React.Component {
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
             onLeave: (index, nextIndex,) => {
-                $('.js-lectures-menu').hide();
+                $('.js-lesson-menu').hide();
                 let {id, number} = _anchors[nextIndex - 1];
                 let _activeMenu = $('#lesson-menu-' + id);
                 if (_activeMenu.length > 0) {
@@ -217,7 +234,7 @@ class LessonPage extends React.Component {
                 :
                 lessonInfo.object ?
                     <div>
-                        <div className='fullpage-wrapper' id='fullpage'>
+                        <div className='fullpage-wrapper' id='fullpage-lesson'>
                             {this._getLessonsBundles()}
                         </div>
 

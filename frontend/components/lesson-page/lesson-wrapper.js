@@ -28,7 +28,9 @@ export default class LessonWrapper extends React.Component {
                           current={this.props.lesson.Number}
                           active={this.props.active}
                           total={this.props.lessonCount}
-                          id={'lesson-menu-' + this.props.lesson.Id}/>
+                          id={'lesson-menu-' + this.props.lesson.Id}
+                          parent={'lesson'}
+                    />
                     <Link to={this.props.lesson.URL + "/transcript"} className="link-to-transcript">Транскрипт <br/>и
                         материалы</Link>
                     <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain} courseUrl={this.props.courseUrl}/>

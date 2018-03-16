@@ -12,6 +12,7 @@ import PlayerWrapper from '../components/player/wrapper'
 import NestedPlayer from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
+// import FullpageWrapper from '../components/fullpage-wrapper';
 
 class Player extends React.Component {
 
@@ -38,7 +39,7 @@ class Player extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.player);
-        $('body').attr('data-page', 'fullpage');
+
     }
 
     componentWillUnmount() {
@@ -55,12 +56,16 @@ class Player extends React.Component {
 
     _mountFullpage() {
         if (($(window).width() > 900)) {
-            let _container = $('#fullpage');
+            let _container = $('#fullpage-player');
             if ((!this._mountGuard) && (_container.length > 0)) {
+                $('body').attr('data-page', 'fullpage-player');
                 const _options = this._getFullpageOptions();
                 _container.fullpage(_options)
                 this._mountGuard = true;
             }
+            // const _options = this._getFullpageOptions();
+            // // _container.fullpage(_options)
+            // FullpageWrapper.getInstance().mount('player', 'fullpage-player', _options);
         }
     }
 
@@ -68,9 +73,10 @@ class Player extends React.Component {
         if (this._mountGuard) {
             $.fn.fullpage.destroy(true)
             this._mountGuard = false
-            let _menu = $('.js-lectures-menu');
+            let _menu = $('.js-player-menu');
             _menu.remove();
         }
+        // FullpageWrapper.getInstance().unmount('player');
     }
 
     _mountPlayer() {
@@ -256,7 +262,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
-            fixedElements: '.js-lectures-menu',
+            fixedElements: '.js-player-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -273,7 +279,7 @@ class Player extends React.Component {
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
             onLeave: (index, nextIndex,) => {
-                $('.js-lectures-menu').hide();
+                $('.js-player-menu').hide();
                 let {id, number} = _anchors[nextIndex - 1];
                 let _activeMenu = $('#lesson-menu-' + id);
                 if (_activeMenu.length > 0) {
@@ -318,7 +324,7 @@ class Player extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='fullpage-wrapper' id='fullpage'>
+                    <div className='fullpage-wrapper' id='fullpage-player'>
                         {this._getBundles()}
                     </div>
                     :

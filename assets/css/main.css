@@ -6550,7 +6550,14 @@ ul.user-tooltip {
     .lectures-menu .play-block {
       display: none; } }
 
-body[data-page="fullpage"] .lectures-menu {
+body[data-page="fullpage-lesson"] .lectures-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10; }
+
+body[data-page="fullpage-player"] .lectures-menu {
   position: fixed;
   top: 0;
   left: 0;
