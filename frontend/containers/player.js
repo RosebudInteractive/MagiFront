@@ -32,6 +32,7 @@ class Player extends React.Component {
         }
 
         this._lessonId = 0;
+        this._timer = null;
     }
 
     componentWillMount() {
@@ -112,7 +113,24 @@ class Player extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             this._mountFullpage();
+            this._mountMouseMoveHandler();
         });
+    }
+
+    _mountMouseMoveHandler() {
+        $(document).on('mousemove', function() {
+            $('body').removeClass('fade');
+            clearTimeout(this._timer);
+
+            this._timer = setTimeout(function() {
+                $('body').addClass('fade');
+            }, 7000);
+        });
+    }
+
+    _unmountMouseMoveHandler() {
+        $(document).off('mousemove');
+        clearTimeout(this._timer);
     }
 
     componentWillReceiveProps(nextProps) {

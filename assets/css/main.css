@@ -247,6 +247,8 @@ ul {
 @media (min-width: 601px) {
   .fade .player-block {
     opacity: 0; }
+  .fade .lectures-menu {
+    opacity: 0; }
   .fade .player-wrapper .link-to-transcript {
     opacity: 0;
     -webkit-transform: translateX(20px);
@@ -7062,7 +7064,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   transition: opacity 0.5s ease, -webkit-transform 0.5s ease;
   transition: opacity 0.5s ease, transform 0.5s ease;
   transition: opacity 0.5s ease, transform 0.5s ease, -webkit-transform 0.5s ease;
-  z-index: 1; }
+  z-index: 2; }
   @media (max-width: 1023px) {
     .link-to-transcript {
       right: 8px;

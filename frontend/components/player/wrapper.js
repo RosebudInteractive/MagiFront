@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom';
 
 import Menu from '../lesson-page/lesson-menu';
 import PlayerFrame from './frame'
@@ -23,8 +24,8 @@ class Wrapper extends Component {
 
     render() {
         return (
-            <section className='fullpage-section lecture-wrapper'>
-                <div className="fp-tableCell">
+            <section className='fullpage-section player-wrapper'>
+                {/*<div className="fp-tableCell">*/}
                     <Menu {...this.props}
                           current={this.props.lesson.Number}
                           active={this.props.active}
@@ -32,8 +33,9 @@ class Wrapper extends Component {
                           id={'lesson-menu-' + this.props.lesson.Id}
                           parent={'player'}
                     />
+                    <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + "/transcript"} className="link-to-transcript _reduced">Транскрипт <br/>и материалы</Link>
                     <PlayerFrame {...this.props}/>
-                </div>
+                {/*</div>*/}
             </section>
         )
     }
