@@ -118,13 +118,21 @@ class Player extends React.Component {
     }
 
     _mountMouseMoveHandler() {
-        $(document).on('mousemove', function() {
-            $('body').removeClass('fade');
-            clearTimeout(this._timer);
+        let that = this;
 
-            this._timer = setTimeout(function() {
-                $('body').addClass('fade');
-            }, 7000);
+        $(document).on('mousemove', () => {
+            $('body').removeClass('fade');
+            if (that._timer) {
+                clearTimeout(that._timer);
+            }
+
+            if (!that.state.paused) {
+                that._timer = setTimeout(function() {
+                    $('body').addClass('fade');
+                }, 7000);
+            } else {
+                that._timer = null
+            }
         });
     }
 
