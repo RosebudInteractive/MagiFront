@@ -38,7 +38,7 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} isActive={lesson.Number === this.props.current} lesson={lesson}
+            return <ListItem {...this.props} lesson={lesson}
                              key={index}/>
         });
     }
@@ -59,7 +59,8 @@ class ListItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
-        isActive: PropTypes.bool.isRequired
+        // currentNumber: PropTypes.string.isRequired,
+        active: PropTypes.string.isRequired
     };
 
     render() {
@@ -69,13 +70,16 @@ class ListItem extends React.Component {
     }
 
     _getReadyLesson(lesson) {
+        let _isActive = this.props.active === this.props.lesson.Number;
+
         return (
-            <li className={"lectures-list__item" + (this.props.isActive ? ' active' : '')}>
+            <li className={"lectures-list__item" + (_isActive ? ' active' : '')}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}/>
+                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL}
+                               courseUrl={this.props.courseUrl}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} parentNumber={lesson.Number} courseUrl={this.props.courseUrl}/>
+                <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
             </li>
         )
     }
@@ -116,8 +120,8 @@ class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string.isRequired,
         duration: PropTypes.string.isRequired,
-        courseUrl : PropTypes.string.isRequired,
-        lessonUrl : PropTypes.string.isRequired,
+        courseUrl: PropTypes.string.isRequired,
+        lessonUrl: PropTypes.string.isRequired,
     };
 
     render() {
@@ -138,7 +142,8 @@ class PlayBlock extends React.Component {
                                     strokeDasharray="565.48" strokeDashoffset="0"/>
                         </svg>
                     </div>
-                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="play-block__btn">
+                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl}
+                          className="play-block__btn">
                         <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
                     </Link>
                     <div className="play-block__tooltip">Смотреть</div>
@@ -164,17 +169,20 @@ class SubList extends React.Component {
 
     static propTypes = {
         subLessons: PropTypes.array.isRequired,
-        parentNumber: PropTypes.number.isRequired,
-        courseUrl: PropTypes.string.isRequired
+        courseUrl: PropTypes.string.isRequired,
+        active: PropTypes.string.isRequired,
     };
 
     _getItems() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
+        const {active} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
-            return <li className="lectures-sublist__item" key={index}>
-                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
-                    <h4 className="lectures-sublist__title">{lesson.Name}</h4>
+            let _isActive = lesson.Number === active;
+
+            return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}>
+                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-sublist__title">
+                    <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
                     <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
@@ -192,8 +200,8 @@ class SubList extends React.Component {
 
     render() {
         return this.props.subLessons.length > 0 ?
-            <ol start={this.props.parentNumber} className="lectures-item__body lectures-sublist">
-                {this._getItems()}
+            <ol className="lectures-item__body lectures-sublist">
+                {::this._getItems()}
             </ol>
             :
             null

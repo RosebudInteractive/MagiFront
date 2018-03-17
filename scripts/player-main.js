@@ -13,6 +13,12 @@ requirejs.config({
     }
 });
 
+import Player from "work-shop/player";
+import Loader from "work-shop/resource-loader";
+import 'jquery-ui/jquery-ui.js';
+import 'script-lib/binary-transport.js';
+import 'script-lib/mouseheld.js'
+
 var Utils = {};
 
 Utils.guid = function () {
@@ -23,11 +29,14 @@ Utils.guid = function () {
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();
-}
+};
 
+window.Utils = Utils;
 
-$(document).ready(function () {
-    require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
+(function ($) {
+    $(document).ready(function () {
+        // require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
+
 
         var o1 = getPlayerOptions();
         //var o2 = getPlayerOptions();
@@ -216,5 +225,6 @@ $(document).ready(function () {
                 })
         });
 
+        // });
     });
-});
+})(jQuery)

@@ -1,9 +1,8 @@
 //let { CategoriesService } = require('./../database/category');
 let { CategoriesService } = require('./../database/db-category');
-let { AuthenticateJWT } = require('../security/jwt-auth');
 
 function setupCategories(app) {
-    app.get('/api/categories', AuthenticateJWT(app), (req, res, next) => {
+    app.get('/api/categories', (req, res, next) => {
         CategoriesService()
             .getAll()
             .then(rows => {
@@ -14,7 +13,7 @@ function setupCategories(app) {
             });
     });
 
-    app.get('/api/categories/:id', AuthenticateJWT(app), (req, res, next) => {
+    app.get('/api/categories/:id', (req, res, next) => {
         CategoriesService()
             .get(parseInt(req.params.id))
             .then(rows => {
@@ -25,7 +24,7 @@ function setupCategories(app) {
             });
     });
 
-    app.post('/api/categories', AuthenticateJWT(app), (req, res, next) => {
+    app.post('/api/categories', (req, res, next) => {
         CategoriesService()
             .insert(req.body)
             .then(rows => {
@@ -36,7 +35,7 @@ function setupCategories(app) {
             });
     });
 
-    app.put('/api/categories/:id', AuthenticateJWT(app), (req, res, next) => {
+    app.put('/api/categories/:id', (req, res, next) => {
         CategoriesService()
             .update(parseInt(req.params.id), req.body)
             .then(rows => {
@@ -47,7 +46,7 @@ function setupCategories(app) {
             });
     });
 
-    app.delete('/api/categories/:id', AuthenticateJWT(app), (req, res, next) => {
+    app.delete('/api/categories/:id', (req, res, next) => {
         CategoriesService()
             .del(parseInt(req.params.id))
             .then(() => {

@@ -12,6 +12,7 @@ import PlayerWrapper from '../components/player/wrapper'
 import NestedPlayer from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
+// import FullpageWrapper from '../components/fullpage-wrapper';
 
 class Player extends React.Component {
 
@@ -24,9 +25,14 @@ class Player extends React.Component {
             current: 0,
             currentContents: [],
             playTime: 0,
+            content: 0,
+            paused: false,
+            muted: false,
+            volume: 0,
         }
 
         this._lessonId = 0;
+        this._timer = null;
     }
 
     componentWillMount() {
@@ -34,15 +40,44 @@ class Player extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.player);
+
+    }
+
+    componentWillUnmount() {
+        this._unmountFullpage();
+        $('body').removeAttr('data-page');
+    }
+
+    componentDidUpdate(prevProps) {
+        if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(this.props.courseUrl, this.props.lessonUrl);
+            this._unmountFullpage()
+        }
     }
 
     _mountFullpage() {
-        let _container = $('#fullpage');
-        if ((!this._mountGuard) && (_container.length > 0)) {
-            const _options = this._getFullpageOptions();
-            _container.fullpage(_options)
-            this._mountGuard = true;
+        if (($(window).width() > 900)) {
+            let _container = $('#fullpage-player');
+            if ((!this._mountGuard) && (_container.length > 0)) {
+                $('body').attr('data-page', 'fullpage-player');
+                const _options = this._getFullpageOptions();
+                _container.fullpage(_options)
+                this._mountGuard = true;
+            }
+            // const _options = this._getFullpageOptions();
+            // // _container.fullpage(_options)
+            // FullpageWrapper.getInstance().mount('player', 'fullpage-player', _options);
         }
+    }
+
+    _unmountFullpage() {
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy(true)
+            this._mountGuard = false
+            let _menu = $('.js-player-menu');
+            _menu.remove();
+        }
+        // FullpageWrapper.getInstance().unmount('player');
     }
 
     _mountPlayer() {
@@ -51,9 +86,24 @@ class Player extends React.Component {
             let _options = {
                 data: this.props.lessonPlayInfo.object,
                 div: _container,
-                onRenderContent: (content) => {this.setState({currentContents : content})},
-                onCurrentTimeChanged: (e) => {this.setState({playTime : e})}
-            }
+                onRenderContent: (content) => {
+                    this.setState({currentContents: content})
+                },
+                onCurrentTimeChanged: (e) => {
+                    this.setState({playTime: e})
+                },
+                onChangeContent: (e) => {
+                    this.setState({content: e.id})
+                },
+                onAudioLoaded: (e) => {
+                    console.log('audio loaded')
+                    this.setState({
+                        paused: e.paused,
+                        muted: e.muted,
+                        volume: e.volume,
+                    })
+                }
+            };
 
             this._player = NestedPlayer(_options);
             this._mountPlayerGuard = true;
@@ -63,12 +113,24 @@ class Player extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             this._mountFullpage();
+            this._mountMouseMoveHandler();
         });
     }
 
-    componentWillUnmount() {
-        document.getElementById('html').className = this._htmlClassName;
-        $.fn.fullpage.destroy('all');
+    _mountMouseMoveHandler() {
+        $(document).on('mousemove', function() {
+            $('body').removeClass('fade');
+            clearTimeout(this._timer);
+
+            this._timer = setTimeout(function() {
+                $('body').addClass('fade');
+            }, 7000);
+        });
+    }
+
+    _unmountMouseMoveHandler() {
+        $(document).off('mousemove');
+        clearTimeout(this._timer);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -82,36 +144,79 @@ class Player extends React.Component {
         }
     }
 
-    _createBundle(lesson) {
+    _createBundle(lesson, key, isMain) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
-        return <PlayerWrapper
-            lesson={lesson}
-            lessonUrl={this.props.lessonUrl}
-            courseUrl={this.props.course.URL}
-            courseTitle={this.props.course.Name}
-            lessonCount={this.props.lessons.object.length}
-            onPause={::this._handlePause}
-            onPlay={::this._handlePlay}
-            content={this.state.currentContents}
-            onGoToContent={::this._handleGoToContent}
-            playTime={this.state.playTime}
+        return <PlayerWrapper key={key}
+                              lesson={lesson}
+                              lessonUrl={this.props.lessonUrl}
+                              courseUrl={this.props.course.URL}
+                              courseTitle={this.props.course.Name}
+                              lessonCount={this.props.lessons.object.length}
+                              isMain={isMain}
+                              active={this.state.currentActive}
+                              content={this.state.currentContents}
+                              currentContent={this.state.content}
+                              onPause={::this._handlePause}
+                              onPlay={::this._handlePlay}
+                              onMute={() => {
+                                  if (this._player) {
+                                      this._player.mute()
+                                      this.setState({
+                                          muted: true
+                                      })
+                                  }
+                              }}
+                              onUnmute={() => {
+                                  if (this._player) {
+                                      this._player.unmute()
+                                      this.setState({
+                                          muted: false
+                                      })
+                                  }
+                              }}
+                              onSetVolume={(value) => {
+                                  if (this._player) {
+                                      this._player.setVolume(value)
+                                      this.setState({
+                                          volume: value
+                                      })
+                                  }
+                              }}
+                              onGoToContent={::this._handleGoToContent}
+                              onSetRate={::this._handleSetRate}
+                              playTime={this.state.playTime}
+                              volume={this.state.volume}
+                              muted={this.state.muted}
+                              paused={this.state.paused}
         />
     }
 
-    _handlePause(){
+    _handlePause() {
         if (this._player) {
             this._player.pause()
+            this.setState({
+                paused: true
+            })
         }
     }
 
-    _handlePlay(){
+    _handlePlay() {
         if (this._player) {
             this._player.play()
+            this.setState({
+                paused: false
+            })
+        }
+    }
+
+    _handleSetRate(value) {
+        if (this._player) {
+            this._player.setRate(value)
         }
     }
 
@@ -127,11 +232,11 @@ class Player extends React.Component {
 
         if (!lesson) return _bundles;
 
-        _bundles.push(this._createBundle(lesson, 'lesson0'));
+        _bundles.push(this._createBundle(lesson, 'lesson0', true));
 
         if (lesson.Lessons) {
             lesson.Lessons.forEach((lesson, index) => {
-                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1)))
+                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
             });
         }
 
@@ -148,11 +253,23 @@ class Player extends React.Component {
         }
 
         let _anchors = [];
-        _anchors.push({name: 'lesson0', title: lesson.Name});
+        _anchors.push({
+            name: 'lesson0',
+            title: lesson.Name,
+            id: lesson.Id,
+            number: lesson.Number,
+            url: lesson.URL,
+        });
 
         lesson.Lessons.forEach((lesson, index) => {
-            _anchors.push({name: 'lesson' + (index + 1), title: lesson.Name})
-        })
+            _anchors.push({
+                name: 'lesson' + (index + 1),
+                title: lesson.Name,
+                id: lesson.Id,
+                number: lesson.Number,
+                url: lesson.URL,
+            })
+        });
 
         return _anchors
     }
@@ -163,6 +280,7 @@ class Player extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper',
+            fixedElements: '.js-player-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -171,12 +289,40 @@ class Player extends React.Component {
                 return anchor.title
             }),
             css3: true,
+            lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
             recordHistory: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
+            onLeave: (index, nextIndex,) => {
+                $('.js-player-menu').hide();
+                let {id, number} = _anchors[nextIndex - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterLoad: (anchorLink, index) => {
+                let {id, number} = _anchors[index - 1];
+                let _activeMenu = $('#lesson-menu-' + id);
+                if (_activeMenu.length > 0) {
+                    _activeMenu.show()
+                }
+                this.setState({currentActive: number})
+            },
+            afterRender: () => {
+                let _url = this.props.lessonUrl;
+                let _anchor = _anchors.find((anchor) => {
+                    return anchor.url === _url
+                })
+
+                if (_anchor) {
+                    $.fn.fullpage.silentMoveTo(_anchor.name);
+                }
+            }
         }
     }
 
@@ -196,7 +342,7 @@ class Player extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='fullpage-wrapper' id='fullpage'>
+                    <div className='fullpage-wrapper' id='fullpage-player'>
                         {this._getBundles()}
                     </div>
                     :

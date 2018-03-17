@@ -1,5 +1,6 @@
 const uccelloDir = '../../Uccello2';
 const path = require('path');
+const config = require('config');
 
 const USER_MODEL_NAME = "User";
 
@@ -10,42 +11,43 @@ exports.DbEngineInit = class DbEngineInit {
         var autoImportFlag = false;
         var autoImportImgFlag = false;
 
-        var impDir = __dirname + "/data/";
+        var impDir = path.join(__dirname, "/data/");
         var is_impDir_next = false;
         
-        var httpPort = options && options.http && options.http.port ? options.http.port : 3000;
+        var httpPort = options && options.http && options.http.port ? options.http.port :
+            (config.has('httpPort') ? config.get('httpPort') : 3000);
         var is_httpPort_next = false;
 
-        var provider = null;
+        var provider = config.has('dbProvider') ? config.get('dbProvider') : null;
         var is_provider_next = false;
 
-        var host = null;
+        var host = provider && config.has('connections.' + provider + '.host') ? config.get('connections.' + provider + '.host') : null;
         var is_host_next = false;
 
-        var port = null;
+        var port = provider && config.has('connections.' + provider + '.port') ? config.get('connections.' + provider + '.port') : null;
         var is_port_next = false;
 
-        var instance = null;
+        var instance = provider && config.has('connections.' + provider + '.instance') ? config.get('connections.' + provider + '.instance') : null;
         var is_instance_next = false;
 
-        var user = null;
+        var user = provider && config.has('connections.' + provider + '.username') ? config.get('connections.' + provider + '.username') : null;
         var is_user_next = false;
 
-        var pwd = null;
+        var pwd = provider && config.has('connections.' + provider + '.password') ? config.get('connections.' + provider + '.password') : null;
         var is_pwd_next = false;
 
-        var dbname = null;
+        var dbname = provider && config.has('connections.' + provider + '.database') ? config.get('connections.' + provider + '.database') : null;
         var is_dbname_next = false;
 
-        var sqlTrace = false;
-        var importFileTrace = false;
+        var sqlTrace = config.has('trace.sqlTrace') ? config.get('trace.sqlTrace') : false;
+        var importFileTrace = config.has('trace.importFileTrace') ? config.get('trace.importFileTrace') : false;
 
         for (var _cnt = 0; _cnt < process.argv.length; _cnt++) {
             var _arg = process.argv[_cnt];
 
             if (is_impDir_next) {
                 is_impDir_next = false;
-                impDir = path.normalize(__dirname + "/../" + _arg + "/");
+                impDir = path.isAbsolute(_arg) ? _arg : path.normalize(path.join(__dirname, path.sep + ".." + path.sep, _arg, path.sep));
                 continue;
             }
 
@@ -203,7 +205,15 @@ exports.DbEngineInit = class DbEngineInit {
         };
 
         var USE_MSSQL_SERVER = (process.env.DB_TYPE === 'ms_sql') || (provider === "mssql");
-
+        let connection = USE_MSSQL_SERVER ? mssql_connection : mysql_connection;
+        if (provider) {
+            if (config.has('connections.' + provider + '.connection_options'))
+                connection.connection_options = config.get('connections.' + provider + '.connection_options');
+            if (config.has('connections.' + provider + '.provider_options'))
+                connection.provider_options = config.get('connections.' + provider + '.provider_options');
+            if (config.has('connections.' + provider + '.pool'))
+                connection.pool = config.get('connections.' + provider + '.pool');
+        };
         const UccelloConfig = require(uccelloDir + '/config/config');
         global.UCCELLO_CONFIG = new UccelloConfig({
             dataPath: impDir,

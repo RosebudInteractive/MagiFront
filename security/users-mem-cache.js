@@ -1,10 +1,10 @@
 'use strict'
 const { UsersBaseCache }= require('./users-base-cache');
 
-exports.UsersMemCache = class UsersMemCache extends UsersBaseCache {
+class UsersMemCache extends UsersBaseCache {
 
-    constructor(userFields, opts) {
-        super(userFields, opts);
+    constructor(opts) {
+        super(opts);
         this._users = {};
     }
 
@@ -42,4 +42,16 @@ exports.UsersMemCache = class UsersMemCache extends UsersBaseCache {
             resolve(res ? true : false);
         }).bind(this));
     }
+
+    _destroyToken(token) {
+        return new Promise((resolve)=>{
+            delete this._users[token];
+            resolve();
+        })
+    }
+}
+
+let usersMemCache = null;
+exports.UsersMemCache = (opts) => {
+    return usersMemCache ? usersMemCache : new UsersMemCache(opts);
 }

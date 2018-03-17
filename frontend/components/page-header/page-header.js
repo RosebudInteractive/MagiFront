@@ -36,6 +36,11 @@ class Header extends React.Component {
         }
     }
 
+    _getLessonInfo(info){
+        let _subLesson = info.object.Lessons;
+        return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+    }
+
     render() {
         let _menuOpened = this.props.pageHeaderState.showMenu;
         let _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!this.props.visible ? ' _animate' : ''));
@@ -64,7 +69,7 @@ class Header extends React.Component {
                             courseUrl={this.props.courseUrl}
                             courseTitle={this.props.lessonInfo.course.Name}
                             total={this.props.lessons.object.length}
-                            current={this.props.lessonInfo.object.Number}
+                            current={::this._getLessonInfo(this.props.lessonInfo).Number}
                             episodes={this.props.lessonText.episodes}
                         />
                         :

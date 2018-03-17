@@ -46,6 +46,9 @@ class NestedPlayer {
         this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
+        this._onChangeTitle = options.onChangeTitle;
+        this._onChangeContent = options.onChangeContent;
+        this._onAudioLoaded = options.onAudioLoaded;
     }
 
     _applyData(data) {
@@ -67,6 +70,21 @@ class NestedPlayer {
         this.pl.setPosition(begin)
     }
 
+    setRate(value) {
+        this.pl.setRate(value)
+    }
+
+    mute() {
+        this.pl.setMute(true)
+    }
+
+    unmute() {
+        this.pl.setMute(false)
+    }
+
+    setVolume(value) {
+        this.pl.setVolume(value)
+    }
 
     _renderContent(content) {
         this._onRenderCotent(content)
@@ -105,9 +123,6 @@ class NestedPlayer {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
             },
-            onAudioLoaded: function () {
-                that.pl.play()
-            },
             onSetPosition: function () {
             },
             onFocused: function () {
@@ -126,6 +141,23 @@ class NestedPlayer {
                 }
 
                 $("#titles-place").html(html);
+            },
+            onChangeContent: (content) => {
+                if (that._onChangeContent) {
+                    that._onChangeContent(content)
+                }
+            },
+            onAudioInitialized(state){
+                if (that._onAudioLoaded) {
+                    // let _state = that.pl._audioState;
+                    that._onAudioLoaded({
+                        currentTime: state.currentTime,
+                        muted: state.muted,
+                        rate: state.playbackRate,
+                        volume: state.volume,
+                        paused: state.stopped
+                    })
+                }
             }
         };
     }

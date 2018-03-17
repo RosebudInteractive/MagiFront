@@ -9,7 +9,8 @@ const _prodConfig = {
     entry: {
         "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
-        adm: './src/index'
+        adm: './src/index',
+        'player-main': './scripts/player-main',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -29,6 +30,8 @@ const _prodConfig = {
                     path.resolve(__dirname, "src"),
                     path.resolve(__dirname, "frontend"),
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                    path.resolve(__dirname, 'node_modules/fullpage.js'),
+                    path.resolve(__dirname, 'scripts/lib'),
                 ],
                 // language=JSRegexp
                 test: /\.js$/
@@ -88,6 +91,7 @@ const _devConfig = {
 
         main: './frontend/index',
         adm: './src/index',
+        'player-main': './scripts/player-main',
     },
     output: {
         path: path.join(__dirname, 'static'),

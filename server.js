@@ -6,7 +6,7 @@
 let webpack = require('webpack')
 let webpackDevMiddleware = require('webpack-dev-middleware');
 let webpackHotMiddleware = require('webpack-hot-middleware');
-let config = require('./webpack.config');
+let webpackConfig = require('./webpack.config');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
@@ -19,22 +19,27 @@ let log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const { FileUpload } = require("./database/file-upload");
+const path = require('path');
+const config = require('config');
 
 //bld.initDatabase()
 Promise.resolve()
     .then(() => {
         // log.info("Init Db succeded!")
-        let path = require('path');
 
         // Prepare http server
         let express = require('express');
+
         let app = new express();
+        if (NODE_ENV === 'production')
+            app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
+
         let port = magisteryConfig.http.port;
 
         if (NODE_ENV === 'development') {
-            let compiler = webpack(config);
+            let compiler = webpack(webpackConfig);
             try {
-                app.use(webpackDevMiddleware(compiler, {noInfo: true, publicPath: config.output.publicPath}));
+                app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath}));
                 app.use(webpackHotMiddleware(compiler));
             }
             catch (e) {
@@ -57,7 +62,6 @@ Promise.resolve()
         app.use("/css", express.static(path.join(__dirname, 'assets', 'css')));
         app.use("/images", express.static(path.join(__dirname, 'assets', 'images')));
         app.use("/scripts", express.static(__dirname + '/scripts'));
-        //app.use('/data', express.static(__dirname + '/data'));
 
         app.get('/genData2', function (req, res) {
             var obj;
@@ -97,7 +101,6 @@ Promise.resolve()
 
 
         app.use('/assets', express.static('assets'));
-        app.use('/data', express.static('../uploads'));
 
         let { setupAPI } = require("./services/setup");
         setupAPI(express, app);
@@ -122,7 +125,7 @@ Promise.resolve()
         //     res.sendFile(__dirname + '/adm-index.html');
         // });
 
-        app.post('/upload', FileUpload.getFileUploadProc());
+        app.post('/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
 
         app.listen(port, function (error) {
             if (error) {

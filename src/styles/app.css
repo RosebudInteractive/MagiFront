@@ -51,7 +51,7 @@
 .cover {
     width: 360px;
     height: auto;
-    border-radius: 100%; /* Радиус скругления */
+    /*border-radius: 100%; !* Радиус скругления *!*/
     /*box-shadow: 0 0 0 3px green, 0 0 13px #333; !* Параметры теней *!*/
     /*display: none;*/
 }
