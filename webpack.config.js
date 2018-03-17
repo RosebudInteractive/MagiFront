@@ -9,7 +9,8 @@ const _prodConfig = {
     entry: {
         "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
-        adm: './src/index'
+        adm: './src/index',
+        'player-main': './scripts/player-main',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -90,6 +91,7 @@ const _devConfig = {
 
         main: './frontend/index',
         adm: './src/index',
+        'player-main': './scripts/player-main',
     },
     output: {
         path: path.join(__dirname, 'static'),

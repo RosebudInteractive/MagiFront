@@ -252,7 +252,6 @@ export default class Frame extends Component {
                             :
                             null
                     }
-
                     <div className="player-block">
                         <Progress total={this.state.totalDuration} current={this.props.playTime}
                                   content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
@@ -310,7 +309,6 @@ export default class Frame extends Component {
                                             </div>
                                         </div>
                                     </div>
-
                                 </ol>
                             </div>
                             <div
