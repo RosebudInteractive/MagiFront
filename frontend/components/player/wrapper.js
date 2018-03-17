@@ -25,7 +25,6 @@ class Wrapper extends Component {
     render() {
         return (
             <section className='fullpage-section player-wrapper'>
-                {/*<div className="fp-tableCell">*/}
                     <Menu {...this.props}
                           current={this.props.lesson.Number}
                           active={this.props.active}
@@ -35,7 +34,6 @@ class Wrapper extends Component {
                     />
                     <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + "/transcript"} className="link-to-transcript _reduced">Транскрипт <br/>и материалы</Link>
                     <PlayerFrame {...this.props}/>
-                {/*</div>*/}
             </section>
         )
     }

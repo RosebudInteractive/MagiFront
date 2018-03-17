@@ -44,11 +44,10 @@ export default class Frame extends Component {
         }
     }
 
-    componentWillMount() {
-        // this.setState({
-        //     pause : this.props.paused,
-        //     muted : this.props.muted,
-        // })
+    componentWillUnmount() {
+        if (this.state.fullScreen) {
+            this._toggleFullscreen()
+        }
     }
 
     componentDidMount() {
@@ -63,8 +62,6 @@ export default class Frame extends Component {
             let _isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
             this.setState({fullScreen : _isFullScreen})
         });
-
-        // $(".scrollable").mCustomScrollbar();
     }
 
 
@@ -126,7 +123,7 @@ export default class Frame extends Component {
             length += episodeContent.duration;
 
             episodeContent.content.forEach((item) => {
-                _items.push({id: item.id, title: item.title, begin: item.begin})
+                _items.push({id: item.id, title: item.title, begin: item.begin, episodeTitle: episodeContent.title})
             })
         })
 
@@ -147,7 +144,7 @@ export default class Frame extends Component {
     }
 
     _onPause() {
-        if (this.state.pause) {
+        if (this.props.paused) {
             this.props.onPlay()
         }
         else {
@@ -176,20 +173,14 @@ export default class Frame extends Component {
     }
 
     _onToggleMute() {
-        if (this.state.muted) {
+        if (this.props.muted) {
             if (this.props.onUnmute) {
                 this.props.onUnmute()
             }
-            this.setState({
-                muted: false
-            })
         } else {
             if (this.props.onMute) {
                 this.props.onMute()
             }
-            this.setState({
-                muted: true
-            })
         }
     }
 
@@ -203,7 +194,9 @@ export default class Frame extends Component {
     }
 
     _getCurrentContent() {
-        return this.state.content[this.state.currentToc]
+        return this.state.content.find((item) => {
+            return item.id === this.state.currentToc
+        })
     }
 
     _toggleFullscreen() {
@@ -234,6 +227,7 @@ export default class Frame extends Component {
 
     render() {
         let _playTimeFrm = tools.getTimeFmt(this.props.playTime)
+        let _currentContent = this._getCurrentContent();
 
         const
             _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
@@ -247,8 +241,12 @@ export default class Frame extends Component {
                     <div className='ws-container' id='player'>
                     </div>
                 </div>
-                {this.props.paused ? <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={::this._getCurrentContent()}/> : null}
+                {this.props.paused ? <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}/> : null}
                 <div className="player-frame">
+                    <div className="player-frame__poster-text">
+                        <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
+                        <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
+                    </div>
                     <div className="player-block">
                         <Progress total={this.state.totalDuration} current={this.props.playTime}
                                   content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
