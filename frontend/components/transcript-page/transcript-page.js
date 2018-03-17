@@ -29,7 +29,7 @@ class TextBlock extends React.Component {
 
     _parseTranscript(episode) {
         let _div = [];
-        const _re = /^<h2>(.*?)<\/h2>/gim;
+        const _re = /^<h2>(.+)<\/h2>/gim;
         let _matches;
 
         let _text = episode.Transcript;
@@ -44,7 +44,8 @@ class TextBlock extends React.Component {
             let _content = '';
 
             if (_index > -1) {
-                _content = _text.substr(0, _index)
+                // _content = _text.substr(0, _index)
+                _content = _text.slice(0, _index)
             } else {
                 _content = _text
             }
@@ -60,6 +61,8 @@ class TextBlock extends React.Component {
                     <div dangerouslySetInnerHTML={{__html: _content}}/>
                 </p>
             </div>)
+
+            _re.lastIndex = 0;
         }
 
         return _div
@@ -103,7 +106,7 @@ class Refs extends React.Component {
 
     render() {
         return (
-            <div className="literature-sources">
+            <div className="literature-sources" id="recommend">
                 <h3 className="literature-sources__title">Источники</h3>
                 <ol className="sources-list">
                     {this._getList()}
