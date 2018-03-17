@@ -243,10 +243,16 @@ export default class Frame extends Component {
                 </div>
                 {this.props.paused ? <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}/> : null}
                 <div className="player-frame">
-                    <div className="player-frame__poster-text">
-                        <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
-                        <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
-                    </div>
+                    {
+                        !this.props.paused ?
+                            <div className="player-frame__poster-text">
+                                <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
+                                <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
+                            </div>
+                            :
+                            null
+                    }
+
                     <div className="player-block">
                         <Progress total={this.state.totalDuration} current={this.props.playTime}
                                   content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
