@@ -19,7 +19,6 @@ define(
         const PTR_SCROLL_NONE = "none";
         // view will be scrolled if pointer is closer then
         const PTR_SCROLL_BOUND = 150;
-        var rates = [0.5, 1, 2];
 
         function compareElements(a,b) {
             if (a.start < b.start)
@@ -456,17 +455,17 @@ define(
                     zIndex: 10,
                     scroll: false,
                     start: (event, ui) => {
-                        var uiHelper = $(ui.helper);
+                        let uiHelper = $(ui.helper);
                         uiHelper.addClass("focused");
                         uiHelper.data = function(v) { return {start: elItem.data('data').start, duration: elItem.data('data').content.duration}};
                         that._setSideTime.bind(this, uiHelper)();
                         elItem.hide();
                     },
-                    over: (event, ui) => {
+                    over: () => {
 
                     },
                     drag: ( event, ui ) => {
-                      var track_list = $('ws-tracks-list-content');
+                      //var track_list = $('ws-tracks-list-content');
                       var sc = $('.ws-tracks-list-scroll');
                       // scroll treshold
                       var st = 10;
@@ -580,7 +579,7 @@ define(
               var st = elItem.find('.ws-element-left-time');
               var et = elItem.find('.ws-element-right-time');
               st.html(msToTime(elData.start*1000));
-              et.html(msToTime((elData.start + elData.content.duration)*1000));
+              et.html(msToTime((elData.start + elData.duration)*1000));
             }
 
             _hideSideTime(elItem) {
@@ -994,7 +993,11 @@ define(
                         bottom: 40
                     },
                     content: {
-                        duration: p.duration
+                        duration: p.duration,
+                        effects:[
+                            {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
+                        ],
+                        track: trackId,
                     },
                     effects:[
                         {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
@@ -1060,14 +1063,15 @@ define(
                 // if player width = 160, then 30% is
                 var w = 30;
                 var actualWidth = 160 * 0.3;
-                var pictRatio = assData.size.height / assData.size.width;
+                var pictRatio = assData.info.size.height / assData.info.size.width;
                 var actualHeight = actualWidth * pictRatio;
                 // calculate actualHeight's %
                 var h = actualHeight / 90 * 100;
 
                 var element = {
                     id: Utils.guid(),
-                    asset: {id: ui.draggable.attr("id"), body: null},
+                    assetId: assData.id,
+                    asset: assData,
                     start: startTime,
                     position: {
                         left: 0,
@@ -1076,7 +1080,8 @@ define(
                         bottom: 100 - 0 - h
                     },
                     content: {
-                        duration: p.duration
+                        duration: p.duration,
+                        track: trackId
                     },
                     effects:[
                         {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}

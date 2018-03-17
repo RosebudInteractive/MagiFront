@@ -19,7 +19,7 @@ define (
                     loadingAudio: {},
                     loaderInt: null,
                     disableChange: false
-                }
+                };
 
                 /*
                 {
@@ -32,9 +32,9 @@ define (
                 this._state.loadedData = {
                     assets: {},
                     audios: {}
-                }
+                };
 
-                this._state.loadedAudio = {}
+                this._state.loadedAudio = {};
 
                 this._recheck = false;
 
@@ -54,9 +54,9 @@ define (
                 this._state.data = $.extend(true, {}, data);
 
                 this._state.episodeStarts = {};
-                var cur = 0;
-                for (var i = 0; i < this._state.data.episodes.length; i++) {
-                    var e = this._state.data.episodes[i];
+                let cur = 0;
+                for (let i = 0; i < this._state.data.episodes.length; i++) {
+                    let e = this._state.data.episodes[i];
                     this._state.episodeStarts[e.id] = {
                         start: cur,
                         end: cur + (+e.audio.info.length),
@@ -79,15 +79,15 @@ define (
             }
 
             _makeTracks(episodes) {
-                for (var i = 0; i < episodes.length; i++) {
-                    var episode = episodes[i];
-                    var start = this._state.episodeStarts[episode.id];
-                    var tracks = [];
-                    var tracksIdx = {};
-                    for (var j = 0; j < episode.elements.length; j++) {
-                        var el = episode.elements[j];
-                        var tId = el.content.track;
-                        var track = null;
+                for (let i = 0; i < episodes.length; i++) {
+                    let episode = episodes[i];
+                    let start = this._state.episodeStarts[episode.id];
+                    let tracks = [];
+                    let tracksIdx = {};
+                    for (let j = 0; j < episode.elements.length; j++) {
+                        let el = episode.elements[j];
+                        let tId = el.content.track;
+                        let track = null;
                         if (tracksIdx[tId] === undefined) {
                             track = {id : tId, elements: []};
                             tracksIdx[tId] = tracks.length;
@@ -105,7 +105,7 @@ define (
                     });
 
                     episode.tracks = tracks;
-                    episode.tractsIdx = tracksIdx;
+                    episode.tracksIdx = tracksIdx;
                 }
             }
 
@@ -113,9 +113,9 @@ define (
                 assets = assets || [];
                 if (!Array.isArray(assets)) assets = [assets];
 
-                var assetsIdx = {};
-                for (var i = 0; i < assets.length; i++) {
-                    var a = assets[i];
+                let assetsIdx = {};
+                for (let i = 0; i < assets.length; i++) {
+                    let a = assets[i];
                     if (a.id) assetsIdx[a.id] = a;
                 }
 
@@ -149,11 +149,11 @@ define (
                 if (!Array.isArray(ids)) ids = [ids];
 
                 return new Promise((resolve, reject) => {
-                    var beg = new Date();
+                    let beg = new Date();
                     console.log("try to get 1", ids)
-                    var result = this._getFromLoaded(ids);
+                    let result = this._getFromLoaded(ids);
                     if (!result.success) {
-                        var int = setInterval(() => {
+                        let int = setInterval(() => {
                             console.log("try to get 2", ids)
                             result = this._getFromLoaded(ids);
                             console.log("get result 2", ids)
@@ -163,7 +163,7 @@ define (
                                 return;
                             }
 
-                            var now = new Date();
+                            let now = new Date();
                             if (now.getTime() - beg.getTime() > FAIL_TIME * 1000) {
                                 clearInterval(int);
                                 reject("timeout: " + JSON.stringify(ids));
@@ -177,10 +177,10 @@ define (
 
             getAudioResource(id) {
                 return new Promise((resolve, reject) => {
-                    var beg = new Date();
-                    var result = this._getFromLoadedAudios(id);
+                    let beg = new Date();
+                    let result = this._getFromLoadedAudios(id);
                     if (!result.success) {
-                        var int = setInterval(() => {
+                        let int = setInterval(() => {
                             result = this._getFromLoadedAudios(id);
                             if (result.success) {
                                 clearInterval(int);
@@ -188,7 +188,7 @@ define (
                                 return;
                             }
 
-                            var now = new Date();
+                            let now = new Date();
                             if (now.getTime() - beg.getTime() > FAIL_AUDIO_TIME * 1000) {
                                 clearInterval(int);
                                 reject("timeout");
@@ -201,7 +201,7 @@ define (
             }
 
             _getFromLoadedAudios(id) {
-                var result = {
+                let result = {
                     success: false,
                     audio: null
                 }
@@ -210,10 +210,10 @@ define (
                     return false;
                 }
 
-                var a = {
+                let a = {
                     id: id
                 };
-                var loaded = this._state.loadedData.audios[id];
+                let loaded = this._state.loadedData.audios[id];
                 a.data = loaded;
 
                 result.success = true;
@@ -222,20 +222,20 @@ define (
             }
 
             _getFromLoaded(ids) {
-                var result = {
+                let result = {
                     success: false,
                     assets: []
                 }
-                for (var i = 0; i < ids.length; i++) {
-                    var id = ids[i];
+                for (let i = 0; i < ids.length; i++) {
+                    let id = ids[i];
                     if (!this._state.loadedData.assets[id]) {
                         return false;
                     }
 
-                    var a = {
+                    let a = {
                         id: id
                     };
-                    var loadedAsset = this._state.loadedData.assets[id];
+                    let loadedAsset = this._state.loadedData.assets[id];
 
                     switch (this._state.mode) {
                         case 0:
@@ -279,8 +279,8 @@ define (
                     this._checkAssets();
                 }
 
-                var nearestIds = this._getNearestAssets();
-                var notLoadedIds = this._getNotLoaded(nearestIds);
+                let nearestIds = this._getNearestAssets();
+                let notLoadedIds = this._getNotLoaded(nearestIds);
                 // if there was critical changes, then immediately load these assets
                 // if (notLoadedIds.length > 0)
                 //     console.log("push to queue", notLoadedIds)
@@ -291,15 +291,15 @@ define (
             }
 
             _monitorAudios() {
-                var audios = this._getNearestAudios();
-                var notLoaded = this._getNotLoadedAudios(audios);
+                let audios = this._getNearestAudios();
+                let notLoaded = this._getNotLoadedAudios(audios);
 
                 this._pushToAudioQueue(this._recheck, notLoaded);
             }
 
             _getNotLoadedAudios(ids) {
-                var notLoaded = []
-                for (var i = 0; i < ids.length; i++) {
+                let notLoaded = [];
+                for (let i = 0; i < ids.length; i++) {
                     if (!this._state.loadedData.audios[ids[i]]) {
 
                         notLoaded.push(ids[i]);
@@ -310,15 +310,15 @@ define (
             }
 
             _getNearestAudios(position) {
-                var ids = [];
-                var position = position === undefined ? this._position : position;
-                var episode = this._getEpisodeAt(position);
+                let ids = [];
+                position = position === undefined ? this._position : position;
+                let episode = this._getEpisodeAt(position);
                 if (episode) {
                     ids.push(episode.audio.file);
                 }
 
-                for (var eId in this._state.episodeStarts) {
-                    var e = this._state.episodeStarts[eId];
+                for (let eId in this._state.episodeStarts) {
+                    let e = this._state.episodeStarts[eId];
                     if (e.start > position && e.start - position <= PRELOAD_AUDIO_TIME) {
                         ids.push(e.episode.audio.file);
                     }
@@ -329,7 +329,7 @@ define (
 
             _pushToAudioQueue(toTop, ids) {
                 if (ids.length == 0) return;
-                for (var i = 0; i < ids.length; i++) {
+                for (let i = 0; i < ids.length; i++) {
                     if (!this._alreadyInAudioQueue(ids[i])) {
                         if (toTop) this._state.loadAudioQueue.unshift(ids[i]);
                         else this._state.loadAudioQueue.push(ids[i]);
@@ -338,7 +338,7 @@ define (
             }
 
             _alreadyInAudioQueue(id) {
-                for (var i = 0; i < this._state.loadAudioQueue.length; i++) {
+                for (let i = 0; i < this._state.loadAudioQueue.length; i++) {
                     if (this._state.loadAudioQueue[i] == id) return true;
                 }
 
@@ -348,7 +348,7 @@ define (
             _pushToQueue(toTop, ids) {
                 if (ids.length == 0) return;
 
-                for (var i = 0; i < ids.length; i++) {
+                for (let i = 0; i < ids.length; i++) {
                     if (toTop) this._state.loadQueue.unshift(ids[i]);
                     else this._state.loadQueue.push(ids[i]);
                 }
@@ -359,17 +359,17 @@ define (
             }
 
             _getNearestAssets(position) {
-                var ids = [];
+                let ids = [];
 
                 position = position === undefined ? this._position : position;
-                 var episode = this._getEpisodeAt(position);
+                 let episode = this._getEpisodeAt(position);
                  if (!episode) return ids;
 
-                for (var i = 0; i < episode.tracks.length; i++) {
-                    var track = episode.tracks[i];
+                for (let i = 0; i < episode.tracks.length; i++) {
+                    let track = episode.tracks[i];
 
-                    for (var j = 0; j < track.elements.length; j++) {
-                        var el = track.elements[j];
+                    for (let j = 0; j < track.elements.length; j++) {
+                        let el = track.elements[j];
 
                         if (!el.assetId) continue;
                         if (el.start + el.content.duration < position) continue;
@@ -385,8 +385,8 @@ define (
             }
 
             _getEpisodeAt(position) {
-                for (var eId in this._state.episodeStarts) {
-                    var e = this._state.episodeStarts[eId];
+                for (let eId in this._state.episodeStarts) {
+                    let e = this._state.episodeStarts[eId];
                     if (position >= e.start && position <= e.end) {
                         return e.episode;
                     }
@@ -396,17 +396,17 @@ define (
             }
 
             _getNotLoaded(ids) {
-                var notLoaded = [];
+                let notLoaded = [];
 
-                for (var i = 0; i < ids.length; i++) {
-                    var id = ids[i];
-                    var l = this._state.loadedData.assets[id];
+                for (let i = 0; i < ids.length; i++) {
+                    let id = ids[i];
+                    let l = this._state.loadedData.assets[id];
                     if (!l) {
                         notLoaded.push(id);
                         continue;
                     }
 
-                    var mode = this._state.mode;
+                    let mode = this._state.mode;
                     if ((mode == 0 && !l.s) ||
                         (mode == 1 && !l.m) ||
                         (mode == 2 && !l.l)
@@ -429,7 +429,7 @@ define (
             }
 
             _createImageUrl(imgData, type) {
-                var blob = new Blob([imgData], {
+                let blob = new Blob([imgData], {
                     type: (type || 'image/*')
                 });
                 return URL.createObjectURL(blob);
@@ -439,18 +439,18 @@ define (
                 if (this._state.loadQueue.length == 0) return;
                 (function (that) {
                     that._state.loaderInt = null;
-                    var id = that._state.loadQueue.shift();
+                    let id = that._state.loadQueue.shift();
                     while (that._alreadyLoadedAsset(id)) {
                         if (that._state.loadQueue.length == 0) {
                             return;
                         }
                         id = that._state.loadQueue.shift();
                     }
-                    var asset = that._state.assetsIdx[id];
-                    var mode = that._state.mode;
+                    let asset = that._state.assetsIdx[id];
+                    let mode = that._state.mode;
                     if (asset) {
                         that._state.loading[id] = true;
-                        var url = "/data/" + asset.file;
+                        let url = "/data/" + asset.file;
                         $.ajax({
                             url: url,
                             type: "GET",
@@ -458,16 +458,16 @@ define (
                             processData: false,
                             responseType: 'arraybuffer',
                             success: function (result) {
-                                var loaded = that._state.loadedData.assets[id];
+                                let loaded = that._state.loadedData.assets[id];
                                 if (!loaded) {
                                     loaded = {
                                         id: id
                                     }
                                 }
 
-                                var b = that._createImageUrl(result, asset.info["mime-type"])
+                                let b = that._createImageUrl(result, asset.info["mime-type"])
 
-                                var res = {
+                                let res = {
                                     url: url,
                                     body: b
                                 }
@@ -496,7 +496,7 @@ define (
                     return;
                 }
 
-                var id = this._state.loadAudioQueue.shift();
+                let id = this._state.loadAudioQueue.shift();
                 while (this._alreadyLoadedAudio(id)) {
                     id = this._state.loadAudioQueue.shift();
                     if (this._state.loadAudioQueue.length == 0) {
@@ -505,8 +505,8 @@ define (
                 }
 
                 if (id && !this._alreadyLoadedAudio(id)) {
-                    var url = "/data/" + id;
-                    var audio = new Audio();
+                    let url = "/data/" + id;
+                    let audio = new Audio();
                     audio.preload = true;
                     audio.src = url;
                     this._state.loadedData.audios[id] = {

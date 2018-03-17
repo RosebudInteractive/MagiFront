@@ -74,7 +74,7 @@ define(
             }
 
             setRate(rate) {
-                if (this._playState.rate == +rate) return
+                if (this._playState.rate == +rate) return;
                 this._playState.rate = +rate;
                 if (!this._playState.stopped) {
                     this.pause();
@@ -396,58 +396,7 @@ define(
               return resource;
             }
 
-            _setEvents(item) {
-                item.draggable({
-                    start: (/*event, ui*/) => {
-                        item.css({
-                            bottom: null,
-                            right: null,
-                            left: this._options.data.content.position.left + "%",
-                            top: this._options.data.content.position.top + "%",
-                            width: item.width() + "px",
-                            height: item.height() + "px"
-                        });
-                        this._options.data.focused = true;
-                        this._broadcastFocused();
-                    },
-                    stop: (/*event, ui*/) => {
-                        item.css({
-                            bottom: this._options.data.content.position.bottom + "%",
-                            right: this._options.data.content.position.right + "%",
-                            left: this._options.data.content.position.left + "%",
-                            top: this._options.data.content.position.top + "%",
-                            width: "",
-                            height: ""
-                        });
-                        this._broadcastPosition();
-                    },
-                    drag: (event, ui) => {
-                        this._recalcPosition(event, ui);
-                    }
-                }).resizable({
-                    handles: "n, e, s, w, ne, se, sw, nw",
-                    aspectRatio: item.height() ? item.width() / item.height() : 1,
-                    resize: (event, ui) => {
-                        this._recalcSize(event, ui);
-                    },
-                    stop: (event, ui) => {
-                        ui.element.css({
-                            bottom: this._options.data.content.position.bottom + "%",
-                            right: this._options.data.content.position.right + "%",
-                            left: this._options.data.content.position.left + "%",
-                            top: this._options.data.content.position.top + "%",
-                            width: "", height: ""
-                        });
-                        this._broadcastPosition();
-                    }
-                }).click(() => {
-                    this._options.data.focused = true;
-                    this._broadcastFocused();
-                });
-
-                item.find(".ws-maximize").click(() => {
-                    this._maximizeElement(item);
-                });
+            _setEvents() {
             }
 
             _calcMaxSize() {
@@ -482,89 +431,6 @@ define(
                     this._options.data.content.position.top = 50 - h / 2;
                     this._options.data.content.position.bottom = 50 - h / 2;
                 }
-            }
-
-            _maximizeElement(item) {
-                this._calcMaxSize();
-                item.css({
-                    bottom: this._options.data.content.position.bottom + "%",
-                    right: this._options.data.content.position.right + "%",
-                    left: this._options.data.content.position.left + "%",
-                    top: this._options.data.content.position.top + "%",
-                    width: "",
-                    height: ""
-                });
-
-                this._broadcastPosition();
-            }
-
-            _recalcSize(event, ui) {
-                var pixWidth = ui.size.width;
-                var pixHeight = ui.size.height;
-
-                var contWidth = this._container.width();
-                var contHeight = this._container.height();
-
-                var right = 0;
-                var bottom = 0;
-                var left = 0;
-                var top = 0;
-
-                if (contWidth > 0) {
-                    right = (contWidth - ui.position.left - pixWidth)/contWidth * 100;
-                    left = ui.position.left/contWidth * 100;
-                }
-                if (contHeight > 0) {
-                    bottom = (contHeight - pixHeight - ui.position.top)/contHeight * 100;
-                    top = ui.position.top/contHeight * 100;
-                }
-
-                this._options.data.position.bottom = bottom;
-                this._options.data.position.right = right;
-                this._options.data.position.left = left;
-                this._options.data.position.top = top;
-            }
-
-            _recalcPosition(event, ui) {
-                //this._options.data.position.left
-                var pixLeft = ui.position.left;
-                var pixTop = ui.position.top;
-
-                var contWidth = this._container.width();
-                var contHeight = this._container.height();
-
-                var left = 0;
-                var top = 0;
-                if (contWidth > 0) left = pixLeft/contWidth * 100;
-                if (contHeight > 0) top = pixTop/contHeight * 100;
-
-                this._options.data.position.right =
-                    this._options.data.position.right - (left - this._options.data.position.left);
-                this._options.data.position.bottom =
-                    this._options.data.position.bottom - (top - this._options.data.position.top);
-                this._options.data.position.left = left;
-                this._options.data.position.top = top;
-
-            }
-
-            _broadcastPosition() {
-                if (this._options.onSetPosition)
-                    this._options.onSetPosition({
-                        trackElId: this._options.data.trackElement,
-                        position: {
-                            bottom: this._options.data.position.bottom,
-                            right: this._options.data.position.right,
-                            left: this._options.data.position.left,
-                            top: this._options.data.position.top
-                        }
-                    });
-            }
-
-            _broadcastFocused() {
-                if (this._options.onFocused)
-                    this._options.onFocused({
-                        trackElId: this._options.data.trackElement
-                    });
             }
 
             _broadcastSetTextData() {

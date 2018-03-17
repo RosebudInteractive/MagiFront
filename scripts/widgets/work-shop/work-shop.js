@@ -23,8 +23,8 @@
  */
 
 define(
-    ["./ws-base", "./ws-assets", "./ws-tracks", "./player", "./ws-prop-editor-image",
-      "./ws-prop-editor-text", "work-shop/resource-loader", 'text!./templates/work-shop.html'],
+    ["./ws-base", "./ws-assets", "./ws-tracks", "./player-design", "./ws-prop-editor-image",
+      "./ws-prop-editor-text", "./resource-loader-design", 'text!./templates/work-shop.html'],
     function (CWSBase, CWSAssets, CWSTracks, CWSPlayer, CWSPropEditorImage, CWSPropEditorText, Loader, tpl) {
         return class CWorkShop extends CWSBase {
 
@@ -96,7 +96,7 @@ define(
                     });
 
                     episode.tracks = tracks;
-                    episode.tractsIdx = tracksIdx;
+                    episode.tracksIdx = tracksIdx;
                 }
             }
 
@@ -213,7 +213,9 @@ define(
             }
 
             _getTracks() {
-                if (this._data && this._data.episodes && this._data.episodes[0].tracks)
+                if (this._data &&
+                    this._data.episodes && this._data.episodes.length > 0 &&
+                    this._data.episodes[0].tracks)
                     return this._data.episodes[0].tracks;
                 else
                     return [];
@@ -235,21 +237,25 @@ define(
             }
 
             _getTracksOptions() {
-                var that = this;
+                let that = this;
                 return {
-                    onAdd: function (e) {
-                        if (that._options.tracks.onAddTrack)
-                            that._options.tracks.onAddTrack(e);
+                    onAdd: function () {
+                        let newTrack = that._addTrack();
+                        that._playerWidget.addTrack(newTrack);
+                        that.render();
                     },
                     onDelete: function (e) {
                         if (that._options.tracks.onDeleteTrack)
                             that._options.tracks.onDeleteTrack(e);
                     },
                     onAddElement: function (e) {
+                        that._playerWidget.addElement(e.track, e.elements);
                         if (that._options.tracks.onAddElement)
                             that._options.tracks.onAddElement(e);
+                        that.render();
                     },
                     onEditElement: function (e) {
+                        that._playerWidget.editElement(e.track, e.elements);
                         for (var i = 0; i < e.elements.length; i++) {
                             var el = e.elements[i];
                             if (el.focused) {
@@ -263,7 +269,7 @@ define(
                         if (that._options.tracks.onMoveElement)
                             that._options.tracks.onMoveElement(e);
                     },
-                    onGetAudioState: function (e) {
+                    onGetAudioState: function () {
                         return that._playerWidget.getAudioState();
                     },
                     onPlay: function () {
@@ -387,13 +393,31 @@ define(
             }
 
             _getPropEditorOptions() {
-                var that = this;
+                let that = this;
                 return {
                     data: null,
                     onPropertyChanged: function (e) {
                         that._tracksWidget.setElementData(e.data);
                     }
                 };
+            }
+
+            _addTrack() {
+                let tracks = this._getTracks();
+                let maxId = 0;
+                for (let i = 0; i < tracks.length; i ++) {
+                    if (tracks[i].id > maxId) maxId = tracks[i].id;
+                }
+
+                maxId++;
+
+                let newTrack = {
+                    id: maxId,
+                    elements: []
+                }
+
+                tracks.push(newTrack);
+                return newTrack;
             }
         };
     }

@@ -58,7 +58,6 @@ Utils.guid = function () {
                         onDeleteAsset: onDeleteAsset
                     },
                     tracks: {
-                        onAddTrack: onAddTrack,
                         onDeleteTrack: onDeleteTrack,
                         onGetAudio: onGetAudio,
                         onAddElement: onAddElement,
@@ -136,25 +135,6 @@ Utils.guid = function () {
                 }
             }
 
-            function getTracksList() {
-                return new Promise((resolve, fail) => {
-                    setTimeout(function () {
-                        resolve(tracksList);
-                    }, 0);
-                });
-            }
-
-            function onAddTrack() {
-                setTimeout(function () {
-                    var track = {
-                        "id": Utils.guid(),
-                        elements: []
-                    }
-                    tracksList.push(track);
-                    ws.render();
-                }, 0);
-            }
-
             function onDeleteTrack(e) {
                 setTimeout(function () {
                     var id = e.id;
@@ -168,13 +148,6 @@ Utils.guid = function () {
             }
 
             function onAddElement(e) {
-                var trackId = e.track;
-                var elemsData = e.elements;
-                var track = findTrack(trackId);
-
-                if (!track) return;
-                track.elements = elemsData;
-                ws.render();
             }
 
             function onMoveElement(e) {
