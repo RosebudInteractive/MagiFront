@@ -11064,6 +11064,16 @@ ul.lectures-tab {
     .player-frame .play-block--big {
       margin-bottom: 0; } }
 
+  .small-player-frame {
+    float: right;
+    position: fixed;
+    bottom: 100px;
+    right: 100px;
+    width: 250px;
+    height: 157px;
+    z-index: 20;
+  }
+
 .contents-tooltip {
   position: absolute;
   right: 58px;

@@ -20,6 +20,7 @@ export default class Frame extends Component {
         onMute: PropTypes.func,
         onUnmute: PropTypes.func,
         onGoToContent: PropTypes.func,
+        onLeavePage: PropTypes.func,
         playTime: PropTypes.number.isRequired,
         isMain: PropTypes.bool,
         volume: PropTypes.number,
@@ -47,6 +48,10 @@ export default class Frame extends Component {
     componentWillUnmount() {
         if (this.state.fullScreen) {
             this._toggleFullscreen()
+        }
+
+        if (this.props.onLeavePage) {
+            this.props.onLeavePage()
         }
     }
 

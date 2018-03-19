@@ -7,12 +7,12 @@ import 'fullpage.js'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
+import * as appActions from '../actions/app-actions';
 
 import PlayerWrapper from '../components/player/wrapper'
 import NestedPlayer from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
-// import FullpageWrapper from '../components/fullpage-wrapper';
 
 class Player extends React.Component {
 
@@ -45,6 +45,7 @@ class Player extends React.Component {
 
     componentWillUnmount() {
         this._unmountFullpage();
+        this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
     }
 
@@ -64,9 +65,6 @@ class Player extends React.Component {
                 _container.fullpage(_options)
                 this._mountGuard = true;
             }
-            // const _options = this._getFullpageOptions();
-            // // _container.fullpage(_options)
-            // FullpageWrapper.getInstance().mount('player', 'fullpage-player', _options);
         }
     }
 
@@ -77,15 +75,16 @@ class Player extends React.Component {
             let _menu = $('.js-player-menu');
             _menu.remove();
         }
-        // FullpageWrapper.getInstance().unmount('player');
     }
 
     _mountPlayer() {
-        let _container = $('#player');
+        let _container = $('#player'),
+            _smallContainer = $('#small-player')
         if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object)) {
             let _options = {
                 data: this.props.lessonPlayInfo.object,
                 div: _container,
+                smallDiv: _smallContainer,
                 onRenderContent: (content) => {
                     this.setState({currentContents: content})
                 },
@@ -195,6 +194,11 @@ class Player extends React.Component {
                                       })
                                   }
                               }}
+                              onLeavePage={() => {
+                                  if (this._player) {
+                                      this.props.appActions.switchToSmallPlayer()
+                                  }
+                              }}
                               onGoToContent={::this._handleGoToContent}
                               onSetRate={::this._handleSetRate}
                               playTime={this.state.playTime}
@@ -220,6 +224,7 @@ class Player extends React.Component {
                 paused: false
             })
         }
+        this.props.appActions.switchToFullPlayer()
     }
 
     _handleSetRate(value) {
@@ -375,6 +380,7 @@ function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(lessonActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

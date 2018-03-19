@@ -21,6 +21,7 @@ import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
+import SmallPlayer from "./containers/small-player";
 
 Polifyll.registry();
 
@@ -131,6 +132,7 @@ class App extends Component {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
+                <SmallPlayer visible={this.props.showSmallPlayer}/>
                 {this._getMainDiv()}
                 {this.props.currentPage !== pages.lesson ? <PageFooter/> : null}
             </div>
@@ -143,6 +145,8 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
+        showSmallPlayer: state.app.showSmallPlayer,
+        lessonInfo: state.singleLesson,
         ownProps,
     }
 }
