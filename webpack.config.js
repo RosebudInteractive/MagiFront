@@ -129,6 +129,7 @@ const _devConfig = {
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
                     path.resolve(__dirname, 'scripts/lib'),
+                    path.resolve(__dirname, 'scripts/widgets/work-shop'),
                 ],
                 test: /\.js$/
             },

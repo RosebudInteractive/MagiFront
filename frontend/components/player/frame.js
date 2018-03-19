@@ -12,7 +12,7 @@ export default class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
-        content: PropTypes.array.isRequired,
+        content: PropTypes.array,
         currentContent: PropTypes.number,
         onPause: PropTypes.func,
         onPlay: PropTypes.func,
@@ -233,6 +233,7 @@ export default class Frame extends Component {
     render() {
         let _playTimeFrm = tools.getTimeFmt(this.props.playTime)
         let _currentContent = this._getCurrentContent();
+        let _id = this.props.lesson ? this.props.lesson.Id : '';
 
         const
             _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
@@ -242,8 +243,8 @@ export default class Frame extends Component {
 
         return (
             <div>
-                <div className="player-frame__poster">
-                    <div className='ws-container' id='player'>
+                <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
+                    <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {this.props.paused ? <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}/> : null}
@@ -258,7 +259,7 @@ export default class Frame extends Component {
                             null
                     }
                     <div className="player-block">
-                        <Progress total={this.state.totalDuration} current={this.props.playTime}
+                        <Progress total={this.state.totalDuration} current={this.props.playTime} id={_id}
                                   content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
                         <div className="player-block__row">
                             <Controls pause={this.props.paused}
@@ -273,7 +274,7 @@ export default class Frame extends Component {
                                 <div className="player-block__info">
                                     <span className="played-time">{_playTimeFrm}</span>
                                     <span className="divider">/</span>
-                                    <span className="total-time">{this.state.totalDurationFmt}</span>
+                                    <span className="total-time">{this.state.totalDurationFmt ? this.state.totalDurationFmt : this.props.lesson.DurationFmt}</span>
                                 </div>
                                 <button type="button" className="speed-button js-speed-trigger"
                                         onClick={::this._openRate}>

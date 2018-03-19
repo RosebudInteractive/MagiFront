@@ -6094,7 +6094,7 @@ ul.user-tooltip {
     .courses {
       padding-top: 64px; } }
 
-.lecture-wrapper {
+.lecture-wrapper, .player-wrapper {
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   background-size: cover;
@@ -10961,7 +10961,7 @@ ul.lectures-tab {
   .player-frame__screen {
     position: absolute;
     /*top: 97px;*/
-    bottom: 100px;
+    bottom: 0;
     left: 0;
     right: 0;
     display: -webkit-box;
@@ -10982,8 +10982,8 @@ ul.lectures-tab {
     -ms-flex-pack: end;
     justify-content: flex-end;
     background-color: rgba(47, 47, 47, 0.8);
-    height: 100vh;}
-    /*padding-bottom: 100px}*/
+    height: 100vh;
+    padding-bottom: 100px}
     @media (max-width: 600px) {
       .player-frame__screen {
         bottom: 0;
@@ -11073,7 +11073,7 @@ ul.lectures-tab {
     height: 157px;
     z-index: 20;
   }
-  .small-player-frame:hover .player-frame__poster-text, .small-player_block  {
+  .small-player-frame:hover .player-frame__poster-text {
     opacity: 1;
   }
 
@@ -11127,25 +11127,31 @@ ul.lectures-tab {
     top: calc(50% - 36px/2 + 8px);
   }
 
-  .small-player_block .maximize:focus{
+  .small-player_block .maximize:focus,
+  .small-player_block .play-button:focus{
     outline: none; }
-  .player-block .maximize:hover {
+  .small-player_block .play-button:hover,
+  .small-player_block .maximize:hover {
     opacity: 0.7; }
-  .player-block .maximize svg {
-    display: block;
-    max-width: 20px; }
-  .player-block .maximize:hover svg,
-  .player-block .maximize:active svg,
-  .player-block .maximize.active svg {
+  .small-player_block .maximize svg,
+  .small-player_block .play-button svg {
+    display: block; }
+  .small-player_block .maximize:hover svg,
+  .small-player_block .maximize:active svg,
+  .small-player_block .maximize.active svg,
+  .small-player_block .play-button:hover svg,
+  .small-player_block .play-button:active svg,
+  .small-player_block .play-button.active svg {
     -webkit-filter: drop-shadow(0 0 6px #c8684c);
     filter: drop-shadow(0 0 6px #c8684c); }
 
 
-  .player-frame__poster-text{
+  .small-player-frame .player-frame__poster-text{
     position: absolute;
-    width: 240px;
+    /*width: 240px;*/
     height: 28px;
     left: 131px;
+    right: -146px;
     top: 7px;
     font-family: "Fira Sans", serif;
     font-style: normal;
@@ -11160,6 +11166,7 @@ ul.lectures-tab {
     opacity: 0;
     vertical-align: top;
     display: table-cell;
+    text-align: left;
   }
 
 .contents-tooltip {

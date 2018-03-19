@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import $ from 'jquery'
 
 import * as Player from '../components/player/nested-player';
 
@@ -23,12 +24,18 @@ export default class SmallPlayer extends React.Component {
         visible: false
     };
 
+    componentDidMount() {
+        $("small-player-frame" ).on("swipe", this._swipeHandler);
+    }
+
+    _swipeHandler(event) {
+        console.log(event)
+    }
+
     componentDidUpdate(prevProps) {
         if (Player.getInstance() && (this.props.visible !== prevProps.visible)) {
             if (this.props.visible) {
                 Player.getInstance().switchToSmall()
-            } else {
-                Player.getInstance().switchToFull()
             }
         }
     }
@@ -36,19 +43,21 @@ export default class SmallPlayer extends React.Component {
     _onPlayClick() {
         if (Player.getInstance()) {
             Player.getInstance().play()
-            this.setState({
-                paused: false
-            })
         }
+
+        this.setState({
+            paused : false
+        })
     }
 
     _onPauseClick() {
         if (Player.getInstance()) {
             Player.getInstance().pause()
-            this.setState({
-                paused: true
-            })
         }
+
+        this.setState({
+            paused : true
+        })
     }
 
     render() {
@@ -62,6 +71,8 @@ export default class SmallPlayer extends React.Component {
                 (_player.lesson.Number + '. ' + _player.lesson.Name)
                 :
                 null;
+
+        let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true;
 
         return (
             <div className='small-player-frame' style={this.props.visible ? null : {display: 'none'}}>
@@ -78,7 +89,7 @@ export default class SmallPlayer extends React.Component {
                                          dangerouslySetInnerHTML={{__html: _maximize}}/>
                                 </button>
                             </Link>
-                            {this.state.paused ?
+                            {_paused ?
                                 <button type="button" className="play-button" onClick={::this._onPlayClick}>
                                     <svg className="play" width="41" height="36"
                                          dangerouslySetInnerHTML={{__html: _play}}/>

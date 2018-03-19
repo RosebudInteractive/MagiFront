@@ -30,8 +30,7 @@ class NestedPlayer {
         this._smallPlayer = new Player(options.smallDiv, this._options);
         this._player = this._fullPlayer;
         this._isFull = true;
-        this._courseUrl = options.courseUrl;
-        this._lesson = options.lesson;
+
 
         this._applyOptions(options);
         this._fullPlayer.render();
@@ -79,6 +78,8 @@ class NestedPlayer {
         this._onChangeTitle = options.onChangeTitle;
         this._onChangeContent = options.onChangeContent;
         this._onAudioLoaded = options.onAudioLoaded;
+        this._courseUrl = options.courseUrl;
+        this._lesson = options.lesson;
     }
 
     _applyData(data) {
@@ -129,14 +130,16 @@ class NestedPlayer {
         }
     }
 
-    switchToFull() {
+    switchToFull(isLoadNew) {
         if ((!this.player.getStopped()) && !this._isFull){
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
                 _oldPlayer.pause();
-                this.player.play();
+                if (!isLoadNew) {
+                    this.player.play();
+                }
             }
         }
     }
