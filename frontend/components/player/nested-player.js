@@ -30,6 +30,8 @@ class NestedPlayer {
         this._smallPlayer = new Player(options.smallDiv, this._options);
         this._player = this._fullPlayer;
         this._isFull = true;
+        this._courseUrl = options.courseUrl;
+        this._lesson = options.lesson;
 
         this._applyOptions(options);
         this._fullPlayer.render();
@@ -48,9 +50,21 @@ class NestedPlayer {
         }
     }
 
+    get audioState() {
+        return this.player.getAudioState()
+    }
+
+    get lesson() {
+        return this._lesson
+    }
+
+    get courseUrl() {
+        return this._courseUrl;
+    }
+
     _loadOtherLesson(options) {
         this._fullPlayer.initContainer(options.div);
-        this._smallPlayer.initContainer(options.div);
+        this._smallPlayer.initContainer(options.smallDiv);
 
         this._applyOptions(options);
         this._fullPlayer.render();

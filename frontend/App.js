@@ -132,7 +132,7 @@ class App extends Component {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
-                <SmallPlayer visible={this.props.showSmallPlayer}/>
+                <SmallPlayer visible={this.props.showSmallPlayer} lesson={this.props.lessonInfo.object}/>
                 {this._getMainDiv()}
                 {this.props.currentPage !== pages.lesson ? <PageFooter/> : null}
             </div>

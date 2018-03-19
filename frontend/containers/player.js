@@ -10,7 +10,7 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
 
 import PlayerWrapper from '../components/player/wrapper'
-import NestedPlayer from '../components/player/nested-player';
+import NestedPlayer, {getInstance} from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
 
@@ -80,9 +80,11 @@ class Player extends React.Component {
     _mountPlayer() {
         let _container = $('#player'),
             _smallContainer = $('#small-player')
-        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object)) {
+        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object) && (this.props.lessonInfo.object)) {
             let _options = {
                 data: this.props.lessonPlayInfo.object,
+                courseUrl: this.props.courseUrl,
+                lesson: this.props.lessonInfo.object,
                 div: _container,
                 smallDiv: _smallContainer,
                 onRenderContent: (content) => {
@@ -95,7 +97,6 @@ class Player extends React.Component {
                     this.setState({content: e.id})
                 },
                 onAudioLoaded: (e) => {
-                    console.log('audio loaded')
                     this.setState({
                         paused: e.paused,
                         muted: e.muted,
@@ -104,7 +105,25 @@ class Player extends React.Component {
                 }
             };
 
-            this._player = NestedPlayer(_options);
+            let _needReload = (!getInstance() || getInstance().lesson.Id !== this.props.lessonInfo.object.Id)
+
+            if (_needReload) {
+                this._player = NestedPlayer(_options);
+            } else {
+                this._player = getInstance()
+            }
+
+            let _state = this._player.audioState;
+            this.setState({
+                paused: _state.stopped,
+                muted: _state.muted,
+                volume: _state.volume,
+                playTime: _state.currentTime,
+                content: _state.currentContent,
+
+            });
+
+            this.props.appActions.switchToFullPlayer()
             this._mountPlayerGuard = true;
         }
     }
@@ -126,7 +145,7 @@ class Player extends React.Component {
             }
 
             if (!that.state.paused) {
-                that._timer = setTimeout(function() {
+                that._timer = setTimeout(function () {
                     $('body').addClass('fade');
                 }, 7000);
             } else {
