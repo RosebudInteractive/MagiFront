@@ -103,7 +103,7 @@ class Player extends React.Component {
                     this._player.play();
 
                     this.setState({
-                        paused: e.paused,
+                        paused: false,
                         muted: e.muted,
                         volume: e.volume,
                     })
