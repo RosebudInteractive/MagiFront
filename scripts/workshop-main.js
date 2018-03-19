@@ -13,6 +13,11 @@ requirejs.config({
     }
 });
 
+import CWorkShop from "work-shop/work-shop";
+import 'jquery-ui/jquery-ui.js';
+import 'script-lib/binary-transport.js';
+import 'script-lib/mouseheld.js'
+
 var Utils = {};
 
 Utils.guid = function () {
@@ -28,9 +33,9 @@ Utils.guid = function () {
 
 (function($){
     $(document).ready(function () {
-        require(["work-shop/work-shop"], function (WS) {
+        //require(["work-shop/work-shop"], function (WS) {
             var options = initOptions();
-            var ws = new WS($(".ws-container"), options);
+            var ws = new CWorkShop($(".ws-container"), options);
             ws.render();
 
             function onGetData() {
@@ -252,6 +257,6 @@ Utils.guid = function () {
                     });
                 });
             }
-        });
+//        });
     });
 })(jQuery);

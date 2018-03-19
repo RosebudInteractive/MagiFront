@@ -1,9 +1,10 @@
-define(
-    [
-        "./resource-loader"
-    ],
-    function (CWSResourceLoader) {
-        return class CWSResourceLoaderDesign extends CWSResourceLoader {
+import CWSResourceLoader from "./resource-loader"
+//define(
+//    [
+//        "./resource-loader"
+//    ],
+//    function (CWSResourceLoader) {
+        export default class CWSResourceLoaderDesign extends CWSResourceLoader {
             changeElements(trackId, elements) {
                 let data = this._state.data;
                 if (!data.episodes || data.episodes.length == 0) return;
@@ -58,5 +59,5 @@ define(
                 return null;
             }
         }
-    }
-);
+//    }
+//);

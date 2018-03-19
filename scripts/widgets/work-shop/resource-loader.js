@@ -1,11 +1,11 @@
-define (
-    [],
-    function () {
+//define (
+//    [],
+//    function () {
         const PRELOAD_TIME = 5;
         const FAIL_TIME = 60;
         const PRELOAD_AUDIO_TIME = 20;
         const FAIL_AUDIO_TIME = 120;
-        return class CWSResourceLoader {
+        export default class CWSResourceLoader {
             constructor() {
                 this._position = 0;
                 this._state = {
@@ -213,8 +213,8 @@ define (
                 let a = {
                     id: id
                 };
-                let loaded = this._state.loadedData.audios[id];
-                a.data = loaded;
+
+                a.data = this._state.loadedData.audios[id];
 
                 result.success = true;
                 result.audio = a;
@@ -521,5 +521,5 @@ define (
             }
 
         }
-    }
-);
+//    }
+//);

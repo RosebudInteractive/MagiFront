@@ -91,40 +91,40 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.stopped = false;
 
         this._playState.rate = this._playState.rate || 1;
-        var rate = this._playState.rate;
+        let rate = this._playState.rate;
         this._getItem();
-        var data = this._options.data;
+        let data = this._options.data;
         this._playState.startedAt = new Date();
         this._playState.interval = setTimeout(() => {
             this.stop();
         }, (data.content.duration - this._playState.position) * 1000 / rate);
 
-        var ass = this.Asset
+        let ass = this.Asset
         if (ass && ass.info.type !== "text") this._playImage();
     }
 
     _playImage() {
-        var rate = this._playState.rate;
+        let rate = this._playState.rate;
 
         //assume now there can be only one effect
-        var effects = this.Data.content.effects;
+        let effects = this.Data.content.effects;
         if (effects.length == 0) return;
-        var effect = effects[0];
+        let effect = effects[0];
 
 
-        var imgDelay = 0;
+        let imgDelay = 0;
         if (this._playState.position < effect.start) {
             imgDelay = (effect.start - this._playState.position) * 1000 / rate;
         }
 
-        var that = this;
+        let that = this;
 
         (function (ef) {
             that._playState.imgDelayInterval = setTimeout(() => {
-                var imgPlayPos = that._playState.position - ef.start;
+                let imgPlayPos = that._playState.position - ef.start;
                 if (imgPlayPos < 0) imgPlayPos = 0;
-                var item = $("#" + that.Id);
-                var img = item.find("img");
+                let item = $("#" + that.Id);
+                let img = item.find("img");
                 that._playState.imageAnimation = animate({
                     from: 0,
                     to: ef.acceleration * ef.duration,
@@ -143,7 +143,7 @@ export default class CWSPlayerElement extends CWSBase {
     }
 
     stop() {
-        var item = $("#" + this.Id);
+        let item = $("#" + this.Id);
         if (item.length != 0) {
             this._hide(item);
         }
@@ -169,12 +169,12 @@ export default class CWSPlayerElement extends CWSBase {
     }
 
     pause() {
-        var rate = this._playState.rate;
+        let rate = this._playState.rate;
         if (this._playState.stopped) return;
         clearTimeout(this._playState.interval);
         this._playState.interval = null;
-        var now = new Date();
-        var position =
+        let now = new Date();
+        let position =
             this._playState.position + (now - this._playState.startedAt) / 1000 * rate;
         this._playState.position = position;
         if (this._playState.imgDelayInterval) {
@@ -185,16 +185,16 @@ export default class CWSPlayerElement extends CWSBase {
     }
 
             _getItem() {
-                var item = $("#" + this.Id);
-                var ass = this.Asset
+                let item = $("#" + this.Id);
+                let ass = this.Asset
 
                 if (item.length == 0) {
-                    var pos = this._options.data.content.position;
+                    let pos = this._options.data.content.position;
                     if (!pos) {
                         this._calcMaxSize()
                     }
 
-            var template = CWSPlayerElement.template("player-element");
+            let template = CWSPlayerElement.template("player-element");
             item = $(template).attr("id", this.Id);
             item.css({
                 left: this._options.data.content.position.left + "%",
@@ -207,14 +207,14 @@ export default class CWSPlayerElement extends CWSBase {
 
             this._container.append(item);
 
-            var cont = item.find(".ws-player-elem-content");
+            let cont = item.find(".ws-player-elem-content");
 
                     if (ass) {
-                        var imgDiv = null;
+                        let imgDiv = null;
                         if (ass.info.type === 'text') {
 
-                    var textToolsDiv = $('.ws-text-element-tools');
-                    var textDiv = document.createElement('div');
+                    let textToolsDiv = $('.ws-text-element-tools');
+                    let textDiv = document.createElement('div');
                     textDiv.classList.add('ws-text-element');
                     textDiv.id = Utils.guid();
 
@@ -240,19 +240,19 @@ export default class CWSPlayerElement extends CWSBase {
                         }
                     }
 
-                    var selectionchangeFn = (e) => {
-                        var s = window.getSelection();
-                        var oRange = s.getRangeAt(0);
-                        var oRect = oRange.getBoundingClientRect();
+                    let selectionchangeFn = (e) => {
+                        let s = window.getSelection();
+                        let oRange = s.getRangeAt(0);
+                        let oRect = oRange.getBoundingClientRect();
                         $(textToolsDiv).css({
                             'top': oRect.top - 30,
                             'left': oRect.right - $(textToolsDiv).width() / 2 - oRect.width / 2
                         });
 
-                        var parents = [];
-                        var colors = [];
-                        var parentEl = oRange.commonAncestorContainer;
-                        var progress = true;
+                        let parents = [];
+                        let colors = [];
+                        let parentEl = oRange.commonAncestorContainer;
+                        let progress = true;
 
                         while (progress) {
                             if (parentEl.classList !== undefined) {
@@ -272,11 +272,11 @@ export default class CWSPlayerElement extends CWSBase {
                         // console.log({parents, colors});
                     }
 
-                    var overTools = false;
+                    let overTools = false;
 
-                    var mousemoveFn = (e) => {
-                        var rect = $.extend({}, textDiv.getBoundingClientRect());
-                        var rect2 = textToolsDiv[0].getBoundingClientRect();
+                    let mousemoveFn = (e) => {
+                        let rect = $.extend({}, textDiv.getBoundingClientRect());
+                        let rect2 = textToolsDiv[0].getBoundingClientRect();
 
                         if (rect.left <= e.clientX && rect.right >= e.clientX && rect.top <= e.clientY && rect.bottom >= e.clientY ||
                             rect2.left <= e.clientX && rect2.right >= e.clientX && rect2.top <= e.clientY && rect2.bottom >= e.clientY) {
@@ -313,7 +313,7 @@ export default class CWSPlayerElement extends CWSBase {
                         $(textToolsDiv).addClass('ws-text-element-tools-show');
                         document.addEventListener('mousemove', mousemoveFn);
                         document.addEventListener("selectionchange", selectionchangeFn);
-                        var oRect = window.getSelection().getRangeAt(0).getBoundingClientRect();
+                        let oRect = window.getSelection().getRangeAt(0).getBoundingClientRect();
                         $(textToolsDiv).css({
                             'top': oRect.top - 30,
                             'left': oRect.right - $(textToolsDiv).width() / 2 - oRect.width / 2
@@ -333,11 +333,11 @@ export default class CWSPlayerElement extends CWSBase {
                     this._options.loader
                         .getAssetResources(ass.id)
                         .then((assData) => {
-                            var imgData = assData[0].file.body;
-                            var imgDiv = $('<img src="' + imgData + '" />');
+                            let imgData = assData[0].file.body;
+                            let imgDiv = $('<img src="' + imgData + '" />');
                             imgDiv.on('load', () => {
-                                var width = this.naturalWidth;
-                                var height = this.naturalHeight;
+                                let width = this.naturalWidth;
+                                let height = this.naturalHeight;
                             });
 
                             cont.html(imgDiv);
@@ -353,7 +353,7 @@ export default class CWSPlayerElement extends CWSBase {
 
                 }
             } else {
-                imgDiv = $('<img src="" />');
+                let imgDiv = $('<img src="" />');
                 cont.html(imgDiv);
 
                 this._setEvents(item);
@@ -364,10 +364,10 @@ export default class CWSPlayerElement extends CWSBase {
                     this._options.loader
                         .getAssetResources(ass.id)
                         .then((assData) => {
-                            var imgData = assData[0].file.body;
+                            let imgData = assData[0].file.body;
                             if (!imgData) {
-                                var cont = item.find(".ws-player-elem-content");
-                                var imgDiv = cont.find("img");
+                                let cont = item.find(".ws-player-elem-content");
+                                let imgDiv = cont.find("img");
                                 imgDiv.attr("src", "");
                                 imgDiv.css("display", "none");
                             }
@@ -384,8 +384,8 @@ export default class CWSPlayerElement extends CWSBase {
     }
 
     _getResource() {
-        var ass = this.Asset;
-        var resource = null;
+        let ass = this.Asset;
+        let resource = null;
         if (ass) {
             resource = ass.body;
         } else if (this._options.data.data) {
@@ -396,8 +396,8 @@ export default class CWSPlayerElement extends CWSBase {
     }
 
     _setResource(data) {
-        var ass = this.Asset;
-        var resource = null;
+        let ass = this.Asset;
+        let resource = null;
         if (ass) {
             ass.body = data;
         } else if (this._options.data.data) {
@@ -411,7 +411,7 @@ export default class CWSPlayerElement extends CWSBase {
             }
 
     _calcMaxSize() {
-        var ass = this.Asset;
+        let ass = this.Asset;
 
                 if (!ass || !ass.info || ass.info.type === 'text') {
                     this._options.data.content.position.bottom = 0;
@@ -419,12 +419,12 @@ export default class CWSPlayerElement extends CWSBase {
                     this._options.data.content.position.left = 0;
                     this._options.data.content.position.top = 0;
                 } else {
-                    var h = ass.info.size.height,
+                    let h = ass.info.size.height,
                         w = ass.info.size.width;
-                    var pictRatio = w ? h / w : 1;
+                    let pictRatio = w ? h / w : 1;
                     w = 100;
-                    var actualWidth = 160 * 1;
-                    var actualHeight = actualWidth * pictRatio;
+                    let actualWidth = 160 * 1;
+                    let actualHeight = actualWidth * pictRatio;
                     // calculate actualHeight's %
                     h = actualHeight / 90 * 100;
 
@@ -454,29 +454,29 @@ export default class CWSPlayerElement extends CWSBase {
             }
 
     renderPosition(position) {
-        var item = this._getItem();
+        let item = this._getItem();
         this._playState.position = position - this.Start;
 
                 //  масштаб изображения
-                var effects = this.Data.effects;
+                let effects = this.Data.effects;
                 if (!effects) effects = [];
                 if (effects.length != 0){
-                    var effect = effects[0];
-                    var imgPlayPos = this._playState.position - effect.start;
-                    var offset = 0;
+                    let effect = effects[0];
+                    let imgPlayPos = this._playState.position - effect.start;
+                    let offset = 0;
                     if (imgPlayPos > 0) {
-                        var timeFraction = imgPlayPos / effect.duration;
+                        let timeFraction = imgPlayPos / effect.duration;
                         if (timeFraction > 1) timeFraction = 1;
-                        var animationFunc = makeEaseInOut(quad);
+                        let animationFunc = makeEaseInOut(quad);
                         // текущее состояние анимации от 0 до 1
-                        var progress = animationFunc(timeFraction);
+                        let progress = animationFunc(timeFraction);
                         // Текущее состояние в заказанных единицах
-                        var calcProgress = effect.acceleration * effect.duration * progress;
+                        let calcProgress = effect.acceleration * effect.duration * progress;
 
                 offset = calcProgress / 2;
             }
-            var item = $("#" + this.Id);
-            var img = item.find("img");
+            let item = $("#" + this.Id);
+            let img = item.find("img");
             img.css({
                 left: (-offset) + "%",
                 top: (-offset) + "%",
@@ -500,17 +500,17 @@ export default class CWSPlayerElement extends CWSBase {
  */
 function animate(options, playState) {
 
-    var start = performance.now();
+    let start = performance.now();
 
     requestAnimationFrame(function animate(time) {
         // timeFraction от 0 до 1
-        var timeFraction = (time - start + options.curTime) / options.duration;
+        let timeFraction = (time - start + options.curTime) / options.duration;
         if (timeFraction > 1) timeFraction = 1;
 
         // текущее состояние анимации от 0 до 1
-        var progress = options.timing(timeFraction);
+        let progress = options.timing(timeFraction);
         // Текущее состояние в заказанных единицах
-        var calcProgress = options.from + options.to * progress;
+        let calcProgress = options.from + options.to * progress;
         options.draw(calcProgress);
 
         if (timeFraction < 1 && !playState.stopped) {
