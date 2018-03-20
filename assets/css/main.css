@@ -11072,13 +11072,15 @@ ul.lectures-tab {
     width: 250px;
     height: 157px;
     z-index: 20;
+    -webkit-transition: opacity 0.7s ease;
+    transition: opacity 0.7s ease;
   }
   @media (max-width: 900px) {
     .small-player-frame {
       bottom: 50px;
       right: 50px;
       width: 145px;
-      height: 91px; } }
+      height: 91px;} }
 
   .small-player-frame:hover .player-frame__poster-text {
     opacity: 1;

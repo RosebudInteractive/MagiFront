@@ -30,7 +30,7 @@ export default class SmallPlayer extends React.Component {
     }
 
     _swipeHandler(event) {
-        console.log(event)
+        alert('swipe!')
     }
 
     componentDidUpdate(prevProps) {
@@ -95,7 +95,7 @@ export default class SmallPlayer extends React.Component {
         let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true;
 
         return (
-            <div className='small-player-frame' style={this.props.visible ? null : {display: 'none'}} onClick={::this._onClick}>
+            <div className='small-player-frame' style={this.props.visible ? {opacity: 1} : {opacity: 0}} onClick={::this._onClick}>
                 <div className='small-player__poster'>
                     <div className='ws-container-mini' id='small-player'/>
                 </div>
