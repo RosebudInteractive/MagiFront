@@ -1,9 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import { Redirect } from 'react-router';
+import Swipeable from 'react-swipeable';
 import $ from 'jquery'
 
 import * as Player from '../components/player/nested-player';
+// import 'script-lib/jquery.mobile-1.4.5.js';
 
 export default class SmallPlayer extends React.Component {
 
@@ -13,6 +16,7 @@ export default class SmallPlayer extends React.Component {
         this.state = {
             paused: false,
             isMobile: false,
+            redirect: false,
         }
     }
 
@@ -24,16 +28,6 @@ export default class SmallPlayer extends React.Component {
     static defaultProps = {
         visible: false
     };
-
-    componentDidMount() {
-        let that = this;
-
-        $(".small-player-frame" ).on('swipe', that._swipeHandler);
-    }
-
-    _swipeHandler(event) {
-        alert('swipe!' + event)
-    }
 
     componentDidUpdate(prevProps) {
         let _isMobile = ($(window).width() < 900);
@@ -58,7 +52,7 @@ export default class SmallPlayer extends React.Component {
         }
 
         this.setState({
-            paused : false
+            paused: false
         })
     }
 
@@ -68,7 +62,7 @@ export default class SmallPlayer extends React.Component {
         }
 
         this.setState({
-            paused : true
+            paused: true
         })
     }
 
@@ -82,10 +76,26 @@ export default class SmallPlayer extends React.Component {
         }
     }
 
+    _close() {
+        Player.getInstance().stop();
+        this.setState({
+            paused: true
+        })
+    }
+
+    _maximize() {
+        this.setState({redirect: true});
+    }
+
     render() {
+        if ((this.state.redirect) && (this.props.course) && (this.props.lesson)) {
+            return <Redirect push to={'/play-lesson/' + this.props.course.URL + '/' + this.props.lesson.URL} />;
+        }
+
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
-            _maximize = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#maximize"/>';
+            _maximize = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#maximize"/>',
+            _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
         let _player = Player.getInstance(),
             _link = _player ? '/play-lesson/' + _player.courseUrl + '/' + _player.lesson.URL : null,
@@ -94,40 +104,52 @@ export default class SmallPlayer extends React.Component {
                 :
                 null;
 
-        let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true;
+        let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true,
+            _stopped = Player.getInstance() ? Player.getInstance()._isHardStopped : false;
+
+
 
         return (
-            <div className='small-player-frame' style={this.props.visible ? {opacity: 1} : {opacity: 0}} onClick={::this._onClick}>
-                <div className='small-player__poster'>
-                    <div className='ws-container-mini' id='small-player'/>
+            <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
+                <div className='small-player-frame'
+                     style={(this.props.visible && !_stopped) ? {opacity: 1} : {opacity: 0}}
+                     onClick={::this._onClick}>
+                    <div className='small-player__poster'>
+                        <div className='ws-container-mini' id='small-player'/>
+                    </div>
+                    <div className='player-frame__poster-text'>{_text}</div>
+                    {
+                        _player ?
+                            <div className='small-player_block'>
+                                <Link to={_link}>
+                                    <button type="button" className="maximize-button">
+                                        <svg className="maximize" width="41" height="37"
+                                             dangerouslySetInnerHTML={{__html: _maximize}}/>
+                                    </button>
+                                </Link>
+                                {_paused ?
+                                    <button type="button" className="play-button" onClick={::this._onPlayClick}>
+                                        <svg className="play" width="41" height="36"
+                                             dangerouslySetInnerHTML={{__html: _play}}/>
+                                    </button>
+                                    :
+                                    <button type="button" className="play-button" onClick={::this._onPauseClick}>
+                                        <svg className="pause" width="23" height="36"
+                                             dangerouslySetInnerHTML={{__html: _pause}}/>
+                                    </button>
+                                }
+                                {
+                                    <button type="button" className="close-button" onClick={::this._close}>
+                                        <svg className="close" width="18" height="18"
+                                             dangerouslySetInnerHTML={{__html: _close}}/>
+                                    </button>
+                                }
+                            </div>
+                            :
+                            null
+                    }
                 </div>
-                <div className='player-frame__poster-text'>{_text}</div>
-                {
-                    _player ?
-                        <div className='small-player_block'>
-                            <Link to={_link}>
-                                <button type="button" className="maximize-button">
-                                    <svg className="maximize" width="41" height="37"
-                                         dangerouslySetInnerHTML={{__html: _maximize}}/>
-                                </button>
-                            </Link>
-                            {_paused ?
-                                <button type="button" className="play-button" onClick={::this._onPlayClick}>
-                                    <svg className="play" width="41" height="36"
-                                         dangerouslySetInnerHTML={{__html: _play}}/>
-                                </button>
-                                :
-                                <button type="button" className="play-button" onClick={::this._onPauseClick}>
-                                    <svg className="pause" width="23" height="36"
-                                         dangerouslySetInnerHTML={{__html: _pause}}/>
-                                </button>
-                            }
-                        </div>
-                        :
-                        null
-                }
-
-            </div>
+            </Swipeable>
         );
     }
 }

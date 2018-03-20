@@ -30,6 +30,7 @@ class NestedPlayer {
         this._smallPlayer = new Player(options.smallDiv, this._options);
         this._player = this._fullPlayer;
         this._isFull = true;
+        this._isHardStopped = false;
 
 
         this._applyOptions(options);
@@ -72,6 +73,7 @@ class NestedPlayer {
     }
 
     _applyOptions(options) {
+        this._isHardStopped = false;
         this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
@@ -92,10 +94,17 @@ class NestedPlayer {
 
     pause() {
         this.player.pause()
+        this._isHardStopped = false;
     }
 
     play() {
         this.player.play()
+        this._isHardStopped = false;
+    }
+
+    stop() {
+        this.player.pause()
+        this._isHardStopped = true;
     }
 
     setPosition(begin) {
