@@ -370,7 +370,7 @@ export default class CWSPlayer extends CWSBase {
             //}
             //console.log("timeupdate", that._audioState.globalTime);
             that._options.loader.setPosition(that._audioState.globalTime);
-            that._chechAndFireContentChanged()
+            that._checkAndFireContentChanged()
         }).on("volumechange", function (e) {
             that._audioState.volume = this.volume;
         }).on("ended", function () {
@@ -386,11 +386,18 @@ export default class CWSPlayer extends CWSBase {
                         that._setAudio(inf)
                     });
             }
+        }).on("pause", function () {
+            that._broadcastPaused();
+        }).on("play", function () {
+            that._broadcastStarted();
+        }).on("error", function (e) {
+            that.pause();
+            that._broadcastError(e);
         });
 
     }
 
-    _chechAndFireContentChanged() {
+    _checkAndFireContentChanged() {
         var episodesContent = this.getLectureContent();
         var curCont = null;
         for (var i = 0; i < episodesContent.length; i++) {
@@ -403,17 +410,17 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
+        if (!curCont && !this._audioState.currentContent) return;
+
         if ((curCont && !this._audioState.currentContent) ||
             (!curCont && this._audioState.currentContent)
         ) {
             this._audioState.currentContent = curCont;
             this._broadcastChangeContent(curCont);
-        } else {
-            if (this._audioState.currentContent.title != curCont.title ||
+        } else if (this._audioState.currentContent.title != curCont.title ||
                 this._audioState.currentContent.begin != curCont.begin) {
                 this._audioState.currentContent = curCont;
                 this._broadcastChangeContent(curCont);
-            }
         }
     }
 
@@ -471,6 +478,21 @@ export default class CWSPlayer extends CWSBase {
     _broadcastCurrentTimeChanged() {
         if (this._options.onCurrentTimeChanged)
             this._options.onCurrentTimeChanged(this.getAudioState());
+    }
+
+    _broadcastPaused() {
+        if (this._options.onPaused)
+            this._options.onPaused();
+    }
+
+    _broadcastStarted() {
+        if (this._options.onStarted)
+            this._options.onStarted();
+    }
+
+    _broadcastError(e) {
+        if (this._options.onError)
+            this._options.onError();
     }
 
     getAudioState() {

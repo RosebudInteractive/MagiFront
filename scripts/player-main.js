@@ -117,6 +117,15 @@ window.Utils = Utils;
                     },
                     onChangeContent: function (content) {
                         console.log(content);
+                    },
+                    onPaused: function () {
+                        console.log("paused event handler")
+                    },
+                    onStarted: function () {
+                        console.log("started event handler")
+                    },
+                    onError: function (e) {
+                        console.error("playback error. player was suspended", e);
                     }
                 };
             }
