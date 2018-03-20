@@ -6,7 +6,7 @@ import Controls from "./controls";
 import * as tools from '../../tools/time-tools'
 
 import $ from 'jquery'
-import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 import PauseScreen from "./pause-screen";
 
 export default class Frame extends Component {
@@ -69,7 +69,7 @@ export default class Frame extends Component {
             this.setState({fullScreen : _isFullScreen})
         });
 
-        $(".scrollable").mCustomScrollbar();
+        // $(".scrollable").mCustomScrollbar();
     }
 
 
