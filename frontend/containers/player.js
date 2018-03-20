@@ -29,6 +29,7 @@ class Player extends React.Component {
             paused: false,
             muted: false,
             volume: 0,
+            isMobile: $(window).width() < 900
         }
 
         this._lessonId = 0;
@@ -59,7 +60,7 @@ class Player extends React.Component {
     }
 
     _mountFullpage() {
-        if (($(window).width() > 900)) {
+        // if (($(window).width() > 900)) {
             let _container = $('#fullpage-player');
             if ((!this._mountGuard) && (_container.length > 0)) {
                 $('body').attr('data-page', 'fullpage-player');
@@ -67,7 +68,7 @@ class Player extends React.Component {
                 _container.fullpage(_options)
                 this._mountGuard = true;
             }
-        }
+        // }
     }
 
     _unmountFullpage() {
@@ -353,15 +354,15 @@ class Player extends React.Component {
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
-            navigation: _anchors.length > 1,
+            navigation: (!this.state.isMobile && (_anchors.length > 1)),
             navigationTooltips: _anchors.map((anchor) => {
                 return anchor.title
             }),
             css3: true,
+            autoScrolling: !this.state.isMobile,
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
-            recordHistory: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,

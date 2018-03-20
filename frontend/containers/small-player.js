@@ -12,6 +12,7 @@ export default class SmallPlayer extends React.Component {
 
         this.state = {
             paused: false,
+            isMobile: false,
         }
     }
 
@@ -33,6 +34,15 @@ export default class SmallPlayer extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
+        let _isMobile = ($(window).width() < 900);
+
+        if (this.state.isMobile !== _isMobile) {
+            this.setState({
+                isMobile: _isMobile
+            })
+        }
+
+
         if (Player.getInstance() && (this.props.visible !== prevProps.visible)) {
             if (this.props.visible) {
                 Player.getInstance().switchToSmall()
@@ -60,6 +70,16 @@ export default class SmallPlayer extends React.Component {
         })
     }
 
+    _onClick() {
+        if (this.state.isMobile) {
+            if (this.state.paused) {
+                this._onPlayClick()
+            } else {
+                this._onPauseClick()
+            }
+        }
+    }
+
     render() {
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
@@ -75,7 +95,7 @@ export default class SmallPlayer extends React.Component {
         let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true;
 
         return (
-            <div className='small-player-frame' style={this.props.visible ? null : {display: 'none'}}>
+            <div className='small-player-frame' style={this.props.visible ? null : {display: 'none'}} onClick={::this._onClick}>
                 <div className='small-player__poster'>
                     <div className='ws-container-mini' id='small-player'/>
                 </div>
