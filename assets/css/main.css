@@ -10960,6 +10960,7 @@ ul.lectures-tab {
       width: auto; }
   .player-frame__screen {
     position: absolute;
+    box-sizing: border-box;
     /*top: 97px;*/
     bottom: 0;
     left: 0;

@@ -26,11 +26,13 @@ export default class SmallPlayer extends React.Component {
     };
 
     componentDidMount() {
-        $("small-player-frame" ).on("swipe", this._swipeHandler);
+        let that = this;
+
+        $(".small-player-frame" ).on('swipe', that._swipeHandler);
     }
 
     _swipeHandler(event) {
-        alert('swipe!')
+        alert('swipe!' + event)
     }
 
     componentDidUpdate(prevProps) {
