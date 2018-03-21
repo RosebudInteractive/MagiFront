@@ -116,9 +116,8 @@ export default class SmallPlayer extends React.Component {
                 <div className='small-player-frame'
                      style={(this.props.visible && !_stopped) ? {opacity: 1} : {opacity: 0}}
                      onClick={::this._onClick}>
-                    <div className='small-player__poster'>
-                        <div className='ws-container-mini' id='small-player'/>
-                    </div>
+                    <div className='ws-container-mini' id='small-player'/>
+                    <div className='small-player__poster'/>
                     <div className='player-frame__poster-text'>{_text}</div>
                     {
                         _player ?

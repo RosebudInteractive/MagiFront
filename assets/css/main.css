@@ -10904,7 +10904,7 @@ ul.lectures-tab {
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
     width: 85%;
-    max-width: 250px;
+    max-width: 450px;
     text-align: center;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
@@ -11078,11 +11078,13 @@ ul.lectures-tab {
   }
   .small-player__poster{
     position: absolute;
-    background: #2F2F2F;
+    background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+    background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
     height: 100%;
     width: 100%;
     -webkit-transition: opacity 0.7s ease;
     transition: opacity 0.7s ease;
+    opacity: 0;
   }
   @media (max-width: 900px) {
     .small-player-frame {
@@ -11091,13 +11093,17 @@ ul.lectures-tab {
       width: 145px;
       height: 91px;} }
 
-  .small-player-frame:hover .player-frame__poster-text {
+  .small-player-frame:hover .player-frame__poster-text{
     opacity: 1;
   }
 
-  .small-player-frame:hover .small-player_block  {
-      opacity: 1;
-    }
+  .small-player-frame:hover .small-player_block{
+    opacity: 1;
+  }
+
+  .small-player-frame:hover .small-player__poster {
+    opacity: 1;
+  }
 
   .small-player_block{
     opacity: 0;
@@ -11157,18 +11163,18 @@ ul.lectures-tab {
     top: 8px;
   }
 
-  .small-player_block .maximize:focus,
+  .small-player_block .maximize-button:focus,
   .small-player_block .play-button:focus{
     outline: none; }
   .small-player_block .play-button:hover,
-  .small-player_block .maximize:hover {
+  .small-player_block .maximize-button:hover {
     opacity: 0.7; }
-  .small-player_block .maximize svg,
+  .small-player_block .maximize-button svg,
   .small-player_block .play-button svg {
     display: block; }
-  .small-player_block .maximize:hover svg,
-  .small-player_block .maximize:active svg,
-  .small-player_block .maximize.active svg,
+  .small-player_block .maximize-button:hover svg,
+  .small-player_block .maximize-button:active svg,
+  .small-player_block .maximize-button.active svg,
   .small-player_block .play-button:hover svg,
   .small-player_block .play-button:active svg,
   .small-player_block .play-button.active svg {
