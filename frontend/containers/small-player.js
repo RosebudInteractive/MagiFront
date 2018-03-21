@@ -83,12 +83,14 @@ export default class SmallPlayer extends React.Component {
         })
     }
 
-    _maximize() {
+    _maximize(e) {
+        console.log(e);
         this.setState({redirect: true});
     }
 
     render() {
         if ((this.state.redirect) && (this.props.course) && (this.props.lesson)) {
+            this.setState({redirect: false})
             return <Redirect push to={'/play-lesson/' + this.props.course.URL + '/' + this.props.lesson.URL} />;
         }
 

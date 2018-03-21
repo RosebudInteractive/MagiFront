@@ -193,7 +193,7 @@ class Player extends React.Component {
 
         let _activeLesson = this._getLessonInfo(this.props.lessonInfo),
             _isActiveLesson = _activeLesson ? (_activeLesson.Id === lesson.Id) : false;
-
+        let that = this;
         return _isActiveLesson ?
             <PlayerWrapper key={key}
                            lesson={lesson}
@@ -208,32 +208,32 @@ class Player extends React.Component {
                            onPause={::this._handlePause}
                            onPlay={::this._handlePlay}
                            onMute={() => {
-                               if (this._player) {
-                                   this._player.mute()
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.mute()
+                                   that.setState({
                                        muted: true
                                    })
                                }
                            }}
                            onUnmute={() => {
-                               if (this._player) {
-                                   this._player.unmute()
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.unmute()
+                                   that.setState({
                                        muted: false
                                    })
                                }
                            }}
                            onSetVolume={(value) => {
-                               if (this._player) {
-                                   this._player.setVolume(value)
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.setVolume(value)
+                                   that.setState({
                                        volume: value
                                    })
                                }
                            }}
                            onLeavePage={() => {
-                               if (this._player) {
-                                   this.props.appActions.switchToSmallPlayer()
+                               if (that._player) {
+                                   that.props.appActions.switchToSmallPlayer()
                                }
                            }}
                            onGoToContent={::this._handleGoToContent}
