@@ -1,6 +1,7 @@
 import template from 'template'
 
-export default class CWSBase {
+
+export default class CWSBase{
     static prepareTemplates(tpl) {
         this._templates = template.parseTemplate(tpl);
     }

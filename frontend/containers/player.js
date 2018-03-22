@@ -43,13 +43,16 @@ class Player extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.player);
-
     }
 
     componentWillUnmount() {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
+        if (this._player) {
+            // this._player.off('play');
+            // this._player.off('pause');
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -104,16 +107,35 @@ class Player extends React.Component {
                     this._player.play();
 
                     this.setState({
-                        paused: false,
+                        // paused: false,
                         muted: e.muted,
                         volume: e.volume,
                     })
-                }
+                },
+                onPaused: () => {
+                    this.setState({
+                        paused: true
+                    })
+                },
             };
 
-            let _needReload = (!getInstance() || getInstance().lesson.Id !== this.props.lessonInfo.object.Id)
+            let _isNewPlayer = !getInstance();
 
             this._player = NestedPlayer(_options);
+
+            if (_isNewPlayer) {
+                this._player.on('pause', () => {
+                    this.setState({
+                        paused: true
+                    })
+                });
+
+                this._player.on('play', () => {
+                    this.setState({
+                        paused: false
+                    })
+                });
+            }
 
             let _state = this._player.audioState;
             this.setState({
@@ -124,7 +146,7 @@ class Player extends React.Component {
                 content: _state.currentContent,
             });
 
-            getInstance().switchToFull(_needReload);
+            getInstance().switchToFull();
             this._mountPlayerGuard = true;
         }
     }

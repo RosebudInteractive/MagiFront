@@ -7,11 +7,13 @@ import $ from 'jquery'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
+import * as appActions from '../actions/app-actions';
 
-import LectureWrapper from '../components/lesson-page/lesson-wrapper'
+import LectureWrapper from '../components/lesson-page/lesson-wrapper';
+// import PlayerWrapper from '../components/player/wrapper'
+import NestedPlayer, {getInstance} from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
-// import FullpageWrapper from '../components/fullpage-wrapper';
 
 class LessonPage extends React.Component {
 
@@ -22,7 +24,8 @@ class LessonPage extends React.Component {
         this.state = {
             total: 0,
             currentActive: 0,
-            isMobile: $(window).width() < 900
+            isMobile: $(window).width() < 900,
+            paused: true,
         }
     }
 
@@ -31,55 +34,7 @@ class LessonPage extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
-
-        // window.addEventListener("resize", () => {
-        //     let _isMobile = window.innerWidth < 900;
-        //     if (_isMobile !== this.state.isMobile) {
-        //         if (this._mountGuard) {
-        //             $.fn.fullpage.destroy(true)
-        //             this._mountGuard = false
-        //             let _menu = $('.js-lectures-menu');
-        //             _menu.hide();
-        //         }
-        //         this.setState({isMobile: _isMobile})
-        //     }
-        // });
-    }
-
-    _mountFullpage() {
-        // if (($(window).width() > 900)) {
-            let _container = $('#fullpage-lesson');
-            if ((!this._mountGuard) &&(_container.length > 0)){
-                $('body').attr('data-page', 'fullpage-lesson');
-                const _options = this._getFullpageOptions();
-                _container.fullpage(_options)
-                // FullpageWrapper.getInstance().mount('lesson', _options);
-                this._mountGuard = true;
-            }
-        // }
-    }
-
-    _unmountFullpage() {
-        if (this._mountGuard) {
-
-            $.fn.fullpage.destroy(true)
-            // FullpageWrapper.getInstance().unmount('lesson');
-            this._mountGuard = false
-            let _menu = $('.js-lesson-menu');
-            _menu.remove();
-            // this._getAnchors().forEach((anchor) => {
-            //     let _menu = $('#lesson-menu-' + anchor.id);
-            //     _menu.remove();
-            // })
-
-            // let {id, number} = _anchors[nextIndex - 1];
-            // let _activeMenu = $('#lesson-menu-' + id);
-            // if (_activeMenu.length > 0) {
-            //     _activeMenu.show()
-            // }
-
-
-        }
+        this._needLoadPlayInfo = this.props.params === '?play'
     }
 
     componentDidMount() {
@@ -88,9 +43,22 @@ class LessonPage extends React.Component {
         });
     }
 
-    componentWillUnmount() {
-        this._unmountFullpage();
-        $('body').removeAttr('data-page');
+    componentWillReceiveProps(nextProps) {
+        if (
+            (this._needLoadPlayInfo) ||
+            (this.props.courseUrl !== nextProps.courseUrl) ||
+            (this.props.lessonUrl !== nextProps.lessonUrl) ||
+            ((this.props.params !== nextProps.params) && (nextProps.params === '?play'))
+        ) {
+            let _lesson = this._getLessonInfo(nextProps.lessonInfo);
+            if ((_lesson) && (_lesson.Id !== this._lessonId)) {
+                this.props.appActions.switchToFullPlayer();
+                this._lessonId = _lesson.Id;
+                this.props.lessonActions.getLessonPlayInfo(this._lessonId);
+                this._needLoadPlayInfo = false;
+                this._mountPlayerGuard = false;
+            }
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -100,6 +68,117 @@ class LessonPage extends React.Component {
         }
     }
 
+    componentWillUnmount() {
+        this._unmountFullpage();
+        this._unmountMouseMoveHandler();
+        $('body').removeAttr('data-page');
+    }
+
+    _getLessonInfo(info) {
+        if (!info.object) {
+            return null
+        }
+
+        let _subLesson = info.object.Lessons;
+        return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+    }
+
+    _mountFullpage() {
+        let _container = $('#fullpage-lesson');
+        if ((!this._mountGuard) && (_container.length > 0)) {
+            $('body').attr('data-page', 'fullpage-lesson');
+            const _options = this._getFullpageOptions();
+            _container.fullpage(_options)
+            this._mountGuard = true;
+        }
+    }
+
+    _unmountFullpage() {
+        if (this._mountGuard) {
+            $.fn.fullpage.destroy(true)
+            this._mountGuard = false
+            let _menu = $('.js-lesson-menu');
+            _menu.remove();
+        }
+    }
+
+    _mountPlayer(id) {
+        let _container = $('#player' + id),
+            _smallContainer = $('#small-player')
+        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object) && (this.props.lessonInfo.object)) {
+
+            let _options = {
+                data: this.props.lessonPlayInfo.object,
+                courseUrl: this.props.courseUrl,
+                lesson: this._getLessonInfo(this.props.lessonInfo),
+                div: _container,
+                smallDiv: _smallContainer,
+                onRenderContent: (content) => {
+                    this.setState({currentContents: content})
+                },
+                onCurrentTimeChanged: (e) => {
+                    this.setState({playTime: e})
+                },
+                onChangeContent: (e) => {
+                    this.setState({content: e.id})
+                },
+                onAudioLoaded: (e) => {
+                    if (e.paused) {
+                        this._player.play()
+                    }
+
+                    this.setState({
+                        // paused: false,
+                        muted: e.muted,
+                        volume: e.volume,
+                    })
+                },
+            };
+
+            let _isNewPlayer = !getInstance();
+
+            this._player = NestedPlayer(_options);
+            let that = this;
+
+            if (_isNewPlayer) {
+                this._player.on('pause', () => {
+                    // if (!that.state.paused) {
+                        that.setState({
+                            paused: true
+                        })
+                    // }
+
+                });
+
+                this._player.on('play', () => {
+                    // if (that.state.paused) {
+                        that.setState({
+                            paused: false
+                        })
+                    // }
+                });
+            }
+
+            let _state = this._player.audioState;
+            this.setState({
+                paused: _state.stopped,
+                muted: _state.muted,
+                volume: _state.volume,
+                playTime: _state.currentTime,
+                content: _state.currentContent,
+            });
+
+            getInstance().switchToFull();
+            this._mountPlayerGuard = true;
+        }
+    }
+
+
+    _unmountMouseMoveHandler() {
+        $(document).off('mousemove');
+        clearTimeout(this._timer);
+    }
+
     _createBundle(lesson, key, isMain) {
         let {authors} = this.props.lessonInfo;
 
@@ -107,15 +186,77 @@ class LessonPage extends React.Component {
             return author.Id === lesson.AuthorId
         });
 
-        return <LectureWrapper key={key}
-                               lesson={lesson}
-                               lessonUrl={this.props.lessonUrl}
-                               courseUrl={this.props.course.URL}
-                               courseTitle={this.props.course.Name}
-                               lessonCount={this.props.lessons.object.length}
-                               isMain={isMain}
-                               active={this.state.currentActive}
-        />
+        if ((lesson.URL === this.props.lessonUrl) && (this.props.params === '?play')) {
+
+            let that = this;
+            return <LectureWrapper key={key}
+                                   lesson={lesson}
+                                   lessonUrl={lesson.URL}
+                                   courseUrl={this.props.course.URL}
+                                   courseTitle={this.props.course.Name}
+                                   lessonCount={this.props.lessons.object.length}
+                                   isMain={isMain}
+                                   active={this.state.currentActive}
+                                   content={this.state.currentContents}
+                                   currentContent={this.state.content}
+                                   onPause={() => {
+                                       if (that._player) {
+                                           that._player.pause()
+                                       }
+                                   }}
+                                   onPlay={() => {
+                                       if (that._player) {
+                                           that._player.play()
+                                       }
+                                   }}
+                                   onMute={() => {
+                                       if (that._player) {
+                                           that._player.mute()
+                                           that.setState({
+                                               muted: true
+                                           })
+                                       }
+                                   }}
+                                   onUnmute={() => {
+                                       if (that._player) {
+                                           that._player.unmute()
+                                           that.setState({
+                                               muted: false
+                                           })
+                                       }
+                                   }}
+                                   onSetVolume={(value) => {
+                                       if (that._player) {
+                                           that._player.setVolume(value)
+                                           that.setState({
+                                               volume: value
+                                           })
+                                       }
+                                   }}
+                                   onLeavePage={() => {
+                                       if ((that._player) && (!that.state.paused)) {
+                                           that.props.appActions.switchToSmallPlayer()
+                                       }
+                                   }}
+                // onGoToContent={::this._handleGoToContent}
+                // onSetRate={::this._handleSetRate}
+                                   playTime={this.state.playTime}
+                                   volume={this.state.volume}
+                                   muted={this.state.muted}
+                                   paused={this.state.paused}
+                                   isPlayer={true}
+            />
+        } else {
+            return <LectureWrapper key={key}
+                                   lesson={lesson}
+                                   lessonUrl={this.props.lessonUrl}
+                                   courseUrl={this.props.course.URL}
+                                   courseTitle={this.props.course.Name}
+                                   lessonCount={this.props.lessons.object.length}
+                                   isMain={isMain}
+                                   active={this.state.currentActive}
+            />
+        }
     }
 
     _getLessonsBundles() {
@@ -225,7 +366,8 @@ class LessonPage extends React.Component {
         } = this.props;
 
         if (lessonInfo.object) {
-            this._mountFullpage()
+            this._mountFullpage();
+            this._mountPlayer(this._getLessonInfo(lessonInfo).Id);
         }
 
         return (
@@ -251,8 +393,10 @@ function mapStateToProps(state, ownProps) {
         lessonUrl: ownProps.match.params.lessonUrl,
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
+        lessonPlayInfo: state.lessonPlayInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
+        params: ownProps.location.search,
     }
 }
 
@@ -260,6 +404,7 @@ function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(lessonActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

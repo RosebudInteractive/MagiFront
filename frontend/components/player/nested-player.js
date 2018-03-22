@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import $ from 'jquery'
 
 import Player from "work-shop/player";
@@ -22,9 +23,10 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
-class NestedPlayer {
+class NestedPlayer extends EventEmitter {
 
     constructor(options) {
+        super();
         this._options = this._getPlayerOptions();
         this._fullPlayer = new Player(options.div, this._options);
         this._smallPlayer = new Player(options.smallDiv, this._options);
@@ -95,11 +97,13 @@ class NestedPlayer {
     pause() {
         this.player.pause()
         this._isHardStopped = false;
+        // this.emit('pause')
     }
 
     play() {
         this.player.play()
         this._isHardStopped = false;
+        // this.emit('play')
     }
 
     stop() {
@@ -133,22 +137,20 @@ class NestedPlayer {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause();
+                _oldPlayer.pause()
                 this.player.play();
             }
         }
     }
 
-    switchToFull(isLoadNew) {
+    switchToFull() {
         if ((!this.player.getStopped()) && !this._isFull){
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
                 _oldPlayer.pause();
-                if (!isLoadNew) {
-                    this.player.play();
-                }
+                this.player.play();
             }
         }
     }
@@ -232,6 +234,12 @@ class NestedPlayer {
                         paused: state.stopped
                     })
                 }
+            },
+            onPaused: () => {
+                that.emit('pause')
+            },
+            onStarted: () => {
+                that.emit('play')
             }
         };
     }
@@ -282,14 +290,9 @@ class NestedPlayer {
     _findAudio(assets) {
         if (!assets) return null;
 
-        // for (var i = 0; i < assets.length; i++) {
-        //     if (assets[i].type == "MP3") return assets[i];
-        // }
         return assets.find((item) => {
             return item.type === 'MP3'
         })
-
-        // return null;
     }
 
     _loadAudio(audio) {

@@ -25,14 +25,13 @@ class Wrapper extends Component {
 
     render() {
         return (
-            <section className='fullpage-section player-wrapper'
+            <section className='fullpage-section lecture-wrapper player-wrapper'
                      style={(this.props.showCover ? {backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"} : null)}>
                     <Menu {...this.props}
                           current={this.props.lesson.Number}
                           active={this.props.active}
                           total={this.props.lessonCount}
                           id={'lesson-menu-' + this.props.lesson.Id}
-                          parent={'player'}
                     />
                     <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + "/transcript"} className="link-to-transcript _reduced">Транскрипт <br/>и материалы</Link>
                     <PlayerFrame {...this.props}/>

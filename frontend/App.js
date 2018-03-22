@@ -119,7 +119,7 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
-                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl'} component={Player}/>
+                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl/:state'} component={Player}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>

@@ -387,8 +387,10 @@ export default class CWSPlayer extends CWSBase {
                     });
             }
         }).on("pause", function () {
+            that.pause();
             that._broadcastPaused();
         }).on("play", function () {
+            that.play();
             that._broadcastStarted();
         }).on("error", function (e) {
             that.pause();
@@ -518,8 +520,12 @@ export default class CWSPlayer extends CWSBase {
     }
 
     pause() {
-        if (!this._audioState.stopped) this._audioState.audio.pause();
-        this._audioState.stopped = true;
+
+        if (!this._audioState.stopped) {
+            this._audioState.stopped = true;
+            this._audioState.audio.pause();
+        }
+        // this._audioState.stopped = true;
         cancelAnimationFrame(this._audioState.requestAnimationFrameID);
         this._pauseElements();
     }

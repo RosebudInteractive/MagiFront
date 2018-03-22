@@ -18,6 +18,8 @@ export default class SmallPlayer extends React.Component {
             isMobile: false,
             redirect: false,
         }
+
+        this._listenerMounted = false;
     }
 
     static propTypes = {
@@ -38,12 +40,34 @@ export default class SmallPlayer extends React.Component {
             })
         }
 
-
         if (Player.getInstance() && (this.props.visible !== prevProps.visible)) {
             if (this.props.visible) {
                 Player.getInstance().switchToSmall()
             }
         }
+
+        this._mountPlayerListener();
+    }
+
+    _mountPlayerListener() {
+        let _player = Player.getInstance();
+
+        if ((!this._listenerMounted) && (_player)){
+            _player.on('pause', () => {
+                this.setState({
+                    paused: true
+                })
+            });
+
+            _player.on('play', () => {
+                this.setState({
+                    paused: false
+                })
+            });
+
+            this._listenerMounted = true;
+        }
+
     }
 
     _onPlayClick() {
@@ -60,10 +84,6 @@ export default class SmallPlayer extends React.Component {
         if (Player.getInstance()) {
             Player.getInstance().pause()
         }
-
-        this.setState({
-            paused: true
-        })
     }
 
     _onClick() {
@@ -78,20 +98,16 @@ export default class SmallPlayer extends React.Component {
 
     _close() {
         Player.getInstance().stop();
-        this.setState({
-            paused: true
-        })
     }
 
-    _maximize(e) {
-        console.log(e);
+    _maximize() {
         this.setState({redirect: true});
     }
 
     render() {
         if ((this.state.redirect) && (this.props.course) && (this.props.lesson)) {
             this.setState({redirect: false})
-            return <Redirect push to={'/play-lesson/' + this.props.course.URL + '/' + this.props.lesson.URL} />;
+            return <Redirect push to={'/' + this.props.course.URL + '/' + this.props.lesson.URL + '?play'} />;
         }
 
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
@@ -100,16 +116,13 @@ export default class SmallPlayer extends React.Component {
             _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
         let _player = Player.getInstance(),
-            _link = _player ? '/play-lesson/' + _player.courseUrl + '/' + _player.lesson.URL : null,
+            _link = _player ? '/' + _player.courseUrl + '/' + _player.lesson.URL + '?play' : null,
             _text = (_player && _player.lesson) ?
                 (_player.lesson.Number + '. ' + _player.lesson.Name)
                 :
                 null;
 
-        let _paused = Player.getInstance() ? Player.getInstance().audioState.stopped : true,
-            _stopped = Player.getInstance() ? Player.getInstance()._isHardStopped : false;
-
-
+        let _stopped = Player.getInstance() ? Player.getInstance()._isHardStopped : false;
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
@@ -128,7 +141,7 @@ export default class SmallPlayer extends React.Component {
                                              dangerouslySetInnerHTML={{__html: _maximize}}/>
                                     </button>
                                 </Link>
-                                {_paused ?
+                                {this.state.paused ?
                                     <button type="button" className="play-button" onClick={::this._onPlayClick}>
                                         <svg className="play" width="41" height="36"
                                              dangerouslySetInnerHTML={{__html: _play}}/>
