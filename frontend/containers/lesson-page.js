@@ -20,7 +20,7 @@ class LessonPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this._mountGuard = false;
+        this._mountFullPageGuard = false;
 
         this.state = {
             total: 0,
@@ -28,6 +28,21 @@ class LessonPage extends React.Component {
             isMobile: $(window).width() < 900,
             paused: true,
             redirectToPlayer: false,
+        }
+
+        this._internalRedirect = false;
+
+        let that = this;
+        this._handlePause = function () {
+            that.setState({
+                paused: this.audioState.stopped
+            })
+        }
+
+        this._handlePlay = function () {
+            that.setState({
+                paused: this.audioState.stopped
+            })
         }
     }
 
@@ -49,26 +64,36 @@ class LessonPage extends React.Component {
         let _lesson = this._getLessonInfo(nextProps.lessonInfo);
         let _player = getInstance();
 
-        if ((_player) && (_lesson) && (_player.lesson) && (_player.lesson.Id === _lesson.Id) && (nextProps.params !== '?play') && (!_player.audioState.stopped)) {
+        let _needRedirect = (_player) && (_lesson) && (_player.lesson) &&
+                            (_player.lesson.Id === _lesson.Id) &&
+                            (_player.lesson.URL === nextProps.lessonUrl) &&
+                            (nextProps.params !== '?play')
+                            // (!_player.audioState.stopped)
+
+        if (_needRedirect) {
             this.setState({
                 redirectToPlayer: true
             })
         }
 
-        if (
-            (this._needLoadPlayInfo) ||
-            (this.props.courseUrl !== nextProps.courseUrl) ||
-            (this.props.lessonUrl !== nextProps.lessonUrl) ||
-            ((this.props.params !== nextProps.params) && (nextProps.params === '?play'))
-        ) {
+        let _needInitPlayer = (this._needLoadPlayInfo) ||
+                            (
+                                (
+                                    (this.props.courseUrl !== nextProps.courseUrl) ||
+                                    (this.props.lessonUrl !== nextProps.lessonUrl) ||
+                                    (this.props.params !== nextProps.params)
+                                ) &&
+                                nextProps.params === '?play'
+                            )
 
-            if (_player) {
-                if ((_lesson) && (_player.lesson) && (_lesson.Id !== _player.lesson.Id)) {
-                    this._unmountPlayer();
-                    this.props.lessonActions.clearLessonPlayInfo();
+        if (_needInitPlayer) {
 
-                }
-            }
+            // if (_player) {
+            //     if ((_lesson) && (_player.lesson) && (_lesson.Id !== _player.lesson.Id)) {
+            //         this._unmountPlayer();
+            //         this.props.lessonActions.clearLessonPlayInfo();
+            //     }
+            // }
 
             if (_lesson) {
                 this.props.appActions.switchToFullPlayer();
@@ -80,6 +105,13 @@ class LessonPage extends React.Component {
         }
     }
 
+    // shouldComponentUpdate() {
+    //     let _needRender = !this._internalRedirect;
+    //     this._internalRedirect = false;
+    //
+    //     return _needRender;
+    // }
+
     componentDidUpdate(prevProps) {
         if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
             this.props.lessonActions.getLesson(this.props.courseUrl, this.props.lessonUrl);
@@ -90,7 +122,7 @@ class LessonPage extends React.Component {
     componentWillUnmount() {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
-        // this._unmountPlayer();
+        this._unmountPlayer();
         $('body').removeAttr('data-page');
     }
 
@@ -105,18 +137,18 @@ class LessonPage extends React.Component {
 
     _mountFullpage() {
         let _container = $('#fullpage-lesson');
-        if ((!this._mountGuard) && (_container.length > 0)) {
+        if ((!this._mountFullPageGuard) && (_container.length > 0)) {
             $('body').attr('data-page', 'fullpage-lesson');
             const _options = this._getFullpageOptions();
             _container.fullpage(_options)
-            this._mountGuard = true;
+            this._mountFullPageGuard = true;
         }
     }
 
     _unmountFullpage() {
-        if (this._mountGuard) {
+        if (this._mountFullPageGuard) {
             $.fn.fullpage.destroy(true)
-            this._mountGuard = false
+            this._mountFullPageGuard = false
             let _menu = $('.js-lesson-menu');
             _menu.remove();
         }
@@ -152,8 +184,6 @@ class LessonPage extends React.Component {
                         muted: e.muted,
                         volume: e.volume,
                     })
-
-
                 },
             };
 
@@ -162,8 +192,8 @@ class LessonPage extends React.Component {
             this._player = NestedPlayer(_options);
 
             // if (_isNewPlayer) {
-            //     this._player.on('pause', handlePause);
-            //     this._player.on('play', handlePlay);
+                this._player.addListener('pause', this._handlePause);
+                this._player.addListener('play', this._handlePlay);
             // }
 
             let _state = this._player.audioState;
@@ -181,26 +211,14 @@ class LessonPage extends React.Component {
         }
     }
 
-    // _handlePlay() {
-    //     this.setState({
-    //         paused: this._player.audioState.stopped
-    //     })
-    // }
-
-    _handlePause() {
-        this.setState({
-            paused: this._player.audioState.stopped
-        })
-    }
-
     _unmountPlayer() {
         if (this._player) {
-            this._player.stop();
-            this.props.lessonActions.clearLessonPlayInfo();
-            this._mountPlayerGuard = false;
+            // this._player.stop();
+            // this.props.lessonActions.clearLessonPlayInfo();
+            // this._mountPlayerGuard = false;
 
-            // this._player.removeListener('pause', ::this._handlePause);
-            // this._player.removeListener('play', ::this._handlePlay)
+            this._player.removeListener('pause', this._handlePause);
+            this._player.removeListener('play', this._handlePlay)
         }
     }
 
@@ -232,17 +250,11 @@ class LessonPage extends React.Component {
                                    onPause={() => {
                                        if (that._player) {
                                            that._player.pause()
-                                           that.setState({
-                                               paused: true
-                                           })
                                        }
                                    }}
                                    onPlay={() => {
                                        if (that._player) {
                                            that._player.play()
-                                           that.setState({
-                                               paused: false
-                                           })
                                        }
                                    }}
                                    onMute={() => {
@@ -385,8 +397,9 @@ class LessonPage extends React.Component {
                 if (_activeMenu.length > 0) {
                     _activeMenu.show()
                 }
-                this.setState({currentActive: number})
-                // this.props.history.replace('/' + this.props.courseUrl + '/' + _anchors[nextIndex - 1].url)
+                this.setState({currentActive: number});
+                this._internalRedirect = true;
+                this.props.history.replace('/' + this.props.courseUrl + '/' + _anchors[nextIndex - 1].url)
             },
             afterLoad: (anchorLink, index) => {
                 let {id, number} = _anchors[index - 1];
@@ -441,12 +454,6 @@ class LessonPage extends React.Component {
         )
     }
 }
-
-// function handlePause() {
-//     this.setState({
-//         paused: this._player.audioState.stopped
-//     })
-// }
 
 function mapStateToProps(state, ownProps) {
     return {

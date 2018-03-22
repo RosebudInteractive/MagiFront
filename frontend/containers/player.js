@@ -18,7 +18,7 @@ class Player extends React.Component {
 
     constructor(props) {
         super(props);
-        this._mountGuard = false;
+        this._mountFullPageGuard = false;
 
         this.state = {
             total: 0,
@@ -65,19 +65,19 @@ class Player extends React.Component {
     _mountFullpage() {
         // if (($(window).width() > 900)) {
             let _container = $('#fullpage-player');
-            if ((!this._mountGuard) && (_container.length > 0)) {
+            if ((!this._mountFullPageGuard) && (_container.length > 0)) {
                 $('body').attr('data-page', 'fullpage-player');
                 const _options = this._getFullpageOptions();
                 _container.fullpage(_options)
-                this._mountGuard = true;
+                this._mountFullPageGuard = true;
             }
         // }
     }
 
     _unmountFullpage() {
-        if (this._mountGuard) {
+        if (this._mountFullPageGuard) {
             $.fn.fullpage.destroy(true)
-            this._mountGuard = false
+            this._mountFullPageGuard = false
             let _menu = $('.js-player-menu');
             _menu.remove();
         }
