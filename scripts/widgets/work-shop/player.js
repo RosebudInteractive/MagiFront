@@ -514,20 +514,61 @@ export default class CWSPlayer extends CWSBase {
     }
 
     play() {
-        this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
-        if (this._audioState.stopped) this._audioState.audio.play();
-        this._audioState.stopped = false;
+        let that = this;
+        let tmInt = null;
+        return new Promise((resolve, reject) => {
+            this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
+            if (this._audioState.stopped) {
+                this._audioState.$audio.on("play", awaitPlayerPlay);
+                this._audioState.audio.play();
+                tmInt = setTimeout(function () {
+                    reject();
+                }, 1000)
+            }
+
+            if (this._audioState.stopped) {
+                setTimeout(function () {
+                    resolve();
+                }, 0)
+            }
+
+            this._audioState.stopped = false;
+
+            function awaitPlayerPlay() {
+                clearInterval(tmInt);
+                that._audioState.$audio.off("play", awaitPlayerPlay);
+                resolve();
+            }
+        });
     }
 
     pause() {
-
-        if (!this._audioState.stopped) {
+        let that = this;
+        let tmInt = null;
+        return new Promise((resolve, reject) => {
+            if (!this._audioState.stopped) {
+                this._audioState.$audio.on("pause", awaitPlayerPause);
+                this._audioState.audio.pause();
+                tmInt = setTimeout(function () {
+                    reject();
+                }, 1000)
+            }
+            if (this._audioState.stopped) {
+                setTimeout(function () {
+                    resolve();
+                }, 0)
+            }
             this._audioState.stopped = true;
-            this._audioState.audio.pause();
-        }
-        // this._audioState.stopped = true;
-        cancelAnimationFrame(this._audioState.requestAnimationFrameID);
-        this._pauseElements();
+            cancelAnimationFrame(this._audioState.requestAnimationFrameID);
+            this._pauseElements();
+
+            function awaitPlayerPause() {
+                clearInterval(tmInt);
+                that._audioState.$audio.off("pause", awaitPlayerPause);
+                resolve();
+            }
+        });
+
     }
 
     /* from 0.1 to 1 */
