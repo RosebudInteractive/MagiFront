@@ -14,8 +14,8 @@ export default class Gallery extends React.Component {
 
     _getList() {
         return this.props.gallery.map((item, index) => {
-            return <Link to={'#'} className={'gallery-item'}>
-                <div className="gallery-item__preview" key={index}>
+            return <Link to={'#'} className={'gallery-item'} key={index}>
+                <div className="gallery-item__preview">
                     <span className="number">{index + 1 + '.'}</span>
                     <div className="gallery-item__image">
                         <img src={'/data/' + item.FileName}/>

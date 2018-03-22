@@ -26,7 +26,7 @@ export default class Progress extends React.Component {
     }
 
     componentDidMount() {
-        $("#timeline").mousemove((event) => {
+        $("#timeline" + this.props.id).mousemove((event) => {
             let _current = event.pageX - event.currentTarget.offsetLeft,
                 _total = event.currentTarget.offsetWidth - 1;
 
@@ -69,7 +69,7 @@ export default class Progress extends React.Component {
         let _playPercent = total ? ((current * 100) / total) : 0;
 
         return (
-            <div className="player-block__progress" id="timeline" onClick={::this._setCurrentPosition}>
+            <div className="player-block__progress" id={"timeline" + this.props.id} onClick={::this._setCurrentPosition}>
                 <div className="player-block__play" style={{width: _playPercent + '%'}}>
                     <span className="indicator"/>
                 </div>

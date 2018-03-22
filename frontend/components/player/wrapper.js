@@ -11,7 +11,7 @@ class Wrapper extends Component {
         courseUrl: PropTypes.string.isRequired,
         lessonUrl: PropTypes.string.isRequired,
         lessonCount: PropTypes.number.isRequired,
-        content: PropTypes.array.isRequired,
+        content: PropTypes.array,
         currentContent: PropTypes.number,
         onPause: PropTypes.func,
         onSetRate:  PropTypes.func,
@@ -20,11 +20,13 @@ class Wrapper extends Component {
         onGoToContent: PropTypes.func,
         onChangeContent: PropTypes.func,
         onChangeTitle: PropTypes.func,
+        showCover: PropTypes.bool,
     };
 
     render() {
         return (
-            <section className='fullpage-section player-wrapper'>
+            <section className='fullpage-section player-wrapper'
+                     style={(this.props.showCover ? {backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"} : null)}>
                     <Menu {...this.props}
                           current={this.props.lesson.Number}
                           active={this.props.active}

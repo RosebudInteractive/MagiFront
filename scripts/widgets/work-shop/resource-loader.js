@@ -505,8 +505,13 @@
                 }
 
                 if (id && !this._alreadyLoadedAudio(id)) {
-                    let url = "/data/" + id;
-                    let audio = new Audio();
+                    var url = "/data/" + id;
+                    var audio = new Audio();
+
+                    audio.onerror = function() {
+                        console.log(audio.error)
+                    }
+
                     audio.preload = true;
                     audio.src = url;
                     this._state.loadedData.audios[id] = {

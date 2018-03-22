@@ -6094,7 +6094,7 @@ ul.user-tooltip {
     .courses {
       padding-top: 64px; } }
 
-.lecture-wrapper {
+.lecture-wrapper, .player-wrapper {
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   background-size: cover;
@@ -10878,14 +10878,15 @@ ul.lectures-tab {
   -moz-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  /*height: calc(100vh - 54px);*/
+  /*height: -webkit-calc(100vh - 54px);*/
   padding-top: 48px; }
   @media (max-width: 900px) {
     .player-frame {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      height: -webkit-calc(100vh - 54px);
-      height: calc(100vh - 54px); } }
+      height: auto} }
   @media (max-width: 600px) {
     .player-frame {
       -webkit-box-sizing: border-box;
@@ -10902,8 +10903,8 @@ ul.lectures-tab {
     -webkit-transform: translateX(-50%);
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
-    width: 90%;
-    max-width: 540px;
+    width: 85%;
+    max-width: 250px;
     text-align: center;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
@@ -10933,8 +10934,7 @@ ul.lectures-tab {
     @media (max-width: 600px) {
       .player-frame__poster {
         position: relative;
-        margin-bottom: 14px;
-        height: 100%; }
+        margin-bottom: 14px;}
         .player-frame__poster:before, .player-frame__poster:after {
           content: "";
           position: absolute;
@@ -10960,8 +10960,9 @@ ul.lectures-tab {
       width: auto; }
   .player-frame__screen {
     position: absolute;
+    box-sizing: border-box;
     /*top: 97px;*/
-    bottom: 100px;
+    bottom: 0;
     left: 0;
     right: 0;
     display: -webkit-box;
@@ -10982,8 +10983,8 @@ ul.lectures-tab {
     -ms-flex-pack: end;
     justify-content: flex-end;
     background-color: rgba(47, 47, 47, 0.8);
-    height: 100vh;}
-    /*padding-bottom: 100px}*/
+    height: 100vh;
+    padding-bottom: 100px}
     @media (max-width: 600px) {
       .player-frame__screen {
         bottom: 0;
@@ -11063,6 +11064,142 @@ ul.lectures-tab {
   @media (max-width: 600px) {
     .player-frame .play-block--big {
       margin-bottom: 0; } }
+
+  .small-player-frame {
+    float: right;
+    position: fixed;
+    bottom: 100px;
+    right: 100px;
+    width: 250px;
+    height: 157px;
+    z-index: 20;
+    -webkit-transition: opacity 0.7s ease;
+    transition: opacity 0.7s ease;
+  }
+  .small-player__poster{
+    position: absolute;
+    background: #2F2F2F;
+    height: 100%;
+    width: 100%;
+    -webkit-transition: opacity 0.7s ease;
+    transition: opacity 0.7s ease;
+  }
+  @media (max-width: 900px) {
+    .small-player-frame {
+      bottom: 50px;
+      right: 50px;
+      width: 145px;
+      height: 91px;} }
+
+  .small-player-frame:hover .player-frame__poster-text {
+    opacity: 1;
+  }
+
+  .small-player-frame:hover .small-player_block  {
+      opacity: 1;
+    }
+
+  .small-player_block{
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+  }
+  @media (max-width: 900px) {
+    .small-player_block {
+      display: none; } }
+
+  .small-player_block .close-button,
+  .small-player_block .maximize-button,
+  .small-player_block .play-button {
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: absolute;
+  }
+
+  .small-player_block .maximize-button{
+    width: 41px;
+    height: 37px;
+    left: calc(50% - 41px/2 - 44.5px);
+    top: calc(50% - 37px/2 + 8.5px);
+  }
+
+  .small-player_block .play-button {
+    width: 41px;
+    height: 36px;
+    left: calc(50% - 23px/2 + 45.5px);
+    top: calc(50% - 36px/2 + 8px);
+  }
+
+  .small-player_block .close-button {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    right: 9px;
+    top: 8px;
+  }
+
+  .small-player_block .maximize:focus,
+  .small-player_block .play-button:focus{
+    outline: none; }
+  .small-player_block .play-button:hover,
+  .small-player_block .maximize:hover {
+    opacity: 0.7; }
+  .small-player_block .maximize svg,
+  .small-player_block .play-button svg {
+    display: block; }
+  .small-player_block .maximize:hover svg,
+  .small-player_block .maximize:active svg,
+  .small-player_block .maximize.active svg,
+  .small-player_block .play-button:hover svg,
+  .small-player_block .play-button:active svg,
+  .small-player_block .play-button.active svg {
+    -webkit-filter: drop-shadow(0 0 6px #c8684c);
+    filter: drop-shadow(0 0 6px #c8684c); }
+
+
+  .small-player-frame .player-frame__poster-text{
+    position: absolute;
+    height: 28px;
+    left: 117px;
+    right: -146px;
+    top: 7px;
+    font-family: "Fira Sans", serif;
+    font-style: normal;
+    font-weight: normal;
+    line-height: normal;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    vertical-align: top;
+    display: table-cell;
+    text-align: left;
+  }
+  @media (max-width: 900px) {
+    .small-player-frame .player-frame__poster-text {
+      display: none; } }
 
 .contents-tooltip {
   position: absolute;

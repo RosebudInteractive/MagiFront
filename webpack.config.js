@@ -32,7 +32,7 @@ const _prodConfig = {
                     path.resolve(__dirname, "frontend"),
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
-                    path.resolve(__dirname, 'scripts/lib'),
+                    path.resolve(__dirname, 'scripts/'),
                     path.resolve(__dirname, 'scripts/widgets/work-shop'),
                 ],
                 // language=JSRegexp
@@ -132,6 +132,7 @@ const _devConfig = {
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
                     path.resolve(__dirname, 'scripts/lib'),
+                    path.resolve(__dirname, 'scripts/widgets/work-shop'),
                 ],
                 test: /\.js$/
             },

@@ -224,6 +224,13 @@ export default class CWSPlayer extends CWSBase {
                         }
                     });
             }
+        }).on("pause", function () {
+            that._broadcastPaused();
+        }).on("play", function () {
+            that._broadcastStarted();
+        }).on("error", function (e) {
+            that.pause();
+            that._broadcastError(e);
         });
 
     }
@@ -241,17 +248,17 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
+        if (!curCont && !this._audioState.currentContent) return;
+
         if ((curCont && !this._audioState.currentContent) ||
             (!curCont && this._audioState.currentContent)
         ) {
             this._audioState.currentContent = curCont;
             this._broadcastChangeContent(curCont);
-        } else {
-            if (this._audioState.currentContent.title != curCont.title ||
+        } else if (this._audioState.currentContent.title != curCont.title ||
                 this._audioState.currentContent.begin != curCont.begin) {
                 this._audioState.currentContent = curCont;
                 this._broadcastChangeContent(curCont);
-            }
         }
     }
 
@@ -309,6 +316,21 @@ export default class CWSPlayer extends CWSBase {
     _broadcastCurrentTimeChanged() {
         if (this._options.onCurrentTimeChanged)
             this._options.onCurrentTimeChanged(this.getAudioState());
+    }
+
+    _broadcastPaused() {
+        if (this._options.onPaused)
+            this._options.onPaused();
+    }
+
+    _broadcastStarted() {
+        if (this._options.onStarted)
+            this._options.onStarted();
+    }
+
+    _broadcastError(e) {
+        if (this._options.onError)
+            this._options.onError();
     }
 
     getAudioState() {

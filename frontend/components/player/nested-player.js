@@ -25,65 +25,132 @@ window.Utils = Utils;
 class NestedPlayer {
 
     constructor(options) {
-        this.o1 = this._getPlayerOptions();
-        this.pl1 = new Player(options.div, this.o1);
-        this.pl = this.pl1;
+        this._options = this._getPlayerOptions();
+        this._fullPlayer = new Player(options.div, this._options);
+        this._smallPlayer = new Player(options.smallDiv, this._options);
+        this._player = this._fullPlayer;
+        this._isFull = true;
+        this._isHardStopped = false;
+
 
         this._applyOptions(options);
-        this.pl1.render();
+        this._fullPlayer.render();
+        this._smallPlayer.render();
         this._applyData(options.data);
     }
 
+    get player() {
+        return this._player
+    }
+
+    set player(value) {
+        if (!this._player !== value) {
+            this._player = value;
+            this._isFull = value === this._fullPlayer;
+        }
+    }
+
+    get audioState() {
+        return this.player.getAudioState()
+    }
+
+    get lesson() {
+        return this._lesson
+    }
+
+    get courseUrl() {
+        return this._courseUrl;
+    }
+
     _loadOtherLesson(options) {
-        this.pl1.initContainer(options.div);
+        this._fullPlayer.initContainer(options.div);
+        this._smallPlayer.initContainer(options.smallDiv);
 
         this._applyOptions(options);
-        this.pl1.render();
+        this._fullPlayer.render();
+        this._smallPlayer.render();
         this._applyData(options.data);
     }
 
     _applyOptions(options) {
+        this._isHardStopped = false;
         this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
         this._onChangeTitle = options.onChangeTitle;
         this._onChangeContent = options.onChangeContent;
         this._onAudioLoaded = options.onAudioLoaded;
+        this._courseUrl = options.courseUrl;
+        this._lesson = options.lesson;
     }
 
     _applyData(data) {
-        this.pl1.setData(data);
+        this._fullPlayer.setData(data);
+        this._smallPlayer.setData(data);
 
-        let content = this.pl1.getLectureContent();
+        let content = this._fullPlayer.getLectureContent();
         this._renderContent(content);
     }
 
     pause() {
-        this.pl.pause()
+        this.player.pause()
+        this._isHardStopped = false;
     }
 
     play() {
-        this.pl.play()
+        this.player.play()
+        this._isHardStopped = false;
+    }
+
+    stop() {
+        this.player.pause()
+        this._isHardStopped = true;
     }
 
     setPosition(begin) {
-        this.pl.setPosition(begin)
+        this.player.setPosition(begin)
     }
 
     setRate(value) {
-        this.pl.setRate(value)
+        this.player.setRate(value)
     }
 
     mute() {
-        this.pl.setMute(true)
+        this.player.setMute(true)
     }
 
     unmute() {
-        this.pl.setMute(false)
+        this.player.setMute(false)
     }
 
     setVolume(value) {
-        this.pl.setVolume(value)
+        this.player.setVolume(value)
+    }
+
+    switchToSmall() {
+        if ((!this.player.getStopped()) && this._isFull){
+            this.player = this._smallPlayer;
+            let _oldPlayer = this._fullPlayer;
+            this.player.setPosition(_oldPlayer.getPosition());
+            if (!_oldPlayer.getStopped()) {
+                _oldPlayer.pause();
+                this.player.play();
+            }
+        }
+    }
+
+    switchToFull(isLoadNew) {
+        if ((!this.player.getStopped()) && !this._isFull){
+            this.player = this._fullPlayer;
+            let _oldPlayer = this._smallPlayer;
+            this.player.setPosition(_oldPlayer.getPosition());
+            if (!_oldPlayer.getStopped()) {
+                _oldPlayer.pause();
+                if (!isLoadNew) {
+                    this.player.play();
+                }
+            }
+        }
     }
 
     _renderContent(content) {
@@ -106,8 +173,8 @@ class NestedPlayer {
                             if (audioObj) {
                                 that._loadAudio(audioObj)
                                     .then((audio) => {
-                                        that.pl1.setAudio(audio);
-                                        // pl2.setAudio(audio);
+                                        that._fullPlayer.setAudio(audio);
+                                        that._smallPlayer.setAudio(audio);
                                     });
                             }
 
@@ -132,13 +199,20 @@ class NestedPlayer {
             onAddElement: function () {
             },
             onChangeTitles: function (titles) {
-                var html = "";
-                for (var i = 0; i < titles.length; i++) {
-                    if (titles[i].title) {
-                        if (html != "") html += "<br/>";
-                        html += titles[i].title;
+                let html = "";
+                titles.forEach((item) => {
+                    if (item.title) {
+                        if (html !== "") html += "<br/>";
+                        html += item.title;
                     }
-                }
+                });
+
+                // for (var i = 0; i < titles.length; i++) {
+                //     if (titles[i].title) {
+                //         if (html !== "") html += "<br/>";
+                //         html += titles[i].title;
+                //     }
+                // }
 
                 $("#titles-place").html(html);
             },
@@ -149,7 +223,7 @@ class NestedPlayer {
             },
             onAudioInitialized(state){
                 if (that._onAudioLoaded) {
-                    // let _state = that.pl._audioState;
+                    // let _state = that.player._audioState;
                     that._onAudioLoaded({
                         currentTime: state.currentTime,
                         muted: state.muted,
@@ -208,10 +282,14 @@ class NestedPlayer {
     _findAudio(assets) {
         if (!assets) return null;
 
-        for (var i = 0; i < assets.length; i++) {
-            if (assets[i].type == "MP3") return assets[i];
-        }
-        return null;
+        // for (var i = 0; i < assets.length; i++) {
+        //     if (assets[i].type == "MP3") return assets[i];
+        // }
+        return assets.find((item) => {
+            return item.type === 'MP3'
+        })
+
+        // return null;
     }
 
     _loadAudio(audio) {
@@ -242,5 +320,9 @@ export default (options) => {
         _instance._loadOtherLesson(options)
     }
 
+    return _instance
+}
+
+export const getInstance = () => {
     return _instance
 }
