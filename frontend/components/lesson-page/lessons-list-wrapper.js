@@ -142,7 +142,7 @@ class PlayBlock extends React.Component {
                                     strokeDasharray="565.48" strokeDashoffset="0"/>
                         </svg>
                     </div>
-                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl}
+                    <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}
                           className="play-block__btn">
                         <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
                     </Link>

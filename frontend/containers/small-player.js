@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-import { Redirect } from 'react-router';
+import {Redirect} from 'react-router';
 import Swipeable from 'react-swipeable';
 import $ from 'jquery'
 
@@ -52,7 +52,7 @@ export default class SmallPlayer extends React.Component {
     _mountPlayerListener() {
         let _player = Player.getInstance();
 
-        if ((!this._listenerMounted) && (_player)){
+        if ((!this._listenerMounted) && (_player)) {
             _player.on('pause', () => {
                 this.setState({
                     paused: true
@@ -107,7 +107,7 @@ export default class SmallPlayer extends React.Component {
     render() {
         if ((this.state.redirect) && (this.props.course) && (this.props.lesson)) {
             this.setState({redirect: false})
-            return <Redirect push to={'/' + this.props.course.URL + '/' + this.props.lesson.URL + '?play'} />;
+            return <Redirect push to={'/' + this.props.course.URL + '/' + this.props.lesson.URL + '?play'}/>;
         }
 
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
@@ -116,7 +116,7 @@ export default class SmallPlayer extends React.Component {
             _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
         let _player = Player.getInstance(),
-            _link = _player ? '/' + _player.courseUrl + '/' + _player.lesson.URL + '?play' : null,
+            _link = (_player && _player.lesson) ? '/' + _player.courseUrl + '/' + _player.lesson.URL + '?play' : '#',
             _text = (_player && _player.lesson) ?
                 (_player.lesson.Number + '. ' + _player.lesson.Name)
                 :

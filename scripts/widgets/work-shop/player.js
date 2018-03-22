@@ -387,10 +387,10 @@ export default class CWSPlayer extends CWSBase {
                     });
             }
         }).on("pause", function () {
-            that.pause();
+            // that.pause();
             that._broadcastPaused();
         }).on("play", function () {
-            that.play();
+            // that.play();
             that._broadcastStarted();
         }).on("error", function (e) {
             that.pause();
