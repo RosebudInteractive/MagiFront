@@ -120,7 +120,7 @@ export default class Frame extends Component {
 
         }
 
-        if (this.state.currentToc !== nextProps.currentContent) {
+        if ((nextProps.currentContent) && (this.state.currentToc !== nextProps.currentContent)) {
             this.setState({
                 currentToc: nextProps.currentContent
             })

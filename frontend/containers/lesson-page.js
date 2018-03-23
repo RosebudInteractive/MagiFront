@@ -1,17 +1,15 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Redirect } from 'react-router';
+import {Redirect} from 'react-router';
 
 import $ from 'jquery'
-// import 'fullpage.js'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
 
 import LectureWrapper from '../components/lesson-page/lesson-wrapper';
-// import PlayerWrapper from '../components/player/wrapper'
 import NestedPlayer, {getInstance} from '../components/player/nested-player';
 
 import {pages} from '../tools/page-tools';
@@ -57,6 +55,7 @@ class LessonPage extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             this._mountFullpage();
+            this._mountMouseMoveHandler();
         });
     }
 
@@ -82,10 +81,9 @@ class LessonPage extends React.Component {
         }
 
         let _needRedirect = (_player) && (_lesson) && (_player.lesson) &&
-                            (_player.lesson.Id === _lesson.Id) &&
-                            (_player.lesson.URL === nextProps.lessonUrl) &&
-                            (nextProps.params !== '?play')
-                            // (!_player.audioState.stopped)
+            (_player.lesson.Id === _lesson.Id) &&
+            (_player.lesson.URL === nextProps.lessonUrl) &&
+            (nextProps.params !== '?play')
 
         if (_needRedirect) {
             this.setState({
@@ -94,33 +92,22 @@ class LessonPage extends React.Component {
         }
 
 
-
         let _needInitPlayer = (this._needLoadPlayInfo) ||
-                            (
-                                (
-                                    (this.props.courseUrl !== nextProps.courseUrl) ||
-                                    (this.props.lessonUrl !== nextProps.lessonUrl) ||
-                                    (this.props.params !== nextProps.params)
-                                ) &&
-                                nextProps.params === '?play'
-                            )
+            (
+                (
+                    (this.props.courseUrl !== nextProps.courseUrl) ||
+                    (this.props.lessonUrl !== nextProps.lessonUrl) ||
+                    (this.props.params !== nextProps.params)
+                ) &&
+                nextProps.params === '?play'
+            )
 
-        if (_needInitPlayer) {
-
-            // if (_player) {
-            //     if ((_lesson) && (_player.lesson) && (_lesson.Id !== _player.lesson.Id)) {
-            //         this._unmountPlayer();
-            //         this.props.lessonActions.clearLessonPlayInfo();
-            //     }
-            // }
-
-            if (_lesson) {
-                this.props.appActions.switchToFullPlayer();
-                this._lessonId = _lesson.Id;
-                this.props.lessonActions.getLessonPlayInfo(this._lessonId);
-                this._needLoadPlayInfo = false;
-                this._mountPlayerGuard = false;
-            }
+        if ((_needInitPlayer) && (_lesson)) {
+            this.props.appActions.switchToFullPlayer();
+            this._lessonId = _lesson.Id;
+            this.props.lessonActions.getLessonPlayInfo(this._lessonId);
+            this._needLoadPlayInfo = false;
+            this._mountPlayerGuard = false;
         }
     }
 
@@ -141,7 +128,7 @@ class LessonPage extends React.Component {
     componentWillUnmount() {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
-        this._unmountPlayer();
+        this._unmountPlayerEvents();
         $('body').removeAttr('data-page');
     }
 
@@ -176,6 +163,7 @@ class LessonPage extends React.Component {
     _mountPlayer(id) {
         let _container = $('#player' + id),
             _smallContainer = $('#small-player')
+
         if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object) && (this.props.lessonInfo.object)) {
 
             let _options = {
@@ -199,21 +187,16 @@ class LessonPage extends React.Component {
                     }
 
                     this.setState({
-                        // paused: e.paused,
                         muted: e.muted,
                         volume: e.volume,
                     })
                 },
             };
 
-            // let _isNewPlayer = !getInstance();
-
             this._player = NestedPlayer(_options);
 
-            // if (_isNewPlayer) {
-                this._player.addListener('pause', this._handlePause);
-                this._player.addListener('play', this._handlePlay);
-            // }
+            this._player.addListener('pause', this._handlePause);
+            this._player.addListener('play', this._handlePlay);
 
             let _state = this._player.audioState;
             this.setState({
@@ -230,15 +213,30 @@ class LessonPage extends React.Component {
         }
     }
 
-    _unmountPlayer() {
+    _unmountPlayerEvents() {
         if (this._player) {
-            // this._player.stop();
-            // this.props.lessonActions.clearLessonPlayInfo();
-            // this._mountPlayerGuard = false;
-
             this._player.removeListener('pause', this._handlePause);
             this._player.removeListener('play', this._handlePlay)
         }
+    }
+
+    _mountMouseMoveHandler() {
+        let that = this;
+
+        $(document).on('mousemove', () => {
+            $('body').removeClass('fade');
+            if (that._timer) {
+                clearTimeout(that._timer);
+            }
+
+            if ((!that.state.paused) && (getInstance()) && (that._activeLessonId === getInstance().lesson.Id)) {
+                that._timer = setTimeout(function () {
+                    $('body').addClass('fade');
+                }, 7000);
+            } else {
+                that._timer = null
+            }
+        });
     }
 
     _unmountMouseMoveHandler() {
@@ -425,14 +423,10 @@ class LessonPage extends React.Component {
                 }
                 that.props.history.replace(_newUrl)
 
-                if (getInstance()) {
-                    if (getInstance().lesson.Id === id) {
-                        // getInstance().switchToFull()
-                        // that.props.appActions.switchToFullPlayer();
-                    } else {
-                        getInstance().switchToSmall()
-                        that.props.appActions.switchToSmallPlayer();
-                    }
+                if (getInstance() && (getInstance().lesson.Id !== id)) {
+                    that._unmountPlayerEvents();
+                    getInstance().switchToSmall();
+                    that.props.appActions.switchToSmallPlayer();
                 }
             },
             afterLoad: (anchorLink, index) => {
@@ -443,6 +437,7 @@ class LessonPage extends React.Component {
                 }
 
                 that._internalRedirect = false;
+                this._activeLessonId = id;
                 that.setState({currentActive: number})
             },
             afterRender: () => {
@@ -466,7 +461,7 @@ class LessonPage extends React.Component {
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
             this.setState({redirectToPlayer: false})
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'} />;
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
         if (lessonInfo.object) {
