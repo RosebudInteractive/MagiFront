@@ -114,7 +114,10 @@ export default class Frame extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (this.props.content !== nextProps.content) {
-            this._calcContent(nextProps.content)
+            if (nextProps.content) {
+                this._calcContent(nextProps.content)
+            }
+
         }
 
         if (this.state.currentToc !== nextProps.currentContent) {
@@ -245,7 +248,7 @@ export default class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div>
+            <div style={this.props.visible ? null : {display: 'none'}}>
                 <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>

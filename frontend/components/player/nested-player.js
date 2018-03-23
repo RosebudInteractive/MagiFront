@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import $ from 'jquery'
 
 import Player from "work-shop/player";
@@ -22,9 +23,10 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
-class NestedPlayer {
+class NestedPlayer extends EventEmitter {
 
     constructor(options) {
+        super();
         this._options = this._getPlayerOptions();
         this._fullPlayer = new Player(options.div, this._options);
         this._smallPlayer = new Player(options.smallDiv, this._options);
@@ -95,16 +97,21 @@ class NestedPlayer {
     pause() {
         this.player.pause()
         this._isHardStopped = false;
+        this.emit('pause')
     }
 
     play() {
         this.player.play()
         this._isHardStopped = false;
+        this.emit('play')
     }
 
     stop() {
         this.player.pause()
+        this._lesson = null
         this._isHardStopped = true;
+        // this.removeAllListeners('pause');
+        // this.removeAllListeners('play');
     }
 
     setPosition(begin) {
@@ -128,27 +135,35 @@ class NestedPlayer {
     }
 
     switchToSmall() {
-        if ((!this.player.getStopped()) && this._isFull){
+        if (this._isFull) {
             this.player = this._smallPlayer;
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause();
-                this.player.play();
+                _oldPlayer.pause()
+                    .then(() => {
+                        this.player.play();
+                    })
+
             }
         }
     }
 
-    switchToFull(isLoadNew) {
-        if ((!this.player.getStopped()) && !this._isFull){
+
+    switchToFull() {
+        if (!this._isFull) {
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause();
-                if (!isLoadNew) {
-                    this.player.play();
-                }
+                _oldPlayer.pause()
+                    .then(() => {
+                        this.player.play();
+                    })
+
+            } else {
+                let _position = this.audioState.globalTime;
+                this.player.setPosition(_position);
             }
         }
     }
@@ -221,7 +236,7 @@ class NestedPlayer {
                     that._onChangeContent(content)
                 }
             },
-            onAudioInitialized(state){
+            onAudioInitialized(state) {
                 if (that._onAudioLoaded) {
                     // let _state = that.player._audioState;
                     that._onAudioLoaded({
@@ -232,6 +247,12 @@ class NestedPlayer {
                         paused: state.stopped
                     })
                 }
+            },
+            onPaused: () => {
+                that.emit('pause')
+            },
+            onStarted: () => {
+                that.emit('play')
             }
         };
     }
@@ -282,14 +303,9 @@ class NestedPlayer {
     _findAudio(assets) {
         if (!assets) return null;
 
-        // for (var i = 0; i < assets.length; i++) {
-        //     if (assets[i].type == "MP3") return assets[i];
-        // }
         return assets.find((item) => {
             return item.type === 'MP3'
         })
-
-        // return null;
     }
 
     _loadAudio(audio) {

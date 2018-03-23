@@ -20,9 +20,9 @@ export default class LessonFrame extends React.Component {
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
 
         return (
-            <div className="lecture-frame">
+            <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
                 <div className="lecture-frame__header">
-                    <a href="#" className="lecture-frame__play-link">
+                    <div className="lecture-frame__play-link">
                         {this.props.isMain ? null :
                             <button type="button" className="lecture-frame__plus">
                                 <span className="lecture-frame__plus-icon">
@@ -32,7 +32,7 @@ export default class LessonFrame extends React.Component {
                             </button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lesson.URL}>
+                            <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}>
                                 <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
                             </Link>
                             <span className="title-text">
@@ -45,7 +45,7 @@ export default class LessonFrame extends React.Component {
                             <p className="lecture-frame__descr">{lesson.ShortDescription}</p>
                             <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                         </div>
-                    </a>
+                    </div>
                     <SocialBlock/>
                 </div>
                 <div className="progress-bar">

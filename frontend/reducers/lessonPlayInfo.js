@@ -1,6 +1,8 @@
 import {
     GET_LESSON_PLAY_INFO_FAIL,
-    GET_LESSON_PLAY_INFO_REQUEST, GET_LESSON_PLAY_INFO_SUCCESS,
+    GET_LESSON_PLAY_INFO_REQUEST,
+    GET_LESSON_PLAY_INFO_SUCCESS,
+    CLEAR_LESSON_PLAY_INFO,
 } from '../constants/lesson'
 
 const initialState = {
@@ -25,6 +27,9 @@ export default function lessonPlayInfo(state = initialState, action) {
         }
 
         case GET_LESSON_PLAY_INFO_FAIL:
+            return initialState;
+
+        case CLEAR_LESSON_PLAY_INFO:
             return initialState;
 
         default:

@@ -18,7 +18,7 @@ class Player extends React.Component {
 
     constructor(props) {
         super(props);
-        this._mountGuard = false;
+        this._mountFullPageGuard = false;
 
         this.state = {
             total: 0,
@@ -43,13 +43,16 @@ class Player extends React.Component {
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.player);
-
     }
 
     componentWillUnmount() {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
+        if (this._player) {
+            // this._player.off('play');
+            // this._player.off('pause');
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -62,19 +65,19 @@ class Player extends React.Component {
     _mountFullpage() {
         // if (($(window).width() > 900)) {
             let _container = $('#fullpage-player');
-            if ((!this._mountGuard) && (_container.length > 0)) {
+            if ((!this._mountFullPageGuard) && (_container.length > 0)) {
                 $('body').attr('data-page', 'fullpage-player');
                 const _options = this._getFullpageOptions();
                 _container.fullpage(_options)
-                this._mountGuard = true;
+                this._mountFullPageGuard = true;
             }
         // }
     }
 
     _unmountFullpage() {
-        if (this._mountGuard) {
+        if (this._mountFullPageGuard) {
             $.fn.fullpage.destroy(true)
-            this._mountGuard = false
+            this._mountFullPageGuard = false
             let _menu = $('.js-player-menu');
             _menu.remove();
         }
@@ -104,16 +107,35 @@ class Player extends React.Component {
                     this._player.play();
 
                     this.setState({
-                        paused: false,
+                        // paused: false,
                         muted: e.muted,
                         volume: e.volume,
                     })
-                }
+                },
+                onPaused: () => {
+                    this.setState({
+                        paused: true
+                    })
+                },
             };
 
-            let _needReload = (!getInstance() || getInstance().lesson.Id !== this.props.lessonInfo.object.Id)
+            let _isNewPlayer = !getInstance();
 
             this._player = NestedPlayer(_options);
+
+            if (_isNewPlayer) {
+                this._player.on('pause', () => {
+                    this.setState({
+                        paused: true
+                    })
+                });
+
+                this._player.on('play', () => {
+                    this.setState({
+                        paused: false
+                    })
+                });
+            }
 
             let _state = this._player.audioState;
             this.setState({
@@ -124,7 +146,7 @@ class Player extends React.Component {
                 content: _state.currentContent,
             });
 
-            getInstance().switchToFull(_needReload);
+            getInstance().switchToFull();
             this._mountPlayerGuard = true;
         }
     }
@@ -193,7 +215,7 @@ class Player extends React.Component {
 
         let _activeLesson = this._getLessonInfo(this.props.lessonInfo),
             _isActiveLesson = _activeLesson ? (_activeLesson.Id === lesson.Id) : false;
-
+        let that = this;
         return _isActiveLesson ?
             <PlayerWrapper key={key}
                            lesson={lesson}
@@ -208,32 +230,32 @@ class Player extends React.Component {
                            onPause={::this._handlePause}
                            onPlay={::this._handlePlay}
                            onMute={() => {
-                               if (this._player) {
-                                   this._player.mute()
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.mute()
+                                   that.setState({
                                        muted: true
                                    })
                                }
                            }}
                            onUnmute={() => {
-                               if (this._player) {
-                                   this._player.unmute()
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.unmute()
+                                   that.setState({
                                        muted: false
                                    })
                                }
                            }}
                            onSetVolume={(value) => {
-                               if (this._player) {
-                                   this._player.setVolume(value)
-                                   this.setState({
+                               if (that._player) {
+                                   that._player.setVolume(value)
+                                   that.setState({
                                        volume: value
                                    })
                                }
                            }}
                            onLeavePage={() => {
-                               if (this._player) {
-                                   this.props.appActions.switchToSmallPlayer()
+                               if (that._player) {
+                                   that.props.appActions.switchToSmallPlayer()
                                }
                            }}
                            onGoToContent={::this._handleGoToContent}

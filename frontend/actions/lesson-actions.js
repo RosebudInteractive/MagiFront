@@ -11,6 +11,7 @@ import {
     GET_LESSON_PLAY_INFO_REQUEST,
     GET_LESSON_PLAY_INFO_SUCCESS,
     GET_LESSON_PLAY_INFO_FAIL,
+    CLEAR_LESSON_PLAY_INFO,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
@@ -123,6 +124,17 @@ export const getLessonPlayInfo = (lessonId) => {
             });
     }
 }
+
+export const clearLessonPlayInfo = () => {
+    return (dispatch) => {
+        dispatch({
+            type: CLEAR_LESSON_PLAY_INFO,
+            payload: null
+        });
+    }
+}
+
+
 
 
 const checkStatus = (response) => {
