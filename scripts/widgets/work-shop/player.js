@@ -387,10 +387,10 @@ export default class CWSPlayer extends CWSBase {
                     });
             }
         }).on("pause", function () {
-            that._audioState.stopped = true;
+            that.pause();
             that._broadcastPaused();
         }).on("play", function () {
-            that._audioState.stopped = false;
+            that.play();
             that._broadcastStarted();
         }).on("error", function (e) {
             that.pause();
@@ -522,8 +522,13 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.$audio.on("play", awaitPlayerPlay);
                 this._audioState.audio.play();
                 tmInt = setTimeout(function () {
-                    reject();
-                }, 1000)
+                    if (that._audioState.audio.paused) {
+                        this._audioState.stopped = false;
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }, 500)
             }
 
             if (this._audioState.stopped) {
@@ -550,9 +555,14 @@ export default class CWSPlayer extends CWSBase {
             if (!this._audioState.stopped) {
                 this._audioState.$audio.on("pause", awaitPlayerPause);
                 this._audioState.audio.pause();
-                tmInt = setTimeout(() => {
-                    reject();
-                }, 1000)
+                tmInt = setTimeout(function () {
+                    if (that._audioState.audio.paused) {
+                        this._audioState.stopped = true;
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }, 500)
             }
             if (this._audioState.stopped) {
                 setTimeout(() => {
