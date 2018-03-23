@@ -522,8 +522,12 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.$audio.on("play", awaitPlayerPlay);
                 this._audioState.audio.play();
                 tmInt = setTimeout(function () {
-                    reject();
-                }, 1000)
+                    if (that._audioState.audio.paused) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }, 500)
             }
 
             if (this._audioState.stopped) {
@@ -550,8 +554,12 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.$audio.on("pause", awaitPlayerPause);
                 this._audioState.audio.pause();
                 tmInt = setTimeout(function () {
-                    reject();
-                }, 1000)
+                    if (that._audioState.audio.paused) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }, 500)
             }
             if (this._audioState.stopped) {
                 setTimeout(function () {
