@@ -64,6 +64,23 @@ class LessonPage extends React.Component {
         let _lesson = this._getLessonInfo(nextProps.lessonInfo);
         let _player = getInstance();
 
+        let _anchor = this._getAnchors().find((item) => {
+            return item.url === nextProps.lessonUrl
+        })
+
+        let _isRedirectFromThisPage = (nextProps.params === '?play') &&
+            (_player) && (_lesson) && (_player.lesson) &&
+            (this.props.courseUrl === nextProps.courseUrl) &&
+            (this.props.lessonUrl !== nextProps.lessonUrl) &&
+            (_anchor);
+
+        if ((_isRedirectFromThisPage) && (!this._internalRedirect)) {
+            $.fn.fullpage.moveTo(_anchor.name);
+            getInstance().switchToFull()
+            this.props.appActions.switchToFullPlayer();
+            return
+        }
+
         let _needRedirect = (_player) && (_lesson) && (_player.lesson) &&
                             (_player.lesson.Id === _lesson.Id) &&
                             (_player.lesson.URL === nextProps.lessonUrl) &&
@@ -75,6 +92,8 @@ class LessonPage extends React.Component {
                 redirectToPlayer: true
             })
         }
+
+
 
         let _needInitPlayer = (this._needLoadPlayInfo) ||
                             (
@@ -105,12 +124,12 @@ class LessonPage extends React.Component {
         }
     }
 
-    // shouldComponentUpdate() {
-    //     let _needRender = !this._internalRedirect;
-    //     this._internalRedirect = false;
-    //
-    //     return _needRender;
-    // }
+    shouldComponentUpdate() {
+        let _needRender = !this._internalRedirect;
+        this._internalRedirect = false;
+
+        return _needRender;
+    }
 
     componentDidUpdate(prevProps) {
         if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {
@@ -369,6 +388,7 @@ class LessonPage extends React.Component {
     }
 
     _getFullpageOptions() {
+        let that = this;
         let _anchors = this._getAnchors();
 
 
@@ -397,9 +417,23 @@ class LessonPage extends React.Component {
                 if (_activeMenu.length > 0) {
                     _activeMenu.show()
                 }
-                this.setState({currentActive: number});
-                this._internalRedirect = true;
-                this.props.history.replace('/' + this.props.courseUrl + '/' + _anchors[nextIndex - 1].url)
+                that.setState({currentActive: number});
+                that._internalRedirect = true;
+                let _newUrl = '/' + this.props.courseUrl + '/' + _anchors[nextIndex - 1].url;
+                if ((that._player) && (that._player.lesson.Id === id)) {
+                    _newUrl += '?play'
+                }
+                that.props.history.replace(_newUrl)
+
+                if (getInstance()) {
+                    if (getInstance().lesson.Id === id) {
+                        // getInstance().switchToFull()
+                        // that.props.appActions.switchToFullPlayer();
+                    } else {
+                        getInstance().switchToSmall()
+                        that.props.appActions.switchToSmallPlayer();
+                    }
+                }
             },
             afterLoad: (anchorLink, index) => {
                 let {id, number} = _anchors[index - 1];
@@ -407,7 +441,9 @@ class LessonPage extends React.Component {
                 if (_activeMenu.length > 0) {
                     _activeMenu.show()
                 }
-                this.setState({currentActive: number})
+
+                that._internalRedirect = false;
+                that.setState({currentActive: number})
             },
             afterRender: () => {
                 let _url = this.props.lessonUrl;

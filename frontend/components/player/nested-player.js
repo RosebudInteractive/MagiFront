@@ -97,13 +97,13 @@ class NestedPlayer extends EventEmitter {
     pause() {
         this.player.pause()
         this._isHardStopped = false;
-        this.emit('pause')
+        // this.emit('pause')
     }
 
     play() {
         this.player.play()
         this._isHardStopped = false;
-        this.emit('play')
+        // this.emit('play')
     }
 
     stop() {
@@ -140,9 +140,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
+                this.player.play()
                     .then(() => {
-                        this.player.play();
+                        _oldPlayer.pause()
                     })
 
             }
@@ -156,9 +156,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
+                this.player.play()
                     .then(() => {
-                        this.player.play();
+                        _oldPlayer.pause();
                     })
 
             } else {
