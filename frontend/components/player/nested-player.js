@@ -141,7 +141,10 @@ class NestedPlayer extends EventEmitter {
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
                 _oldPlayer.pause()
-                this.player.play();
+                    .then(() => {
+                        this.player.play();
+                    })
+
             }
         }
     }
@@ -153,8 +156,11 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause();
-                this.player.play();
+                _oldPlayer.pause()
+                    .then(() => {
+                        this.player.play();
+                    })
+
             } else {
                 let _position = this.audioState.globalTime;
                 this.player.setPosition(_position);

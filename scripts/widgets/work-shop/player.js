@@ -387,10 +387,10 @@ export default class CWSPlayer extends CWSBase {
                     });
             }
         }).on("pause", function () {
-            // that.pause();
+            that._audioState.stopped = true;
             that._broadcastPaused();
         }).on("play", function () {
-            // that.play();
+            that._audioState.stopped = false;
             that._broadcastStarted();
         }).on("error", function (e) {
             that.pause();
@@ -527,16 +527,17 @@ export default class CWSPlayer extends CWSBase {
             }
 
             if (this._audioState.stopped) {
-                setTimeout(function () {
+                setTimeout(() => {
                     resolve();
                 }, 0)
             }
 
-            this._audioState.stopped = false;
+
 
             function awaitPlayerPlay() {
                 clearInterval(tmInt);
                 that._audioState.$audio.off("play", awaitPlayerPlay);
+                that._audioState.stopped = false;
                 resolve();
             }
         });
@@ -549,22 +550,23 @@ export default class CWSPlayer extends CWSBase {
             if (!this._audioState.stopped) {
                 this._audioState.$audio.on("pause", awaitPlayerPause);
                 this._audioState.audio.pause();
-                tmInt = setTimeout(function () {
+                tmInt = setTimeout(() => {
                     reject();
                 }, 1000)
             }
             if (this._audioState.stopped) {
-                setTimeout(function () {
+                setTimeout(() => {
                     resolve();
                 }, 0)
             }
-            this._audioState.stopped = true;
+
             cancelAnimationFrame(this._audioState.requestAnimationFrameID);
             this._pauseElements();
 
             function awaitPlayerPause() {
                 clearInterval(tmInt);
                 that._audioState.$audio.off("pause", awaitPlayerPause);
+                that._audioState.stopped = true;
                 resolve();
             }
         });

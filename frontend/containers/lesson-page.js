@@ -176,11 +176,11 @@ class LessonPage extends React.Component {
                 },
                 onAudioLoaded: (e) => {
                     if (e.paused) {
-                        // this._player.play()
+                        this._player.play()
                     }
 
                     this.setState({
-                        paused: e.paused,
+                        // paused: e.paused,
                         muted: e.muted,
                         volume: e.volume,
                     })
