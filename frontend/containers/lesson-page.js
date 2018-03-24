@@ -86,9 +86,13 @@ class LessonPage extends React.Component {
             (nextProps.params !== '?play')
 
         if (_needRedirect) {
-            this.setState({
-                redirectToPlayer: true
-            })
+            if (this._silentMove) {
+                this._silentMove = false
+            } else {
+                this.setState({
+                    redirectToPlayer: true
+                })
+            }
         }
 
 
@@ -102,12 +106,14 @@ class LessonPage extends React.Component {
                 nextProps.params === '?play'
             )
 
-        if ((_needInitPlayer) && (_lesson)) {
+        if (_needInitPlayer && _lesson) {
             this.props.appActions.switchToFullPlayer();
-            this._lessonId = _lesson.Id;
-            this.props.lessonActions.getLessonPlayInfo(this._lessonId);
-            this._needLoadPlayInfo = false;
-            this._mountPlayerGuard = false;
+            if (!this._internalRedirect) {
+                this._lessonId = _lesson.Id;
+                this.props.lessonActions.getLessonPlayInfo(this._activeLessonId ? this._activeLessonId : this._lessonId);
+                this._needLoadPlayInfo = false;
+                this._mountPlayerGuard = false;
+            }
         }
     }
 
@@ -137,8 +143,22 @@ class LessonPage extends React.Component {
             return null
         }
 
-        let _subLesson = info.object.Lessons;
-        return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+        let _lesson;
+        if (this._activeLessonId) {
+            _lesson = info.object.Id === this._activeLessonId ?
+                info.object
+                :
+                info.object.Lessons.find((lesson) => {
+                    return lesson.Id === this._activeLessonId
+                })
+        }
+
+        if (!_lesson) {
+            let _subLesson = info.object.Lessons;
+            _lesson = !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+        }
+
+        return _lesson
     }
 
     _mountFullpage() {
@@ -164,7 +184,7 @@ class LessonPage extends React.Component {
         let _container = $('#player' + id),
             _smallContainer = $('#small-player')
 
-        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object) && (this.props.lessonInfo.object)) {
+        if ((!this._mountPlayerGuard) && (_container.length > 0) && (this.props.lessonPlayInfo.object) && (this.props.lessonInfo.object) && (this._mountFullPageGuard)) {
 
             let _options = {
                 data: this.props.lessonPlayInfo.object,
@@ -214,7 +234,7 @@ class LessonPage extends React.Component {
     }
 
     _unmountPlayerEvents() {
-        if (this._player) {
+        if ((this._player) && (!this._internalRedirect)) {
             this._player.removeListener('pause', this._handlePause);
             this._player.removeListener('play', this._handlePlay)
         }
@@ -416,17 +436,21 @@ class LessonPage extends React.Component {
                     _activeMenu.show()
                 }
                 that.setState({currentActive: number});
-                that._internalRedirect = true;
-                let _newUrl = '/' + this.props.courseUrl + '/' + _anchors[nextIndex - 1].url;
-                if ((that._player) && (that._player.lesson.Id === id)) {
-                    _newUrl += '?play'
-                }
-                that.props.history.replace(_newUrl)
+                that._activeLessonId = id;
 
-                if (getInstance() && (getInstance().lesson.Id !== id)) {
-                    that._unmountPlayerEvents();
-                    getInstance().switchToSmall();
-                    that.props.appActions.switchToSmallPlayer();
+                if (that.props.lessonUrl !== _anchors[nextIndex - 1].url ){
+                    that._internalRedirect = true;
+                    let _newUrl = '/' + that.props.courseUrl + '/' + _anchors[nextIndex - 1].url;
+                    if ((that._player) && (that._player.lesson.Id === id)) {
+                        _newUrl += '?play'
+                    }
+                    that.props.history.replace(_newUrl)
+
+                    if (getInstance() && (getInstance().lesson.Id !== id)) {
+                        // that._unmountPlayerEvents();
+                        getInstance().switchToSmall();
+                        that.props.appActions.switchToSmallPlayer();
+                    }
                 }
             },
             afterLoad: (anchorLink, index) => {
@@ -437,7 +461,7 @@ class LessonPage extends React.Component {
                 }
 
                 that._internalRedirect = false;
-                this._activeLessonId = id;
+                that._activeLessonId = id;
                 that.setState({currentActive: number})
             },
             afterRender: () => {
@@ -447,6 +471,7 @@ class LessonPage extends React.Component {
                 })
 
                 if (_anchor) {
+                    that._silentMove = true;
                     $.fn.fullpage.silentMoveTo(_anchor.name);
                 }
             }

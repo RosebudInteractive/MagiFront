@@ -236,16 +236,16 @@ class NestedPlayer extends EventEmitter {
                     that._onChangeContent(content)
                 }
             },
-            onAudioInitialized(state) {
+            onAudioInitialized() {
                 if (that._onAudioLoaded) {
-                    // let _state = that.player._audioState;
-                    that._onAudioLoaded({
-                        currentTime: state.currentTime,
-                        muted: state.muted,
-                        rate: state.playbackRate,
-                        volume: state.volume,
-                        paused: state.stopped
-                    })
+                //     // let _state = that.player._audioState;
+                //     that._onAudioLoaded({
+                //         currentTime: state.currentTime,
+                //         muted: state.muted,
+                //         rate: state.playbackRate,
+                //         volume: state.volume,
+                //         paused: state.stopped
+                //     })
                 }
             },
             onPaused: () => {
