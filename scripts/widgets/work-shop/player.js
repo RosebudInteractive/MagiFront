@@ -340,7 +340,11 @@ export default class CWSPlayer extends CWSBase {
             this._options.loader.setPosition(this._audioState.globalTime);
             if (!this._audioState.stopped) audio.play();
             //this._audioState.audio.load();
-            this._broadcastAudioInitialized()
+            this._broadcastAudioInitialized();
+            // if ready state is greater, then onloaded event was already fired for the current element
+            if (this._audioState.audio.readyState >= 2) {
+                this._broadcastAudioLoaded();
+            }
         }
     }
 
@@ -507,13 +511,14 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _proccessAnimationFrame(timestamp) {
-        this._audioState.currentTime = this._audioState.audio.currentTime;
-        this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
-        this._broadcastCurrentTimeChanged();
-        if (!this._audioState.stopped) {
-            this._playElements(this._audioState.globalTime);
+        if (this._audioState.audio) {
+            this._audioState.currentTime = this._audioState.audio.currentTime;
+            this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
+            this._broadcastCurrentTimeChanged();
+            if (!this._audioState.stopped) {
+                this._playElements(this._audioState.globalTime);
+            }
         }
-        // console.log(this._audioState.audio.currentTime);
         this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
     }
 
@@ -536,7 +541,7 @@ export default class CWSPlayer extends CWSBase {
                 }, 500)
             }
 
-            if (that._audioState.stopped) {
+            if (!that._audioState.stopped) {
                 setTimeout(() => {
                     resolve();
                 }, 0)
@@ -570,6 +575,7 @@ export default class CWSPlayer extends CWSBase {
                     }
                 }, 500)
             }
+
             if (that._audioState.stopped) {
                 setTimeout(() => {
                     resolve();
