@@ -1,7 +1,13 @@
 /**
  * Created by levan.kiknadze on 19/05/2017.
  */
-requirejs.config({
+
+import CWorkShop from "work-shop/work-shop2";
+import 'jquery-ui/jquery-ui.js';
+import 'script-lib/binary-transport.js';
+import 'script-lib/mouseheld.js'
+
+/*requirejs.config({
     baseUrl: 'scripts',
     nodeRequire: require,
     paths: {
@@ -12,11 +18,7 @@ requirejs.config({
         "work-shop": '/scripts/widgets/work-shop'
     }
 });
-
-import CWorkShop from "work-shop/work-shop";
-import 'jquery-ui/jquery-ui.js';
-import 'script-lib/binary-transport.js';
-import 'script-lib/mouseheld.js'
+*/
 
 var Utils = {};
 

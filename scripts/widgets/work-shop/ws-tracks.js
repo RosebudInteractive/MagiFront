@@ -12,7 +12,7 @@ import CWSTrackTools from "./ws-track-tools"
 //        "./ws-track-tools"
 //    ],
 //    function (CWSBase, tpl, CWSTrackTools) {
-var steps = [1, 2, 5, 10, 20, 30, 60, 120, 180, 240, 360];
+let steps = [1, 2, 5, 10, 20, 30, 60, 120, 180, 240, 360];
 const STEP_WIDTH_MAX = 64;
 const STEP_WIDTH_MIN = 42;
 const STEP_TYPE_MIN = "minStepWidth";
@@ -69,34 +69,34 @@ export default class CWSTracks extends CWSBase {
             },
             _setRateMeter: (value) => {
 
-                var rateDiv = this._rate.select;
-                var rateValueDiv = this._rate.value;
+                let rateDiv = this._rate.select;
+                let rateValueDiv = this._rate.value;
 
-                var halfSize = rateDiv.height()/2;
-                var fullSize = rateDiv.height();
+                let halfSize = rateDiv.height()/2;
+                let fullSize = rateDiv.height();
 
-                var middleOffset = 4;
-                var rateValue = 0;
+                let middleOffset = 4;
+                let rateValue = 0;
 
                 if (value < halfSize-middleOffset) {
-                    var newValue = rateDiv.height() - value;
+                    let newValue = rateDiv.height() - value;
                     if (newValue > rateDiv.height()) newValue = rateDiv.height();
-                    var rateRatio = 2/rateDiv.height();
+                    let rateRatio = 2/rateDiv.height();
                     rateValue = newValue * rateRatio;
                     rateValueDiv.height(newValue);
                 } else if (value >= halfSize-middleOffset && value <= halfSize+middleOffset) {
-                    var newValue = rateDiv.height()/2;
-                    var rateRatio = 1/rateDiv.height();
+                    let newValue = rateDiv.height()/2;
+                    let rateRatio = 1/rateDiv.height();
                     rateValue = newValue * rateRatio + 0.5;
                     rateValueDiv.height(newValue);
                 } else {
-                    var newValue = rateDiv.height() - value;
+                    let newValue = rateDiv.height() - value;
                     if (newValue > rateDiv.height()) newValue = rateDiv.height();
-                    var rateRatio = 1/rateDiv.height();
+                    let rateRatio = 1/rateDiv.height();
                     rateValue = newValue * rateRatio + 0.5; //between
                     rateValueDiv.height(newValue);
                 }
-                var rateText = $('.ws-rate-select-text');
+                let rateText = $('.ws-rate-select-text');
                 rateText.text(rateValue.toFixed(2));
                 this._setRateText(rateValue.toFixed(2));
                 this._setRate(rateValue.toFixed(2));
@@ -111,23 +111,23 @@ export default class CWSTracks extends CWSBase {
     }
 
     render(tracks) {
-        var that = this;
-        var trackGuids = {};
+        let that = this;
+        let trackGuids = {};
         tracks = tracks || this._tracks || [];
         this._tracks = tracks;
 
-        var template = CWSTracks.template("track");
-        var closeTpl = CWSTracks.template("track-close");
+        let template = CWSTracks.template("track");
+        let closeTpl = CWSTracks.template("track-close");
 
-        for (var i = 0; i < tracks.length; i++) {
-            var track = tracks[i];
+        for (let i = 0; i < tracks.length; i++) {
+            let track = tracks[i];
             trackGuids[track.id] = true;
-            var item = this._list.find("#t_" + track.id);
+            let item = this._list.find("#t_" + track.id);
             if (item.length == 0) {
                 item = $(template);
                 item.attr("id", "t_" + track.id);
                 this._list.prepend(item);
-                var delBtn = $(closeTpl);
+                let delBtn = $(closeTpl);
                 delBtn.attr("id", "close_t_" + track.id).attr("data-track", track.id);
                 this._closeButtonsList.append(delBtn);
                 this._setDeleteBtnEvents(delBtn);
@@ -139,7 +139,7 @@ export default class CWSTracks extends CWSBase {
         }
 
         this._list.children().each(function () {
-            var id = $(this).attr("id").replace(/^t_/, '');
+            let id = $(this).attr("id").replace(/^t_/, '');
             if (!trackGuids[id]) {
                 $(this).remove();
                 that._closeButtonsList.find("#close_t_" + id).remove();
@@ -153,28 +153,28 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setFileEvents() {
-        // var that = this;
+        // let that = this;
         this._fileInput = this._container.find("input[type='file']");
 
         this._fileInput.change( (evt) => {
-            var files = evt.target.files; // FileList object
+            let files = evt.target.files; // FileList object
 
             // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, f; f = files[i]; i++) {
+            for (let i = 0, f; f = files[i]; i++) {
 
                 // Only process image files.
                 // if (!f.type.match('image.*')) {
                 //     continue;
                 // }
 
-                var reader = new FileReader();
+                let reader = new FileReader();
 
                 reader.addEventListener('load', (e) => {
-                    var dataUrl = e.target.result;
-                    var img = $("<img style='display: none'/>");
+                    let dataUrl = e.target.result;
+                    let img = $("<img style='display: none'/>");
                     this._container.append(img);
                     img.load( () => {
-                        var size = {
+                        let size = {
                             width: this.naturalWidth,
                             height: this.naturalHeight
                         };
@@ -186,11 +186,11 @@ export default class CWSTracks extends CWSBase {
                 // Closure to capture the file information.
                 // reader.onload = (function(theFile) {
                 //     return function(e) {
-                //         var dataUrl = e.target.result;
-                //         var img = $("<img style='display: none'/>");
+                //         let dataUrl = e.target.result;
+                //         let img = $("<img style='display: none'/>");
                 //         that._container.append(img);
                 //         img.load(function () {
-                //             var size = {
+                //             let size = {
                 //                 width: this.naturalWidth,
                 //                 height: this.naturalHeight
                 //             };
@@ -213,7 +213,7 @@ export default class CWSTracks extends CWSBase {
 
     _newImageLoaded(fileName, dataUrl, size) {
         if (!this._newElemData) return;
-        var base64 = dataUrl.split(',')[1];
+        let base64 = dataUrl.split(',')[1];
         this._broadcastAddAsset(fileName, base64, size, this._newElemData);
         this._newElemData = null;
     }
@@ -225,8 +225,8 @@ export default class CWSTracks extends CWSBase {
                 body: base64,
                 size: size
             }).then((assetId) => {
-                var track = this._findTrackByElement(elemData.id);
-                var trItem = $("#" + track.id);
+                let track = this._findTrackByElement(elemData.id);
+                let trItem = $("#" + track.id);
                 elemData.asset = {
                     id: assetId
                 };
@@ -242,13 +242,13 @@ export default class CWSTracks extends CWSBase {
     }
 
     setElementData(data) {
-        var el = this._findElement(data.id);
-        var that = this;
-        var trItem = null;
+        let el = this._findElement(data.id);
+        let that = this;
+        let trItem = null;
         if (el) {
-            for (var i = 0; i < this._tracks.length; i++) {
-                var track = this._tracks[i];
-                for (var j = 0; j < track.elements.length; j++) {
+            for (let i = 0; i < this._tracks.length; i++) {
+                let track = this._tracks[i];
+                for (let j = 0; j < track.elements.length; j++) {
                     if (track.elements[j].id == data.id) {
                         track.elements[j] = data;
                         trItem = $("#" + track.id);
@@ -264,11 +264,11 @@ export default class CWSTracks extends CWSBase {
     }
 
     assetsLoaded(assets) {
-        for (var k = 0; k < assets.length; k ++) {
-            for (var i = 0; i < this._tracks.length; i++) {
-                var track = this._tracks[i];
-                for (var j = 0; j < track.elements.length; j++) {
-                    var el = track.elements[j];
+        for (let k = 0; k < assets.length; k ++) {
+            for (let i = 0; i < this._tracks.length; i++) {
+                let track = this._tracks[i];
+                for (let j = 0; j < track.elements.length; j++) {
+                    let el = track.elements[j];
                     if (el.asset.id == assets[k].id) {
                         el.asset.body = $.extend(true, {}, assets[k]);
                     }
@@ -279,13 +279,13 @@ export default class CWSTracks extends CWSBase {
     }
 
     deleteFocused() {
-        for (var i = 0; i < this._tracks.length; i++) {
-            var track = this._tracks[i];
-            for (var j = 0; j < track.elements.length; j++) {
-                var el = track.elements[j];
+        for (let i = 0; i < this._tracks.length; i++) {
+            let track = this._tracks[i];
+            for (let j = 0; j < track.elements.length; j++) {
+                let el = track.elements[j];
                 if (el.focused) {
                     track.elements.splice(j, 1);
-                    var item = $("#" + track.id);
+                    let item = $("#" + track.id);
                     this._broadcastEditElement(item, track.elements);
                 }
             }
@@ -294,8 +294,8 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setZoomCircle(e_offsetX) {
-        var maxZoomPos = this._getMaxZoomPosition();
-        var new_position = e_offsetX
+        let maxZoomPos = this._getMaxZoomPosition();
+        let new_position = e_offsetX
         if (new_position < 0) new_position = 0;
         if (new_position > maxZoomPos) new_position = maxZoomPos;
         this._recalcZoomState(new_position);
@@ -306,7 +306,7 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setZoomEvents() {
-        var lineWrapperDown = false;
+        let lineWrapperDown = false;
         this._lineWrapper.on('mouseenter', (e) => {
             this._lineWrapper.addClass('ws-zoom-over');
             lineWrapperDown = false;
@@ -338,17 +338,17 @@ export default class CWSTracks extends CWSBase {
 
     _renderElements(elements, item) {
         if (!this._zoomState) return;
-        var cont = item.children(".ws-track-content");
+        let cont = item.children(".ws-track-content");
         if (!elements) cont.empty();
-        var p = this._getStepParams();
-        var template = CWSTracks.template("track-element");
+        let p = this._getStepParams();
+        let template = CWSTracks.template("track-element");
 
-        var css = {};
+        let css = {};
 
         cont.children(".ws-track-element").each(function () {
-            var oldElItem = $(this);
-            var found = false;
-            for (var i = 0; i < elements.length; i++) {
+            let oldElItem = $(this);
+            let found = false;
+            for (let i = 0; i < elements.length; i++) {
                 if (elements[i].id == oldElItem.attr("id").replace(/^te_/, '')) {
                     found = true;
                     break;
@@ -360,9 +360,9 @@ export default class CWSTracks extends CWSBase {
             }
         });
 
-        for (var i = 0; i < elements.length; i++) {
-            var element = elements[i];
-            var elItem = $("#te_" + element.id);
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements[i];
+            let elItem = $("#te_" + element.id);
 
             if (elItem.length > 0 && elItem.data("parentId") != item.attr("id").replace(/^t_/, '')) {
                 elItem.remove();
@@ -378,8 +378,8 @@ export default class CWSTracks extends CWSBase {
             elItem.data("data", element);
             elItem.data("parentId", item.attr("id").replace(/^t_/, ''));
 
-            var left = p.pixelsInSencond * element.start + p.offset;
-            var width = p.pixelsInSencond * element.content.duration;
+            let left = p.pixelsInSencond * element.start + p.offset;
+            let width = p.pixelsInSencond * element.content.duration;
             css.left = left;
             css.width = width;
 
@@ -399,7 +399,7 @@ export default class CWSTracks extends CWSBase {
             if (width >= 60) elItem.removeClass("no-title");
             else elItem.addClass("no-title");
 
-            var resource = null;
+            let resource = null;
             if (element.asset) {
                 resource = element.asset;
             } else if (this._options.onGetAsset) {
@@ -410,10 +410,10 @@ export default class CWSTracks extends CWSBase {
             if (resource) {
                 // console.log(resource);
                 elItem.find(".ws-element-text").text(resource.title);
-                var bk = null;
+                let bk = null;
 
                 if (resource.info.icon) {
-                    var iconPath = "/data/" + resource.info.path + resource.info.icon;
+                    let iconPath = "/data/" + resource.info.path + resource.info.icon;
                     if (resource.info.icon) bk = "url(" + iconPath + ") no-repeat center center";
                 }
                 elItem.find(".ws-element-pict").css({
@@ -444,7 +444,7 @@ export default class CWSTracks extends CWSBase {
 
     _setElementEvents(item, elItem) {
 
-        var that = this;
+        let that = this;
 
         this._elementResizeData = {
             stepParams: null,
@@ -468,21 +468,21 @@ export default class CWSTracks extends CWSBase {
 
             },
             drag: ( event, ui ) => {
-                //var track_list = $('ws-tracks-list-content');
-                var sc = $('.ws-tracks-list-scroll');
+                //let track_list = $('ws-tracks-list-content');
+                let sc = $('.ws-tracks-list-scroll');
                 // scroll treshold
-                var st = 10;
+                let st = 10;
                 // scroll step
-                var ss = 2;
+                let ss = 2;
                 // scroll position
-                var sp = {};
+                let sp = {};
                 sp.width = sc.width();
                 sp.height = sc.height();
                 sp.top = sc.offset().top;
                 sp.left = sc.offset().left;
 
                 //drag position
-                var dp = ui.offset;
+                let dp = ui.offset;
 
                 if (sp.top + st > dp.top) {
                     this._scrollerDiv.scrollerData.scrollBy(0, -ss);
@@ -497,12 +497,12 @@ export default class CWSTracks extends CWSBase {
                     this._scrollerDiv.scrollerData.scrollBy(ss, 0);
                 }
 
-                var stepParams = this._getStepParams();
+                let stepParams = this._getStepParams();
 
-                var startPos = (this._scrollerDiv.scrollerData.scrollX + ui.position.left - this._container.find('.ws-track-tools-background').width() - stepParams.offset)/stepParams.pixelsInSencond;
-                var endPos = elItem.data('data').content.duration;
+                let startPos = (this._scrollerDiv.scrollerData.scrollX + ui.position.left - this._container.find('.ws-track-tools-background').width() - stepParams.offset)/stepParams.pixelsInSencond;
+                let endPos = elItem.data('data').content.duration;
 
-                var uiHelper = $(ui.helper);
+                let uiHelper = $(ui.helper);
                 uiHelper.data = function(v) { return {start: startPos < 0 ? 0 : startPos, duration: endPos}};
 
                 that._setSideTime.bind(this, uiHelper)();
@@ -531,7 +531,7 @@ export default class CWSTracks extends CWSBase {
                 that._setSideTime.bind(this, elItem)();
             },
             stop: (event, ui) => {
-                var elementsData = this._resizeElement(item, event, ui,
+                let elementsData = this._resizeElement(item, event, ui,
                     this._elementResizeData.prevLeft,
                     this._elementResizeData.prevWidth);
                 this._broadcastEditElement(item, elementsData);
@@ -548,13 +548,13 @@ export default class CWSTracks extends CWSBase {
         });
 
         elItem.find(".ws-track-element-menu").click(() => {
-            var elementData = elItem.data("data");
-            var oldTrackId = elItem.data("parentId");
-            var oldTrack = this._findTrack(oldTrackId);
+            let elementData = elItem.data("data");
+            let oldTrackId = elItem.data("parentId");
+            let oldTrack = this._findTrack(oldTrackId);
 
             if (!oldTrack) return;
 
-            for (var i = 0; i < oldTrack.elements.length; i++) {
+            for (let i = 0; i < oldTrack.elements.length; i++) {
                 if (oldTrack.elements[i].id == elementData.id) {
                     oldTrack.elements.splice(i, 1);
                 }
@@ -567,10 +567,10 @@ export default class CWSTracks extends CWSBase {
 
     _setSideTime(elItem) {
         elItem.addClass('ws-track-element-details');
-        var elData = elItem.data("data");
+        let elData = elItem.data("data");
 
         function msToTime(duration) {
-            var milliseconds = parseInt((duration%1000))
+            let milliseconds = parseInt((duration%1000))
                 , seconds = parseInt((duration/1000)%60)
                 , minutes = parseInt(duration/(1000*60))
             seconds = (seconds < 10) ? "0" + seconds : seconds;
@@ -579,8 +579,8 @@ export default class CWSTracks extends CWSBase {
             return minutes + ":" + seconds + ":" + milliseconds;
         }
 
-        var st = elItem.find('.ws-element-left-time');
-        var et = elItem.find('.ws-element-right-time');
+        let st = elItem.find('.ws-element-left-time');
+        let et = elItem.find('.ws-element-right-time');
         st.html(msToTime(elData.start*1000));
         et.html(msToTime((elData.start + elData.duration)*1000));
     }
@@ -591,41 +591,41 @@ export default class CWSTracks extends CWSBase {
 
     _setFocusedWithBroadcast(elItem) {
         this._container.find(".ws-track-element").removeClass("focused ws-track-element-details").each(function () {
-            var elData = $(this).data("data");
+            let elData = $(this).data("data");
             if (elData) elData.focused = false;
         });
         elItem.addClass("focused");
-        var elData = elItem.data("data");
+        let elData = elItem.data("data");
         if (elData)elData.focused = true;
-        for (var i = 0; i < this._tracks.length; i++) {
-            var trItem = $("#t_" + this._tracks[i].id);
+        for (let i = 0; i < this._tracks.length; i++) {
+            let trItem = $("#t_" + this._tracks[i].id);
             this._broadcastEditElement(trItem, this._tracks[i].elements);
         }
     }
 
     _resizeElement(item, event, ui, prevLeft, prevWidth) {
-        var elementData = $.extend(true, {}, ui.originalElement.data("data"));
-        var trackId = ui.originalElement.data("parentId");
-        var track = this._findTrack(trackId);
+        let elementData = $.extend(true, {}, ui.originalElement.data("data"));
+        let trackId = ui.originalElement.data("parentId");
+        let track = this._findTrack(trackId);
         if (!track) return null;
 
-        var p = this._getStepParams();
-        var left = ui.position.left;
-        var position = {
+        let p = this._getStepParams();
+        let left = ui.position.left;
+        let position = {
             dropped :{left: left, top: 0},
             container: {left: 0, top: 0}
         };
-        var startTime = this._positionToTime(position);
+        let startTime = this._positionToTime(position);
         position = {
             dropped :{left: left + ui.size.width, top: 0},
             container: {left: 0, top: 0}
         };
-        var duration = this._positionToTime(position) - startTime;
+        let duration = this._positionToTime(position) - startTime;
 
         elementData.start = startTime;
         elementData.content.duration = duration;
 
-        var success = this._correctElementsIntersection(track, elementData, event.altKey);
+        let success = this._correctElementsIntersection(track, elementData, event.altKey);
 
         if (!success) {
             ui.position.left = prevLeft;
@@ -636,9 +636,9 @@ export default class CWSTracks extends CWSBase {
     }
 
     _createScroll() {
-        var that = this;
+        let that = this;
         // console.log(this._scrollerDiv);
-        var scrollerData = {
+        let scrollerData = {
             viewportWidth: () => this._scrollerDiv.width(),
             viewportHeight: () => this._scrollerDiv.height(),
             scrollMaxWidth: () => this._list.width(),
@@ -667,18 +667,18 @@ export default class CWSTracks extends CWSBase {
                 }
 
                 this._list[0].style.transform = 'translate(' + -scrollerData.scrollX + 'px, ' + -scrollerData.scrollY + 'px)';
-                var transform = this._list.css("transform");
-                var parts = transform.split(",");
+                let transform = this._list.css("transform");
+                let parts = transform.split(",");
                 parts[4] = 0;
-                var closeTransform = parts.join(",");
+                let closeTransform = parts.join(",");
                 this._closeButtonsList.css("transform", closeTransform);
 
-                var parts = transform.split(",");
+                parts = transform.split(",");
                 parts[5] = 0;
-                var linerTransform = parts.join(",");
+                let linerTransform = parts.join(",");
                 this._linerList.css("transform", linerTransform);
 
-                var p = this._getStepParams();
+                let p = this._getStepParams();
                 let pLeft = "0px";
                 if (p) {
                     pLeft = (p.offset + p.pixelsInSencond*this._getAudioState().currentTime -
@@ -700,8 +700,8 @@ export default class CWSTracks extends CWSBase {
                     window.addEventListener('mouseup', this._scrollerDiv.scrollerData.horBar.eventMouseUp, false);
                 },
                 eventMouseMove: (e) => {
-                    var deltaX = this._scrollerDiv.scrollerData.horBar.mousedownOffset - e.clientX;
-                    var ratio = this._scrollerDiv.scrollerData.scrollMaxWidth()/this._scrollerDiv.scrollerData.viewportWidth();
+                    let deltaX = this._scrollerDiv.scrollerData.horBar.mousedownOffset - e.clientX;
+                    let ratio = this._scrollerDiv.scrollerData.scrollMaxWidth()/this._scrollerDiv.scrollerData.viewportWidth();
                     this._scrollerDiv.scrollerData.horBar.mousedownOffset = e.clientX;
                     this._scrollerDiv.scrollerData.scrollBy(-deltaX*ratio, 0);
                 },
@@ -724,8 +724,8 @@ export default class CWSTracks extends CWSBase {
                     window.addEventListener('mouseup', this._scrollerDiv.scrollerData.verBar.eventMouseUp, false);
                 },
                 eventMouseMove: (e) => {
-                    var deltaY = this._scrollerDiv.scrollerData.verBar.mousedownOffset - e.clientY;
-                    var ratio = this._scrollerDiv.scrollerData.scrollMaxHeight()/this._scrollerDiv.scrollerData.viewportHeight();
+                    let deltaY = this._scrollerDiv.scrollerData.verBar.mousedownOffset - e.clientY;
+                    let ratio = this._scrollerDiv.scrollerData.scrollMaxHeight()/this._scrollerDiv.scrollerData.viewportHeight();
                     this._scrollerDiv.scrollerData.verBar.mousedownOffset = e.clientY;
                     this._scrollerDiv.scrollerData.scrollBy(0,-deltaY*ratio);
                 },
@@ -746,13 +746,13 @@ export default class CWSTracks extends CWSBase {
             scrollerData.scrollBy(e.deltaX, e.deltaY);
         })
 
-        var horBar = this._container.find('.ws-scroller-hor-bar')[0];
+        let horBar = this._container.find('.ws-scroller-hor-bar')[0];
         this._scrollerDiv.scrollerData.horBar.element = horBar;
         horBar.addEventListener('mousedown', this._scrollerDiv.scrollerData.horBar.eventMouseDown);
         horBar.update = () => {
-            var ratio = this._scrollerDiv.scrollerData.viewportWidth()/this._scrollerDiv.scrollerData.scrollMaxWidth();
-            var horLeft = this._scrollerDiv.scrollerData.scrollX * ratio;
-            var horWidth = this._scrollerDiv.scrollerData.viewportWidth() * ratio;
+            let ratio = this._scrollerDiv.scrollerData.viewportWidth()/this._scrollerDiv.scrollerData.scrollMaxWidth();
+            let horLeft = this._scrollerDiv.scrollerData.scrollX * ratio;
+            let horWidth = this._scrollerDiv.scrollerData.viewportWidth() * ratio;
             if(horWidth === this._scrollerDiv.scrollerData.viewportWidth()) {
                 horBar.style.display = 'none';
             } else {
@@ -763,13 +763,13 @@ export default class CWSTracks extends CWSBase {
         };
         horBar.update();
 
-        var verBar = this._container.find('.ws-scroller-ver-bar')[0];
+        let verBar = this._container.find('.ws-scroller-ver-bar')[0];
         this._scrollerDiv.scrollerData.verBar.element = verBar;
         verBar.addEventListener('mousedown', this._scrollerDiv.scrollerData.verBar.eventMouseDown);
         verBar.update = () => {
-            var ratio = this._scrollerDiv.scrollerData.viewportHeight()/this._scrollerDiv.scrollerData.scrollMaxHeight();
-            var verTop = this._scrollerDiv.scrollerData.scrollY * ratio;
-            var verHeight = this._scrollerDiv.scrollerData.viewportHeight() * ratio;
+            let ratio = this._scrollerDiv.scrollerData.viewportHeight()/this._scrollerDiv.scrollerData.scrollMaxHeight();
+            let verTop = this._scrollerDiv.scrollerData.scrollY * ratio;
+            let verHeight = this._scrollerDiv.scrollerData.viewportHeight() * ratio;
             if(verHeight === this._scrollerDiv.scrollerData.viewportHeight()) {
                 verBar.style.display = 'none';
             } else {
@@ -788,8 +788,8 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setToolsEvents() {
-        var that = this;
-        var addButton = this._container.find("[role='add-panel']");
+        let that = this;
+        let addButton = this._container.find("[role='add-panel']");
         addButton.click(function () {
             if (that._options.onAdd) {
                 that._options.onAdd();
@@ -800,13 +800,13 @@ export default class CWSTracks extends CWSBase {
             }
 
         });
-        var playButton = this._container.find(".ws-tools-top")
+        let playButton = this._container.find(".ws-tools-top")
             .find(".ws-tools-top-play");
-        var pause = playButton.find("[role='pause']");
-        var play = playButton.find("[role='play']");
+        let pause = playButton.find("[role='pause']");
+        let play = playButton.find("[role='play']");
         pause.hide();
         playButton.on('mouseup', function () {
-            var audioState = that._getAudioState();
+            let audioState = that._getAudioState();
             if (audioState.stopped) {
                 that._play();
                 play.hide();
@@ -824,7 +824,7 @@ export default class CWSTracks extends CWSBase {
             this._rate.run(e);
         });
 
-        var mute = this._container.find(".ws-mute-button");
+        let mute = this._container.find(".ws-mute-button");
         mute.on('click', function() {
 
             that._toggleMute();
@@ -839,9 +839,9 @@ export default class CWSTracks extends CWSBase {
 
         });
 
-        var meter = this._container.find(".ws-volume-meter");
+        let meter = this._container.find(".ws-volume-meter");
 
-        var meter_mouse_down = false;
+        let meter_mouse_down = false;
 
         meter.on('mouseenter', function(e) {
             meter.addClass('ws-volume-meter-over')
@@ -868,11 +868,11 @@ export default class CWSTracks extends CWSBase {
     }
 
     setVolumeMeter(e, that) {
-        var m_posx = 0;
-        var m_posy = 0;
-        var e_posx = 0;
-        var e_posy = 0;
-        var obj = this;
+        let m_posx = 0;
+        let m_posy = 0;
+        let e_posx = 0;
+        let e_posy = 0;
+        let obj = this;
         //get mouse position on document crossbrowser
         if (!e){e = window.event;}
         if (e.pageX || e.pageY){
@@ -892,14 +892,14 @@ export default class CWSTracks extends CWSBase {
             } while (obj = obj.offsetParent);
         }
 
-        var meter = {
+        let meter = {
             'x': (m_posx-e_posx),
             'y': (m_posy-e_posy)
         }
 
-        var meterValue = $(this).height() - meter.y;
+        let meterValue = $(this).height() - meter.y;
         if (meterValue > $(this).height()) meterValue = $(this).height();
-        var meterRatio = 100/$(this).height();
+        let meterRatio = 100/$(this).height();
 
         $(this).find(".ws-volume-value").css({'height': meterValue + 'px'});
         that._setVolume((meterValue * meterRatio)/100);
@@ -941,20 +941,20 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setRateText(rate) {
-        var rateDiv = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='rate']");
+        let rateDiv = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='rate']");
         rateDiv.text(rate);
     }
 
     _setDeleteBtnEvents(deleteBtn) {
-        var that = this;
+        let that = this;
         deleteBtn.click(function () {
-            var id = $(this).attr("data-track");
+            let id = $(this).attr("data-track");
             if (that._options.onDelete) that._options.onDelete({id: id});
         });
     }
 
     _setTrackEvents(item) {
-        var cont = item.children(".ws-track-content");
+        let cont = item.children(".ws-track-content");
         cont.droppable({
             accept: (el) => {
                 return el.hasClass("ws-assets-item") ||
@@ -973,19 +973,19 @@ export default class CWSTracks extends CWSBase {
     }
 
     _onDropPaletteBtn(item, event, ui) {
-        var hOffset = ui.helper.offset();
-        var position = {
+        let hOffset = ui.helper.offset();
+        let position = {
             dropped :{left: hOffset.left, top: hOffset.top},
             container: item.offset()
         };
 
-        var trackId = item.attr("id").replace(/^t_/, '');;
-        var track = this._findTrack(trackId);
+        let trackId = item.attr("id").replace(/^t_/, '');;
+        let track = this._findTrack(trackId);
 
-        var startTime = this._positionToTime(position);
-        var p = this._getStepParams();
+        let startTime = this._positionToTime(position);
+        let p = this._getStepParams();
 
-        var element = {
+        let element = {
             id: Utils.guid(),
             asset: null,
             start: startTime,
@@ -1007,7 +1007,7 @@ export default class CWSTracks extends CWSBase {
             ]
         };
 
-        var type = ui.draggable.attr("role") == "add-image" ? "image" : "text";
+        let type = ui.draggable.attr("role") == "add-image" ? "image" : "text";
 
         // console.log(type)
         track.elements.push(element);
@@ -1049,29 +1049,29 @@ export default class CWSTracks extends CWSBase {
     // _selectText()
 
     _onDropAsset(item, event, ui) {
-        var hOffset = ui.helper.offset();
-        var position = {
+        let hOffset = ui.helper.offset();
+        let position = {
             dropped :{left: hOffset.left, top: hOffset.top},
             container: item.offset()
         };
 
-        var trackId = item.attr("id").replace(/^t_/, '');
-        var track = this._findTrack(trackId);
+        let trackId = item.attr("id").replace(/^t_/, '');
+        let track = this._findTrack(trackId);
 
 
-        var startTime = this._positionToTime(position);
-        var p = this._getStepParams();
-        var assData = ui.draggable.data("data");
+        let startTime = this._positionToTime(position);
+        let p = this._getStepParams();
+        let assData = ui.draggable.data("data");
         // player ratio is 16:9
         // if player width = 160, then 30% is
-        var w = 30;
-        var actualWidth = 160 * 0.3;
-        var pictRatio = assData.info.size.height / assData.info.size.width;
-        var actualHeight = actualWidth * pictRatio;
+        let w = 30;
+        let actualWidth = 160 * 0.3;
+        let pictRatio = assData.info.size.height / assData.info.size.width;
+        let actualHeight = actualWidth * pictRatio;
         // calculate actualHeight's %
-        var h = actualHeight / 90 * 100;
+        let h = actualHeight / 90 * 100;
 
-        var element = {
+        let element = {
             id: Utils.guid(),
             assetId: assData.id,
             asset: assData,
@@ -1096,15 +1096,15 @@ export default class CWSTracks extends CWSBase {
     }
 
     _onDropElement(item, event, ui) {
-        var elementData = ui.draggable.data("data");
-        var oldTrackId = ui.draggable.data("parentId");
-        var newTrackId = item.attr("id").replace(/^t_/, '');;
-        var oldTrack = this._findTrack(oldTrackId);
-        var newTrack = this._findTrack(newTrackId);
+        let elementData = ui.draggable.data("data");
+        let oldTrackId = ui.draggable.data("parentId");
+        let newTrackId = item.attr("id").replace(/^t_/, '');;
+        let oldTrack = this._findTrack(oldTrackId);
+        let newTrack = this._findTrack(newTrackId);
 
         if (!(oldTrack && newTrack)) return;
         if (oldTrack != newTrack) {
-            for (var i = 0; i < oldTrack.elements.length; i++) {
+            for (let i = 0; i < oldTrack.elements.length; i++) {
                 if (oldTrack.elements[i].id == elementData.id) {
                     oldTrack.elements.splice(i, 1);
                 }
@@ -1112,15 +1112,15 @@ export default class CWSTracks extends CWSBase {
             newTrack.elements.push(elementData);
         }
 
-        var hOffset = ui.helper.offset();
-        var position = {
+        let hOffset = ui.helper.offset();
+        let position = {
             dropped :{left: hOffset.left, top: hOffset.top},
             container: item.offset()
         };
 
-        var startTime = this._positionToTime(position);
+        let startTime = this._positionToTime(position);
         elementData.start = startTime;
-        var newTrackId = item.attr("id").replace(/^t_/, '');
+        newTrackId = item.attr("id").replace(/^t_/, '');
 
         if (this._correctElementsIntersection(newTrack, elementData, event.altKey)) {
             if (oldTrackId == newTrackId)
@@ -1133,7 +1133,7 @@ export default class CWSTracks extends CWSBase {
     }
 
     _broadcastMoveElement(item, oldTrackId, elementsData, oldTrackElementsData) {
-        var trackId = item.attr("id").replace(/^t_/, '');
+        let trackId = item.attr("id").replace(/^t_/, '');
         if (this._options.onMoveElement) {
             this._options.onMoveElement({
                 track: trackId,
@@ -1145,43 +1145,43 @@ export default class CWSTracks extends CWSBase {
     }
 
     _broadcastEditElement(item, element) {
-        var trackId = item.attr("id").replace(/^t_/, '');
+        let trackId = item.attr("id").replace(/^t_/, '');
         if (this._options.onEditElement) {
             this._options.onEditElement({track: trackId, elements: element});
         }
     }
 
     _broadcastAddElement(item, elements) {
-        var trackId = item.attr("id").replace(/^t_/, '');
+        let trackId = item.attr("id").replace(/^t_/, '');
         if (this._options.onAddElement) {
             this._options.onAddElement({track: trackId, elements: elements});
         }
     }
 
     _positionToTime(position) {
-        var p = this._getStepParams();
-        var left = position.dropped.left - p.offset - position.container.left;
+        let p = this._getStepParams();
+        let left = position.dropped.left - p.offset - position.container.left;
         if (left < 0) return 0;
-        var start = left / p.pixelsInSencond;
+        let start = left / p.pixelsInSencond;
         return start;
     }
 
     _renderLiner(audioState) {
-        var that = this;
-        var liner = this._container.find(".ws-track-liner").find(".ws-liner-list");
-        var p = this._getStepParams(audioState);
-        var offset = p.offset;
+        let that = this;
+        let liner = this._container.find(".ws-track-liner").find(".ws-liner-list");
+        let p = this._getStepParams(audioState);
+        let offset = p.offset;
 
         if (!this._linerSteps) {
             this._linerSteps = [];
-            var zeroStep = this._getLinerObject(0, offset, 0);
+            let zeroStep = this._getLinerObject(0, offset, 0);
             this._linerSteps.push(zeroStep);
             liner.append(zeroStep.step);
             //liner.append(zeroStep.text);
         }
 
         if (this._linerSteps.length > p.count + 1) {
-            for (var i = p.count + 1; i < this._linerSteps.length; i ++) {
+            for (let i = p.count + 1; i < this._linerSteps.length; i ++) {
                 this._linerSteps[i].step.remove();
                 this._linerSteps[i].text.remove();
             }
@@ -1189,17 +1189,17 @@ export default class CWSTracks extends CWSBase {
             this._linerSteps.splice(p.count + 1);
         }
 
-        var i = 0;
+        let i = 0;
         while (i < p.count) {
-            var curStepObj = null;
-            var left = offset + (i*p.width);
-            var point = i*p.duration;
+            let curStepObj = null;
+            let left = offset + (i*p.width);
+            let point = i*p.duration;
             if (i + 1 < this._linerSteps.length) {
                 curStepObj = this._linerSteps[i + 1];
                 curStepObj.step.css({left: left + "px", width: p.width});
                 curStepObj.text.css({left: left + "px"});
-                var s = this._getStepText(point);
-                var d = curStepObj.text.find("div");
+                let s = this._getStepText(point);
+                let d = curStepObj.text.find("div");
                 d.text(s.text);
                 d.css("opacity", s.opacity);
             } else {
@@ -1211,8 +1211,8 @@ export default class CWSTracks extends CWSBase {
             i++;
         }
 
-        var lw = liner.parent().width();
-        var w = 0;
+        let lw = liner.parent().width();
+        let w = 0;
         if (lw > left + p.width) {
             left += p.width;
             curStepObj = this._getLinerObject(left, lw - left, i*p.duration);
@@ -1233,11 +1233,11 @@ export default class CWSTracks extends CWSBase {
                 this._linerList.digitsBar.mousedown = true;
                 this._linerList.digitsBar.mousedownOffset = e.clientX;
 
-                var position = {
+                let position = {
                     dropped :{left: e.clientX, top: e.clientY},
                     container: this._linerList.digitsBar.liner.offset()
                 };
-                var startTime = that._positionToTime(position);
+                let startTime = that._positionToTime(position);
                 that._setPosition(startTime);
                 that._setPositionEnd();
                 that._scrollerDiv.scrollerData.scrollBy(0,0); // alt refresh
@@ -1247,11 +1247,11 @@ export default class CWSTracks extends CWSBase {
                 window.addEventListener('mouseup', this._linerList.digitsBar.eventMouseUp, false);
             },
             eventMouseMove: (e) => {
-                var position = {
+                let position = {
                     dropped :{left: e.clientX, top: e.clientY},
                     container: this._linerList.digitsBar.liner.offset()
                 };
-                var startTime = that._positionToTime(position);
+                let startTime = that._positionToTime(position);
                 that._setPosition(startTime);
                 that._setPositionEnd();
                 that._scrollerDiv.scrollerData.scrollBy(0,0);
@@ -1272,19 +1272,19 @@ export default class CWSTracks extends CWSBase {
     }
 
     _resetHorizontalScroll(linerWidth) {
-        var list = this._scrollerDiv.find(".list");
+        let list = this._scrollerDiv.find(".list");
         list.width(linerWidth);
     }
 
     _getStepParams(audioState) {
-        var liner = this._container.find(".ws-track-liner");
-        var fSize = liner.css('font-size').replace("px", "");
-        var zoomState = this._zoomState;
+        let liner = this._container.find(".ws-track-liner");
+        let fSize = liner.css('font-size').replace("px", "");
+        let zoomState = this._zoomState;
         if (!zoomState) return null;
-        var stepDuration = zoomState.params.step;
-        var stepWidth = zoomState.params.stepWidth;
+        let stepDuration = zoomState.params.step;
+        let stepWidth = zoomState.params.stepWidth;
 
-        var result = {
+        let result = {
             duration: stepDuration,
             width: stepWidth,
             fontSize: Number(fSize),
@@ -1292,7 +1292,7 @@ export default class CWSTracks extends CWSBase {
             offset: Number(fSize)
         };
         audioState = audioState || this._getAudioState();
-        var count = Math.floor(audioState.duration / result.duration);
+        let count = Math.floor(audioState.duration / result.duration);
         if (count * result.duration < audioState.duration) count++;
         result.count = count;
 
@@ -1300,7 +1300,7 @@ export default class CWSTracks extends CWSBase {
     }
 
     _getLinerObject(left, width, point) {
-        var result = {
+        let result = {
             step: $(CWSTracks.template("liner-step")),
             text: $(CWSTracks.template("liner-text"))
         };
@@ -1308,8 +1308,8 @@ export default class CWSTracks extends CWSBase {
         result.step.css({width: width + "px", left: left + "px"});
         result.text.css({width: "auto", left: left + "px"});
 
-        var s = this._getStepText(point);
-        var d = result.text.find("div");
+        let s = this._getStepText(point);
+        let d = result.text.find("div");
         d.text(s.text);
         d.css("opacity", s.opacity);
 
@@ -1332,7 +1332,7 @@ export default class CWSTracks extends CWSBase {
 
     renderAudioState(audioState) {
         audioState = audioState || this._getAudioState();
-        var audio = audioState.audio;
+        let audio = audioState.audio;
         if (!audio) {
             this._clearAudioRender();
             return;
@@ -1344,7 +1344,7 @@ export default class CWSTracks extends CWSBase {
 
     _setDurationMeter() {
         function msToTime(duration) {
-            var milliseconds = parseInt((duration%1000))
+            let milliseconds = parseInt((duration%1000))
                 , seconds = parseInt((duration/1000)%60)
                 , minutes = parseInt(duration/(1000*60))
             seconds = (seconds < 10) ? "0" + seconds : seconds;
@@ -1352,16 +1352,16 @@ export default class CWSTracks extends CWSBase {
             milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
             return minutes + ":" + seconds + ":" + milliseconds;
         }
-        var durStr = msToTime(this._getAudioState().currentTime*1000);
-        var durDiv = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='duration']");
+        let durStr = msToTime(this._getAudioState().currentTime*1000);
+        let durDiv = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='duration']");
         durDiv.text(durStr);
     }
 
     _animationFrame(timestamp) {
 
-        var fps = 30;
-        var interval = 1000/fps;
-        var scrollBy = (this._getStepParams().pixelsInSencond/fps) * this._getAudioState().playbackRate;
+        let fps = 30;
+        let interval = 1000/fps;
+        let scrollBy = (this._getStepParams().pixelsInSencond/fps) * this._getAudioState().playbackRate;
 
         if (timestamp < this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
             //missed step
@@ -1377,11 +1377,11 @@ export default class CWSTracks extends CWSBase {
 
     _altScrollToPointer() {
 
-        var audioState = this._getAudioState();
-        var p = this._getStepParams();
+        let audioState = this._getAudioState();
+        let p = this._getStepParams();
         if (!audioState.stopped) {
-            var pos = PTR_SCROLL_NONE;
-            var pPos = this._getPointerLeft(audioState.currentTime)
+            let pos = PTR_SCROLL_NONE;
+            let pPos = this._getPointerLeft(audioState.currentTime)
             if (pPos < 0) pos = PTR_SCROLL_LEFT;
             else if (pPos >= this._scrollerDiv.width() - PTR_SCROLL_BOUND) pos = PTR_SCROLL_RIGHT;
 
@@ -1403,7 +1403,7 @@ export default class CWSTracks extends CWSBase {
                     this._scrollerDiv.scrollerData.scrollAuto = false;
                     cancelAnimationFrame(this._scrollerDiv.scrollerData.scrollAnimationFrame);
                 } else {
-                    var p = this._getStepParams();
+                    let p = this._getStepParams();
                     this._pointer.css("left", (p.offset + p.pixelsInSencond*this._getAudioState().currentTime - this._pointer.width()/2 - this._scrollerDiv.scrollerData.scrollX) + 'px');
                 }
             }
@@ -1414,15 +1414,15 @@ export default class CWSTracks extends CWSBase {
     }
 
     _getPointerLeft(curPos) {
-        var p = this._getStepParams();
+        let p = this._getStepParams();
 
-        var transform = this._linerList.css("transform");
-        var offset = 0;
-        var parts = transform.split(",");
+        let transform = this._linerList.css("transform");
+        let offset = 0;
+        let parts = transform.split(",");
         if (parts.length > 1)
             offset = Number.parseFloat(parts[4].trim());
 
-        var left = p.offset + p.pixelsInSencond*curPos - this._pointer.width()/2 + offset;
+        let left = p.offset + p.pixelsInSencond*curPos - this._pointer.width()/2 + offset;
 
         return left;
     }
@@ -1432,7 +1432,7 @@ export default class CWSTracks extends CWSBase {
     }
 
     _clearAudioRender() {
-        var div = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='duration']");
+        let div = this._container.find(".ws-tools-top").find(".ws-tools-top-text[role='duration']");
         div.text("00:00:00");
     }
 
@@ -1442,10 +1442,10 @@ export default class CWSTracks extends CWSBase {
     }
 
     _correctElementsIntersection(track, editedData, shift) {
-        var audioState = this._getAudioState();
+        let audioState = this._getAudioState();
 
-        var elements = [];
-        for (var i = 0; i < track.elements.length; i++) {
+        let elements = [];
+        for (let i = 0; i < track.elements.length; i++) {
             if (track.elements[i].id == editedData.id)
                 elements.push(editedData);
             else
@@ -1454,33 +1454,33 @@ export default class CWSTracks extends CWSBase {
 
         elements = elements.sort(compareElements);
 
-        var currentPos = 0;
-        for (var i = 0; i < elements.length; i++) {
-            var element = elements[i];
-            var oldStart = element.start;
+        let currentPos = 0;
+        for (let i = 0; i < elements.length; i++) {
+            let element = elements[i];
+            let oldStart = element.start;
 
             if (currentPos > element.start) {
                 element.start = currentPos;
             }
             // если не зажат Shift, то пытаемся ужать следующий элемент
             if (!shift && oldStart != element.start) {
-                var delta = element.start - oldStart;
+                let delta = element.start - oldStart;
                 element.content.duration -= delta;
                 if (element.content.duration < 1) element.content.duration = 1;
             }
 
             currentPos = element.start + element.content.duration;
         }
-        var last = elements[elements.length - 1];
+        let last = elements[elements.length - 1];
         if (last.start + last.content.duration > audioState.duration) {
             return false;
         }
 
-        for (var i = 0; i < elements.length; i++) {
-            var el = elements[i];
-            for (var j = 0; j < track.elements.length; j++) {
+        for (let i = 0; i < elements.length; i++) {
+            let el = elements[i];
+            for (let j = 0; j < track.elements.length; j++) {
                 if (track.elements[j].id == el.id) {
-                    var tEl = track.elements[j];
+                    let tEl = track.elements[j];
                     tEl.start = el.start;
                     tEl.content.duration = el.content.duration;
                     break;
@@ -1492,17 +1492,17 @@ export default class CWSTracks extends CWSBase {
     }
 
     setElementPosition(elementId, position) {
-        var el = this._findElement(elementId);
-        var pos = $.extend(true, {}, position);
+        let el = this._findElement(elementId);
+        let pos = $.extend(true, {}, position);
         el.position = pos;
     }
 
     setFocused(elementId) {
-        var oldFocused = null;
-        for (var i = 0; i < this._tracks.length; i++) {
-            var track = this._tracks[i];
-            for (var j = 0; j < track.elements.length; j++) {
-                var el = track.elements[j];
+        let oldFocused = null;
+        for (let i = 0; i < this._tracks.length; i++) {
+            let track = this._tracks[i];
+            for (let j = 0; j < track.elements.length; j++) {
+                let el = track.elements[j];
                 if (el.focused) {
                     el.focused = false;
                     oldFocused = el;
@@ -1517,10 +1517,10 @@ export default class CWSTracks extends CWSBase {
     }
 
     _findTrack(id) {
-        var tracks = this._tracks;
-        var track = null;
-        for (var i = 0; i < tracks.length; i++) {
-            var cur = tracks[i];
+        let tracks = this._tracks;
+        let track = null;
+        for (let i = 0; i < tracks.length; i++) {
+            let cur = tracks[i];
             if (cur.id == id) {
                 track = cur;
                 break;
@@ -1531,9 +1531,9 @@ export default class CWSTracks extends CWSBase {
     }
 
     _findElement(id) {
-        for (var i = 0; i < this._tracks.length; i++) {
-            var track = this._tracks[i];
-            for (var j = 0; j < track.elements.length; j++) {
+        for (let i = 0; i < this._tracks.length; i++) {
+            let track = this._tracks[i];
+            for (let j = 0; j < track.elements.length; j++) {
                 if (track.elements[j].id == id) return track.elements[j];
             }
         }
@@ -1542,9 +1542,9 @@ export default class CWSTracks extends CWSBase {
     }
 
     _findTrackByElement(id) {
-        for (var i = 0; i < this._tracks.length; i++) {
-            var track = this._tracks[i];
-            for (var j = 0; j < track.elements.length; j++) {
+        for (let i = 0; i < this._tracks.length; i++) {
+            let track = this._tracks[i];
+            for (let j = 0; j < track.elements.length; j++) {
                 if (track.elements[j].id == id) return track;
             }
         }
@@ -1561,20 +1561,20 @@ export default class CWSTracks extends CWSBase {
     }
 
     _getMaxZoomPosition() {
-        var lw = this._line.width();
-        var cw = this._circle.width();
+        let lw = this._line.width();
+        let cw = this._circle.width();
         return lw - cw/2;
     }
 
     _recalcZoomState(position) {
-        var maxStep = this._getMaxStep();
-        var intervalCount = maxStep.idx * 2 + 1;
-        var maxZoomPos = this._getMaxZoomPosition();
+        let maxStep = this._getMaxStep();
+        let intervalCount = maxStep.idx * 2 + 1;
+        let maxZoomPos = this._getMaxZoomPosition();
         position = maxZoomPos - position;
-        var zoomStepWidth = maxZoomPos / intervalCount;
-        var intervalIdx = Math.floor(position / zoomStepWidth);
+        let zoomStepWidth = maxZoomPos / intervalCount;
+        let intervalIdx = Math.floor(position / zoomStepWidth);
         this._zoomState.position = position;
-        var idx = Math.floor(intervalIdx/2);
+        let idx = Math.floor(intervalIdx/2);
         this._zoomState.params = {
             idx: idx,
             step: steps[idx],
@@ -1584,7 +1584,7 @@ export default class CWSTracks extends CWSBase {
     }
 
     _getStepText(point) {
-        var state = this._zoomState;
+        let state = this._zoomState;
 
         if (point > 0) {
             if (state.params.step <= 2) {
@@ -1599,7 +1599,7 @@ export default class CWSTracks extends CWSBase {
                     return {text: "5", opacity: 0.3};
             } else if (state.params.step <= 20) {
                 if (point%60 == 0) {
-                    var s = Math.floor(point/60);
+                    let s = Math.floor(point/60);
                     if (s < 10) s = "0" + s;
                     else s = String(s);
                     s += ":00м";
@@ -1609,7 +1609,7 @@ export default class CWSTracks extends CWSBase {
                 }
             } else if (state.params.step <= 30) {
                 if (point%60 == 0) {
-                    var s = Math.floor(point/60);
+                    let s = Math.floor(point/60);
                     if (s < 10) s = "0" + s;
                     else s = String(s);
                     s += ":00м";
@@ -1624,14 +1624,14 @@ export default class CWSTracks extends CWSBase {
 
     _getMaxStep(audioState) {
         audioState = audioState || this._getAudioState();
-        var duration = audioState.duration;
-        var linerWidth = this._container.find(".ws-track-liner").width();
+        let duration = audioState.duration;
+        let linerWidth = this._container.find(".ws-track-liner").width();
 
-        var visStepsCount = linerWidth / STEP_WIDTH_MIN;
-        var idealStemWeight = duration / visStepsCount;
-        var maxStep = steps[steps.length - 1];
-        var idx = steps.length - 1;
-        for (var i = 1; i < steps.length; i++) {
+        let visStepsCount = linerWidth / STEP_WIDTH_MIN;
+        let idealStemWeight = duration / visStepsCount;
+        let maxStep = steps[steps.length - 1];
+        let idx = steps.length - 1;
+        for (let i = 1; i < steps.length; i++) {
             if (steps[i] >= idealStemWeight) {
                 maxStep = steps[i];
                 idx = i;
