@@ -340,7 +340,11 @@ export default class CWSPlayer extends CWSBase {
             this._options.loader.setPosition(this._audioState.globalTime);
             if (!this._audioState.stopped) audio.play();
             //this._audioState.audio.load();
-            this._broadcastAudioInitialized()
+            this._broadcastAudioInitialized();
+            // if ready state is greater, then onloaded event was already fired for the current element
+            if (this._audioState.audio.readyState >= 2) {
+                this._broadcastAudioLoaded();
+            }
         }
     }
 
@@ -388,10 +392,12 @@ export default class CWSPlayer extends CWSBase {
             }
         }).on("pause", function () {
             // that.pause();
+            console.log("PLAYER. onpause");
             that._audioState.stopped = true;
             that._broadcastPaused();
         }).on("play", function () {
             // that.play();
+            console.log("PLAYER. onplay");
             that._audioState.stopped = false;
             that._broadcastStarted();
         }).on("error", function (e) {
@@ -505,13 +511,14 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _proccessAnimationFrame(timestamp) {
-        this._audioState.currentTime = this._audioState.audio.currentTime;
-        this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
-        this._broadcastCurrentTimeChanged();
-        if (!this._audioState.stopped) {
-            this._playElements(this._audioState.globalTime);
+        if (this._audioState.audio) {
+            this._audioState.currentTime = this._audioState.audio.currentTime;
+            this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
+            this._broadcastCurrentTimeChanged();
+            if (!this._audioState.stopped) {
+                this._playElements(this._audioState.globalTime);
+            }
         }
-        // console.log(this._audioState.audio.currentTime);
         this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
     }
 
@@ -522,6 +529,7 @@ export default class CWSPlayer extends CWSBase {
             this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
             if (that._audioState.stopped) {
                 that._audioState.$audio.on("play", awaitPlayerPlay);
+                console.log("PLAYER. CallPlay")
                 that._audioState.audio.play();
                 tmInt = setTimeout(function () {
                     if (that._audioState.audio.paused) {
@@ -533,7 +541,7 @@ export default class CWSPlayer extends CWSBase {
                 }, 500)
             }
 
-            if (that._audioState.stopped) {
+            if (!that._audioState.stopped) {
                 setTimeout(() => {
                     resolve();
                 }, 0)
@@ -542,6 +550,7 @@ export default class CWSPlayer extends CWSBase {
 
 
             function awaitPlayerPlay() {
+                console.log("PLAYER. awaitPlayerPlay")
                 clearInterval(tmInt);
                 that._audioState.$audio.off("play", awaitPlayerPlay);
                 that._audioState.stopped = false;
@@ -566,6 +575,7 @@ export default class CWSPlayer extends CWSBase {
                     }
                 }, 500)
             }
+
             if (that._audioState.stopped) {
                 setTimeout(() => {
                     resolve();
