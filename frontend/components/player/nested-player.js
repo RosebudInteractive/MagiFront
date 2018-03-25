@@ -97,13 +97,13 @@ class NestedPlayer extends EventEmitter {
     pause() {
         this.player.pause()
         this._isHardStopped = false;
-        this.emit('pause')
+        // this.emit('pause')
     }
 
     play() {
         this.player.play()
         this._isHardStopped = false;
-        this.emit('play')
+        // this.emit('play')
     }
 
     stop() {
@@ -140,9 +140,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
+                this.player.play()
                     .then(() => {
-                        this.player.play();
+                        _oldPlayer.pause()
                     })
 
             }
@@ -156,9 +156,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
+                this.player.play()
                     .then(() => {
-                        this.player.play();
+                        _oldPlayer.pause();
                     })
 
             } else {
@@ -236,16 +236,16 @@ class NestedPlayer extends EventEmitter {
                     that._onChangeContent(content)
                 }
             },
-            onAudioInitialized(state) {
+            onAudioInitialized() {
                 if (that._onAudioLoaded) {
-                    // let _state = that.player._audioState;
-                    that._onAudioLoaded({
-                        currentTime: state.currentTime,
-                        muted: state.muted,
-                        rate: state.playbackRate,
-                        volume: state.volume,
-                        paused: state.stopped
-                    })
+                //     // let _state = that.player._audioState;
+                //     that._onAudioLoaded({
+                //         currentTime: state.currentTime,
+                //         muted: state.muted,
+                //         rate: state.playbackRate,
+                //         volume: state.volume,
+                //         paused: state.stopped
+                //     })
                 }
             },
             onPaused: () => {
