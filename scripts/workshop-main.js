@@ -32,6 +32,7 @@ Utils.guid = function () {
         s4() + '-' + s4() + s4() + s4();
 };
 
+window.Utils = Utils;
 
 (function($){
     $(document).ready(function () {
