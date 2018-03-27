@@ -91,13 +91,13 @@ export default class Frame extends Component {
             this.setState({fullScreen: _isFullScreen})
         });
 
-        $(document).keydown((e) => {
-            if (e.which === 32) {
-                that._onPause()
-                e.preventDefault();
-                return false
-            }
-        })
+        // $(document).keydown((e) => {
+        //     if (e.which === 32) {
+        //         that._onPause()
+        //         e.preventDefault();
+        //         return false
+        //     }
+        // })
     }
 
 
@@ -226,6 +226,13 @@ export default class Frame extends Component {
         e.preventDefault();
     }
 
+    _onScreenClick(e) {
+        if (e.target.className === 'player-frame__screen') {
+            this._onPause()
+        }
+
+    }
+
     _onBackward() {
         let _newPosition = (this.props.playTime < 10) ? 0 : (this.props.playTime - 10);
         this.props.onGoToContent(_newPosition);
@@ -307,7 +314,7 @@ export default class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}} onClick={::this._onPause}
+            <div style={this.props.visible ? null : {display: 'none'}} onClick={::this._onScreenClick}
                  onKeyUp={this._handleKeyUp} ref="player">
                 <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
