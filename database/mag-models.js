@@ -11,7 +11,10 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Language", { type: "string", length: 50, allowNull: false });
         
         metaDataMgr.addModel("Role", "e788831c-6f91-4bf6-ae6f-a21f0243d670", "RootRole", "b23a3900-6f89-4df4-b4e4-ca6d475b3d60")
-            .addField("Name", { type: "string", length: 50, allowNull: false });
+            .addField("Code", { type: "string", length: 10, allowNull: false })
+            .addField("Name", { type: "string", length: 50, allowNull: false })
+            .addField("ShortCode", { type: "string", length: 5, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("Account", "81b276ee-a34a-4267-9f24-0fce75896c91", "RootAccount", "3a19b68f-50fe-4fa9-923e-0f14d6272a72")
             .addField("Domain", { type: "string", length: 50, allowNull: false })
@@ -23,21 +26,55 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("Description", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("SNetProvider", "fc1d1d24-7d61-4d38-a963-c617a022560e", "RootSNetProvider", "0f0b2dfb-6899-413a-8af5-644598bbef6b")
+            .addField("Code", { type: "string", length: 20, allowNull: false })
+            .addField("Name", { type: "string", length: 50, allowNull: false })
+            .addField("URL", { type: "string", length: 200, allowNull: true });
+
         metaDataMgr.getModel("SysUser")
             .inherit("User", "ad96cb5d-a5a7-4fae-b8b7-738ca992fcd4", "RootUser", "5ef58b64-044e-42e4-b43c-3f8c455bb139")
             .addField("OwnedAccount", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: true })
             .addField("Name", { type: "string", length: 50, allowNull: true })
-            .addField("Mail", { type: "string", length: 50, allowNull: true })
+            .addField("DisplayName", { type: "string", length: 50, allowNull: true })
+            .addField("Email", { type: "string", length: 50, allowNull: false })
+            .addField("URL", { type: "string", length: 255, allowNull: true })
             .addField("Phone", { type: "string", length: 50, allowNull: true })
-            .addField("SNetWorkType", { type: "string", length: 10, allowNull: true })
-            .addField("SNetWorkId", { type: "string", length: 50, allowNull: true })
-            .addField("SubsBegin", { type: "datetime", allowNull: true })
-            .addField("SubsEnd", { type: "datetime", allowNull: true })
-            .addField("PData", { type: "string", allowNull: true })
-            .addField("Profile", { type: "string", allowNull: true });
+            .addField("RegDate", { type: "datetime", allowNull: true })
+            .addField("ExpDate", { type: "datetime", allowNull: true })
+            .addField("ActivationKey", { type: "string", length: 50, allowNull: true })
+            .addField("Status", { type: "int", allowNull: true })
+            .addField("IsOld", { type: "boolean", allowNull: true })
+            .addField("PData", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("SNetProfile", "54c9008e-4916-4972-a5f3-7325d229df68", "RootSNetProfile", "45d677c1-9784-426a-b255-024eaa6f1ebc")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
+            .addField("ProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
+            .addField("Identifier", { type: "string", length: 50, allowNull: false })
+            .addField("URL", { type: "string", length: 100, allowNull: true })
+            .addField("WebSite", { type: "string", length: 255, allowNull: true })
+            .addField("PhotoUrl", { type: "string", length: 255, allowNull: true })
+            .addField("DisplayName", { type: "string", length: 50, allowNull: true })
+            .addField("Description", { type: "string", allowNull: true })
+            .addField("FirstName", { type: "string", length: 50, allowNull: true })
+            .addField("LastName", { type: "string", length: 50, allowNull: true })
+            .addField("Gender", { type: "string", length: 10, allowNull: true })
+            .addField("Language", { type: "string", length: 10, allowNull: true })
+            .addField("Age", { type: "int", allowNull: true })
+            .addField("DayOfBirth", { type: "int", allowNull: true })
+            .addField("MonthOfBirth", { type: "int", allowNull: true })
+            .addField("YearOfBirth", { type: "int", allowNull: true })
+            .addField("Email", { type: "string", length: 50, allowNull: true })
+            .addField("EmailVerified", { type: "string", length: 50, allowNull: true })
+            .addField("Phone", { type: "string", length: 25, allowNull: true })
+            .addField("Address", { type: "string", length: 100, allowNull: true })
+            .addField("Country", { type: "string", length: 50, allowNull: true })
+            .addField("Region", { type: "string", length: 50, allowNull: true })
+            .addField("City", { type: "string", length: 50, allowNull: true })
+            .addField("Zip", { type: "string", length: 50, allowNull: true });
+        
         metaDataMgr.addModel("UserRole", "86e022dd-13d9-4c9d-811c-76b2ac807cff", "RootUserRole", "87c43f07-15f7-47d3-9309-263c14d71959")
-            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+            .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
             .addField("RoleId", { type: "dataRef", model: "Role", refAction: "parentRestrict", allowNull: false });
 
         metaDataMgr.addModel("Transaction", "d0b37074-3748-495b-8d96-20f1c55d27a8", "RootTransaction", "f5d989fb-da06-405a-9395-6cc3cd7d0082")

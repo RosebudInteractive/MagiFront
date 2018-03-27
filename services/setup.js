@@ -13,6 +13,9 @@ const methodOverride = require('method-override');
 
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal } = require('../security/local-auth');
+const { AuthVKInit } = require('../security/vk-auth');
+const { AuthFBInit } = require('../security/fb-auth');
+const { AuthGoogleInit } = require('../security/google-auth');
 const { setupEpisodes } = require('./episodes');
 const { setupAuthors } = require('./authors');
 const { setupCategories } = require('./categories');
@@ -36,15 +39,30 @@ function setupAPI(express, app) {
         let RedisStore = RedisStoreSession(expressSession);
         sessionOpts.store = new RedisStore(config.redisSession);
     };
-    app.use("/api", expressSession(config.session));
 
-    app.use("/api", passport.initialize());
-    app.use("/api", passport.session());   
+    let sessionMiddleware = {
+        express: expressSession(config.session),
+        passportInit: passport.initialize(),
+        passportSession: passport.session()
+    };
+
+    app.use("/api", sessionMiddleware.express);
+    app.use("/api", sessionMiddleware.passportInit);
+    app.use("/api", sessionMiddleware.passportSession);   
 
     app.use("/api", methodOverride()); // поддержка put и delete
 
+//     ///////////////////////////////////////////////////////////////////////////////////////////////
+//     app.use(config.snets.vk.callBack, expressSession(config.session));
+//     app.use(config.snets.vk.callBack, passport.initialize());
+//     app.use(config.snets.vk.callBack, passport.session());
+//    ///////////////////////////////////////////////////////////////////////////////////////////////
+
     let useJWT = config.has('authentication.useJWT') ? config.authentication.useJWT : false;
     AuthLocalInit(app);
+    AuthVKInit(app, sessionMiddleware);
+    AuthFBInit(app, sessionMiddleware);
+    AuthGoogleInit(app, sessionMiddleware);
     if (useJWT)
         AuthJWTInit(app);
 

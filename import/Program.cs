@@ -27,7 +27,7 @@ namespace MagImport
                 return JsonConvert.SerializeObject(this, fmt, settings == null ? jss : settings);
             }
 
-            public void ToJSONFile(string outFile, Formatting fmt = Formatting.None, Encoding enc = null, JsonSerializerSettings settings = null)
+            public string ToJSONFile(string outFile, Formatting fmt = Formatting.None, Encoding enc = null, JsonSerializerSettings settings = null)
             {
                 string json = ToJSONString(fmt, settings);
                 string dir = Path.GetDirectoryName(outFile);
@@ -42,6 +42,7 @@ namespace MagImport
                 string path = Path.Combine(dir, file);
                 Directory.CreateDirectory(dir);
                 File.WriteAllText(path, json, enc == null ? enc_dflt : enc);
+                return dir;
             }
 
             Encoding enc_dflt = new UTF8Encoding(false); /* UTF8 w/o BOM */
@@ -711,6 +712,190 @@ namespace MagImport
             public EpisodeContentRoot() : base(CLASS_GUID) { }
         };
 
+        //
+        // Role
+        //
+        public class RoleFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public char ShortCode { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class Role : DataObjTyped<RoleFields, RoleRoot>
+        {
+            const string CLASS_GUID = "e788831c-6f91-4bf6-ae6f-a21f0243d670";
+            public Role() : base(CLASS_GUID) { }
+        };
+
+        public class RoleRoot : RootDataObject
+        {
+            const string CLASS_GUID = "b23a3900-6f89-4df4-b4e4-ca6d475b3d60";
+            public override string GetClassName() { return "Role"; }
+            public RoleRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // SNetProvider
+        //
+        public class SNetProviderFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string URL { get; set; }
+        };
+
+        public class SNetProvider : DataObjTyped<SNetProviderFields, SNetProviderRoot>
+        {
+            const string CLASS_GUID = "fc1d1d24-7d61-4d38-a963-c617a022560e";
+            public SNetProvider() : base(CLASS_GUID) { }
+        };
+
+        public class SNetProviderRoot : RootDataObject
+        {
+            const string CLASS_GUID = "0f0b2dfb-6899-413a-8af5-644598bbef6b";
+            public override string GetClassName() { return "SNetProvider"; }
+            public SNetProviderRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // SNetProfile
+        //
+        public class SNetProfileFields : BaseFieldsData
+        {
+            public int UserId { get; set; }
+            public int ProviderId { get; set; }
+            public string Identifier { get; set; }
+            public string URL { get; set; }
+            public string WebSite { get; set; }
+            public string PhotoUrl { get; set; }
+            public string DisplayName { get; set; }
+            public string Description { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Gender { get; set; }
+            public string Language { get; set; }
+            public int? Age { get; set; }
+            public int? DayOfBirth { get; set; }
+            public int? MonthOfBirth { get; set; }
+            public int? YearOfBirth { get; set; }
+            public string Email { get; set; }
+            public string EmailVerified { get; set; }
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public string Country { get; set; }
+            public string Region { get; set; }
+            public string City { get; set; }
+            public string Zip { get; set; }
+        };
+
+        public class SNetProfile : DataObjTyped<SNetProfileFields, SNetProfileRoot>
+        {
+            const string CLASS_GUID = "54c9008e-4916-4972-a5f3-7325d229df68";
+            public SNetProfile() : base(CLASS_GUID) { }
+        };
+
+        public class SNetProfileRoot : RootDataObject
+        {
+            const string CLASS_GUID = "45d677c1-9784-426a-b255-024eaa6f1ebc";
+            public override string GetClassName() { return "SNetProfile"; }
+            public SNetProfileRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // UserRole
+        //
+        public class UserRoleFields : BaseFieldsData
+        {
+            public int AccountId { get; set; }
+            public int UserId { get; set; }
+            public int RoleId { get; set; }
+        };
+
+        public class UserRole : DataObjTyped<UserRoleFields, UserRoleRoot>
+        {
+            const string CLASS_GUID = "86e022dd-13d9-4c9d-811c-76b2ac807cff";
+            public UserRole() : base(CLASS_GUID) { }
+        };
+
+        public class UserRoleRoot : RootDataObject
+        {
+            const string CLASS_GUID = "87c43f07-15f7-47d3-9309-263c14d71959";
+            public override string GetClassName() { return "UserRole"; }
+            public UserRoleRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // User
+        //
+        public class UserAccessRights : JSONSerializable
+        {
+            public bool isAdmin { get; set; }
+            public Dictionary<string, int> roles = new Dictionary<string, int>();
+            public UserAccessRights() { isAdmin = false; }
+        }
+
+        public class UserFields : JSONSerializable
+        {
+            public int Id { get; set; }
+            public int? OwnedAccount { get; set; }
+            public string Name { get; set; }
+            public string DisplayName { get; set; }
+            public string Email { get; set; }
+            public string URL { get; set; }
+            public string Phone { get; set; }
+            public DateTime? RegDate { get; set; }
+            public DateTime? ExpDate { get; set; }
+            public string ActivationKey { get; set; }
+            public int? Status { get; set; }
+            public bool? IsOld { get; set; }
+            public string PData { get { return _PData == null ? null : _PData.ToJSONString(); } }
+            [JsonIgnore]
+            public UserAccessRights _PData= new UserAccessRights();
+            public UserFields()
+            {
+                IsOld = true;
+                Status = 1;
+            }
+        }
+
+        public class User : JSONSerializable
+        {
+            private static Random random = new Random();
+            public static string RandomString(int length)
+            {
+                const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+                //return new string(Enumerable.Repeat(chars, length)
+                //  .Select(s => s[random.Next(s.Length)]).ToArray());
+                return new string(Enumerable.Range(1, length).Select(_ => chars[random.Next(chars.Length)]).ToArray());
+            }
+            public string login { get; set; }
+            public string pwd { get; set; }
+            public UserFields fields;
+            public User()
+            {
+                fields = new UserFields();
+                pwd = User.RandomString(15);
+            }
+        }
+
+        public class Users : JSONSerializable
+        {
+            public string model { get { return "User"; } }
+            public List<User> data = new List<User>();
+            public Users() { }
+            public User newUser()
+            {
+                User user = new User();
+                user.fields.Id = ++_counter;
+                data.Add(user);
+                return user;
+            }
+            int _counter = 0;
+        };
+
+
         public class AudioFileDescriptionObj: JSONSerializable
         {
             public string title { get; set; }
@@ -997,18 +1182,222 @@ namespace MagImport
             acc_lng.Fields.LanguageId = LANGUAGE_ID;
             acc_lng.Fields.Name = "Пост Модерн Текнолоджи";
 
+            Dictionary<string, SNetProvider> providers = new Dictionary<string, SNetProvider>();
+            SNetProvider.AllData = allData;
+            SNetProvider provider = new SNetProvider();
+            provider.Fields.Code = "facebook";
+            provider.Fields.Name = "FaceBook";
+            provider.Fields.URL = "https://www.facebook.com";
+            providers.Add(provider.Fields.Code, provider);
+
+            provider = new SNetProvider();
+            provider.Fields.Code = "google";
+            provider.Fields.Name = "Google+";
+            provider.Fields.URL = "https://plus.google.com";
+            providers.Add(provider.Fields.Code, provider);
+
+            provider = new SNetProvider();
+            provider.Fields.Code = "mailru";
+            provider.Fields.Name = "MailRu";
+            provider.Fields.URL = "https://my.mail.ru";
+            providers.Add(provider.Fields.Code, provider);
+
+            provider = new SNetProvider();
+            provider.Fields.Code = "vkontakte";
+            provider.Fields.Name = "VKontakte";
+            provider.Fields.URL = "http://vk.com";
+            providers.Add(provider.Fields.Code, provider);
+
+            provider = new SNetProvider();
+            provider.Fields.Code = "yandex";
+            provider.Fields.Name = "Yandex";
+            provider.Fields.URL = "https://www.yandex.ru";
+            providers.Add(provider.Fields.Code, provider);
+
+            Dictionary<string, Role> roles = new Dictionary<string, Role>();
+            Role.AllData = allData;
+            Role role = new Role();
+            role.Fields.Code = "ADM";
+            role.Fields.Name = "Administrator";
+            role.Fields.ShortCode = 'a';
+            roles.Add("a:1:{s:13:\"administrator\";b:1;}", role);
+
+            role = new Role();
+            role.Fields.Code = "EDT";
+            role.Fields.Name = "Editor";
+            role.Fields.ShortCode = 'e';
+            roles.Add("a:1:{s:6:\"editor\";b:1;}", role);
+
+            role = new Role();
+            role.Fields.Code = "SBS";
+            role.Fields.Name = "Subscriber";
+            role.Fields.ShortCode = 's';
+            roles.Add("a:1:{s:10:\"subscriber\";b:1;}", role);
+
+            role = new Role();
+            role.Fields.Code = "PND";
+            role.Fields.Name = "Pending";
+            role.Fields.ShortCode = 'p';
+            roles.Add("a:1:{s:7:\"pending\";b:1;}", role);
+
+            Users users = new Users();
+            User user = users.newUser();
+            user.login = "admin";
+            user.pwd = "admin";
+            user.fields.DisplayName = user.fields.Name = "Admin";
+            user.fields.Email = "admin@magisteria.ru";
+            user.fields.IsOld = false;
+            user.fields._PData.isAdmin = true;
+            user.fields.RegDate = DateTime.Now;
+
             conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
             conn.Open();
 
             //
+            // Read Users & their profiles
+            //
+            MySqlCommand cmd = new MySqlCommand(sql_users_profile, conn);
+            rdr = cmd.ExecuteReader();
+
+            Dictionary<int, User> users_mag = new Dictionary<int, User>();
+            int curr_id = -1;
+            user = null;
+            bool isFirstTime = true;
+
+            while (rdr.Read())
+            {
+                int db_id = rdr.GetInt32("ID");
+                if (db_id != curr_id)
+                {
+                    user = users.newUser();
+                    users_mag.Add(db_id, user);
+
+                    user.login = String.IsNullOrEmpty(rdr.GetString("user_login")) ? null : rdr.GetString("user_login");
+                    user.fields.Name = String.IsNullOrEmpty(rdr.GetString("user_nicename")) ? null : rdr.GetString("user_nicename");
+                    user.fields.Email = String.IsNullOrEmpty(rdr.GetString("user_email")) ? null : rdr.GetString("user_email");
+                    if (user.fields.Email == null)
+                        throw new Exception(String.Format("User email (Id={0}) is empty!", db_id));
+                    user.fields.URL = String.IsNullOrEmpty(rdr.GetString("user_url")) ? null : rdr.GetString("user_url");
+                    user.fields.RegDate = null;
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("user_registered")))
+                        user.fields.RegDate = rdr.GetDateTime("user_registered");
+                    //user.fields.Status = rdr.GetInt32("user_status");
+                    user.fields.DisplayName = String.IsNullOrEmpty(rdr.GetString("display_name")) ? null : rdr.GetString("display_name");
+                    curr_id = db_id;
+                }
+                if (!rdr.IsDBNull(rdr.GetOrdinal("user_id")))
+                {
+                    string provider_code= String.IsNullOrEmpty(rdr.GetString("provider")) ? null : rdr.GetString("provider").ToLower();
+                    SNetProvider curr_provider = null;
+                    if (!providers.TryGetValue(provider_code, out curr_provider))
+                        throw new Exception(String.Format("Unknown provider \"{0}\" for user (Id={1})!", curr_provider, curr_id));
+
+                    if (isFirstTime)
+                    {
+                        SNetProfile.AllData = allData;
+                        isFirstTime = false;
+                    }
+
+                    SNetProfile profile = new SNetProfile();
+                    profile.Fields.UserId = user.fields.Id;
+                    profile.Fields.ProviderId = curr_provider.Fields.Id;
+                    profile.Fields.Identifier = String.IsNullOrEmpty(rdr.GetString("identifier")) ? null : rdr.GetString("identifier");
+                    profile.Fields.URL = String.IsNullOrEmpty(rdr.GetString("profileurl")) ? null : rdr.GetString("profileurl");
+                    profile.Fields.WebSite = String.IsNullOrEmpty(rdr.GetString("websiteurl")) ? null : rdr.GetString("websiteurl");
+                    profile.Fields.PhotoUrl = String.IsNullOrEmpty(rdr.GetString("photourl")) ? null : rdr.GetString("photourl");
+                    profile.Fields.DisplayName = String.IsNullOrEmpty(rdr.GetString("displayname")) ? null : rdr.GetString("displayname");
+                    profile.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
+                    profile.Fields.FirstName = String.IsNullOrEmpty(rdr.GetString("firstname")) ? null : rdr.GetString("firstname");
+                    if (profile.Fields.FirstName != null)
+                        profile.Fields.FirstName = profile.Fields.FirstName.Length > 50 ? profile.Fields.FirstName.Substring(0, 50) : profile.Fields.FirstName;
+                    profile.Fields.LastName = String.IsNullOrEmpty(rdr.GetString("lastname")) ? null : rdr.GetString("lastname");
+                    profile.Fields.Gender = String.IsNullOrEmpty(rdr.GetString("gender")) ? null : rdr.GetString("gender");
+                    profile.Fields.Language = String.IsNullOrEmpty(rdr.GetString("language")) ? null : rdr.GetString("language");
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("age")))
+                    {
+                        int age;
+                        if (Int32.TryParse(rdr.GetString("age"), out age))
+                            profile.Fields.Age = age;
+                    }
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
+                        profile.Fields.Age = rdr.GetInt32("birthday");
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
+                        profile.Fields.DayOfBirth = rdr.GetInt32("birthday");
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthmonth")))
+                        profile.Fields.MonthOfBirth = rdr.GetInt32("birthmonth");
+                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthyear")))
+                        profile.Fields.YearOfBirth = rdr.GetInt32("birthyear");
+                    profile.Fields.Email = String.IsNullOrEmpty(rdr.GetString("email")) ? null : rdr.GetString("email");
+                    profile.Fields.EmailVerified = String.IsNullOrEmpty(rdr.GetString("emailverified")) ? null : rdr.GetString("emailverified");
+                    profile.Fields.Phone = String.IsNullOrEmpty(rdr.GetString("phone")) ? null : rdr.GetString("phone");
+                    profile.Fields.Address = String.IsNullOrEmpty(rdr.GetString("address")) ? null : rdr.GetString("address");
+                    profile.Fields.Country = String.IsNullOrEmpty(rdr.GetString("country")) ? null : rdr.GetString("country");
+                    profile.Fields.Region = String.IsNullOrEmpty(rdr.GetString("region")) ? null : rdr.GetString("region");
+                    profile.Fields.City = String.IsNullOrEmpty(rdr.GetString("city")) ? null : rdr.GetString("city");
+                    profile.Fields.Zip = String.IsNullOrEmpty(rdr.GetString("zip")) ? null : rdr.GetString("zip");
+                }
+            }
+            rdr.Close();
+
+            //
+            // Read Users Roles
+            //
+
+            cmd = new MySqlCommand(sql_users_roles, conn);
+            rdr = cmd.ExecuteReader();
+
+            curr_id = -1;
+            user = null;
+            isFirstTime = true;
+
+            while (rdr.Read())
+            {
+                int db_id = rdr.GetInt32("user_id");
+                if (db_id != curr_id)
+                {
+                    if(!users_mag.TryGetValue(db_id,out user))
+                        throw new Exception(String.Format("User (Id={0}) doesn't exist!", db_id));
+                    curr_id = db_id;
+                }
+                string role_data = String.IsNullOrEmpty(rdr.GetString("meta_value")) ? null : rdr.GetString("meta_value");
+                if (!roles.TryGetValue(role_data, out role))
+                    throw new Exception(String.Format("Can't find role \"{0}\"!", role_data));
+
+                if (isFirstTime)
+                {
+                    UserRole.AllData = allData;
+                    isFirstTime = false;
+                }
+                UserRole ur = new UserRole();
+                ur.Fields.AccountId = ACCOUNT_ID;
+                ur.Fields.UserId = user.fields.Id;
+                ur.Fields.RoleId = role.Fields.Id;
+                string role_code = "" + role.Fields.ShortCode;
+                switch (role.Fields.ShortCode)
+                {
+                    case 'a':
+                        user.fields._PData.isAdmin = true;
+                        break;
+
+                    default:
+                        if (role.Fields.ShortCode == 'p')
+                            role_code = "s"; // Change "pending" to "subscribe"
+                        user.fields._PData.roles[role_code] = 1;
+                        break;
+                }
+            }
+            rdr.Close();
+
+            //
             // Read Categories
             //
+
             Category.AllData = allData;
             CategoryLng.AllData = allData;
             Dictionary<int, Tuple<Category, CategoryLng>> categoriesDB = new Dictionary<int, Tuple<Category, CategoryLng>>();
 
-            MySqlCommand cmd = new MySqlCommand(sql_get_category, conn);
+            cmd = new MySqlCommand(sql_get_category, conn);
             cmd.Parameters.AddWithValue("@TermType", "razdel");
             rdr = cmd.ExecuteReader();
 
@@ -1631,9 +2020,11 @@ namespace MagImport
             //
             // Export to JSON files
             //
+            string root_path= Path.GetDirectoryName(outDir);
             foreach (RootDataObject root in allData)
-                root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
+                root_path = root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
+            users.ToJSONFile(Path.Combine(root_path + Path.DirectorySeparatorChar, "users"), JSONFormatting, JSONEncoding, JSONSettings);
         }
 
         static string ErrInvSymbolExpMsg = "MagisteryToJSON::_JSONParse: Invalid symbol \"{0}\" at position {1}. Expected one is \"{2}\".";
@@ -1946,6 +2337,22 @@ namespace MagImport
             "  join `wp_term_taxonomy` `mc` on `rc`.`term_taxonomy_id` = `mc`.`term_taxonomy_id` and `mc`.`taxonomy` = 'category'\n" +
             "  join `wp_terms` `tc` on `tc`.`term_id` = `mc`.`term_id`\n" +
             "order by `t`.`term_id`, `tc`.`term_id`";
+
+        const string sql_users_profile =
+            "select u.`ID`, u.`user_login`, u.`user_nicename`, u.`user_email`, u.`user_url`, u.`user_registered`,\n" +
+            "  u.`user_status`, u.`display_name`,\n" +
+            "  p.`user_id`, p.`provider`, p.`identifier`, p.`profileurl`, p.`websiteurl`,\n" +
+            "  p.`photourl`, p.`displayname`, p.`description`, p.`firstname`, p.`lastname`, p.`gender`,\n" +
+            "  p.`language`, p.`age`, p.`birthday`, p.`birthmonth`, p.`birthyear`, p.`email`, p.`emailverified`,\n" +
+            "  p.`phone`, p.`address`, p.`country`, p.`region`, p.`city`, p.`zip`\n" +
+            "from `wp_users` u\n" +
+            "  left join `wp_wslusersprofiles` p on p.user_id = u.id\n" +
+            "order by u.id";
+
+        const string sql_users_roles =
+            "select `user_id`, `meta_value` from wp_usermeta\n" +
+            "where meta_key = 'wp_capabilities'\n" +
+            "order by user_id";
 
         const string att_lsn_number_name = "номер_сортировки";
         const string att_lsn_cover_name = "картинка_лекции";

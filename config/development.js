@@ -1,9 +1,19 @@
 const path = require('path');
+const defer = require('config/defer').deferConfig;
 
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
-    httpPort: 3000,
+    proxyServer: {
+        protocol: 'http',
+        address: '0.0.0.0',
+        port: 3000
+    },
+    server: {
+        protocol: 'http',
+        address: '0.0.0.0',
+        port: 3000
+    },
     dbProvider: 'mssql',
     trace: {
         sqlTrace: false,
@@ -21,7 +31,7 @@ module.exports = {
         scanCount: 100
     },
     authentication: {
-        enabled: false,
+        enabled: true,
         useJWT: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)

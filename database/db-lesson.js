@@ -1042,6 +1042,17 @@ const DbLesson = class DbLesson extends DbObject {
                     lesson_lng_obj.duration(duration);
                     lesson_lng_obj.durationFmt(DbUtils.fmtDuration(duration));
                     return root_obj.save(options);
+                })
+                .finally((isErr, res) => {
+                    if (root_obj)
+                        this._db._deleteRoot(root_obj.getRoot());
+                    if (isErr) {
+                        if (res instanceof Error)
+                            throw res
+                        else
+                            throw new Error("Error: " + JSON.stringify(res));
+                    }
+                    return res;
                 });
             resolve(res);
         });
