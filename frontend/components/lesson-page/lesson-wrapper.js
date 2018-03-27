@@ -34,11 +34,24 @@ export default class LessonWrapper extends React.Component {
                       total={this.props.lessonCount}
                       id={'lesson-menu-' + this.props.lesson.Id}
                 />
-                <Link to={this.props.lesson.URL + "/transcript"}
-                      className={"link-to-transcript" + (this.props.isPlayer ? ' _reduced' : '')}>
-                    Транскрипт <br/>и
-                    материалы
-                </Link>
+                {
+                    (this.props.isPlayer && !this.props.paused) ?
+                        <div className='player-wrapper'>
+                            <Link to={this.props.lesson.URL + "/transcript"}
+                                  className={"link-to-transcript _reduced"}>
+                                Транскрипт <br/>и
+                                материалы
+                            </Link>
+                        </div>
+                        :
+                        <div>
+                            <Link to={this.props.lesson.URL + "/transcript"}
+                                  className={"link-to-transcript"}>
+                                Транскрипт <br/>и
+                                материалы
+                            </Link>
+                        </div>
+                }
                 <PlayerFrame {...this.props} visible={this.props.isPlayer}/>
                 <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain}
                              courseUrl={this.props.courseUrl}
