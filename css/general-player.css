@@ -31,7 +31,8 @@ html div {
 .ws-container-mini {
   display: float;
   float: right;
-  position: absolute;
+  /*position: absolute;*/
+  position: fixed;
   width: 200px;
   height: 150px;
   bottom: 10px;

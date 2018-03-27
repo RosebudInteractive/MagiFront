@@ -105,7 +105,7 @@ class PlayBlock extends React.Component {
                     </svg>
                 </div>
                 <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
-                <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="lecture__btn">
+                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'} className="lecture__btn">
                     <svg width="41" height="36">
                         {svg.play}
                     </svg>

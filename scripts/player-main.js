@@ -13,6 +13,12 @@ requirejs.config({
     }
 });
 
+import Player from "work-shop/player";
+import Loader from "work-shop/resource-loader";
+import 'jquery-ui/jquery-ui.js';
+import 'script-lib/binary-transport.js';
+import 'script-lib/mouseheld.js'
+
 var Utils = {};
 
 Utils.guid = function () {
@@ -25,9 +31,12 @@ Utils.guid = function () {
         s4() + '-' + s4() + s4() + s4();
 };
 
+window.Utils = Utils;
+
 (function ($) {
     $(document).ready(function () {
-        require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
+        // require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
+
 
             var o1 = getPlayerOptions();
             //var o2 = getPlayerOptions();
@@ -108,6 +117,15 @@ Utils.guid = function () {
                     },
                     onChangeContent: function (content) {
                         console.log(content);
+                    },
+                    onPaused: function () {
+                        console.log("paused event handler")
+                    },
+                    onStarted: function () {
+                        console.log("started event handler")
+                    },
+                    onError: function (e) {
+                        console.error("playback error. player was suspended", e);
                     }
                 };
             }
@@ -302,6 +320,6 @@ Utils.guid = function () {
                     })
             });
 
-        });
+        // });
     });
 })(jQuery)

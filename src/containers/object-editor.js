@@ -97,7 +97,10 @@ export default class ObjectEditor extends React.Component {
         return '/edit/';
     }
 
-    // componentWillUnmount() {
+    componentWillUnmount() {
+        window.$$('editor-form').clear()
+    }
+
     componentWillMount() {
         this._clearObjectInStorage()
     }
@@ -180,6 +183,7 @@ export default class ObjectEditor extends React.Component {
 
         return {
             view: "form",
+            id: 'editor-form',
             width: 1000,
             elements: that._getElements(),
             on: {

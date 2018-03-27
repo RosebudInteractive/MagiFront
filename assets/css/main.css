@@ -246,6 +246,8 @@ ul {
 
 @media (min-width: 601px) {
   .fade .player-block {
+    opacity: 0;}
+  .fade .lectures-menu {
     opacity: 0; }
   .fade .player-wrapper .link-to-transcript {
     opacity: 0;
@@ -272,7 +274,18 @@ ul {
     opacity: 0;
     -webkit-transform: translateX(20px);
     -ms-transform: translateX(20px);
-    transform: translateX(20px); } }
+    transform: translateX(20px); }
+  /*.fade .player-frame__poster-text {*/
+    /*!*opacity: 0;*!*/
+    /*-webkit-transform: translate(-50%, 80px);*/
+    /*-ms-transform: translate(-50%, 80px);*/
+    /*transform: translate(-50%, 80px); }*/
+  .fade .player-frame {
+    -webkit-transform: translateY(100px);
+    -ms-transform: translateY(100px);
+    transform: translateY(100px);
+  }
+}
 
 html {
   width: 100%; }
@@ -6086,7 +6099,7 @@ ul.user-tooltip {
     .courses {
       padding-top: 64px; } }
 
-.lecture-wrapper {
+.lecture-wrapper, .player-wrapper {
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   background-size: cover;
@@ -6453,6 +6466,9 @@ ul.user-tooltip {
       .lectures-menu:after {
         left: 0; } }
   .lectures-menu._dark {
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#1C1B17), to(rgba(28, 27, 23, 0)));
+    background-image: -webkit-linear-gradient(top, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);
+    background-image: linear-gradient(to bottom, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);
     color: #fff; }
     .lectures-menu._dark.opened {
       background-color: #2f2f2f; }
@@ -6550,7 +6566,14 @@ ul.user-tooltip {
     .lectures-menu .play-block {
       display: none; } }
 
-body[data-page="fullpage"] .lectures-menu {
+body[data-page="fullpage-lesson"] .lectures-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10; }
+
+body[data-page="fullpage-player"] .lectures-menu {
   position: fixed;
   top: 0;
   left: 0;
@@ -6625,7 +6648,7 @@ body[data-page="fullpage"] .lectures-menu {
   width: 100%;
   min-height: -webkit-calc(100vh - 149px);
   min-height: calc(100vh - 149px);
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(255, 255, 255, 0.9);
   color: #2f2f2f;
   opacity: 0;
   z-index: -1000000;
@@ -7055,7 +7078,7 @@ body[data-page="fullpage"] .lectures-menu {
   transition: opacity 0.5s ease, -webkit-transform 0.5s ease;
   transition: opacity 0.5s ease, transform 0.5s ease;
   transition: opacity 0.5s ease, transform 0.5s ease, -webkit-transform 0.5s ease;
-  z-index: 1; }
+  z-index: 2; }
   @media (max-width: 1023px) {
     .link-to-transcript {
       right: 8px;
@@ -10491,9 +10514,9 @@ ul.lectures-tab {
   padding-right: 58px;
   padding-bottom: 10px;
   min-height: 100px;
-  background-image: -webkit-gradient(linear, left bottom, left top, from(#1C1B17), to(rgba(28, 27, 23, 0)));
-  background-image: -webkit-linear-gradient(bottom, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);
-  background-image: linear-gradient(to top, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);
+  /*background-image: -webkit-gradient(linear, left bottom, left top, from(#1C1B17), to(rgba(28, 27, 23, 0)));*/
+  /*background-image: -webkit-linear-gradient(bottom, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);*/
+  /*background-image: linear-gradient(to top, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);*/
   -webkit-transition: opacity 0.5s ease;
   transition: opacity 0.5s ease; }
   @media (max-width: 600px) {
@@ -10744,11 +10767,12 @@ ul.lectures-tab {
   .player-block .sound-button svg {
     fill: #fff; }
   .player-block .sound-button .off {
-    display: none; }
-  .player-block .sound-button._sound-off .on {
-    display: none; }
-  .player-block .sound-button._sound-off .off {
-    display: block; }
+    /*display: none; }*/
+  }
+  /*.player-block .sound-button._sound-off .on {*/
+    /*display: none; }*/
+  /*.player-block .sound-button._sound-off .off {*/
+    /*display: block; }*/
   @media (max-width: 600px) {
     .player-block .sound-button {
       margin: 0;
@@ -10812,7 +10836,8 @@ ul.lectures-tab {
   -ms-flex-pack: center;
   justify-content: center;
   width: 100px;
-  height: 16px; }
+  height: 16px;
+  cursor: pointer}
   @media (max-width: 600px) {
     .sound-control {
       display: none; } }
@@ -10844,6 +10869,11 @@ ul.lectures-tab {
       outline: none; }
 
 .player-frame {
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+  bottom: 0;
+
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -10855,15 +10885,21 @@ ul.lectures-tab {
   -moz-box-orient: vertical;
   -moz-box-direction: normal;
   -ms-flex-direction: column;
-  flex-direction: column; }
-  /*padding-top: 48px; }*/
+  flex-direction: column;
+  /*height: calc(100vh - 54px);*/
+  /*height: -webkit-calc(100vh - 54px);*/
+  padding-top: 48px;
+  background: -webkit-gradient(top, rgba(47,47,47,0) 0%,rgba(47,47,47,1) 43%,rgba(47,47,47,1) 100%);
+  background: -webkit-linear-gradient(top, rgba(47,47,47,0) 0%,rgba(47,47,47,1) 43%,rgba(47,47,47,1) 100%);
+  background: linear-gradient(to bottom, rgba(47,47,47,0) 0%,rgba(47,47,47,1) 43%,rgba(47,47,47,1) 100%);
+  -webkit-transition: all 0.5s ease;
+  transition: all 0.5s ease;}
   @media (max-width: 900px) {
     .player-frame {
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      height: -webkit-calc(100vh - 54px);
-      height: calc(100vh - 54px); } }
+      height: auto} }
   @media (max-width: 600px) {
     .player-frame {
       -webkit-box-sizing: border-box;
@@ -10873,20 +10909,22 @@ ul.lectures-tab {
       height: 100vh;
       min-height: 360px; } }
   .player-frame__poster-text {
-    display: none;
+    /*display: none;*/
     position: absolute;
-    bottom: 48px;
+    bottom: 100px;
     left: 50%;
     -webkit-transform: translateX(-50%);
     -ms-transform: translateX(-50%);
     transform: translateX(-50%);
-    width: 90%;
-    max-width: 540px;
+    width: 85%;
+    max-width: 100vw;
     text-align: center;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
-    color: #fff; }
+    color: #fff;
+    transition: transform 0.5s ease, -webkit-transform 0.5s ease;
+    }
     @media (max-width: 600px) {
       .player-frame__poster-text {
         display: block;
@@ -10902,14 +10940,14 @@ ul.lectures-tab {
   .player-frame__poster {
     width: 100%;
     /*height: -webkit-calc(100vh - 149px);*/
+    height: -webkit-calc(100vh);
     height: 100vh;
     /*height: calc(100vh - 149px);*/
     overflow: hidden; }
     @media (max-width: 600px) {
       .player-frame__poster {
         position: relative;
-        margin-bottom: 14px;
-        height: 100%; }
+        margin-bottom: 14px;}
         .player-frame__poster:before, .player-frame__poster:after {
           content: "";
           position: absolute;
@@ -10935,8 +10973,9 @@ ul.lectures-tab {
       width: auto; }
   .player-frame__screen {
     position: absolute;
+    box-sizing: border-box;
     /*top: 97px;*/
-    bottom: 100px;
+    bottom: 0;
     left: 0;
     right: 0;
     display: -webkit-box;
@@ -10957,7 +10996,10 @@ ul.lectures-tab {
     -ms-flex-pack: end;
     justify-content: flex-end;
     background-color: rgba(47, 47, 47, 0.8);
-    height: 100vh; }
+    height: 100vh;
+    padding-bottom: 100px;
+    -webkit-transition: background-color 0.7s ease, opacity 0.7s ease;
+    transition: background-color 0.7s ease, opacity 0.7s ease; }
     @media (max-width: 600px) {
       .player-frame__screen {
         bottom: 0;
@@ -11037,6 +11079,148 @@ ul.lectures-tab {
   @media (max-width: 600px) {
     .player-frame .play-block--big {
       margin-bottom: 0; } }
+
+  .small-player-frame {
+    float: right;
+    position: fixed;
+    bottom: 100px;
+    right: 100px;
+    width: 250px;
+    height: 157px;
+    z-index: 20;
+    -webkit-transition: opacity 0.7s ease;
+    transition: opacity 0.7s ease;
+  }
+  .small-player__poster{
+    position: absolute;
+    background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+    background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+    height: 100%;
+    width: 100%;
+    -webkit-transition: opacity 0.7s ease;
+    transition: opacity 0.7s ease;
+    opacity: 0;
+  }
+  @media (max-width: 900px) {
+    .small-player-frame {
+      bottom: 50px;
+      right: 50px;
+      width: 145px;
+      height: 91px;} }
+
+  .small-player-frame:hover .player-frame__poster-text{
+    opacity: 1;
+  }
+
+  .small-player-frame:hover .small-player_block{
+    opacity: 1;
+  }
+
+  .small-player-frame:hover .small-player__poster {
+    opacity: 1;
+  }
+
+  .small-player_block{
+    opacity: 0;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+  }
+  @media (max-width: 900px) {
+    .small-player_block {
+      display: none; } }
+
+  .small-player_block .close-button,
+  .small-player_block .maximize-button,
+  .small-player_block .play-button {
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    position: absolute;
+  }
+
+  .small-player_block .maximize-button{
+    width: 41px;
+    height: 37px;
+    left: calc(50% - 41px/2 - 44.5px);
+    top: calc(50% - 37px/2 + 8.5px);
+  }
+
+  .small-player_block .play-button {
+    width: 41px;
+    height: 36px;
+    left: calc(50% - 23px/2 + 45.5px);
+    top: calc(50% - 36px/2 + 8px);
+  }
+
+  .small-player_block .close-button {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    right: 9px;
+    top: 8px;
+  }
+
+  .small-player_block .maximize-button:focus,
+  .small-player_block .play-button:focus{
+    outline: none; }
+  .small-player_block .play-button:hover,
+  .small-player_block .maximize-button:hover {
+    opacity: 0.7; }
+  .small-player_block .maximize-button svg,
+  .small-player_block .play-button svg {
+    display: block; }
+  .small-player_block .maximize-button:hover svg,
+  .small-player_block .maximize-button:active svg,
+  .small-player_block .maximize-button.active svg,
+  .small-player_block .play-button:hover svg,
+  .small-player_block .play-button:active svg,
+  .small-player_block .play-button.active svg {
+    -webkit-filter: drop-shadow(0 0 6px #c8684c);
+    filter: drop-shadow(0 0 6px #c8684c); }
+
+
+  .small-player-frame .player-frame__poster-text{
+    position: absolute;
+    height: 28px;
+    left: 117px;
+    right: -146px;
+    top: 7px;
+    font-family: "Fira Sans", serif;
+    font-style: normal;
+    font-weight: normal;
+    line-height: normal;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    vertical-align: top;
+    display: table-cell;
+    text-align: left;
+  }
+  @media (max-width: 900px) {
+    .small-player-frame .player-frame__poster-text {
+      display: none; } }
 
 .contents-tooltip {
   position: absolute;

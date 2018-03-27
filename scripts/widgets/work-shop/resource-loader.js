@@ -507,6 +507,11 @@ define (
                 if (id && !this._alreadyLoadedAudio(id)) {
                     var url = "/data/" + id;
                     var audio = new Audio();
+
+                    audio.onerror = function() {
+                        console.log(audio.error)
+                    }
+
                     audio.preload = true;
                     audio.src = url;
                     this._state.loadedData.audios[id] = {

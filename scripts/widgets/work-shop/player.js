@@ -340,6 +340,11 @@ export default class CWSPlayer extends CWSBase {
             this._options.loader.setPosition(this._audioState.globalTime);
             if (!this._audioState.stopped) audio.play();
             //this._audioState.audio.load();
+            // this._broadcastAudioInitialized();
+            // if ready state is greater, then onloaded event was already fired for the current element
+            if (this._audioState.audio.readyState >= 2) {
+                this._broadcastAudioLoaded();
+            }
         }
     }
 
@@ -352,44 +357,68 @@ export default class CWSPlayer extends CWSBase {
 
     _setAudioEvents(audio) {
         var that = this;
-        audio.on("loadeddata", function () {
-            that._audioState.duration = this.duration;
-            that._audioState.currentTime = this.currentTime;
-            that._audioState.audio.volume = that._audioState.volume;
-            that._audioState.audio.playbackRate = that._audioState.playbackRate;
-            // that._audioState.audio.muted = that._audioState.muted;
-            that._broadcastAudioLoaded();
-            //that._options.loader.setPosition(0)
-        }).on("timeupdate", function (e) {
-            that._audioState.currentTime = this.currentTime;
-            that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
-            that._broadcastCurrentTimeChanged();
-            //if (!that._audioState.stopped) {
-            //    that._playElements(that._audioState.globalTime);
-            //}
-            //console.log("timeupdate", that._audioState.globalTime);
-            that._options.loader.setPosition(that._audioState.globalTime);
-            that._chechAndFireContentChanged()
-        }).on("volumechange", function (e) {
-            that._audioState.volume = this.volume;
-        }).on("ended", function () {
-            var data = that._options.loader.getData();
-            if (that._audioState.currentEpisode + 1 < data.episodes.length) {
-                that._audioState.currentEpisode++;
-                var episode = data.episodes[that._audioState.currentEpisode];
-                that._options.loader
-                    .getAudioResource(episode.audio.file)
-                    .then((a) => {
-                        var inf = $.extend(true, {}, episode.audio.info);
-                        inf.data = a.data;
-                        that._setAudio(inf)
-                    });
-            }
-        });
+        audio
+            .on("canplay", () => {
+                console.log('Can play');
+                that._broadcastAudioInitialized();
+            })
+            .on("loadeddata", function () {
+                that._audioState.duration = this.duration;
+                that._audioState.currentTime = this.currentTime;
+                that._audioState.audio.volume = that._audioState.volume;
+                that._audioState.audio.playbackRate = that._audioState.playbackRate;
+                // that._audioState.audio.muted = that._audioState.muted;
+                that._broadcastAudioLoaded();
+                //that._options.loader.setPosition(0)
+            })
+            .on("timeupdate", function (e) {
+                that._audioState.currentTime = this.currentTime;
+                that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
+                that._broadcastCurrentTimeChanged();
+                //if (!that._audioState.stopped) {
+                //    that._playElements(that._audioState.globalTime);
+                //}
+                //console.log("timeupdate", that._audioState.globalTime);
+                that._options.loader.setPosition(that._audioState.globalTime);
+                that._checkAndFireContentChanged()
+            })
+            .on("volumechange", function (e) {
+                that._audioState.volume = this.volume;
+            })
+            .on("ended", function () {
+                var data = that._options.loader.getData();
+                if (that._audioState.currentEpisode + 1 < data.episodes.length) {
+                    that._audioState.currentEpisode++;
+                    var episode = data.episodes[that._audioState.currentEpisode];
+                    that._options.loader
+                        .getAudioResource(episode.audio.file)
+                        .then((a) => {
+                            var inf = $.extend(true, {}, episode.audio.info);
+                            inf.data = a.data;
+                            that._setAudio(inf)
+                        });
+                }
+            })
+            .on("pause", function () {
+                // that.pause();
+                console.log("PLAYER. onpause");
+                that._audioState.stopped = true;
+                that._broadcastPaused();
+            })
+            .on("play", function () {
+                // that.play();
+                console.log("PLAYER. onplay");
+                that._audioState.stopped = false;
+                that._broadcastStarted();
+            })
+            .on("error", function (e) {
+                that.pause();
+                that._broadcastError(e);
+            });
 
     }
 
-    _chechAndFireContentChanged() {
+    _checkAndFireContentChanged() {
         var episodesContent = this.getLectureContent();
         var curCont = null;
         for (var i = 0; i < episodesContent.length; i++) {
@@ -402,17 +431,17 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
+        if (!curCont && !this._audioState.currentContent) return;
+
         if ((curCont && !this._audioState.currentContent) ||
             (!curCont && this._audioState.currentContent)
         ) {
             this._audioState.currentContent = curCont;
             this._broadcastChangeContent(curCont);
-        } else {
-            if (this._audioState.currentContent.title != curCont.title ||
-                this._audioState.currentContent.begin != curCont.begin) {
-                this._audioState.currentContent = curCont;
-                this._broadcastChangeContent(curCont);
-            }
+        } else if (this._audioState.currentContent.title != curCont.title ||
+            this._audioState.currentContent.begin != curCont.begin) {
+            this._audioState.currentContent = curCont;
+            this._broadcastChangeContent(curCont);
         }
     }
 
@@ -462,9 +491,29 @@ export default class CWSPlayer extends CWSBase {
             this._options.onAudioLoaded(this.getAudioState());
     }
 
+    _broadcastAudioInitialized() {
+        if (this._options.onAudioInitialized)
+            this._options.onAudioInitialized(this.getAudioState());
+    }
+
     _broadcastCurrentTimeChanged() {
         if (this._options.onCurrentTimeChanged)
             this._options.onCurrentTimeChanged(this.getAudioState());
+    }
+
+    _broadcastPaused() {
+        if (this._options.onPaused)
+            this._options.onPaused();
+    }
+
+    _broadcastStarted() {
+        if (this._options.onStarted)
+            this._options.onStarted();
+    }
+
+    _broadcastError(e) {
+        if (this._options.onError)
+            this._options.onError();
     }
 
     getAudioState() {
@@ -473,27 +522,98 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _proccessAnimationFrame(timestamp) {
-        this._audioState.currentTime = this._audioState.audio.currentTime;
-        this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
-        this._broadcastCurrentTimeChanged();
-        if (!this._audioState.stopped) {
-            this._playElements(this._audioState.globalTime);
+        if (this._audioState.audio) {
+            this._audioState.currentTime = this._audioState.audio.currentTime;
+            this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
+            this._broadcastCurrentTimeChanged();
+            if (!this._audioState.stopped) {
+                this._playElements(this._audioState.globalTime);
+            }
         }
-        // console.log(this._audioState.audio.currentTime);
         this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
     }
 
     play() {
-        this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
-        if (this._audioState.stopped) this._audioState.audio.play();
-        this._audioState.stopped = false;
+        // let that = this;
+        // let tmInt = null;
+        this._audioState.requestAnimationFrameID = requestAnimationFrame(::this._proccessAnimationFrame);
+        if (this._audioState.stopped) {
+            return this._audioState.audio.play()
+                .then(() => {
+                    console.log("PLAYER. CallPlay")
+                });
+        } else {
+            return Promise.resolve()
+        }
+
+        // return new Promise((resolve, reject) => {
+        //     this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
+        //     if (that._audioState.stopped) {
+        //         that._audioState.$audio.on("play", awaitPlayerPlay);
+        //
+        //         that._audioState.audio.play();
+        //         tmInt = setTimeout(function () {
+        //             if (that._audioState.audio.paused) {
+        //                 that._audioState.stopped = false;
+        //                 resolve();
+        //             } else {
+        //                 reject();
+        //             }
+        //         }, 500)
+        //     }
+        //
+        //     if (!that._audioState.stopped) {
+        //         setTimeout(() => {
+        //             resolve();
+        //         }, 0)
+        //     }
+        //
+        //
+        //
+        //     function awaitPlayerPlay() {
+        //         console.log("PLAYER. awaitPlayerPlay")
+        //         clearInterval(tmInt);
+        //         that._audioState.$audio.off("play", awaitPlayerPlay);
+        //         that._audioState.stopped = false;
+        //         resolve();
+        //     }
+        // });
     }
 
     pause() {
-        if (!this._audioState.stopped) this._audioState.audio.pause();
-        this._audioState.stopped = true;
-        cancelAnimationFrame(this._audioState.requestAnimationFrameID);
-        this._pauseElements();
+        let that = this;
+        let tmInt = null;
+        return new Promise((resolve, reject) => {
+            if (!that._audioState.stopped) {
+                that._audioState.$audio.on("pause", awaitPlayerPause);
+                that._audioState.audio.pause();
+                tmInt = setTimeout(function () {
+                    if (that._audioState.audio.paused) {
+                        that._audioState.stopped = true;
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                }, 500)
+            }
+
+            if (that._audioState.stopped) {
+                setTimeout(() => {
+                    resolve();
+                }, 0)
+            }
+
+            cancelAnimationFrame(that._audioState.requestAnimationFrameID);
+            that._pauseElements();
+
+            function awaitPlayerPause() {
+                clearInterval(tmInt);
+                that._audioState.$audio.off("pause", awaitPlayerPause);
+                that._audioState.stopped = true;
+                resolve();
+            }
+        });
+
     }
 
     /* from 0.1 to 1 */

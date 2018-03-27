@@ -91,7 +91,7 @@ class PlayBlock extends React.Component {
                             />
                         </svg>
                     </div>
-                    <Link to={'/play-lesson/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="play-block__btn">
+                    <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'} className="play-block__btn">
                         <svg width="41" height="36">
                             {svg.play}
                         </svg>

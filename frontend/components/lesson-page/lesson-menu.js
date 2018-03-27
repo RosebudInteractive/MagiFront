@@ -41,17 +41,17 @@ export default class Menu extends React.Component {
             _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>';
 
         return (
-            <div className={"lectures-menu js-lectures-menu _dark" + (this.state.opened ? ' opened' : '')} id={this.props.id} style={this.props.isMain ? null : {display: 'none'}}>
+            <div className={"lectures-menu js-lesson-menu _dark" + (this.state.opened ? ' opened' : '')} id={this.props.id} style={this.props.isMain ? null : {display: 'none'}}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>
                     </Link>
-                    <a href={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
+                    <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
                         <div className="icon">
                             <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _linkBack}}/>
                         </div>
                         <span><span className="label">Курс:</span>{' ' + this.props.courseTitle}</span>
-                    </a>
+                    </Link>
                 </div>
                 <div className="lectures-menu__section lectures-list-block">
                     <button type="button" className="lectures-list-trigger js-lectures-list-trigger"

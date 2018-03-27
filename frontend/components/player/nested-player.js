@@ -1,3 +1,4 @@
+import EventEmitter from 'events'
 import $ from 'jquery'
 
 import Player from "work-shop/player";
@@ -22,57 +23,150 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
-class NestedPlayer {
+class NestedPlayer extends EventEmitter {
 
     constructor(options) {
-        this.o1 = this._getPlayerOptions();
-        this.pl1 = new Player(options.div, this.o1);
-        this.pl = this.pl1;
+        super();
+        this._options = this._getPlayerOptions();
+        this._fullPlayer = new Player(options.div, this._options);
+        this._smallPlayer = new Player(options.smallDiv, this._options);
+        this._player = this._fullPlayer;
+        this._isFull = true;
+        this._isHardStopped = false;
+
 
         this._applyOptions(options);
-        this.pl1.render();
+        this._fullPlayer.render();
+        this._smallPlayer.render();
         this._applyData(options.data);
     }
 
+    get player() {
+        return this._player
+    }
+
+    set player(value) {
+        if (!this._player !== value) {
+            this._player = value;
+            this._isFull = value === this._fullPlayer;
+        }
+    }
+
+    get audioState() {
+        return this.player.getAudioState()
+    }
+
+    get lesson() {
+        return this._lesson
+    }
+
+    get courseUrl() {
+        return this._courseUrl;
+    }
+
     _loadOtherLesson(options) {
-        this.pl1.initContainer(options.div);
+        this._fullPlayer.initContainer(options.div);
+        this._smallPlayer.initContainer(options.smallDiv);
 
         this._applyOptions(options);
-        this.pl1.render();
+        this._fullPlayer.render();
+        this._smallPlayer.render();
         this._applyData(options.data);
     }
 
     _applyOptions(options) {
+        this._isHardStopped = false;
         this.assetsList = options.data.assets;
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
         this._onChangeTitle = options.onChangeTitle;
         this._onChangeContent = options.onChangeContent;
+        this._onAudioLoaded = options.onAudioLoaded;
+        this._courseUrl = options.courseUrl;
+        this._lesson = options.lesson;
     }
 
     _applyData(data) {
-        this.pl1.setData(data);
+        this._fullPlayer.setData(data);
+        this._smallPlayer.setData(data);
 
-        let content = this.pl1.getLectureContent();
+        let content = this._fullPlayer.getLectureContent();
         this._renderContent(content);
     }
 
     pause() {
-        this.pl.pause()
+        this.player.pause()
+        this._isHardStopped = false;
+        // this.emit('pause')
     }
 
     play() {
-        this.pl.play()
+        this.player.play()
+        this._isHardStopped = false;
+        // this.emit('play')
+    }
+
+    stop() {
+        this.player.pause()
+        this._lesson = null
+        this._isHardStopped = true;
+        // this.removeAllListeners('pause');
+        // this.removeAllListeners('play');
     }
 
     setPosition(begin) {
-        this.pl.setPosition(begin)
+        this.player.setPosition(begin)
     }
 
     setRate(value) {
-        this.pl.setRate(value)
+        this.player.setRate(value)
     }
 
+    mute() {
+        this.player.setMute(true)
+    }
+
+    unmute() {
+        this.player.setMute(false)
+    }
+
+    setVolume(value) {
+        this.player.setVolume(value)
+    }
+
+    switchToSmall() {
+        if (this._isFull) {
+            this.player = this._smallPlayer;
+            let _oldPlayer = this._fullPlayer;
+            this.player.setPosition(_oldPlayer.getPosition());
+            if (!_oldPlayer.getStopped()) {
+                _oldPlayer.pause()
+                    .then(() => {
+                        this.player.play()
+                    })
+
+            }
+        }
+    }
+
+
+    switchToFull() {
+        if (!this._isFull) {
+            this.player = this._fullPlayer;
+            let _oldPlayer = this._smallPlayer;
+            this.player.setPosition(_oldPlayer.getPosition());
+            if (!_oldPlayer.getStopped()) {
+                _oldPlayer.pause()
+                    .then(() => {
+                    this.player.play();
+                    })
+
+            } else {
+                let _position = this.audioState.globalTime;
+                this.player.setPosition(_position);
+            }
+        }
+    }
 
     _renderContent(content) {
         this._onRenderCotent(content)
@@ -94,8 +188,8 @@ class NestedPlayer {
                             if (audioObj) {
                                 that._loadAudio(audioObj)
                                     .then((audio) => {
-                                        that.pl1.setAudio(audio);
-                                        // pl2.setAudio(audio);
+                                        that._fullPlayer.setAudio(audio);
+                                        that._smallPlayer.setAudio(audio);
                                     });
                             }
 
@@ -111,9 +205,6 @@ class NestedPlayer {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
             },
-            onAudioLoaded: function () {
-                that.pl.play()
-            },
             onSetPosition: function () {
             },
             onFocused: function () {
@@ -123,20 +214,40 @@ class NestedPlayer {
             onAddElement: function () {
             },
             onChangeTitles: function (titles) {
-                var html = "";
-                for (var i = 0; i < titles.length; i++) {
-                    if (titles[i].title) {
-                        if (html != "") html += "<br/>";
-                        html += titles[i].title;
+                let html = "";
+                titles.forEach((item) => {
+                    if (item.title) {
+                        if (html !== "") html += "<br/>";
+                        html += item.title;
                     }
-                }
+                });
 
-                $("#titles-place").html(html);
+                if (that._onChangeTitle) {
+                    that._onChangeTitle(html)
+                }
             },
             onChangeContent: (content) => {
-                if (this._onChangeContent) {
-                    this._onChangeContent(content)
+                if (that._onChangeContent) {
+                    that._onChangeContent(content)
                 }
+            },
+            onAudioInitialized() {
+                if (that._onAudioLoaded) {
+                     let _state = that.player._audioState;
+                     that._onAudioLoaded({
+                         currentTime: _state.currentTime,
+                         muted: _state.muted,
+                         rate: _state.playbackRate,
+                         volume: _state.volume,
+                         paused: _state.stopped
+                     })
+                }
+            },
+            onPaused: () => {
+                that.emit('pause')
+            },
+            onStarted: () => {
+                that.emit('play')
             }
         };
     }
@@ -187,10 +298,9 @@ class NestedPlayer {
     _findAudio(assets) {
         if (!assets) return null;
 
-        for (var i = 0; i < assets.length; i++) {
-            if (assets[i].type == "MP3") return assets[i];
-        }
-        return null;
+        return assets.find((item) => {
+            return item.type === 'MP3'
+        })
     }
 
     _loadAudio(audio) {
@@ -221,5 +331,9 @@ export default (options) => {
         _instance._loadOtherLesson(options)
     }
 
+    return _instance
+}
+
+export const getInstance = () => {
     return _instance
 }

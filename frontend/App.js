@@ -21,6 +21,7 @@ import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
+import SmallPlayer from "./containers/small-player";
 
 Polifyll.registry();
 
@@ -118,7 +119,7 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
-                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl'} component={Player}/>
+                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl/:state'} component={Player}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
@@ -131,8 +132,9 @@ class App extends Component {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
+                <SmallPlayer visible={this.props.showSmallPlayer} lesson={this.props.lessonInfo.object} course={this.props.lessonInfo.course}/>
                 {this._getMainDiv()}
-                {this.props.currentPage !== pages.lesson ? <PageFooter/> : null}
+                {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ? <PageFooter/> : null}
             </div>
         );
     }
@@ -143,6 +145,8 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
+        showSmallPlayer: state.app.showSmallPlayer,
+        lessonInfo: state.singleLesson,
         ownProps,
     }
 }
