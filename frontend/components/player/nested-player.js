@@ -140,9 +140,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                this.player.play()
+                _oldPlayer.pause()
                     .then(() => {
-                        _oldPlayer.pause()
+                        this.player.play()
                     })
 
             }
@@ -156,9 +156,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                this.player.play()
+                _oldPlayer.pause()
                     .then(() => {
-                        _oldPlayer.pause();
+                    this.player.play();
                     })
 
             } else {
@@ -222,14 +222,9 @@ class NestedPlayer extends EventEmitter {
                     }
                 });
 
-                // for (var i = 0; i < titles.length; i++) {
-                //     if (titles[i].title) {
-                //         if (html !== "") html += "<br/>";
-                //         html += titles[i].title;
-                //     }
-                // }
-
-                $("#titles-place").html(html);
+                if (that._onChangeTitle) {
+                    that._onChangeTitle(html)
+                }
             },
             onChangeContent: (content) => {
                 if (that._onChangeContent) {

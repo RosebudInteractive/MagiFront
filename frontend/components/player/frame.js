@@ -6,7 +6,7 @@ import Controls from "./controls";
 import * as tools from '../../tools/time-tools'
 
 import $ from 'jquery'
-// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 import PauseScreen from "./pause-screen";
 
 export default class Frame extends Component {
@@ -44,6 +44,8 @@ export default class Frame extends Component {
             currentRate: 1,
             fullScreen: false,
         }
+
+        this._scrollMounted = false;
     }
 
     componentWillUnmount() {
@@ -51,34 +53,74 @@ export default class Frame extends Component {
             this._toggleFullscreen()
         }
 
+        this._removeListeners();
+
         if (this.props.onLeavePage) {
             this.props.onLeavePage()
+        }
+
+        if (this._scrollMounted) {
+            $(".scrollable").mCustomScrollbar('destroy');
         }
     }
 
     componentDidMount() {
+        let that = this;
         let tooltips = $('.js-speed, .js-contents, .js-share');
+
         $(document).mouseup(function (e) {
+            let _needHide = false;
             if (tooltips.has(e.target).length === 0) {
-                tooltips.removeClass('opened');
+                _needHide = _needHide || tooltips.hasClass('opened');
+                if (_needHide) {
+                    tooltips.removeClass('opened');
+                }
+            }
+
+            that._hideAllTooltips = _needHide;
+            if (_needHide) {
+                that.setState({
+                    showContent: false,
+                    showRate: false,
+                })
             }
         });
 
         $(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', () => {
             let _isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
-            this.setState({fullScreen : _isFullScreen})
+            this.setState({fullScreen: _isFullScreen})
         });
 
-        // $(".scrollable").mCustomScrollbar();
+        // $(document).keydown((e) => {
+        //     if (e.which === 32) {
+        //         that._onPause()
+        //         e.preventDefault();
+        //         return false
+        //     }
+        // })
     }
 
 
+    _removeListeners() {
+        $(document).off('mouseup');
+        $(document).off('keyup');
+    }
+
     _openContent() {
-        this.setState({showContent: !this.state.showContent})
+        if (!this._hideAllTooltips) {
+            this.setState({showContent: !this.state.showContent})
+        } else {
+            this._hideAllTooltips = false
+        }
+
     }
 
     _openRate() {
-        this.setState({showRate: !this.state.showRate})
+        if (!this._hideAllTooltips) {
+            this.setState({showRate: !this.state.showRate})
+        } else {
+            this._hideAllTooltips = false
+        }
     }
 
     _getContent() {
@@ -127,6 +169,13 @@ export default class Frame extends Component {
         }
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.content.length && (prevState.content.length !== this.state.content.length)) {
+            $(".scrollable").mCustomScrollbar();
+            this._scrollMounted = true;
+        }
+    }
+
     _calcContent(content) {
         let length = 0;
         let _items = [];
@@ -155,16 +204,33 @@ export default class Frame extends Component {
     }
 
     _onPause() {
-        if (this.props.paused) {
-            this.props.onPlay()
+        if (this.props.onPause && this.props.onPlay) {
+            if (this.props.paused) {
+                this.props.onPlay()
+            }
+            else {
+                this.props.onPause();
+            }
+
+            this.setState({
+                pause: !this.state.pause
+            })
         }
-        else {
-            this.props.onPause();
+    }
+
+    _keyUpHandler(e) {
+        if (e.which === 32) {
+            this._onPause()
+
+        }
+        e.preventDefault();
+    }
+
+    _onScreenClick(e) {
+        if (e.target.className === 'player-frame__screen') {
+            this._onPause()
         }
 
-        this.setState({
-            pause: !this.state.pause
-        })
     }
 
     _onBackward() {
@@ -212,7 +278,7 @@ export default class Frame extends Component {
 
     _toggleFullscreen() {
         if (!document.fullscreenElement &&    // alternative standard method
-            !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {  // current working methods
+            !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {  // current working methods
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
             } else if (document.documentElement.msRequestFullscreen) {
@@ -248,93 +314,89 @@ export default class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}}>
+            <div style={this.props.visible ? null : {display: 'none'}} onClick={::this._onScreenClick}
+                 onKeyUp={this._handleKeyUp} ref="player">
                 <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
-                {this.props.paused ? <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}/> : null}
-                <div className="player-frame">
-                    {
-                        !this.props.paused ?
-                            <div className="player-frame__poster-text">
-                                <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
-                                <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
-                            </div>
-                            :
-                            null
-                    }
-                    <div className="player-block">
-                        <Progress total={this.state.totalDuration} current={this.props.playTime} id={_id}
-                                  content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
-                        <div className="player-block__row">
-                            <Controls pause={this.props.paused}
-                                      muted={this.props.muted}
-                                      volume={this.props.volume}
-                                      handlePauseClick={::this._onPause}
-                                      handleBackwardClick={::this._onBackward}
-                                      handleToggleMuteClick={::this._onToggleMute}
-                                      handleSetVolume={::this._onSetVolume}
-                            />
-                            <div className="player-block__stats">
-                                <div className="player-block__info">
-                                    <span className="played-time">{_playTimeFrm}</span>
-                                    <span className="divider">/</span>
-                                    <span className="total-time">{this.state.totalDurationFmt ? this.state.totalDurationFmt : this.props.lesson.DurationFmt}</span>
-                                </div>
-                                <button type="button" className="speed-button js-speed-trigger"
-                                        onClick={::this._openRate}>
-                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                </button>
-                                <button type="button" className="content-button js-contents-trigger"
-                                        onClick={::this._openContent}>
-                                    <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
-                                </button>
-                                <button type="button" className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')} onClick={::this._toggleFullscreen}>
-                                    <svg className="full" width="20" height="18"
-                                         dangerouslySetInnerHTML={{__html: _fullscreen}}/>
-                                    <svg className="normal" width="20" height="18"
-                                         dangerouslySetInnerHTML={{__html: _screen}}/>
-                                </button>
-                            </div>
-                            <div
-                                className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.state.showContent ? ' opened' : '')}>
-                                <header className="contents-tooltip__header">
-                                    <p className="contents-tooltip__title">Оглавление</p>
-                                </header>
-                                <ol className="contents-tooltip__body scrollable mCustomScrollbar _mCS_2">
-                                    <div id="mCSB_2" className="mCustomScrollBox mCS-light mCSB_vertical mCSB_inside"
-                                         tabIndex="0" style={{maxHeight: "none"}}>
-                                        <div id="mCSB_2_container" className="mCSB_container"
-                                             style={{position: "relative", top: 0, left: 0}} dir="ltr">
-                                            {this._getContent()}
+
+                {
+                    this.props.visible ?
+                        <div>
+                            <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}
+                                         visible={!this.props.paused}/>
+                            <div className="player-frame">
+                                {
+                                    !this.props.paused ?
+                                        <div className="player-frame__poster-text">
+                                            <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
+                                            <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
                                         </div>
-                                        <div id="mCSB_2_scrollbar_vertical"
-                                             className="mCSB_scrollTools mCSB_2_scrollbar mCS-light mCSB_scrollTools_vertical"
-                                             style={{display: "block"}}>
-                                            <div className="mCSB_draggerContainer">
-                                                <div id="mCSB_2_dragger_vertical" className="mCSB_dragger"
-                                                     style={{position: "absolute", minHeight: 30, display: "block", height: 159, maxHeight: 300, top: 0}}>
-                                                    <div className="mCSB_dragger_bar" style={{lineHeight: 30}}/>
-                                                </div>
-                                                <div className="mCSB_draggerRail"/>
+                                        :
+                                        null
+                                }
+                                <div className="player-block">
+                                    <Progress total={this.state.totalDuration} current={this.props.playTime} id={_id}
+                                              content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
+                                    <div className="player-block__row">
+                                        <Controls pause={this.props.paused}
+                                                  muted={this.props.muted}
+                                                  volume={this.props.volume}
+                                                  handlePauseClick={::this._onPause}
+                                                  handleBackwardClick={::this._onBackward}
+                                                  handleToggleMuteClick={::this._onToggleMute}
+                                                  handleSetVolume={::this._onSetVolume}
+                                        />
+                                        <div className="player-block__stats">
+                                            <div className="player-block__info">
+                                                <span className="played-time">{_playTimeFrm}</span>
+                                                <span className="divider">/</span>
+                                                <span className="total-time">{this.state.totalDurationFmt ? this.state.totalDurationFmt : this.props.lesson.DurationFmt}</span>
                                             </div>
+                                            <button type="button" className="speed-button js-speed-trigger"
+                                                    onClick={::this._openRate}>
+                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
+                                            </button>
+                                            <button type="button" className="content-button js-contents-trigger"
+                                                    onClick={::this._openContent}>
+                                                <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
+                                            </button>
+                                            <button type="button"
+                                                    className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')}
+                                                    onClick={::this._toggleFullscreen}>
+                                                <svg className="full" width="20" height="18"
+                                                     dangerouslySetInnerHTML={{__html: _fullscreen}}/>
+                                                <svg className="normal" width="20" height="18"
+                                                     dangerouslySetInnerHTML={{__html: _screen}}/>
+                                            </button>
+                                        </div>
+                                        <div
+                                            className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.state.showContent ? ' opened' : '')}>
+                                            <header className="contents-tooltip__header">
+                                                <p className="contents-tooltip__title">Оглавление</p>
+                                            </header>
+                                            <ol className="contents-tooltip__body scrollable">
+                                                {this._getContent()}
+                                            </ol>
+                                        </div>
+                                        <div
+                                            className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
+                                            <header className="speed-tooltip__header">
+                                                <p className="speed-tooltip__title">Скорость</p>
+                                            </header>
+                                            <ul className="speed-tooltip__body">
+                                                {this._getRates()}
+                                            </ul>
                                         </div>
                                     </div>
-                                </ol>
-                            </div>
-                            <div
-                                className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
-                                <header className="speed-tooltip__header">
-                                    <p className="speed-tooltip__title">Скорость</p>
-                                </header>
-                                <ul className="speed-tooltip__body">
-                                    {this._getRates()}
-                                </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        :
+                        null
+                }
+
             </div>
         )
     }

@@ -187,10 +187,12 @@ class SubList extends React.Component {
                 <div className="lectures-sublist__item-info">
                     <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                     <div className="lectures-sublist__play-block">
-                        <button type="button" className="play-btn-small">
-                            <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                            <span>Воспроизвести</span>
-                        </button>
+                        <Link to={'/' + this.props.courseUrl + '/' + lesson.URL + '?play'}>
+                            <button type="button" className="play-btn-small">
+                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                                <span>Воспроизвести</span>
+                            </button>
+                        </Link>
                         <span className="lectures-sublist__item-duration">{lesson.DurationFmt}</span>
                     </div>
                 </div>
