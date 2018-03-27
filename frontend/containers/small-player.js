@@ -20,6 +20,19 @@ export default class SmallPlayer extends React.Component {
         }
 
         this._listenerMounted = false;
+
+        let that = this;
+        this._handlePause = function () {
+            that.setState({
+                paused: this.audioState.stopped
+            })
+        }
+
+        this._handlePlay = function () {
+            that.setState({
+                paused: this.audioState.stopped
+            })
+        }
     }
 
     static propTypes = {
@@ -49,25 +62,26 @@ export default class SmallPlayer extends React.Component {
         this._mountPlayerListener();
     }
 
+    componentWillUnmount() {
+        let _player = Player.getInstance();
+
+        if (this._listenerMounted && _player) {
+            _player.removeListener('pause', this._handlePause);
+            _player.removeListener('play', this._handlePlay);
+
+            this._listenerMounted = false;
+        }
+    }
+
     _mountPlayerListener() {
         let _player = Player.getInstance();
 
         if ((!this._listenerMounted) && (_player)) {
-            _player.on('pause', () => {
-                this.setState({
-                    paused: true
-                })
-            });
-
-            _player.on('play', () => {
-                this.setState({
-                    paused: false
-                })
-            });
+            _player.addListener('pause', this._handlePause);
+            _player.addListener('play', this._handlePlay);
 
             this._listenerMounted = true;
         }
-
     }
 
     _onPlayClick() {
@@ -126,8 +140,7 @@ export default class SmallPlayer extends React.Component {
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
-                <div className='small-player-frame'
-                     style={(this.props.visible && !_stopped) ? {opacity: 1} : {opacity: 0}}
+                <div className={'small-player-frame' + ((this.props.visible && !_stopped) ? '' : ' hide')}
                      onClick={::this._onClick}>
                     <div className='ws-container-mini' id='small-player'/>
                     <div className='small-player__poster'/>
