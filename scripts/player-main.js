@@ -1,7 +1,7 @@
 /**
  * Created by levan.kiknadze on 06/12/2017.
  */
-requirejs.config({
+/*requirejs.config({
     baseUrl: 'scripts',
     nodeRequire: require,
     paths: {
@@ -12,7 +12,7 @@ requirejs.config({
         "work-shop": '/scripts/widgets/work-shop'
     }
 });
-
+*/
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader";
 import 'jquery-ui/jquery-ui.js';

@@ -35,6 +35,7 @@ Utils.guid = function () {
 
 (function($){
     $(document).ready(function () {
+
         //require(["work-shop/work-shop"], function (WS) {
             var options = initOptions();
             var ws = new CWorkShop($(".ws-container"), options);
