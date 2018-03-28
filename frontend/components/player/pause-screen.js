@@ -28,7 +28,7 @@ export default class PauseScreen extends React.Component {
         const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
 
         return (
-            <div className="player-frame__screen" style={this.props.visible ? {opacity: 0} : {opacity: 1}}>
+            <div className={"player-frame__screen" + (this.props.visible ? "" : " hide")}>
                 <div className="lecture-frame">
                     <div className="lecture-frame__header">
                         <div className='lecture-frame__play-link'>

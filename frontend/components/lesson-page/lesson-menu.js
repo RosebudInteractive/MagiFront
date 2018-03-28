@@ -28,8 +28,16 @@ export default class Menu extends React.Component {
         let _newStatIsOpened = !this.state.opened;
         if (_newStatIsOpened) {
             $('#fp-nav').toggleClass('hide');
+            this._smallPlayerIsHidden = $('.small-player-frame').hasClass('hide');
+            if (!this._smallPlayerIsHidden) {
+                $('.small-player-frame').toggleClass('hide');
+            }
+
         } else {
             $('#fp-nav').removeClass('hide');
+            if (!this._smallPlayerIsHidden) {
+                $('.small-player-frame').removeClass('hide');
+            }
         }
         this.setState({opened: !this.state.opened})
 

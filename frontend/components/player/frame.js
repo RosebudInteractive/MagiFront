@@ -6,8 +6,9 @@ import Controls from "./controls";
 import * as tools from '../../tools/time-tools'
 
 import $ from 'jquery'
-import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 import PauseScreen from "./pause-screen";
+import ContentTooltip from "./content-tooltip";
 
 export default class Frame extends Component {
 
@@ -48,21 +49,6 @@ export default class Frame extends Component {
         this._scrollMounted = false;
     }
 
-    componentWillUnmount() {
-        if (this.state.fullScreen) {
-            this._toggleFullscreen()
-        }
-
-        this._removeListeners();
-
-        if (this.props.onLeavePage) {
-            this.props.onLeavePage()
-        }
-
-        if (this._scrollMounted) {
-            $(".scrollable").mCustomScrollbar('destroy');
-        }
-    }
 
     componentDidMount() {
         let that = this;
@@ -77,8 +63,8 @@ export default class Frame extends Component {
                 }
             }
 
-            that._hideAllTooltips = _needHide;
-            if (_needHide) {
+            that._hideAllTooltips = _needHide || that.state.showContent;
+            if (that._hideAllTooltips) {
                 that.setState({
                     showContent: false,
                     showRate: false,
@@ -100,6 +86,41 @@ export default class Frame extends Component {
         // })
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.props.content !== nextProps.content) {
+            if (nextProps.content) {
+                this._calcContent(nextProps.content)
+            }
+
+        }
+
+        if ((nextProps.currentContent) && (this.state.currentToc !== nextProps.currentContent))  {
+            this.setState({
+                currentToc: nextProps.currentContent
+            })
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.state.fullScreen) {
+            this._toggleFullscreen()
+        }
+
+        this._removeListeners();
+
+        if (this.props.onLeavePage) {
+            this.props.onLeavePage()
+        }
+
+        // this._unmountCustomScroll();
+    }
+
+    // _unmountCustomScroll() {
+    //     if (this._scrollMounted) {
+    //         $(".scrollable").mCustomScrollbar('destroy');
+    //         this._scrollMounted = false
+    //     }
+    // }
 
     _removeListeners() {
         $(document).off('mouseup');
@@ -123,16 +144,7 @@ export default class Frame extends Component {
         }
     }
 
-    _getContent() {
-        let that = this;
 
-        return this.state.content.map((item, index) => {
-            return <li className={(this.state.currentToc === item.id) ? 'active' : ''} key={index}
-                       onClick={() => that._goToContent(item.begin, item.id)}>
-                <a href='#'>{item.title}</a>
-            </li>
-        })
-    }
 
     _getRates() {
         let that = this;
@@ -152,28 +164,6 @@ export default class Frame extends Component {
                 {item.title ? item.title : item.value}
             </li>
         })
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (this.props.content !== nextProps.content) {
-            if (nextProps.content) {
-                this._calcContent(nextProps.content)
-            }
-
-        }
-
-        if ((nextProps.currentContent) && (this.state.currentToc !== nextProps.currentContent)) {
-            this.setState({
-                currentToc: nextProps.currentContent
-            })
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.content.length && (prevState.content.length !== this.state.content.length)) {
-            $(".scrollable").mCustomScrollbar();
-            this._scrollMounted = true;
-        }
     }
 
     _calcContent(content) {
@@ -227,10 +217,18 @@ export default class Frame extends Component {
     }
 
     _onScreenClick(e) {
-        if (e.target.className === 'player-frame__screen') {
+        if (this._hasOrIs(e.target, 'player-frame__screen') || this._hasOrIs(e.target, 'ws-container')) {
             this._onPause()
         }
 
+    }
+
+    _hasOrIs(target, name) {
+        if (target.className === name) {
+            return true
+        } else {
+            return target.parentNode ? false : this._hasOrIs(target.parentNode, name)
+        }
     }
 
     _onBackward() {
@@ -325,13 +323,13 @@ export default class Frame extends Component {
                     this.props.visible ?
                         <div>
                             <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}
-                                         visible={!this.props.paused}/>
+                                         visible={this.props.paused}/>
                             <div className="player-frame">
                                 {
                                     !this.props.paused ?
                                         <div className="player-frame__poster-text">
-                                            <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
-                                            <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
+                                            <h2 className="player-frame__poster-title">{this.props.title}</h2>
+                                            <p className="player-frame__poster-subtitle">{this.props.subTitle}</p>
                                         </div>
                                         :
                                         null
@@ -371,17 +369,11 @@ export default class Frame extends Component {
                                                      dangerouslySetInnerHTML={{__html: _screen}}/>
                                             </button>
                                         </div>
-                                        <div
-                                            className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.state.showContent ? ' opened' : '')}>
-                                            <header className="contents-tooltip__header">
-                                                <p className="contents-tooltip__title">Оглавление</p>
-                                            </header>
-                                            <ol className="contents-tooltip__body scrollable">
-                                                {this._getContent()}
-                                            </ol>
-                                        </div>
-                                        <div
-                                            className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
+                                        <ContentTooltip content={this.state.content}
+                                                        currentToc={this.state.currentToc}
+                                                        visible={this.state.showContent}
+                                                        onGoToContent={::this._goToContent}/>
+                                        <div className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
                                             <header className="speed-tooltip__header">
                                                 <p className="speed-tooltip__title">Скорость</p>
                                             </header>

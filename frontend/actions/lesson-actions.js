@@ -12,6 +12,7 @@ import {
     GET_LESSON_PLAY_INFO_SUCCESS,
     GET_LESSON_PLAY_INFO_FAIL,
     CLEAR_LESSON_PLAY_INFO,
+    START_LESSON_PLAYING,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
@@ -130,6 +131,15 @@ export const clearLessonPlayInfo = () => {
         dispatch({
             type: CLEAR_LESSON_PLAY_INFO,
             payload: null
+        });
+    }
+}
+
+export const startLessonPlaying = (lessonInfo) => {
+    return (dispatch) => {
+        dispatch({
+            type: START_LESSON_PLAYING,
+            payload: lessonInfo
         });
     }
 }

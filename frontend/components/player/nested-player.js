@@ -33,12 +33,15 @@ class NestedPlayer extends EventEmitter {
         this._player = this._fullPlayer;
         this._isFull = true;
         this._isHardStopped = false;
+        this._canEmit = true;
 
 
         this._applyOptions(options);
         this._fullPlayer.render();
         this._smallPlayer.render();
-        this._applyData(options.data);
+        if (options.data) {
+            this._applyData(options.data)
+        }
     }
 
     get player() {
@@ -64,19 +67,32 @@ class NestedPlayer extends EventEmitter {
         return this._courseUrl;
     }
 
+    _disableEmits(){
+        this._canEmit = false;
+    }
+
+    _enableEmits(){
+        this._canEmit = true;
+    }
+
     _loadOtherLesson(options) {
+        this._disableEmits()
         this._fullPlayer.initContainer(options.div);
         this._smallPlayer.initContainer(options.smallDiv);
 
         this._applyOptions(options);
         this._fullPlayer.render();
         this._smallPlayer.render();
-        this._applyData(options.data);
+        if (options.data) {
+            this._applyData(options.data)
+        }
     }
 
     _applyOptions(options) {
         this._isHardStopped = false;
-        this.assetsList = options.data.assets;
+        if (options.data) {
+            this.assetsList = options.data.assets;
+        }
         this._onRenderCotent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
         this._onChangeTitle = options.onChangeTitle;
@@ -95,9 +111,8 @@ class NestedPlayer extends EventEmitter {
     }
 
     pause() {
-        this.player.pause()
         this._isHardStopped = false;
-        // this.emit('pause')
+        return this.player.pause()
     }
 
     play() {
@@ -201,7 +216,7 @@ class NestedPlayer extends EventEmitter {
                 });
             },
             onCurrentTimeChanged: (e) => {
-                if (that._onCurrentTimeChanged) {
+                if (that._onCurrentTimeChanged && that._canEmit) {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
             },
@@ -222,12 +237,12 @@ class NestedPlayer extends EventEmitter {
                     }
                 });
 
-                if (that._onChangeTitle) {
+                if (that._onChangeTitle && that._canEmit) {
                     that._onChangeTitle(html)
                 }
             },
             onChangeContent: (content) => {
-                if (that._onChangeContent) {
+                if (that._onChangeContent && that._canEmit) {
                     that._onChangeContent(content)
                 }
             },
@@ -242,12 +257,18 @@ class NestedPlayer extends EventEmitter {
                          paused: _state.stopped
                      })
                 }
+
+                that._enableEmits();
             },
             onPaused: () => {
-                that.emit('pause')
+                if (that._canEmit) {
+                    that.emit('pause')
+                }
             },
             onStarted: () => {
-                that.emit('play')
+                if (that._canEmit) {
+                    that.emit('play')
+                }
             }
         };
     }
