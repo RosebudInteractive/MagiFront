@@ -17,13 +17,6 @@ class AuthJWT {
         const jwtOptions = {}
         jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
         jwtOptions.secretOrKey = config.get('authentication.secret');
-        let convUserDataFn = (rawUser) => {
-            try {
-                rawUser.PData = JSON.parse(rawUser.PData);
-            }
-            catch (e) { rawUser.PData = {}; }
-            return rawUser;
-        };
         
         this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
         
@@ -32,11 +25,10 @@ class AuthJWT {
                 // console.log('payload received', jwt_payload);
                 var user = this._usersCache.getUserInfoById(jwt_payload.id)
                     .then((result) => {
-                        next(null, result);
+                        next(null, result ? result : false);
                     })
-                    .catch(() => {
-                        next(null, false);
-                    
+                    .catch((err) => {
+                        next(err);
                     });
             }).bind(this));
 
@@ -44,8 +36,8 @@ class AuthJWT {
 
         app.post("/api/jwtlogin",
             ((req, res) => {
-                if (req.body && req.body.name && req.body.password) {
-                    let login = req.body.name;
+                if (req.body && req.body.login && req.body.password) {
+                    let login = req.body.login;
                     let password = req.body.password;
                     let token = req.headers["authorization"];
                     let promise = Promise.resolve();
@@ -58,12 +50,12 @@ class AuthJWT {
                         .then(() => {
                             return this._usersCache.authUser(login, password);
                         })
-                        .then((result) => {
-                            let payload = { id: result.Id };
+                        .then((user) => {
+                            let payload = { id: user.Id };
                             let token = jwt.sign(payload, jwtOptions.secretOrKey);
                             this._usersCache.checkToken("JWT " + token, true)
                                 .then((result) => {
-                                    res.json({ token: token });
+                                    res.json({ user: this._usersCache.userToClientJSON(user), token: token });
                                 })
                                 .catch((err) => {
                                     res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
@@ -149,7 +141,7 @@ exports.AuthenticateJWT = (app, isAuthRequired) => {
                     next();;
             })(req, res, next)
         else {
-            req.jwtResult.info = { message: "Missing token!" };
+            req.jwtResult.info = { message: "Not authorized." };
             if (isAuthRequired)
                 res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info)
             else

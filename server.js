@@ -3,6 +3,10 @@
  */
 
 //var webpack = require('webpack');
+const path = require('path');
+const fs = require('fs');
+const _ = require('lodash');
+
 let webpack = require('webpack')
 let webpackDevMiddleware = require('webpack-dev-middleware');
 let webpackHotMiddleware = require('webpack-hot-middleware');
@@ -19,7 +23,6 @@ let log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const { FileUpload } = require("./database/file-upload");
-const path = require('path');
 const config = require('config');
 
 //bld.initDatabase()
@@ -35,6 +38,7 @@ Promise.resolve()
             app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
 
         let port = magisteryConfig.http.port;
+        let address = magisteryConfig.http.address;
 
         if (NODE_ENV === 'development') {
             let compiler = webpack(webpackConfig);
@@ -99,6 +103,23 @@ Promise.resolve()
             res.sendFile(__dirname + '/FileUploadTest.html');
         });
 
+        app.get("/logintest", function (req, res) {
+            res.sendFile(__dirname + '/LoginTestPage.html');
+        });
+
+        app.get("/regtest", function (req, res) {
+            res.sendFile(__dirname + '/RegTestPage.html');
+        });
+
+        app.get("/testrecovery/:activationKey", function (req, res) {
+            let template = fs.readFileSync(__dirname + '/templates/PwdRecoverTest.tmpl', 'utf8');
+            let body = _.template(template)(
+                {
+                    activationKey: req.params.activationKey
+                });
+            res.send(body);
+        });
+
         app.get("/adm/*", function (req, res) {
             res.sendFile(__dirname + '/adm-index.html');
         });
@@ -117,11 +138,12 @@ Promise.resolve()
 
         app.post('/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
 
-        app.listen(port, function (error) {
+        app.listen(port, address, function (error) {
             if (error) {
                 console.error(error)
             } else {
-                console.info("==> 🌎  Listening on port %s. Open up http://localhost:%s/ in your browser.", port, port)
+                console.info("==> 🌎  Listening on port %s. Open up %s://%s:%s/ in your browser.",
+                    port, config.server.protocol, address === '0.0.0.0' ? 'localhost' : address, port);
             }
         });
     }, (err) => {

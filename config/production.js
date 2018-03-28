@@ -1,7 +1,17 @@
 const path = require('path');
+const defer = require('config/defer').deferConfig;
 
 module.exports = {
-    httpPort: 8090,
+    proxyServer: {
+        protocol: 'http',
+        address: '0.0.0.0',
+        port: 3000
+    },
+    server: {
+        protocol: 'http',
+        address: '0.0.0.0',
+        port: 8090
+    },
     dbProvider: 'mysql',
     trace: {
         sqlTrace: false,
