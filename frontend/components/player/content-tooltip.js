@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
-import $ from 'jquery'
-import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+// import $ from 'jquery'
+// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 
 export default class ContentTooltip extends Component {
 
@@ -61,13 +61,13 @@ export default class ContentTooltip extends Component {
     }
 
     _mountCustomScroll() {
-        $(".scrollable").mCustomScrollbar();
+        // $("#content" + this.props.id).mCustomScrollbar();
         this._scrollMounted = true;
     }
 
     _unmountCustomScroll() {
         if (this._scrollMounted) {
-            $(".scrollable").mCustomScrollbar('destroy');
+            // $("#content" + this.props.id).mCustomScrollbar('destroy');
             this._scrollMounted = false
         }
     }
@@ -91,8 +91,8 @@ export default class ContentTooltip extends Component {
 
     render() {
         return (
-            <div
-                className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.props.visible ? ' opened' : '')}>
+            <div className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.props.visible ? ' opened' : '')}
+                 id={'content' + this.props.id}>
                 <header className="contents-tooltip__header">
                     <p className="contents-tooltip__title">Оглавление</p>
                 </header>
