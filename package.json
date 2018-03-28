@@ -80,7 +80,7 @@
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^4.0.8",
     "react-swipe": "^5.1.1",
-    "react-swipeable": "^4.2.0",
+    "react-swipeable": "^4.2.1",
     "react-tabs-redux": "^2.0.1",
     "redis": "^2.8.0",
     "redux": "^3.7.2",
