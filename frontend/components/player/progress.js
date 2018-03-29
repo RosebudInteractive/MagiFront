@@ -1,13 +1,18 @@
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+
 import $ from 'jquery'
 import * as tools from '../../tools/time-tools'
 
-export default class Progress extends React.Component {
+import * as playerStartActions from '../../actions/player-start-actions'
+
+class Progress extends React.Component {
 
     static propTypes = {
         total: PropTypes.number,
-        current: PropTypes.number,
+        // current: PropTypes.number,
         content: PropTypes.array,
         onSetCurrentPosition: PropTypes.func,
     };
@@ -59,14 +64,12 @@ export default class Progress extends React.Component {
     }
 
     _setCurrentPosition(){
-        if (this.props.onSetCurrentPosition) {
-            this.props.onSetCurrentPosition(this.state.mouseTime)
-        }
+        this.props.playerStartActions.startSetCurrentTime(this.state.mouseTime)
     }
 
     render() {
-        let {current, total} = this.props;
-        let _playPercent = total ? ((current * 100) / total) : 0;
+        let {currentTime, total} = this.props;
+        let _playPercent = total ? ((currentTime * 100) / total) : 0;
 
         return (
             <div className="player-block__progress" id={"timeline" + this.props.id} onClick={::this._setCurrentPosition}>
@@ -80,3 +83,16 @@ export default class Progress extends React.Component {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        currentTime: state.player.currentTime,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Progress);

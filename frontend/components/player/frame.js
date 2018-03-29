@@ -335,8 +335,8 @@ export default class Frame extends Component {
                                         null
                                 }
                                 <div className="player-block">
-                                    <Progress total={this.state.totalDuration} current={this.props.playTime} id={_id}
-                                              content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
+                                    <Progress total={this.state.totalDuration} id={_id}
+                                              content={this.state.content}/>
                                     <div className="player-block__row">
                                         <Controls pause={this.props.paused}
                                                   muted={this.props.muted}

@@ -1,6 +1,9 @@
 import EventEmitter from 'events'
 import $ from 'jquery'
 
+import * as playerActions from '../../actions/player-actions';
+import {store} from '../../store/configureStore';
+
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader"
 import 'jquery-ui/jquery-ui.js';
@@ -67,16 +70,7 @@ class NestedPlayer extends EventEmitter {
         return this._courseUrl;
     }
 
-    _disableEmits(){
-        // this._canEmit = false;
-    }
-
-    _enableEmits(){
-        // this._canEmit = true;
-    }
-
     _loadOtherLesson(options) {
-        this._disableEmits()
         this._fullPlayer.initContainer(options.div);
         this._smallPlayer.initContainer(options.smallDiv);
 
@@ -118,15 +112,12 @@ class NestedPlayer extends EventEmitter {
     play() {
         this.player.play()
         this._isHardStopped = false;
-        // this.emit('play')
     }
 
     stop() {
         this.player.pause()
         this._lesson = null
         this._isHardStopped = true;
-        // this.removeAllListeners('pause');
-        // this.removeAllListeners('play');
     }
 
     setPosition(begin) {
@@ -219,6 +210,8 @@ class NestedPlayer extends EventEmitter {
                 if (that._onCurrentTimeChanged && that._canEmit) {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
+
+                store.dispatch(playerActions.setCurrentTime(e.currentTime))
             },
             onSetPosition: function () {
             },
@@ -242,9 +235,11 @@ class NestedPlayer extends EventEmitter {
                 }
             },
             onChangeContent: (content) => {
-                if (that._onChangeContent && that._canEmit) {
+                if (that._onChangeContent) {
                     that._onChangeContent(content)
                 }
+
+                store.dispatch(playerActions.play())
             },
             onAudioInitialized() {
                 if (that._onAudioLoaded) {
@@ -261,14 +256,12 @@ class NestedPlayer extends EventEmitter {
                 // that._enableEmits();
             },
             onPaused: () => {
-                if (that._canEmit) {
-                    that.emit('pause')
-                }
+                that.emit('pause');
+                store.dispatch(playerActions.pause())
             },
             onStarted: () => {
-                if (that._canEmit) {
-                    that.emit('play')
-                }
+                that.emit('play');
+                store.dispatch(playerActions.play())
             }
         };
     }

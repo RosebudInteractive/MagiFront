@@ -9,6 +9,7 @@ import lessons from './lessons';
 import lessonText from './lessonText';
 import lessonPlayInfo from './lessonPlayInfo';
 import app from './app';
+import player from './player';
 // import { routerReducer } from 'react-router-redux';
 
 
@@ -23,6 +24,7 @@ export default combineReducers({
     lessons,
     lessonText,
     lessonPlayInfo,
+    player,
     routing: routerReducer,
     // browser: responsiveStateReducer({
     //     mobile: 500,

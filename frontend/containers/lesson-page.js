@@ -275,11 +275,11 @@ class LessonPage extends React.Component {
                     if (this._mounted)
                         this.setState({currentContents: content})
                 },
-                onCurrentTimeChanged: (e) => {
-                    if (this._mounted) {
-                        this.setState({playTime: e})
-                    }
-                },
+                // onCurrentTimeChanged: (e) => {
+                //     if (this._mounted) {
+                //         this.setState({playTime: e})
+                //     }
+                // },
                 onChangeContent: (e) => {
                     if (this._mounted)
                         this.setState({content: e.id})
@@ -295,12 +295,12 @@ class LessonPage extends React.Component {
                             volume: e.volume,
                         })
                 },
-                onChangeTitle: (value) => {
-                    if (this._mounted)
-                        this.setState({
-                            title: value,
-                        })
-                }
+                // onChangeTitle: (value) => {
+                //     if (this._mounted)
+                //         this.setState({
+                //             title: value,
+                //         })
+                // }
             };
 
             this._player = NestedPlayer(_options);

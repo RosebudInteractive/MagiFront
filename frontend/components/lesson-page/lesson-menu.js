@@ -9,7 +9,7 @@ import $ from 'jquery'
 import * as appActions from '../../actions/app-actions';
 
 import LessonsListWrapper from './lessons-list-wrapper';
-import * as Player from '../../components/player/nested-player';
+// import * as Player from '../../components/player/nested-player';
 
 class Menu extends React.Component {
 
