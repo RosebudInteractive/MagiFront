@@ -1,7 +1,8 @@
 'use strict'
 const config = require('config');
-const passport = require("passport");
-const passportLocal = require("passport-local");
+const passport = require('passport');
+const passportLocal = require('passport-local');
+const reCAPTCHA = require('recaptcha2');
 const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
 const { UsersRedisCache } = require("./users-redis-cache");
@@ -13,6 +14,10 @@ const { UserLoginError } = require("./errors");
 const serialize = require('./serialize');
 
 let usersCache = null;
+let recaptcha = new reCAPTCHA({
+    siteKey: config.authentication.reCapture.siteKey,
+    secretKey: config.authentication.reCapture.secretKey
+});
 
 class AuthLocal {
 
@@ -61,7 +66,7 @@ class AuthLocal {
 
         passport.use(strategy);
 
-        app.post("/api/login", StdLoginProcessor('local'));
+        app.post("/api/login", StdLoginProcessor('local', true));
 
         app.get("/api/logout", (req, res) => {
             AuthLocal.destroySession(req)
@@ -94,27 +99,31 @@ class AuthLocal {
         });
 
         app.post("/api/pwdrecovery", (req, res) => {
-            let activationKey = req.body.activationKey;
-            let password = req.body.password;
-            this._usersCache.userPwdRecovery({ key: { ActivationKey: activationKey }, Password: password })
-                .then((user) => {
-                    StdLogin(req, res, user, { message: "User Password Recovery: Unknown error." });
-                })
-                .catch((err) => {
-                    res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
-                });
+            chechRecapture(true, req, res, () => {
+                let activationKey = req.body.activationKey;
+                let password = req.body.password;
+                this._usersCache.userPwdRecovery({ key: { ActivationKey: activationKey }, Password: password })
+                    .then((user) => {
+                        StdLogin(req, res, user, { message: "User Password Recovery: Unknown error." });
+                    })
+                    .catch((err) => {
+                        res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                    });
+            });
         });
 
         app.post("/api/register", (req, res) => {
-            let data = { Login: req.body.login };
-            let password = req.body.password;
-            UserRegister(password, data, this._usersCache)
-                .then((user) => {
-                    StdLogin(req, res, user, { message: "User Register: Unknown error." });
-                })
-                .catch((err) => {
-                    res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
-                });
+            chechRecapture(true, req, res, () => {
+                let data = { Login: req.body.login };
+                let password = req.body.password;
+                UserRegister(password, data, this._usersCache)
+                    .then((user) => {
+                        StdLogin(req, res, user, { message: "User Register: Unknown error." });
+                    })
+                    .catch((err) => {
+                        res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                    });
+            });
         });
     }
 };
@@ -141,22 +150,41 @@ let StdLogin = (req, res, user, info) => {
         });
 }
 
-let StdLoginProcessor = (strategy) => {
-    return (req, res, next) => {
-        passport.authenticate(strategy, (err, user, info) => {
-            if (err || !user) {
-                AuthLocal.destroySession(req)
-                    .then(() => {
-                        if (err) { return res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() }); }
-                        if (!user) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
-                    })
-                    .catch((err) => {
-                        res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
-                    });
-            }
+let chechRecapture = (hasCapture, req, res, processor) => {
+    let promise = Promise.resolve();
+    if (hasCapture)
+        promise = recaptcha.validateRequest(req);
+    promise
+        .then(() => {
+            if (typeof (processor) === "function")
+                processor();
+        }, (errorCodes) => {
+            if (errorCodes && (errorCodes.length > 0) && (errorCodes[0] === "missing-input-response"))
+                res.status(HttpCode.ERR_UNAUTH).json({ errors: ["Missing capture"] })
             else
-                StdLogin(req, res, user);    
-        })(req, res, next);
+                // translate error codes to human readable text
+                res.status(HttpCode.ERR_UNAUTH).json({ errors: recaptcha.translateErrors(errorCodes) });
+        });
+}
+
+let StdLoginProcessor = (strategy, hasCapture) => {
+    return (req, res, next) => {
+        chechRecapture(hasCapture, req, res, () => {
+            passport.authenticate(strategy, (err, user, info) => {
+                if (err || !user) {
+                    AuthLocal.destroySession(req)
+                        .then(() => {
+                            if (err) { return res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() }); }
+                            if (!user) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
+                        })
+                        .catch((err) => {
+                            res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                        });
+                }
+                else
+                    StdLogin(req, res, user);
+            })(req, res, next);
+        })
     }
 };
 

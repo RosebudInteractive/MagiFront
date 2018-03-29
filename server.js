@@ -100,19 +100,19 @@ Promise.resolve()
         setupAPI(express, app);
 
         app.get("/testupload", function (req, res) {
-            res.sendFile(__dirname + '/FileUploadTest.html');
+            res.sendFile(__dirname + '/debug/FileUploadTest.html');
         });
 
         app.get("/logintest", function (req, res) {
-            res.sendFile(__dirname + '/LoginTestPage.html');
+            res.sendFile(__dirname + '/debug/LoginTestPage.html');
         });
 
         app.get("/regtest", function (req, res) {
-            res.sendFile(__dirname + '/RegTestPage.html');
+            res.sendFile(__dirname + '/debug/RegTestPage.html');
         });
 
         app.get("/testrecovery/:activationKey", function (req, res) {
-            let template = fs.readFileSync(__dirname + '/templates/PwdRecoverTest.tmpl', 'utf8');
+            let template = fs.readFileSync(__dirname + '/debug/templates/PwdRecoverTest.tmpl', 'utf8');
             let body = _.template(template)(
                 {
                     activationKey: req.params.activationKey
