@@ -54,7 +54,7 @@ class TextBlock extends React.Component {
             let _firstLetter = _content.slice(0, 1);
             _content = _content.slice(1);
 
-                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+            _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                 <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
                 <p className='text-intro'>
                     <span className="first-letter">{_firstLetter}</span>
@@ -63,6 +63,18 @@ class TextBlock extends React.Component {
             </div>)
 
             _re.lastIndex = 0;
+        }
+
+        if ((_div.length === 0) && (episode.Transcript)) {
+            let _firstLetter = episode.Transcript.slice(0, 1);
+            let _content = episode.Transcript.slice(1);
+
+            _div.push(<div>
+                <p className='text-intro'>
+                    <span className="first-letter">{_firstLetter}</span>
+                    <div dangerouslySetInnerHTML={{__html: _content}}/>
+                </p>
+            </div>)
         }
 
         return _div

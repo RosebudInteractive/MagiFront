@@ -68,11 +68,11 @@ class NestedPlayer extends EventEmitter {
     }
 
     _disableEmits(){
-        this._canEmit = false;
+        // this._canEmit = false;
     }
 
     _enableEmits(){
-        this._canEmit = true;
+        // this._canEmit = true;
     }
 
     _loadOtherLesson(options) {
@@ -258,7 +258,7 @@ class NestedPlayer extends EventEmitter {
                      })
                 }
 
-                that._enableEmits();
+                // that._enableEmits();
             },
             onPaused: () => {
                 if (that._canEmit) {

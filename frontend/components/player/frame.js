@@ -372,7 +372,8 @@ export default class Frame extends Component {
                                         <ContentTooltip content={this.state.content}
                                                         currentToc={this.state.currentToc}
                                                         visible={this.state.showContent}
-                                                        onGoToContent={::this._goToContent}/>
+                                                        onGoToContent={::this._goToContent}
+                                                        id={_id}/>
                                         <div className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
                                             <header className="speed-tooltip__header">
                                                 <p className="speed-tooltip__title">Скорость</p>
