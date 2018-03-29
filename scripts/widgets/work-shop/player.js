@@ -630,7 +630,6 @@ export default class CWSPlayer extends CWSBase {
                 that._audioState.audio.volume = volume;
                 return
             }
-
             that._audioState.audio.volume = oldVol + part * diffTime;
             requestAnimationFrame(_changeVolumeCallback);
         });

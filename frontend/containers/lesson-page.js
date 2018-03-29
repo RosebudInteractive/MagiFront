@@ -24,28 +24,11 @@ class LessonPage extends React.Component {
             total: 0,
             currentActive: 0,
             isMobile: $(window).width() < 900,
-            paused: true,
             redirectToPlayer: false,
         }
 
         this._internalRedirect = false;
-        this._mounted = false;
         this._mountPlayerGuard = true;
-
-        let that = this;
-        this._handlePause = function () {
-            if (that._mounted)
-                that.setState({
-                    paused: this.audioState.stopped
-                })
-        }
-
-        this._handlePlay = function () {
-            if (that._mounted)
-                that.setState({
-                    paused: this.audioState.stopped
-                })
-        }
     }
 
     componentWillMount() {
@@ -61,8 +44,6 @@ class LessonPage extends React.Component {
             this._mountFullpage();
             this._mountMouseMoveHandler();
         });
-
-        this._mounted = true;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -71,8 +52,7 @@ class LessonPage extends React.Component {
             return
 
         if ((nextProps.params !== this.props.params) || (this.props.courseUrl !== nextProps.courseUrl) ||
-            (this.props.lessonUrl !== nextProps.lessonUrl))
-        {
+            (this.props.lessonUrl !== nextProps.lessonUrl)) {
             let _oldLesson = this._getLessonInfo(this.props.lessonInfo);
             if (_oldLesson) {
                 this.props.appActions.hideLessonMenu('lesson-menu-' + _oldLesson.Id);
@@ -197,7 +177,6 @@ class LessonPage extends React.Component {
                 this.props.appActions.hideLessonMenu('lesson-menu-' + _lessonId);
                 $.fn.fullpage.moveTo(_anchor.name);
                 if (getInstance() && (getInstance().lesson.Id !== _anchor.id)) {
-                    // that._unmountPlayerEvents();
                     getInstance().switchToSmall();
                     this.props.appActions.switchToSmallPlayer();
                 } else {
@@ -211,9 +190,7 @@ class LessonPage extends React.Component {
     componentWillUnmount() {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
-        this._unmountPlayerEvents();
         $('body').removeAttr('data-page');
-        this._mounted = false;
     }
 
     _getLessonInfo(info) {
@@ -271,42 +248,14 @@ class LessonPage extends React.Component {
                 lesson: this._getLessonInfo(this.props.lessonInfo),
                 div: _container,
                 smallDiv: _smallContainer,
-                onRenderContent: (content) => {
-                    if (this._mounted)
-                        this.setState({currentContents: content})
-                },
-                // onCurrentTimeChanged: (e) => {
-                //     if (this._mounted) {
-                //         this.setState({playTime: e})
-                //     }
-                // },
-                onChangeContent: (e) => {
-                    if (this._mounted)
-                        this.setState({content: e.id})
-                },
                 onAudioLoaded: (e) => {
                     if (e.paused) {
                         this._player.play()
                     }
-
-                    if (this._mounted)
-                        this.setState({
-                            muted: e.muted,
-                            volume: e.volume,
-                        })
                 },
-                // onChangeTitle: (value) => {
-                //     if (this._mounted)
-                //         this.setState({
-                //             title: value,
-                //         })
-                // }
             };
 
             this._player = NestedPlayer(_options);
-
-            this._player.addListener('pause', this._handlePause);
-            this._player.addListener('play', this._handlePlay);
 
             if (!this._reinitPlayer) {
                 this.props.lessonActions.startLessonPlaying(this.props.lessonPlayInfo.loadedObject);
@@ -314,26 +263,7 @@ class LessonPage extends React.Component {
 
             getInstance().switchToFull();
             this._mountPlayerGuard = true;
-
-            let _state = this._player.audioState;
-            if (this._mounted) {
-                this.setState({
-                    paused: _state.stopped,
-                    muted: _state.muted,
-                    volume: _state.volume,
-                    playTime: _state.currentTime,
-                    content: _state.currentContent,
-                });
-            }
-
             this._reinitPlayer = false;
-        }
-    }
-
-    _unmountPlayerEvents() {
-        if ((this._player) && (!this._internalRedirect)) {
-            this._player.removeListener('pause', this._handlePause);
-            this._player.removeListener('play', this._handlePlay)
         }
     }
 
@@ -346,7 +276,7 @@ class LessonPage extends React.Component {
                 clearTimeout(that._timer);
             }
 
-            if ((!that.state.paused) && (getInstance()) && (that._activeLessonId === getInstance().lesson.Id)) {
+            if (getInstance() && (that._activeLessonId === getInstance().lesson.Id)) {
                 that._timer = setTimeout(function () {
                     $('body').addClass('fade');
                 }, 7000);
@@ -379,42 +309,6 @@ class LessonPage extends React.Component {
                                    lessonCount={this.props.lessons.object.length}
                                    isMain={isMain}
                                    active={this.state.currentActive}
-                                   content={this.state.currentContents}
-                                   currentContent={this.state.content}
-                                   onPause={() => {
-                                       if (that._player) {
-                                           that._player.pause()
-                                       }
-                                   }}
-                                   onPlay={() => {
-                                       if (that._player) {
-                                           that._player.play()
-                                       }
-                                   }}
-                                   onMute={() => {
-                                       if (that._player) {
-                                           that._player.mute()
-                                           that.setState({
-                                               muted: true
-                                           })
-                                       }
-                                   }}
-                                   onUnmute={() => {
-                                       if (that._player) {
-                                           that._player.unmute()
-                                           that.setState({
-                                               muted: false
-                                           })
-                                       }
-                                   }}
-                                   onSetVolume={(value) => {
-                                       if (that._player) {
-                                           that._player.setVolume(value)
-                                           that.setState({
-                                               volume: value
-                                           })
-                                       }
-                                   }}
                                    onLeavePage={() => {
                                        if (that._player) {
                                            if (that.state.paused) {
@@ -425,21 +319,6 @@ class LessonPage extends React.Component {
                                            }
                                        }
                                    }}
-                                   onGoToContent={(position) => {
-                                       if (that._player) {
-                                           that._player.setPosition(position)
-                                       }
-                                   }}
-                                   onSetRate={(value) => {
-                                       if (that._player) {
-                                           that._player.setRate(value)
-                                       }
-                                   }}
-                                   playTime={this.state.playTime}
-                                   volume={this.state.volume}
-                                   muted={this.state.muted}
-                                   paused={this.state.paused}
-                                   title={this.state.title}
                                    isPlayer={true}
             />
         } else {
@@ -546,7 +425,6 @@ class LessonPage extends React.Component {
                     that.props.history.replace(_newUrl)
 
                     if (getInstance() && (getInstance().lesson.Id !== id)) {
-                        // that._unmountPlayerEvents();
                         getInstance().switchToSmall();
                         that.props.appActions.switchToSmallPlayer();
                     }

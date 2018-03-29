@@ -3,6 +3,11 @@ import {
     PLAYER_PAUSED,
     PLAYER_SET_CURRENT_TIME,
     PLAYER_SET_TITLE,
+    PLAYER_SET_MUTE_STATE,
+    PLAYER_SET_VOLUME,
+    PLAYER_SET_CONTENT_ARRAY,
+    PLAYER_SET_CURRENT_CONTENT,
+    PLAYER_SET_RATE,
 } from '../constants/player'
 
 export const play = () => {
@@ -14,7 +19,6 @@ export const play = () => {
     }
 };
 
-
 export const pause = () => {
     return (dispatch) => {
         dispatch({
@@ -25,19 +29,50 @@ export const pause = () => {
 };
 
 export const setCurrentTime = (time) => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_SET_CURRENT_TIME,
-            payload: time
-        });
-    }
+    return {
+        type: PLAYER_SET_CURRENT_TIME,
+        payload: time
+    };
 };
 
 export const setTitle = (title) => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_SET_TITLE,
-            payload: title
-        });
+    return {
+        type: PLAYER_SET_TITLE,
+        payload: title
+    };
+};
+
+export const setMuteState = (value) => {
+    return {
+        type: PLAYER_SET_MUTE_STATE,
+        payload: value
+    }
+};
+
+export const setVolume = (value) => {
+    return {
+        type: PLAYER_SET_VOLUME,
+        payload: value
+    }
+};
+
+export const setContentArray = (value) => {
+    return {
+        type: PLAYER_SET_CONTENT_ARRAY,
+        payload: value
+    }
+}
+
+export const setCurrentContent = (value) => {
+    return {
+        type: PLAYER_SET_CURRENT_CONTENT,
+        payload: value
+    }
+};
+
+export const setRate = (value) => {
+    return {
+        type: PLAYER_SET_RATE,
+        payload: value
     }
 };
