@@ -45,7 +45,11 @@ module.exports = {
         activationRoute: "/api/activation",
         recoveryRoute: "/testrecovery",
         secret: 'zxcvv8708xulsajfois23h32',
-        storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
+        storage: 'redis',// Also can be 'local' (not applicable for cluster mode)
+        reCapture: {
+            siteKey: "6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t",
+            secretKey: "6LfobE8UAAAAAOIpLL4jothsvn8IgogqdkM8ie0r"
+        }
     },
     mail: {
         userReg: {
