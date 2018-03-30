@@ -47,11 +47,11 @@ class AuthGoogle {
 
         passport.use(strategy);
 
-        if (sessionMiddleware) {
-            app.use(config.snets.google.callBack, sessionMiddleware.express);
-            app.use(config.snets.google.callBack, sessionMiddleware.passportInit);
-            app.use(config.snets.google.callBack, sessionMiddleware.passportSession);
-        }
+        // if (sessionMiddleware) {
+        //     app.use(config.snets.google.callBack, sessionMiddleware.express);
+        //     app.use(config.snets.google.callBack, sessionMiddleware.passportInit);
+        //     app.use(config.snets.google.callBack, sessionMiddleware.passportSession);
+        // }
 
         app.get('/api/googlelogin', passport.authenticate('google', config.snets.google.passportOptions));
         app.get(config.snets.google.callBack, StdLoginProcessor('google'));

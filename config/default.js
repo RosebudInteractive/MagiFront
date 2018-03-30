@@ -98,9 +98,12 @@ module.exports = {
             }
         },
         google: {
-            appId: '794235726914-7bkpl8nhtulqo4thna0kha48db611jg9.apps.googleusercontent.com',
-            appSecret: 'C28iY7NssUCe-yGgpS3wFSiW',
-            callBack: '/google/callback',
+            appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
+            appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
+            callBack: '/api/google/callback',
+            // appId: '794235726914-7bkpl8nhtulqo4thna0kha48db611jg9.apps.googleusercontent.com',
+            // appSecret: 'C28iY7NssUCe-yGgpS3wFSiW',
+            // callBack: '/google/callback',
             passportOptions: {
                 scope: ['profile', 'email']
             }
@@ -110,7 +113,7 @@ module.exports = {
             appSecret: 'LsrNgANtMnP0ofdT4dKB',
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
             apiVersion: '5.17',
-            callBack: '/vk/callback',
+            callBack: '/api/vk/callback',
             passportOptions: {
                 display: 'popup',
                 scope: ['status', 'email', 'friends']
