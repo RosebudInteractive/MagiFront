@@ -171,7 +171,6 @@ window.Utils = Utils;
                 track.elements = elemsData;
                 oldTrack.elements = oldElementsData;
 
-                ws.render();
             }
 
             function findTrack(id) {

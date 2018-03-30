@@ -306,22 +306,26 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._recalcTitles(newtitles, deleteOld);
-        this._broadcastChangeTitles();
+        let changed = this._recalcTitles(newtitles, deleteOld);
+        if (changed)
+            this._broadcastChangeTitles();
     }
 
     _recalcTitles(newTitles, deleteOld) {
+        let changed = false;
         if (deleteOld || newTitles.length > 0) {
             for (let i = 0; i < this._audioState.currentTitles.length; ) {
                 if (!(this._audioState.currentTitles[i].id in this._audioState.playingNow)) {
                     this._audioState.currentTitles.splice(i, 1);
+                    changed = true;
                 } else {
                     i++
                 }
             }
         }
 
-        this._audioState.currentTitles.push(...newTitles)
+        this._audioState.currentTitles.push(...newTitles);
+        return changed || newTitles.length > 0;
     }
 
     _broadcastAudioLoaded() {
@@ -677,7 +681,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _setElementsPosition(position) {
-        let newtitles = [];
+        let newTitles = [];
         let deleteOld = false;
         for (let i = 0; i < this._elements.array.length; i++) {
             let el = this._elements.array[i];
@@ -688,8 +692,9 @@ export default class CWSPlayer extends CWSBase {
                     if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
                         deleteOld = true;
                     }
-                    if (el.Title)
-                        newtitles.push({id: el.Id, title: el.Title})
+                    if (el.Title || el.Title2) {
+                        newTitles.push({id: el.Id, title: el.Title, title2: el.Title2})
+                    }
                 }
 
                 this._audioState.playingNow[el.Id] = el;
@@ -703,8 +708,9 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._recalcTitles(newtitles, deleteOld);
-        this._broadcastChangeTitles();
+        let changed = this._recalcTitles(newTitles, deleteOld);
+        if (changed)
+            this._broadcastChangeTitles();
     }
 
     _broadcastChangeTitles() {

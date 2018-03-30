@@ -275,8 +275,10 @@ export default class CWorkShop extends CWSBase {
                 that.render();
             },
             onMoveElement: function (e) {
+                that._playerWidget.moveElement(e.track, e.elements);
                 if (that._options.tracks.onMoveElement)
                     that._options.tracks.onMoveElement(e);
+                that.render();
             },
             onGetAudioState: function () {
                 return that._playerWidget.getAudioState();
