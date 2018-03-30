@@ -1,25 +1,25 @@
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {Redirect} from 'react-router';
 import Swipeable from 'react-swipeable';
 import $ from 'jquery'
 
+import * as playerStartActions from '../actions/player-start-actions'
 import * as Player from '../components/player/nested-player';
-// import 'script-lib/jquery.mobile-1.4.5.js';
 
-export default class SmallPlayer extends React.Component {
+class SmallPlayer extends React.Component {
 
     constructor(props) {
         super(props)
 
         this.state = {
-            paused: false,
             isMobile: false,
             redirect: false,
         }
-
-        this._listenerMounted = false;
     }
 
     static propTypes = {
@@ -49,55 +49,24 @@ export default class SmallPlayer extends React.Component {
         this._mountPlayerListener();
     }
 
+    componentWillUnmount() {
+    }
+
     _mountPlayerListener() {
-        let _player = Player.getInstance();
-
-        if ((!this._listenerMounted) && (_player)) {
-            _player.on('pause', () => {
-                this.setState({
-                    paused: true
-                })
-            });
-
-            _player.on('play', () => {
-                this.setState({
-                    paused: false
-                })
-            });
-
-            this._listenerMounted = true;
-        }
-
     }
 
     _onPlayClick() {
-        if (Player.getInstance()) {
-            Player.getInstance().play()
-        }
-
-        this.setState({
-            paused: false
-        })
     }
 
     _onPauseClick() {
-        if (Player.getInstance()) {
-            Player.getInstance().pause()
-        }
+
     }
 
     _onClick() {
-        if (this.state.isMobile) {
-            if (this.state.paused) {
-                this._onPlayClick()
-            } else {
-                this._onPauseClick()
-            }
-        }
     }
 
     _close() {
-        Player.getInstance().stop();
+        this.props.playerStartActions.startStop();
     }
 
     _maximize() {
@@ -126,8 +95,7 @@ export default class SmallPlayer extends React.Component {
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
-                <div className='small-player-frame'
-                     style={(this.props.visible && !_stopped) ? {opacity: 1} : {opacity: 0}}
+                <div className={'small-player-frame' + ((this.props.visible && !_stopped) ? '' : ' hide')}
                      onClick={::this._onClick}>
                     <div className='ws-container-mini' id='small-player'/>
                     <div className='small-player__poster'/>
@@ -141,13 +109,13 @@ export default class SmallPlayer extends React.Component {
                                              dangerouslySetInnerHTML={{__html: _maximize}}/>
                                     </button>
                                 </Link>
-                                {this.state.paused ?
-                                    <button type="button" className="play-button" onClick={::this._onPlayClick}>
+                                {this.props.paused ?
+                                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPlay}>
                                         <svg className="play" width="41" height="36"
                                              dangerouslySetInnerHTML={{__html: _play}}/>
                                     </button>
                                     :
-                                    <button type="button" className="play-button" onClick={::this._onPauseClick}>
+                                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPause}>
                                         <svg className="pause" width="23" height="36"
                                              dangerouslySetInnerHTML={{__html: _pause}}/>
                                     </button>
@@ -168,4 +136,18 @@ export default class SmallPlayer extends React.Component {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        paused: state.player.paused,
+    }
+}
 
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        // pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        // appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SmallPlayer);

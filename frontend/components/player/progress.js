@@ -1,20 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+
 import $ from 'jquery'
 import * as tools from '../../tools/time-tools'
 
-export default class Progress extends React.Component {
+import * as playerStartActions from '../../actions/player-start-actions'
 
-    static propTypes = {
-        total: PropTypes.number,
-        current: PropTypes.number,
-        content: PropTypes.array,
-        onSetCurrentPosition: PropTypes.func,
-    };
-
-    static defaultProps = {
-        totalDuration: 0
-    };
+class Progress extends React.Component {
 
     constructor(props) {
         super(props);
@@ -36,7 +29,7 @@ export default class Progress extends React.Component {
 
     _calcMousePosition(current, total) {
         let _mousePosition = total ? (current / total) : 0,
-            _mouseTime = _mousePosition * this.props.total,
+            _mouseTime = _mousePosition * this.props.totalDuration,
             _mouseTimeFmt = tools.getTimeFmt(_mouseTime);
 
         this.setState({
@@ -47,11 +40,11 @@ export default class Progress extends React.Component {
     }
 
     _getGaps() {
-        let {content, total} = this.props;
+        let {contentArray, totalDuration} = this.props;
 
-        return total ?
-            content.map((item, index) => {
-                let _position = (item.begin * 100) / total;
+        return totalDuration ?
+            contentArray.map((item, index) => {
+                let _position = (item.begin * 100) / totalDuration;
                 return <div className="player-block__gap" style={{left: _position + '%'}} key={index}/>
             })
             :
@@ -59,14 +52,12 @@ export default class Progress extends React.Component {
     }
 
     _setCurrentPosition(){
-        if (this.props.onSetCurrentPosition) {
-            this.props.onSetCurrentPosition(this.state.mouseTime)
-        }
+        this.props.playerStartActions.startSetCurrentTime(this.state.mouseTime)
     }
 
     render() {
-        let {current, total} = this.props;
-        let _playPercent = total ? ((current * 100) / total) : 0;
+        let {currentTime, totalDuration} = this.props;
+        let _playPercent = totalDuration ? ((currentTime * 100) / totalDuration) : 0;
 
         return (
             <div className="player-block__progress" id={"timeline" + this.props.id} onClick={::this._setCurrentPosition}>
@@ -74,9 +65,24 @@ export default class Progress extends React.Component {
                     <span className="indicator"/>
                 </div>
                 {this._getGaps()}
-                {total ? <div className="player-block__time" style={{left: (this.state.mousePosition * 100) + "%"}}>{this.state.mouseTimeFmt}</div> : null}
+                {totalDuration ? <div className="player-block__time" style={{left: (this.state.mousePosition * 100) + "%"}}>{this.state.mouseTimeFmt}</div> : null}
             </div>
         );
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        currentTime: state.player.currentTime,
+        contentArray: state.player.contentArray,
+        totalDuration: state.player.totalDuration,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Progress);

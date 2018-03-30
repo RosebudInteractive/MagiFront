@@ -13,9 +13,13 @@ exports.DbEngineInit = class DbEngineInit {
 
         var impDir = path.join(__dirname, "/data/");
         var is_impDir_next = false;
+
+        var httpAddress = options && options.http && options.http.address ? options.http.address :
+            (config.has('server.address') ? config.get('server.address') : 'localhost');
+        var is_httpAddress_next = false;
         
         var httpPort = options && options.http && options.http.port ? options.http.port :
-            (config.has('httpPort') ? config.get('httpPort') : 3000);
+            (config.has('server.port') ? config.get('server.port') : 3000);
         var is_httpPort_next = false;
 
         var provider = config.has('dbProvider') ? config.get('dbProvider') : null;
@@ -54,6 +58,12 @@ exports.DbEngineInit = class DbEngineInit {
             if (is_httpPort_next) {
                 is_httpPort_next = false;
                 httpPort = parseInt(_arg);
+                continue;
+            }
+
+            if (is_httpAddress_next) {
+                is_httpAddress_next = false;
+                httpAddress = _arg;
                 continue;
             }
 
@@ -107,6 +117,10 @@ exports.DbEngineInit = class DbEngineInit {
 
                 case "-P":
                     is_httpPort_next = true;
+                    break;
+
+                case "-A":
+                    is_httpAddress_next = true;
                     break;
 
                 case "-v":
@@ -168,6 +182,7 @@ exports.DbEngineInit = class DbEngineInit {
             if (!options.http)
                 options.http = {};    
             options.http.port = httpPort;
+            options.http.address = httpAddress;
         }
 
         var mssql_connection = { //MSSQL

@@ -3,66 +3,34 @@ import PropTypes from 'prop-types';
 import Progress from "./progress";
 import Controls from "./controls";
 
-import * as tools from '../../tools/time-tools'
-
 import $ from 'jquery'
-import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 import PauseScreen from "./pause-screen";
+import Titles from "./titles";
+import TimeInfo from './time-info';
+import ContentTooltip from "./content-tooltip";
+import RateTooltip from './rate-tooltip';
 
 export default class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
-        content: PropTypes.array,
-        currentContent: PropTypes.number,
-        onPause: PropTypes.func,
-        onPlay: PropTypes.func,
-        onSetRate: PropTypes.func,
-        onMute: PropTypes.func,
-        onUnmute: PropTypes.func,
-        onGoToContent: PropTypes.func,
         onLeavePage: PropTypes.func,
-        playTime: PropTypes.number.isRequired,
         isMain: PropTypes.bool,
-        volume: PropTypes.number,
-        paused: PropTypes.bool,
-        mute: PropTypes.bool,
     };
 
     constructor(props) {
         super(props)
 
         this.state = {
-            // pause: false,
-            // muted: false,
             showContent: false,
             showRate: false,
-            totalDurationFmt: '',
-            totalDuration: 0,
-            content: [],
-            currentToc: 0,
-            currentRate: 1,
             fullScreen: false,
         }
 
         this._scrollMounted = false;
     }
 
-    componentWillUnmount() {
-        if (this.state.fullScreen) {
-            this._toggleFullscreen()
-        }
-
-        this._removeListeners();
-
-        if (this.props.onLeavePage) {
-            this.props.onLeavePage()
-        }
-
-        if (this._scrollMounted) {
-            $(".scrollable").mCustomScrollbar('destroy');
-        }
-    }
 
     componentDidMount() {
         let that = this;
@@ -77,8 +45,8 @@ export default class Frame extends Component {
                 }
             }
 
-            that._hideAllTooltips = _needHide;
-            if (_needHide) {
+            that._hideAllTooltips = _needHide || that.state.showContent;
+            if (that._hideAllTooltips) {
                 that.setState({
                     showContent: false,
                     showRate: false,
@@ -100,6 +68,18 @@ export default class Frame extends Component {
         // })
     }
 
+    componentWillUnmount() {
+        if (this.state.fullScreen) {
+            this._toggleFullscreen()
+        }
+
+        this._removeListeners();
+
+        if (this.props.onLeavePage) {
+            this.props.onLeavePage()
+        }
+
+    }
 
     _removeListeners() {
         $(document).off('mouseup');
@@ -112,7 +92,6 @@ export default class Frame extends Component {
         } else {
             this._hideAllTooltips = false
         }
-
     }
 
     _openRate() {
@@ -123,99 +102,39 @@ export default class Frame extends Component {
         }
     }
 
-    _getContent() {
-        let that = this;
-
-        return this.state.content.map((item, index) => {
-            return <li className={(this.state.currentToc === item.id) ? 'active' : ''} key={index}
-                       onClick={() => that._goToContent(item.begin, item.id)}>
-                <a href='#'>{item.title}</a>
-            </li>
-        })
-    }
-
-    _getRates() {
-        let that = this;
-        const _rates = [
-            {value: 0.25}, // Todo : надо убрать 0.25
-            {value: 0.5},
-            {value: 0.75},
-            {value: 1, title: 'Обычная'},
-            {value: 1.25},
-            {value: 1.5},
-            {value: 2},
-        ];
-
-        return _rates.map((item, index) => {
-            return <li className={(this.state.currentRate === item.value) ? 'active' : ''} key={index}
-                       onClick={() => that._setRate(item.value)}>
-                {item.title ? item.title : item.value}
-            </li>
-        })
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (this.props.content !== nextProps.content) {
-            if (nextProps.content) {
-                this._calcContent(nextProps.content)
-            }
-
-        }
-
-        if ((nextProps.currentContent) && (this.state.currentToc !== nextProps.currentContent)) {
-            this.setState({
-                currentToc: nextProps.currentContent
-            })
-        }
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.content.length && (prevState.content.length !== this.state.content.length)) {
-            $(".scrollable").mCustomScrollbar();
-            this._scrollMounted = true;
-        }
-    }
-
-    _calcContent(content) {
-        let length = 0;
-        let _items = [];
-        content.forEach((episodeContent) => {
-            length += episodeContent.duration;
-
-            episodeContent.content.forEach((item) => {
-                _items.push({id: item.id, title: item.title, begin: item.begin, episodeTitle: episodeContent.title})
-            })
-        })
-
-        let _total = tools.getTimeFmt(length);
-
-        this.setState({
-            totalDurationFmt: _total,
-            totalDuration: length,
-            content: _items,
-        })
-    }
-
-    _goToContent(begin, index) {
-        this.props.onGoToContent(begin)
-        this.setState({
-            currentToc: index,
-        })
-    }
+    // _calcContent(content) {
+    //     let length = 0;
+    //     let _items = [];
+    //     content.forEach((episodeContent) => {
+    //         length += episodeContent.duration;
+    //
+    //         episodeContent.content.forEach((item) => {
+    //             _items.push({id: item.id, title: item.title, begin: item.begin, episodeTitle: episodeContent.title})
+    //         })
+    //     })
+    //
+    //     let _total = tools.getTimeFmt(length);
+    //
+    //     this.setState({
+    //         totalDurationFmt: _total,
+    //         totalDuration: length,
+    //         content: _items,
+    //     })
+    // }
 
     _onPause() {
-        if (this.props.onPause && this.props.onPlay) {
-            if (this.props.paused) {
-                this.props.onPlay()
-            }
-            else {
-                this.props.onPause();
-            }
-
-            this.setState({
-                pause: !this.state.pause
-            })
-        }
+        // if (this.props.onPause && this.props.onPlay) {
+        //     if (this.props.paused) {
+        //         this.props.onPlay()
+        //     }
+        //     else {
+        //         this.props.onPause();
+        //     }
+        //
+        //     this.setState({
+        //         pause: !this.state.pause
+        //     })
+        // }
     }
 
     _keyUpHandler(e) {
@@ -227,53 +146,18 @@ export default class Frame extends Component {
     }
 
     _onScreenClick(e) {
-        if (e.target.className === 'player-frame__screen') {
+        if (this._hasOrIs(e.target, 'player-frame__screen') || this._hasOrIs(e.target, 'ws-container')) {
             this._onPause()
         }
 
     }
 
-    _onBackward() {
-        let _newPosition = (this.props.playTime < 10) ? 0 : (this.props.playTime - 10);
-        this.props.onGoToContent(_newPosition);
-    }
-
-    _setRate(value) {
-        if (this.props.onSetRate) {
-            this.props.onSetRate(value)
-            this.setState({currentRate: value})
-        }
-    }
-
-    _onSetCurrentPosition(value) {
-        this.props.onGoToContent(value);
-    }
-
-    _onToggleMute() {
-        if (this.props.muted) {
-            if (this.props.onUnmute) {
-                this.props.onUnmute()
-            }
+    _hasOrIs(target, name) {
+        if (target.className === name) {
+            return true
         } else {
-            if (this.props.onMute) {
-                this.props.onMute()
-            }
+            return target.parentNode ? false : this._hasOrIs(target.parentNode, name)
         }
-    }
-
-    _onSetVolume(value) {
-        if (this.props.onSetVolume) {
-            this.setState({
-                volume: value
-            });
-            this.props.onSetVolume(value)
-        }
-    }
-
-    _getCurrentContent() {
-        return this.state.content.find((item) => {
-            return item.id === this.state.currentToc
-        })
     }
 
     _toggleFullscreen() {
@@ -303,8 +187,6 @@ export default class Frame extends Component {
 
 
     render() {
-        let _playTimeFrm = tools.getTimeFmt(this.props.playTime)
-        let _currentContent = this._getCurrentContent();
         let _id = this.props.lesson ? this.props.lesson.Id : '';
 
         const
@@ -320,40 +202,18 @@ export default class Frame extends Component {
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
-
                 {
                     this.props.visible ?
                         <div>
-                            <PauseScreen onPlay={::this._onPause} {...this.props} currentToc={_currentContent}
-                                         visible={!this.props.paused}/>
+                            <PauseScreen {...this.props}/>
                             <div className="player-frame">
-                                {
-                                    !this.props.paused ?
-                                        <div className="player-frame__poster-text">
-                                            <h2 className="player-frame__poster-title">{_currentContent ? _currentContent.episodeTitle : null}</h2>
-                                            <p className="player-frame__poster-subtitle">{_currentContent ? _currentContent.title : null}</p>
-                                        </div>
-                                        :
-                                        null
-                                }
+                                <Titles/>
                                 <div className="player-block">
-                                    <Progress total={this.state.totalDuration} current={this.props.playTime} id={_id}
-                                              content={this.state.content} onSetCurrentPosition={::this._onSetCurrentPosition}/>
+                                    <Progress id={_id}/>
                                     <div className="player-block__row">
-                                        <Controls pause={this.props.paused}
-                                                  muted={this.props.muted}
-                                                  volume={this.props.volume}
-                                                  handlePauseClick={::this._onPause}
-                                                  handleBackwardClick={::this._onBackward}
-                                                  handleToggleMuteClick={::this._onToggleMute}
-                                                  handleSetVolume={::this._onSetVolume}
-                                        />
+                                        <Controls/>
                                         <div className="player-block__stats">
-                                            <div className="player-block__info">
-                                                <span className="played-time">{_playTimeFrm}</span>
-                                                <span className="divider">/</span>
-                                                <span className="total-time">{this.state.totalDurationFmt ? this.state.totalDurationFmt : this.props.lesson.DurationFmt}</span>
-                                            </div>
+                                            <TimeInfo/>
                                             <button type="button" className="speed-button js-speed-trigger"
                                                     onClick={::this._openRate}>
                                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
@@ -371,24 +231,9 @@ export default class Frame extends Component {
                                                      dangerouslySetInnerHTML={{__html: _screen}}/>
                                             </button>
                                         </div>
-                                        <div
-                                            className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.state.showContent ? ' opened' : '')}>
-                                            <header className="contents-tooltip__header">
-                                                <p className="contents-tooltip__title">Оглавление</p>
-                                            </header>
-                                            <ol className="contents-tooltip__body scrollable">
-                                                {this._getContent()}
-                                            </ol>
-                                        </div>
-                                        <div
-                                            className={"speed-tooltip js-player-tooltip js-speed" + (this.state.showRate ? ' opened' : '')}>
-                                            <header className="speed-tooltip__header">
-                                                <p className="speed-tooltip__title">Скорость</p>
-                                            </header>
-                                            <ul className="speed-tooltip__body">
-                                                {this._getRates()}
-                                            </ul>
-                                        </div>
+                                        <ContentTooltip visible={this.state.showContent}
+                                                        id={_id}/>
+                                        <RateTooltip visible={this.state.showRate}/>
                                     </div>
                                 </div>
                             </div>
@@ -396,7 +241,6 @@ export default class Frame extends Component {
                         :
                         null
                 }
-
             </div>
         )
     }

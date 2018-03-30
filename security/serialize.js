@@ -17,7 +17,7 @@ module.exports = (users_cache) => {
                     done(null, user);
                 })
                 .catch((err) => {
-                    done(err, null);
+                    done(err);
                 });
         });
     };

@@ -1,34 +1,29 @@
 import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+import * as playerStartActions from '../../actions/player-start-actions'
 
-export default class PauseScreen extends React.Component {
+class PauseScreen extends React.Component {
     static propTypes = {
         isMain: PropTypes.bool,
-        onPlay: PropTypes.func,
         duration: PropTypes.string,
         number: PropTypes.number,
-        currentToc: PropTypes.object,
     };
 
     static defaultProps = {
         isMain: true,
     };
 
-    _onPlay() {
-        if (this.props.onPlay) {
-            this.props.onPlay()
-        }
-    }
-
     render() {
         let {lesson} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
-        let _toc = this.props.currentToc ? this.props.currentToc.title : '';
+        let _toc = this.props.currentContent ? this.props.currentContent.title : '';
 
         const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
 
         return (
-            <div className="player-frame__screen" style={this.props.visible ? {opacity: 0} : {opacity: 1}}>
+            <div className={"player-frame__screen" + (this.props.paused ? "" : " hide")}>
                 <div className="lecture-frame">
                     <div className="lecture-frame__header">
                         <div className='lecture-frame__play-link'>
@@ -46,7 +41,7 @@ export default class PauseScreen extends React.Component {
                             <h2 className="lecture-frame__title">
                                 <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                                 <span className="play-btn-big lecture-frame__play-btn" style={{cursor: 'pointer'}}
-                                      onClick={::this._onPlay}>Воспроизвести</span>
+                                      onClick={::this.props.playerStartActions.startPlay}>Воспроизвести</span>
                                 <span className="title-text">
                                             <span className="number">{_number}</span>{lesson.Name}</span>
                             </h2>
@@ -62,3 +57,18 @@ export default class PauseScreen extends React.Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        paused: state.player.paused,
+        currentContent: state.player.currentContent,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PauseScreen);

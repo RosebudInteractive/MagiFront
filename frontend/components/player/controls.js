@@ -1,23 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import $ from 'jquery'
 
-export default class Controls extends React.Component {
+import * as playerStartActions from '../../actions/player-start-actions'
 
-    static propTypes = {
-        handlePauseClick: PropTypes.func,
-        handleBackwardClick: PropTypes.func,
-        handleToggleMuteClick: PropTypes.func,
-        handleSetVolume: PropTypes.func,
-        pause: PropTypes.bool,
-        muted: PropTypes.bool,
-        volume: PropTypes.number
-    };
-
-    static defaultProps = {
-        pause: false,
-        muted: false
-    };
+class Controls extends React.Component {
 
     componentDidMount() {
         $("#sound-bar").click((event) => {
@@ -27,31 +15,16 @@ export default class Controls extends React.Component {
         });
     }
 
-    _onPause(e) {
-        if (this.props.handlePauseClick) {
-            this.props.handlePauseClick(e)
-        }
-    }
-
-    _onBackward(e) {
-        if (this.props.handleBackwardClick) {
-            this.props.handleBackwardClick(e)
-        }
-    }
-
-    _onToggleMute(e) {
-        if (this.props.handleToggleMuteClick) {
-            this.props.handleToggleMuteClick(e)
-        }
+    _onBackward() {
+        let _newPosition = (this.props.currentTime < 10) ? 0 : (this.props.currentTime - 10);
+        this.props.playerStartActions.startSetCurrentTime(_newPosition);
     }
 
     _setVolume(current, total) {
         let value = total ? (current / total) : 0
-
-        if (this.props.handleSetVolume) {
-            this.props.handleSetVolume(value)
-        }
+        this.props.playerStartActions.startSetVolume(value)
     }
+
 
     render() {
         const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
@@ -65,17 +38,16 @@ export default class Controls extends React.Component {
                 <button type="button" className="backwards" onClick={::this._onBackward}>
                     <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _backwards}}/>
                 </button>
-                {this.props.pause ?
-                    <button type="button" className="play-button" onClick={::this._onPause}>
+                {this.props.paused ?
+                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPlay}>
                         <svg className="play" width="19" height="19" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
                     :
-                    <button type="button" className="play-button" onClick={::this._onPause}>
+                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPause}>
                         <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: _pause}}/>
                     </button>
                 }
-                <button type="button" className="sound-button" onClick={::this._onToggleMute}>
-
+                <button type="button" className="sound-button" onClick={::this.props.playerStartActions.toggleMute}>
                     {
                         this.props.muted ?
                             <svg className="off" width="18" height="18" dangerouslySetInnerHTML={{__html: _mute}}/>
@@ -96,3 +68,20 @@ export default class Controls extends React.Component {
         );
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        currentTime: state.player.currentTime,
+        paused: state.player.paused,
+        muted: state.player.muted,
+        volume: state.player.volume,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Controls);
