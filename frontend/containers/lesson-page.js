@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 
 import $ from 'jquery'
+import 'fullpage.js'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -48,98 +49,103 @@ class LessonPage extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         let _lesson = this._getLessonInfo(nextProps.lessonInfo);
-        if (!_lesson)
-            return
+        if (_lesson && (nextProps.params === '?play')) {
 
-        if ((nextProps.params !== this.props.params) || (this.props.courseUrl !== nextProps.courseUrl) ||
-            (this.props.lessonUrl !== nextProps.lessonUrl)) {
-            let _oldLesson = this._getLessonInfo(this.props.lessonInfo);
-            if (_oldLesson) {
-                this.props.appActions.hideLessonMenu('lesson-menu-' + _oldLesson.Id);
-            }
         }
 
-        let _player = getInstance();
-
-        let _anchor = this._getAnchors().find((item) => {
-            return item.url === nextProps.lessonUrl
-        })
-
-        let _isRedirectFromThisPage = (nextProps.params === '?play') &&
-            (_player) && (_lesson) && (_player.lesson) &&
-            (this.props.courseUrl === nextProps.courseUrl) &&
-            (this.props.lessonUrl !== nextProps.lessonUrl) &&
-            (_anchor);
-
-        if ((_isRedirectFromThisPage) && (!this._internalRedirect)) {
-            this._moveToPlayer = nextProps.params === '?play';
-            // this._internalRedirect = true;
-            $.fn.fullpage.moveTo(_anchor.name);
-            getInstance().switchToFull()
-            this.props.appActions.switchToFullPlayer();
-            this.props.appActions.hideLessonMenu('lesson-menu-' + _anchor.id);
-            return
-        }
-
-        let _needRedirect = (_player) && (_lesson) && (_player.lesson) &&
-            (_player.lesson.Id === _lesson.Id) &&
-            (_player.lesson.URL === nextProps.lessonUrl) &&
-            (nextProps.params !== '?play')
-
-        if (_needRedirect) {
-            if (this._silentMove) {
-                this._silentMove = false
-            } else {
-                // this.props.appActions.startHideLessonMenu();
-                this.setState({
-                    redirectToPlayer: true
-                })
-            }
-        }
-
-
-        // let _lessonId = this._activeLessonId ? this._activeLessonId : _lesson.Id;
-        let _needReloadPlayInfo = (
-                (_player) &&
-                (_player.lesson) &&
-                (_player.lesson.Id !== _lesson.Id) &&
-                (_player.lesson.URL !== nextProps.lessonUrl) &&
-                (_lesson.URL === nextProps.lessonUrl)
-            ) &&
-            (nextProps.params === '?play');
-        let _needFirstLoad = (!_player && _lesson) && (nextProps.params === '?play');
-
-        if (_needFirstLoad || _needReloadPlayInfo) {
-            if (!this.props.lessonPlayInfo.fetching && !nextProps.lessonPlayInfo.fetching) {
-                this.props.lessonActions.getLessonPlayInfo(_lesson.Id);
-                return
-            }
-
-            if (nextProps.lessonPlayInfo.loaded) {
-                this.props.appActions.switchToFullPlayer()
-                this._needMountPlayer = false;
-                this._mountPlayerGuard = false;
-            }
-        }
-
-        let _needInitPlayer = (this._needMountPlayer) ||
-            (
-                (
-                    (this.props.courseUrl !== nextProps.courseUrl) ||
-                    (this.props.lessonUrl !== nextProps.lessonUrl) ||
-                    (this.props.params !== nextProps.params)
-                ) &&
-                nextProps.params === '?play'
-            )
-
-        if (_needInitPlayer && _player && nextProps.lessonPlayInfo.loaded) {
-            this.props.appActions.switchToFullPlayer();
-            if (!this._internalRedirect) {
-                this._needMountPlayer = false;
-                this._mountPlayerGuard = false;
-                this._reinitPlayer = nextProps.lessonPlayInfo.playing
-            }
-        }
+        // if (!_lesson) {
+        //     return
+        // }
+        //
+        // if ((nextProps.params !== this.props.params) || (this.props.courseUrl !== nextProps.courseUrl) ||
+        //     (this.props.lessonUrl !== nextProps.lessonUrl)) {
+        //     let _oldLesson = this._getLessonInfo(this.props.lessonInfo);
+        //     if (_oldLesson) {
+        //         this.props.appActions.hideLessonMenu('lesson-menu-' + _oldLesson.Id);
+        //     }
+        // }
+        //
+        // let _player = getInstance();
+        //
+        // let _anchor = this._getAnchors().find((item) => {
+        //     return item.url === nextProps.lessonUrl
+        // })
+        //
+        // let _isRedirectFromThisPage = (nextProps.params === '?play') &&
+        //     (_player) && (_lesson) && (_player.lesson) &&
+        //     (this.props.courseUrl === nextProps.courseUrl) &&
+        //     (this.props.lessonUrl !== nextProps.lessonUrl) &&
+        //     (_anchor);
+        //
+        // if ((_isRedirectFromThisPage) && (!this._internalRedirect)) {
+        //     this._moveToPlayer = nextProps.params === '?play';
+        //     // this._internalRedirect = true;
+        //     $.fn.fullpage.moveTo(_anchor.name);
+        //     getInstance().switchToFull()
+        //     this.props.appActions.switchToFullPlayer();
+        //     this.props.appActions.hideLessonMenu('lesson-menu-' + _anchor.id);
+        //     return
+        // }
+        //
+        // let _needRedirect = (_player) && (_lesson) && (_player.lesson) &&
+        //     (_player.lesson.Id === _lesson.Id) &&
+        //     (_player.lesson.URL === nextProps.lessonUrl) &&
+        //     (nextProps.params !== '?play')
+        //
+        // if (_needRedirect) {
+        //     if (this._silentMove) {
+        //         this._silentMove = false
+        //     } else {
+        //         // this.props.appActions.startHideLessonMenu();
+        //         this.setState({
+        //             redirectToPlayer: true
+        //         })
+        //     }
+        // }
+        //
+        //
+        // // let _lessonId = this._activeLessonId ? this._activeLessonId : _lesson.Id;
+        // let _needReloadPlayInfo = (
+        //         (_player) &&
+        //         (_player.lesson) &&
+        //         (_player.lesson.Id !== _lesson.Id) &&
+        //         (_player.lesson.URL !== nextProps.lessonUrl) &&
+        //         (_lesson.URL === nextProps.lessonUrl)
+        //     ) &&
+        //     (nextProps.params === '?play');
+        // let _needFirstLoad = (!_player && _lesson) && (nextProps.params === '?play');
+        //
+        // if (_needFirstLoad || _needReloadPlayInfo) {
+        //     if (!this.props.lessonPlayInfo.fetching && !nextProps.lessonPlayInfo.fetching) {
+        //         this.props.lessonActions.getLessonPlayInfo(_lesson.Id);
+        //         return
+        //     }
+        //
+        //     if (nextProps.lessonPlayInfo.loaded) {
+        //         this.props.appActions.switchToFullPlayer()
+        //         this._needMountPlayer = false;
+        //         this._mountPlayerGuard = false;
+        //     }
+        // }
+        //
+        // let _needInitPlayer = (this._needMountPlayer) ||
+        //     (
+        //         (
+        //             (this.props.courseUrl !== nextProps.courseUrl) ||
+        //             (this.props.lessonUrl !== nextProps.lessonUrl) ||
+        //             (this.props.params !== nextProps.params)
+        //         ) &&
+        //         nextProps.params === '?play'
+        //     )
+        //
+        // if (_needInitPlayer && _player && nextProps.lessonPlayInfo.loaded) {
+        //     this.props.appActions.switchToFullPlayer();
+        //     if (!this._internalRedirect) {
+        //         this._needMountPlayer = false;
+        //         this._mountPlayerGuard = false;
+        //         this._reinitPlayer = nextProps.lessonPlayInfo.playing
+        //     }
+        // }
     }
 
     shouldComponentUpdate() {
@@ -494,7 +500,7 @@ function mapStateToProps(state, ownProps) {
         lessonUrl: ownProps.match.params.lessonUrl,
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
-        lessonPlayInfo: state.lessonPlayInfo,
+        // lessonPlayInfo: state.lessonPlayInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
         params: ownProps.location.search,

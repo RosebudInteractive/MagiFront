@@ -27,8 +27,6 @@ export default class Frame extends Component {
             showRate: false,
             fullScreen: false,
         }
-
-        this._scrollMounted = false;
     }
 
 
@@ -101,26 +99,6 @@ export default class Frame extends Component {
             this._hideAllTooltips = false
         }
     }
-
-    // _calcContent(content) {
-    //     let length = 0;
-    //     let _items = [];
-    //     content.forEach((episodeContent) => {
-    //         length += episodeContent.duration;
-    //
-    //         episodeContent.content.forEach((item) => {
-    //             _items.push({id: item.id, title: item.title, begin: item.begin, episodeTitle: episodeContent.title})
-    //         })
-    //     })
-    //
-    //     let _total = tools.getTimeFmt(length);
-    //
-    //     this.setState({
-    //         totalDurationFmt: _total,
-    //         totalDuration: length,
-    //         content: _items,
-    //     })
-    // }
 
     _onPause() {
         // if (this.props.onPause && this.props.onPlay) {

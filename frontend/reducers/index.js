@@ -7,7 +7,7 @@ import singleCourse from './singleCourse';
 import singleLesson from './singleLesson';
 import lessons from './lessons';
 import lessonText from './lessonText';
-import lessonPlayInfo from './lessonPlayInfo';
+import lessonPlayInfo from './lesson-play-info';
 import app from './app';
 import player from './player';
 // import { routerReducer } from 'react-router-redux';
