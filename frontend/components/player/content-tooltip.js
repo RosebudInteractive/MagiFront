@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
+
+import * as playerStartActions from '../../actions/player-start-actions'
 
 // import $ from 'jquery'
 // import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 
-export default class ContentTooltip extends Component {
+class ContentTooltip extends Component {
 
     constructor(props) {
         super(props)
@@ -14,7 +18,6 @@ export default class ContentTooltip extends Component {
 
     static propTypes = {
         content: PropTypes.array.isRequired,
-        currentToc: PropTypes.number.isRequired,
         visible: PropTypes.bool.isRequired,
         onGoToContent: PropTypes.func
     };
@@ -75,18 +78,18 @@ export default class ContentTooltip extends Component {
     _getContent() {
         let that = this;
 
-        return this.props.content.map((item, index) => {
-            return <li className={(this.props.currentToc === item.id) ? 'active' : ''} key={index}
-                       onClick={() => that._goToContent(item.begin, item.id)}>
+        return this.props.contentArray.map((item, index) => {
+            let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0;
+
+            return <li className={(_currContentId === item.id) ? 'active' : ''} key={index}
+                       onClick={() => that._goToContent(item.begin)}>
                 <a href='#'>{item.title}</a>
             </li>
         })
     }
 
-    _goToContent(begin, index) {
-        if (this.props.onGoToContent) {
-            this.props.onGoToContent(begin, index)
-        }
+    _goToContent(begin) {
+        this.props.playerStartActions.startSetCurrentTime(begin)
     }
 
     render() {
@@ -104,4 +107,17 @@ export default class ContentTooltip extends Component {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        contentArray: state.player.contentArray,
+        currentContent: state.player.currentContent,
+    }
+}
 
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContentTooltip);

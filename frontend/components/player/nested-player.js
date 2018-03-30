@@ -1,6 +1,9 @@
 import EventEmitter from 'events'
 import $ from 'jquery'
 
+import * as playerActions from '../../actions/player-actions';
+import {store} from '../../store/configureStore';
+
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader"
 import 'jquery-ui/jquery-ui.js';
@@ -67,16 +70,7 @@ class NestedPlayer extends EventEmitter {
         return this._courseUrl;
     }
 
-    _disableEmits(){
-        // this._canEmit = false;
-    }
-
-    _enableEmits(){
-        // this._canEmit = true;
-    }
-
     _loadOtherLesson(options) {
-        this._disableEmits()
         this._fullPlayer.initContainer(options.div);
         this._smallPlayer.initContainer(options.smallDiv);
 
@@ -93,7 +87,7 @@ class NestedPlayer extends EventEmitter {
         if (options.data) {
             this.assetsList = options.data.assets;
         }
-        this._onRenderCotent = options.onRenderContent;
+        this._onRenderContent = options.onRenderContent;
         this._onCurrentTimeChanged = options.onCurrentTimeChanged;
         this._onChangeTitle = options.onChangeTitle;
         this._onChangeContent = options.onChangeContent;
@@ -118,15 +112,12 @@ class NestedPlayer extends EventEmitter {
     play() {
         this.player.play()
         this._isHardStopped = false;
-        // this.emit('play')
     }
 
     stop() {
         this.player.pause()
         this._lesson = null
         this._isHardStopped = true;
-        // this.removeAllListeners('pause');
-        // this.removeAllListeners('play');
     }
 
     setPosition(begin) {
@@ -135,18 +126,22 @@ class NestedPlayer extends EventEmitter {
 
     setRate(value) {
         this.player.setRate(value)
+        store.dispatch(playerActions.setRate(this.audioState.playbackRate))
     }
 
     mute() {
-        this.player.setMute(true)
+        this.player.setMute(true);
+        store.dispatch(playerActions.setMuteState(this.audioState.muted))
     }
 
     unmute() {
-        this.player.setMute(false)
+        this.player.setMute(false);
+        store.dispatch(playerActions.setMuteState(this.audioState.muted))
     }
 
     setVolume(value) {
-        this.player.setVolume(value)
+        this.player.setVolume(value);
+        store.dispatch(playerActions.setVolume(this.audioState.volume))
     }
 
     switchToSmall() {
@@ -184,7 +179,11 @@ class NestedPlayer extends EventEmitter {
     }
 
     _renderContent(content) {
-        this._onRenderCotent(content)
+        if (this._onRenderContent) {
+            this._onRenderContent(content);
+        }
+
+        store.dispatch(playerActions.setContentArray(content))
     }
 
     _getPlayerOptions(assetsList) {
@@ -219,6 +218,8 @@ class NestedPlayer extends EventEmitter {
                 if (that._onCurrentTimeChanged && that._canEmit) {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
+
+                store.dispatch(playerActions.setCurrentTime(e.currentTime))
             },
             onSetPosition: function () {
             },
@@ -232,7 +233,7 @@ class NestedPlayer extends EventEmitter {
                 let html = "";
                 titles.forEach((item) => {
                     if (item.title) {
-                        if (html !== "") html += "<br/>";
+                        if (html !== "") html += "\n";
                         html += item.title;
                     }
                 });
@@ -240,15 +241,20 @@ class NestedPlayer extends EventEmitter {
                 if (that._onChangeTitle && that._canEmit) {
                     that._onChangeTitle(html)
                 }
+
+                store.dispatch(playerActions.setTitle(html))
             },
             onChangeContent: (content) => {
-                if (that._onChangeContent && that._canEmit) {
+                if (that._onChangeContent) {
                     that._onChangeContent(content)
                 }
+
+                store.dispatch(playerActions.setCurrentContent(content))
             },
             onAudioInitialized() {
+                let _state = that.player._audioState;
+
                 if (that._onAudioLoaded) {
-                     let _state = that.player._audioState;
                      that._onAudioLoaded({
                          currentTime: _state.currentTime,
                          muted: _state.muted,
@@ -258,17 +264,17 @@ class NestedPlayer extends EventEmitter {
                      })
                 }
 
-                // that._enableEmits();
+                store.dispatch(playerActions.setMuteState(_state.muted))
+                store.dispatch(playerActions.setVolume(_state.volume))
+                store.dispatch(playerActions.setRate(_state.playbackRate))
             },
             onPaused: () => {
-                if (that._canEmit) {
-                    that.emit('pause')
-                }
+                that.emit('pause');
+                store.dispatch(playerActions.pause())
             },
             onStarted: () => {
-                if (that._canEmit) {
-                    that.emit('play')
-                }
+                that.emit('play');
+                store.dispatch(playerActions.play())
             }
         };
     }
