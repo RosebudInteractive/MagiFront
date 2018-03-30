@@ -3,7 +3,7 @@ import './App.css';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
-import {Switch, Route, } from 'react-router-dom'
+import {Switch, Route, withRouter} from 'react-router-dom'
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
@@ -78,7 +78,7 @@ class App extends Component {
         window.addEventListener("resize", this.updateDimensions.bind(this));
         window.addEventListener('scroll', this._handleScroll);
 
-        let tooltips = $('.js-language, .js-user-block');
+        let tooltips = $('.js-language, .js-user-block, .js-speed, .js-contents, .js-share');
         $(document).mouseup(function (e) {
             if (tooltips.has(e.target).length === 0){
                 tooltips.removeClass('opened');
@@ -155,5 +155,5 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App)
-// export default withRouter(connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App))
+// export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

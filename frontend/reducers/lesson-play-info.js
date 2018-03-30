@@ -22,7 +22,7 @@ export default function lessonPlayInfo(state = initialState, action) {
                 fetching: true};
 
         case GET_LESSON_PLAY_INFO_SUCCESS: {
-            if (state.requestId === action.payload.Id) {
+            if (state.requestId === action.payload.id) {
                 return {
                     ...state,
                     playInfo: Object.assign({}, action.payload),

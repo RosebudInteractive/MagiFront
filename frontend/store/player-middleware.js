@@ -1,8 +1,6 @@
 import * as Player from '../components/player/nested-player';
-import Loader from '../components/player/play-info-loader'
 
 import {
-    PLAYER_START_PLAY_LESSON,
     PLAYER_START_PLAY,
     PLAYER_START_PAUSE,
     PLAYER_START_STOP,
@@ -10,26 +8,22 @@ import {
     PLAYER_TOGGLE_MUTE,
     PLAYER_START_SET_VOLUME,
     PLAYER_START_SET_RATE,
+    PLAYER_SET_SMALL_VIEWPORT,
+    PLAYER_SET_FULL_VIEWPORT,
 } from '../constants/player'
 
 import {
-    GET_LESSON_PLAY_INFO_SUCCESS,
+    SET_LESSON_PLAY_INFO_LOADED,
 } from '../constants/lesson'
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {
-        case PLAYER_START_PLAY_LESSON: {
-            let _needLoadEmptyPlayer = !store.player.playingLesson && action.payload,
-                _needLoadOtherLesson =  store.player.playingLesson && action.payload && (store.player.playingLesson.Id !== action.payload.Id);
 
-            if (_needLoadEmptyPlayer || _needLoadOtherLesson) {
-                Loader.startLoadLesson(action.payload)
-            }
+        case SET_LESSON_PLAY_INFO_LOADED: {
+            let _state = store.getState();
 
-            return next(action)
-        }
+            Player.loadPlayInfo(_state.lessonPlayInfo.playInfo)
 
-        case GET_LESSON_PLAY_INFO_SUCCESS: {
             return next(action)
         }
 
@@ -88,6 +82,16 @@ const playerMiddleware = store => next => action => {
                 }
                 _player.setVolume(action.payload)
             }
+            return next(action)
+        }
+
+        case PLAYER_SET_SMALL_VIEWPORT: {
+            Player.setSmallViewPort(action.payload);
+            return next(action)
+        }
+
+        case PLAYER_SET_FULL_VIEWPORT: {
+            Player.setFullViewPort(action.payload);
             return next(action)
         }
 

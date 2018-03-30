@@ -2,6 +2,7 @@ import {
     GET_LESSON_PLAY_INFO_REQUEST,
     GET_LESSON_PLAY_INFO_SUCCESS,
     GET_LESSON_PLAY_INFO_FAIL,
+    SET_LESSON_PLAY_INFO_LOADED,
 } from '../constants/lesson'
 
 
@@ -31,7 +32,10 @@ export const getLessonPlayInfo = (lessonId) => {
 }
 
 export const notifyLessonPlayInfoLoaded = () => {
-
+    return {
+        type: SET_LESSON_PLAY_INFO_LOADED,
+        payload: null
+    }
 }
 
 const checkStatus = (response) => {
