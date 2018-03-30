@@ -578,8 +578,9 @@ export default class CWSPlayer extends CWSBase {
                 this._options.loader.setPosition(position);
                 this._audioState.audio.currentTime = this._audioState.currentTime;
                 this._setElementsPosition(position);
-                this._playElements(position);
-                if (this._audioState.stopped) this._pauseElements();
+                //this._renderPosition(position);
+                //this._playElements(position);
+                //if (this._audioState.stopped) this._pauseElements();
             }
         }
     }
@@ -692,6 +693,7 @@ export default class CWSPlayer extends CWSBase {
                 }
 
                 this._audioState.playingNow[el.Id] = el;
+                el.renderPosition(position);
             } else {
                 if (el.Id in this._audioState.playingNow) {
                     delete this._audioState.playingNow[el.Id];
@@ -785,7 +787,7 @@ export default class CWSPlayer extends CWSBase {
     static _isElementDeleted(lecture, trackElId) {
         for (let epIdx = 0; epIdx < lecture.episodes.length; epIdx++) {
             let data = lecture.episodes[epIdx];
-            for (let i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.tracks.length; i++) {
                 let track = data.tracks[i];
                 for (let j = 0; j < track.elements.length; j++) {
                     if (track.elements[j].id == trackElId) return false;
@@ -829,17 +831,19 @@ export default class CWSPlayer extends CWSBase {
         let oldData = null;
         if (trackElData.id in this._elements.trackElIdx) {
             oldData = this._elements.trackElIdx[trackElData.id].Data;
-            oldData.content.position = {
-                left: trackElData.content.position.left,
-                top: trackElData.content.position.top,
-                bottom: trackElData.content.position.bottom,
-                right: trackElData.content.position.right
-            };
-            oldData.content.duration = trackElData.duration;
+            if (trackElData.content.position) {
+                oldData.content.position = {
+                    left: trackElData.content.position.left,
+                    top: trackElData.content.position.top,
+                    bottom: trackElData.content.position.bottom,
+                    right: trackElData.content.position.right
+                };
+            }
+            oldData.content.duration = trackElData.content.duration;
             oldData.zIndex = zIndex;
             oldData.focused = trackElData.focused;
             oldData.data = trackElData.data;
-            oldData.content.effects = $.extend(true, {}, trackElData.content.effects);
+            oldData.content.effects = $.extend(true, {}, trackElData.content.effects || []);
             oldData.content.title = trackElData.content.title;
             oldData.content.title2 = trackElData.content.title2;
             oldData.content.deleteOldTitles =

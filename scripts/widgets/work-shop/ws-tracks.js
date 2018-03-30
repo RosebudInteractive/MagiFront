@@ -1190,9 +1190,10 @@ export default class CWSTracks extends CWSBase {
         }
 
         let i = 0;
+        let left = 0;
         while (i < p.count) {
             let curStepObj = null;
-            let left = offset + (i*p.width);
+            left = offset + (i*p.width);
             let point = i*p.duration;
             if (i + 1 < this._linerSteps.length) {
                 curStepObj = this._linerSteps[i + 1];
@@ -1215,7 +1216,7 @@ export default class CWSTracks extends CWSBase {
         let w = 0;
         if (lw > left + p.width) {
             left += p.width;
-            curStepObj = this._getLinerObject(left, lw - left, i*p.duration);
+            let curStepObj = this._getLinerObject(left, lw - left, i*p.duration);
             this._linerSteps.push(curStepObj);
             liner.append(curStepObj.step);
             liner.append(curStepObj.text);
@@ -1510,7 +1511,7 @@ export default class CWSTracks extends CWSBase {
                 }
             }
         }
-        el = this._findElement(elementId);
+        let el = this._findElement(elementId);
         el.focused = true;
         this.render();
         return oldFocused;
