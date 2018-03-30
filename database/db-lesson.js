@@ -893,7 +893,7 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getPlayerData(id) {
-        let data = { assets: [], episodes: [] };
+        let data = { id: id, assets: [], episodes: [] };
         let epi_list = {};
         let assets_list = {};
 
