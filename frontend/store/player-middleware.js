@@ -1,17 +1,33 @@
 import * as Player from '../components/player/nested-player';
+
 import {
     PLAYER_START_PLAY,
     PLAYER_START_PAUSE,
     PLAYER_START_STOP,
     PLAYER_START_SET_CURRENT_TIME,
     PLAYER_TOGGLE_MUTE,
-    PLAYER_START_SET_VOLUME, PLAYER_START_SET_RATE,
+    PLAYER_START_SET_VOLUME,
+    PLAYER_START_SET_RATE,
+    PLAYER_SET_SMALL_VIEWPORT,
+    PLAYER_SET_FULL_VIEWPORT,
 } from '../constants/player'
+
+import {
+    SET_LESSON_PLAY_INFO_LOADED,
+} from '../constants/lesson'
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {
+
+        case SET_LESSON_PLAY_INFO_LOADED: {
+            let _state = store.getState();
+
+            Player.loadPlayInfo(_state.lessonPlayInfo.playInfo)
+
+            return next(action)
+        }
+
         case PLAYER_START_PLAY: {
-            console.log(store)
             if (Player.getInstance()) {
                 Player.getInstance().play()
             }
@@ -66,6 +82,16 @@ const playerMiddleware = store => next => action => {
                 }
                 _player.setVolume(action.payload)
             }
+            return next(action)
+        }
+
+        case PLAYER_SET_SMALL_VIEWPORT: {
+            Player.setSmallViewPort(action.payload);
+            return next(action)
+        }
+
+        case PLAYER_SET_FULL_VIEWPORT: {
+            Player.setFullViewPort(action.payload);
             return next(action)
         }
 

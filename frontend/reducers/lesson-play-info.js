@@ -7,27 +7,30 @@ import {
 } from '../constants/lesson'
 
 const initialState = {
-    loadedObject: null,
-    playingObject: null,
+    requestId: 0,
+    playInfo: null,
     fetching: false,
-    loaded: false,
-    playing: false,
 };
 
 export default function lessonPlayInfo(state = initialState, action) {
 
     switch (action.type) {
         case GET_LESSON_PLAY_INFO_REQUEST:
-            return {...state, loadedObject: null, playingObject: null, fetching: true, loaded: false, playing: false};
+            return {...state,
+                requestId: action.payload,
+                playInfo: null,
+                fetching: true};
 
         case GET_LESSON_PLAY_INFO_SUCCESS: {
-            return {
-                ...state,
-                loadedObject: action.payload,
-                fetching: false,
-                loaded: true,
-                playing: false,
-            };
+            if (state.requestId === action.payload.id) {
+                return {
+                    ...state,
+                    playInfo: Object.assign({}, action.payload),
+                    fetching: false,
+                };
+            } else {
+                return state
+            }
         }
 
         case GET_LESSON_PLAY_INFO_FAIL:

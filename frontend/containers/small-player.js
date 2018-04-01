@@ -9,6 +9,7 @@ import Swipeable from 'react-swipeable';
 import $ from 'jquery'
 
 import * as playerStartActions from '../actions/player-start-actions'
+import * as playerActions from '../actions/player-actions'
 import * as Player from '../components/player/nested-player';
 
 class SmallPlayer extends React.Component {
@@ -31,6 +32,11 @@ class SmallPlayer extends React.Component {
         visible: false
     };
 
+    componentDidMount() {
+        let _smallContainer = $('#small-player');
+        this.props.playerActions.setSmallViewPort(_smallContainer)
+    }
+
     componentDidUpdate(prevProps) {
         let _isMobile = ($(window).width() < 900);
 
@@ -46,14 +52,11 @@ class SmallPlayer extends React.Component {
             }
         }
 
-        this._mountPlayerListener();
     }
 
     componentWillUnmount() {
     }
 
-    _mountPlayerListener() {
-    }
 
     _onPlayClick() {
     }
@@ -145,6 +148,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        playerActions: bindActionCreators(playerActions, dispatch),
         // pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         // appActions: bindActionCreators(appActions, dispatch),
     }

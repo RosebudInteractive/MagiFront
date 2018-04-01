@@ -8,20 +8,11 @@ import * as lessonActions from '../../actions/lesson-actions';
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
-        courseUrl: PropTypes.string.isRequired,
-        lessonUrl: PropTypes.string.isRequired,
         isDark: PropTypes.bool,
     };
 
     constructor(props) {
         super(props);
-    }
-
-    componentWillMount() {
-        // if (!this.props.lessons.loaded) {
-        let {courseUrl, lessonUrl} = this.props;
-        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl)
-        // }
     }
 
     _getLessonsList() {
@@ -44,7 +35,7 @@ class LessonsListWrapper extends React.Component {
     }
 
     render() {
-        return (
+        return this.props.fetching ? null : (
             <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
                 <ol className="lectures-list">
                     {this._getLessonsList()}

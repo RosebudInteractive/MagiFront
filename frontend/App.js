@@ -3,13 +3,12 @@ import './App.css';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
-import {Switch, Route, } from 'react-router-dom'
+import {Switch, Route, withRouter} from 'react-router-dom'
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
-import Player from './containers/player';
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -119,7 +118,6 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
-                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl/:state'} component={Player}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
@@ -157,5 +155,5 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App)
-// export default withRouter(connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App))
+// export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

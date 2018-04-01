@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "./progress";
 import Controls from "./controls";
@@ -11,7 +13,9 @@ import TimeInfo from './time-info';
 import ContentTooltip from "./content-tooltip";
 import RateTooltip from './rate-tooltip';
 
-export default class Frame extends Component {
+import * as playerActions from '../../actions/player-actions'
+
+class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
@@ -27,8 +31,6 @@ export default class Frame extends Component {
             showRate: false,
             fullScreen: false,
         }
-
-        this._scrollMounted = false;
     }
 
 
@@ -66,6 +68,20 @@ export default class Frame extends Component {
         //         return false
         //     }
         // })
+
+        if (this.props.visible) {
+            let _id = this.props.lesson ? this.props.lesson.Id : '';
+            let _container = $('#player' + _id)
+            this.props.playerActions.setFullViewPort(_container)
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (!this.props.visible && nextProps.visible) {
+            let _id = this.props.lesson ? this.props.lesson.Id : '';
+            let _container = $('#player' + _id)
+            this.props.playerActions.setSmallViewPort(_container)
+        }
     }
 
     componentWillUnmount() {
@@ -101,26 +117,6 @@ export default class Frame extends Component {
             this._hideAllTooltips = false
         }
     }
-
-    // _calcContent(content) {
-    //     let length = 0;
-    //     let _items = [];
-    //     content.forEach((episodeContent) => {
-    //         length += episodeContent.duration;
-    //
-    //         episodeContent.content.forEach((item) => {
-    //             _items.push({id: item.id, title: item.title, begin: item.begin, episodeTitle: episodeContent.title})
-    //         })
-    //     })
-    //
-    //     let _total = tools.getTimeFmt(length);
-    //
-    //     this.setState({
-    //         totalDurationFmt: _total,
-    //         totalDuration: length,
-    //         content: _items,
-    //     })
-    // }
 
     _onPause() {
         // if (this.props.onPause && this.props.onPlay) {
@@ -245,3 +241,22 @@ export default class Frame extends Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        fetching: state.singleLesson.fetching,
+        lessonInfo: state.singleLesson,
+        course: state.singleLesson.course,
+        lessons: state.lessons,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerActions: bindActionCreators(playerActions, dispatch),
+        // pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        // appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Frame);

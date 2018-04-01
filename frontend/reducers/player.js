@@ -24,6 +24,7 @@ const initialState = {
     totalDurationFmt: '',
     totalDuration: 0,
     contentArray: [],
+    // playingLesson: null,
 };
 
 export default function player(state = initialState, action) {
@@ -36,7 +37,11 @@ export default function player(state = initialState, action) {
             return {...state, paused: true};
 
         case PLAYER_SET_CURRENT_TIME:
-            return {...state, currentTime: action.payload};
+            if (state.currentTime !== action.payload) {
+                return {...state, currentTime: action.payload}
+            } else {
+                return state
+            }
 
         case PLAYER_SET_TITLE: {
             if (state.title !== action.payload) {

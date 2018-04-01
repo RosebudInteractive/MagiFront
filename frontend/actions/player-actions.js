@@ -8,6 +8,8 @@ import {
     PLAYER_SET_CONTENT_ARRAY,
     PLAYER_SET_CURRENT_CONTENT,
     PLAYER_SET_RATE,
+    PLAYER_SET_SMALL_VIEWPORT,
+    PLAYER_SET_FULL_VIEWPORT,
 } from '../constants/player'
 
 export const play = () => {
@@ -76,3 +78,17 @@ export const setRate = (value) => {
         payload: value
     }
 };
+
+export const setSmallViewPort = (div) => {
+    return {
+        type: PLAYER_SET_SMALL_VIEWPORT,
+        payload: div
+    }
+}
+
+export const setFullViewPort = (div) => {
+    return {
+        type: PLAYER_SET_FULL_VIEWPORT,
+        payload: div
+    }
+}
