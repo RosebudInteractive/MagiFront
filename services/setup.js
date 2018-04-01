@@ -52,11 +52,9 @@ function setupAPI(express, app) {
 
     app.use("/api", methodOverride()); // поддержка put и delete
 
-//     ///////////////////////////////////////////////////////////////////////////////////////////////
-//     app.use(config.snets.vk.callBack, expressSession(config.session));
-//     app.use(config.snets.vk.callBack, passport.initialize());
-//     app.use(config.snets.vk.callBack, passport.session());
-//    ///////////////////////////////////////////////////////////////////////////////////////////////
+    app.use("/data", sessionMiddleware.express);
+    app.use("/data", sessionMiddleware.passportInit);
+    app.use("/data", sessionMiddleware.passportSession);
 
     let useJWT = config.has('authentication.useJWT') ? config.authentication.useJWT : false;
     AuthLocalInit(app);
