@@ -33,9 +33,10 @@ class NestedPlayer extends EventEmitter {
 
     constructor(options) {
         super();
+        this._fullPlayer = null;
         this._applyOptions(options);
 
-        this.applyViewPorts()
+        this.applyViewPorts();
 
         this._isHardStopped = false;
 
@@ -49,7 +50,11 @@ class NestedPlayer extends EventEmitter {
 
         if (fullViewPort && (this._fullDiv !== fullViewPort)) {
             this._fullDiv = fullViewPort;
-            this._fullPlayer = new Player(fullViewPort, _options);
+            if (!this._fullPlayer) {
+                this._fullPlayer = new Player(fullViewPort, _options);
+            } else {
+                this._fullPlayer.initContainer(this._fullDiv);
+            }
             this._fullPlayer.render();
 
         }

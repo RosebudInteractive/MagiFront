@@ -26,7 +26,6 @@ export const getLesson = (courseUrl, lessonUrl) => {
             .then(parseJSON)
             .then(data => {
                 handleData(data);
-
                 dispatch({
                     type: GET_LESSON_SUCCESS,
                     payload: data
@@ -144,8 +143,10 @@ const parseJSON = (response) => {
 //
 const handleData = (data) => {
     let _lesson = data.Lesson;
+    _lesson.courseUrl = data.Course.URL;
     let _parentNumber = _lesson.Number;
     _lesson.Lessons.forEach((lesson) => {
+        lesson.courseUrl = data.Course.URL;
         lesson.Number = _parentNumber + '.' + lesson.Number
     })
 };

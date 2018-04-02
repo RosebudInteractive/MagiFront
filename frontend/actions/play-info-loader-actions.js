@@ -6,17 +6,21 @@ import {
 } from '../constants/lesson'
 
 
-export const getLessonPlayInfo = (lessonId) => {
+export const getLessonPlayInfo = (lesson) => {
     return (dispatch) => {
         dispatch({
             type: GET_LESSON_PLAY_INFO_REQUEST,
-            payload: lessonId
+            payload: lesson.Id
         });
 
-        fetch('/api/lessons/play/' + lessonId, {credentials: 'include'})
+        fetch('/api/lessons/play/' + lesson.Id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                data.lessonUrl = lesson.URL;
+                data.courseUrl = lesson.courseUrl;
+                data.Number = lesson.Number;
+                data.Name = lesson.Name;
                 dispatch({
                     type: GET_LESSON_PLAY_INFO_SUCCESS,
                     payload: data
@@ -31,10 +35,12 @@ export const getLessonPlayInfo = (lessonId) => {
     }
 }
 
-export const notifyLessonPlayInfoLoaded = () => {
-    return {
-        type: SET_LESSON_PLAY_INFO_LOADED,
-        payload: null
+export const notifyLessonPlayInfoLoaded = (data) => {
+    return (dispatch) => {
+        dispatch({
+            type: SET_LESSON_PLAY_INFO_LOADED,
+            payload: data
+        })
     }
 }
 

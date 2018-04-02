@@ -23,9 +23,11 @@ export default function lessonPlayInfo(state = initialState, action) {
 
         case GET_LESSON_PLAY_INFO_SUCCESS: {
             if (state.requestId === action.payload.id) {
+                let _newObject = Object.assign({}, action.payload);
+
                 return {
                     ...state,
-                    playInfo: Object.assign({}, action.payload),
+                    playInfo: _newObject,
                     fetching: false,
                 };
             } else {

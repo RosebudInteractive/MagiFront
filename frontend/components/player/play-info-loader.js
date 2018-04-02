@@ -3,10 +3,10 @@ import {store} from '../../store/configureStore';
 
 export default class  PlayInfoLoader {
     static startLoadLesson(lesson) {
-        store.dispatch(loaderActions.getLessonPlayInfo(lesson.Id))
+        store.dispatch(loaderActions.getLessonPlayInfo(lesson))
     }
 
-    static notyfyPlayInfoLoaded() {
-        store.dispatch(loaderActions.notifyLessonPlayInfoLoaded())
+    static notyfyPlayInfoLoaded(data) {
+        store.dispatch(loaderActions.notifyLessonPlayInfoLoaded(data))
     }
 }

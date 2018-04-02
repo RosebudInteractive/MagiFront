@@ -10,7 +10,6 @@ import $ from 'jquery'
 
 import * as playerStartActions from '../actions/player-start-actions'
 import * as playerActions from '../actions/player-actions'
-import * as Player from '../components/player/nested-player';
 
 class SmallPlayer extends React.Component {
 
@@ -37,7 +36,7 @@ class SmallPlayer extends React.Component {
         this.props.playerActions.setSmallViewPort(_smallContainer)
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
         let _isMobile = ($(window).width() < 900);
 
         if (this.state.isMobile !== _isMobile) {
@@ -45,13 +44,6 @@ class SmallPlayer extends React.Component {
                 isMobile: _isMobile
             })
         }
-
-        if (Player.getInstance() && (this.props.visible !== prevProps.visible)) {
-            if (this.props.visible) {
-                Player.getInstance().switchToSmall()
-            }
-        }
-
     }
 
     componentWillUnmount() {
@@ -87,14 +79,15 @@ class SmallPlayer extends React.Component {
             _maximize = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#maximize"/>',
             _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
-        let _player = Player.getInstance(),
-            _link = (_player && _player.lesson) ? '/' + _player.courseUrl + '/' + _player.lesson.URL + '?play' : '#',
-            _text = (_player && _player.lesson) ?
-                (_player.lesson.Number + '. ' + _player.lesson.Name)
+        let {paused, playingLesson} = this.props;
+
+        let _link = (playingLesson) ? '/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play' : '#',
+            _text = (playingLesson) ?
+                (playingLesson.Number + '. ' + playingLesson.Name)
                 :
                 null;
 
-        let _stopped = Player.getInstance() ? Player.getInstance()._isHardStopped : false;
+        let _stopped = false; //Player.getInstance() ? Player.getInstance()._isHardStopped : false;
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
@@ -104,7 +97,7 @@ class SmallPlayer extends React.Component {
                     <div className='small-player__poster'/>
                     <div className='player-frame__poster-text'>{_text}</div>
                     {
-                        _player ?
+                        playingLesson ?
                             <div className='small-player_block'>
                                 <Link to={_link}>
                                     <button type="button" className="maximize-button">
@@ -112,7 +105,7 @@ class SmallPlayer extends React.Component {
                                              dangerouslySetInnerHTML={{__html: _maximize}}/>
                                     </button>
                                 </Link>
-                                {this.props.paused ?
+                                {paused ?
                                     <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPlay}>
                                         <svg className="play" width="41" height="36"
                                              dangerouslySetInnerHTML={{__html: _play}}/>
@@ -142,6 +135,7 @@ class SmallPlayer extends React.Component {
 function mapStateToProps(state) {
     return {
         paused: state.player.paused,
+        playingLesson: state.player.playingLesson,
     }
 }
 

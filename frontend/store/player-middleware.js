@@ -16,6 +16,11 @@ import {
     SET_LESSON_PLAY_INFO_LOADED,
 } from '../constants/lesson'
 
+import {
+    SWITCH_TO_SMALL_PLAYER,
+    SWITCH_TO_FULL_PLAYER,
+} from '../constants/app'
+
 const playerMiddleware = store => next => action => {
     switch (action.type) {
 
@@ -92,6 +97,22 @@ const playerMiddleware = store => next => action => {
 
         case PLAYER_SET_FULL_VIEWPORT: {
             Player.setFullViewPort(action.payload);
+            return next(action)
+        }
+
+        case SWITCH_TO_SMALL_PLAYER: {
+            let _player = Player.getInstance();
+            if (_player) {
+                _player.switchToSmall()
+            }
+            return next(action)
+        }
+
+        case SWITCH_TO_FULL_PLAYER: {
+            let _player = Player.getInstance();
+            if (_player) {
+                _player.switchToFull()
+            }
             return next(action)
         }
 
