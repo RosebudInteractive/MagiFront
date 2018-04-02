@@ -56,7 +56,13 @@ class LessonPage extends React.Component {
         let _needStartPlay = (nextProps.params === '?play') //&& (this.props.params !== nextProps.params)
 
         if (_lesson && _needStartPlay) {
-            this.props.playerStartActions.startPlayLesson(_lesson)
+            let _isPlayingLesson = nextProps.playInfo ? (nextProps.playInfo.id === _lesson.Id) : false;
+
+            if (_isPlayingLesson) {
+                this.props.appActions.switchToFullPlayer()
+            } else {
+                this.props.playerStartActions.startPlayLesson(_lesson)
+            }
         }
 
         let _needRedirect = (this.props.playInfo) &&
@@ -226,7 +232,7 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
-        this.props.appActions.switchToSmallPlayer();
+        // this.props.appActions.switchToSmallPlayer();
     }
 
     _getLessonInfo(info) {
@@ -416,11 +422,9 @@ class LessonPage extends React.Component {
                 that._activeLessonId = id;
 
                 if (that.props.lessonUrl !== _anchors[nextIndex - 1].url) {
-                    // that._internalRedirect = true;
                     let _newUrl = '/' + that.props.courseUrl + '/' + _anchors[nextIndex - 1].url;
-                    if (that._moveToPlayer || ((that._player) && (that._player.lesson.Id === id))) {
+                    if (that.props.playInfo && (that.props.playInfo.id === id)) {
                         _newUrl += '?play';
-                        that._moveToPlayer = false;
                     }
                     that.props.history.replace(_newUrl)
                 }
@@ -486,7 +490,7 @@ function mapStateToProps(state, ownProps) {
 
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
-        // playInfo: state.lessonPlayInfo.playInfo,
+        playInfo: state.lessonPlayInfo.playInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
     }

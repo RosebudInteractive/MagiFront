@@ -86,10 +86,12 @@ class App extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.playInfo) {
-            let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
-            if (this.props.ownProps.location.pathname !== _targetUrl) {
-                this.props.appActions.switchToSmall()
+        if (this.props.ownProps.location.pathname != nextProps.ownProps.location.pathname) {
+            if (nextProps.playInfo) {
+                let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
+                if (nextProps.ownProps.location.pathname !== _targetUrl) {
+                    this.props.appActions.switchToSmallPlayer()
+                }
             }
         }
     }

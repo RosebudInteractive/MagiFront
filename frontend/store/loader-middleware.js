@@ -17,7 +17,7 @@ const loaderMiddleware = store => next => action => {
             let _loadRequiredLesson = (_state.lessonPlayInfo.requestId === action.payload.Id) && (_state.lessonPlayInfo.fetching);
             if (!_loadRequiredLesson) {
                 let _needLoadEmptyPlayer = !_state.lessonPlayInfo.playInfo && action.payload,
-                    _needLoadOtherLesson =  _state.lessonPlayInfo.playInfo && action.payload && (_state.lessonPlayInfo.playInfo.Id !== action.payload.Id);
+                    _needLoadOtherLesson =  _state.lessonPlayInfo.playInfo && action.payload && (_state.lessonPlayInfo.playInfo.id !== action.payload.Id);
 
                 if (_needLoadEmptyPlayer || _needLoadOtherLesson) {
                     Loader.startLoadLesson(action.payload)
@@ -36,6 +36,8 @@ const loaderMiddleware = store => next => action => {
                     lessonId : _state.lessonPlayInfo.playInfo.Id,
                     courseUrl : _state.lessonPlayInfo.playInfo.courseUrl,
                     lessonUrl : _state.lessonPlayInfo.playInfo.lessonUrl,
+                    Number : _state.lessonPlayInfo.playInfo.Number,
+                    Name : _state.lessonPlayInfo.playInfo.Name,
                 })
             }
 

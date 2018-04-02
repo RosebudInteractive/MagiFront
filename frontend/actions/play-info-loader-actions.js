@@ -19,6 +19,8 @@ export const getLessonPlayInfo = (lesson) => {
             .then(data => {
                 data.lessonUrl = lesson.URL;
                 data.courseUrl = lesson.courseUrl;
+                data.Number = lesson.Number;
+                data.Name = lesson.Name;
                 dispatch({
                     type: GET_LESSON_PLAY_INFO_SUCCESS,
                     payload: data
@@ -34,9 +36,11 @@ export const getLessonPlayInfo = (lesson) => {
 }
 
 export const notifyLessonPlayInfoLoaded = (data) => {
-    return {
-        type: SET_LESSON_PLAY_INFO_LOADED,
-        payload: data
+    return (dispatch) => {
+        dispatch({
+            type: SET_LESSON_PLAY_INFO_LOADED,
+            payload: data
+        })
     }
 }
 
