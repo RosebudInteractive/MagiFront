@@ -71,8 +71,7 @@ class NestedPlayer extends EventEmitter {
             this._smallPlayer.render();
         }
 
-        this._player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
-        this._isFull = this._fullPlayer ? true : false;
+        this.player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
     }
 
     get player() {
@@ -99,6 +98,7 @@ class NestedPlayer extends EventEmitter {
     }
 
     _loadOtherLesson(data) {
+
         this._isSmallActive = false;
         if (data) {
             this._setAssetsList(data);
@@ -145,6 +145,7 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(lessonActions.clearLessonPlayInfo());
                 this._fullPlayer = null;
                 this._smallPlayer = null;
+                this._playingData = null;
             })
         this._hasStoppedOnSwitch = false;
 
