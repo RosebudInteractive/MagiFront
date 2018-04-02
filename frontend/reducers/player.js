@@ -12,6 +12,10 @@ import {
 
 import * as tools from '../tools/time-tools'
 
+import {
+    SET_LESSON_PLAY_INFO_LOADED,
+} from '../constants/lesson'
+
 const initialState = {
     currentTime: 0,
     currentContent: null,
@@ -24,12 +28,16 @@ const initialState = {
     totalDurationFmt: '',
     totalDuration: 0,
     contentArray: [],
-    // playingLesson: null,
+    playingLesson: null,
 };
 
 export default function player(state = initialState, action) {
 
     switch (action.type) {
+        case SET_LESSON_PLAY_INFO_LOADED: {
+            return {...state, playingLesson: Object.assign({}, action.payload)}
+        }
+
         case PLAYER_PLAYED:
             return {...state, paused: false};
 

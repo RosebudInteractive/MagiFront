@@ -76,11 +76,15 @@ class Frame extends Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (!this.props.visible && nextProps.visible) {
+    // componentWillReceiveProps(nextProps) {
+    //
+    // }
+
+    componentDidUpdate(prevProps){
+        if (!prevProps.visible && this.props.visible) {
             let _id = this.props.lesson ? this.props.lesson.Id : '';
             let _container = $('#player' + _id)
-            this.props.playerActions.setSmallViewPort(_container)
+            this.props.playerActions.setFullViewPort(_container)
         }
     }
 

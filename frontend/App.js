@@ -24,6 +24,8 @@ import SmallPlayer from "./containers/small-player";
 
 Polifyll.registry();
 
+let _homePath = '/';
+
 class App extends Component {
 
     constructor(props) {
@@ -38,9 +40,6 @@ class App extends Component {
             height: 0,
         };
         this._handleScroll = this._handleScroll.bind(this);
-        // this._narrowerThan = tools.narrowerThan.bind(this);
-        // this._widerThan = tools.widerThan.bind(this);
-        // this._widthBetween = tools.widthBetween.bind(this);
     }
 
     get width() {
@@ -78,12 +77,21 @@ class App extends Component {
         window.addEventListener("resize", this.updateDimensions.bind(this));
         window.addEventListener('scroll', this._handleScroll);
 
-        let tooltips = $('.js-language, .js-user-block, .js-speed, .js-contents, .js-share');
+        let tooltips = $('.js-language, .js-user-block');
         $(document).mouseup(function (e) {
             if (tooltips.has(e.target).length === 0){
                 tooltips.removeClass('opened');
             }
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.playInfo) {
+            let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
+            if (this.props.ownProps.location.pathname !== _targetUrl) {
+                this.props.appActions.switchToSmall()
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -112,8 +120,6 @@ class App extends Component {
     }
 
     _getMainDiv() {
-        let _homePath = '/';
-
         return (
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
@@ -146,6 +152,7 @@ function mapStateToProps(state, ownProps) {
         showSmallPlayer: state.app.showSmallPlayer,
         lessonInfo: state.singleLesson,
         ownProps,
+        playInfo: state.player.playingLesson,
     }
 }
 
