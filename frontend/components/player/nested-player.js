@@ -38,11 +38,14 @@ class NestedPlayer extends EventEmitter {
         this._setAssetsList(playingData);
         this.applyViewPorts();
         this._isHardStopped = false;
+        this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
     }
 
 
     applyViewPorts() {
+        let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
+
         let _options = this._getPlayerOptions();
 
         if (fullViewPort && (this._fullDiv !== fullViewPort)) {
@@ -68,7 +71,7 @@ class NestedPlayer extends EventEmitter {
         }
 
         this._player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
-        this._isFull = true;
+        this._isFull = !_isSmallActive && (this._fullPlayer ? true : false);
     }
 
     get player() {
@@ -122,17 +125,20 @@ class NestedPlayer extends EventEmitter {
 
     pause() {
         this._isHardStopped = false;
+        this._hasStoppedOnSwitch = false;
         return this.player.pause()
     }
 
     play() {
         this.player.play()
+        this._hasStoppedOnSwitch = false;
         this._isHardStopped = false;
     }
 
     stop() {
         this.player.pause()
         this._lesson = null
+        this._hasStoppedOnSwitch = false;
         this._isHardStopped = true;
     }
 
@@ -166,11 +172,7 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
-                    .then(() => {
-                        this.player.play()
-                    })
-
+                this.player.play()
             }
         }
     }
@@ -182,12 +184,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
-                    .then(() => {
-                        this.player.play();
-                    })
-
+                this.player.play()
             } else {
+                this._hasStoppedOnSwitch = true;
                 let _position = this.audioState.globalTime;
                 this.player.setPosition(_position);
             }
@@ -284,7 +283,9 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
 
-                that.play()
+                if (!that._hasStoppedOnSwitch) {
+                    that.play()
+                } 
             },
             onPaused: () => {
                 that.emit('pause');
