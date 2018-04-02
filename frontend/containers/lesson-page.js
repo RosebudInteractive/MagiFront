@@ -197,23 +197,12 @@ class LessonPage extends React.Component {
 
         if ((lesson.URL === this.props.lessonUrl) && (this.props.params === '?play')) {
 
-            let that = this;
             return <Wrapper key={key}
                             lesson={lesson}
                             courseUrl={this.props.courseUrl}
                             lessonUrl={lesson.URL}
                             isMain={isMain}
                             active={this.state.currentActive}
-                            onLeavePage={() => {
-                                       if (that._player) {
-                                           if (that.state.paused) {
-                                               // that.props.lessonActions.clearLessonPlayInfo()
-                                               that._player.stop()
-                                           } else {
-                                               // that.props.appActions.switchToSmallPlayer()
-                                           }
-                                       }
-                                   }}
                             isPlayer={true}
             />
         } else {

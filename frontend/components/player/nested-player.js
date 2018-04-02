@@ -2,6 +2,7 @@ import EventEmitter from 'events'
 import $ from 'jquery'
 
 import * as playerActions from '../../actions/player-actions';
+import * as lessonActions from '../../actions/lesson-actions';
 import {store} from '../../store/configureStore';
 
 import Player from "work-shop/player";
@@ -44,7 +45,7 @@ class NestedPlayer extends EventEmitter {
 
 
     applyViewPorts() {
-        let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
+        // let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
 
         let _options = this._getPlayerOptions();
 
@@ -64,14 +65,14 @@ class NestedPlayer extends EventEmitter {
 
         }
 
-        if (smallViewPort && (this._smallDiv !== smallViewPort)) {
+        if (smallViewPort && ((this._smallDiv !== smallViewPort) || !this._smallPlayer)) {
             this._smallDiv = smallViewPort;
             this._smallPlayer = new Player(smallViewPort, _options);
             this._smallPlayer.render();
         }
 
         this._player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
-        this._isFull = !_isSmallActive && (this._fullPlayer ? true : false);
+        this._isFull = this._fullPlayer ? true : false;
     }
 
     get player() {
@@ -98,8 +99,10 @@ class NestedPlayer extends EventEmitter {
     }
 
     _loadOtherLesson(data) {
+        this._isSmallActive = false;
         if (data) {
             this._setAssetsList(data);
+            this.applyViewPorts();
             this._applyData(data)
         }
     }
@@ -137,9 +140,14 @@ class NestedPlayer extends EventEmitter {
 
     stop() {
         this.player.pause()
-        this._lesson = null
+            .then(() => {
+                store.dispatch(playerActions.stop())
+                store.dispatch(lessonActions.clearLessonPlayInfo());
+                this._fullPlayer = null;
+                this._smallPlayer = null;
+            })
         this._hasStoppedOnSwitch = false;
-        this._isHardStopped = true;
+
     }
 
     setPosition(begin) {
@@ -283,9 +291,7 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
 
-                if (!that._hasStoppedOnSwitch) {
-                    that.play()
-                } 
+                that.play()
             },
             onPaused: () => {
                 that.emit('pause');

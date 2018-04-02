@@ -1,6 +1,7 @@
 import {
     PLAYER_PLAYED,
     PLAYER_PAUSED,
+    PLAYER_STOPPED,
     PLAYER_SET_CURRENT_TIME,
     PLAYER_SET_TITLE,
     PLAYER_SET_MUTE_STATE,
@@ -13,20 +14,23 @@ import {
 } from '../constants/player'
 
 export const play = () => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_PLAYED,
-            payload: null
-        });
+    return {
+        type: PLAYER_PLAYED,
+        payload: null
     }
 };
 
 export const pause = () => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_PAUSED,
-            payload: null
-        });
+    return {
+        type: PLAYER_PAUSED,
+        payload: null
+    };
+};
+
+export const stop = () => {
+    return {
+        type: PLAYER_STOPPED,
+        payload: null
     }
 };
 

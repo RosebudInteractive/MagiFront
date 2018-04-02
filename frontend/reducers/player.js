@@ -1,6 +1,7 @@
 import {
     PLAYER_PLAYED,
     PLAYER_PAUSED,
+    PLAYER_STOPPED,
     PLAYER_SET_CURRENT_TIME,
     PLAYER_SET_TITLE,
     PLAYER_SET_MUTE_STATE,
@@ -20,6 +21,7 @@ const initialState = {
     currentTime: 0,
     currentContent: null,
     paused: true,
+    stopped: false,
     muted: false,
     volume: 0,
     rate: 0,
@@ -39,10 +41,13 @@ export default function player(state = initialState, action) {
         }
 
         case PLAYER_PLAYED:
-            return {...state, paused: false};
+            return {...state, paused: false, stopped: false};
 
         case PLAYER_PAUSED:
-            return {...state, paused: true};
+            return {...state, paused: true, stopped: false};
+
+        case PLAYER_STOPPED:
+            return initialState;
 
         case PLAYER_SET_CURRENT_TIME:
             if (state.currentTime !== action.payload) {

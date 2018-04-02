@@ -95,11 +95,9 @@ export const getLessonText = (courseUrl, lessonUrl) => {
 }
 
 export const clearLessonPlayInfo = () => {
-    return (dispatch) => {
-        dispatch({
-            type: CLEAR_LESSON_PLAY_INFO,
-            payload: null
-        });
+    return {
+        type: CLEAR_LESSON_PLAY_INFO,
+        payload: null
     }
 }
 
@@ -111,8 +109,6 @@ export const startLessonPlaying = (lessonInfo) => {
         });
     }
 }
-
-
 
 
 const checkStatus = (response) => {

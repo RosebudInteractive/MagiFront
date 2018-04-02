@@ -138,7 +138,7 @@ class App extends Component {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
-                <SmallPlayer visible={this.props.showSmallPlayer} lesson={this.props.lessonInfo.object} course={this.props.lessonInfo.course}/>
+                <SmallPlayer/>
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ? <PageFooter/> : null}
             </div>
@@ -151,10 +151,8 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
-        showSmallPlayer: state.app.showSmallPlayer,
-        lessonInfo: state.singleLesson,
-        ownProps,
         playInfo: state.player.playingLesson,
+        ownProps,
     }
 }
 
@@ -164,5 +162,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-// export default connect(mapStateToProps, mapDispatchToProps)(App)
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

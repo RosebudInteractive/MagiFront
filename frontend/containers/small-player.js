@@ -2,7 +2,6 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {Redirect} from 'react-router';
 import Swipeable from 'react-swipeable';
@@ -21,15 +20,6 @@ class SmallPlayer extends React.Component {
             redirect: false,
         }
     }
-
-    static propTypes = {
-        visible: PropTypes.bool.isRequired,
-        lesson: PropTypes.object,
-    };
-
-    static defaultProps = {
-        visible: false
-    };
 
     componentDidMount() {
         let _smallContainer = $('#small-player');
@@ -69,17 +59,17 @@ class SmallPlayer extends React.Component {
     }
 
     render() {
-        if ((this.state.redirect) && (this.props.course) && (this.props.lesson)) {
-            this.setState({redirect: false})
-            return <Redirect push to={'/' + this.props.course.URL + '/' + this.props.lesson.URL + '?play'}/>;
-        }
-
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _maximize = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#maximize"/>',
             _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
-        let {paused, playingLesson} = this.props;
+        let {paused, stopped, playingLesson, showSmallPlayer, isLessonMenuOpened} = this.props;
+
+        if ((this.state.redirect) && (this.props.playingLesson)) {
+            this.setState({redirect: false})
+            return <Redirect push to={'/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play'}/>;
+        }
 
         let _link = (playingLesson) ? '/' + playingLesson.courseUrl + '/' + playingLesson.lessonUrl + '?play' : '#',
             _text = (playingLesson) ?
@@ -87,11 +77,11 @@ class SmallPlayer extends React.Component {
                 :
                 null;
 
-        let _stopped = false; //Player.getInstance() ? Player.getInstance()._isHardStopped : false;
+        let _visible = playingLesson && showSmallPlayer && !isLessonMenuOpened
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
-                <div className={'small-player-frame' + ((this.props.visible && !_stopped) ? '' : ' hide')}
+                <div className={'small-player-frame' + ((_visible && !stopped) ? '' : ' hide')}
                      onClick={::this._onClick}>
                     <div className='ws-container-mini' id='small-player'/>
                     <div className='small-player__poster'/>
@@ -135,7 +125,10 @@ class SmallPlayer extends React.Component {
 function mapStateToProps(state) {
     return {
         paused: state.player.paused,
+        stopped: state.player.stopped,
         playingLesson: state.player.playingLesson,
+        showSmallPlayer: state.app.showSmallPlayer,
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }
 

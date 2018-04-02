@@ -19,7 +19,6 @@ class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
-        onLeavePage: PropTypes.func,
         isMain: PropTypes.bool,
     };
 
@@ -94,11 +93,6 @@ class Frame extends Component {
         }
 
         this._removeListeners();
-
-        if (this.props.onLeavePage) {
-            this.props.onLeavePage()
-        }
-
     }
 
     _removeListeners() {
@@ -258,8 +252,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerActions: bindActionCreators(playerActions, dispatch),
-        // pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-        // appActions: bindActionCreators(appActions, dispatch),
     }
 }
 
