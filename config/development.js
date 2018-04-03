@@ -5,9 +5,9 @@ module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     proxyServer: {
-        protocol: 'http',
-        address: '0.0.0.0',
-        port: 3000
+        protocol: 'https',
+        address: '172.16.0.12',
+        port: null
     },
     server: {
         protocol: 'http',

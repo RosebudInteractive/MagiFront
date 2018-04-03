@@ -87,11 +87,14 @@ module.exports = {
     },
     snets: {
         facebook: {
-            appId: '1584514044907807',
-            appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
+            appId: '591000364592228',
+            appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
+            callBack: '/api/facebook/callback',
+            // appId: '1584514044907807',
+            // appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
+            // callBack: '/oauth/facebook',
             profileURL: 'https://graph.facebook.com/v2.12/me',
             profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
-            callBack: '/oauth/facebook',
             passportOptions: {
                 display: 'popup',
                 scope: ['email', 'user_about_me', 'user_birthday', 'user_hometown']

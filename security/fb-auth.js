@@ -70,11 +70,11 @@ class AuthFB {
 
         passport.use(strategy);
 
-        if (sessionMiddleware) {
-            app.use(config.snets.facebook.callBack, sessionMiddleware.express);
-            app.use(config.snets.facebook.callBack, sessionMiddleware.passportInit);
-            app.use(config.snets.facebook.callBack, sessionMiddleware.passportSession);
-        }
+        // if (sessionMiddleware) {
+        //     app.use(config.snets.facebook.callBack, sessionMiddleware.express);
+        //     app.use(config.snets.facebook.callBack, sessionMiddleware.passportInit);
+        //     app.use(config.snets.facebook.callBack, sessionMiddleware.passportSession);
+        // }
 
         app.get('/api/fblogin', passport.authenticate('facebook', config.snets.facebook.passportOptions));
         app.get(config.snets.facebook.callBack, StdLoginProcessor('facebook'));
