@@ -326,9 +326,23 @@ export default class CWSPlayerDesign extends CWSPlayer {
         this._prepareElements();
     }
 
+    moveElements(e) {
+        var trackId = e.track;
+        var oldTrackId = e.oldTrackId;
+        var elemsData = e.elements;
+        var oldElementsData = e.oldTrackElements;
+
+        this._options.loader.changeElements(trackId, elemsData);
+        if (trackId != oldTrackId) {
+            this._options.loader.changeElements(oldTrackId, oldElementsData);
+        }
+        this._prepareElements();
+    }
+
     addTrack(track) {
         this._options.loader.addTrack(track);
     }
+
 }
 //    }
 //);

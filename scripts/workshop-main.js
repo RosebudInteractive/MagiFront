@@ -160,17 +160,6 @@ window.Utils = Utils;
             }
 
             function onMoveElement(e) {
-                var trackId = e.track;
-                var oldTrackId = e.oldTrackId;
-                var elemsData = e.elements;
-                var oldElementsData = e.oldTrackElements;
-                var track = findTrack(trackId);
-                var oldTrack = findTrack(oldTrackId);
-
-                if (!(track && oldTrack)) return;
-                track.elements = elemsData;
-                oldTrack.elements = oldElementsData;
-
             }
 
             function findTrack(id) {

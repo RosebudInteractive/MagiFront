@@ -226,7 +226,7 @@ export default class CWSTracks extends CWSBase {
                 size: size
             }).then((assetId) => {
                 let track = this._findTrackByElement(elemData.id);
-                let trItem = $("#" + track.id);
+                let trItem = $("#t_" + track.id);
                 elemData.asset = {
                     id: assetId
                 };
@@ -251,7 +251,7 @@ export default class CWSTracks extends CWSBase {
                 for (let j = 0; j < track.elements.length; j++) {
                     if (track.elements[j].id == data.id) {
                         track.elements[j] = data;
-                        trItem = $("#" + track.id);
+                        trItem = $("#t_" + track.id);
                         setTimeout(function () {
                             that._broadcastEditElement(trItem, track.elements);
                         });
@@ -285,7 +285,7 @@ export default class CWSTracks extends CWSBase {
                 let el = track.elements[j];
                 if (el.focused) {
                     track.elements.splice(j, 1);
-                    let item = $("#" + track.id);
+                    let item = $("#t_" + track.id);
                     this._broadcastEditElement(item, track.elements);
                 }
             }
@@ -1109,6 +1109,7 @@ export default class CWSTracks extends CWSBase {
                     oldTrack.elements.splice(i, 1);
                 }
             }
+            elementData.content.track = newTrack.id;
             newTrack.elements.push(elementData);
         }
 
@@ -1128,8 +1129,6 @@ export default class CWSTracks extends CWSBase {
             else
                 this._broadcastMoveElement(item, oldTrackId, newTrack.elements, oldTrack.elements);
         }
-
-
     }
 
     _broadcastMoveElement(item, oldTrackId, elementsData, oldTrackElementsData) {

@@ -79,10 +79,10 @@ export default class CWSPlayerElementDesign extends CWSPlayerElement {
             top = ui.position.top/contHeight * 100;
         }
 
-        this._options.data.position.bottom = bottom;
-        this._options.data.position.right = right;
-        this._options.data.position.left = left;
-        this._options.data.position.top = top;
+        this._options.data.content.position.bottom = bottom;
+        this._options.data.content.position.right = right;
+        this._options.data.content.position.left = left;
+        this._options.data.content.position.top = top;
     }
 
     _recalcPosition(event, ui) {
@@ -98,12 +98,12 @@ export default class CWSPlayerElementDesign extends CWSPlayerElement {
         if (contWidth > 0) left = pixLeft/contWidth * 100;
         if (contHeight > 0) top = pixTop/contHeight * 100;
 
-        this._options.data.position.right =
-            this._options.data.position.right - (left - this._options.data.position.left);
-        this._options.data.position.bottom =
-            this._options.data.position.bottom - (top - this._options.data.position.top);
-        this._options.data.position.left = left;
-        this._options.data.position.top = top;
+        this._options.data.content.position.right =
+            this._options.data.content.position.right - (left - this._options.data.content.position.left);
+        this._options.data.content.position.bottom =
+            this._options.data.content.position.bottom - (top - this._options.data.content.position.top);
+        this._options.data.content.position.left = left;
+        this._options.data.content.position.top = top;
 
     }
 
@@ -133,10 +133,10 @@ export default class CWSPlayerElementDesign extends CWSPlayerElement {
             this._options.onSetPosition({
                 trackElId: this._options.data.trackElement,
                 position: {
-                    bottom: this._options.data.position.bottom,
-                    right: this._options.data.position.right,
-                    left: this._options.data.position.left,
-                    top: this._options.data.position.top
+                    bottom: this._options.data.content.position.bottom,
+                    right: this._options.data.content.position.right,
+                    left: this._options.data.content.position.left,
+                    top: this._options.data.content.position.top
                 }
             });
     }
