@@ -64,7 +64,7 @@ class SmallPlayer extends React.Component {
             _maximize = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#maximize"/>',
             _close = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close"/>';
 
-        let {paused, stopped, playingLesson, showSmallPlayer, isLessonMenuOpened} = this.props;
+        let {paused, ended, playingLesson, showSmallPlayer, isLessonMenuOpened} = this.props;
 
         if ((this.state.redirect) && (this.props.playingLesson)) {
             this.setState({redirect: false})
@@ -81,7 +81,7 @@ class SmallPlayer extends React.Component {
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>
-                <div className={'small-player-frame' + ((_visible && !stopped) ? '' : ' hide')}
+                <div className={'small-player-frame' + ((_visible && !ended) ? '' : ' hide')}
                      onClick={::this._onClick}>
                     <div className='ws-container-mini' id='small-player'/>
                     <div className='small-player__poster'/>
@@ -126,6 +126,7 @@ function mapStateToProps(state) {
     return {
         paused: state.player.paused,
         stopped: state.player.stopped,
+        ended: state.player.ended,
         playingLesson: state.player.playingLesson,
         showSmallPlayer: state.app.showSmallPlayer,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

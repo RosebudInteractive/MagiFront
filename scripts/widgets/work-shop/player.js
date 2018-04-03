@@ -404,6 +404,9 @@ export default class CWSPlayer extends CWSBase {
                 console.log("PLAYER. onpause");
                 that._audioState.stopped = true;
                 that._broadcastPaused();
+                if (this.ended) {
+                    that._broadcastEnded();
+                }
             })
             .on("play", function () {
                 // that.play();
@@ -509,6 +512,11 @@ export default class CWSPlayer extends CWSBase {
     _broadcastStarted() {
         if (this._options.onStarted)
             this._options.onStarted();
+    }
+
+    _broadcastEnded() {
+        if (this._options.onEnded)
+            this._options.onEnded();
     }
 
     _broadcastError(e) {

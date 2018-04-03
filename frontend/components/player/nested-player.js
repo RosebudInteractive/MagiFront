@@ -291,6 +291,7 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
+                store.dispatch(playerActions.setCurrentTime(_state.currentTime))
 
                 that.play()
             },
@@ -301,6 +302,9 @@ class NestedPlayer extends EventEmitter {
             onStarted: () => {
                 that.emit('play');
                 store.dispatch(playerActions.play())
+            },
+            onEnded: () => {
+                store.dispatch(playerActions.end())
             }
         };
     }
