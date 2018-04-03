@@ -50,19 +50,19 @@ class LessonPage extends React.Component {
 
     componentWillReceiveProps(nextProps) {
 
-        // let _lesson = this._getLessonInfo(nextProps.lessonInfo);
-        //
-        // let _needStartPlay = (nextProps.params === '?play')
-        //
-        // if (_lesson && _needStartPlay) {
-        //     let _isPlayingLesson = nextProps.playInfo ? (nextProps.playInfo.id === _lesson.Id) : false;
-        //
-        //     if (_isPlayingLesson) {
-        //         this.props.appActions.switchToFullPlayer()
-        //     } else {
-        //         this.props.playerStartActions.startPlayLesson(_lesson)
-        //     }
-        // }
+        let _lesson = this._getLessonInfoByUrl(nextProps.lessonInfo, nextProps.courseUrl, nextProps.lessonUrl);
+
+        let _needStartPlay = (nextProps.params === '?play')
+
+        if (_lesson && _needStartPlay) {
+            let _isPlayingLesson = nextProps.playInfo ? (nextProps.playInfo.id === _lesson.Id) : false;
+
+            if (_isPlayingLesson) {
+                this.props.appActions.switchToFullPlayer()
+            } else {
+                this.props.playerStartActions.startPlayLesson(_lesson)
+            }
+        }
 
         let _needRedirect = (this.props.playInfo) &&
             (this.props.playInfo.lessonUrl === nextProps.lessonUrl) &&
@@ -75,27 +75,21 @@ class LessonPage extends React.Component {
             })
         }
 
-        let _needHideMenu = (this.props.lessonUrl === nextProps.lessonUrl) &&
-            (this.props.courseUrl === nextProps.courseUrl) &&
-            (this.props.params === nextProps.params)
-
-        if (_needHideMenu) {
-            this.props.appActions.hideLessonMenu()
-        }
     }
 
     componentDidUpdate(prevProps) {
-        let {lessonInfo, courseUrl, lessonUrl} = this.props;
+        let {lessonInfo} = this.props;
         this._mountFullpage();
 
-        let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
+        let _lesson = this._getLessonInfo(lessonInfo);
         if (!_lesson) {
             return
         }
 
-        let _needStartPlay = (this.props.params === '?play')
+        this.props.appActions.hideLessonMenu()
+        // let _needStartPlay = (this.props.params === '?play')
 
-        if (this._needStartPlayer || _needStartPlay) {
+        if (this._needStartPlayer ) {
             this._needStartPlayer = false;
 
             let _isPlayingLesson = this.props.playInfo ? (this.props.playInfo.id === _lesson.Id) : false;
@@ -106,7 +100,7 @@ class LessonPage extends React.Component {
                 this.props.playerStartActions.startPlayLesson(_lesson)
             }
 
-            this.props.playerStartActions.startPlayLesson(_lesson)
+            // this.props.playerStartActions.startPlayLesson(_lesson)
         }
 
         if ((this.props.courseUrl !== prevProps.courseUrl) || (this.props.lessonUrl !== prevProps.lessonUrl)) {

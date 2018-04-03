@@ -46,7 +46,7 @@ class Frame extends Component {
                 }
             }
 
-            that._hideAllTooltips = _needHide || that.state.showContent;
+            that._hideAllTooltips = _needHide || that.state.showContent || that.state.showRate;
             if (that._hideAllTooltips) {
                 that.setState({
                     showContent: false,
