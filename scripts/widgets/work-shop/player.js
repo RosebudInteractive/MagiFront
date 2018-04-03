@@ -360,7 +360,7 @@ export default class CWSPlayer extends CWSBase {
         audio
             .on("canplay", () => {
                 console.log('Can play');
-                that._broadcastAudioInitialized();
+                that._broadcastCanPlay();
             })
             .on("loadeddata", function () {
                 that._audioState.duration = this.duration;
@@ -502,6 +502,12 @@ export default class CWSPlayer extends CWSBase {
     _broadcastCurrentTimeChanged() {
         if (this._options.onCurrentTimeChanged)
             this._options.onCurrentTimeChanged(this.getAudioState());
+    }
+
+    _broadcastCanPlay() {
+        if (this._options.onCanPlay) {
+            this._options.onCanPlay()
+        }
     }
 
     _broadcastPaused() {

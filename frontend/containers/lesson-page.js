@@ -131,7 +131,6 @@ class LessonPage extends React.Component {
 
         this.props.appActions.hideLessonMenu()
 
-        // let _lesson = this._getLessonInfo(lessonInfo);
         let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
         if (!_lesson) {
             return
@@ -157,29 +156,6 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
-    }
-
-    _getLessonInfo(info) {
-        if (!info.object) {
-            return null
-        }
-
-        let _lesson;
-        if (this._activeLessonId) {
-            _lesson = info.object.Id === this._activeLessonId ?
-                info.object
-                :
-                info.object.Lessons.find((lesson) => {
-                    return lesson.Id === this._activeLessonId
-                })
-        }
-
-        if (!_lesson) {
-            let _subLesson = info.object.Lessons;
-            _lesson = !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
-        }
-
-        return _lesson
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
