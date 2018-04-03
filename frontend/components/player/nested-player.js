@@ -38,14 +38,13 @@ class NestedPlayer extends EventEmitter {
         this._fullPlayer = null;
         this._setAssetsList(playingData);
         this.applyViewPorts();
-        this._isHardStopped = false;
         this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
     }
 
 
     applyViewPorts() {
-        // let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
+        let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
 
         let _options = this._getPlayerOptions();
 
@@ -71,7 +70,13 @@ class NestedPlayer extends EventEmitter {
             this._smallPlayer.render();
         }
 
-        this.player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
+        this.player = _isSmallActive ?
+            this._smallPlayer
+            :
+            this._fullPlayer ?
+                this._fullPlayer
+                :
+                this._smallPlayer;
     }
 
     get player() {
@@ -89,26 +94,18 @@ class NestedPlayer extends EventEmitter {
         return this.player.getAudioState()
     }
 
-    get lesson() {
-        return this._lesson
-    }
-
-    get courseUrl() {
-        return this._courseUrl;
-    }
-
     _loadOtherLesson(data) {
 
-        this._isSmallActive = false;
         if (data) {
             this._setAssetsList(data);
             this.applyViewPorts();
             this._applyData(data)
         }
+
+        this._hasStoppedOnSwitch = false;
     }
 
     _setAssetsList(data) {
-        this._isHardStopped = false;
         this.assetsList = data.assets;
     }
 
@@ -127,7 +124,6 @@ class NestedPlayer extends EventEmitter {
     }
 
     pause() {
-        this._isHardStopped = false;
         this._hasStoppedOnSwitch = false;
         return this.player.pause()
     }
@@ -135,7 +131,6 @@ class NestedPlayer extends EventEmitter {
     play() {
         this.player.play()
         this._hasStoppedOnSwitch = false;
-        this._isHardStopped = false;
     }
 
     stop() {
@@ -182,6 +177,10 @@ class NestedPlayer extends EventEmitter {
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
                 this.player.play()
+            } else {
+                this._hasStoppedOnSwitch = true;
+                let _position = this.audioState.globalTime;
+                this.player.setPosition(_position);
             }
         }
     }
@@ -191,7 +190,6 @@ class NestedPlayer extends EventEmitter {
         if (!this._isFull) {
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
-            this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
                 this.player.play()
             } else {
@@ -293,7 +291,22 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setRate(_state.playbackRate))
                 store.dispatch(playerActions.setCurrentTime(_state.currentTime))
 
-                that.play()
+                // that.play()
+                that._hasStoppedOnSwitch = false
+            },
+            onCanPlay: () => {
+                let _state = that.player._audioState;
+
+                if (!that._hasStoppedOnSwitch) {
+                    if (_state.stopped) {
+                        that.play()
+                    }
+                }
+
+                store.dispatch(playerActions.setMuteState(_state.muted))
+                store.dispatch(playerActions.setVolume(_state.volume))
+                store.dispatch(playerActions.setRate(_state.playbackRate))
+                store.dispatch(playerActions.setCurrentTime(_state.currentTime))
             },
             onPaused: () => {
                 that.emit('pause');
