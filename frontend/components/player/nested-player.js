@@ -2,6 +2,7 @@ import EventEmitter from 'events'
 import $ from 'jquery'
 
 import * as playerActions from '../../actions/player-actions';
+import * as lessonActions from '../../actions/lesson-actions';
 import {store} from '../../store/configureStore';
 
 import Player from "work-shop/player";
@@ -26,25 +27,51 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
+let fullViewPort = null,
+    smallViewPort = null;
+
 class NestedPlayer extends EventEmitter {
 
-    constructor(options) {
+    constructor(playingData) {
         super();
-        this._options = this._getPlayerOptions();
-        this._fullPlayer = new Player(options.div, this._options);
-        this._smallPlayer = new Player(options.smallDiv, this._options);
-        this._player = this._fullPlayer;
-        this._isFull = true;
+        this._playingData = null;
+        this._fullPlayer = null;
+        this._setAssetsList(playingData);
+        this.applyViewPorts();
         this._isHardStopped = false;
-        this._canEmit = true;
+        this._hasStoppedOnSwitch = false;
+        this._applyData(playingData)
+    }
 
 
-        this._applyOptions(options);
-        this._fullPlayer.render();
-        this._smallPlayer.render();
-        if (options.data) {
-            this._applyData(options.data)
+    applyViewPorts() {
+        // let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
+
+        let _options = this._getPlayerOptions();
+
+        if (fullViewPort && (this._fullDiv !== fullViewPort)) {
+            this._fullDiv = fullViewPort;
+            if (!this._fullPlayer) {
+                this._fullPlayer = new Player(fullViewPort, _options);
+                this._fullPlayer.render();
+            } else {
+                if (this._playingData) {
+                    this._fullPlayer.initContainer(this._fullDiv);
+                    this._setAssetsList(this._playingData);
+                    this._fullPlayer.render();
+                    this._applyData(this._playingData)
+                }
+            }
+
         }
+
+        if (smallViewPort && ((this._smallDiv !== smallViewPort) || !this._smallPlayer)) {
+            this._smallDiv = smallViewPort;
+            this._smallPlayer = new Player(smallViewPort, _options);
+            this._smallPlayer.render();
+        }
+
+        this.player = this._fullPlayer ? this._fullPlayer : this._smallPlayer;
     }
 
     get player() {
@@ -70,54 +97,58 @@ class NestedPlayer extends EventEmitter {
         return this._courseUrl;
     }
 
-    _loadOtherLesson(options) {
-        this._fullPlayer.initContainer(options.div);
-        this._smallPlayer.initContainer(options.smallDiv);
+    _loadOtherLesson(data) {
 
-        this._applyOptions(options);
-        this._fullPlayer.render();
-        this._smallPlayer.render();
-        if (options.data) {
-            this._applyData(options.data)
+        this._isSmallActive = false;
+        if (data) {
+            this._setAssetsList(data);
+            this.applyViewPorts();
+            this._applyData(data)
         }
     }
 
-    _applyOptions(options) {
+    _setAssetsList(data) {
         this._isHardStopped = false;
-        if (options.data) {
-            this.assetsList = options.data.assets;
-        }
-        this._onRenderContent = options.onRenderContent;
-        this._onCurrentTimeChanged = options.onCurrentTimeChanged;
-        this._onChangeTitle = options.onChangeTitle;
-        this._onChangeContent = options.onChangeContent;
-        this._onAudioLoaded = options.onAudioLoaded;
-        this._courseUrl = options.courseUrl;
-        this._lesson = options.lesson;
+        this.assetsList = data.assets;
     }
 
     _applyData(data) {
-        this._fullPlayer.setData(data);
-        this._smallPlayer.setData(data);
+        if (this._fullPlayer) {
+            this._fullPlayer.setData(data);
+        }
 
-        let content = this._fullPlayer.getLectureContent();
+        if (this._smallPlayer) {
+            this._smallPlayer.setData(data);
+        }
+
+        let content = this._fullPlayer ? this._fullPlayer.getLectureContent() : this._smallPlayer.getLectureContent();
         this._renderContent(content);
+        this._playingData = data;
     }
 
     pause() {
         this._isHardStopped = false;
+        this._hasStoppedOnSwitch = false;
         return this.player.pause()
     }
 
     play() {
         this.player.play()
+        this._hasStoppedOnSwitch = false;
         this._isHardStopped = false;
     }
 
     stop() {
         this.player.pause()
-        this._lesson = null
-        this._isHardStopped = true;
+            .then(() => {
+                store.dispatch(playerActions.stop())
+                store.dispatch(lessonActions.clearLessonPlayInfo());
+                this._fullPlayer = null;
+                this._smallPlayer = null;
+                this._playingData = null;
+            })
+        this._hasStoppedOnSwitch = false;
+
     }
 
     setPosition(begin) {
@@ -150,11 +181,7 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._fullPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
-                    .then(() => {
-                        this.player.play()
-                    })
-
+                this.player.play()
             }
         }
     }
@@ -166,12 +193,9 @@ class NestedPlayer extends EventEmitter {
             let _oldPlayer = this._smallPlayer;
             this.player.setPosition(_oldPlayer.getPosition());
             if (!_oldPlayer.getStopped()) {
-                _oldPlayer.pause()
-                    .then(() => {
-                    this.player.play();
-                    })
-
+                this.player.play()
             } else {
+                this._hasStoppedOnSwitch = true;
                 let _position = this.audioState.globalTime;
                 this.player.setPosition(_position);
             }
@@ -215,7 +239,7 @@ class NestedPlayer extends EventEmitter {
                 });
             },
             onCurrentTimeChanged: (e) => {
-                if (that._onCurrentTimeChanged && that._canEmit) {
+                if (that._onCurrentTimeChanged) {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
 
@@ -238,7 +262,7 @@ class NestedPlayer extends EventEmitter {
                     }
                 });
 
-                if (that._onChangeTitle && that._canEmit) {
+                if (that._onChangeTitle) {
                     that._onChangeTitle(html)
                 }
 
@@ -255,18 +279,20 @@ class NestedPlayer extends EventEmitter {
                 let _state = that.player._audioState;
 
                 if (that._onAudioLoaded) {
-                     that._onAudioLoaded({
-                         currentTime: _state.currentTime,
-                         muted: _state.muted,
-                         rate: _state.playbackRate,
-                         volume: _state.volume,
-                         paused: _state.stopped
-                     })
+                    that._onAudioLoaded({
+                        currentTime: _state.currentTime,
+                        muted: _state.muted,
+                        rate: _state.playbackRate,
+                        volume: _state.volume,
+                        paused: _state.stopped
+                    })
                 }
 
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
+
+                that.play()
             },
             onPaused: () => {
                 that.emit('pause');
@@ -363,4 +389,26 @@ export default (options) => {
 
 export const getInstance = () => {
     return _instance
+}
+
+export const loadPlayInfo = (data) => {
+    if (!_instance) {
+        _instance = new NestedPlayer(data)
+    } else {
+        _instance._loadOtherLesson(data)
+    }
+}
+
+export const setSmallViewPort = (div) => {
+    smallViewPort = div
+    if (_instance) {
+        _instance.applyViewPorts()
+    }
+}
+
+export const setFullViewPort = (div) => {
+    fullViewPort = div
+    if (_instance) {
+        _instance.applyViewPorts()
+    }
 }

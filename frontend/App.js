@@ -3,13 +3,12 @@ import './App.css';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
-import {Switch, Route, } from 'react-router-dom'
+import {Switch, Route, withRouter} from 'react-router-dom'
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
-import Player from './containers/player';
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -25,6 +24,8 @@ import SmallPlayer from "./containers/small-player";
 
 Polifyll.registry();
 
+let _homePath = '/';
+
 class App extends Component {
 
     constructor(props) {
@@ -39,9 +40,6 @@ class App extends Component {
             height: 0,
         };
         this._handleScroll = this._handleScroll.bind(this);
-        // this._narrowerThan = tools.narrowerThan.bind(this);
-        // this._widerThan = tools.widerThan.bind(this);
-        // this._widthBetween = tools.widthBetween.bind(this);
     }
 
     get width() {
@@ -79,12 +77,23 @@ class App extends Component {
         window.addEventListener("resize", this.updateDimensions.bind(this));
         window.addEventListener('scroll', this._handleScroll);
 
-        let tooltips = $('.js-language, .js-user-block, .js-speed, .js-contents, .js-share');
+        let tooltips = $('.js-language, .js-user-block');
         $(document).mouseup(function (e) {
             if (tooltips.has(e.target).length === 0){
                 tooltips.removeClass('opened');
             }
         });
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.ownProps.location.pathname != nextProps.ownProps.location.pathname) {
+            if (nextProps.playInfo) {
+                let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
+                if (nextProps.ownProps.location.pathname !== _targetUrl) {
+                    this.props.appActions.switchToSmallPlayer()
+                }
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -113,13 +122,10 @@ class App extends Component {
     }
 
     _getMainDiv() {
-        let _homePath = '/';
-
         return (
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
-                <Route path={_homePath + 'play-lesson/:courseUrl/:lessonUrl/:state'} component={Player}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
@@ -132,7 +138,7 @@ class App extends Component {
         return (
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
-                <SmallPlayer visible={this.props.showSmallPlayer} lesson={this.props.lessonInfo.object} course={this.props.lessonInfo.course}/>
+                <SmallPlayer/>
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ? <PageFooter/> : null}
             </div>
@@ -145,8 +151,7 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
-        showSmallPlayer: state.app.showSmallPlayer,
-        lessonInfo: state.singleLesson,
+        playInfo: state.player.playingLesson,
         ownProps,
     }
 }
@@ -157,5 +162,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App)
-// export default withRouter(connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(App))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

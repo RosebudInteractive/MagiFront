@@ -5,8 +5,8 @@ import PropTypes from 'prop-types';
 
 import * as playerStartActions from '../../actions/player-start-actions'
 
-// import $ from 'jquery'
-// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
+import $ from 'jquery'
+import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 
 class ContentTooltip extends Component {
 
@@ -27,32 +27,11 @@ class ContentTooltip extends Component {
         visible: false,
     };
 
-    componentDidMount() {
-        // let that = this;
-        // let tooltips = $('.js-contents');
-        //
-        // $(document).mouseup((e) => {
-        //     let _needHide = false;
-        //     if (tooltips.has(e.target).length === 0) {
-        //         _needHide = _needHide || tooltips.hasClass('opened');
-        //         if (_needHide) {
-        //             tooltips.removeClass('opened');
-        //         }
-        //     }
-        //
-        //     that._hideAllTooltips = _needHide;
-        //     if (_needHide) {
-        //         that.setState({
-        //             showContent: false,
-        //             showRate: false,
-        //         })
-        //     }
-        // });
-    }
+    componentDidMount() {}
 
     componentDidUpdate(prevProps) {
-        let _contentHasChanged = this.props.content.length && (prevProps.content.length !== this.props.content.length),
-            _scrollWasUnmounted = this.props.content.length && !this._scrollMounted;
+        let _contentHasChanged = this.props.contentArray.length && (prevProps.contentArray.length !== this.props.contentArray.length),
+            _scrollWasUnmounted = this.props.contentArray.length && !this._scrollMounted;
 
         if (_contentHasChanged || _scrollWasUnmounted) {
             this._mountCustomScroll();
@@ -64,14 +43,20 @@ class ContentTooltip extends Component {
     }
 
     _mountCustomScroll() {
-        // $("#content" + this.props.id).mCustomScrollbar();
-        this._scrollMounted = true;
+        let _div = $('#contents' + this.props.id);
+        if (_div.length && _div[0].childElementCount) {
+            _div.mCustomScrollbar();
+            this._scrollMounted = true;
+        }
     }
 
     _unmountCustomScroll() {
         if (this._scrollMounted) {
-            // $("#content" + this.props.id).mCustomScrollbar('destroy');
-            this._scrollMounted = false
+            let _div = $('#contents' + this.props.id);
+            if (_div.length) {
+                $(".scrollable").mCustomScrollbar('destroy');
+                this._scrollMounted = false
+            }
         }
     }
 
@@ -94,12 +79,11 @@ class ContentTooltip extends Component {
 
     render() {
         return (
-            <div className={"contents-tooltip js-player-tooltip js-contents scrollable" + (this.props.visible ? ' opened' : '')}
-                 id={'content' + this.props.id}>
+            <div className={"contents-tooltip js-player-tooltip js-contents" + (this.props.visible ? ' opened' : '')}>
                 <header className="contents-tooltip__header">
                     <p className="contents-tooltip__title">Оглавление</p>
                 </header>
-                <ol className="contents-tooltip__body scrollable">
+                <ol className="contents-tooltip__body scrollable" id={'contents' + this.props.id}>
                     {this._getContent()}
                 </ol>
             </div>

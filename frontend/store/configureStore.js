@@ -8,6 +8,7 @@ import thunk from 'redux-thunk';
 import {routerMiddleware} from 'react-router-redux'
 import history from '../history'
 import playerMiddleware from './player-middleware';
+import loaderMiddleware from './loader-middleware';
 
 export const store = configureStore();
 
@@ -23,7 +24,8 @@ function configureStore(initialState) {
                 // responsiveStoreEnhancer,
                 applyMiddleware(thunk, logger),
                 applyMiddleware(routerMiddl),
-                applyMiddleware(playerMiddleware)
+                applyMiddleware(playerMiddleware),
+                applyMiddleware(loaderMiddleware),
             )
         ) :
         createStore(
@@ -33,6 +35,7 @@ function configureStore(initialState) {
                 applyMiddleware(thunk),
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
+                applyMiddleware(loaderMiddleware),
             )
         );
 

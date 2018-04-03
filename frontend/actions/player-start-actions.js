@@ -1,4 +1,5 @@
 import {
+    PLAYER_START_PLAY_LESSON,
     PLAYER_START_PLAY,
     PLAYER_START_PAUSE,
     PLAYER_START_STOP,
@@ -7,6 +8,15 @@ import {
     PLAYER_START_SET_VOLUME,
     PLAYER_START_SET_RATE,
 } from '../constants/player'
+
+export const startPlayLesson = (lesson) => {
+    return (dispatch) => {
+        dispatch({
+            type: PLAYER_START_PLAY_LESSON,
+            payload: lesson
+        });
+    }
+};
 
 export const startPlay = () => {
     return (dispatch) => {

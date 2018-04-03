@@ -1,6 +1,7 @@
 import {
     PLAYER_PLAYED,
     PLAYER_PAUSED,
+    PLAYER_STOPPED,
     PLAYER_SET_CURRENT_TIME,
     PLAYER_SET_TITLE,
     PLAYER_SET_MUTE_STATE,
@@ -12,10 +13,15 @@ import {
 
 import * as tools from '../tools/time-tools'
 
+import {
+    SET_LESSON_PLAY_INFO_LOADED,
+} from '../constants/lesson'
+
 const initialState = {
     currentTime: 0,
     currentContent: null,
     paused: true,
+    stopped: false,
     muted: false,
     volume: 0,
     rate: 0,
@@ -24,19 +30,31 @@ const initialState = {
     totalDurationFmt: '',
     totalDuration: 0,
     contentArray: [],
+    playingLesson: null,
 };
 
 export default function player(state = initialState, action) {
 
     switch (action.type) {
+        case SET_LESSON_PLAY_INFO_LOADED: {
+            return {...state, playingLesson: Object.assign({}, action.payload)}
+        }
+
         case PLAYER_PLAYED:
-            return {...state, paused: false};
+            return {...state, paused: false, stopped: false};
 
         case PLAYER_PAUSED:
-            return {...state, paused: true};
+            return {...state, paused: true, stopped: false};
+
+        case PLAYER_STOPPED:
+            return initialState;
 
         case PLAYER_SET_CURRENT_TIME:
-            return {...state, currentTime: action.payload};
+            if (state.currentTime !== action.payload) {
+                return {...state, currentTime: action.payload}
+            } else {
+                return state
+            }
 
         case PLAYER_SET_TITLE: {
             if (state.title !== action.payload) {

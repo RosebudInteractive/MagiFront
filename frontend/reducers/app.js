@@ -10,7 +10,6 @@ const initialState = {
     size: null,
     showSmallPlayer: false,
     isLessonMenuOpened: false,
-    menuId: '',
 };
 
 export default function app(state = initialState, action) {
@@ -26,10 +25,10 @@ export default function app(state = initialState, action) {
             return {...state, showSmallPlayer: false};
 
         case SHOW_LESSON_MENU:
-            return {...state, isLessonMenuOpened: true, menuId: action.payload};
+            return {...state, isLessonMenuOpened: true};
 
         case HIDE_LESSON_MENU:
-            return {...state, isLessonMenuOpened: false, menu: ''};
+            return {...state, isLessonMenuOpened: false};
 
         default:
             return state;

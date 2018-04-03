@@ -8,9 +8,6 @@ import {
     GET_LESSON_TEXT_REQUEST,
     GET_LESSON_TEXT_SUCCESS,
     GET_LESSON_TEXT_FAIL,
-    GET_LESSON_PLAY_INFO_REQUEST,
-    GET_LESSON_PLAY_INFO_SUCCESS,
-    GET_LESSON_PLAY_INFO_FAIL,
     CLEAR_LESSON_PLAY_INFO,
     START_LESSON_PLAYING,
 } from '../constants/lesson'
@@ -29,7 +26,6 @@ export const getLesson = (courseUrl, lessonUrl) => {
             .then(parseJSON)
             .then(data => {
                 handleData(data);
-
                 dispatch({
                     type: GET_LESSON_SUCCESS,
                     payload: data
@@ -98,40 +94,10 @@ export const getLessonText = (courseUrl, lessonUrl) => {
     }
 }
 
-
-export const getLessonPlayInfo = (lessonId) => {
-    return (dispatch) => {
-        dispatch({
-            type: GET_LESSON_PLAY_INFO_REQUEST,
-            payload: null
-        });
-
-        fetch('/api/lessons/play/' + lessonId, {credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                // handleTextData(data);
-
-                dispatch({
-                    type: GET_LESSON_PLAY_INFO_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((err) => {
-                dispatch({
-                    type: GET_LESSON_PLAY_INFO_FAIL,
-                    payload: err
-                });
-            });
-    }
-}
-
 export const clearLessonPlayInfo = () => {
-    return (dispatch) => {
-        dispatch({
-            type: CLEAR_LESSON_PLAY_INFO,
-            payload: null
-        });
+    return {
+        type: CLEAR_LESSON_PLAY_INFO,
+        payload: null
     }
 }
 
@@ -143,8 +109,6 @@ export const startLessonPlaying = (lessonInfo) => {
         });
     }
 }
-
-
 
 
 const checkStatus = (response) => {
@@ -175,8 +139,10 @@ const parseJSON = (response) => {
 //
 const handleData = (data) => {
     let _lesson = data.Lesson;
+    _lesson.courseUrl = data.Course.URL;
     let _parentNumber = _lesson.Number;
     _lesson.Lessons.forEach((lesson) => {
+        lesson.courseUrl = data.Course.URL;
         lesson.Number = _parentNumber + '.' + lesson.Number
     })
 };

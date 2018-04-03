@@ -34,9 +34,9 @@ export const hideLessonMenu = (id) => {
     }
 }
 
-export const showLessonMenu = (id) => {
+export const showLessonMenu = () => {
     return {
         type: SHOW_LESSON_MENU,
-        payload: id
+        payload: null
     }
 }

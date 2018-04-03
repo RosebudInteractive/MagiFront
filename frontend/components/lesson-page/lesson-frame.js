@@ -20,7 +20,7 @@ export default class LessonFrame extends React.Component {
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
 
         return (
-            <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
+            <div className="lecture-frame">
                 <div className="lecture-frame__header">
                     <div className="lecture-frame__play-link">
                         {this.props.isMain ? null :

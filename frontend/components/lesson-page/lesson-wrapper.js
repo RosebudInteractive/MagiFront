@@ -1,4 +1,6 @@
 import React from 'react';
+// import {bindActionCreators} from 'redux';
+// import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
@@ -7,12 +9,11 @@ import PlayerFrame from '../player/frame'
 import LessonFrame from './lesson-frame';
 
 
-export default class LessonWrapper extends React.Component {
+export default class Wrapper extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
         courseUrl: PropTypes.string.isRequired,
-        lessonCount: PropTypes.number.isRequired,
         isMain: PropTypes.bool,
         active: PropTypes.string.isRequired,
         isPlayer: PropTypes.bool.isRequired
@@ -24,18 +25,14 @@ export default class LessonWrapper extends React.Component {
     };
 
     render() {
+        let {isPlayer} = this.props;
 
         return (
             <section className='fullpage-section lecture-wrapper'
                      style={{backgroundImage: "url(" + '/data/' + this.props.lesson.Cover + ")"}}>
-                <Menu {...this.props}
-                      current={this.props.lesson.Number}
-                      active={this.props.active}
-                      total={this.props.lessonCount}
-                      id={'lesson-menu-' + this.props.lesson.Id}
-                />
+                <Menu {...this.props} current={this.props.lesson.Number} id={'lesson-menu-' + this.props.lesson.Id}/>
                 {
-                    (this.props.isPlayer && !this.props.paused) ?
+                    (isPlayer && !this.props.paused) ?
                         <div className='player-wrapper'>
                             <Link to={this.props.lesson.URL + "/transcript"}
                                   className={"link-to-transcript _reduced"}>
