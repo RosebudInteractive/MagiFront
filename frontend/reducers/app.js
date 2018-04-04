@@ -19,16 +19,32 @@ export default function app(state = initialState, action) {
             return {...state, size: action.payload};
 
         case SWITCH_TO_SMALL_PLAYER:
-            return {...state, showSmallPlayer: true};
+            if (state.showSmallPlayer !== action.payload) {
+                return {...state, showSmallPlayer: true};
+            } else {
+                return state
+            }
 
         case SWITCH_TO_FULL_PLAYER:
-            return {...state, showSmallPlayer: false};
+            if (state.showSmallPlayer !== action.payload) {
+                return {...state, showSmallPlayer: false};
+            } else {
+                return state
+            }
 
         case SHOW_LESSON_MENU:
-            return {...state, isLessonMenuOpened: true};
+            if (state.isLessonMenuOpened !== action.payload) {
+                return {...state, isLessonMenuOpened: true};
+            } else {
+                return state
+            }
 
         case HIDE_LESSON_MENU:
-            return {...state, isLessonMenuOpened: false};
+            if (state.isLessonMenuOpened !== action.payload) {
+                return {...state, isLessonMenuOpened: false};
+            } else {
+                return state
+            }
 
         default:
             return state;

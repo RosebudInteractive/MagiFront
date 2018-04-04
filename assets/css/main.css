@@ -6660,7 +6660,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     min-height: -webkit-calc(100vh - 54px);
     min-height: calc(100vh - 54px);
     color: #fff;
-    background-color: rgba(47, 47, 47, 0.98); }
+    background-color: rgba(47, 47, 47, 0.9); }
   .lectures-list-wrapper._dark {
     background-color: #2f2f2f; }
     .lectures-list-wrapper._dark .lectures-list__item-header {
@@ -11295,6 +11295,9 @@ ul.lectures-tab {
     @media (max-width: 600px) {
       .contents-tooltip:after {
         display: none; } }
+  .contents-tooltip_item {
+    cursor: pointer;
+  }
   .contents-tooltip__header {
     margin-right: 16px;
     padding-top: 14px;

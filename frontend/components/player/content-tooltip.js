@@ -27,14 +27,21 @@ class ContentTooltip extends Component {
         visible: false,
     };
 
-    componentDidMount() {}
+    componentDidMount() {
+        this._mountCustomScroll()
+    }
 
-    componentDidUpdate(prevProps) {
-        let _contentHasChanged = this.props.contentArray.length && (prevProps.contentArray.length !== this.props.contentArray.length),
-            _scrollWasUnmounted = this.props.contentArray.length && !this._scrollMounted;
+    componentWillReceiveProps(nextProps){
+        let _contentHasChanged = (nextProps.contentArray.length !== this.props.contentArray.length);
+        if (_contentHasChanged) {
+            this._unmountCustomScroll();
+        }
+    }
 
-        if (_contentHasChanged || _scrollWasUnmounted) {
-            this._mountCustomScroll();
+    componentDidUpdate() {
+        let _scrollWasUnmounted = this.props.contentArray.length && !this._scrollMounted;
+        if (_scrollWasUnmounted) {
+            this._mountCustomScroll()
         }
     }
 
@@ -54,7 +61,7 @@ class ContentTooltip extends Component {
         if (this._scrollMounted) {
             let _div = $('#contents' + this.props.id);
             if (_div.length) {
-                $(".scrollable").mCustomScrollbar('destroy');
+                _div.mCustomScrollbar('destroy');
                 this._scrollMounted = false
             }
         }
@@ -67,10 +74,10 @@ class ContentTooltip extends Component {
             let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0;
 
             return <li className={(_currContentId === item.id) ? 'active' : ''} key={index}
-                       onClick={() => that._goToContent(item.begin)}>
-                <a href='#'>{item.title}</a>
+                       onClick={() => {that._goToContent(item.begin)}}>
+                <div className='contents-tooltip_item'>{item.title}</div>
             </li>
-        })
+        }, this)
     }
 
     _goToContent(begin) {
@@ -79,7 +86,7 @@ class ContentTooltip extends Component {
 
     render() {
         return (
-            <div className={"contents-tooltip js-player-tooltip js-contents" + (this.props.visible ? ' opened' : '')}>
+            <div className={"contents-tooltip js-player-tooltip js-contents opened"}>
                 <header className="contents-tooltip__header">
                     <p className="contents-tooltip__title">Оглавление</p>
                 </header>

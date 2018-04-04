@@ -79,14 +79,14 @@ class App extends Component {
 
         let tooltips = $('.js-language, .js-user-block');
         $(document).mouseup(function (e) {
-            if (tooltips.has(e.target).length === 0){
+            if (tooltips.has(e.target).length === 0) {
                 tooltips.removeClass('opened');
             }
         });
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.ownProps.location.pathname != nextProps.ownProps.location.pathname) {
+        if (this.props.ownProps.location.pathname !== nextProps.ownProps.location.pathname) {
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
                 if (nextProps.ownProps.location.pathname !== _targetUrl) {
@@ -140,7 +140,8 @@ class App extends Component {
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
-                {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ? <PageFooter/> : null}
+                {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
+                    <PageFooter/> : null}
             </div>
         );
     }

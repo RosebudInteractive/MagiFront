@@ -1,6 +1,7 @@
 import {
     SWITCH_SIZE_TO,
     SWITCH_TO_SMALL_PLAYER,
+    DUMMY_SWITCH_TO_SMALL_PLAYER,
     SWITCH_TO_FULL_PLAYER,
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
@@ -14,9 +15,20 @@ export const switchSizeTo = (size) => {
 };
 
 export const switchToSmallPlayer = () => {
-    return {
-        type: SWITCH_TO_SMALL_PLAYER,
-        payload: null
+    return (dispatch, getState) => {
+        let _playerState = getState().player
+
+        if (!_playerState.paused) {
+            dispatch({
+                type: SWITCH_TO_SMALL_PLAYER,
+                payload: null
+            });
+        } else {
+            dispatch({
+                type: DUMMY_SWITCH_TO_SMALL_PLAYER,
+                payload: null
+            })
+        }
     }
 }
 
@@ -27,10 +39,10 @@ export const switchToFullPlayer = () => {
     }
 }
 
-export const hideLessonMenu = (id) => {
+export const hideLessonMenu = () => {
     return {
         type: HIDE_LESSON_MENU,
-        payload: id
+        payload: null
     }
 }
 

@@ -19,6 +19,7 @@ import {
 import {
     SWITCH_TO_SMALL_PLAYER,
     SWITCH_TO_FULL_PLAYER,
+    DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
 
 const playerMiddleware = store => next => action => {
@@ -101,6 +102,14 @@ const playerMiddleware = store => next => action => {
         }
 
         case SWITCH_TO_SMALL_PLAYER: {
+            let _player = Player.getInstance();
+            if (_player) {
+                _player.switchToSmall()
+            }
+            return next(action)
+        }
+
+        case DUMMY_SWITCH_TO_SMALL_PLAYER: {
             let _player = Player.getInstance();
             if (_player) {
                 _player.switchToSmall()
