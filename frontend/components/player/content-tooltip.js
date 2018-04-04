@@ -27,7 +27,9 @@ class ContentTooltip extends Component {
         visible: false,
     };
 
-    componentDidMount() {}
+    componentDidMount() {
+        this._mountCustomScroll()
+    }
 
     componentWillReceiveProps(nextProps){
         let _contentHasChanged = (nextProps.contentArray.length !== this.props.contentArray.length);
@@ -72,10 +74,10 @@ class ContentTooltip extends Component {
             let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0;
 
             return <li className={(_currContentId === item.id) ? 'active' : ''} key={index}
-                       onClick={() => that._goToContent(item.begin)}>
-                <a href='#'>{item.title}</a>
+                       onClick={() => {that._goToContent(item.begin)}}>
+                <div className='contents-tooltip_item'>{item.title}</div>
             </li>
-        })
+        }, this)
     }
 
     _goToContent(begin) {
@@ -84,7 +86,7 @@ class ContentTooltip extends Component {
 
     render() {
         return (
-            <div className={"contents-tooltip js-player-tooltip js-contents" + (this.props.visible ? ' opened' : '')}>
+            <div className={"contents-tooltip js-player-tooltip js-contents opened"}>
                 <header className="contents-tooltip__header">
                     <p className="contents-tooltip__title">Оглавление</p>
                 </header>

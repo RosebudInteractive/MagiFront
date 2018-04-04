@@ -11295,6 +11295,9 @@ ul.lectures-tab {
     @media (max-width: 600px) {
       .contents-tooltip:after {
         display: none; } }
+  .contents-tooltip_item {
+    cursor: pointer;
+  }
   .contents-tooltip__header {
     margin-right: 16px;
     padding-top: 14px;
