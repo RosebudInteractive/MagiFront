@@ -212,7 +212,7 @@ class NestedPlayer extends EventEmitter {
         let that = this;
 
         return {
-            designMode: true,
+            designMode: false,
             loader: new Loader(),
             onGetAssets: (e) => {
                 return new Promise((resolve, reject) => {
