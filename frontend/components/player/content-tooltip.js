@@ -29,12 +29,17 @@ class ContentTooltip extends Component {
 
     componentDidMount() {}
 
-    componentDidUpdate(prevProps) {
-        let _contentHasChanged = this.props.contentArray.length && (prevProps.contentArray.length !== this.props.contentArray.length),
-            _scrollWasUnmounted = this.props.contentArray.length && !this._scrollMounted;
+    componentWillReceiveProps(nextProps){
+        let _contentHasChanged = (nextProps.contentArray.length !== this.props.contentArray.length);
+        if (_contentHasChanged) {
+            this._unmountCustomScroll();
+        }
+    }
 
-        if (_contentHasChanged || _scrollWasUnmounted) {
-            this._mountCustomScroll();
+    componentDidUpdate() {
+        let _scrollWasUnmounted = this.props.contentArray.length && !this._scrollMounted;
+        if (_scrollWasUnmounted) {
+            this._mountCustomScroll()
         }
     }
 
@@ -54,7 +59,7 @@ class ContentTooltip extends Component {
         if (this._scrollMounted) {
             let _div = $('#contents' + this.props.id);
             if (_div.length) {
-                $(".scrollable").mCustomScrollbar('destroy');
+                _div.mCustomScrollbar('destroy');
                 this._scrollMounted = false
             }
         }

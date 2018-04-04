@@ -2,6 +2,7 @@ import {
     PLAYER_PLAYED,
     PLAYER_PAUSED,
     PLAYER_STOPPED,
+    PLAYER_ENDED,
     PLAYER_SET_CURRENT_TIME,
     PLAYER_SET_TITLE,
     PLAYER_SET_MUTE_STATE,
@@ -33,6 +34,13 @@ export const stop = () => {
         payload: null
     }
 };
+
+export const end = () => {
+    return {
+        type: PLAYER_ENDED,
+        payload: null
+    }
+}
 
 export const setCurrentTime = (time) => {
     return {

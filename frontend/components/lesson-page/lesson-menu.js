@@ -27,6 +27,14 @@ class Menu extends React.Component {
         this.props.appActions.hideLessonMenu()
     }
 
+    componentDidUpdate() {
+        if (this.props.isLessonMenuOpened) {
+            this._hideNavigationButtons()
+        } else {
+            this._showNavigationButtons()
+        }
+    }
+
     _switchMenu() {
         if (this.props.isLessonMenuOpened) {
             this.props.appActions.hideLessonMenu()
@@ -35,11 +43,11 @@ class Menu extends React.Component {
         }
     }
 
-    _hideMenu() {
-        $('#fp-nav').toggleClass('hide');
+    _hideNavigationButtons() {
+        $('#fp-nav').addClass('hide');
     }
 
-    _showNavigationMenu() {
+    _showNavigationButtons() {
         $('#fp-nav').removeClass('hide');
     }
 

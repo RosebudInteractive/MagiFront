@@ -27,10 +27,10 @@ export const switchToFullPlayer = () => {
     }
 }
 
-export const hideLessonMenu = (id) => {
+export const hideLessonMenu = () => {
     return {
         type: HIDE_LESSON_MENU,
-        payload: id
+        payload: null
     }
 }
 

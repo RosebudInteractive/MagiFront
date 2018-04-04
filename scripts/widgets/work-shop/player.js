@@ -201,7 +201,7 @@ export default class CWSPlayer extends CWSBase {
         audio
             .on("canplay", () => {
                 console.log('Can play');
-                that._broadcastAudioInitialized();
+                that._broadcastCanPlay();
             })
             .on("loadeddata", function () {
                that._onAudioLoadedHandler(this);
@@ -242,6 +242,9 @@ export default class CWSPlayer extends CWSBase {
                 console.log("PLAYER. onpause");
                 that._audioState.stopped = true;
                 that._broadcastPaused();
+                if (this.ended) {
+                    that._broadcastEnded();
+                }
             })
             .on("play", function () {
                 // that.play();
@@ -343,6 +346,12 @@ export default class CWSPlayer extends CWSBase {
             this._options.onCurrentTimeChanged(this.getAudioState());
     }
 
+    _broadcastCanPlay() {
+        if (this._options.onCanPlay) {
+            this._options.onCanPlay()
+        }
+    }
+
     _broadcastPaused() {
         if (this._options.onPaused)
             this._options.onPaused();
@@ -351,6 +360,11 @@ export default class CWSPlayer extends CWSBase {
     _broadcastStarted() {
         if (this._options.onStarted)
             this._options.onStarted();
+    }
+
+    _broadcastEnded() {
+        if (this._options.onEnded)
+            this._options.onEnded();
     }
 
     _broadcastError(e) {
