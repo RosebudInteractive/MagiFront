@@ -81,9 +81,6 @@ export default class CWSPlayerDesign extends CWSPlayer {
             start: startTime,
             content: {
                 duration: 5,
-                effects:[
-                    {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
-                ],
                 track: trackId,
             },
             position: {
@@ -91,7 +88,10 @@ export default class CWSPlayerDesign extends CWSPlayer {
                 top: t,
                 right: r,
                 bottom: b
-            }
+            },
+            effects:[
+                {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
+            ],
         };
         track.elements.push(element);
         if (this._correctElementsIntersection(track, element, false))
