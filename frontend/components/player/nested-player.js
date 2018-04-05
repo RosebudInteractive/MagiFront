@@ -174,7 +174,8 @@ class NestedPlayer extends EventEmitter {
         if (this._isFull) {
             this.player = this._smallPlayer;
             let _oldPlayer = this._fullPlayer;
-            this.player.setPosition(_oldPlayer.getPosition());
+            let _position = _oldPlayer.getPosition();
+            this.player.setPosition(_position);
             if (!_oldPlayer.getStopped()) {
                 this.player.play()
             } else {

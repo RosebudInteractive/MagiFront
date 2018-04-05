@@ -58,10 +58,10 @@ class Frame extends Component {
             this._hideContentTooltip = this.state.showContent;
             this._hideRateTooltip = this.state.showRate
             if (this._hideContentTooltip) {
-                this.setState({ showContent: false })
+                this.setState({showContent: false})
             }
             if (this._hideRateTooltip) {
-                this.setState({ showRate: false })
+                this.setState({showRate: false})
             }
         });
 
@@ -70,13 +70,12 @@ class Frame extends Component {
             this.setState({fullScreen: _isFullScreen})
         });
 
-        // $(window).keydown((e) => {
-        //     if (e.which === 40) {
-        //         // this._onPause()
-        //         e.preventDefault();
-        //         return false
-        //     }
-        // })
+        $(window).keydown((e) => {
+            if (e.which === 32) {
+                this._onPause()
+                e.preventDefault();
+            }
+        })
 
         // let that = this;
         //
@@ -102,7 +101,7 @@ class Frame extends Component {
         }
     }
 
-    componentDidUpdate(prevProps){
+    componentDidUpdate(prevProps) {
         if (!prevProps.visible && this.props.visible) {
             let _id = this.props.lesson ? this.props.lesson.Id : '';
             let _container = $('#player' + _id)
@@ -120,7 +119,7 @@ class Frame extends Component {
 
     _removeListeners() {
         $(document).off('mouseup');
-        $(document).off('keyup');
+        $(document).off('keydown');
         $(document).off('mousemove');
     }
 
@@ -141,27 +140,12 @@ class Frame extends Component {
     }
 
     _onPause() {
-        // if (this.props.onPause && this.props.onPlay) {
-        //     if (this.props.paused) {
-        //         this.props.onPlay()
-        //     }
-        //     else {
-        //         this.props.onPause();
-        //     }
-        //
-        //     this.setState({
-        //         pause: !this.state.pause
-        //     })
-        // }
-    }
-
-    _keyDownHandler(e) {
-        if (e.which === 32) {
-            this._onPause()
-
+        if (this.props.paused) {
+            this.props.playerStartActions.startPlay()
         }
-        e.preventDefault();
-        return false
+        else {
+            this.props.playerStartActions.startPause()
+        }
     }
 
     _toggleFullscreen() {
@@ -225,7 +209,8 @@ class Frame extends Component {
                                                 this.props.contentArray.length > 0 ?
                                                     <button type="button" className="content-button js-contents-trigger"
                                                             onClick={::this._openContent}>
-                                                        <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                        <svg width="18" height="12"
+                                                             dangerouslySetInnerHTML={{__html: _contents}}/>
                                                     </button>
                                                     :
                                                     null

@@ -46,6 +46,8 @@ class LessonPage extends React.Component {
             this._mountFullpage();
             this._mountMouseMoveHandler();
         });
+
+        this._mountKeydownHandler();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -59,7 +61,6 @@ class LessonPage extends React.Component {
             (this.props.playInfo.courseUrl === nextProps.courseUrl) &&
             (nextProps.params !== '?play')
 
-        // if (_needRedirect && !this._internalRedirect) {
         if (_needRedirect) {
             this.setState({
                 redirectToPlayer: true
@@ -208,6 +209,15 @@ class LessonPage extends React.Component {
         // });
     }
 
+    _mountKeydownHandler(){
+        $(window).keydown((e) => {
+            if (e.which === 32) {
+                this._handleWhitespace = true;
+                e.preventDefault();
+            }
+        })
+    }
+
     _unmountMouseMoveHandler() {
         $(document).off('mousemove');
         clearTimeout(this._timer);
@@ -314,6 +324,11 @@ class LessonPage extends React.Component {
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
             onLeave: (index, nextIndex,) => {
+                if (that._handleWhitespace) {
+                    that._handleWhitespace = false;
+                    return false
+                }
+
                 if (index === nextIndex) {
                     return
                 }
