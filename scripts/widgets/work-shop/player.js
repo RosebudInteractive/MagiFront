@@ -11,14 +11,6 @@ import tpl from 'text!./templates/work-shop.html'
 //     function (CWSBase, CPlayerElement, Loader, tpl) {
 const ratioX = 16, ratioY = 9;
 
-function compareElements(a, b) {
-    if (a.start < b.start)
-        return -1;
-    if (a.start > b.start)
-        return 1;
-    return 0;
-}
-
 export default class CWSPlayer extends CWSBase {
     constructor(container, options) {
         super(container, tpl);
@@ -33,7 +25,7 @@ export default class CWSPlayer extends CWSBase {
             playingNow: {},
             volume: 0.3,
             muted: false,
-            playbackRate: '1.0',
+            playbackRate: 1.0,
             requestAnimationFrameID: null,
             videoOff: false,
             source: null,
@@ -47,8 +39,6 @@ export default class CWSPlayer extends CWSBase {
         this._player = null;
 
         this._options.loader.setPosition(0);
-
-        this._setTextToolsEvents();
     }
 
     initContainer(container) {
@@ -56,9 +46,9 @@ export default class CWSPlayer extends CWSBase {
     }
 
     render() {
-        var template = CWSPlayer.template("player");
+        let template = CWSPlayer.template("player");
 
-        var item = this._container.children();
+        let item = this._container.children();
         if (item.length == 0) {
             item = $(template);
             this._container.append(item);
@@ -70,20 +60,26 @@ export default class CWSPlayer extends CWSBase {
     }
 
     setData(data) {
-        var data2 = $.extend(true, {}, data)
+        let data2 = $.extend(true, {}, data);
         this._options.loader.setData(data2);
+
+        this._audioState.globalTime = 0;
+        this._audioState.currentTime = 0;
+
         this._prepareElements();
 
-        var audioId = null;
         if (data2.episodes.length > 0) {
-            var episode = data2.episodes[0];
+            let episode = data2.episodes[0];
             this._audioState.currentEpisode = 0;
             this._options.loader
                 .getAudioResource(episode.audio.file)
                 .then((a) => {
-                    var inf = $.extend(true, {}, episode.audio.info);
+                    let inf = $.extend(true, {}, episode.audio.info);
                     inf.data = a.data;
-                    this._setAudio(inf)
+                    this._setAudio(inf);
+                    if (this._audioState.audio.readyState >= 1) {
+                        this._onAudioLoadedHandler(this._audioState.audio);
+                    }
                 });
 
         }
@@ -95,173 +91,12 @@ export default class CWSPlayer extends CWSBase {
             this._setRatio(item);
         });
 
-        var cont = item.children(".ws-player-content");
-        cont.droppable({
-            tolerance: "touch",
-            accept: (el) => {
-                var accept = el.hasClass("ws-assets-item");
-                accept = accept && this._findFreeSpace();
-                return accept;
-            },
-            drop: (event, ui) => {
-                var freeTrackId = this._findFreeSpace();
-                if (ui.draggable.hasClass("ws-assets-item") && freeTrackId)
-                    this._onDropAsset(freeTrackId, ui);
-            }
-        });
-    }
-
-    _findTrack(id) {
-        var tracks = this._tracksList;
-        var track = null;
-        for (var i = 0; i < tracks.length; i++) {
-            var cur = tracks[i];
-            if (cur.id == id) {
-                track = cur;
-                break;
-            }
-        }
-
-        return track;
-    }
-
-    _onDropAsset(trackId, ui) {
-        var hOffset = ui.helper.offset();
-        var track = this._findTrack(trackId);
-
-        var startTime = this._audioState.currentTime;
-        var assData = ui.draggable.data("data");
-        // player ratio is 16:9
-        // if player width = 160, then 30% is
-        var w = 30;
-        var actualWidth = 160 * (w / 100);
-        var pictRatio = assData.size.height / assData.size.width;
-        var actualHeight = actualWidth * pictRatio;
-        // calculate actualHeight's %
-        var h = actualHeight / 90 * 100;
-
-        var cont = this._container.find(".ws-player-content");
-        var contOffset = cont.offset();
-        var cw = cont.width();
-        var ch = cont.height();
-        var l = (hOffset.left - contOffset.left) / cw * 100,
-            t = (hOffset.top - contOffset.top) / ch * 100,
-            r = 100 - l - w,
-            b = 100 - t - h;
-        if (b < 0) {
-            t += b;
-            b = 0;
-        }
-        if (r < 0) {
-            l += r;
-            r = 0;
-        }
-
-
-        var element = {
-            id: Utils.guid(),
-            asset: {id: ui.draggable.attr("id"), body: null},
-            start: startTime,
-            duration: 5,
-            position: {
-                left: l,
-                top: t,
-                right: r,
-                bottom: b
-            },
-            effects: [
-                {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
-            ]
-        };
-        track.elements.push(element);
-        if (this._correctElementsIntersection(track, element, false))
-            this._broadcastAddElement(trackId, track.elements);
-    }
-
-    _correctElementsIntersection(track, editedData, shift) {
-        var audioState = this._audioState;
-
-        var elements = [];
-        for (var i = 0; i < track.elements.length; i++) {
-            if (track.elements[i].id == editedData.id)
-                elements.push(editedData);
-            else
-                elements.push($.extend(true, {}, track.elements[i]));
-        }
-
-        elements = elements.sort(compareElements);
-
-        var currentPos = 0;
-        for (var i = 0; i < elements.length; i++) {
-            var element = elements[i];
-            var oldStart = element.start;
-
-            if (currentPos > element.start) {
-                element.start = currentPos;
-            }
-            // если не зажат Shift, то пытаемся ужать следующий элемент
-            if (!shift && oldStart != element.start) {
-                var delta = element.start - oldStart;
-                element.duration -= delta;
-                if (element.duration < 1) element.duration = 1;
-            }
-
-            currentPos = element.start + element.duration;
-        }
-        var last = elements[elements.length - 1];
-        if (last.start + last.duration > audioState.duration) {
-            return false;
-        }
-
-        for (var i = 0; i < elements.length; i++) {
-            var el = elements[i];
-            for (var j = 0; j < track.elements.length; j++) {
-                if (track.elements[j].id == el.id) {
-                    var tEl = track.elements[j];
-                    tEl.start = el.start;
-                    tEl.duration = el.duration;
-                    break;
-                }
-            }
-        }
-        track.elements = track.elements.sort(compareElements);
-        return true;
-    }
-
-    _broadcastAddElement(trackId, elements) {
-        if (this._options.onAddElement) {
-            this._options.onAddElement({track: trackId, elements: elements});
-        }
     }
 
     _broadcastChangeContent(content) {
         if (this._options.onChangeContent) {
             this._options.onChangeContent($.extend(true, {}, content));
         }
-    }
-
-    _findFreeSpace() {
-        var pos = this._audioState.currentTime;
-        var pNow = this._audioState.playingNow;
-        var trackId = null;
-
-        for (var i = 0; i < this._tracksList.length; i++) {
-            var track = this._tracksList[i];
-            var trackIsFree = true;
-            for (var j = 0; j < track.elements.length; j++) {
-                var el = track.elements[j];
-                if (el.start <= pos && pos <= el.start + el.duration) {
-                    trackIsFree = false;
-                    break;
-                }
-            }
-            if (trackIsFree) {
-                trackId = track.id;
-                break;
-            }
-        }
-
-        return trackId;
     }
 
     _initDefaultOptions() {
@@ -275,10 +110,10 @@ export default class CWSPlayer extends CWSBase {
 
     _setRatio(item) {
         // console.log(window.textId);
-        var contW = this._container.width();
-        var contH = this._container.height();
-        var contRatio = contW == 0 ? 0 : contH / contW;
-        var playerRatio = this._options.ratioY / this._options.ratioX;
+        let contW = this._container.width();
+        let contH = this._container.height();
+        let contRatio = contW == 0 ? 0 : contH/contW;
+        let playerRatio = this._options.ratioY/this._options.ratioX;
         // console.log(fontSize);
 
         item.css({height: null, width: null});//, fontSize: fontSize + 'px'});
@@ -303,6 +138,7 @@ export default class CWSPlayer extends CWSBase {
     _setAudio(audio) {
         if (this._audioState.source && audio.data.id == this._audioState.source.data.id) return;
         this._audioState.source = audio;
+
         this._initAudioTrack();
     }
 
@@ -317,7 +153,7 @@ export default class CWSPlayer extends CWSBase {
             this._audioState.$audio = null;
             this._audioState.duration = 0;
         } else {
-            var audio = this._audioState.source.data.body;
+            let audio = this._audioState.source.data.body;
             audio.pause();
             audio.muted = this.getMute();
             audio.currentTime = 0;
@@ -327,10 +163,10 @@ export default class CWSPlayer extends CWSBase {
 
             this._audioState.duration = audio.duration;
             this._audioState.currentTime = audio.currentTime;
-            var data = this._options.loader.getData();
-            var starts = this._options.loader.getEpisodesStartTimes();
+            let data = this._options.loader.getData();
+            let starts = this._options.loader.getEpisodesStartTimes();
 
-            var startPos = starts[data.episodes[this._audioState.currentEpisode].id];
+            let startPos = starts[data.episodes[this._audioState.currentEpisode].id];
             this._audioState.globalTime = startPos.start;
             this._audioState.baseTime = startPos.start;
             audio.volume = this._audioState.volume;
@@ -355,23 +191,27 @@ export default class CWSPlayer extends CWSBase {
             .off('ended');
     }
 
+    _onAudioLoadedHandler(audio) {
+        this._audioState.duration = audio.duration;
+        this._audioState.currentTime = audio.currentTime;
+        this._audioState.audio.volume = this._audioState.volume;
+        this._audioState.audio.playbackRate = this._audioState.playbackRate;
+        // that._audioState.audio.muted = that._audioState.muted;
+        this._broadcastAudioLoaded();
+        //that._options.loader.setPosition(0)
+    }
+
     _setAudioEvents(audio) {
-        var that = this;
+        let that = this;
         audio
             .on("canplay", () => {
                 console.log('Can play');
                 that._broadcastCanPlay();
             })
             .on("loadeddata", function () {
-                that._audioState.duration = this.duration;
-                that._audioState.currentTime = this.currentTime;
-                that._audioState.audio.volume = that._audioState.volume;
-                that._audioState.audio.playbackRate = that._audioState.playbackRate;
-                // that._audioState.audio.muted = that._audioState.muted;
-                that._broadcastAudioLoaded();
-                //that._options.loader.setPosition(0)
+               that._onAudioLoadedHandler(this);
             })
-            .on("timeupdate", function (e) {
+            .on("timeupdate", function () {
                 that._audioState.currentTime = this.currentTime;
                 that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
                 that._broadcastCurrentTimeChanged();
@@ -379,23 +219,27 @@ export default class CWSPlayer extends CWSBase {
                 //    that._playElements(that._audioState.globalTime);
                 //}
                 //console.log("timeupdate", that._audioState.globalTime);
-                that._options.loader.setPosition(that._audioState.globalTime);
-                that._checkAndFireContentChanged()
+                that._options.loader.setPosition(that._audioState.globalTime)
+                that._chechAndFireContentChanged();
             })
-            .on("volumechange", function (e) {
+            .on("volumechange", function() {
                 that._audioState.volume = this.volume;
+                that._audioState.muted = this.muted;
             })
             .on("ended", function () {
-                var data = that._options.loader.getData();
+                let data = that._options.loader.getData();
                 if (that._audioState.currentEpisode + 1 < data.episodes.length) {
                     that._audioState.currentEpisode++;
-                    var episode = data.episodes[that._audioState.currentEpisode];
+                    let episode = data.episodes[that._audioState.currentEpisode];
                     that._options.loader
                         .getAudioResource(episode.audio.file)
                         .then((a) => {
-                            var inf = $.extend(true, {}, episode.audio.info);
+                            let inf = $.extend(true, {}, episode.audio.info);
                             inf.data = a.data;
                             that._setAudio(inf)
+                            if (this._audioState.audio.readyState >= 1) {
+                                this._onAudioLoadedHandler(this._audioState.audio);
+                            }
                         });
                 }
             })
@@ -421,13 +265,13 @@ export default class CWSPlayer extends CWSBase {
 
     }
 
-    _checkAndFireContentChanged() {
-        var episodesContent = this.getLectureContent();
-        var curCont = null;
-        for (var i = 0; i < episodesContent.length; i++) {
-            var epContent = episodesContent[i].content;
-            for (var j = 0; j < epContent.length; j++) {
-                var epCont = epContent[j];
+    _chechAndFireContentChanged() {
+        let episodesContent = this.getLectureContent();
+        let curCont = null;
+        for (let i = 0; i < episodesContent.length; i++) {
+            let epContent = episodesContent[i].content;
+            for (let j = 0; j < epContent.length; j++) {
+                let epCont = epContent[j];
                 if (epCont.begin <= this._audioState.globalTime) {
                     curCont = epCont;
                 }
@@ -449,11 +293,11 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _playElements(position) {
-        var newtitles = [];
-        var deleteOld = false;
-        var rate = +(this._audioState.playbackRate || 1);
-        for (var i = 0; i < this._elements.array.length; i++) {
-            var el = this._elements.array[i];
+        let newtitles = [];
+        let deleteOld = false;
+        let rate = +(this._audioState.playbackRate || 1);
+        for (let i = 0; i < this._elements.array.length; i++) {
+            let el = this._elements.array[i];
             if (position >= el.Start && position <= (el.Start + el.Duration)) {
                 el.setRate(rate);
                 el.play();
@@ -471,22 +315,26 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._recalcTitles(newtitles, deleteOld);
-        this._broadcastChangeTitles();
+        let changed = this._recalcTitles(newtitles, deleteOld);
+        if (changed)
+            this._broadcastChangeTitles();
     }
 
     _recalcTitles(newTitles, deleteOld) {
+        let changed = false;
         if (deleteOld || newTitles.length > 0) {
-            for (var i = 0; i < this._audioState.currentTitles.length;) {
+            for (let i = 0; i < this._audioState.currentTitles.length; ) {
                 if (!(this._audioState.currentTitles[i].id in this._audioState.playingNow)) {
                     this._audioState.currentTitles.splice(i, 1);
+                    changed = true;
                 } else {
                     i++
                 }
             }
         }
 
-        this._audioState.currentTitles.push(...newTitles)
+        this._audioState.currentTitles.push(...newTitles);
+        return changed || newTitles.length > 0;
     }
 
     _broadcastAudioLoaded() {
@@ -531,11 +379,11 @@ export default class CWSPlayer extends CWSBase {
     }
 
     getAudioState() {
-        var result = $.extend(true, {}, this._audioState);
+        let result = $.extend(true, {}, this._audioState);
         return result;
     }
 
-    _proccessAnimationFrame(timestamp) {
+    _proccessAnimationFrame() {
         if (this._audioState.audio) {
             this._audioState.currentTime = this._audioState.audio.currentTime;
             this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
@@ -633,30 +481,36 @@ export default class CWSPlayer extends CWSBase {
     /* from 0.1 to 1 */
     setVolume(volume) {
         if (this._audioState.audio.volume == volume) return;
-        var oldVol = +this._audioState.audio.volume;
+        let oldVol = +this._audioState.audio.volume;
         this._audioState.volume = volume;
-        var volDiff = volume - oldVol;
-        var part = volDiff / 300;
-        var start = performance.now();
+        let volDiff = volume - oldVol;
+        let part = volDiff / 300;
+        let start = performance.now();
+
+        let that = this;
         requestAnimationFrame(function _changeVolumeCallback(time) {
-            var diffTime = time - start;
+            let diffTime = time - start;
             if (diffTime > 300) {
                 that._audioState.audio.volume = volume;
                 return
             }
-            that._audioState.audio.volume = oldVol + part * diffTime;
+
+            let newVol = oldVol + part * diffTime;
+            if (newVol < 0) newVol = 0;
+            if (newVol > 1) newVol = 1;
+
+            that._audioState.audio.volume = newVol;
             requestAnimationFrame(_changeVolumeCallback);
         });
-
-        var that = this;
     }
 
 
     setRate(rate) {
         this._audioState.audio.playbackRate = +rate;
         this._audioState.playbackRate = +rate;
-        for (var i in this._audioState.playingNow) {
-            var el = this._audioState.playingNow[i];
+        for (let i in this._audioState.playingNow) {
+            if (!this._audioState.playingNow.hasOwnProperty(i)) continue;
+            let el = this._audioState.playingNow[i];
             el.setRate(+rate);
         }
     }
@@ -664,11 +518,10 @@ export default class CWSPlayer extends CWSBase {
     setMute(value) {
         this._audioState.muted = !!value;
         this._audioState.audio.muted = !!value;
-        console.log(this._audioState.muted);
     }
 
     toggleMute() {
-        this._audioState.muted = !this._audioState.muted
+        this._audioState.muted = !this._audioState.muted;
         this._audioState.audio.muted = this._audioState.muted;
     }
 
@@ -677,11 +530,11 @@ export default class CWSPlayer extends CWSBase {
     }
 
     setPosition(position) {
-        var starts = this._options.loader.getEpisodesStartTimes();
-        var maxEnd = 0;
-        var newStart = null;
-        for (var id in starts) {
-            var s = starts[id];
+        let starts = this._options.loader.getEpisodesStartTimes();
+        let maxEnd = 0;
+        let newStart = null;
+        for (let id in starts) {
+            let s = starts[id];
             if (s.end > maxEnd) {
                 maxEnd = s.end;
             }
@@ -691,10 +544,10 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        if (position >= 0 && position <= maxEnd) {
-            var data = this._options.loader.getData();
-            var epIdx = 0;
-            for (var i = 0; i < data.episodes.length; i++) {
+        if (position >=0 && position <= maxEnd) {
+            let data = this._options.loader.getData();
+            let epIdx = 0;
+            for (let i = 0; i < data.episodes.length; i++) {
                 if (data.episodes[i].id == newStart.episode.id) {
                     epIdx = i;
                     break;
@@ -710,16 +563,15 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.audio.pause();
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
-                console.log("Set position 1", this._audioState)
                 var savedState = $.extend(true, {}, this._audioState);
+                let savedState = $.extend(true, {}, this._audioState);
                 this._options.loader
                     .getAudioResource(newStart.episode.audio.file)
                     .then((a) => {
-                        var inf = $.extend(true, {}, newStart.episode.audio.info);
+                        let inf = $.extend(true, {}, newStart.episode.audio.info);
                         inf.data = a.data;
                         this._audioState.currentEpisode = epIdx;
 
-                        console.log("Set position 2", this._audioState)
                         this._setAudio(inf)
 
                         this._audioState.audio.currentTime = savedState.currentTime;
@@ -728,7 +580,10 @@ export default class CWSPlayer extends CWSBase {
                         this._audioState.currentTime = savedState.currentTime;
                         this._audioState.baseTime = savedState.baseTime;
 
-                        console.log("Set position 3", this._audioState)
+                        if (this._audioState.audio.readyState >= 1) {
+                            this._onAudioLoadedHandler(this._audioState.audio);
+                        }
+
                         this._setElementsPosition(position);
                         this._playElements(position);
                         if (this._audioState.stopped) this._pauseElements();
@@ -744,7 +599,9 @@ export default class CWSPlayer extends CWSBase {
                 this._options.loader.setPosition(position);
                 this._audioState.audio.currentTime = this._audioState.currentTime;
                 this._setElementsPosition(position);
-                this._playElements(position)
+                //this._renderPosition(position);
+                //this._playElements(position);
+                //if (this._audioState.stopped) this._pauseElements();
             }
         }
     }
@@ -758,11 +615,11 @@ export default class CWSPlayer extends CWSBase {
     }
 
     getCurrent() {
-        var result = [];
+        let result = [];
 
-        for (var id in this._audioState.playingNow) {
-            var obj = {};
-            var el = this._audioState.playingNow[id];
+        for (let id in this._audioState.playingNow) {
+            let obj = {};
+            let el = this._audioState.playingNow[id];
             obj.id = el.Data.id;
             if (el.Data.asset) {
                 obj.asset = {
@@ -806,23 +663,23 @@ export default class CWSPlayer extends CWSBase {
     }
 
     getLectureContent() {
-        var data = this._options.loader.getData();
-        var result = [];
-        var epStarts = this._options.loader.getEpisodesStartTimes();
+        let data = this._options.loader.getData();
+        let result = [];
+        let epStarts = this._options.loader.getEpisodesStartTimes();
 
-        for (var i = 0; i < data.episodes.length; i++) {
-            var episode = data.episodes[i];
-            var epContent = {
+        for (let i = 0; i < data.episodes.length; i++) {
+            let episode = data.episodes[i];
+            let epContent = {
                 title: episode.title,
                 duration: episode.audio.info.length,
                 duration_formated: episode.audio.info.length_formatted,
                 content: []
-            }
+            };
 
-            var cont = episode.contents;
-            var epStart = epStarts[episode.id];
-            for (var j = 0; j < cont.length; j++) {
-                var resCont = $.extend(true, {}, cont[j]);
+            let cont = episode.contents;
+            let epStart = epStarts[episode.id];
+            for (let j = 0; j < cont.length; j++) {
+                let resCont = $.extend(true, {}, cont[j]);
                 resCont.begin += epStart.start;
                 epContent.content.push(resCont);
             }
@@ -834,30 +691,31 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _pauseElements() {
-        for (var i in this._audioState.playingNow) {
-            var el = this._audioState.playingNow[i];
+        for (let i in this._audioState.playingNow) {
+            let el = this._audioState.playingNow[i];
             el.pause();
         }
     }
 
     _setElementsPosition(position) {
-        var newtitles = [];
-        var deleteOld = false;
-        for (var i = 0; i < this._elements.array.length; i++) {
-            var el = this._elements.array[i];
+        let newTitles = [];
+        let deleteOld = false;
+        for (let i = 0; i < this._elements.array.length; i++) {
+            let el = this._elements.array[i];
             if (position >= el.Start && position <= (el.Start + el.Duration)) {
-                var localPosition = position - el.Start;
-                el.Position = localPosition;
+                el.Position = position - el.Start;
 
                 if (this._audioState.playingNow[el.Id] === undefined) {
                     if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
                         deleteOld = true;
                     }
-                    if (el.Title)
-                        newtitles.push({id: el.Id, title: el.Title})
+                    if (el.Title || el.Title2) {
+                        newTitles.push({id: el.Id, title: el.Title, title2: el.Title2})
+                    }
                 }
 
                 this._audioState.playingNow[el.Id] = el;
+                el.renderPosition(position);
             } else {
                 if (el.Id in this._audioState.playingNow) {
                     delete this._audioState.playingNow[el.Id];
@@ -867,8 +725,9 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._recalcTitles(newtitles, deleteOld);
-        this._broadcastChangeTitles();
+        let changed = this._recalcTitles(newTitles, deleteOld);
+        if (changed)
+            this._broadcastChangeTitles();
     }
 
     _broadcastChangeTitles() {
@@ -877,150 +736,29 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
-    _setTextToolsEvents() {
-
-        console.log('_setTextToolsEvents')
-
-        var textToolsDiv = $('.ws-text-element-tools');
-
-        $('.ws-text-element-tools-a1').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            var textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            var ratio = this._container.height() / this._container.width();
-            console.log('?');
-            textDiv._textTools.setCurrentSize(0);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {
-                $(item).removeClass('ws-text-element-tools-a-selected');
-            });
-            $(e.target).addClass('ws-text-element-tools-a-selected')
-            this._setRatio(this._player);
-        });
-
-        $('.ws-text-element-tools-a2').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            var textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            var ratio = this._container.height() / this._container.width();
-            textDiv._textTools.setCurrentSize(1);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {
-                $(item).removeClass('ws-text-element-tools-a-selected');
-            });
-            $(e.target).addClass('ws-text-element-tools-a-selected')
-            this._setRatio(this._player);
-        });
-
-        $('.ws-text-element-tools-a3').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            var textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            var ratio = this._container.height() / this._container.width();
-            textDiv._textTools.setCurrentSize(2);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {
-                $(item).removeClass('ws-text-element-tools-a-selected');
-            });
-            $(e.target).addClass('ws-text-element-tools-a-selected')
-            this._setRatio(this._player);
-        });
-
-        $('.ws-text-element-tools-i').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            document.execCommand('Italic', false, null);
-        });
-
-        $('.ws-text-element-tools-i').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            document.execCommand('Italic', false, null);
-        });
-
-        $('.ws-text-element-tools-b').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            document.execCommand('Bold', false, null);
-        });
-
-        $('.ws-text-element-tools-ol').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            document.execCommand('insertUnorderedList', false, null);
-        });
-
-        var clEl = $('.ws-text-element-tools-color');
-        if (clEl.length > 0) {
-            clEl[0].controls = {
-                setColor: (color) => {
-                    var clEl = $('.ws-text-element-tools-color');
-                    clEl[0].style.backgroundColor = color;
-                    clEl[0].style.borderColor = color;
-                },
-            }
-        }
-        $('.ws-text-element-tools-color').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            // console.log(getComputedStyle($('.ws-text-element-tools-color')[0]).backgroundColor);
-
-            document.execCommand('hiliteColor', false, getComputedStyle($('.ws-text-element-tools-color')[0]).backgroundColor);
-        });
-        $('.ws-text-element-tools-color').on('mouseheld', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            // console.log('color held')
-            // console.log($('.ws-text-element-tools-color')[0].controls.setColor('#F00'));
-            $('.ws-text-element-tools-color-pal').css({'display': 'block'});
-        });
-        $('.ws-text-element-tools-color-pal').on('mouseleave', (e) => {
-            $('.ws-text-element-tools-color-pal').css({'display': 'none'});
-        });
-        $('.ws-text-element-tools-color-item').each((index, value) => {
-            $(value).on('click', () => {
-                var clEl = $('.ws-text-element-tools-color');
-                clEl[0].controls.setColor(getComputedStyle($(value)[0]).backgroundColor);
-                $('.ws-text-element-tools-color-item').each((index, item) => {
-                    $(item).removeClass('ws-text-element-tools-color-selected');
-                });
-                $(value).addClass('ws-text-element-tools-color-selected');
-            });
-        })
-    }
-
     _prepareElements() {
-        var data = this._options.loader.getData();
-        var assets = [];
-        var elemsIdx = {};
-        var cont = this._container.find(".ws-player-content");
+        let data = this._options.loader.getData();
+        let assets = [];
+        let elemsIdx = {};
+        let cont = this._container.find(".ws-player-content");
+        const ElConstructor = this._getElementConstructor();
 
         // Удалим элементы плеера, которые относятся к уже не существующим элементам трека
         this._deleteUnusedElements(data);
 
-        var starts = this._options.loader.getEpisodesStartTimes();
-
-        for (var epIdx = 0; epIdx < data.episodes.length; epIdx++) {
-            var episode = data.episodes[epIdx];
-            for (var i = 0; i < episode.tracks.length; i++) {
-                var track = episode.tracks[i];
-                for (var j = 0; j < track.elements.length; j++) {
-                    var elData = this._decodeElData(track.elements[j], i + 1, starts[episode.id].start);
-                    var elem = null;
+        for (let epIdx = 0; epIdx < data.episodes.length; epIdx++) {
+            let episode = data.episodes[epIdx];
+            for (let i = 0; i < episode.tracks.length; i++) {
+                let track = episode.tracks[i];
+                for (let j = 0; j < track.elements.length; j++) {
+                    let elData = this._decodeElData(track.elements[j], i + 1);
+                    let elem = null;
                     if (elData.trackElement in this._elements.trackElIdx) {
                         elem = this._elements.trackElIdx[elData.trackElement];
                         elem.Data = elData;
                     } else {
-                        var elOptions = this._getElementOptions(elData);
-                        elem = new CPlayerElement(cont, elOptions);
+                        let elOptions = this._getElementOptions(elData);
+                        elem = new ElConstructor(cont, elOptions);
 
                         this._elements.trackElIdx[elData.trackElement] = elem;
                         this._elements.array.push(elem);
@@ -1036,9 +774,9 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
-    _getResource(elData) {
-        var ass = elData.asset;
-        var resource = null;
+    static _getResource(elData) {
+        let ass = elData.asset;
+        let resource = null;
         if (ass) {
             resource = ass.body;
         } else if (elData.data) {
@@ -1049,13 +787,13 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _deleteUnusedElements(data) {
-        var newElArray = [];
-        var newElIdx = {};
-        for (var i = 0; i < this._elements.array.length; i++) {
-            var el = this._elements.array[i];
-            var elData = el.Data;
-            var trackElId = elData.trackElement;
-            if (this._isElementDeleted(data, trackElId)) {
+        let newElArray = [];
+        let newElIdx = {};
+        for (let i = 0; i < this._elements.array.length; i++) {
+            let el = this._elements.array[i];
+            let elData = el.Data;
+            let trackElId = elData.trackElement;
+            if (CWSPlayer._isElementDeleted(data, trackElId)) {
                 el.stop();
                 if (el.Id in this._audioState.playingNow)
                     delete this._audioState.playingNow[el.Id];
@@ -1069,12 +807,12 @@ export default class CWSPlayer extends CWSBase {
         this._elements.trackElIdx = newElIdx;
     }
 
-    _isElementDeleted(lecture, trackElId) {
-        for (var epIdx = 0; epIdx < lecture.episodes.length; epIdx++) {
-            var data = lecture.episodes[epIdx];
-            for (var i = 0; i < data.length; i++) {
-                var track = data.tracks[i];
-                for (var j = 0; j < track.elements.length; j++) {
+    static _isElementDeleted(lecture, trackElId) {
+        for (let epIdx = 0; epIdx < lecture.episodes.length; epIdx++) {
+            let data = lecture.episodes[epIdx];
+            for (let i = 0; i < data.tracks.length; i++) {
+                let track = data.tracks[i];
+                for (let j = 0; j < track.elements.length; j++) {
                     if (track.elements[j].id == trackElId) return false;
                 }
             }
@@ -1083,7 +821,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _getElementOptions(elData) {
-        var that = this;
+        let that = this;
         return {
             data: elData,
             designMode: this._options.designMode,
@@ -1092,16 +830,16 @@ export default class CWSPlayer extends CWSBase {
                 if (that._options.onSetPosition) that._options.onSetPosition(e);
             },
             onFocused: function (e) {
-                for (var i = 0; i < that._elements.array.length; i++) {
-                    var el = that._elements.array[i];
+                for (let i = 0; i < that._elements.array.length; i++) {
+                    let el = that._elements.array[i];
                     if (el.Id != elData.id) el.Focused = false;
                 }
                 that.renderPosition(null);
                 if (that._options.onFocused) that._options.onFocused(e);
             },
             onSetTextData: function (e) {
-                for (var i = 0; i < that._elements.array.length; i++) {
-                    var el = that._elements.array[i];
+                for (let i = 0; i < that._elements.array.length; i++) {
+                    let el = that._elements.array[i];
                     if (el.Data.trackElement == e.trackElId) {
                         // elData.data = e.data
                         if (that._options.onSetTextData) that._options.onSetTextData(e);
@@ -1112,22 +850,23 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
-    _decodeElData(trackElData, zIndex, episodeStart) {
-        var oldData = null;
+    _decodeElData(trackElData, zIndex) {
+        let oldData = null;
         if (trackElData.id in this._elements.trackElIdx) {
             oldData = this._elements.trackElIdx[trackElData.id].Data;
-            oldData.content.position = {
-                left: trackElData.content.position.left,
-                top: trackElData.content.position.top,
-                bottom: trackElData.content.position.bottom,
-                right: trackElData.content.position.right
-            };
-            oldData.content.duration = trackElData.duration;
-            //oldData.start = episodeStart + trackElData.start;
+            if (trackElData.content.position) {
+                oldData.content.position = {
+                    left: trackElData.content.position.left,
+                    top: trackElData.content.position.top,
+                    bottom: trackElData.content.position.bottom,
+                    right: trackElData.content.position.right
+                };
+            }
+            oldData.content.duration = trackElData.content.duration;
             oldData.zIndex = zIndex;
             oldData.focused = trackElData.focused;
             oldData.data = trackElData.data;
-            oldData.content.effects = $.extend(true, {}, trackElData.content.effects);
+            oldData.content.effects = $.extend(true, {}, trackElData.content.effects || []);
             oldData.content.title = trackElData.content.title;
             oldData.content.title2 = trackElData.content.title2;
             oldData.content.deleteOldTitles =
@@ -1136,7 +875,6 @@ export default class CWSPlayer extends CWSBase {
             oldData = $.extend(true, {}, trackElData);
             oldData.id = Utils.guid();
             oldData.trackElement = trackElData.id;
-            //oldData.start = episodeStart + trackElData.start
             oldData.zIndex = zIndex;
         }
 
@@ -1159,8 +897,8 @@ export default class CWSPlayer extends CWSBase {
         if (position !== undefined && position != null)
             this.setPosition(position);
 
-        for (var i = 0; i < this._elements.array.length; i++) {
-            var el = this._elements.array[i];
+        for (let i = 0; i < this._elements.array.length; i++) {
+            let el = this._elements.array[i];
             if (el.Id in this._audioState.playingNow)
                 el.renderPosition(this._audioState.globalTime);
             else
@@ -1173,6 +911,10 @@ export default class CWSPlayer extends CWSBase {
             this._options.loader = new Loader();
         }
     }
+
+    _getElementConstructor() {
+        return CPlayerElement;
+    }
 }
-// }
-// );
+//    }
+//);

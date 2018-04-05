@@ -45,7 +45,7 @@ class RateTooltip extends Component {
 
     render() {
         return (
-            <div className={"speed-tooltip js-player-tooltip js-speed" + (this.props.visible ? ' opened' : '')}>
+            <div className={"speed-tooltip js-player-tooltip js-speed opened"}>
                 <header className="speed-tooltip__header">
                     <p className="speed-tooltip__title">Скорость</p>
                 </header>

@@ -1,0 +1,2395 @@
+{
+  "id": 178,
+  "assets": [
+    {
+      "id": 8019,
+      "file": "2017/12/Katalog-vystavki-Bubnovyj-valet-.-1910-1911.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1200,
+          "height": 943
+        },
+        "content": {
+          "m": "Katalog-vystavki-Bubnovyj-valet-.-1910-1911-768x604.jpg",
+          "s": "Katalog-vystavki-Bubnovyj-valet-.-1910-1911-360x283.jpg"
+        },
+        "icon": "Katalog-vystavki-Bubnovyj-valet-.-1910-1911-150x150.jpg"
+      },
+      "title": "Каталог выставки «Бубновый валет». 1910–1911"
+    },
+    {
+      "id": 8020,
+      "file": "2017/12/Duh-mertvyh-ne-dremlet.-1892.-Hudozhnik-Pol-Gogen-fr.-Paul-Gauguin-1848-1903.-Hudozhestvennaya-galereya-Olbrajt-Noks-Buffalo.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1042,
+          "height": 818
+        },
+        "content": {
+          "m": "Duh-mertvyh-ne-dremlet.-1892.-Hudozhnik-Pol-Gogen-fr.-Paul-Gauguin-1848-1903.-Hudozhestvennaya-galereya-Olbrajt-Noks-Buffalo-768x603.jpg",
+          "s": "Duh-mertvyh-ne-dremlet.-1892.-Hudozhnik-Pol-Gogen-fr.-Paul-Gauguin-1848-1903.-Hudozhestvennaya-galereya-Olbrajt-Noks-Buffalo-360x283.jpg"
+        },
+        "icon": "Duh-mertvyh-ne-dremlet.-1892.-Hudozhnik-Pol-Gogen-fr.-Paul-Gauguin-1848-1903.-Hudozhestvennaya-galereya-Olbrajt-Noks-Buffalo-150x150.jpg"
+      },
+      "title": "Дух мертвых не дремлет. 1892",
+      "title2": "Художник – Поль Гоген (фр. Paul Gauguin, 1848–1903). Художественная галерея Олбрайт-Нокс, Буффало"
+    },
+    {
+      "id": 8021,
+      "file": "2017/12/Golubaya-obnazhennaya.-1907.-Hudozhnik-Anri-Matiss-fr.-Henri-Matiss-1869-1954.-Baltimorskij-hudozhestvennyj-muzej.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 772,
+          "height": 492
+        },
+        "content": {
+          "m": "Golubaya-obnazhennaya.-1907.-Hudozhnik-Anri-Matiss-fr.-Henri-Matiss-1869-1954.-Baltimorskij-hudozhestvennyj-muzej-768x489.jpg",
+          "s": "Golubaya-obnazhennaya.-1907.-Hudozhnik-Anri-Matiss-fr.-Henri-Matiss-1869-1954.-Baltimorskij-hudozhestvennyj-muzej-360x229.jpg"
+        },
+        "icon": "Golubaya-obnazhennaya.-1907.-Hudozhnik-Anri-Matiss-fr.-Henri-Matiss-1869-1954.-Baltimorskij-hudozhestvennyj-muzej-150x150.jpg"
+      },
+      "title": "Голубая обнаженная. 1907",
+      "title2": "Художник – Анри Матисс (фр. Henri Matiss, 1869–1954). Балтиморский художественный музей"
+    },
+    {
+      "id": 8022,
+      "file": "2017/12/Lezhashhaya-obnazhennaya-pered-zerkalom.-1910.-Hudozhnik-Ernst-Lyudvig-Kirhner-nem.-Ernst-Ludwig-Kirchner-1880-1938.-Muzej-gruppy-Most-Berlin.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1139,
+          "height": 999
+        },
+        "content": {
+          "m": "Lezhashhaya-obnazhennaya-pered-zerkalom.-1910.-Hudozhnik-Ernst-Lyudvig-Kirhner-nem.-Ernst-Ludwig-Kirchner-1880-1938.-Muzej-gruppy-Most-Berlin-768x674.jpg",
+          "s": "Lezhashhaya-obnazhennaya-pered-zerkalom.-1910.-Hudozhnik-Ernst-Lyudvig-Kirhner-nem.-Ernst-Ludwig-Kirchner-1880-1938.-Muzej-gruppy-Most-Berlin-360x316.jpg"
+        },
+        "icon": "Lezhashhaya-obnazhennaya-pered-zerkalom.-1910.-Hudozhnik-Ernst-Lyudvig-Kirhner-nem.-Ernst-Ludwig-Kirchner-1880-1938.-Muzej-gruppy-Most-Berlin-150x150.jpg"
+      },
+      "title": "Лежащая обнаженная перед зеркалом. 1910",
+      "title2": "Художник – Эрнст Людвиг Кирхнер (нем. Ernst Ludwig Kirchner, 1880–1938). Музей группы «Мост», Берлин"
+    },
+    {
+      "id": 8023,
+      "file": "2017/12/Plyaska-vokrug-zolotogo-teltsa.-1910.-Hudozhnik-Emil-Nolde-nem.-Emil-Nolde-1867-1956.-Pinakoteka-sovremennogo-iskusstva-Myunhen.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1264,
+          "height": 1080
+        },
+        "content": {
+          "m": "Plyaska-vokrug-zolotogo-teltsa.-1910.-Hudozhnik-Emil-Nolde-nem.-Emil-Nolde-1867-1956.-Pinakoteka-sovremennogo-iskusstva-Myunhen-768x656.jpg",
+          "s": "Plyaska-vokrug-zolotogo-teltsa.-1910.-Hudozhnik-Emil-Nolde-nem.-Emil-Nolde-1867-1956.-Pinakoteka-sovremennogo-iskusstva-Myunhen-360x308.jpg"
+        },
+        "icon": "Plyaska-vokrug-zolotogo-teltsa.-1910.-Hudozhnik-Emil-Nolde-nem.-Emil-Nolde-1867-1956.-Pinakoteka-sovremennogo-iskusstva-Myunhen-150x150.jpg"
+      },
+      "title": "Пляска вокруг золотого тельца. 1910",
+      "title2": "Художник – Эмиль Нольде (нем. Emil Nolde, 1867–1956). Пинакотека современного искусства, Мюнхен"
+    },
+    {
+      "id": 8024,
+      "file": "2017/12/Rekonstruktsiya-komnaty-Polya-Gogena-v-osobnyake-Sergeya-SHHukina.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 990,
+          "height": 754
+        },
+        "content": {
+          "m": "Rekonstruktsiya-komnaty-Polya-Gogena-v-osobnyake-Sergeya-SHHukina-768x585.jpg",
+          "s": "Rekonstruktsiya-komnaty-Polya-Gogena-v-osobnyake-Sergeya-SHHukina-360x274.jpg"
+        },
+        "icon": "Rekonstruktsiya-komnaty-Polya-Gogena-v-osobnyake-Sergeya-SHHukina-150x150.jpg"
+      },
+      "title": "Реконструкция комнаты Поля Гогена в особняке Сергея Щукина"
+    },
+    {
+      "id": 8025,
+      "file": "2017/12/Rekonstruktsiya-ekspozitsii-Matissa-v-osobnyake-Sergeya-SHHukina.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 990,
+          "height": 787
+        },
+        "content": {
+          "m": "Rekonstruktsiya-ekspozitsii-Matissa-v-osobnyake-Sergeya-SHHukina-768x611.jpg",
+          "s": "Rekonstruktsiya-ekspozitsii-Matissa-v-osobnyake-Sergeya-SHHukina-360x286.jpg"
+        },
+        "icon": "Rekonstruktsiya-ekspozitsii-Matissa-v-osobnyake-Sergeya-SHHukina-150x150.jpg"
+      },
+      "title": "Реконструкция экспозиции Матисса в особняке Сергея Щукина"
+    },
+    {
+      "id": 8026,
+      "file": "2017/12/Derevenskie-kupalshhitsy.-1909.-Hudozhnik-Mihail-Larionov-1881-1964.-Krasnodarskij-kraevoj-hudozhestvennyj-muzej-im.-F.A.-Kovalenko.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 800,
+          "height": 683
+        },
+        "content": {
+          "m": "Derevenskie-kupalshhitsy.-1909.-Hudozhnik-Mihail-Larionov-1881-1964.-Krasnodarskij-kraevoj-hudozhestvennyj-muzej-im.-F.A.-Kovalenko-768x656.jpg",
+          "s": "Derevenskie-kupalshhitsy.-1909.-Hudozhnik-Mihail-Larionov-1881-1964.-Krasnodarskij-kraevoj-hudozhestvennyj-muzej-im.-F.A.-Kovalenko-360x307.jpg"
+        },
+        "icon": "Derevenskie-kupalshhitsy.-1909.-Hudozhnik-Mihail-Larionov-1881-1964.-Krasnodarskij-kraevoj-hudozhestvennyj-muzej-im.-F.A.-Kovalenko-150x150.jpg"
+      },
+      "title": "Деревенские купальщицы. 1909",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Краснодарский краевой художественный музей им. Ф.А. Коваленко"
+    },
+    {
+      "id": 8027,
+      "file": "2017/12/Lezhashhaya-naturshhitsa.-Hudozhnik-Ilya-Mashkov-1881-1944.-Ok.-1910.-Russkij-muzej-Sankt-Peteburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1380,
+          "height": 1000
+        },
+        "content": {
+          "l": "Lezhashhaya-naturshhitsa.-Hudozhnik-Ilya-Mashkov-1881-1944.-Ok.-1910.-Russkij-muzej-Sankt-Peteburg-1366x990.jpg",
+          "m": "Lezhashhaya-naturshhitsa.-Hudozhnik-Ilya-Mashkov-1881-1944.-Ok.-1910.-Russkij-muzej-Sankt-Peteburg-768x557.jpg",
+          "s": "Lezhashhaya-naturshhitsa.-Hudozhnik-Ilya-Mashkov-1881-1944.-Ok.-1910.-Russkij-muzej-Sankt-Peteburg-360x261.jpg"
+        },
+        "icon": "Lezhashhaya-naturshhitsa.-Hudozhnik-Ilya-Mashkov-1881-1944.-Ok.-1910.-Russkij-muzej-Sankt-Peteburg-150x150.jpg"
+      },
+      "title": "Лежащая натурщица. Ок. 1910",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петебург"
+    },
+    {
+      "id": 8028,
+      "file": "2017/12/Dom-Levissona.-Bolshaya-Dmitrovka-d.-32.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 768
+        },
+        "content": {
+          "m": "Dom-Levissona.-Bolshaya-Dmitrovka-d.-32-768x768.jpg",
+          "s": "Dom-Levissona.-Bolshaya-Dmitrovka-d.-32-360x360.jpg"
+        },
+        "icon": "Dom-Levissona.-Bolshaya-Dmitrovka-d.-32-150x150.jpg"
+      },
+      "title": "Дом Левинсона",
+      "title2": "Москва, Большая Дмитровка, д. 32"
+    },
+    {
+      "id": 8029,
+      "file": "2017/12/Avtoportret-i-portret-Petra-Konchalovskogo.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1485,
+          "height": 1080
+        },
+        "content": {
+          "l": "Avtoportret-i-portret-Petra-Konchalovskogo.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-1366x993.jpg",
+          "m": "Avtoportret-i-portret-Petra-Konchalovskogo.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-768x559.jpg",
+          "s": "Avtoportret-i-portret-Petra-Konchalovskogo.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-360x262.jpg"
+        },
+        "icon": "Avtoportret-i-portret-Petra-Konchalovskogo.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Автопортрет и портрет Петра Кончаловского. 1910",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8030,
+      "file": "2017/12/Malchik-v-raspisnoj-rubashke.-1909.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 760,
+          "height": 1056
+        },
+        "content": {
+          "s": "Malchik-v-raspisnoj-rubashke.-1909.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-360x500.jpg"
+        },
+        "icon": "Malchik-v-raspisnoj-rubashke.-1909.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Мальчик в расписной рубашке. 1909",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8031,
+      "file": "2017/12/Matador-Manuel-Garta.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 817,
+          "height": 1080
+        },
+        "content": {
+          "m": "Matador-Manuel-Garta.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-768x1015.jpg",
+          "s": "Matador-Manuel-Garta.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-360x476.jpg"
+        },
+        "icon": "Matador-Manuel-Garta.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Матадор Мануэль Гарта. 1910",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8032,
+      "file": "2017/12/Natasha-na-stule-Portret-N.P.-Konchalovskoj-v-detstve.-1925.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Sobranie-V.-A.-i-E.-A.-Semenihinyh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1000,
+          "height": 987
+        },
+        "content": {
+          "m": "Natasha-na-stule-Portret-N.P.-Konchalovskoj-v-detstve.-1925.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Sobranie-V.-A.-i-E.-A.-Semenihinyh-768x758.jpg",
+          "s": "Natasha-na-stule-Portret-N.P.-Konchalovskoj-v-detstve.-1925.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Sobranie-V.-A.-i-E.-A.-Semenihinyh-360x355.jpg"
+        },
+        "icon": "Natasha-na-stule-Portret-N.P.-Konchalovskoj-v-detstve.-1925.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Sobranie-V.-A.-i-E.-A.-Semenihinyh-150x150.jpg"
+      },
+      "title": "Наташа на стуле (Портрет Н.П. Кончаловской в детстве). 1925",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Собрание В. А. и Е. А. Семенихиных"
+    },
+    {
+      "id": 8033,
+      "file": "2017/12/Portret-Evgenii-Ivanovny-Kirkaldi-Dama-s-kitayankoj.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 819,
+          "height": 1080
+        },
+        "content": {
+          "m": "Portret-Evgenii-Ivanovny-Kirkaldi-Dama-s-kitayankoj.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Tretyakovskaya-galereya-Moskva-768x1013.jpg",
+          "s": "Portret-Evgenii-Ivanovny-Kirkaldi-Dama-s-kitayankoj.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Tretyakovskaya-galereya-Moskva-360x475.jpg"
+        },
+        "icon": "Portret-Evgenii-Ivanovny-Kirkaldi-Dama-s-kitayankoj.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Портрет Евгении Ивановны Киркальди (Дама с китаянкой). 1910",
+      "title2": "Художник – Илья Машков (1881–1944). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8034,
+      "file": "2017/12/Portret-Papashi-Tangi.-1887.-Hudozhnik-Vinsent-Van-Gog-niderl.-Vincent-van-Gogh-1853-1890.-Muzej-Rodena-Parizh.jpeg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 789,
+          "height": 1000
+        },
+        "content": {
+          "m": "Portret-Papashi-Tangi.-1887.-Hudozhnik-Vinsent-Van-Gog-niderl.-Vincent-van-Gogh-1853-1890.-Muzej-Rodena-Parizh-768x973.jpeg",
+          "s": "Portret-Papashi-Tangi.-1887.-Hudozhnik-Vinsent-Van-Gog-niderl.-Vincent-van-Gogh-1853-1890.-Muzej-Rodena-Parizh-360x456.jpeg"
+        },
+        "icon": "Portret-Papashi-Tangi.-1887.-Hudozhnik-Vinsent-Van-Gog-niderl.-Vincent-van-Gogh-1853-1890.-Muzej-Rodena-Parizh-150x150.jpeg"
+      },
+      "title": "Портрет Папаши Танги. 1887",
+      "title2": "Художник – Винсент Ван Гог (нидерл. Vincent van Gogh, 1853–1890). Музей Родена, Париж"
+    },
+    {
+      "id": 8035,
+      "file": "2017/12/Arlezianka-Devushka-iz-Arlya.-1908.-Hudozhnik-Petr-Konchalovskij-1876-1956.-CHastnoe-sobranie.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 602,
+          "height": 768
+        },
+        "content": {
+          "s": "Arlezianka-Devushka-iz-Arlya.-1908.-Hudozhnik-Petr-Konchalovskij-1876-1956.-CHastnoe-sobranie-360x459.jpg"
+        },
+        "icon": "Arlezianka-Devushka-iz-Arlya.-1908.-Hudozhnik-Petr-Konchalovskij-1876-1956.-CHastnoe-sobranie-150x150.jpg"
+      },
+      "title": "Арлезианка (Девушка из Арля). 1908",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Частное собрание"
+    },
+    {
+      "id": 8036,
+      "file": "2017/12/YAgody-na-fone-krasnogo-podnosa.-Ok.-1908.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 794,
+          "height": 800
+        },
+        "content": {
+          "m": "YAgody-na-fone-krasnogo-podnosa.-Ok.-1908.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-768x774.jpg",
+          "s": "YAgody-na-fone-krasnogo-podnosa.-Ok.-1908.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-360x363.jpg"
+        },
+        "icon": "YAgody-na-fone-krasnogo-podnosa.-Ok.-1908.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Ягоды на фоне красного подноса. Ок. 1908",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8037,
+      "file": "2017/12/Natyurmort.-Podnos-i-ovoshhi.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 957,
+          "height": 755
+        },
+        "content": {
+          "m": "Natyurmort.-Podnos-i-ovoshhi.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-768x606.jpg",
+          "s": "Natyurmort.-Podnos-i-ovoshhi.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-360x284.jpg"
+        },
+        "icon": "Natyurmort.-Podnos-i-ovoshhi.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Натюрморт. Поднос и овощи. 1910",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8038,
+      "file": "2017/12/Natyurmort-s-ananasom.-Ok.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1087,
+          "height": 790
+        },
+        "content": {
+          "m": "Natyurmort-s-ananasom.-Ok.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-768x558.jpg",
+          "s": "Natyurmort-s-ananasom.-Ok.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-360x262.jpg"
+        },
+        "icon": "Natyurmort-s-ananasom.-Ok.-1910.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Натюрморт с ананасом. Ок. 1910",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8039,
+      "file": "2017/12/Vyveska.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 765,
+          "height": 768
+        },
+        "content": {
+          "s": "Vyveska.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga-360x361.jpg"
+        },
+        "icon": "Vyveska.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga-150x150.jpg"
+      },
+      "title": "Вывеска. Нач. XX в.",
+      "title2": "Художник – Илья Машков (1881–1944). Музей истории Санкт-Петербурга"
+    },
+    {
+      "id": 8040,
+      "file": "2017/12/Vyveska-dlya-hlebnoj-lavki.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 765,
+          "height": 768
+        },
+        "content": {
+          "s": "Vyveska-dlya-hlebnoj-lavki.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga-360x361.jpg"
+        },
+        "icon": "Vyveska-dlya-hlebnoj-lavki.-Nach.-XX-v.-Hudozhnik-Ilya-Mashkov-1881-1944.-Muzej-istorii-Sankt-Peterburga-150x150.jpg"
+      },
+      "title": "Вывеска для хлебной лавки. Нач. XX в.",
+      "title2": "Художник – Илья Машков (1881–1944). Музей истории Санкт-Петербурга"
+    },
+    {
+      "id": 8041,
+      "file": "2017/12/Somalijskaya-mama-s-rebyonkom-v-CHelovecheskom-zooparke-.-1895.-Parizh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1681,
+          "height": 1080
+        },
+        "content": {
+          "l": "Somalijskaya-mama-s-rebyonkom-v-CHelovecheskom-zooparke-.-1895.-Parizh-1366x878.jpg",
+          "m": "Somalijskaya-mama-s-rebyonkom-v-CHelovecheskom-zooparke-.-1895.-Parizh-768x493.jpg",
+          "s": "Somalijskaya-mama-s-rebyonkom-v-CHelovecheskom-zooparke-.-1895.-Parizh-360x231.jpg"
+        },
+        "icon": "Somalijskaya-mama-s-rebyonkom-v-CHelovecheskom-zooparke-.-1895.-Parizh-150x150.jpg"
+      },
+      "title": "Сомалийская мама с ребёнком в «Человеческом зоопарке». Париж, 1895 г."
+    },
+    {
+      "id": 8042,
+      "file": "2017/12/Hudozhestvennaya-gruppa-Bubnovyj-valet-.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Hudozhestvennaya-gruppa-Bubnovyj-valet--768x765.jpg",
+          "s": "Hudozhestvennaya-gruppa-Bubnovyj-valet--360x359.jpg"
+        },
+        "icon": "Hudozhestvennaya-gruppa-Bubnovyj-valet--150x150.jpg"
+      },
+      "title": "Художественная группа «Бубновый валет»"
+    },
+    {
+      "id": 8043,
+      "file": "2017/12/Pavliny.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 800,
+          "height": 774
+        },
+        "content": {
+          "m": "Pavliny.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x743.jpg",
+          "s": "Pavliny.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x348.jpg"
+        },
+        "icon": "Pavliny.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Павлины. 1910",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8044,
+      "file": "2017/12/Pavliny.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Volgogradskij-muzej-izobrazitelnyh-iskusstv.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Pavliny.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Volgogradskij-muzej-izobrazitelnyh-iskusstv-768x765.jpg",
+          "s": "Pavliny.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Volgogradskij-muzej-izobrazitelnyh-iskusstv-360x359.jpg"
+        },
+        "icon": "Pavliny.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Volgogradskij-muzej-izobrazitelnyh-iskusstv-150x150.jpg"
+      },
+      "title": "Павлины. 1904",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Волгоградский музей изобразительных искусств"
+    },
+    {
+      "id": 8045,
+      "file": "2017/12/Svini.-1906.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1106,
+          "height": 880
+        },
+        "content": {
+          "m": "Svini.-1906.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-768x611.jpg",
+          "s": "Svini.-1906.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-360x286.jpg"
+        },
+        "icon": "Svini.-1906.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-150x150.jpg"
+      },
+      "title": "Свиньи. 1906",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Национальный центр искусства и культуры Жоржа Помпиду, Париж"
+    },
+    {
+      "id": 8046,
+      "file": "2017/12/Ryby-na-zakate.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 813,
+          "height": 800
+        },
+        "content": {
+          "m": "Ryby-na-zakate.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-768x756.jpg",
+          "s": "Ryby-na-zakate.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-360x354.jpg"
+        },
+        "icon": "Ryby-na-zakate.-1904.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Рыбы на закате. 1904",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8047,
+      "file": "2017/12/Vesna.-1898.-Hudozhnik-Viktor-Borisov-Musatov-1870-1905.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1050,
+          "height": 700
+        },
+        "content": {
+          "m": "Vesna.-1898.-Hudozhnik-Viktor-Borisov-Musatov-1870-1905.-Russkij-muzej-Sankt-Peterburg-768x512.jpg",
+          "s": "Vesna.-1898.-Hudozhnik-Viktor-Borisov-Musatov-1870-1905.-Russkij-muzej-Sankt-Peterburg-360x240.jpg"
+        },
+        "icon": "Vesna.-1898.-Hudozhnik-Viktor-Borisov-Musatov-1870-1905.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Весна. 1898",
+      "title2": "Художник – Виктор Борисов-Мусатов (1870–1905). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8048,
+      "file": "2017/12/Avtoportret-s-zheltymi-liliyami.-1907.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 762,
+          "height": 1024
+        },
+        "content": {
+          "s": "Avtoportret-s-zheltymi-liliyami.-1907.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-360x484.jpg"
+        },
+        "icon": "Avtoportret-s-zheltymi-liliyami.-1907.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Автопортрет с желтыми лилиями. 1907",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8049,
+      "file": "2017/12/Baby.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Baby.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-768x765.jpg",
+          "s": "Baby.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-360x359.jpg"
+        },
+        "icon": "Baby.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Бабы. 1910",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8050,
+      "file": "2017/12/Horovod-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Istoriko-hudozhestvennyj-muzej-Serpuhov.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1024,
+          "height": 752
+        },
+        "content": {
+          "m": "Horovod-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Istoriko-hudozhestvennyj-muzej-Serpuhov-768x564.jpg",
+          "s": "Horovod-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Istoriko-hudozhestvennyj-muzej-Serpuhov-360x264.jpg"
+        },
+        "icon": "Horovod-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Istoriko-hudozhestvennyj-muzej-Serpuhov-150x150.jpg"
+      },
+      "title": "Хоровод 1910",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Историко-художественный музей, Серпухов"
+    },
+    {
+      "id": 8051,
+      "file": "2017/12/Horovod.-Kon.-XIX-v.-Lubok.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1222,
+          "height": 772
+        },
+        "content": {
+          "m": "Horovod.-Kon.-XIX-v.-Lubok.-Russkij-muzej-Sankt-Peterburg-768x485.jpg",
+          "s": "Horovod.-Kon.-XIX-v.-Lubok.-Russkij-muzej-Sankt-Peterburg-360x227.jpg"
+        },
+        "icon": "Horovod.-Kon.-XIX-v.-Lubok.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Хоровод. Кон. XIX в.",
+      "title2": "Лубок. Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8052,
+      "file": "2017/12/Mat.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Penzenskaya-oblastnaya-kartinnaya-galereya.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 816,
+          "height": 945
+        },
+        "content": {
+          "m": "Mat.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Penzenskaya-oblastnaya-kartinnaya-galereya-768x889.jpg",
+          "s": "Mat.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Penzenskaya-oblastnaya-kartinnaya-galereya-360x417.jpg"
+        },
+        "icon": "Mat.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Penzenskaya-oblastnaya-kartinnaya-galereya-150x150.jpg"
+      },
+      "title": "Мать. 1910",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Пензенская областная картинная галерея"
+    },
+    {
+      "id": 8053,
+      "file": "2017/12/Bortsy.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 900,
+          "height": 740
+        },
+        "content": {
+          "m": "Bortsy.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-768x631.jpg",
+          "s": "Bortsy.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-360x296.jpg"
+        },
+        "icon": "Bortsy.-1910.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Борцы. 1910",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8054,
+      "file": "2017/12/Kupalshhik.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-Muzej-Stedelik-Amsterdam.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 657,
+          "height": 1000
+        },
+        "content": {
+          "s": "Kupalshhik.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-Muzej-Stedelik-Amsterdam-360x548.jpg"
+        },
+        "icon": "Kupalshhik.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-Muzej-Stedelik-Amsterdam-150x150.jpg"
+      },
+      "title": "Купальщик. 1911",
+      "title2": "Художник – Казимир Малевич (польск. Kazimierz Malewicz, 1879–1935). Музей Стеделик, Амстердам"
+    },
+    {
+      "id": 8055,
+      "file": "2017/12/Mihail-Larionov-1881-1964-i-Natalya-Goncharova-1881-1962.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Mihail-Larionov-1881-1964-i-Natalya-Goncharova-1881-1962-768x765.jpg",
+          "s": "Mihail-Larionov-1881-1964-i-Natalya-Goncharova-1881-1962-360x359.jpg"
+        },
+        "icon": "Mihail-Larionov-1881-1964-i-Natalya-Goncharova-1881-1962-150x150.jpg"
+      },
+      "title": "Михаил Ларионов (1881–1964) и Наталья Гончарова (1881–1962)"
+    },
+    {
+      "id": 8056,
+      "file": "2017/12/David-Burlyuk-v-futuristicheskom-grime.-1910.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 700,
+          "height": 953
+        },
+        "content": {
+          "s": "David-Burlyuk-v-futuristicheskom-grime.-1910-360x490.jpg"
+        },
+        "icon": "David-Burlyuk-v-futuristicheskom-grime.-1910-150x150.jpg"
+      },
+      "title": "Давид Бурлюк в футуристическом гриме. 1910"
+    },
+    {
+      "id": 8057,
+      "file": "2017/12/Fragment-kartiny-Ivan-Groznyj-i-syn-ego-Ivan-16-noyabrya-1581-goda-posle-poluchennyh-povrezhdenij.-1913.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 783,
+          "height": 1080
+        },
+        "content": {
+          "m": "Fragment-kartiny-Ivan-Groznyj-i-syn-ego-Ivan-16-noyabrya-1581-goda-posle-poluchennyh-povrezhdenij.-1913-768x1059.jpg",
+          "s": "Fragment-kartiny-Ivan-Groznyj-i-syn-ego-Ivan-16-noyabrya-1581-goda-posle-poluchennyh-povrezhdenij.-1913-360x497.jpg"
+        },
+        "icon": "Fragment-kartiny-Ivan-Groznyj-i-syn-ego-Ivan-16-noyabrya-1581-goda-posle-poluchennyh-povrezhdenij.-1913-150x150.jpg"
+      },
+      "title": "Фрагмент картины «Иван Грозный и сын его Иван 16 ноября 1581 года» после полученных повреждений. 1913"
+    },
+    {
+      "id": 8058,
+      "file": "2017/12/Afisha-vystavki-Oslinyj-hvost-.-1912.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Afisha-vystavki-Oslinyj-hvost-.-1912-768x765.jpg",
+          "s": "Afisha-vystavki-Oslinyj-hvost-.-1912-360x359.jpg"
+        },
+        "icon": "Afisha-vystavki-Oslinyj-hvost-.-1912-150x150.jpg"
+      },
+      "title": "Афиша выставки «Ослиный хвост». 1912"
+    },
+    {
+      "id": 8059,
+      "file": "2017/12/Otdyhayushhij-soldat.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1000,
+          "height": 901
+        },
+        "content": {
+          "m": "Otdyhayushhij-soldat.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x692.jpg",
+          "s": "Otdyhayushhij-soldat.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x324.jpg"
+        },
+        "icon": "Otdyhayushhij-soldat.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Отдыхающий солдат. 1911",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8060,
+      "file": "2017/12/Portret-Mihaila-Larionova-i-ego-vzvodnogo.-1911.-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 800,
+          "height": 968
+        },
+        "content": {
+          "m": "Portret-Mihaila-Larionova-i-ego-vzvodnogo.-1911.-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-768x929.jpg",
+          "s": "Portret-Mihaila-Larionova-i-ego-vzvodnogo.-1911.-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-360x436.jpg"
+        },
+        "icon": "Portret-Mihaila-Larionova-i-ego-vzvodnogo.-1911.-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Портрет Михаила Ларионова и его взводного. 1911",
+      "title2": "Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8061,
+      "file": "2017/12/Otdyhayushhij-soldat.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Rossijskaya-gosudarstvennaya-biblioteka-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Otdyhayushhij-soldat.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Rossijskaya-gosudarstvennaya-biblioteka-Moskva-768x765.jpg",
+          "s": "Otdyhayushhij-soldat.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Rossijskaya-gosudarstvennaya-biblioteka-Moskva-360x359.jpg"
+        },
+        "icon": "Otdyhayushhij-soldat.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Rossijskaya-gosudarstvennaya-biblioteka-Moskva-150x150.jpg"
+      },
+      "title": "Отдыхающий солдат. Эскиз. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Российская государственная библиотека, Москва"
+    },
+    {
+      "id": 8062,
+      "file": "2017/12/Stepan-Razin.-1906.-Hudozhnik-Vasilij-Surikov-1848-1916.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Stepan-Razin.-1906.-Hudozhnik-Vasilij-Surikov-1848-1916-768x765.jpg",
+          "s": "Stepan-Razin.-1906.-Hudozhnik-Vasilij-Surikov-1848-1916-360x359.jpg"
+        },
+        "icon": "Stepan-Razin.-1906.-Hudozhnik-Vasilij-Surikov-1848-1916-150x150.jpg"
+      },
+      "title": "Степан Разин. 1906",
+      "title2": "Художник – Василий Суриков (1848–1916)"
+    },
+    {
+      "id": 8063,
+      "file": "2017/12/Kupayushhiesya-soldaty.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1250,
+          "height": 1080
+        },
+        "content": {
+          "m": "Kupayushhiesya-soldaty.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x664.jpg",
+          "s": "Kupayushhiesya-soldaty.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x311.jpg"
+        },
+        "icon": "Kupayushhiesya-soldaty.-1911.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Купающиеся солдаты. 1911",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8064,
+      "file": "2017/12/Argentinskaya-polka.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-CHastnoe-sobranie-Nyu-Jork.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 574,
+          "height": 1000
+        },
+        "content": {
+          "s": "Argentinskaya-polka.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-CHastnoe-sobranie-Nyu-Jork-360x627.jpg"
+        },
+        "icon": "Argentinskaya-polka.-1911.-Hudozhnik-Kazimir-Malevich-polsk.-Kazimierz-Malewicz-1879-1935.-CHastnoe-sobranie-Nyu-Jork-150x150.jpg"
+      },
+      "title": "Аргентинская полька. 1911",
+      "title2": "Художник – Казимир Малевич (польск. Kazimierz Malewicz, 1879–1935). Частное собрание, Нью-Йорк"
+    },
+    {
+      "id": 8065,
+      "file": "2017/12/Pavlin-pod-yarkim-solntsem-stil-egipetskij.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 900,
+          "height": 814
+        },
+        "content": {
+          "m": "Pavlin-pod-yarkim-solntsem-stil-egipetskij.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-768x695.jpg",
+          "s": "Pavlin-pod-yarkim-solntsem-stil-egipetskij.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-360x326.jpg"
+        },
+        "icon": "Pavlin-pod-yarkim-solntsem-stil-egipetskij.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Павлин под ярким солнцем (стиль египетский). 1911",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8066,
+      "file": "2017/12/Pavlin-stil-ukrainskoj-vyshivki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1194,
+          "height": 1067
+        },
+        "content": {
+          "m": "Pavlin-stil-ukrainskoj-vyshivki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-768x686.jpg",
+          "s": "Pavlin-stil-ukrainskoj-vyshivki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-360x322.jpg"
+        },
+        "icon": "Pavlin-stil-ukrainskoj-vyshivki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Павлин (стиль украинской вышивки). 1911",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8067,
+      "file": "2017/12/Sbor-plodov.-1908.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 460,
+          "height": 770
+        },
+        "content": {
+          "s": "Sbor-plodov.-1908.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-360x603.jpg"
+        },
+        "icon": "Sbor-plodov.-1908.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Сбор плодов. 1908",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8068,
+      "file": "2017/12/Krestyane-sobirayushhie-yabloki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1028,
+          "height": 1080
+        },
+        "content": {
+          "m": "Krestyane-sobirayushhie-yabloki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-768x807.jpg",
+          "s": "Krestyane-sobirayushhie-yabloki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-360x378.jpg"
+        },
+        "icon": "Krestyane-sobirayushhie-yabloki.-1911.-Hudozhnik-Natalya-Goncharova-1881-1962.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Крестьяне, собирающие яблоки. 1911",
+      "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8069,
+      "file": "2017/12/Konstruktsiya.-1920.-Hudozhnik-Lyubov-Popova-1889-1924.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 760,
+          "height": 922
+        },
+        "content": {
+          "s": "Konstruktsiya.-1920.-Hudozhnik-Lyubov-Popova-1889-1924.-Tretyakovskaya-galereya-Moskva-360x437.jpg"
+        },
+        "icon": "Konstruktsiya.-1920.-Hudozhnik-Lyubov-Popova-1889-1924.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Конструкция. 1920",
+      "title2": "Художник – Любовь Попова (1889–1924). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8070,
+      "file": "2017/12/Avtoportret.-Matros.-1911.-Hudozhnik-Vladimir-Tatlin-1885-1953.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 778,
+          "height": 768
+        },
+        "content": {
+          "m": "Avtoportret.-Matros.-1911.-Hudozhnik-Vladimir-Tatlin-1885-1953.-Russkij-muzej-Sankt-Peterburg-768x758.jpg",
+          "s": "Avtoportret.-Matros.-1911.-Hudozhnik-Vladimir-Tatlin-1885-1953.-Russkij-muzej-Sankt-Peterburg-360x355.jpg"
+        },
+        "icon": "Avtoportret.-Matros.-1911.-Hudozhnik-Vladimir-Tatlin-1885-1953.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Автопортрет. Матрос. 1911",
+      "title2": "Художник – Владимир Татлин (1885–1953). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8071,
+      "file": "2017/12/Afisha-vystavki-Bubnovyj-valet-.-1912.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Afisha-vystavki-Bubnovyj-valet-.-1912-768x765.jpg",
+          "s": "Afisha-vystavki-Bubnovyj-valet-.-1912-360x359.jpg"
+        },
+        "icon": "Afisha-vystavki-Bubnovyj-valet-.-1912-150x150.jpg"
+      },
+      "title": "Афиша выставки «Бубновый валет». 1912"
+    },
+    {
+      "id": 8072,
+      "file": "2017/12/Pejzazh-s-bashnyami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1721,
+          "height": 1080
+        },
+        "content": {
+          "l": "Pejzazh-s-bashnyami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-1366x857.jpg",
+          "m": "Pejzazh-s-bashnyami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-768x482.jpg",
+          "s": "Pejzazh-s-bashnyami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-360x226.jpg"
+        },
+        "icon": "Pejzazh-s-bashnyami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-150x150.jpg"
+      },
+      "title": "Пейзаж с башнями. 1911",
+      "title2": "Художник – Илья Машков (1881–1944). Частное собрание"
+    },
+    {
+      "id": 8073,
+      "file": "2017/12/Avtoportret-v-serom.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 852,
+          "height": 1080
+        },
+        "content": {
+          "m": "Avtoportret-v-serom.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-Moskva-768x974.jpg",
+          "s": "Avtoportret-v-serom.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-Moskva-360x456.jpg"
+        },
+        "icon": "Avtoportret-v-serom.-1910.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Автопортрет в сером. 1910",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8074,
+      "file": "2017/12/Portret-knyagini-Olgi-Orlovoj.-1911.-Hudozhnik-Valentin-Serov-1865-1911.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 720,
+          "height": 1080
+        },
+        "content": {
+          "s": "Portret-knyagini-Olgi-Orlovoj.-1911.-Hudozhnik-Valentin-Serov-1865-1911.-Russkij-muzej-Sankt-Peterburg-360x540.jpg"
+        },
+        "icon": "Portret-knyagini-Olgi-Orlovoj.-1911.-Hudozhnik-Valentin-Serov-1865-1911.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Портрет княгини Ольги Орловой. 1911",
+      "title2": "Художник – Валентин Серов (1865–1911). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8075,
+      "file": "2017/12/Dama-s-fazanami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 626,
+          "height": 876
+        },
+        "content": {
+          "s": "Dama-s-fazanami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-360x504.jpg"
+        },
+        "icon": "Dama-s-fazanami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Дама с фазанами. 1911",
+      "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8076,
+      "file": "2017/12/Natyurmort-s-fruktami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1065,
+          "height": 780
+        },
+        "content": {
+          "m": "Natyurmort-s-fruktami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-768x562.jpg",
+          "s": "Natyurmort-s-fruktami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-360x264.jpg"
+        },
+        "icon": "Natyurmort-s-fruktami.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-CHastnoe-sobranie-150x150.jpg"
+      },
+      "title": "Натюрморт с фруктами. 1911",
+      "title2": "Художник – Илья Машков (1881–1944). Частное собрание"
+    },
+    {
+      "id": 8077,
+      "file": "2017/12/Tri-sestry-na-divane.-Portret-N.-L.-i-E.-Samojlovyh.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Omskij-muzej-izobrazitelnyh-iskusstv-im.-M.A.-Vrubelya.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1000,
+          "height": 774
+        },
+        "content": {
+          "m": "Tri-sestry-na-divane.-Portret-N.-L.-i-E.-Samojlovyh.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Omskij-muzej-izobrazitelnyh-iskusstv-im.-M.A.-Vrubelya-768x594.jpg",
+          "s": "Tri-sestry-na-divane.-Portret-N.-L.-i-E.-Samojlovyh.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Omskij-muzej-izobrazitelnyh-iskusstv-im.-M.A.-Vrubelya-360x279.jpg"
+        },
+        "icon": "Tri-sestry-na-divane.-Portret-N.-L.-i-E.-Samojlovyh.-1911.-Hudozhnik-Ilya-Mashkov-1881-1944.-Omskij-muzej-izobrazitelnyh-iskusstv-im.-M.A.-Vrubelya-150x150.jpg"
+      },
+      "title": "Три сестры на диване. Портрет Н., Л. и Е. Самойловых. 1911",
+      "title2": "Художник – Илья Машков (1881–1944). Омский музей изобразительных искусств им. М.А. Врубеля"
+    },
+    {
+      "id": 8078,
+      "file": "2017/12/Semejnyj-portret-sienskij.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1198,
+          "height": 924
+        },
+        "content": {
+          "m": "Semejnyj-portret-sienskij.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-768x592.jpg",
+          "s": "Semejnyj-portret-sienskij.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-360x278.jpg"
+        },
+        "icon": "Semejnyj-portret-sienskij.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Tretyakovskaya-galereya-150x150.jpg"
+      },
+      "title": "Семейный портрет (сиенский). 1912",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8079,
+      "file": "2017/12/Ploshhad-Sinorii-v-Siene.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Gosudarstvennyj-muzej-izobrazitelnyh-iskusstv-Respubliki-Tatarstan-Kazan.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1079,
+          "height": 840
+        },
+        "content": {
+          "m": "Ploshhad-Sinorii-v-Siene.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Gosudarstvennyj-muzej-izobrazitelnyh-iskusstv-Respubliki-Tatarstan-Kazan-768x598.jpg",
+          "s": "Ploshhad-Sinorii-v-Siene.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Gosudarstvennyj-muzej-izobrazitelnyh-iskusstv-Respubliki-Tatarstan-Kazan-360x280.jpg"
+        },
+        "icon": "Ploshhad-Sinorii-v-Siene.-1912.-Hudozhnik-Petr-Konchalovskij-1876-1956.-Gosudarstvennyj-muzej-izobrazitelnyh-iskusstv-Respubliki-Tatarstan-Kazan-150x150.jpg"
+      },
+      "title": "Площадь Синьории в Сиене. 1912",
+      "title2": "Художник – Петр Кончаловский (1876–1956). Государственный музей изобразительных искусств Республики Татарстан, Казань"
+    },
+    {
+      "id": 8080,
+      "file": "2017/12/Natyurmort-s-turetskoj-nabojkoj.-1913.-Hudozhnik-Ilya-Mashkov-1881-1944.-Saratovskij-gosudarstvennyj-hudozhestvennyj-muzej.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 935,
+          "height": 742
+        },
+        "content": {
+          "m": "Natyurmort-s-turetskoj-nabojkoj.-1913.-Hudozhnik-Ilya-Mashkov-1881-1944.-Saratovskij-gosudarstvennyj-hudozhestvennyj-muzej-768x609.jpg",
+          "s": "Natyurmort-s-turetskoj-nabojkoj.-1913.-Hudozhnik-Ilya-Mashkov-1881-1944.-Saratovskij-gosudarstvennyj-hudozhestvennyj-muzej-360x286.jpg"
+        },
+        "icon": "Natyurmort-s-turetskoj-nabojkoj.-1913.-Hudozhnik-Ilya-Mashkov-1881-1944.-Saratovskij-gosudarstvennyj-hudozhestvennyj-muzej-150x150.jpg"
+      },
+      "title": "Натюрморт с турецкой набойкой. 1913",
+      "title2": "Художник – Илья Машков (1881–1944). Саратовский государственный художественный музей"
+    },
+    {
+      "id": 8081,
+      "file": "2017/12/Osen-schastlivaya.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 675,
+          "height": 800
+        },
+        "content": {
+          "s": "Osen-schastlivaya.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-360x427.jpg"
+        },
+        "icon": "Osen-schastlivaya.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Осень счастливая. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8082,
+      "file": "2017/12/Foto-hudozhnikov-Oslinogo-hvosta-avtografy-i-odin-iz-printsipov-gruppy.-1913.-Stranitsa-iz-sbornika-Oslinyj-hvost-i-mishen-.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1000,
+          "height": 854
+        },
+        "content": {
+          "m": "Foto-hudozhnikov-Oslinogo-hvosta-avtografy-i-odin-iz-printsipov-gruppy.-1913.-Stranitsa-iz-sbornika-Oslinyj-hvost-i-mishen--768x656.jpg",
+          "s": "Foto-hudozhnikov-Oslinogo-hvosta-avtografy-i-odin-iz-printsipov-gruppy.-1913.-Stranitsa-iz-sbornika-Oslinyj-hvost-i-mishen--360x307.jpg"
+        },
+        "icon": "Foto-hudozhnikov-Oslinogo-hvosta-avtografy-i-odin-iz-printsipov-gruppy.-1913.-Stranitsa-iz-sbornika-Oslinyj-hvost-i-mishen--150x150.jpg"
+      },
+      "title": "Фото художников «Ослиного хвоста», автографы и один из принципов группы. 1913",
+      "title2": "Страница из сборника «Ослиный хвост и мишень»"
+    },
+    {
+      "id": 8083,
+      "file": "2017/12/Venera-i-Mihail.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1395,
+          "height": 1080
+        },
+        "content": {
+          "l": "Venera-i-Mihail.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-1366x1058.jpg",
+          "m": "Venera-i-Mihail.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-768x595.jpg",
+          "s": "Venera-i-Mihail.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-360x279.jpg"
+        },
+        "icon": "Venera-i-Mihail.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Russkij-muzej-Sankt-Peterburg-150x150.jpg"
+      },
+      "title": "Венера и Михаил. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург"
+    },
+    {
+      "id": 8084,
+      "file": "2017/12/Osen.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 776,
+          "height": 938
+        },
+        "content": {
+          "m": "Osen.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-768x928.jpg",
+          "s": "Osen.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-360x435.jpg"
+        },
+        "icon": "Osen.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Natsionalnyj-tsentr-iskusstva-i-kultury-ZHorzha-Pompidu-Parizh-150x150.jpg"
+      },
+      "title": "Осень. Из цикла «Времена года». 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Национальный центр искусства и культуры Жоржа Помпиду, Париж"
+    },
+    {
+      "id": 8085,
+      "file": "2017/12/Zima.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1321,
+          "height": 1080
+        },
+        "content": {
+          "m": "Zima.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x628.jpg",
+          "s": "Zima.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x294.jpg"
+        },
+        "icon": "Zima.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Зима. Из цикла «Времена года». 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8086,
+      "file": "2017/12/Leto.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-CHastnaya-kollektsiya-Parizh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 776,
+          "height": 913
+        },
+        "content": {
+          "m": "Leto.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-CHastnaya-kollektsiya-Parizh-768x904.jpg",
+          "s": "Leto.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-CHastnaya-kollektsiya-Parizh-360x424.jpg"
+        },
+        "icon": "Leto.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-CHastnaya-kollektsiya-Parizh-150x150.jpg"
+      },
+      "title": "Лето. Из цикла «Времена года». 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Частная коллекция, Париж"
+    },
+    {
+      "id": 8087,
+      "file": "2017/12/Vesna.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 776,
+          "height": 954
+        },
+        "content": {
+          "m": "Vesna.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x944.jpg",
+          "s": "Vesna.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x443.jpg"
+        },
+        "icon": "Vesna.-Iz-tsikla-Vremena-goda-.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Весна. Из цикла «Времена года». 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8088,
+      "file": "2017/12/Katsapskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Nizhegorodskij-gosudarstvennyj-hudozhestvennyj-muzej.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1397,
+          "height": 1080
+        },
+        "content": {
+          "l": "Katsapskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Nizhegorodskij-gosudarstvennyj-hudozhestvennyj-muzej-1366x1056.jpg",
+          "m": "Katsapskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Nizhegorodskij-gosudarstvennyj-hudozhestvennyj-muzej-768x594.jpg",
+          "s": "Katsapskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Nizhegorodskij-gosudarstvennyj-hudozhestvennyj-muzej-360x278.jpg"
+        },
+        "icon": "Katsapskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Nizhegorodskij-gosudarstvennyj-hudozhestvennyj-muzej-150x150.jpg"
+      },
+      "title": "Кацапская Венера. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Нижегородский государственный художественный музей"
+    },
+    {
+      "id": 8089,
+      "file": "2017/12/Evrejskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Muzej-izobrazitelnyh-iskusstv-Ekaterinburg.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Evrejskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Muzej-izobrazitelnyh-iskusstv-Ekaterinburg-768x765.jpg",
+          "s": "Evrejskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Muzej-izobrazitelnyh-iskusstv-Ekaterinburg-360x359.jpg"
+        },
+        "icon": "Evrejskaya-Venera.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Muzej-izobrazitelnyh-iskusstv-Ekaterinburg-150x150.jpg"
+      },
+      "title": "Еврейская Венера. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Музей изобразительных искусств, Екатеринбург"
+    },
+    {
+      "id": 8090,
+      "file": "2017/12/Rybak-v-krasnoj-rubashke.-1906.-Hudozhnik-Niko-Pirosmani-1862-1918.-Muzej-izobrazitelnyh-iskusstv-im.-SHalva-Amiranashvili-Tbilisi.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 748,
+          "height": 1080
+        },
+        "content": {
+          "s": "Rybak-v-krasnoj-rubashke.-1906.-Hudozhnik-Niko-Pirosmani-1862-1918.-Muzej-izobrazitelnyh-iskusstv-im.-SHalva-Amiranashvili-Tbilisi-360x520.jpg"
+        },
+        "icon": "Rybak-v-krasnoj-rubashke.-1906.-Hudozhnik-Niko-Pirosmani-1862-1918.-Muzej-izobrazitelnyh-iskusstv-im.-SHalva-Amiranashvili-Tbilisi-150x150.jpg"
+      },
+      "title": "Рыбак в красной рубашке. 1906",
+      "title2": "Художник – Нико Пиросмани (1862–1918). Музей изобразительных искусств им. Шалвы Амиранашвили, Тбилиси"
+    },
+    {
+      "id": 8091,
+      "file": "2017/12/Portret-Ili-Zdanevicha.-1913.-Hudozhnik-Niko-Pirosmani-1862-1918.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 800,
+          "height": 899
+        },
+        "content": {
+          "m": "Portret-Ili-Zdanevicha.-1913.-Hudozhnik-Niko-Pirosmani-1862-1918-768x863.jpg",
+          "s": "Portret-Ili-Zdanevicha.-1913.-Hudozhnik-Niko-Pirosmani-1862-1918-360x405.jpg"
+        },
+        "icon": "Portret-Ili-Zdanevicha.-1913.-Hudozhnik-Niko-Pirosmani-1862-1918-150x150.jpg"
+      },
+      "title": "Портрет Ильи Зданевича. 1913",
+      "title2": "Художник – Нико Пиросмани (1862–1918)"
+    },
+    {
+      "id": 8092,
+      "file": "2017/12/Semejnaya-kompaniya.-1907.-Hudozhnik-Niko-Pirosmani-1862-1918.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 768,
+          "height": 765
+        },
+        "content": {
+          "m": "Semejnaya-kompaniya.-1907.-Hudozhnik-Niko-Pirosmani-1862-1918.-Tretyakovskaya-galereya-Moskva-768x765.jpg",
+          "s": "Semejnaya-kompaniya.-1907.-Hudozhnik-Niko-Pirosmani-1862-1918.-Tretyakovskaya-galereya-Moskva-360x359.jpg"
+        },
+        "icon": "Semejnaya-kompaniya.-1907.-Hudozhnik-Niko-Pirosmani-1862-1918.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Семейная компания. 1907",
+      "title2": "Художник – Нико Пиросмани (1862–1918). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8093,
+      "file": "2017/12/Kosulya-na-fone-pejzazha.-1915.-Hudozhnik-Niko-Pirosmani-1862-1918.-Gosudarstvennyj-muzej-iskusstv-Gruzii-Tbilisi.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 751,
+          "height": 1080
+        },
+        "content": {
+          "s": "Kosulya-na-fone-pejzazha.-1915.-Hudozhnik-Niko-Pirosmani-1862-1918.-Gosudarstvennyj-muzej-iskusstv-Gruzii-Tbilisi-360x518.jpg"
+        },
+        "icon": "Kosulya-na-fone-pejzazha.-1915.-Hudozhnik-Niko-Pirosmani-1862-1918.-Gosudarstvennyj-muzej-iskusstv-Gruzii-Tbilisi-150x150.jpg"
+      },
+      "title": "Косуля на фоне пейзажа. 1915",
+      "title2": "Художник – Нико Пиросмани (1862–1918). Государственный музей искусств Грузии, Тбилиси"
+    },
+    {
+      "id": 8094,
+      "file": "2017/12/Petuh-i-kuritsa.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 1028,
+          "height": 1080
+        },
+        "content": {
+          "m": "Petuh-i-kuritsa.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-768x807.jpg",
+          "s": "Petuh-i-kuritsa.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-360x378.jpg"
+        },
+        "icon": "Petuh-i-kuritsa.-1912.-Hudozhnik-Mihail-Larionov-1881-1964.-Tretyakovskaya-galereya-Moskva-150x150.jpg"
+      },
+      "title": "Петух и курица. 1912",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва"
+    },
+    {
+      "id": 8095,
+      "file": "2017/12/Sobstvennyj-portret.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Sobranie-A.-K.-Tomilinoj-Larionovoj-Parizh.jpg",
+      "info": {
+        "path": "2017/12/",
+        "mime-type": "image/jpeg",
+        "size": {
+          "width": 902,
+          "height": 1080
+        },
+        "content": {
+          "m": "Sobstvennyj-portret.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Sobranie-A.-K.-Tomilinoj-Larionovoj-Parizh-768x920.jpg",
+          "s": "Sobstvennyj-portret.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Sobranie-A.-K.-Tomilinoj-Larionovoj-Parizh-360x431.jpg"
+        },
+        "icon": "Sobstvennyj-portret.-1910.-Hudozhnik-Mihail-Larionov-1881-1964.-Sobranie-A.-K.-Tomilinoj-Larionovoj-Parizh-150x150.jpg"
+      },
+      "title": "Собственный портрет. 1910",
+      "title2": "Художник – Михаил Ларионов (1881–1964). Собрание А. К. Томилиной-Ларионовой, Париж"
+    }
+  ],
+  "episodes": [
+    {
+      "id": 178,
+      "title": "Неопримитивизм",
+      "elements": [
+        {
+          "id": 8362,
+          "assetId": 8019,
+          "start": 0,
+          "content": {
+            "title": "Каталог выставки «Бубновый валет». 1910–1911",
+            "track": 1,
+            "duration": 58.2
+          }
+        },
+        {
+          "id": 8363,
+          "assetId": 8020,
+          "start": 58.2,
+          "content": {
+            "title": "Дух мертвых не дремлет. 1892",
+            "title2": "Художник – Поль Гоген (фр. Paul Gauguin, 1848–1903). Художественная галерея Олбрайт-Нокс, Буффало",
+            "track": 1,
+            "duration": 74.4
+          }
+        },
+        {
+          "id": 8364,
+          "assetId": 8021,
+          "start": 132.6,
+          "content": {
+            "title": "Голубая обнаженная. 1907",
+            "title2": "Художник – Анри Матисс (фр. Henri Matiss, 1869–1954). Балтиморский художественный музей",
+            "track": 1,
+            "duration": 139.15
+          }
+        },
+        {
+          "id": 8365,
+          "assetId": 8022,
+          "start": 271.75,
+          "content": {
+            "title": "Лежащая обнаженная перед зеркалом. 1910",
+            "title2": "Художник – Эрнст Людвиг Кирхнер (нем. Ernst Ludwig Kirchner, 1880–1938). Музей группы «Мост», Берлин",
+            "track": 1,
+            "duration": 66.45
+          }
+        },
+        {
+          "id": 8366,
+          "assetId": 8023,
+          "start": 338.2,
+          "content": {
+            "title": "Пляска вокруг золотого тельца. 1910",
+            "title2": "Художник – Эмиль Нольде (нем. Emil Nolde, 1867–1956). Пинакотека современного искусства, Мюнхен",
+            "track": 1,
+            "duration": 28.8
+          }
+        },
+        {
+          "id": 8367,
+          "assetId": 8024,
+          "start": 367,
+          "content": {
+            "title": "Реконструкция комнаты Поля Гогена в особняке Сергея Щукина",
+            "track": 1,
+            "duration": 45
+          }
+        },
+        {
+          "id": 8368,
+          "assetId": 8025,
+          "start": 412,
+          "content": {
+            "title": "Реконструкция экспозиции Матисса в особняке Сергея Щукина",
+            "track": 1,
+            "duration": 23.5
+          }
+        },
+        {
+          "id": 8369,
+          "assetId": 8026,
+          "start": 435.5,
+          "content": {
+            "title": "Деревенские купальщицы. 1909",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Краснодарский краевой художественный музей им. Ф.А. Коваленко",
+            "track": 1,
+            "duration": 94.5
+          }
+        },
+        {
+          "id": 8370,
+          "assetId": 8027,
+          "start": 530,
+          "content": {
+            "title": "Лежащая натурщица. Ок. 1910",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петебург",
+            "track": 1,
+            "duration": 75
+          }
+        },
+        {
+          "id": 8371,
+          "assetId": 8028,
+          "start": 605,
+          "content": {
+            "title": "Дом Левинсона",
+            "title2": "Москва, Большая Дмитровка, д. 32",
+            "track": 1,
+            "duration": 36.2
+          }
+        },
+        {
+          "id": 8372,
+          "assetId": 8029,
+          "start": 641.2,
+          "content": {
+            "title": "Автопортрет и портрет Петра Кончаловского. 1910",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 180
+          }
+        },
+        {
+          "id": 8373,
+          "assetId": 8030,
+          "start": 821.2,
+          "content": {
+            "title": "Мальчик в расписной рубашке. 1909",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 47.6
+          }
+        },
+        {
+          "id": 8374,
+          "assetId": 8031,
+          "start": 868.8,
+          "content": {
+            "title": "Матадор Мануэль Гарта. 1910",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 65.8
+          }
+        },
+        {
+          "id": 8375,
+          "assetId": 8032,
+          "start": 934.6,
+          "content": {
+            "title": "Наташа на стуле (Портрет Н.П. Кончаловской в детстве). 1925",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Собрание В. А. и Е. А. Семенихиных",
+            "track": 1,
+            "duration": 12.6
+          }
+        },
+        {
+          "id": 8376,
+          "assetId": 8033,
+          "start": 947.2,
+          "content": {
+            "title": "Портрет Евгении Ивановны Киркальди (Дама с китаянкой). 1910",
+            "title2": "Художник – Илья Машков (1881–1944). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 62
+          }
+        },
+        {
+          "id": 8377,
+          "assetId": 8034,
+          "start": 1009.2,
+          "content": {
+            "title": "Портрет Папаши Танги. 1887",
+            "title2": "Художник – Винсент Ван Гог (нидерл. Vincent van Gogh, 1853–1890). Музей Родена, Париж",
+            "track": 1,
+            "duration": 39.2
+          }
+        },
+        {
+          "id": 8378,
+          "assetId": 8035,
+          "start": 1048.4,
+          "content": {
+            "title": "Арлезианка (Девушка из Арля). 1908",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Частное собрание",
+            "track": 1,
+            "duration": 37.1
+          }
+        },
+        {
+          "id": 8379,
+          "assetId": 8036,
+          "start": 1085.5,
+          "content": {
+            "title": "Ягоды на фоне красного подноса. Ок. 1908",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 65.5
+          }
+        },
+        {
+          "id": 8380,
+          "assetId": 8037,
+          "start": 1151,
+          "content": {
+            "title": "Натюрморт. Поднос и овощи. 1910",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 30.5
+          }
+        },
+        {
+          "id": 8381,
+          "assetId": 8038,
+          "start": 1181.5,
+          "content": {
+            "title": "Натюрморт с ананасом. Ок. 1910",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 52.7
+          }
+        },
+        {
+          "id": 8382,
+          "assetId": 8039,
+          "start": 1234.2,
+          "content": {
+            "title": "Вывеска. Нач. XX в.",
+            "title2": "Художник – Илья Машков (1881–1944). Музей истории Санкт-Петербурга",
+            "track": 1,
+            "duration": 40.6
+          }
+        },
+        {
+          "id": 8383,
+          "assetId": 8040,
+          "start": 1274.8,
+          "content": {
+            "title": "Вывеска для хлебной лавки. Нач. XX в.",
+            "title2": "Художник – Илья Машков (1881–1944). Музей истории Санкт-Петербурга",
+            "track": 1,
+            "duration": 104.6
+          }
+        },
+        {
+          "id": 8384,
+          "assetId": 8041,
+          "start": 1379.4,
+          "content": {
+            "title": "Сомалийская мама с ребёнком в «Человеческом зоопарке». Париж, 1895 г.",
+            "track": 1,
+            "duration": 88.6
+          }
+        },
+        {
+          "id": 8385,
+          "assetId": 8042,
+          "start": 1468,
+          "content": {
+            "title": "Художественная группа «Бубновый валет»",
+            "track": 1,
+            "duration": 28.2
+          }
+        },
+        {
+          "id": 8386,
+          "assetId": 8043,
+          "start": 1496.2,
+          "content": {
+            "title": "Павлины. 1910",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 54.2
+          }
+        },
+        {
+          "id": 8387,
+          "assetId": 8044,
+          "start": 1550.4,
+          "content": {
+            "title": "Павлины. 1904",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Волгоградский музей изобразительных искусств",
+            "track": 1,
+            "duration": 36.8
+          }
+        },
+        {
+          "id": 8388,
+          "assetId": 8045,
+          "start": 1587.2,
+          "content": {
+            "title": "Свиньи. 1906",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Национальный центр искусства и культуры Жоржа Помпиду, Париж",
+            "track": 1,
+            "duration": 27
+          }
+        },
+        {
+          "id": 8389,
+          "assetId": 8043,
+          "start": 1614.2,
+          "content": {
+            "title": "Павлины. 1910",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 14.3
+          }
+        },
+        {
+          "id": 8390,
+          "assetId": 8046,
+          "start": 1628.5,
+          "content": {
+            "title": "Рыбы на закате. 1904",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 14
+          }
+        },
+        {
+          "id": 8391,
+          "assetId": 8047,
+          "start": 1642.5,
+          "content": {
+            "title": "Весна. 1898",
+            "title2": "Художник – Виктор Борисов-Мусатов (1870–1905). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 28
+          }
+        },
+        {
+          "id": 8392,
+          "assetId": 8048,
+          "start": 1670.5,
+          "content": {
+            "title": "Автопортрет с желтыми лилиями. 1907",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 31.5
+          }
+        },
+        {
+          "id": 8393,
+          "assetId": 8049,
+          "start": 1702,
+          "content": {
+            "title": "Бабы. 1910",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 49.6
+          }
+        },
+        {
+          "id": 8394,
+          "assetId": 8050,
+          "start": 1751.6,
+          "content": {
+            "title": "Хоровод 1910",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Историко-художественный музей, Серпухов",
+            "track": 1,
+            "duration": 31.9
+          }
+        },
+        {
+          "id": 8395,
+          "assetId": 8051,
+          "start": 1783.5,
+          "content": {
+            "title": "Хоровод. Кон. XIX в.",
+            "title2": "Лубок. Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 41.3
+          }
+        },
+        {
+          "id": 8396,
+          "assetId": 8052,
+          "start": 1824.8,
+          "content": {
+            "title": "Мать. 1910",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Пензенская областная картинная галерея",
+            "track": 1,
+            "duration": 33.8
+          }
+        },
+        {
+          "id": 8397,
+          "assetId": 8053,
+          "start": 1858.6,
+          "content": {
+            "title": "Борцы. 1910",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 19.9
+          }
+        },
+        {
+          "id": 8398,
+          "assetId": 8054,
+          "start": 1878.5,
+          "content": {
+            "title": "Купальщик. 1911",
+            "title2": "Художник – Казимир Малевич (польск. Kazimierz Malewicz, 1879–1935). Музей Стеделик, Амстердам",
+            "track": 1,
+            "duration": 62.5
+          }
+        },
+        {
+          "id": 8399,
+          "assetId": 8055,
+          "start": 1941,
+          "content": {
+            "title": "Михаил Ларионов (1881–1964) и Наталья Гончарова (1881–1962)",
+            "track": 1,
+            "duration": 62.4
+          }
+        },
+        {
+          "id": 8400,
+          "assetId": 8056,
+          "start": 2003.4,
+          "content": {
+            "title": "Давид Бурлюк в футуристическом гриме. 1910",
+            "track": 1,
+            "duration": 13.4
+          }
+        },
+        {
+          "id": 8401,
+          "assetId": 8057,
+          "start": 2016.8,
+          "content": {
+            "title": "Фрагмент картины «Иван Грозный и сын его Иван 16 ноября 1581 года» после полученных повреждений. 1913",
+            "track": 1,
+            "duration": 35.6
+          }
+        },
+        {
+          "id": 8402,
+          "assetId": 8058,
+          "start": 2052.4,
+          "content": {
+            "title": "Афиша выставки «Ослиный хвост». 1912",
+            "track": 1,
+            "duration": 20.4
+          }
+        },
+        {
+          "id": 8403,
+          "assetId": 8059,
+          "start": 2072.8,
+          "content": {
+            "title": "Отдыхающий солдат. 1911",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 108.8
+          }
+        },
+        {
+          "id": 8404,
+          "assetId": 8060,
+          "start": 2181.6,
+          "content": {
+            "title": "Портрет Михаила Ларионова и его взводного. 1911",
+            "title2": "Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 29
+          }
+        },
+        {
+          "id": 8405,
+          "assetId": 8061,
+          "start": 2210.6,
+          "content": {
+            "title": "Отдыхающий солдат. Эскиз. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Российская государственная библиотека, Москва",
+            "track": 1,
+            "duration": 10.9
+          }
+        },
+        {
+          "id": 8406,
+          "assetId": 8062,
+          "start": 2221.5,
+          "content": {
+            "title": "Степан Разин. 1906",
+            "title2": "Художник – Василий Суриков (1848–1916)",
+            "track": 1,
+            "duration": 45.5
+          }
+        },
+        {
+          "id": 8407,
+          "assetId": 8063,
+          "start": 2267,
+          "content": {
+            "title": "Купающиеся солдаты. 1911",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 68.8
+          }
+        },
+        {
+          "id": 8408,
+          "assetId": 8064,
+          "start": 2335.8,
+          "content": {
+            "title": "Аргентинская полька. 1911",
+            "title2": "Художник – Казимир Малевич (польск. Kazimierz Malewicz, 1879–1935). Частное собрание, Нью-Йорк",
+            "track": 1,
+            "duration": 32
+          }
+        },
+        {
+          "id": 8409,
+          "assetId": 8065,
+          "start": 2367.8,
+          "content": {
+            "title": "Павлин под ярким солнцем (стиль египетский). 1911",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 82.4
+          }
+        },
+        {
+          "id": 8410,
+          "assetId": 8066,
+          "start": 2450.2,
+          "content": {
+            "title": "Павлин (стиль украинской вышивки). 1911",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 122.6
+          }
+        },
+        {
+          "id": 8411,
+          "assetId": 8067,
+          "start": 2572.8,
+          "content": {
+            "title": "Сбор плодов. 1908",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 13.95
+          }
+        },
+        {
+          "id": 8412,
+          "assetId": 8068,
+          "start": 2586.75,
+          "content": {
+            "title": "Крестьяне, собирающие яблоки. 1911",
+            "title2": "Художник – Наталья Гончарова (1881–1962). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 111.25
+          }
+        },
+        {
+          "id": 8413,
+          "assetId": 8069,
+          "start": 2698,
+          "content": {
+            "title": "Конструкция. 1920",
+            "title2": "Художник – Любовь Попова (1889–1924). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 46.2
+          }
+        },
+        {
+          "id": 8414,
+          "assetId": 8070,
+          "start": 2744.2,
+          "content": {
+            "title": "Автопортрет. Матрос. 1911",
+            "title2": "Художник – Владимир Татлин (1885–1953). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 36.8
+          }
+        },
+        {
+          "id": 8415,
+          "assetId": 8071,
+          "start": 2781,
+          "content": {
+            "title": "Афиша выставки «Бубновый валет». 1912",
+            "track": 1,
+            "duration": 13
+          }
+        },
+        {
+          "id": 8416,
+          "assetId": 8072,
+          "start": 2794,
+          "content": {
+            "title": "Пейзаж с башнями. 1911",
+            "title2": "Художник – Илья Машков (1881–1944). Частное собрание",
+            "track": 1,
+            "duration": 24.3
+          }
+        },
+        {
+          "id": 8417,
+          "assetId": 8073,
+          "start": 2818.3,
+          "content": {
+            "title": "Автопортрет в сером. 1910",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 34.5
+          }
+        },
+        {
+          "id": 8418,
+          "assetId": 8074,
+          "start": 2852.8,
+          "content": {
+            "title": "Портрет княгини Ольги Орловой. 1911",
+            "title2": "Художник – Валентин Серов (1865–1911). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 55.6
+          }
+        },
+        {
+          "id": 8419,
+          "assetId": 8073,
+          "start": 2908.4,
+          "content": {
+            "title": "Автопортрет в сером. 1910",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 14.75
+          }
+        },
+        {
+          "id": 8420,
+          "assetId": 8075,
+          "start": 2923.15,
+          "content": {
+            "title": "Дама с фазанами. 1911",
+            "title2": "Художник – Илья Машков (1881–1944). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 30.65
+          }
+        },
+        {
+          "id": 8421,
+          "assetId": 8076,
+          "start": 2953.8,
+          "content": {
+            "title": "Натюрморт с фруктами. 1911",
+            "title2": "Художник – Илья Машков (1881–1944). Частное собрание",
+            "track": 1,
+            "duration": 42
+          }
+        },
+        {
+          "id": 8422,
+          "assetId": 8077,
+          "start": 2995.8,
+          "content": {
+            "title": "Три сестры на диване. Портрет Н., Л. и Е. Самойловых. 1911",
+            "title2": "Художник – Илья Машков (1881–1944). Омский музей изобразительных искусств им. М.А. Врубеля",
+            "track": 1,
+            "duration": 17.4
+          }
+        },
+        {
+          "id": 8423,
+          "assetId": 8078,
+          "start": 3013.2,
+          "content": {
+            "title": "Семейный портрет (сиенский). 1912",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 73.4
+          }
+        },
+        {
+          "id": 8424,
+          "assetId": 8079,
+          "start": 3086.6,
+          "content": {
+            "title": "Площадь Синьории в Сиене. 1912",
+            "title2": "Художник – Петр Кончаловский (1876–1956). Государственный музей изобразительных искусств Республики Татарстан, Казань",
+            "track": 1,
+            "duration": 3.4
+          }
+        },
+        {
+          "id": 8425,
+          "assetId": 8080,
+          "start": 3090,
+          "content": {
+            "title": "Натюрморт с турецкой набойкой. 1913",
+            "title2": "Художник – Илья Машков (1881–1944). Саратовский государственный художественный музей",
+            "track": 1,
+            "duration": 117.4
+          }
+        },
+        {
+          "id": 8426,
+          "assetId": 8081,
+          "start": 3207.4,
+          "content": {
+            "title": "Осень счастливая. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 68.4
+          }
+        },
+        {
+          "id": 8427,
+          "assetId": 8082,
+          "start": 3275.8,
+          "content": {
+            "title": "Фото художников «Ослиного хвоста», автографы и один из принципов группы. 1913",
+            "title2": "Страница из сборника «Ослиный хвост и мишень»",
+            "track": 1,
+            "duration": 58.2
+          }
+        },
+        {
+          "id": 8428,
+          "assetId": 8083,
+          "start": 3334,
+          "content": {
+            "title": "Венера и Михаил. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Русский музей, Санкт-Петербург",
+            "track": 1,
+            "duration": 34.5
+          }
+        },
+        {
+          "id": 8429,
+          "assetId": 8084,
+          "start": 3368.5,
+          "content": {
+            "title": "Осень. Из цикла «Времена года». 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Национальный центр искусства и культуры Жоржа Помпиду, Париж",
+            "track": 1,
+            "duration": 40.5
+          }
+        },
+        {
+          "id": 8430,
+          "assetId": 8085,
+          "start": 3409,
+          "content": {
+            "title": "Зима. Из цикла «Времена года». 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 18.8
+          }
+        },
+        {
+          "id": 8431,
+          "assetId": 8086,
+          "start": 3427.8,
+          "content": {
+            "title": "Лето. Из цикла «Времена года». 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Частная коллекция, Париж",
+            "track": 1,
+            "duration": 7.4
+          }
+        },
+        {
+          "id": 8432,
+          "assetId": 8087,
+          "start": 3435.2,
+          "content": {
+            "title": "Весна. Из цикла «Времена года». 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 11
+          }
+        },
+        {
+          "id": 8433,
+          "assetId": 8088,
+          "start": 3446.2,
+          "content": {
+            "title": "Кацапская Венера. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Нижегородский государственный художественный музей",
+            "track": 1,
+            "duration": 9.2
+          }
+        },
+        {
+          "id": 8434,
+          "assetId": 8089,
+          "start": 3455.4,
+          "content": {
+            "title": "Еврейская Венера. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Музей изобразительных искусств, Екатеринбург",
+            "track": 1,
+            "duration": 59.6
+          }
+        },
+        {
+          "id": 8435,
+          "assetId": 8090,
+          "start": 3515,
+          "content": {
+            "title": "Рыбак в красной рубашке. 1906",
+            "title2": "Художник – Нико Пиросмани (1862–1918). Музей изобразительных искусств им. Шалвы Амиранашвили, Тбилиси",
+            "track": 1,
+            "duration": 29.8
+          }
+        },
+        {
+          "id": 8436,
+          "assetId": 8091,
+          "start": 3544.8,
+          "content": {
+            "title": "Портрет Ильи Зданевича. 1913",
+            "title2": "Художник – Нико Пиросмани (1862–1918)",
+            "track": 1,
+            "duration": 20.7
+          }
+        },
+        {
+          "id": 8437,
+          "assetId": 8092,
+          "start": 3565.5,
+          "content": {
+            "title": "Семейная компания. 1907",
+            "title2": "Художник – Нико Пиросмани (1862–1918). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 23.7
+          }
+        },
+        {
+          "id": 8438,
+          "assetId": 8093,
+          "start": 3589.2,
+          "content": {
+            "title": "Косуля на фоне пейзажа. 1915",
+            "title2": "Художник – Нико Пиросмани (1862–1918). Государственный музей искусств Грузии, Тбилиси",
+            "track": 1,
+            "duration": 31.8
+          }
+        },
+        {
+          "id": 8439,
+          "assetId": 8094,
+          "start": 3621,
+          "content": {
+            "title": "Петух и курица. 1912",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Третьяковская галерея, Москва",
+            "track": 1,
+            "duration": 56.6
+          }
+        },
+        {
+          "id": 8440,
+          "assetId": 8095,
+          "start": 3677.6,
+          "content": {
+            "title": "Собственный портрет. 1910",
+            "title2": "Художник – Михаил Ларионов (1881–1964). Собрание А. К. Томилиной-Ларионовой, Париж",
+            "track": 1,
+            "duration": 61.4
+          }
+        }
+      ],
+      "audio": {
+        "file": "2017/12/Svetlyakov_01_Avant-gardeRus_Mono_128Kbps_Nov_15_2017.mp3",
+        "info": {
+          "dataformat": "mp3",
+          "bitrate": 128000,
+          "filesize": 59835497,
+          "mime-type": "audio/mpeg",
+          "length": 3739,
+          "length_formatted": "1:02:19"
+        }
+      },
+      "contents": [
+        {
+          "id": 1501,
+          "title": "Интерес к дикости и экзотике на рубеже эпох",
+          "begin": 0
+        },
+        {
+          "id": 1502,
+          "title": "Собрание Сергея Щукина",
+          "begin": 367
+        },
+        {
+          "id": 1503,
+          "title": "Ранние работы М. Ларионова и И. Машкова",
+          "begin": 435.5
+        },
+        {
+          "id": 1504,
+          "title": "Художники-нарушители",
+          "begin": 605
+        },
+        {
+          "id": 1505,
+          "title": "Натюрморты и рекламные вывески",
+          "begin": 1085.5
+        },
+        {
+          "id": 1506,
+          "title": "Отличие от французов и немцев",
+          "begin": 1379.4
+        },
+        {
+          "id": 1507,
+          "title": "Павлины и свиньи Михаила Ларионова",
+          "begin": 1496.2
+        },
+        {
+          "id": 1508,
+          "title": "Живопись Натальи Гончаровой",
+          "begin": 1670.5
+        },
+        {
+          "id": 1509,
+          "title": "Раскол в «Бубновом валете»",
+          "begin": 1941
+        },
+        {
+          "id": 1510,
+          "title": "Выставка «Ослиный хвост», 1912 год",
+          "begin": 2052.4
+        },
+        {
+          "id": 1511,
+          "title": "Любовь Попова и Владимир Татлин",
+          "begin": 2698
+        },
+        {
+          "id": 1512,
+          "title": "«Бубновый валет» после раскола",
+          "begin": 2781
+        },
+        {
+          "id": 1513,
+          "title": "Выставка «Мишень», 1913 год",
+          "begin": 3207.4
+        }
+      ]
+    }
+  ],
+  "title": "Неопримитивизм"
+}

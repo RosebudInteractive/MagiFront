@@ -212,7 +212,7 @@ class NestedPlayer extends EventEmitter {
         let that = this;
 
         return {
-            designMode: true,
+            designMode: false,
             loader: new Loader(),
             onGetAssets: (e) => {
                 return new Promise((resolve, reject) => {
@@ -306,7 +306,7 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
-                store.dispatch(playerActions.setCurrentTime(_state.currentTime))
+                // store.dispatch(playerActions.setCurrentTime(_state.currentTime))
             },
             onPaused: () => {
                 that.emit('pause');

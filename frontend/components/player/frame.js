@@ -14,6 +14,7 @@ import ContentTooltip from "./content-tooltip";
 import RateTooltip from './rate-tooltip';
 
 import * as playerActions from '../../actions/player-actions'
+import * as playerStartActions from '../../actions/player-start-actions'
 
 class Frame extends Component {
 
@@ -25,6 +26,8 @@ class Frame extends Component {
     constructor(props) {
         super(props)
 
+        this._timer = null;
+
         this.state = {
             showContent: false,
             showRate: false,
@@ -34,24 +37,31 @@ class Frame extends Component {
 
 
     componentDidMount() {
-        let that = this;
-        let tooltips = $('.js-speed, .js-contents, .js-share');
+        $(document).mouseup((e) => {
+            let _isContent = e.target.closest('.js-contents'),
+                _isRate = e.target.closest('.js-speed'),
+                _isPlayer = e.target.closest('.ws-player-main'),
+                _isPauseFrame = e.target.closest('.player-frame__screen');
 
-        $(document).mouseup(function (e) {
-            let _needHide = false;
-            if (tooltips.has(e.target).length === 0) {
-                _needHide = _needHide || tooltips.hasClass('opened');
-                if (_needHide) {
-                    tooltips.removeClass('opened');
-                }
+            if (_isContent || _isRate) {
+                return
             }
 
-            that._hideAllTooltips = _needHide || that.state.showContent || that.state.showRate;
-            if (that._hideAllTooltips) {
-                that.setState({
-                    showContent: false,
-                    showRate: false,
-                })
+            if (_isPlayer) {
+                this.props.playerStartActions.startPause()
+            }
+
+            if (_isPauseFrame) {
+                this.props.playerStartActions.startPlay()
+            }
+
+            this._hideContentTooltip = this.state.showContent;
+            this._hideRateTooltip = this.state.showRate
+            if (this._hideContentTooltip) {
+                this.setState({ showContent: false })
+            }
+            if (this._hideRateTooltip) {
+                this.setState({ showRate: false })
             }
         });
 
@@ -60,13 +70,30 @@ class Frame extends Component {
             this.setState({fullScreen: _isFullScreen})
         });
 
-        // $(document).keydown((e) => {
-        //     if (e.which === 32) {
-        //         that._onPause()
+        // $(window).keydown((e) => {
+        //     if (e.which === 40) {
+        //         // this._onPause()
         //         e.preventDefault();
         //         return false
         //     }
         // })
+
+        // let that = this;
+        //
+        $(document).on('mousemove', () => {
+            $('body').removeClass('fade');
+            if (this._timer) {
+                clearTimeout(this._timer);
+            }
+
+            if (!this.props.paused) {
+                this._timer = setTimeout(function () {
+                    $('body').addClass('fade');
+                }, 7000);
+            } else {
+                this._timer = null
+            }
+        });
 
         if (this.props.visible) {
             let _id = this.props.lesson ? this.props.lesson.Id : '';
@@ -74,10 +101,6 @@ class Frame extends Component {
             this.props.playerActions.setFullViewPort(_container)
         }
     }
-
-    // componentWillReceiveProps(nextProps) {
-    //
-    // }
 
     componentDidUpdate(prevProps){
         if (!prevProps.visible && this.props.visible) {
@@ -98,21 +121,22 @@ class Frame extends Component {
     _removeListeners() {
         $(document).off('mouseup');
         $(document).off('keyup');
+        $(document).off('mousemove');
     }
 
     _openContent() {
-        if (!this._hideAllTooltips) {
+        if (!this._hideContentTooltip) {
             this.setState({showContent: !this.state.showContent})
         } else {
-            this._hideAllTooltips = false
+            this._hideContentTooltip = false
         }
     }
 
     _openRate() {
-        if (!this._hideAllTooltips) {
+        if (!this._hideRateTooltip) {
             this.setState({showRate: !this.state.showRate})
         } else {
-            this._hideAllTooltips = false
+            this._hideRateTooltip = false
         }
     }
 
@@ -131,27 +155,13 @@ class Frame extends Component {
         // }
     }
 
-    _keyUpHandler(e) {
+    _keyDownHandler(e) {
         if (e.which === 32) {
             this._onPause()
 
         }
         e.preventDefault();
-    }
-
-    _onScreenClick(e) {
-        if (this._hasOrIs(e.target, 'player-frame__screen') || this._hasOrIs(e.target, 'ws-container')) {
-            this._onPause()
-        }
-
-    }
-
-    _hasOrIs(target, name) {
-        if (target.className === name) {
-            return true
-        } else {
-            return target.parentNode ? false : this._hasOrIs(target.parentNode, name)
-        }
+        return false
     }
 
     _toggleFullscreen() {
@@ -190,8 +200,7 @@ class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}} onClick={::this._onScreenClick}
-                 onKeyUp={this._handleKeyUp} ref="player">
+            <div style={this.props.visible ? null : {display: 'none'}} tabIndex="0">
                 <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
@@ -212,10 +221,15 @@ class Frame extends Component {
                                                     onClick={::this._openRate}>
                                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                             </button>
-                                            <button type="button" className="content-button js-contents-trigger"
-                                                    onClick={::this._openContent}>
-                                                <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
-                                            </button>
+                                            {
+                                                this.props.contentArray.length > 0 ?
+                                                    <button type="button" className="content-button js-contents-trigger"
+                                                            onClick={::this._openContent}>
+                                                        <svg width="18" height="12" dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                    </button>
+                                                    :
+                                                    null
+                                            }
                                             <button type="button"
                                                     className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')}
                                                     onClick={::this._toggleFullscreen}>
@@ -225,9 +239,8 @@ class Frame extends Component {
                                                      dangerouslySetInnerHTML={{__html: _screen}}/>
                                             </button>
                                         </div>
-                                        <ContentTooltip visible={this.state.showContent}
-                                                        id={_id}/>
-                                        <RateTooltip visible={this.state.showRate}/>
+                                        {this.state.showContent ? <ContentTooltip id={_id}/> : ''}
+                                        {this.state.showRate ? <RateTooltip/> : ''}
                                     </div>
                                 </div>
                             </div>
@@ -246,12 +259,15 @@ function mapStateToProps(state) {
         lessonInfo: state.singleLesson,
         course: state.singleLesson.course,
         lessons: state.lessons,
+        contentArray: state.player.contentArray,
+        paused: state.player.paused,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         playerActions: bindActionCreators(playerActions, dispatch),
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
     }
 }
 
