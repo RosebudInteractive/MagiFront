@@ -62,6 +62,10 @@ export default class CWSPlayer extends CWSBase {
     setData(data) {
         let data2 = $.extend(true, {}, data);
         this._options.loader.setData(data2);
+
+        this._audioState.globalTime = 0;
+        this._audioState.currentTime = 0;
+
         this._prepareElements();
 
         if (data2.episodes.length > 0) {
@@ -134,6 +138,7 @@ export default class CWSPlayer extends CWSBase {
     _setAudio(audio) {
         if (this._audioState.source && audio.data.id == this._audioState.source.data.id) return;
         this._audioState.source = audio;
+
         this._initAudioTrack();
     }
 
@@ -219,6 +224,7 @@ export default class CWSPlayer extends CWSBase {
             })
             .on("volumechange", function() {
                 that._audioState.volume = this.volume;
+                that._audioState.muted = this.muted;
             })
             .on("ended", function () {
                 let data = that._options.loader.getData();
@@ -480,6 +486,8 @@ export default class CWSPlayer extends CWSBase {
         let volDiff = volume - oldVol;
         let part = volDiff / 300;
         let start = performance.now();
+
+        let that = this;
         requestAnimationFrame(function _changeVolumeCallback(time) {
             let diffTime = time - start;
             if (diffTime > 300) {
@@ -494,8 +502,6 @@ export default class CWSPlayer extends CWSBase {
             that._audioState.audio.volume = newVol;
             requestAnimationFrame(_changeVolumeCallback);
         });
-
-        let that = this;
     }
 
 
@@ -512,7 +518,6 @@ export default class CWSPlayer extends CWSBase {
     setMute(value) {
         this._audioState.muted = !!value;
         this._audioState.audio.muted = !!value;
-        console.log(this._audioState.muted);
     }
 
     toggleMute() {
@@ -558,7 +563,7 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.audio.pause();
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
-                console.log("Set position 1", this._audioState)
+                var savedState = $.extend(true, {}, this._audioState);
                 let savedState = $.extend(true, {}, this._audioState);
                 this._options.loader
                     .getAudioResource(newStart.episode.audio.file)
@@ -567,8 +572,7 @@ export default class CWSPlayer extends CWSBase {
                         inf.data = a.data;
                         this._audioState.currentEpisode = epIdx;
 
-                        console.log("Set position 2", this._audioState)
-                        this._setAudio(inf);
+                        this._setAudio(inf)
 
                         this._audioState.audio.currentTime = savedState.currentTime;
                         this._audioState.currentEpisode = epIdx;
@@ -580,7 +584,6 @@ export default class CWSPlayer extends CWSBase {
                             this._onAudioLoadedHandler(this._audioState.audio);
                         }
 
-                        console.log("Set position 3", this._audioState)
                         this._setElementsPosition(position);
                         this._playElements(position);
                         if (this._audioState.stopped) this._pauseElements();
