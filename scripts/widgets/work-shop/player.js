@@ -607,7 +607,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     getPosition() {
-        return this._audioState.audio.globalTime;
+        return this._audioState.globalTime;
     }
 
     getStopped() {
