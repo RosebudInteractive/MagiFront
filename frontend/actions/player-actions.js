@@ -49,10 +49,10 @@ export const setCurrentTime = (time) => {
     };
 };
 
-export const setTitle = (title) => {
+export const setTitle = (value) => {
     return {
         type: PLAYER_SET_TITLE,
-        payload: title
+        payload: value
     };
 };
 

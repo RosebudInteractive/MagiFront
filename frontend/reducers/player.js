@@ -67,8 +67,11 @@ export default function player(state = initialState, action) {
         }
 
         case PLAYER_SET_TITLE: {
-            if (state.title !== action.payload) {
-                return {...state, title: action.payload}
+            let _newTitle = action.payload ? action.payload.title : '',
+                _newSubTitle = action.payload ? action.payload.subTitle : '';
+
+            if ((state.title !== _newTitle) || (state.subTitle !== _newSubTitle)) {
+                return {...state, title: _newTitle, subTitle: _newSubTitle}
             } else {
                 return state
             }
@@ -95,10 +98,12 @@ export default function player(state = initialState, action) {
         case PLAYER_SET_CONTENT_ARRAY: {
             let _result = _calcContent(action.payload)
 
-            return {...state,
+            return {
+                ...state,
                 totalDuration: _result.totalDuration,
                 totalDurationFmt: _result.totalDurationFmt,
-                contentArray: [..._result.content]}
+                contentArray: [..._result.content]
+            }
         }
 
         case PLAYER_SET_CURRENT_CONTENT: {

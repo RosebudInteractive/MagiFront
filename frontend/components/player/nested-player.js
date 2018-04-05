@@ -252,19 +252,29 @@ class NestedPlayer extends EventEmitter {
             onAddElement: function () {
             },
             onChangeTitles: function (titles) {
-                let html = "";
+                let _title = '',
+                    _subTitle = '';
+
                 titles.forEach((item) => {
                     if (item.title) {
-                        if (html !== "") html += "\n";
-                        html += item.title;
+                        if (_title !== "") _title += "\n";
+                        _title += item.title ? item.title : '';
+
+                        if (_subTitle !== "") _subTitle += "\n";
+                        _subTitle += item.title2 ? item.title2 : '';
                     }
                 });
 
-                if (that._onChangeTitle) {
-                    that._onChangeTitle(html)
+                let _result = {
+                    title : _title,
+                    subTitle : _subTitle
                 }
 
-                store.dispatch(playerActions.setTitle(html))
+                if (that._onChangeTitle) {
+                    that._onChangeTitle(_result)
+                }
+
+                store.dispatch(playerActions.setTitle(_result))
             },
             onChangeContent: (content) => {
                 if (that._onChangeContent) {
