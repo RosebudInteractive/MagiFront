@@ -89,7 +89,7 @@ module.exports = {
         facebook: {
             appId: '591000364592228',
             appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
-            callBack: '/api/facebook/callback',
+            callBack: '/api/facebook/oauth',
             // appId: '1584514044907807',
             // appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
             // callBack: '/oauth/facebook',
@@ -97,13 +97,14 @@ module.exports = {
             profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
             passportOptions: {
                 display: 'popup',
-                scope: ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+                scope: ['email', 'public_profile'] // don't require application review
+                // scope: ['email', 'user_about_me', 'user_birthday', 'user_hometown']
             }
         },
         google: {
             appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
             appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
-            callBack: '/api/google/callback',
+            callBack: '/api/google/oauth',
             // appId: '794235726914-7bkpl8nhtulqo4thna0kha48db611jg9.apps.googleusercontent.com',
             // appSecret: 'C28iY7NssUCe-yGgpS3wFSiW',
             // callBack: '/google/callback',
@@ -116,7 +117,7 @@ module.exports = {
             appSecret: 'LsrNgANtMnP0ofdT4dKB',
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
             apiVersion: '5.17',
-            callBack: '/api/vk/callback',
+            callBack: '/api/vk/oauth',
             passportOptions: {
                 display: 'popup',
                 scope: ['status', 'email', 'friends']
