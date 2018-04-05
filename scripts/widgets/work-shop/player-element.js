@@ -595,7 +595,7 @@ export default class CWSPlayerElement extends CWSBase {
 
         //  масштаб изображения
         var effects = this.Data.effects;
-        if (effects.length != 0) {
+        if ((effects)&&(effects.length != 0)) {
             var effect = effects[0];
             var imgPlayPos = this._playState.position - effect.start;
             var offset = 0;
