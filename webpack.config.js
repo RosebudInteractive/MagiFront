@@ -11,6 +11,7 @@ const _prodConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
+        'workshop-main': './scripts/workshop-main',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -92,6 +93,7 @@ const _devConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
+        'workshop-main': './scripts/workshop-main',
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -128,8 +130,7 @@ const _devConfig = {
                     path.resolve(__dirname, "frontend"),
                     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
-                    path.resolve(__dirname, 'scripts/lib'),
-                    path.resolve(__dirname, 'scripts/widgets/work-shop'),
+                    path.resolve(__dirname, 'scripts/'),
                 ],
                 test: /\.js$/
             },
