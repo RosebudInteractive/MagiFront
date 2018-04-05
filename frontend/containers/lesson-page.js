@@ -65,7 +65,6 @@ class LessonPage extends React.Component {
                 redirectToPlayer: true
             })
         }
-
     }
 
     shouldComponentUpdate(nextProps, nextState) {
