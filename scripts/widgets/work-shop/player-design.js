@@ -23,8 +23,9 @@ export default class CWSPlayerDesign extends CWSPlayer {
         return CWSPlayerElementDesign;
     }
 
-    _setEvents(item) {
-        super._setEvents(item);
+    _setEvents() {
+        super._setEvents();
+        let item = this._container.children();
 
         const cont = item.children(".ws-player-content");
         cont.droppable({

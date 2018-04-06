@@ -76,14 +76,14 @@ export default class CWSPlayerElement extends CWSBase {
         return this._options.data.content.title2;
     }
 
-            setRate(rate) {
-                if (this._playState.rate == +rate) return;
-                this._playState.rate = +rate;
-                if (!this._playState.stopped) {
-                    this.pause();
-                    this.play();
-                }
-            }
+    setRate(rate) {
+        if (this._playState.rate == +rate) return;
+        this._playState.rate = +rate;
+        if (!this._playState.stopped) {
+            this.pause();
+            this.play();
+        }
+    }
 
     play() {
         if (!this._playState.stopped) return;
@@ -184,15 +184,15 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.stopped = true;
     }
 
-            _getItem() {
-                let item = $("#" + this.Id);
-                let ass = this.Asset
+    _getItem() {
+        let item = $("#" + this.Id);
+        let ass = this.Asset
 
-                if (item.length == 0) {
-                    let pos = this._options.data.content.position;
-                    if (!pos) {
-                        this._calcMaxSize()
-                    }
+        if (item.length == 0) {
+            let pos = this._options.data.content.position;
+            if (!pos) {
+                this._calcMaxSize()
+            }
 
             let template = CWSPlayerElement.template("player-element");
             item = $(template).attr("id", this.Id);
@@ -209,9 +209,9 @@ export default class CWSPlayerElement extends CWSBase {
 
             let cont = item.find(".ws-player-elem-content");
 
-                    if (ass) {
-                        let imgDiv = null;
-                        if (ass.info.type === 'text') {
+            if (ass) {
+                let imgDiv = null;
+                if (ass.info.type === 'text') {
 
                     let textToolsDiv = $('.ws-text-element-tools');
                     let textDiv = document.createElement('div');
@@ -360,22 +360,22 @@ export default class CWSPlayerElement extends CWSBase {
                 item.fadeIn("fast");
             }
 
-                } else {
-                    this._options.loader
-                        .getAssetResources(ass.id)
-                        .then((assData) => {
-                            let imgData = assData[0].file.body;
-                            if (!imgData) {
-                                let cont = item.find(".ws-player-elem-content");
-                                let imgDiv = cont.find("img");
-                                imgDiv.attr("src", "");
-                                imgDiv.css("display", "none");
-                            }
-                        })
-                        .catch((err) => {
-                            console.error(err);
-                        });
-                }
+        } else {
+            this._options.loader
+                .getAssetResources(ass.id)
+                .then((assData) => {
+                    let imgData = assData[0].file.body;
+                    if (!imgData) {
+                        let cont = item.find(".ws-player-elem-content");
+                        let imgDiv = cont.find("img");
+                        imgDiv.attr("src", "");
+                        imgDiv.css("display", "none");
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
 
         if (this._options.data.focused) item.addClass("focused");
         else item.removeClass("focused");
@@ -407,26 +407,26 @@ export default class CWSPlayerElement extends CWSBase {
         return resource;
     }
 
-            _setEvents() {
-            }
+    _setEvents() {
+    }
 
     _calcMaxSize() {
         let ass = this.Asset;
 
-                if (!ass || !ass.info || ass.info.type === 'text') {
-                    this._options.data.content.position.bottom = 0;
-                    this._options.data.content.position.right = 0;
-                    this._options.data.content.position.left = 0;
-                    this._options.data.content.position.top = 0;
-                } else {
-                    let h = ass.info.size.height,
-                        w = ass.info.size.width;
-                    let pictRatio = w ? h / w : 1;
-                    w = 100;
-                    let actualWidth = 160 * 1;
-                    let actualHeight = actualWidth * pictRatio;
-                    // calculate actualHeight's %
-                    h = actualHeight / 90 * 100;
+        if (!ass || !ass.info || ass.info.type === 'text') {
+            this._options.data.content.position.bottom = 0;
+            this._options.data.content.position.right = 0;
+            this._options.data.content.position.left = 0;
+            this._options.data.content.position.top = 0;
+        } else {
+            let h = ass.info.size.height,
+                w = ass.info.size.width;
+            let pictRatio = w ? h / w : 1;
+            w = 100;
+            let actualWidth = 160 * 1;
+            let actualHeight = actualWidth * pictRatio;
+            // calculate actualHeight's %
+            h = actualHeight / 90 * 100;
 
             if (h > 100) {
                 h = 100;
@@ -444,38 +444,37 @@ export default class CWSPlayerElement extends CWSBase {
         }
     }
 
-            _broadcastSetTextData() {
-              if (this._options.onSetTextData) {
-                  this._options.onSetTextData({
-                    trackElId: this._options.data.trackElement,
-                    data: this._options.data.data
-                  })
-              }
-            }
+    _broadcastSetTextData() {
+        if (this._options.onSetTextData) {
+            this._options.onSetTextData({
+                trackElId: this._options.data.trackElement,
+                data: this._options.data.data
+            })
+        }
+    }
 
     renderPosition(position) {
         let item = this._getItem();
         this._playState.position = position - this.Start;
 
-                //  масштаб изображения
-                let effects = this.Data.effects;
-                if (!effects) effects = [];
-                if (effects.length != 0){
-                    let effect = effects[0];
-                    let imgPlayPos = this._playState.position - effect.start;
-                    let offset = 0;
-                    if (imgPlayPos > 0) {
-                        let timeFraction = imgPlayPos / effect.duration;
-                        if (timeFraction > 1) timeFraction = 1;
-                        let animationFunc = makeEaseInOut(quad);
-                        // текущее состояние анимации от 0 до 1
-                        let progress = animationFunc(timeFraction);
-                        // Текущее состояние в заказанных единицах
-                        let calcProgress = effect.acceleration * effect.duration * progress;
+        // масштаб изображения
+        let effects = this.Data.effects;
+        if (!effects) effects = [];
+        if (effects.length != 0){
+            let effect = effects[0];
+            let imgPlayPos = this._playState.position - effect.start;
+            let offset = 0;
+            if (imgPlayPos > 0) {
+                let timeFraction = imgPlayPos / effect.duration;
+                if (timeFraction > 1) timeFraction = 1;
+                let animationFunc = makeEaseInOut(quad);
+                // текущее состояние анимации от 0 до 1
+                let progress = animationFunc(timeFraction);
+                // Текущее состояние в заказанных единицах
+                let calcProgress = effect.acceleration * effect.duration * progress;
 
                 offset = calcProgress / 2;
             }
-            let item = $("#" + this.Id);
             let img = item.find("img");
             img.css({
                 left: (-offset) + "%",
@@ -490,6 +489,14 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.interval = null;
         this._playState.stopped = true;
         this.play();
+    }
+
+    initContainer(cont) {
+        this._container = cont;
+        let item = $("#" + this.Id);
+        if (item.length != 0) {
+            item.parent().empty();
+        }
     }
 
 }
