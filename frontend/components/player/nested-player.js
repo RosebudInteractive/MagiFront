@@ -54,14 +54,13 @@ class NestedPlayer extends EventEmitter {
                 this._fullPlayer = new Player(fullViewPort, _options);
                 this._fullPlayer.render();
             } else {
-                if (this._playingData) {
+                if ((this._playingData) && !this._fullDiv.children()) {
                     this._fullPlayer.initContainer(this._fullDiv);
                     this._setAssetsList(this._playingData);
                     this._fullPlayer.render();
                     this._applyData(this._playingData)
                 }
             }
-
         }
 
         if (smallViewPort && ((this._smallDiv !== smallViewPort) || !this._smallPlayer)) {
@@ -77,6 +76,10 @@ class NestedPlayer extends EventEmitter {
                 this._fullPlayer
                 :
                 this._smallPlayer;
+    }
+
+    clearFullViewPorts() {
+        this._fullDiv = null;
     }
 
     get player() {
@@ -174,8 +177,8 @@ class NestedPlayer extends EventEmitter {
         if (this._isFull) {
             this.player = this._smallPlayer;
             let _oldPlayer = this._fullPlayer;
-            let _position = _oldPlayer.getPosition();
-            this.player.setPosition(_position);
+            // let _position = _oldPlayer.getPosition();
+            // this.player.setPosition(_position);
             if (!_oldPlayer.getStopped()) {
                 this.player.play()
             } else {
@@ -191,6 +194,8 @@ class NestedPlayer extends EventEmitter {
         if (!this._isFull) {
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
+            // let _position = _oldPlayer.getPosition();
+            // this.player.setPosition(_position);
             if (!_oldPlayer.getStopped()) {
                 this.player.play()
             } else {
@@ -438,5 +443,12 @@ export const setFullViewPort = (div) => {
     fullViewPort = div
     if (_instance) {
         _instance.applyViewPorts()
+    }
+}
+
+export const clearFullViewPort = () => {
+    fullViewPort = null
+    if (_instance) {
+        _instance.clearFullViewPorts()
     }
 }

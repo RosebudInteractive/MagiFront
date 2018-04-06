@@ -19,6 +19,7 @@ import {
 import {
     SWITCH_TO_SMALL_PLAYER,
     SWITCH_TO_FULL_PLAYER,
+    CLEAR_FULL_VIEWPORT,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
 
@@ -98,6 +99,11 @@ const playerMiddleware = store => next => action => {
 
         case PLAYER_SET_FULL_VIEWPORT: {
             Player.setFullViewPort(action.payload);
+            return next(action)
+        }
+
+        case CLEAR_FULL_VIEWPORT: {
+            Player.clearFullViewPort();
             return next(action)
         }
 

@@ -115,6 +115,7 @@ class Frame extends Component {
         }
 
         this._removeListeners();
+        this.props.playerActions.clearFullViewPort()
     }
 
     _removeListeners() {
