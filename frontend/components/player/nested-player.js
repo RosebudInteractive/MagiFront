@@ -48,17 +48,18 @@ class NestedPlayer extends EventEmitter {
 
         let _options = this._getPlayerOptions();
 
-        if (fullViewPort && (this._fullDiv !== fullViewPort)) {
+        let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
+        if (fullViewPort && !_isSameViewPort) {
             this._fullDiv = fullViewPort;
             if (!this._fullPlayer) {
                 this._fullPlayer = new Player(fullViewPort, _options);
                 this._fullPlayer.render();
             } else {
-                if ((this._playingData) && !this._fullDiv.children()) {
+                if (this._playingData) {
                     this._fullPlayer.initContainer(this._fullDiv);
                     this._setAssetsList(this._playingData);
-                    this._fullPlayer.render();
                     this._applyData(this._playingData)
+                    this._fullPlayer.render();
                 }
             }
         }
@@ -78,8 +79,17 @@ class NestedPlayer extends EventEmitter {
                 this._smallPlayer;
     }
 
-    clearFullViewPorts() {
-        this._fullDiv = null;
+    clearPlayInfo() {
+        this._playingData = null;
+    }
+
+    clearFullViewPort(div) {
+        let _isSameViewPort = (div && fullViewPort) ? div[0].isEqualNode(fullViewPort[0]) : false;
+
+        if (_isSameViewPort) {
+            fullViewPort = null;
+            this._fullDiv = null;
+        }
     }
 
     get player() {
@@ -446,9 +456,14 @@ export const setFullViewPort = (div) => {
     }
 }
 
-export const clearFullViewPort = () => {
-    fullViewPort = null
+export const clearPlayInfo = () => {
     if (_instance) {
-        _instance.clearFullViewPorts()
+        _instance.clearPlayInfo()
+    }
+}
+
+export const clearFullViewPort = (div) => {
+    if (_instance) {
+        _instance.clearFullViewPort(div)
     }
 }

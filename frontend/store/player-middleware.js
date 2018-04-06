@@ -10,16 +10,17 @@ import {
     PLAYER_START_SET_RATE,
     PLAYER_SET_SMALL_VIEWPORT,
     PLAYER_SET_FULL_VIEWPORT,
+    PLAYER_CLEAR_FULL_VIEWPORT,
 } from '../constants/player'
 
 import {
+    GET_LESSON_PLAY_INFO_REQUEST,
     SET_LESSON_PLAY_INFO_LOADED,
 } from '../constants/lesson'
 
 import {
     SWITCH_TO_SMALL_PLAYER,
     SWITCH_TO_FULL_PLAYER,
-    CLEAR_FULL_VIEWPORT,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
 
@@ -30,6 +31,14 @@ const playerMiddleware = store => next => action => {
             let _state = store.getState();
 
             Player.loadPlayInfo(_state.lessonPlayInfo.playInfo)
+
+            return next(action)
+        }
+
+        case GET_LESSON_PLAY_INFO_REQUEST: {
+            let _state = store.getState();
+
+            Player.clearPlayInfo(_state.lessonPlayInfo.playInfo)
 
             return next(action)
         }
@@ -102,8 +111,8 @@ const playerMiddleware = store => next => action => {
             return next(action)
         }
 
-        case CLEAR_FULL_VIEWPORT: {
-            Player.clearFullViewPort();
+        case PLAYER_CLEAR_FULL_VIEWPORT: {
+            Player.clearFullViewPort(action.payload);
             return next(action)
         }
 

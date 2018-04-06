@@ -95,17 +95,17 @@ class Frame extends Component {
         });
 
         if (this.props.visible) {
-            let _id = this.props.lesson ? this.props.lesson.Id : '';
-            let _container = $('#player' + _id)
-            this.props.playerActions.setFullViewPort(_container)
+            this._applyViewPort()
         }
     }
 
     componentDidUpdate(prevProps) {
         if (!prevProps.visible && this.props.visible) {
-            let _id = this.props.lesson ? this.props.lesson.Id : '';
-            let _container = $('#player' + _id)
-            this.props.playerActions.setFullViewPort(_container)
+            this._applyViewPort()
+        } else {
+            if (prevProps.visible && !this.props.visible) {
+                this._viewPortApplied = false;
+            }
         }
     }
 
@@ -115,7 +115,22 @@ class Frame extends Component {
         }
 
         this._removeListeners();
-        this.props.playerActions.clearFullViewPort()
+        this._clearViewPort();
+    }
+
+    _applyViewPort() {
+        let _id = this.props.lesson ? this.props.lesson.Id : '';
+        let _container = $('#player' + _id)
+        this.props.playerActions.setFullViewPort(_container)
+    }
+
+    _clearViewPort() {
+        let _id = this.props.lesson ? this.props.lesson.Id : '';
+        let _container = $('#player' + _id)
+
+        if (_container.length) {
+            this.props.playerActions.clearFullViewPort(_container)
+        }
     }
 
     _removeListeners() {
