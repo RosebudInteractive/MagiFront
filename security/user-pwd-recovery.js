@@ -52,7 +52,10 @@ exports.UserPwdRecovery = (user_data, userCache) => {
             };
             return SendMail(MAIL_CFG_NAME, mailOptions)
                 .then((mailResult) => {
-                    return userCache.userToClientJSON(user);
+                    let result = userCache.userToClientJSON(user);
+                    if (mailResult.msgUrl)
+                        result.msgUrl = mailResult.msgUrl;
+                    return result;
                 });
         });
 };

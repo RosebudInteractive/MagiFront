@@ -61,11 +61,11 @@ class AuthVK {
 
         passport.use(strategy);
 
-        // if (sessionMiddleware) {
-        //     app.use(config.snets.vk.callBack, sessionMiddleware.express);
-        //     app.use(config.snets.vk.callBack, sessionMiddleware.passportInit);
-        //     app.use(config.snets.vk.callBack, sessionMiddleware.passportSession);   
-        // }
+        if (sessionMiddleware && (config.snets.vk.callBack.indexOf("/api/") !== 0)) {
+            app.use(config.snets.vk.callBack, sessionMiddleware.express);
+            app.use(config.snets.vk.callBack, sessionMiddleware.passportInit);
+            app.use(config.snets.vk.callBack, sessionMiddleware.passportSession);   
+        }
 
         app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
         app.get(config.snets.vk.callBack, StdLoginProcessor('vkontakte'));
