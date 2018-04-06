@@ -53,36 +53,16 @@ module.exports = {
     },
     mail: {
         userReg: {
-            type: "smtp",
+            type: "test",
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <vadym.zobnin@yandex.ru>',
-            options: {
-                disableUrlAccess: false,
-                host: 'smtp.yandex.ru',
-                port: 465,//587
-                secure: true, // true for 465, false for other ports
-                auth: {
-                    user: "vadym.zobnin",
-                    pass: "Vzobnin1963"
-                }
-            }
+            sender: '"Magisteria" <administrator@magisteria.ru>'
         },
         pwdRecovery: {
-            type: "smtp",
+            type: "test",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <vadym.zobnin@yandex.ru>',
-            options: {
-                disableUrlAccess: false,
-                host: 'smtp.yandex.ru',
-                port: 465,//587
-                secure: true, // true for 465, false for other ports
-                auth: {
-                    user: "vadym.zobnin",
-                    pass: "Vzobnin1963"
-                }
-            }
+            sender: '"Magisteria" <administrator@magisteria.ru>'
         }
     },
     snets: {
@@ -90,9 +70,6 @@ module.exports = {
             appId: '591000364592228',
             appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
             callBack: '/api/facebook/oauth',
-            // appId: '1584514044907807',
-            // appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
-            // callBack: '/oauth/facebook',
             profileURL: 'https://graph.facebook.com/v2.12/me',
             profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
             passportOptions: {
