@@ -190,24 +190,7 @@ class LessonPage extends React.Component {
         }
     }
 
-    _mountMouseMoveHandler() {
-        // let that = this;
-        //
-        // $(document).on('mousemove', () => {
-        //     $('body').removeClass('fade');
-        //     if (that._timer) {
-        //         clearTimeout(that._timer);
-        //     }
-        //
-        //     if (getInstance() && (that._activeLessonId === getInstance().lesson.Id)) {
-        //         that._timer = setTimeout(function () {
-        //             $('body').addClass('fade');
-        //         }, 7000);
-        //     } else {
-        //         that._timer = null
-        //     }
-        // });
-    }
+    _mountMouseMoveHandler() {}
 
     _mountKeydownHandler(){
         $(window).keydown((e) => {
