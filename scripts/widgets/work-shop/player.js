@@ -607,7 +607,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     getPosition() {
-        return this._audioState.audio.globalTime;
+        return this._audioState.globalTime;
     }
 
     getStopped() {
@@ -866,7 +866,7 @@ export default class CWSPlayer extends CWSBase {
             oldData.zIndex = zIndex;
             oldData.focused = trackElData.focused;
             oldData.data = trackElData.data;
-            oldData.content.effects = $.extend(true, {}, trackElData.content.effects || []);
+            oldData.effects = $.extend(true, [], trackElData.effects || []);
             oldData.content.title = trackElData.content.title;
             oldData.content.title2 = trackElData.content.title2;
             oldData.content.deleteOldTitles =
@@ -883,7 +883,7 @@ export default class CWSPlayer extends CWSBase {
         } else
             oldData.asset = null;
 
-        oldData.content.effects = oldData.content.effects || [];
+        oldData.effects = oldData.effects || [];
 
         return oldData;
 

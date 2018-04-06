@@ -997,14 +997,11 @@ export default class CWSTracks extends CWSBase {
             },
             content: {
                 duration: p.duration,
-                effects:[
-                    {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
-                ],
                 track: trackId,
             },
             effects:[
                 {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
-            ]
+            ],
         };
 
         let type = ui.draggable.attr("role") == "add-image" ? "image" : "text";

@@ -107,7 +107,7 @@ export default class CWSPlayerElement extends CWSBase {
         let rate = this._playState.rate;
 
         //assume now there can be only one effect
-        let effects = this.Data.content.effects;
+        let effects = this.Data.effects || [];
         if (effects.length == 0) return;
         let effect = effects[0];
 
