@@ -49,6 +49,21 @@ export default class CWSPlayer extends CWSBase {
         this._reInitElements();
     }
 
+    destroy() {
+        this._destroyAudioEvents();
+        this._destroyEvents();
+        this._options.loader.destroy();
+        this.clear();
+    }
+
+    clear() {
+        this._container.empty();
+        this._elements = {
+            array: [],
+            trackElIdx: {}
+        }
+    }
+
     _reInitElements() {
         let cont = this._container.find(".ws-player-content");
 
@@ -360,7 +375,22 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._audioState.currentTitles.push(...newTitles);
+        for (let i = 0; i < newTitles.length; i++) {
+            let nt = newTitles[i];
+            let found = false;
+            for (let j = 0; j < this._audioState.currentTitles.length; j++) {
+                let ot = this._audioState.currentTitles[j];
+                if (ot.id == nt.id) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                this._audioState.currentTitles.push(nt);
+                changed = true;
+            }
+        }
         return changed || newTitles.length > 0;
     }
 

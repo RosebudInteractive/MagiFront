@@ -9,18 +9,7 @@ const FAIL_AUDIO_TIME = 120;
 export default class CWSResourceLoader {
     constructor() {
         this._position = 0;
-        this._state = {
-            data: {},
-            assetsIdx: {},
-            audio: null,
-            mode: 2,
-            loadQueue: [],
-            loadAudioQueue: [],
-            loading: {},
-            loadingAudio: {},
-            loaderInt: null,
-            disableChange: false
-        };
+        this._state = this._getInitialState();
 
         /*
         {
@@ -40,6 +29,21 @@ export default class CWSResourceLoader {
         this._recheck = false;
 
         this._executeMonitor();
+    }
+
+    _getInitialState() {
+        return {
+            data: {},
+            assetsIdx: {},
+            audio: null,
+            mode: 2,
+            loadQueue: [],
+            loadAudioQueue: [],
+            loading: {},
+            loadingAudio: {},
+            loaderInt: null,
+            disableChange: false
+        }
     }
 
     // load images
@@ -524,6 +528,14 @@ export default class CWSResourceLoader {
 
     getEpisodesStartTimes() {
         return this._state.episodeStarts;
+    }
+
+    destroy() {
+        clearInterval(this._state.interval);
+        clearInterval(this._state.loaderInt);
+        clearInterval(this._state.loaderAudioInt);
+
+        this._state = this._getInitialState();
     }
 
 }
