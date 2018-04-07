@@ -201,7 +201,7 @@ class NestedPlayer extends EventEmitter {
 
 
     switchToFull() {
-        if (!this._isFull) {
+        if (!this._isFull && this._fullPlayer) {
             this.player = this._fullPlayer;
             let _oldPlayer = this._smallPlayer;
             // let _position = _oldPlayer.getPosition();
