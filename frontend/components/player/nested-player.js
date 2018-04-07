@@ -112,7 +112,11 @@ class NestedPlayer extends EventEmitter {
         if (data) {
             this.player.pause();
             this.player = null;
+            // this._fullPlayer.destroy();
+            // this._smallPlayer.destroy();
+
             this._fullPlayer = null;
+            this._smallPlayer = null;
 
             this._setAssetsList(data);
             this.applyViewPorts();
