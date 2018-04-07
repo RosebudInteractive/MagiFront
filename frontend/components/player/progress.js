@@ -61,6 +61,7 @@ class Progress extends React.Component {
 
         return (
             <div className="player-block__progress" id={"timeline" + this.props.id} onClick={::this._setCurrentPosition}>
+                <div className='player-block__timeline'/>
                 <div className="player-block__play" style={{width: _playPercent + '%'}}>
                     <span className="indicator"/>
                 </div>
