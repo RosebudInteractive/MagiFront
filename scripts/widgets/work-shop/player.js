@@ -426,6 +426,10 @@ export default class CWSPlayer extends CWSBase {
         // let that = this;
         // let tmInt = null;
         this._audioState.requestAnimationFrameID = requestAnimationFrame(::this._proccessAnimationFrame);
+        if (!this._audioState.audio) {
+            return Promise.reject(new Error('Audio is undefined'))
+        }
+
         if (this._audioState.stopped) {
             return this._audioState.audio.play()
                 .then(() => {

@@ -49,7 +49,7 @@ class NestedPlayer extends EventEmitter {
         let _options = this._getPlayerOptions();
 
         let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
-        if (fullViewPort && !_isSameViewPort) {
+        if (fullViewPort && (!_isSameViewPort || !this._fullPlayer)) {
             this._fullDiv = fullViewPort;
             if (!this._fullPlayer) {
                 this._fullPlayer = new Player(fullViewPort, _options);
@@ -57,14 +57,15 @@ class NestedPlayer extends EventEmitter {
             } else {
                 if (this._playingData) {
                     this._fullPlayer.initContainer(this._fullDiv);
-                    this._setAssetsList(this._playingData);
-                    this._applyData(this._playingData)
+                    // this._setAssetsList(this._playingData);
                     this._fullPlayer.render();
+                    // this._applyData(this._playingData)
                 }
             }
         }
 
-        if (smallViewPort && ((this._smallDiv !== smallViewPort) || !this._smallPlayer)) {
+        _isSameViewPort = (this._smallDiv && smallViewPort) ? this._smallDiv[0].isEqualNode(smallViewPort[0]) : false;
+        if (smallViewPort && (!_isSameViewPort || !this._smallPlayer)) {
             this._smallDiv = smallViewPort;
             this._smallPlayer = new Player(smallViewPort, _options);
             this._smallPlayer.render();
@@ -108,8 +109,11 @@ class NestedPlayer extends EventEmitter {
     }
 
     _loadOtherLesson(data) {
-
         if (data) {
+            this.player.pause();
+            this.player = null;
+            this._fullPlayer = null;
+
             this._setAssetsList(data);
             this.applyViewPorts();
             this._applyData(data)
@@ -119,6 +123,7 @@ class NestedPlayer extends EventEmitter {
     }
 
     _setAssetsList(data) {
+        this._playingData = data;
         this.assetsList = data.assets;
     }
 
@@ -133,7 +138,6 @@ class NestedPlayer extends EventEmitter {
 
         let content = this._fullPlayer ? this._fullPlayer.getLectureContent() : this._smallPlayer.getLectureContent();
         this._renderContent(content);
-        this._playingData = data;
     }
 
     pause() {
@@ -151,8 +155,8 @@ class NestedPlayer extends EventEmitter {
             .then(() => {
                 store.dispatch(playerActions.stop())
                 store.dispatch(lessonActions.clearLessonPlayInfo());
-                this._fullPlayer = null;
-                this._smallPlayer = null;
+                this.player = null;
+                // this._fullPlayer = null;
                 this._playingData = null;
             })
         this._hasStoppedOnSwitch = false;
@@ -282,8 +286,8 @@ class NestedPlayer extends EventEmitter {
                 });
 
                 let _result = {
-                    title : _title,
-                    subTitle : _subTitle
+                    title: _title,
+                    subTitle: _subTitle
                 }
 
                 if (that._onChangeTitle) {
