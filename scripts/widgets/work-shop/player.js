@@ -50,7 +50,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     destroy() {
-        this._destroyAudioEvents();
+        this._destroyAudioEvents(this._audioState.$audio);
         this._destroyEvents();
         this._options.loader.destroy();
         this.clear();
