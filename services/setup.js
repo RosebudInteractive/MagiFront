@@ -3,10 +3,10 @@
  */
 
 const config = require('config');
+const _ = require('lodash');
 const log = require('../logger/log')(module);
 //const exprLogger = require("express-logger");
 const bodyParser  = require('body-parser');
-const cookieParser = require('cookie-parser');
 const expressSession = require('express-session');
 const passport = require('passport');
 const methodOverride = require('method-override');
@@ -28,20 +28,26 @@ const RedisStoreSession = require('../security/session-storage/redis-storage');
 function setupAPI(express, app) {
     var path = require('path');
 
+    let sessionOpts = _.cloneDeep(config.session)
+    if (config.proxyServer.protocol === 'https') {
+        app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
+        if (!sessionOpts.cookie)
+            sessionOpts.cookie = {};
+        sessionOpts.cookie.secure = true;
+    }
+
     //app.use(express.favicon()); // отдаем стандартную фавиконку, можем здесь же свою задать
     //app.use("/api", exprLogger('dev')); // выводим все запросы со статусами в консоль
-    app.use("/api", cookieParser());
     app.use("/api", bodyParser.json()); // стандартный модуль, для парсинга JSON в запросах
     app.use("/api", bodyParser.urlencoded({ extended: true }));
 
-    let sessionOpts = config.session;
     if (config.has('redisSession.enabled') && config.redisSession.enabled) {
         let RedisStore = RedisStoreSession(expressSession);
         sessionOpts.store = new RedisStore(config.redisSession);
     };
 
     let sessionMiddleware = {
-        express: expressSession(config.session),
+        express: expressSession(sessionOpts),
         passportInit: passport.initialize(),
         passportSession: passport.session()
     };

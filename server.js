@@ -34,8 +34,6 @@ Promise.resolve()
         let express = require('express');
 
         let app = new express();
-        if (NODE_ENV === 'production')
-            app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
 
         let port = magisteryConfig.http.port;
         let address = magisteryConfig.http.address;
@@ -161,7 +159,8 @@ Promise.resolve()
         process.exit(1);
     })
     .catch((e) => {
-        console.log(e)
+        console.error(e);
+        process.exit(1);
     });
 
 

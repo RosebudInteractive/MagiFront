@@ -20,7 +20,7 @@ module.exports = {
         importFileTrace: false
     },
     session: {
-        name: 'mag.sid',
+        name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
         saveUninitialized: false

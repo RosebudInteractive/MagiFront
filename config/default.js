@@ -25,7 +25,7 @@ module.exports = {
     },
     dbProvider: 'mysql',
     session: {
-        name: 'mag.sid',
+        name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
         saveUninitialized: false
