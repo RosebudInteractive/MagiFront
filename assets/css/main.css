@@ -10529,12 +10529,13 @@ ul.lectures-tab {
       padding: 0;
       background-color: rgba(255, 255, 255, 0);
       pointer-events: none; } }
+
   .player-block__progress {
     position: relative;
     margin-bottom: 6px;
     width: 100%;
     height: 15px;
-    background-color: rgba(255, 255, 255, 0.3);
+    /*background-color: rgba(255, 255, 255, 0.3);*/
     cursor: pointer; }
     @media (max-width: 600px) {
       .player-block__progress {
@@ -10568,20 +10569,30 @@ ul.lectures-tab {
     position: absolute;
     top: 0;
     left: 0;
-    height: 15px;
+    height: 5px;
+    background-color: rgba(255, 255, 255, 0.3); }
+  .player-block__timeline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin-top: 5px;
+    height: 5px;
     background-color: rgba(255, 255, 255, 0.3); }
   .player-block__play {
     text-align: right;
     position: absolute;
     top: 0;
     left: 0;
-    height: 15px;
+    margin-top: 5px;
+    height: 5px;
     background-color: #c8684c; }
   .player-block__gap {
     position: absolute;
     top: 0;
     width: 1px;
-    height: 15px;
+    margin-top: 5px;
+    height: 5px;
     background-color: #2f2f2f; }
   .player-block__time {
     position: absolute;
@@ -10597,7 +10608,7 @@ ul.lectures-tab {
     display: inline-block;
     vertical-align: top;
     width: 3px;
-    height: 15px;
+    height: 5px;
     background-color: #fff; }
   .player-block__row {
     display: -webkit-box;

@@ -43,6 +43,39 @@ export default class CWSPlayer extends CWSBase {
 
     initContainer(container) {
         super.initContainer(container, tpl);
+        container.empty();
+        this.render();
+
+        this._reInitElements();
+    }
+
+    destroy() {
+        this._destroyAudioEvents(this._audioState.$audio);
+        this._destroyEvents();
+        this._options.loader.destroy();
+        this.clear();
+    }
+
+    clear() {
+        this._container.empty();
+        this._elements = {
+            array: [],
+            trackElIdx: {}
+        }
+    }
+
+    _reInitElements() {
+        let cont = this._container.find(".ws-player-content");
+
+        for (let i = 0; i < this._elements.array.length; i++) {
+            let el = this._elements.array[i];
+            el.initContainer(cont);
+            if (el.Id in this._audioState.playingNow)
+                el.renderPosition(this._audioState.globalTime);
+            else
+                el.stop();
+        }
+
     }
 
     render() {
@@ -52,7 +85,7 @@ export default class CWSPlayer extends CWSBase {
         if (item.length == 0) {
             item = $(template);
             this._container.append(item);
-            this._setEvents(item);
+            this._setEvents();
             this._player = item;
         }
 
@@ -86,11 +119,16 @@ export default class CWSPlayer extends CWSBase {
 
     }
 
-    _setEvents(item) {
-        $(window).resize(() => {
-            this._setRatio(item);
-        });
+    _setEvents() {
+        $(window).resize(this._onResize.bind(this));
+    }
 
+    _destroyEvents() {
+        $(window).off("resize", this._onResize.bind(this))
+    }
+
+    _onResize() {
+        this._setRatio(this._container.children());
     }
 
     _broadcastChangeContent(content) {
@@ -188,7 +226,11 @@ export default class CWSPlayer extends CWSBase {
         $audio.off("loadeddata")
             .off('volumechange')
             .off('timeupdate')
-            .off('ended');
+            .off('ended')
+            .off('pause')
+            .off('play')
+            .off('error')
+            .off("canplay");
     }
 
     _onAudioLoadedHandler(audio) {
@@ -333,7 +375,22 @@ export default class CWSPlayer extends CWSBase {
             }
         }
 
-        this._audioState.currentTitles.push(...newTitles);
+        for (let i = 0; i < newTitles.length; i++) {
+            let nt = newTitles[i];
+            let found = false;
+            for (let j = 0; j < this._audioState.currentTitles.length; j++) {
+                let ot = this._audioState.currentTitles[j];
+                if (ot.id == nt.id) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                this._audioState.currentTitles.push(nt);
+                changed = true;
+            }
+        }
         return changed || newTitles.length > 0;
     }
 
@@ -399,6 +456,10 @@ export default class CWSPlayer extends CWSBase {
         // let that = this;
         // let tmInt = null;
         this._audioState.requestAnimationFrameID = requestAnimationFrame(::this._proccessAnimationFrame);
+        if (!this._audioState.audio) {
+            return Promise.reject(new Error('Audio is undefined'))
+        }
+
         if (this._audioState.stopped) {
             return this._audioState.audio.play()
                 .then(() => {
