@@ -9,6 +9,7 @@ import {routerMiddleware} from 'react-router-redux'
 import history from '../history'
 import playerMiddleware from './player-middleware';
 import loaderMiddleware from './loader-middleware';
+import LessonInfoStorageMiddleware from './lesson-info-storage-middleware';
 
 export const store = configureStore();
 
@@ -26,6 +27,7 @@ function configureStore(initialState) {
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
                 applyMiddleware(loaderMiddleware),
+                applyMiddleware(LessonInfoStorageMiddleware),
             )
         ) :
         createStore(
@@ -36,6 +38,7 @@ function configureStore(initialState) {
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
                 applyMiddleware(loaderMiddleware),
+                applyMiddleware(LessonInfoStorageMiddleware),
             )
         );
 

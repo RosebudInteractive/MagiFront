@@ -32,7 +32,7 @@ let fullViewPort = null,
 
 class NestedPlayer extends EventEmitter {
 
-    constructor(playingData) {
+    constructor(playingData, currentTime) {
         super();
         this._playingData = null;
         this._fullPlayer = null;
@@ -40,6 +40,9 @@ class NestedPlayer extends EventEmitter {
         this.applyViewPorts();
         this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
+        if (currentTime !== undefined) {
+            this._initialPosition = currentTime
+        }
         this._currentTime = 0;
     }
 
@@ -109,7 +112,7 @@ class NestedPlayer extends EventEmitter {
         return this.player.getAudioState()
     }
 
-    _loadOtherLesson(data) {
+    _loadOtherLesson(data, currentTime) {
         if (data) {
             this.player.pause();
             this.player = null;
@@ -121,7 +124,10 @@ class NestedPlayer extends EventEmitter {
 
             this._setAssetsList(data);
             this.applyViewPorts();
-            this._applyData(data)
+            this._applyData(data);
+            if (currentTime !== undefined) {
+                this._initialPosition = currentTime
+            }
         }
 
         this._hasStoppedOnSwitch = false;
@@ -159,7 +165,7 @@ class NestedPlayer extends EventEmitter {
         this.player.pause()
             .then(() => {
                 store.dispatch(playerActions.stop())
-                store.dispatch(lessonActions.clearLessonPlayInfo());
+                // store.dispatch(lessonActions.clearLessonPlayInfo());
                 this.player = null;
                 // this._fullPlayer = null;
                 this._playingData = null;
@@ -341,6 +347,12 @@ class NestedPlayer extends EventEmitter {
             onCanPlay: () => {
                 let _state = that.player._audioState;
 
+                if (that._initialPosition) {
+                    let _position = that._initialPosition;
+                    that._initialPosition = 0;
+                    that.setPosition(_position)
+                }
+
                 if (!that._hasStoppedOnSwitch) {
                     if (_state.stopped) {
                         that.play()
@@ -452,11 +464,11 @@ export const getInstance = () => {
     return _instance
 }
 
-export const loadPlayInfo = (data) => {
+export const loadPlayInfo = (data, currentTime) => {
     if (!_instance) {
-        _instance = new NestedPlayer(data)
+        _instance = new NestedPlayer(data, currentTime)
     } else {
-        _instance._loadOtherLesson(data)
+        _instance._loadOtherLesson(data, currentTime)
     }
 }
 
