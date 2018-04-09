@@ -40,6 +40,7 @@ class NestedPlayer extends EventEmitter {
         this.applyViewPorts();
         this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
+        this._currentTime = 0;
     }
 
 
@@ -55,7 +56,7 @@ class NestedPlayer extends EventEmitter {
                 this._fullPlayer = new Player(fullViewPort, _options);
                 this._fullPlayer.render();
             } else {
-                if (this._playingData) {
+                if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)){
                     this._fullPlayer.initContainer(this._fullDiv);
                     // this._setAssetsList(this._playingData);
                     this._fullPlayer.render();
@@ -232,6 +233,14 @@ class NestedPlayer extends EventEmitter {
         store.dispatch(playerActions.setContentArray(content))
     }
 
+    _setCurrentTime(value) {
+        let _delta = value - this._currentTime;
+        if ((_delta > 0.5) || (_delta < 0)) {
+            this._currentTime = value;
+            store.dispatch(playerActions.setCurrentTime(value))
+        }
+    }
+
     _getPlayerOptions(assetsList) {
         let that = this;
 
@@ -265,7 +274,7 @@ class NestedPlayer extends EventEmitter {
                     that._onCurrentTimeChanged(e.currentTime)
                 }
 
-                store.dispatch(playerActions.setCurrentTime(e.currentTime))
+                that._setCurrentTime(e.currentTime)
             },
             onSetPosition: function () {
             },
@@ -323,7 +332,8 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
-                store.dispatch(playerActions.setCurrentTime(_state.currentTime))
+
+                that._setCurrentTime(_state.currentTime)
 
                 // that.play()
                 that._hasStoppedOnSwitch = false
