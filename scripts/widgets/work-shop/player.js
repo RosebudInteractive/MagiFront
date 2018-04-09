@@ -344,7 +344,7 @@ export default class CWSPlayer extends CWSBase {
                 el.setRate(rate);
                 el.play();
                 if (this._audioState.playingNow[el.Id] === undefined) {
-                    if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
+                    if (el.DeleteOldTitles === undefined || el.DeleteOldTitles) {
                         deleteOld = true;
                     }
                     if (el.Title)
@@ -767,7 +767,7 @@ export default class CWSPlayer extends CWSBase {
                 el.Position = position - el.Start;
 
                 if (this._audioState.playingNow[el.Id] === undefined) {
-                    if (el.DeleteOldTitles === undefined && el.DeleteOldTitles) {
+                    if (el.DeleteOldTitles === undefined || el.DeleteOldTitles) {
                         deleteOld = true;
                     }
                     if (el.Title || el.Title2) {
