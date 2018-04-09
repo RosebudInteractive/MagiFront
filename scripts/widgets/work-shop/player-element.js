@@ -87,7 +87,6 @@ export default class CWSPlayerElement extends CWSBase {
 
     play() {
         if (!this._playState.stopped) return;
-        console.log("El:" + this.Id + "luanched");
         this._playState.stopped = false;
 
         this._playState.rate = this._playState.rate || 1;
@@ -344,7 +343,6 @@ export default class CWSPlayerElement extends CWSBase {
 
                             this._setEvents(item);
                             item.fadeIn("fast");
-                            console.log("El:" + this.Id + "fade");
 
                         })
                         .catch((err) => {

@@ -247,7 +247,6 @@ export default class CWSPlayer extends CWSBase {
         let that = this;
         audio
             .on("canplay", () => {
-                console.log('Can play');
                 that._broadcastCanPlay();
             })
             .on("loadeddata", function () {
@@ -287,7 +286,6 @@ export default class CWSPlayer extends CWSBase {
             })
             .on("pause", function () {
                 // that.pause();
-                console.log("PLAYER. onpause");
                 that._audioState.stopped = true;
                 that._broadcastPaused();
                 if (this.ended) {
@@ -296,7 +294,6 @@ export default class CWSPlayer extends CWSBase {
             })
             .on("play", function () {
                 // that.play();
-                console.log("PLAYER. onplay");
                 that._audioState.stopped = false;
                 that._broadcastStarted();
             })
@@ -463,44 +460,10 @@ export default class CWSPlayer extends CWSBase {
         if (this._audioState.stopped) {
             return this._audioState.audio.play()
                 .then(() => {
-                    console.log("PLAYER. CallPlay")
                 });
         } else {
             return Promise.resolve()
         }
-
-        // return new Promise((resolve, reject) => {
-        //     this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
-        //     if (that._audioState.stopped) {
-        //         that._audioState.$audio.on("play", awaitPlayerPlay);
-        //
-        //         that._audioState.audio.play();
-        //         tmInt = setTimeout(function () {
-        //             if (that._audioState.audio.paused) {
-        //                 that._audioState.stopped = false;
-        //                 resolve();
-        //             } else {
-        //                 reject();
-        //             }
-        //         }, 500)
-        //     }
-        //
-        //     if (!that._audioState.stopped) {
-        //         setTimeout(() => {
-        //             resolve();
-        //         }, 0)
-        //     }
-        //
-        //
-        //
-        //     function awaitPlayerPlay() {
-        //         console.log("PLAYER. awaitPlayerPlay")
-        //         clearInterval(tmInt);
-        //         that._audioState.$audio.off("play", awaitPlayerPlay);
-        //         that._audioState.stopped = false;
-        //         resolve();
-        //     }
-        // });
     }
 
     pause() {
