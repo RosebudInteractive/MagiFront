@@ -430,6 +430,10 @@ export default class CWorkShop extends CWSBase {
         tracks.push(newTrack);
         return newTrack;
     }
+
+    getData() {
+        return this._playerWidget.getData();
+    }
 }
 //    }
 //);

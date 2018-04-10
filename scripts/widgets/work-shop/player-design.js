@@ -344,6 +344,10 @@ export default class CWSPlayerDesign extends CWSPlayer {
         this._options.loader.addTrack(track);
     }
 
+    getData() {
+        return $.extend(true, {}, this._options.loader.getData())
+    }
+
 }
 //    }
 //);
