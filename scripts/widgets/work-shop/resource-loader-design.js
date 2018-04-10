@@ -17,7 +17,7 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
         let trackElements = track.elements;
 
         // delete not existent elements
-        for (let i = 0; i < trackElements;) {
+        for (let i = 0; i < trackElements.length;) {
             let found = CWSResourceLoaderDesign._findElementById(trackElements[i].id, elements);
             if (!found) {
                 trackElements.splice(i, 1);
@@ -35,6 +35,15 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
             } else {
                 let oldEl = found.element;
                 trackElements[found.idx] = $.extend(true, oldEl, elements[i]);
+            }
+
+            found = CWSResourceLoaderDesign._findElementById(elements[i].id, ep.elements);
+            if (!found) {
+                let newEl = $.extend(true, {}, elements[i]);
+                ep.elements.push(newEl);
+            } else {
+                let oldEl = found.element;
+                ep.elements[found.idx] = $.extend(true, oldEl, elements[i]);
             }
         }
     }
