@@ -32,12 +32,17 @@ const loaderMiddleware = store => next => action => {
             let _state = store.getState();
 
             if (_state.lessonPlayInfo.playInfo && !_state.lessonPlayInfo.fetching) {
+                let _id = _state.lessonPlayInfo.playInfo.id,
+                    _lessonInfo = _state.lessonInfoStorage.lessons.get(_id),
+                    _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0
+
                 Loader.notyfyPlayInfoLoaded({
-                    lessonId : _state.lessonPlayInfo.playInfo.Id,
+                    lessonId : _id,
                     courseUrl : _state.lessonPlayInfo.playInfo.courseUrl,
                     lessonUrl : _state.lessonPlayInfo.playInfo.lessonUrl,
                     Number : _state.lessonPlayInfo.playInfo.Number,
                     Name : _state.lessonPlayInfo.playInfo.Name,
+                    currentTime : _currentTime,
                 })
             }
 

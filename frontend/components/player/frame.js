@@ -6,7 +6,6 @@ import Progress from "./progress";
 import Controls from "./controls";
 
 import $ from 'jquery'
-// import 'script-lib/jquery.mCustomScrollbar.concat.min.js';
 import PauseScreen from "./pause-screen";
 import Titles from "./titles";
 import TimeInfo from './time-info';

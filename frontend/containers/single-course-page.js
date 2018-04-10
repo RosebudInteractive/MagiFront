@@ -23,6 +23,11 @@ class Main extends React.Component {
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
 
+    componentDidUpdate() {
+        if (this.props.course) {
+            document.title = 'Курс: ' + this.props.course.Name + ' - Магистерия'
+        }
+    }
 
     render() {
         let {

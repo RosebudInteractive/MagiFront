@@ -77,7 +77,7 @@ class SmallPlayer extends React.Component {
                 :
                 null;
 
-        let _visible = playingLesson && showSmallPlayer && !isLessonMenuOpened
+        let _visible = playingLesson && showSmallPlayer && !isLessonMenuOpened && !this.props.stopped
 
         return (
             <Swipeable trackMouse onSwipingRight={::this._close} onSwipedLeft={::this._maximize}>

@@ -30,7 +30,7 @@ const playerMiddleware = store => next => action => {
         case SET_LESSON_PLAY_INFO_LOADED: {
             let _state = store.getState();
 
-            Player.loadPlayInfo(_state.lessonPlayInfo.playInfo)
+            Player.loadPlayInfo(_state.lessonPlayInfo.playInfo, action.payload.currentTime)
 
             return next(action)
         }

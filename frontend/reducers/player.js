@@ -32,6 +32,7 @@ const initialState = {
     totalDuration: 0,
     contentArray: [],
     playingLesson: null,
+    stopped: false,
 };
 
 export default function player(state = initialState, action) {
@@ -46,13 +47,14 @@ export default function player(state = initialState, action) {
         }
 
         case PLAYER_PLAYED:
-            return {...state, paused: false, ended: false};
+            return {...state, paused: false, ended: false, stopped: false};
 
         case PLAYER_PAUSED:
             return {...state, paused: true};
 
         case PLAYER_STOPPED:
-            return initialState;
+            // return initialState;
+            return {...state, stopped: true, currentTime: 0};
 
         case PLAYER_ENDED:
             return {...state, ended: true};

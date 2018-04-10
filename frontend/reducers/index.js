@@ -10,6 +10,7 @@ import lessonText from './lessonText';
 import lessonPlayInfo from './lesson-play-info';
 import app from './app';
 import player from './player';
+import lessonInfoStorage from './lesson-info-storage';
 // import { routerReducer } from 'react-router-redux';
 
 
@@ -25,6 +26,7 @@ export default combineReducers({
     lessonText,
     lessonPlayInfo,
     player,
+    lessonInfoStorage,
     routing: routerReducer,
     // browser: responsiveStateReducer({
     //     mobile: 500,

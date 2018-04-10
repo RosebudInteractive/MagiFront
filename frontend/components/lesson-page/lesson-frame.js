@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import {connect} from 'react-redux';
 
-export default class LessonFrame extends React.Component {
+class LessonFrame extends React.Component {
     static propTypes = {
         courseUrl: PropTypes.string.isRequired,
         lesson: PropTypes.object.isRequired,
@@ -18,6 +19,9 @@ export default class LessonFrame extends React.Component {
 
         let {lesson} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
+        let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
+            _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
 
         return (
             <div className="lecture-frame">
@@ -49,7 +53,7 @@ export default class LessonFrame extends React.Component {
                     <SocialBlock/>
                 </div>
                 <div className="progress-bar">
-                    <div className="progress-bar__bar" style={{width: 186}}/>
+                    <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
                 </div>
             </div>
         )
@@ -94,3 +98,11 @@ class SocialBlock extends React.Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        lessonInfoStorage: state.lessonInfoStorage,
+    }
+}
+
+export default connect(mapStateToProps)(LessonFrame);
