@@ -121,7 +121,7 @@ window.Utils = Utils;
                 return newId;
             }
 
-            function onDeleteAsset(e) {
+            function onDeleteAsset(e) { // не работает
                 var id = e.id;
                 for (var i = 0; i < assetsList.length; i++) {
                     var a = assetsList[i];
