@@ -127,7 +127,6 @@ function mapStateToProps(state) {
         paused: state.player.paused,
         stopped: state.player.stopped,
         ended: state.player.ended,
-        stopped: state.player.stopped,
         playingLesson: state.player.playingLesson,
         showSmallPlayer: state.app.showSmallPlayer,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

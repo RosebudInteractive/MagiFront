@@ -54,7 +54,7 @@ export default function player(state = initialState, action) {
 
         case PLAYER_STOPPED:
             // return initialState;
-            return {...state, stopped: true};
+            return {...state, stopped: true, currentTime: 0};
 
         case PLAYER_ENDED:
             return {...state, ended: true};
