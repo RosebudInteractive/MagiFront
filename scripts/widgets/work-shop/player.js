@@ -396,10 +396,10 @@ export default class CWSPlayer extends CWSBase {
             this._options.onAudioLoaded(this.getAudioState());
     }
 
-    _broadcastAudioInitialized() {
-        if (this._options.onAudioInitialized)
-            this._options.onAudioInitialized(this.getAudioState());
-    }
+    //_broadcastAudioInitialized() {
+    //    if (this._options.onAudioInitialized)
+    //        this._options.onAudioInitialized(this.getAudioState());
+    //}
 
     _broadcastCurrentTimeChanged() {
         if (this._options.onCurrentTimeChanged)
@@ -429,7 +429,7 @@ export default class CWSPlayer extends CWSBase {
 
     _broadcastError(e) {
         if (this._options.onError)
-            this._options.onError();
+            this._options.onError(e);
     }
 
     getAudioState() {
@@ -587,7 +587,6 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.audio.pause();
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
-                var savedState = $.extend(true, {}, this._audioState);
                 let savedState = $.extend(true, {}, this._audioState);
                 this._options.loader
                     .getAudioResource(newStart.episode.audio.file)
@@ -596,7 +595,7 @@ export default class CWSPlayer extends CWSBase {
                         inf.data = a.data;
                         this._audioState.currentEpisode = epIdx;
 
-                        this._setAudio(inf)
+                        this._setAudio(inf);
 
                         this._audioState.audio.currentTime = savedState.currentTime;
                         this._audioState.currentEpisode = epIdx;
@@ -895,6 +894,7 @@ export default class CWSPlayer extends CWSBase {
             oldData.content.title2 = trackElData.content.title2;
             oldData.content.deleteOldTitles =
                 trackElData.content.deleteOldTitles === undefined || trackElData.content.deleteOldTitles;
+            oldData.start = trackElData.start;
         } else {
             oldData = $.extend(true, {}, trackElData);
             oldData.id = Utils.guid();

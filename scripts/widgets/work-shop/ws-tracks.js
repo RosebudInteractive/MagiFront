@@ -53,7 +53,7 @@ export default class CWSTracks extends CWSBase {
             select: this._container.find('.ws-rate-select'),
             value: this._container.find('.ws-rate-select-value'),
             mousedownPosition: 0,
-            eventMouseUp: (e) => {
+            eventMouseUp: () => {
                 this._rate.select.removeClass('ws-rate-select-over');
                 this._rate.select[0].removeEventListener('mousemove', this._rate.eventMouseMove);
                 window.removeEventListener('mouseup', this._rate.eventMouseUp);
@@ -73,7 +73,6 @@ export default class CWSTracks extends CWSBase {
                 let rateValueDiv = this._rate.value;
 
                 let halfSize = rateDiv.height()/2;
-                let fullSize = rateDiv.height();
 
                 let middleOffset = 4;
                 let rateValue = 0;
@@ -147,7 +146,7 @@ export default class CWSTracks extends CWSBase {
         });
 
         // this._iscroll.refresh();
-        try {this._scrollerDiv.scrollerData.scrollBy(0,0);} catch(err) {}
+        try {this._scrollerDiv.scrollerData.scrollBy(0,0);} catch(err) {console.warning(err)}
 
         this._toolsPanel.render();
     }
@@ -460,7 +459,14 @@ export default class CWSTracks extends CWSBase {
             start: (event, ui) => {
                 let uiHelper = $(ui.helper);
                 uiHelper.addClass("focused");
-                uiHelper.data = function(v) { return {start: elItem.data('data').start, duration: elItem.data('data').content.duration}};
+                uiHelper.data = function() {
+                    return {
+                        start: elItem.data('data').start,
+                        content: {
+                            duration: elItem.data('data').content.duration
+                        }
+                    }
+                };
                 that._setSideTime.bind(this, uiHelper)();
                 elItem.hide();
             },
@@ -500,14 +506,20 @@ export default class CWSTracks extends CWSBase {
                 let stepParams = this._getStepParams();
 
                 let startPos = (this._scrollerDiv.scrollerData.scrollX + ui.position.left - this._container.find('.ws-track-tools-background').width() - stepParams.offset)/stepParams.pixelsInSencond;
-                let endPos = elItem.data('data').content.duration;
 
                 let uiHelper = $(ui.helper);
-                uiHelper.data = function(v) { return {start: startPos < 0 ? 0 : startPos, duration: endPos}};
+                uiHelper.data = function(v) {
+                    return {
+                        start: startPos < 0 ? 0 : startPos,
+                        content: {
+                            duration: elItem.data('data').content.duration
+                        }
+                    }
+                };
 
                 that._setSideTime.bind(this, uiHelper)();
             },
-            stop: (event, ui) => {
+            stop: (/*event, ui*/) => {
                 elItem.show();
                 that._setFocusedWithBroadcast.bind(this, elItem)();
             }
@@ -570,9 +582,9 @@ export default class CWSTracks extends CWSBase {
         let elData = elItem.data("data");
 
         function msToTime(duration) {
-            let milliseconds = parseInt((duration%1000))
-                , seconds = parseInt((duration/1000)%60)
-                , minutes = parseInt(duration/(1000*60))
+            let milliseconds = (+duration)%1000
+                , seconds = ((+duration)/1000)%60
+                , minutes = Math.trunc((+duration)/(1000*60));
             seconds = (seconds < 10) ? "0" + seconds : seconds;
             if (milliseconds > 99) milliseconds = parseInt(milliseconds/10);
             milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
@@ -582,7 +594,7 @@ export default class CWSTracks extends CWSBase {
         let st = elItem.find('.ws-element-left-time');
         let et = elItem.find('.ws-element-right-time');
         st.html(msToTime(elData.start*1000));
-        et.html(msToTime((elData.start + elData.duration)*1000));
+        et.html(msToTime((elData.start + elData.content.duration)*1000));
     }
 
     _hideSideTime(elItem) {
@@ -609,7 +621,6 @@ export default class CWSTracks extends CWSBase {
         let track = this._findTrack(trackId);
         if (!track) return null;
 
-        let p = this._getStepParams();
         let left = ui.position.left;
         let position = {
             dropped :{left: left, top: 0},
@@ -636,7 +647,6 @@ export default class CWSTracks extends CWSBase {
     }
 
     _createScroll() {
-        let that = this;
         // console.log(this._scrollerDiv);
         let scrollerData = {
             viewportWidth: () => this._scrollerDiv.width(),
@@ -737,14 +747,14 @@ export default class CWSTracks extends CWSBase {
                 },
                 element: null,
             }
-        }
+        };
 
         this._scrollerDiv.scrollerData = scrollerData;
 
         this._container.find('.ws-tracks-list')[0].addEventListener('wheel', (e) => {
             e.preventDefault();
             scrollerData.scrollBy(e.deltaX, e.deltaY);
-        })
+        });
 
         let horBar = this._container.find('.ws-scroller-hor-bar')[0];
         this._scrollerDiv.scrollerData.horBar.element = horBar;
@@ -777,11 +787,11 @@ export default class CWSTracks extends CWSBase {
             }
             verBar.style.height = (verHeight - 5) + 'px';
             verBar.style.top = verTop + 'px';
-        }
+        };
         verBar.update();
 
         this._scrollerDiv[0].addEventListener('mouseenter', () => {
-        })
+        });
 
         this._pointer = $(CWSTracks.template("pointer-top"));
         this._container.find(".ws-tracks-list-content").append(this._pointer);
@@ -816,7 +826,10 @@ export default class CWSTracks extends CWSBase {
                 pause.hide();
                 play.show();
                 that._scrollerDiv.scrollerData.scrollAuto = false;
-                cancelAnimationFrame(that._scrollerDiv.scrollerData.scrollAnimationFrame);
+                if (that._scrollerDiv.scrollerData.scrollAnimationFrame) {
+                    cancelAnimationFrame(that._scrollerDiv.scrollerData.scrollAnimationFrame);
+                    that._scrollerDiv.scrollerData.scrollAnimationFrame = null;
+                }
             }
         });
 
@@ -856,7 +869,7 @@ export default class CWSTracks extends CWSBase {
             if (meter.hasClass('ws-volume-meter-over') && meter_mouse_down === true) {
                 that.setVolumeMeter.bind(this,e, that)();
             }
-        })
+        });
         meter.on('mouseup', function(e) {
             if (meter_mouse_down) that.setVolumeMeter.bind(this, e, that)();
             meter_mouse_down = false;
@@ -889,13 +902,14 @@ export default class CWSTracks extends CWSBase {
             do{
                 e_posx += obj.offsetLeft;
                 e_posy += obj.offsetTop;
-            } while (obj = obj.offsetParent);
+                obj = obj.offsetParent
+            } while (obj);
         }
 
         let meter = {
             'x': (m_posx-e_posx),
             'y': (m_posy-e_posy)
-        }
+        };
 
         let meterValue = $(this).height() - meter.y;
         if (meterValue > $(this).height()) meterValue = $(this).height();
@@ -1076,8 +1090,8 @@ export default class CWSTracks extends CWSBase {
             position: {
                 left: 0,
                 top: 0,
-                right: 100 - 0 - w,
-                bottom: 100 - 0 - h
+                right: 100 - w,
+                bottom: 100 - h
             },
             content: {
                 duration: p.duration,
@@ -1355,21 +1369,21 @@ export default class CWSTracks extends CWSBase {
     }
 
     _animationFrame(timestamp) {
-
         let fps = 30;
         let interval = 1000/fps;
         let scrollBy = (this._getStepParams().pixelsInSencond/fps) * this._getAudioState().playbackRate;
 
-        if (timestamp < this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
+        if (timestamp >= this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
             //missed step
-            this._scrollerDiv.scrollerData.scrollBy(scrollBy, 0)
-            this._scrollerDiv.scrollerData.scrollAnimationFrame = requestAnimationFrame(this._animationFrame.bind(this));
-            return;
+            this._scrollerDiv.scrollerData.scrollAnimationFrameTime = timestamp + interval;
         }
 
-        this._scrollerDiv.scrollerData.scrollAnimationFrameTime = timestamp + interval;
-        this._scrollerDiv.scrollerData.scrollBy(scrollBy, 0)
-        this._scrollerDiv.scrollerData.scrollAnimationFrame = requestAnimationFrame(this._animationFrame.bind(this));
+        this._scrollerDiv.scrollerData.scrollBy(scrollBy, 0);
+        if (this._scrollerDiv.scrollerData.scrollAnimationFrame && !this._getAudioState().stopped)
+            this._scrollerDiv.scrollerData.scrollAnimationFrame =
+                requestAnimationFrame(this._animationFrame.bind(this));
+        else
+            this._scrollerDiv.scrollerData.scrollAuto = false;
     }
 
     _altScrollToPointer() {
@@ -1384,7 +1398,7 @@ export default class CWSTracks extends CWSBase {
 
             if (pos === PTR_SCROLL_RIGHT) {
                 if (!this._scrollerDiv.scrollerData.scrollAuto) {
-                    this._scrollerDiv.scrollerData.scrollAuto = true
+                    this._scrollerDiv.scrollerData.scrollAuto = true;
                     this._scrollerDiv.scrollerData.scrollAnimationFrame = requestAnimationFrame(this._animationFrame.bind(this));
                     this._scrollerDiv.scrollerData.scrollAnimationFrameTime = performance.now();
                 } else {
@@ -1398,7 +1412,10 @@ export default class CWSTracks extends CWSBase {
             if (pos === PTR_SCROLL_NONE) {
                 if (this._scrollerDiv.scrollerData.scrollAuto) {
                     this._scrollerDiv.scrollerData.scrollAuto = false;
-                    cancelAnimationFrame(this._scrollerDiv.scrollerData.scrollAnimationFrame);
+                    if (this._scrollerDiv.scrollerData.scrollAnimationFrame) {
+                        cancelAnimationFrame(this._scrollerDiv.scrollerData.scrollAnimationFrame);
+                        this._scrollerDiv.scrollerData.scrollAnimationFrame = null;
+                    }
                 } else {
                     let p = this._getStepParams();
                     this._pointer.css("left", (p.offset + p.pixelsInSencond*this._getAudioState().currentTime - this._pointer.width()/2 - this._scrollerDiv.scrollerData.scrollX) + 'px');
@@ -1461,8 +1478,7 @@ export default class CWSTracks extends CWSBase {
             }
             // если не зажат Shift, то пытаемся ужать следующий элемент
             if (!shift && oldStart != element.start) {
-                let delta = element.start - oldStart;
-                element.content.duration -= delta;
+                element.content.duration -= element.start - oldStart;
                 if (element.content.duration < 1) element.content.duration = 1;
             }
 
