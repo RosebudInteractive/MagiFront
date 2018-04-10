@@ -334,10 +334,10 @@ export default class CWSPlayerElement extends CWSBase {
                         .then((assData) => {
                             let imgData = assData[0].file.body;
                             let imgDiv = $('<img src="' + imgData + '" />');
-                            imgDiv.on('load', () => {
-                                let width = this.naturalWidth;
-                                let height = this.naturalHeight;
-                            });
+                            //imgDiv.on('load', () => {
+                            //    let width = this.naturalWidth;
+                            //    let height = this.naturalHeight;
+                            //});
 
                             cont.html(imgDiv);
 

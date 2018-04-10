@@ -50,6 +50,7 @@ export default class CWSPlayer extends CWSBase {
     }
 
     destroy() {
+        this.pause();
         this._destroyAudioEvents(this._audioState.$audio);
         this._destroyEvents();
         this._options.loader.destroy();
@@ -295,6 +296,7 @@ export default class CWSPlayer extends CWSBase {
             .on("play", function () {
                 // that.play();
                 that._audioState.stopped = false;
+                that._audioState.requestAnimationFrameID = requestAnimationFrame(::that._proccessAnimationFrame);
                 that._broadcastStarted();
             })
             .on("error", function (e) {
@@ -446,13 +448,15 @@ export default class CWSPlayer extends CWSBase {
                 this._playElements(this._audioState.globalTime);
             }
         }
-        this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
+
+        if (!this._audioState.stopped) {
+            this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
+        }
     }
 
     play() {
         // let that = this;
         // let tmInt = null;
-        this._audioState.requestAnimationFrameID = requestAnimationFrame(::this._proccessAnimationFrame);
         if (!this._audioState.audio) {
             return Promise.reject(new Error('Audio is undefined'))
         }
@@ -493,7 +497,7 @@ export default class CWSPlayer extends CWSBase {
             that._pauseElements();
 
             function awaitPlayerPause() {
-                clearInterval(tmInt);
+                clearTimeout(tmInt);
                 that._audioState.$audio.off("pause", awaitPlayerPause);
                 that._audioState.stopped = true;
                 resolve();
