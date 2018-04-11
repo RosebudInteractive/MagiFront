@@ -1,7 +1,11 @@
+import * as workShopActions from '../actions/work-shop-actions';
+import {store} from '../store/configureStore';
+
 import CWorkShop from "work-shop/work-shop2";
 import 'jquery-ui/jquery-ui.js';
 import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
+import 'script-lib/iscroll.js'
 import $ from 'jquery'
 
 
@@ -19,22 +23,36 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
+var _instance = null
+let _data = null;
 
 class AdmWorkShop {
-    constructor(div, data) {
+    static loadData(data) {
+        _instance = new AdmWorkShop(data);
+        store.dispatch(workShopActions.show())
+    }
+
+    static close() {
+        _instance = null
+    }
+
+    constructor(data) {
         let _options = this._initOptions();
+        _data = Object.assign({}, data);
+        let div = $('.ws-container');
         this._ws = new CWorkShop(div, _options);
         this._ws.render();
-        this._data = data;
     }
 
     _initOptions() {
+        let that = this;
+
         let result = {
-            data: this._onGetData,
-            // assets: {
-            //     onAddAsset: onAddAsset,
-            //     onDeleteAsset: onDeleteAsset
-            // },
+            data: that._onGetData,
+            assets: {
+                // onAddAsset: onAddAsset,
+                // onDeleteAsset: onDeleteAsset
+            },
             tracks: {
                 onDeleteTrack: this._onDeleteTrack,
                 onGetAudio: this._onGetAudio,
@@ -52,7 +70,7 @@ class AdmWorkShop {
     }
 
     _onGetData() {
-        return Promise.resolve(this._data)
+        return Promise.resolve(_data)
     }
 
 

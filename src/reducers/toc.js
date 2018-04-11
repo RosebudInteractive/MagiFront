@@ -17,7 +17,6 @@ const initialState = {
     editMode: EDIT_MODE_INSERT,
 };
 
-
 export default function toc(state = initialState, action) {
 
     switch (action.type) {

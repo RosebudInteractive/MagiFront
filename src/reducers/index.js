@@ -35,6 +35,7 @@ import references from './references';
 import resources from './resources';
 import toc from './toc';
 import content from './content';
+import workShop from './work-shop'
 
 export default combineReducers({
     page,
@@ -67,5 +68,6 @@ export default combineReducers({
     resources,
     toc,
     content,
+    workShop,
     routing: routerReducer,
 })

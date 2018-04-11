@@ -1,8 +1,9 @@
-import { createStore, applyMiddleware } from 'redux'
+import { createStore, applyMiddleware, compose } from 'redux'
 import rootReducer from '../reducers'
 import { createLogger } from 'redux-logger'
 import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
+import workShopMiddleware from '../middlewares/work-shop-middleware'
 
 export const store = configureStore();
 
@@ -13,8 +14,11 @@ function configureStore(initialState) {
     const store = createStore(
         rootReducer,
         initialState,
-        applyMiddleware(thunk, logger),
-        applyMiddleware(routerMiddl)
+        compose(
+            applyMiddleware(thunk, logger),
+            applyMiddleware(routerMiddl),
+            applyMiddleware(workShopMiddleware)
+        )
     );
 
     if (module.hot) {

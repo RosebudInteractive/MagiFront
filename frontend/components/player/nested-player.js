@@ -1,4 +1,3 @@
-import EventEmitter from 'events'
 import $ from 'jquery'
 
 import * as playerActions from '../../actions/player-actions';
@@ -29,10 +28,9 @@ window.Utils = Utils;
 let fullViewPort = null,
     smallViewPort = null;
 
-class NestedPlayer extends EventEmitter {
+class NestedPlayer {
 
     constructor(playingData, initState) {
-        super();
         this._playingData = null;
         this._fullPlayer = null;
         this._setAssetsList(playingData);
@@ -163,37 +161,38 @@ class NestedPlayer extends EventEmitter {
     }
 
     play() {
-        if (!this._initState) {
-            let _state = this.player._audioState;
+        // if (!this._initState) {
+        //     let _state = this.player._audioState;
+        //
+        //     store.dispatch(playerActions.setMuteState(_state.muted))
+        //     console.log('!!!VOLUME', _state.volume)
+        //     store.dispatch(playerActions.setVolume(_state.volume))
+        //     store.dispatch(playerActions.setRate(_state.playbackRate))
+        // }
 
-            store.dispatch(playerActions.setMuteState(_state.muted))
-            console.log('!!!VOLUME', _state.volume)
-            store.dispatch(playerActions.setVolume(_state.volume))
-            store.dispatch(playerActions.setRate(_state.playbackRate))
-        }
-
-        this.player.play().then(() => {
-            if (this._initState) {
-                let _state = Object.assign({},this._initState);
-                this._initState = null;
-                if (_state.currentTime) {
-                    this.setPosition(_state.currentTime)
-                }
-
-                if (_state.muted !== undefined) {
-                    if (_state.muted) {
-                        this.mute()
-                    } else {
-                        this.unmute()
-                    }
-                }
-
-                if (_state.volume !== undefined) {
-                    console.log('!!!VOLUME INIT', _state.volume)
-                    // this.setVolume(_state.volume)
-                }
-            }
-        })
+        this.player.play()
+            // .then(() => {
+            // if (this._initState) {
+            //     let _state = Object.assign({},this._initState);
+            //     this._initState = null;
+            //     if (_state.currentTime) {
+            //         this.setPosition(_state.currentTime)
+            //     }
+            //
+            //     if (_state.muted !== undefined) {
+            //         if (_state.muted) {
+            //             this.mute()
+            //         } else {
+            //             this.unmute()
+            //         }
+            //     }
+            //
+            //     if (_state.volume !== undefined) {
+            //         console.log('!!!VOLUME INIT', _state.volume)
+            //         // this.setVolume(_state.volume)
+            //     }
+            // }
+        // })
 
         this._hasStoppedOnSwitch = false;
     }
@@ -366,9 +365,9 @@ class NestedPlayer extends EventEmitter {
                     })
                 }
 
-                // store.dispatch(playerActions.setMuteState(_state.muted))
-                // store.dispatch(playerActions.setVolume(_state.volume))
-                // store.dispatch(playerActions.setRate(_state.playbackRate))
+                store.dispatch(playerActions.setMuteState(_state.muted))
+                store.dispatch(playerActions.setVolume(_state.volume))
+                store.dispatch(playerActions.setRate(_state.playbackRate))
 
                 // that._setCurrentTime(_state.currentTime)
 
@@ -395,11 +394,9 @@ class NestedPlayer extends EventEmitter {
                 store.dispatch(playerActions.setRate(_state.playbackRate))
             },
             onPaused: () => {
-                that.emit('pause');
                 store.dispatch(playerActions.pause())
             },
             onStarted: () => {
-                that.emit('play');
                 store.dispatch(playerActions.play())
             },
             onEnded: () => {

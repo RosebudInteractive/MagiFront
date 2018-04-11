@@ -242,8 +242,18 @@ class EpisodeEditor extends ObjectEditor {
         return [
             {
                 view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол',
+                disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
+                    let {lessonId, episodeId} = that.props;
 
+                    if (lessonId && episodeId) {
+                        let _object = {
+                            lessonId: lessonId,
+                            episodeId: episodeId
+                        }
+
+                        that.props.workShopActions.loadData(_object)
+                    }
                 }
             },
             {

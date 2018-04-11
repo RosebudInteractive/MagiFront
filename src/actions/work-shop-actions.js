@@ -1,6 +1,6 @@
 import {
-    WORK_SHOP_LOAD_DATA,
-    WORK_SHOP_GET_DATA_REQUEST,
+    WORK_SHOP_SHOW,
+    WORK_SHOP_HIDE,
     WORK_SHOP_GET_DATA_SUCCESS,
     WORK_SHOP_GET_DATA_FAIL,
 } from '../constants/work-shop';
@@ -9,20 +9,22 @@ import {
     SHOW_ERROR_DIALOG,
 } from '../constants/Common';
 
-export const loadData = (object) => {
+export const show = () => {
     return {
-        type: WORK_SHOP_LOAD_DATA,
-        payload: object
+        type: WORK_SHOP_SHOW,
+        payload: null
     }
 };
 
-export const get = (object) => {
-    return (dispatch) => {
-        dispatch({
-            type: WORK_SHOP_GET_DATA_REQUEST,
-            payload: null
-        });
+export const hide = () => {
+    return {
+        type: WORK_SHOP_HIDE,
+        payload: null
+    }
+};
 
+export const loadData = (object) => {
+    return (dispatch) => {
         fetch("/api/episodes/play/" + object.lessonId + '/' + object.episodeId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
