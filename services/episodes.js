@@ -4,6 +4,7 @@
 
 //let { EpisodesService } = require("../database/episodes");
 let { EpisodesService } = require("../database/db-episode");
+let { LessonsService } = require('./../database/db-lesson');
 
 function setupEpisodes(app) {
     app.get('/api/episodes/:id/:lessonId', (req, res, next) => {
@@ -17,13 +18,16 @@ function setupEpisodes(app) {
             });
     });
 
-    // app.get('/api/episodes', function(req, res, next) {
-    //     new EpisodesService().getAll().then(rows => {
-    //         res.send(rows);
-    //     }).catch(err => {
-    //         next(err);
-    //     });
-    // });
+    app.get('/api/episodes/play/:id/:lessonId', (req, res, next) => {
+        LessonsService()
+            .getPlayerData(parseInt(req.params.lessonId), parseInt(req.params.id))
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
 
     app.post('/api/episodes/:lessonId', (req, res, next) => {
         EpisodesService()
