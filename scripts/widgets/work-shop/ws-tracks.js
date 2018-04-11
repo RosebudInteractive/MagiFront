@@ -1355,9 +1355,10 @@ export default class CWSTracks extends CWSBase {
 
     _setDurationMeter() {
         function msToTime(duration) {
-            let milliseconds = parseInt((duration%1000))
-                , seconds = parseInt((duration/1000)%60)
-                , minutes = parseInt(duration/(1000*60))
+            duration = +duration;
+            let milliseconds = duration%1000
+                , seconds = (duration/1000)%60
+                , minutes = Math.trunc(duration/(1000*60));
             seconds = (seconds < 10) ? "0" + seconds : seconds;
             if (milliseconds > 99) milliseconds = parseInt(milliseconds/10);
             milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
@@ -1369,9 +1370,10 @@ export default class CWSTracks extends CWSBase {
     }
 
     _animationFrame(timestamp) {
+        let state = this._getAudioState();
         let fps = 30;
         let interval = 1000/fps;
-        let scrollBy = (this._getStepParams().pixelsInSencond/fps) * this._getAudioState().playbackRate;
+        let scrollBy = (this._getStepParams().pixelsInSencond/fps) * state.playbackRate;
 
         if (timestamp >= this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
             //missed step
@@ -1379,7 +1381,7 @@ export default class CWSTracks extends CWSBase {
         }
 
         this._scrollerDiv.scrollerData.scrollBy(scrollBy, 0);
-        if (this._scrollerDiv.scrollerData.scrollAnimationFrame && !this._getAudioState().stopped)
+        if (this._scrollerDiv.scrollerData.scrollAnimationFrame && !state.stopped)
             this._scrollerDiv.scrollerData.scrollAnimationFrame =
                 requestAnimationFrame(this._animationFrame.bind(this));
         else

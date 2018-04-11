@@ -116,6 +116,15 @@ export default class CWorkShop extends CWSBase {
         }).click(function () {
             $(this).focus();
         });
+
+        this._container.find(".save-btn.header-icon").click(() => {
+            if (this._options.onSave)
+                this._options.onSave(this.getData());
+        });
+        this._container.find(".cancel-btn.header-icon").click(() => {
+            if (this._options.onCancel)
+                this._options.onCancel();
+        });
     }
 
     refreshItem() {
@@ -341,15 +350,15 @@ export default class CWorkShop extends CWSBase {
                 that._tracksWidget.setElementPosition(elId, e.position);
                 let data = that._tracksWidget.getElementData(elId);
                 that._propeditorWidget.render(data);
-                if (that._options.onSetElementPosition)
-                    that._options.onSetElementPosition(e);
+                if (that._options.player.onSetElementPosition)
+                    that._options.player.onSetElementPosition(e);
             },
             onFocused: function (e) {
                 let elId = e.trackElId;
                 let oldFocused = that._tracksWidget.setFocused(elId);
 
-                if (that._options.onElementFocused) {
-                    that._options.onElementFocused({
+                if (that._options.player.onElementFocused) {
+                    that._options.player.onElementFocused({
                         trackElId: e.trackElId,
                         oldFocusedId: oldFocused ? oldFocused.id : null
                     });
@@ -432,8 +441,15 @@ export default class CWorkShop extends CWSBase {
     }
 
     getData() {
-        return this._playerWidget.getData();
+        let data = this._playerWidget.getData();
+        if (data.episodes[0]) {
+            let ep = data.episodes[0];
+            if (ep.tracks) delete ep.tracks;
+            if (ep.tracksIdx) delete ep.tracksIdx;
+        }
+        return data;
     }
+
 }
 //    }
 //);
