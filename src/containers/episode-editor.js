@@ -8,6 +8,7 @@ import * as episodeTocActions from '../actions/episode/episode-tocs-actions';
 import * as episodeContentActions from '../actions/episode/episode-contents-actions';
 import * as tocActions from '../actions/toc-actions';
 import * as contentActions from '../actions/content-actions';
+import * as workShopActions from '../actions/work-shop-actions';
 
 import {EpisodeToc, EpisodeContent} from '../components/episodeGrids'
 
@@ -240,6 +241,12 @@ class EpisodeEditor extends ObjectEditor {
 
         return [
             {
+                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол',
+                click: () => {
+
+                }
+            },
+            {
                 view: "text",
                 name: "Name",
                 label: "Название эпизода",
@@ -416,6 +423,7 @@ function mapDispatchToProps(dispatch) {
         tocActions: bindActionCreators(tocActions, dispatch),
         episodeContentActions: bindActionCreators(episodeContentActions, dispatch),
         contentActions: bindActionCreators(contentActions, dispatch),
+        workShopActions: bindActionCreators(workShopActions, dispatch),
     }
 }
 
