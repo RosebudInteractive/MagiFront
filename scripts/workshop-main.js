@@ -62,6 +62,8 @@ window.Utils = Utils;
             function initOptions() {
                 var result = {
                     data: onGetData,
+                    onSave: onSave,
+                    onCancel: onCancel,
                     assets: {
                         onAddAsset: onAddAsset,
                         onDeleteAsset: onDeleteAsset
@@ -162,69 +164,10 @@ window.Utils = Utils;
             function onMoveElement(e) {
             }
 
-            function findTrack(id) {
-                var track = null;
-                for (var i = 0; i < tracksList.length; i++) {
-                    var cur = tracksList[i];
-                    if (cur.id == id) {
-                        track = cur;
-                        break;
-                    }
-                }
-
-                return track;
-            }
-
-            function findElement(id) {
-                var element = null;
-                for (var i = 0; i < tracksList.length; i++) {
-                    var cur = tracksList[i];
-                    for (var j = 0; j < cur.elements.length; j++) {
-                        if (cur.elements[j].id == id) {
-                            element = cur.elements[j];
-                            break;
-                        }
-                    }
-                }
-
-                return element;
-            }
-
-            function getAssets(ids) {
-                ids = ids || [];
-                if (!Array.isArray(ids)) ids = [ids];
-
-                var idsMap = {};
-
-                for (var i = 0; i < ids.length; i++) {
-                    idsMap[ids[i]] = true;
-                }
-
-                var result = [];
-                for (var i = 0; i < assetsList.length; i++) {
-                    var asset = assetsList[i];
-                    if (asset.id in idsMap) {
-                        result.push(asset);
-                    }
-                }
-
-                return result;
-            }
-
             function setPlayerElementPosition(e) {
-                var elId = e.trackElId;
-                var el = findElement(elId);
-                el.position = e.position;
             }
 
             function setPlayerElementFocused(e) {
-                var elId = e.trackElId;
-                var el = findElement(elId);
-                el.focused = true;
-                if (e.oldFocusedId) {
-                    var old = findElement(e.oldFocusedId);
-                    old.focused = false;
-                }
             }
 
             function onAddAssetFromTrack(e) {
@@ -249,6 +192,13 @@ window.Utils = Utils;
                     });
                 });
             }
-//        });
+
+            function onSave(data) {
+                console.log(data);
+            }
+
+            function onCancel() {
+                console.log("cancel callback called");
+            }
     });
 })(jQuery);
