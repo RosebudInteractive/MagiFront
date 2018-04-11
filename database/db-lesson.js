@@ -179,15 +179,18 @@ const LESSON_MSSQL_EPISODE_REQ =
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [EpisodeLng] epl on e.[Id] = epl.[EpisodeId]\n" +
     "where el.[LessonId] = <%= id %>";
+
 const LESSON_MSSQL_REFERENCE_REQ =
     "select r.[Id], r.[Description], r.[Number], r.[URL], r.[Recommended] from [Reference] r\n" +
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
+
 const LESSON_MSSQL_RESOURCE_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
+
 const LESSON_MSSQL_TOC_REQ =
     "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
     "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id]\n" +
@@ -197,6 +200,17 @@ const LESSON_MSSQL_TOC_REQ =
     "  join[LessonLng] lls on lls.[LessonId] = ls.[Id]\n" +
     "where pl.[LessonId] = <%= id %>\n" +
     "order by e.[Id], t.[Number]";
+
+const LESSON_EPI_MSSQL_TOC_REQ =
+    "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
+    "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id]\n" +
+    "  join[Episode] e on e.[Id] = t.[EpisodeId]\n" +
+    "  join[EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]\n" +
+    "  join[Lesson] ls on ls.[Id] = pl.[LessonId]\n" +
+    "  join[LessonLng] lls on lls.[LessonId] = ls.[Id]\n" +
+    "where pl.[LessonId] = <%= id %> and e.[Id] = <%= episodeId %>\n" +
+    "order by e.[Id], t.[Number]";
+
 const LESSON_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
     "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
@@ -207,6 +221,16 @@ const LESSON_MSSQL_CONTENT_REQ =
     "where pl.[LessonId] = <%= id %>\n" +
     "order by pl.[Number], e.[Id], t.[StartTime]";
 
+const LESSON_EPI_MSSQL_CONTENT_REQ =
+    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
+    "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
+    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
+    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
+    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
+    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "where pl.[LessonId] = <%= id %> and e.[Id] = <%= episodeId %>\n" +
+    "order by pl.[Number], e.[Id], t.[StartTime]";
+
 const LESSON_MSSQL_ASSETS_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
@@ -215,6 +239,12 @@ const LESSON_MSSQL_ASSETS_REQ =
     "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
     "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
     "where pl.[LessonId] = <%= id %>";
+
+const LESSON_MSSQL_ASSETS_ALL_REQ =
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], rl.[MetaData] from [Resource] r\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
+    "  join[Episode] e on e.[LessonId] = r.[LessonId]\n" +
+    "where e.[Id] = <%= episodeId %>";
 
 const LESSON_MSSQL_REQ =
     "select lc.[CourseId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
@@ -258,15 +288,18 @@ const LESSON_MYSQL_EPISODE_REQ =
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `EpisodeLng` epl on e.`Id` = epl.`EpisodeId`\n" +
     "where el.`LessonId` = <%= id %>";
+
 const LESSON_MYSQL_REFERENCE_REQ =
     "select r.`Id`, r.`Description`, r.`Number`, r.`URL`, r.`Recommended` from `Reference` r\n" +
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
+
 const LESSON_MYSQL_RESOURCE_REQ =
     "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
+
 const LESSON_MYSQL_TOC_REQ =
     "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
     "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id`\n" +
@@ -276,6 +309,17 @@ const LESSON_MYSQL_TOC_REQ =
     "  join`LessonLng` lls on lls.`LessonId` = ls.`Id`\n" +
     "where pl.`LessonId` = <%= id %>\n" +
     "order by e.`Id`, t.`Number`";
+
+const LESSON_EPI_MYSQL_TOC_REQ =
+    "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
+    "  join`EpisodeTocLng` l on l.`EpisodeTocId` = t.`Id`\n" +
+    "  join`Episode` e on e.`Id` = t.`EpisodeId`\n" +
+    "  join`EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`\n" +
+    "  join`Lesson` ls on ls.`Id` = pl.`LessonId`\n" +
+    "  join`LessonLng` lls on lls.`LessonId` = ls.`Id`\n" +
+    "where pl.`LessonId` = <%= id %> and e.`Id` = <%= episodeId %>\n" +
+    "order by e.`Id`, t.`Number`";
+
 const LESSON_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
     "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
@@ -285,6 +329,17 @@ const LESSON_MYSQL_CONTENT_REQ =
     "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
     "where pl.`LessonId` = <%= id %>\n" +
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
+
+const LESSON_EPI_MYSQL_CONTENT_REQ =
+    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
+    "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
+    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
+    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
+    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
+    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "where pl.`LessonId` = <%= id %> and e.`Id` = <%= episodeId %>\n" +
+    "order by pl.`Number`, e.`Id`, t.`StartTime`";
+
 const LESSON_MYSQL_ASSETS_REQ =
     "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
@@ -293,6 +348,12 @@ const LESSON_MYSQL_ASSETS_REQ =
     "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
     "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
     "where pl.`LessonId` = <%= id %>";
+
+const LESSON_MYSQL_ASSETS_ALL_REQ =
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, rl.`MetaData` from `Resource` r\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
+    "  join`Episode` e on e.`LessonId` = r.`LessonId`\n" +
+    "where e.`Id` = <%= episodeId %>";
 
 const LESSON_MYSQL_REQ =
     "select lc.`CourseId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
@@ -892,7 +953,7 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getPlayerData(id) {
+    getPlayerData(id, episodeId) {
         let data = { id: id, assets: [], episodes: [] };
         let epi_list = {};
         let assets_list = {};
@@ -901,8 +962,10 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
-                        mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ id: id })
+                        mysql: episodeId ? _.template(LESSON_MYSQL_ASSETS_ALL_REQ)({ episodeId: episodeId }) :
+                            _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
+                        mssql: episodeId ? _.template(LESSON_MSSQL_ASSETS_ALL_REQ)({ episodeId: episodeId }) :
+                            _.template(LESSON_MSSQL_ASSETS_REQ)({ id: id })
                     }
                 }, {})
                     .then((result) => {
@@ -915,9 +978,9 @@ const DbLesson = class DbLesson extends DbObject {
                                         info: JSON.parse(elem.MetaData)
                                     };
                                     if (elem.Name)
-                                        asset.title = elem.Name;    
+                                        asset.title = elem.Name;
                                     if (elem.Description)
-                                        asset.title2 = elem.Description;    
+                                        asset.title2 = elem.Description;
                                     assets_list[elem.Id] = asset;
                                     data.assets.push(asset);
                                 }
@@ -925,8 +988,10 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(LESSON_MYSQL_CONTENT_REQ)({ id: id }),
-                                mssql: _.template(LESSON_MSSQL_CONTENT_REQ)({ id: id })
+                                mysql: episodeId ? _.template(LESSON_EPI_MYSQL_CONTENT_REQ)({ id: id, episodeId: episodeId }) :
+                                    _.template(LESSON_MYSQL_CONTENT_REQ)({ id: id }),
+                                mssql: episodeId ? _.template(LESSON_EPI_MSSQL_CONTENT_REQ)({ id: id, episodeId: episodeId }) :
+                                    _.template(LESSON_MSSQL_CONTENT_REQ)({ id: id })
                             }
                         }, {});
                     })
@@ -955,18 +1020,20 @@ const DbLesson = class DbLesson extends DbObject {
                                 let curr_elem = {
                                     id: elem.Id,
                                     assetId: assetId,
-                                    start: elem.StartTime/ 1000.,
+                                    start: elem.StartTime / 1000.,
                                     content: JSON.parse(elem.Content),
                                 };
                                 curr_episode.elements.push(curr_elem);
                                 if (!assets_list[assetId])
-                                    throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode+").");    
+                                    throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode + ").");
                             });
                         }
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ id: id }),
-                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ id: id })
+                                mysql: episodeId ? _.template(LESSON_EPI_MYSQL_TOC_REQ)({ id: id, episodeId: episodeId }) :
+                                    _.template(LESSON_MYSQL_TOC_REQ)({ id: id }),
+                                mssql: episodeId ? _.template(LESSON_EPI_MSSQL_TOC_REQ)({ id: id, episodeId: episodeId }) :
+                                    _.template(LESSON_MSSQL_TOC_REQ)({ id: id })
                             }
                         }, {});
                     })
@@ -979,7 +1046,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (curr_id !== elem.Episode) {
                                     curr_episode = epi_list[elem.Episode];
                                     if (!curr_episode)
-                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");    
+                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");
                                 }
                                 curr_episode.contents.push({
                                     id: elem.Id,
