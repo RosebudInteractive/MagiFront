@@ -149,6 +149,10 @@ class LessonPage extends React.Component {
                 this.props.playerStartActions.startPlayLesson(_lesson)
             }
         }
+
+        if (_lesson) {
+            document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
+        }
     }
 
 
@@ -213,7 +217,10 @@ class LessonPage extends React.Component {
             return author.Id === lesson.AuthorId
         });
 
-        if ((lesson.URL === this.props.lessonUrl) && (this.props.params === '?play')) {
+
+        let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
+            _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
+        if (_playingLessonUrl || _lessonInPlayer) {
 
             return <Wrapper key={key}
                             lesson={lesson}
@@ -406,6 +413,7 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.lessonPlayInfo.playInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
+        playingLesson: state.player.playingLesson
     }
 }
 

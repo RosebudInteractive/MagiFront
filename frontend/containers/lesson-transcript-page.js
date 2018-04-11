@@ -38,6 +38,10 @@ class TranscriptLessonPage extends React.Component {
 
     componentDidUpdate() {
         TranscriptLessonPage._handleScroll()
+
+        if (this.props.lessonInfo.object) {
+            document.title = 'Лекция[Транскрипт]: ' + this.props.lessonInfo.object.Name + ' - Магистерия'
+        }
     }
 
     _lessonLoaded() {

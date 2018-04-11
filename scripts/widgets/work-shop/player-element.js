@@ -87,7 +87,6 @@ export default class CWSPlayerElement extends CWSBase {
 
     play() {
         if (!this._playState.stopped) return;
-        console.log("El:" + this.Id + "luanched");
         this._playState.stopped = false;
 
         this._playState.rate = this._playState.rate || 1;
@@ -335,16 +334,15 @@ export default class CWSPlayerElement extends CWSBase {
                         .then((assData) => {
                             let imgData = assData[0].file.body;
                             let imgDiv = $('<img src="' + imgData + '" />');
-                            imgDiv.on('load', () => {
-                                let width = this.naturalWidth;
-                                let height = this.naturalHeight;
-                            });
+                            //imgDiv.on('load', () => {
+                            //    let width = this.naturalWidth;
+                            //    let height = this.naturalHeight;
+                            //});
 
                             cont.html(imgDiv);
 
                             this._setEvents(item);
                             item.fadeIn("fast");
-                            console.log("El:" + this.Id + "fade");
 
                         })
                         .catch((err) => {

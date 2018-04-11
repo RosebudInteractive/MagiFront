@@ -64,7 +64,7 @@ export default class Menu extends React.Component {
                                     <TableOfContents episodes={this.props.episodes}/>
                                 </li>
                                 <li className="menu-nav-list__item">
-                                    <a href="#recommend" className="menu-nav-list__item-head js-scroll-link">Рекомендации</a>
+                                    <a href="#recommend" className="menu-nav-list__item-head js-scroll-link">Источники</a>
                                 </li>
                                 <li className="menu-nav-list__item">
                                     <a href="#gallery" className="menu-nav-list__item-head js-scroll-link">Галерея</a>

@@ -155,13 +155,10 @@ export default class CWSResourceLoader {
 
         return new Promise((resolve, reject) => {
             let beg = new Date();
-            console.log("try to get 1", ids)
             let result = this._getFromLoaded(ids);
             if (!result.success) {
                 let int = setInterval(() => {
-                    console.log("try to get 2", ids)
                     result = this._getFromLoaded(ids);
-                    console.log("get result 2", ids)
                     if (result.success) {
                         clearInterval(int);
                         resolve(result.assets);
@@ -485,7 +482,6 @@ export default class CWSResourceLoader {
 
                         that._state.loadedData.assets[id] = loaded;
                         delete that._state.loading[id];
-                        console.log("Loaded asset", id, loaded);
                     },
                     fail: function (err) {
                         delete that._state.loading[id];
