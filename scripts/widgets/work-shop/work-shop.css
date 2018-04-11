@@ -399,13 +399,16 @@
   height: 3em;
 }
 .ws-header .header-icon {
-  padding-left: 25px;
+  padding-left: 0.5em;
   padding-top: 0.5833em;
   padding-bottom: 0.5em;
   display: inline-block;
 }
+.ws-header .header-icon.second {
+  padding-left: 2em;
+}
 .ws-header .header-icon.first {
-  padding-left: 13px;
+  padding-left: 1em;
 }
 .ws-assets-background {
   background-color: #3e3e3e;
