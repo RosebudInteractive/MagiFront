@@ -1,7 +1,7 @@
 //define (
 //    [],
 //    function () {
-const PRELOAD_TIME = 5;
+const PRELOAD_TIME = 15;
 const FAIL_TIME = 60;
 const PRELOAD_AUDIO_TIME = 20;
 const FAIL_AUDIO_TIME = 120;
@@ -157,6 +157,7 @@ export default class CWSResourceLoader {
             let beg = new Date();
             let result = this._getFromLoaded(ids);
             if (!result.success) {
+                console.warn("resource loader: begin to waiting for resource download");
                 let int = setInterval(() => {
                     result = this._getFromLoaded(ids);
                     if (result.success) {
@@ -440,7 +441,6 @@ export default class CWSResourceLoader {
     _loadFromQueue() {
         if (this._state.loadQueue.length == 0) return;
         (function (that) {
-            that._state.loaderInt = null;
             let id = that._state.loadQueue.shift();
             while (that._alreadyLoadedAsset(id)) {
                 if (that._state.loadQueue.length == 0) {
@@ -472,7 +472,7 @@ export default class CWSResourceLoader {
                         let res = {
                             url: url,
                             body: b
-                        }
+                        };
 
                         switch (mode) {
                             case 0: loaded.s = res; break;
@@ -488,6 +488,8 @@ export default class CWSResourceLoader {
                         console.error(err);
                     }
                 });
+            } else {
+                console.warn("resource loader: asset not found. id = " + id);
             }
         })(this);
     }
@@ -510,7 +512,7 @@ export default class CWSResourceLoader {
             var audio = new Audio();
 
             audio.onerror = function() {
-                console.log(audio.error)
+                console.error("resource loader: " + audio.error);
             }
 
             audio.preload = true;
