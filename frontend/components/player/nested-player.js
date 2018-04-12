@@ -160,20 +160,20 @@ class NestedPlayer {
     }
 
     play() {
-        // if (!this._initState) {
-        //     let _state = this.player._audioState;
-        //
-        //     store.dispatch(playerActions.setMuteState(_state.muted))
-        //     console.log('!!!VOLUME', _state.volume)
-        //     store.dispatch(playerActions.setVolume(_state.volume))
-        //     store.dispatch(playerActions.setRate(_state.playbackRate))
-        // }
+        if (!this._initState) {
+            let _state = this.player._audioState;
+
+            store.dispatch(playerActions.setMuteState(_state.muted))
+
+            store.dispatch(playerActions.setRate(_state.playbackRate))
+        }
 
         this.player.play()
             .then(() => {
                 if (this._initState) {
                     let _state = Object.assign({}, this._initState);
                     this._initState = null;
+                    let _audioState = this.player._audioState;
                     if (_state.currentTime) {
                         this.setPosition(_state.currentTime)
                     }
@@ -187,8 +187,9 @@ class NestedPlayer {
                     }
 
                     if (_state.volume !== undefined) {
-                        console.log('!!!VOLUME INIT', _state.volume)
                         this.setVolume(_state.volume)
+                    } else {
+                        store.dispatch(playerActions.setVolume(_audioState.volume))
                     }
                 }
             })
@@ -229,7 +230,7 @@ class NestedPlayer {
 
     setVolume(value) {
         this.player.setVolume(value);
-        store.dispatch(playerActions.setVolume(value))
+        // store.dispatch(playerActions.setVolume(value))
         // store.dispatch(playerActions.setVolume(this.audioState.volume))
     }
 
@@ -304,6 +305,9 @@ class NestedPlayer {
             },
             onSetTextData: function () {
             },
+            onVolumeChanged: (value) => {
+                store.dispatch(playerActions.setVolume(value))
+            },
             onChangeTitles: function (titles) {
                 let _title = '',
                     _subTitle = '';
@@ -350,7 +354,6 @@ class NestedPlayer {
                 }
 
                 store.dispatch(playerActions.setMuteState(_state.muted))
-                store.dispatch(playerActions.setVolume(_state.volume))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
 
                 // that._setCurrentTime(_state.currentTime)
@@ -371,12 +374,12 @@ class NestedPlayer {
 
                     store.dispatch(playerActions.setMuteState(_state.muted))
 
-                    let _volume = _state.volume;
+                    // let _volume = _state.volume;
                     // if (this._initState && (this._initState.volume !== undefined)) {
                     //     _volume = this._initState.volume;
                     //     this._initState.volume = undefined
                     // }
-                    store.dispatch(playerActions.setVolume(_volume))
+                    // store.dispatch(playerActions.setVolume(_volume))
 
                     store.dispatch(playerActions.setRate(_state.playbackRate))
                 }

@@ -138,6 +138,12 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
+    _broadcastVolumeChanged(value){
+        if (this._options.onVolumeChanged) {
+            this._options.onVolumeChanged(value)
+        }
+    }
+
     _initDefaultOptions() {
         this._options = this._options || {};
         this._options.ratioX = this._options.ratioX || ratioX;
@@ -521,6 +527,7 @@ export default class CWSPlayer extends CWSBase {
             let diffTime = time - start;
             if (diffTime > 300) {
                 that._audioState.audio.volume = volume;
+                that._broadcastVolumeChanged(volume)
                 return
             }
 
