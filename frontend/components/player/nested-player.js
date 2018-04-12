@@ -45,29 +45,31 @@ class NestedPlayer {
     applyViewPorts() {
         let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
 
-        let _options = this._getPlayerOptions();
+
 
         let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
         if (fullViewPort && (!_isSameViewPort || !this._fullPlayer)) {
             this._fullDiv = fullViewPort;
             if (!this._fullPlayer) {
+                let _options = this._getPlayerOptions();
                 this._fullPlayer = new Player(fullViewPort, _options);
                 this._fullPlayer.render();
             } else {
                 if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)) {
                     this._fullPlayer.initContainer(this._fullDiv);
-                    // this._setAssetsList(this._playingData);
                     this._fullPlayer.render();
-                    // this._applyData(this._playingData)
+                    if (this.audioState.audio) {
+                        this.play()
+                    }
                 }
             }
         }
 
         _isSameViewPort = (this._smallDiv && smallViewPort) ? this._smallDiv[0].isEqualNode(smallViewPort[0]) : false;
         if (smallViewPort && (!_isSameViewPort || !this._smallPlayer)) {
-            this._smallDiv = smallViewPort;
-            this._smallPlayer = new Player(smallViewPort, _options);
-            this._smallPlayer.render();
+            // this._smallDiv = smallViewPort;
+            // this._smallPlayer = new Player(smallViewPort, _options);
+            // this._smallPlayer.render();
         }
 
         this.player = _isSmallActive ?
@@ -112,7 +114,7 @@ class NestedPlayer {
             this.player.pause();
             this.player = null;
             this._fullPlayer.destroy();
-            this._smallPlayer.destroy();
+            // this._smallPlayer.destroy();
 
             this._fullPlayer = null;
             this._smallPlayer = null;
@@ -121,9 +123,6 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
-            // if (currentTime !== undefined) {
-            //     this._initialPosition = currentTime
-            // }
         }
 
         this._hasStoppedOnSwitch = false;
@@ -189,7 +188,7 @@ class NestedPlayer {
 
                     if (_state.volume !== undefined) {
                         console.log('!!!VOLUME INIT', _state.volume)
-                        // this.setVolume(_state.volume)
+                        this.setVolume(_state.volume)
                     }
                 }
             })
@@ -209,8 +208,8 @@ class NestedPlayer {
     }
 
     setPosition(begin) {
-        this._fullPlayer.setPosition(begin)
-        this._smallPlayer.setPosition(begin)
+        this.player.setPosition(begin)
+        // this._smallPlayer.setPosition(begin)
     }
 
     setRate(value) {
@@ -230,36 +229,44 @@ class NestedPlayer {
 
     setVolume(value) {
         this.player.setVolume(value);
-        store.dispatch(playerActions.setVolume(this.audioState.volume))
+        store.dispatch(playerActions.setVolume(value))
+        // store.dispatch(playerActions.setVolume(this.audioState.volume))
     }
 
     switchToSmall() {
-        if (this._isFull) {
-            this.player = this._smallPlayer;
-            let _oldPlayer = this._fullPlayer;
-            if (!_oldPlayer.getStopped()) {
-                this.player.play()
-            } else {
-                this._hasStoppedOnSwitch = true;
-                let _position = this.audioState.globalTime;
-                this.player.setPosition(_position);
-            }
-        }
+        // if (this._isFull) {
+        //     this.player = this._smallPlayer;
+        //     let _oldPlayer = this._fullPlayer;
+        //     if (!_oldPlayer.getStopped()) {
+        //         this.player.play()
+        //     } else {
+        //         this._hasStoppedOnSwitch = true;
+        //         let _position = this.audioState.globalTime;
+        //         this.player.setPosition(_position);
+        //     }
+        // }
+        this.pause()
+        console.log('temporary disabled')
     }
 
 
     switchToFull() {
-        if (!this._isFull && this._fullPlayer) {
-            this.player = this._fullPlayer;
-            let _oldPlayer = this._smallPlayer;
-            if (!_oldPlayer.getStopped()) {
-                this.player.play()
-            } else {
-                this._hasStoppedOnSwitch = true;
-                let _position = this.audioState.globalTime;
-                this.player.setPosition(_position);
-            }
-        }
+        // if (this.audioState.audio) {
+        //     this.play()
+        // }
+
+        console.log('temporary disabled')
+        // if (!this._isFull && this._fullPlayer) {
+        //     this.player = this._fullPlayer;
+        //     let _oldPlayer = this._smallPlayer;
+        //     if (!_oldPlayer.getStopped()) {
+        //         this.player.play()
+        //     } else {
+        //         this._hasStoppedOnSwitch = true;
+        //         let _position = this.audioState.globalTime;
+        //         this.player.setPosition(_position);
+        //     }
+        // }
     }
 
     _renderContent(content) {

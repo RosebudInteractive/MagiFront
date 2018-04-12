@@ -160,6 +160,7 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
+        this.props.lessonActions.clearLesson();
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
@@ -219,8 +220,9 @@ class LessonPage extends React.Component {
 
 
         let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
+            _isManyLessonsOnPage = this._getAnchors().length > 0,
             _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
-        if (_playingLessonUrl || _lessonInPlayer) {
+        if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
 
             return <Wrapper key={key}
                             lesson={lesson}

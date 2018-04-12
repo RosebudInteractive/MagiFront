@@ -2,6 +2,7 @@ import {
     GET_LESSON_REQUEST,
     GET_LESSON_SUCCESS,
     GET_LESSON_FAIL,
+    CLEAR_LESSON,
 } from '../constants/lesson'
 
 const initialState = {
@@ -17,6 +18,9 @@ const initialState = {
 export default function singleLesson(state = initialState, action) {
 
     switch (action.type) {
+        case CLEAR_LESSON :
+            return initialState
+
         case GET_LESSON_REQUEST:
             return {...state, object: null, fetching: true, loaded: false, isSublesson: null};
 

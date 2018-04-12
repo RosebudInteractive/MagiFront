@@ -10,9 +10,17 @@ import {
     GET_LESSON_TEXT_FAIL,
     CLEAR_LESSON_PLAY_INFO,
     START_LESSON_PLAYING,
+    CLEAR_LESSON,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
+
+export const clearLesson = () => {
+    return {
+        type: CLEAR_LESSON,
+        payload: null
+    }
+}
 
 export const getLesson = (courseUrl, lessonUrl) => {
     return (dispatch) => {

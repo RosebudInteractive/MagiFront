@@ -19,11 +19,12 @@ export default function app(state = initialState, action) {
             return {...state, size: action.payload};
 
         case SWITCH_TO_SMALL_PLAYER:
-            if (state.showSmallPlayer !== action.payload) {
-                return {...state, showSmallPlayer: true};
-            } else {
-                return state
-            }
+            // if (state.showSmallPlayer !== action.payload) {
+            //     return {...state, showSmallPlayer: true};
+            // } else {
+            //     return state
+            // }
+            return state
 
         case SWITCH_TO_FULL_PLAYER:
             if (state.showSmallPlayer !== action.payload) {

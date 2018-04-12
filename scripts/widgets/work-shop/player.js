@@ -458,7 +458,8 @@ export default class CWSPlayer extends CWSBase {
         // let that = this;
         // let tmInt = null;
         if (!this._audioState.audio) {
-            return Promise.reject(new Error('Audio is undefined'))
+            // return Promise.reject(new Error('Audio is undefined'))
+            return Promise.resolve()
         }
 
         if (this._audioState.stopped) {
