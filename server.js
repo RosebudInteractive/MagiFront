@@ -6,13 +6,14 @@
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
+const morgan = require('morgan');
 
 let webpack = require('webpack')
 let webpackDevMiddleware = require('webpack-dev-middleware');
 let webpackHotMiddleware = require('webpack-hot-middleware');
 let webpackConfig = require('./webpack.config');
 
-const NODE_ENV = process.env.NODE_ENV || 'prod';
+const NODE_ENV = process.env.NODE_ENV || 'production';
 
 // init DB if needed
 let { DatabaseBuilder } = require("./database/builder");
@@ -39,6 +40,7 @@ Promise.resolve()
         let address = magisteryConfig.http.address;
 
         if (NODE_ENV === 'development') {
+            app.use(morgan('dev')); // log HTTP requests
             let compiler = webpack(webpackConfig);
             try {
                 app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath}));
