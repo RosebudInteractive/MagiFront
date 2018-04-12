@@ -22,10 +22,7 @@ class App extends Component {
         let _homePath = '/adm';
 
         return [<WorkShop/>,
-            this.props.visible ?
-                null
-                :
-                <div className="app">
+                <div className="app" style={this.props.workShopVisible ? {display: 'none'} : null}>
                     <div className="left bar-bgcolor">
                         <div className="toolbar top-bar-size">
                             <div className="logo-sidebar">
@@ -97,7 +94,7 @@ function mapStateToProps(state, ownProps) {
         user: state.user,
         page: state.page,
         menu: state.menu,
-        visible: state.workShop.visible,
+        workShopVisible: state.workShop.visible,
         ownProps,
     }
 }

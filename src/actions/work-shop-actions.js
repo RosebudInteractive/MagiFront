@@ -3,6 +3,7 @@ import {
     WORK_SHOP_HIDE,
     WORK_SHOP_GET_DATA_SUCCESS,
     WORK_SHOP_GET_DATA_FAIL,
+    WORK_SHOP_SAVE_DATA,
 } from '../constants/work-shop';
 
 import {
@@ -25,7 +26,7 @@ export const hide = () => {
 
 export const loadData = (object) => {
     return (dispatch) => {
-        fetch("/api/episodes/play/" + object.lessonId + '/' + object.episodeId, {credentials: 'include'})
+        fetch("/api/episodes/play/" + object.episodeId + '/' + object.lessonId, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -48,6 +49,13 @@ export const loadData = (object) => {
 
     }
 };
+
+export const save = (data) => {
+    return {
+        type: WORK_SHOP_SAVE_DATA,
+        payload: data
+    }
+}
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {

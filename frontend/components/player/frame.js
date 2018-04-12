@@ -79,22 +79,29 @@ class Frame extends Component {
         // let that = this;
         //
         $(document).on('mousemove', () => {
-            $('body').removeClass('fade');
-            if (this._timer) {
-                clearTimeout(this._timer);
-            }
-
-            if (!this.props.paused) {
-                this._timer = setTimeout(function () {
-                    $('body').addClass('fade');
-                }, 7000);
-            } else {
-                this._timer = null
-            }
+            this._clearTimeOut();
+            this._initTimeOut();
         });
 
         if (this.props.visible) {
             this._applyViewPort()
+        }
+    }
+
+    _clearTimeOut(){
+        $('body').removeClass('fade');
+        if (this._timer) {
+            clearTimeout(this._timer);
+        }
+    }
+
+    _initTimeOut(){
+        if (!this.props.paused) {
+            this._timer = setTimeout(function () {
+                $('body').addClass('fade');
+            }, 7000);
+        } else {
+            this._timer = null
         }
     }
 
@@ -106,6 +113,14 @@ class Frame extends Component {
                 this._viewPortApplied = false;
             }
         }
+
+        if (!prevProps.paused && this.props.paused) {
+            this._clearTimeOut()
+        } else {
+            if (prevProps.paused && !this.props.paused) {
+                this._initTimeOut();
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -114,6 +129,7 @@ class Frame extends Component {
         }
 
         this._removeListeners();
+        this._clearTimeOut();
         this._clearViewPort();
     }
 

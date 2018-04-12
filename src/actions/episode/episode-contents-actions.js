@@ -5,14 +5,13 @@ import {
     REMOVE_EPISODE_CONTENT,
     MOVE_EPISODE_CONTENT_UP,
     MOVE_EPISODE_CONTENT_DOWN,
+    EPISODE_CONTENT_APPLY_DATA_FROM_WORKSHOP,
 } from '../../constants/episode/episode-сontents';
 
 export const select = (id) => {
-    return (dispatch) => {
-        dispatch({
-            type: SELECT_EPISODE_CONTENT,
-            payload: id
-        });
+    return {
+        type: SELECT_EPISODE_CONTENT,
+        payload: id
     }
 };
 
@@ -60,3 +59,10 @@ export const moveDown = (id) => {
         });
     }
 };
+
+export const applyFromWorkShop = (data) => {
+    return {
+        type: EPISODE_CONTENT_APPLY_DATA_FROM_WORKSHOP,
+        payload: data
+    }
+}

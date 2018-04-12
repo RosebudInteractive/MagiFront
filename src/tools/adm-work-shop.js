@@ -63,10 +63,22 @@ class AdmWorkShop {
             player: {
                 onSetElementPosition: this._setPlayerElementPosition,
                 onElementFocused: this._setPlayerElementFocused
-            }
+            },
+            onSave: this._onSave,
+            onCancel: this._onCancel,
         };
 
         return result;
+    }
+
+    _onCancel() {
+        _data = null
+        store.dispatch(workShopActions.hide())
+    }
+
+    _onSave(data) {
+        store.dispatch(workShopActions.save(data))
+        store.dispatch(workShopActions.hide())
     }
 
     _onGetData() {

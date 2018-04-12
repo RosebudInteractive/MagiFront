@@ -4,7 +4,7 @@ import {
     UPDATE_EPISODE_CONTENT,
     REMOVE_EPISODE_CONTENT,
     MOVE_EPISODE_CONTENT_UP,
-    MOVE_EPISODE_CONTENT_DOWN,
+    MOVE_EPISODE_CONTENT_DOWN, EPISODE_CONTENT_APPLY_DATA_FROM_WORKSHOP,
 } from '../../constants/episode/episode-сontents';
 
 import {
@@ -47,6 +47,15 @@ export default function episodeContent(state = initialState, action) {
                     selected: (_data.length > 0) ? _data[0].id : null,
                     hasChanges: false,
                 }
+            }
+        }
+
+        case EPISODE_CONTENT_APPLY_DATA_FROM_WORKSHOP : {
+            return {
+                ...state,
+                current: [...action.payload],
+                selected: (action.payload.length > 0) ? action.payload[0].id : null,
+                hasChanges: true,
             }
         }
 
