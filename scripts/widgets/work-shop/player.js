@@ -248,7 +248,7 @@ export default class CWSPlayer extends CWSBase {
         let that = this;
         audio
             .on("canplay", () => {
-                that._broadcastCanPlay();
+                that._broadcastCanPlay(that);
             })
             .on("loadeddata", function () {
                that._onAudioLoadedHandler(this);
@@ -408,9 +408,9 @@ export default class CWSPlayer extends CWSBase {
             this._options.onCurrentTimeChanged(this.getAudioState());
     }
 
-    _broadcastCanPlay() {
+    _broadcastCanPlay(e) {
         if (this._options.onCanPlay) {
-            this._options.onCanPlay()
+            this._options.onCanPlay(e)
         }
     }
 

@@ -42,7 +42,11 @@ export default class CWSResourceLoader {
             loading: {},
             loadingAudio: {},
             loaderInt: null,
-            disableChange: false
+            disableChange: false,
+            loadedData: {
+                assets: {},
+                audios: {}
+            },
         }
     }
 
@@ -94,7 +98,7 @@ export default class CWSResourceLoader {
                 let tId = el.content.track;
                 let track = null;
                 if (tracksIdx[tId] === undefined) {
-                    track = {id : tId, elements: []};
+                    track = {id: tId, elements: []};
                     tracksIdx[tId] = tracks.length;
                     tracks.push(track);
                 } else {
@@ -475,9 +479,15 @@ export default class CWSResourceLoader {
                         };
 
                         switch (mode) {
-                            case 0: loaded.s = res; break;
-                            case 1: loaded.m = res; break;
-                            case 2: loaded.l = res; break;
+                            case 0:
+                                loaded.s = res;
+                                break;
+                            case 1:
+                                loaded.m = res;
+                                break;
+                            case 2:
+                                loaded.l = res;
+                                break;
                         }
 
                         that._state.loadedData.assets[id] = loaded;
@@ -511,7 +521,7 @@ export default class CWSResourceLoader {
             var url = "/data/" + id;
             var audio = new Audio();
 
-            audio.onerror = function() {
+            audio.onerror = function () {
                 console.error("resource loader: " + audio.error);
             }
 

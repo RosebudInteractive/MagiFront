@@ -54,7 +54,7 @@ class NestedPlayer {
                 this._fullPlayer = new Player(fullViewPort, _options);
                 this._fullPlayer.render();
             } else {
-                if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)){
+                if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)) {
                     this._fullPlayer.initContainer(this._fullDiv);
                     // this._setAssetsList(this._playingData);
                     this._fullPlayer.render();
@@ -171,28 +171,28 @@ class NestedPlayer {
         // }
 
         this.player.play()
-            // .then(() => {
-            // if (this._initState) {
-            //     let _state = Object.assign({},this._initState);
-            //     this._initState = null;
-            //     if (_state.currentTime) {
-            //         this.setPosition(_state.currentTime)
-            //     }
-            //
-            //     if (_state.muted !== undefined) {
-            //         if (_state.muted) {
-            //             this.mute()
-            //         } else {
-            //             this.unmute()
-            //         }
-            //     }
-            //
-            //     if (_state.volume !== undefined) {
-            //         console.log('!!!VOLUME INIT', _state.volume)
-            //         // this.setVolume(_state.volume)
-            //     }
-            // }
-        // })
+            .then(() => {
+                if (this._initState) {
+                    let _state = Object.assign({}, this._initState);
+                    this._initState = null;
+                    if (_state.currentTime) {
+                        this.setPosition(_state.currentTime)
+                    }
+
+                    if (_state.muted !== undefined) {
+                        if (_state.muted) {
+                            this.mute()
+                        } else {
+                            this.unmute()
+                        }
+                    }
+
+                    if (_state.volume !== undefined) {
+                        console.log('!!!VOLUME INIT', _state.volume)
+                        // this.setVolume(_state.volume)
+                    }
+                }
+            })
 
         this._hasStoppedOnSwitch = false;
     }
@@ -209,7 +209,8 @@ class NestedPlayer {
     }
 
     setPosition(begin) {
-        this.player.setPosition(begin)
+        this._fullPlayer.setPosition(begin)
+        this._smallPlayer.setPosition(begin)
     }
 
     setRate(value) {
@@ -277,34 +278,12 @@ class NestedPlayer {
         }
     }
 
-    _getPlayerOptions(assetsList) {
+    _getPlayerOptions() {
         let that = this;
 
         return {
             designMode: false,
             loader: new Loader(),
-            onGetAssets: (e) => {
-                return new Promise((resolve, reject) => {
-                    that._readDataProperty(that._getAssets, e)
-                        .then((assets) => {
-                            resolve(assets);
-
-                            let audioObj = that._findAudio(assetsList);
-                            if (audioObj) {
-                                that._loadAudio(audioObj)
-                                    .then((audio) => {
-                                        that._fullPlayer.setAudio(audio);
-                                        that._smallPlayer.setAudio(audio);
-                                    });
-                            }
-
-                        })
-                        .catch((err) => {
-                            console.error(err)
-                            reject(err);
-                        });
-                });
-            },
             onCurrentTimeChanged: (e) => {
                 if (that._onCurrentTimeChanged) {
                     that._onCurrentTimeChanged(e.currentTime)
@@ -317,8 +296,6 @@ class NestedPlayer {
             onFocused: function () {
             },
             onSetTextData: function () {
-            },
-            onAddElement: function () {
             },
             onChangeTitles: function (titles) {
                 let _title = '',
@@ -373,25 +350,29 @@ class NestedPlayer {
 
                 that._hasStoppedOnSwitch = false
             },
-            onCanPlay: () => {
-                let _state = that.player._audioState;
+            onCanPlay: (e) => {
+                if (e === that.player) {
 
-                if (!that._hasStoppedOnSwitch) {
-                    if (_state.stopped) {
-                        that.play()
+                    let _state = that.player._audioState;
+
+                    if (!that._hasStoppedOnSwitch) {
+                        if (_state.stopped) {
+                            that.play()
+                        }
                     }
+
+
+                    store.dispatch(playerActions.setMuteState(_state.muted))
+
+                    let _volume = _state.volume;
+                    // if (this._initState && (this._initState.volume !== undefined)) {
+                    //     _volume = this._initState.volume;
+                    //     this._initState.volume = undefined
+                    // }
+                    store.dispatch(playerActions.setVolume(_volume))
+
+                    store.dispatch(playerActions.setRate(_state.playbackRate))
                 }
-
-                store.dispatch(playerActions.setMuteState(_state.muted))
-
-                let _volume = _state.volume;
-                // if (this._initState && (this._initState.volume !== undefined)) {
-                //     _volume = this._initState.volume;
-                //     this._initState.volume = undefined
-                // }
-                store.dispatch(playerActions.setVolume(_volume))
-
-                store.dispatch(playerActions.setRate(_state.playbackRate))
             },
             onPaused: () => {
                 store.dispatch(playerActions.pause())
