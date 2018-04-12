@@ -98,7 +98,7 @@ export default class CWSPlayerElement extends CWSBase {
             this.stop();
         }, (data.content.duration - this._playState.position) * 1000 / rate);
 
-        let ass = this.Asset
+        let ass = this.Asset;
         if (ass && ass.info.type !== "text") this._playImage();
     }
 

@@ -346,8 +346,8 @@ export default class CWSPlayer extends CWSBase {
                     if (el.DeleteOldTitles === undefined || el.DeleteOldTitles) {
                         deleteOld = true;
                     }
-                    if (el.Title)
-                        newtitles.push({id: el.Id, title: el.Title})
+                    if (el.Title || el.Title2)
+                        newtitles.push({id: el.Id, title: el.Title, title2: el.Title2})
                 }
                 this._audioState.playingNow[el.Id] = el;
             } else if (el.Id in this._audioState.playingNow) {
