@@ -6108,6 +6108,10 @@ ul.user-tooltip {
     background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
     background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%); }
   @media (max-width: 900px) {
+    .lecture-wrapper .fp-tableCell {
+      background-image: none; }
+  }
+  @media (max-width: 900px) {
     .lecture-wrapper {
       position: relative;
       display: -webkit-box;
@@ -6122,7 +6126,10 @@ ul.user-tooltip {
       -moz-box-direction: normal;
       -ms-flex-direction: column;
       flex-direction: column;
-      min-height: 100vh; }
+      min-height: 100vh;
+      background-image: -webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+      background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%);
+    }
       .lecture-wrapper:before {
         content: "";
         position: absolute;

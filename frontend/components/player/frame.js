@@ -39,7 +39,7 @@ class Frame extends Component {
         $(document).mouseup((e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-player-main'),
+                _isPlayer = e.target.closest('.ws-container'),
                 _isPauseFrame = e.target.closest('.player-frame__screen');
 
             if (_isContent || _isRate) {
