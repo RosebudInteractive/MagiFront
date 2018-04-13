@@ -272,6 +272,7 @@ export default class CWSPlayer extends CWSBase {
             })
             .on("volumechange", function() {
                 that._audioState.volume = this.volume;
+                that._broadcastVolumeChanged(this.volume)
                 that._audioState.muted = this.muted;
             })
             .on("ended", function () {
@@ -527,7 +528,7 @@ export default class CWSPlayer extends CWSBase {
             let diffTime = time - start;
             if (diffTime > 300) {
                 that._audioState.audio.volume = volume;
-                that._broadcastVolumeChanged(volume)
+
                 return
             }
 
