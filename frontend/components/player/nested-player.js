@@ -292,6 +292,19 @@ class NestedPlayer {
         return {
             designMode: false,
             loader: new Loader(),
+            onAudioLoaded: () => {
+                let _state = that.player._audioState;
+
+                if (!that._hasStoppedOnSwitch) {
+                    if (_state.stopped) {
+                        that.play()
+                    }
+                }
+
+
+                store.dispatch(playerActions.setMuteState(_state.muted))
+                store.dispatch(playerActions.setRate(_state.playbackRate))
+            },
             onCurrentTimeChanged: (e) => {
                 if (that._onCurrentTimeChanged) {
                     that._onCurrentTimeChanged(e.currentTime)
@@ -373,14 +386,6 @@ class NestedPlayer {
 
 
                     store.dispatch(playerActions.setMuteState(_state.muted))
-
-                    // let _volume = _state.volume;
-                    // if (this._initState && (this._initState.volume !== undefined)) {
-                    //     _volume = this._initState.volume;
-                    //     this._initState.volume = undefined
-                    // }
-                    // store.dispatch(playerActions.setVolume(_volume))
-
                     store.dispatch(playerActions.setRate(_state.playbackRate))
                 }
             },
