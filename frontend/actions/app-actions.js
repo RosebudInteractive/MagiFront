@@ -5,6 +5,7 @@ import {
     SWITCH_TO_FULL_PLAYER,
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
+
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
