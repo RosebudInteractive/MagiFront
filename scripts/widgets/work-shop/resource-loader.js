@@ -531,10 +531,6 @@ export default class CWSResourceLoader {
                 id: id,
                 body: audio
             };
-
-            setTimeout(()=>{
-                audio.play()
-            }, 0)
         }
     }
 

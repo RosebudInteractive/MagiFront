@@ -39,6 +39,8 @@ class NestedPlayer {
         this._applyData(playingData)
         this._setInitState(initState);
         this._currentTime = 0;
+
+        this.play();
     }
 
 
@@ -123,6 +125,7 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
+            this.play();
         }
 
         this._hasStoppedOnSwitch = false;
