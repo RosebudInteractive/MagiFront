@@ -22,6 +22,8 @@ import {pages} from "./tools/page-tools";
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
 
+import Platform from 'platform';
+
 Polifyll.registry();
 
 let _homePath = '/';
@@ -40,6 +42,11 @@ class App extends Component {
             height: 0,
         };
         this._handleScroll = this._handleScroll.bind(this);
+
+        let _isMobile = ((Platform.os.family === 'Andriod') || (Platform.os.family === "iOS"));
+        if (_isMobile) {
+            this.props.appActions.setAppTypeMobile()
+        }
     }
 
     get width() {

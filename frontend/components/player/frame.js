@@ -32,14 +32,18 @@ class Frame extends Component {
             showRate: false,
             fullScreen: false,
         }
+
+        this._firstTap = false;
     }
 
 
     componentDidMount() {
+        let that = this
+
         $(document).mouseup((e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-player-main'),
+                _isPlayer = e.target.closest('.ws-container'),
                 _isPauseFrame = e.target.closest('.player-frame__screen');
 
             if (_isContent || _isRate) {
@@ -47,7 +51,14 @@ class Frame extends Component {
             }
 
             if (_isPlayer) {
-                this.props.playerStartActions.startPause()
+                if (that.props.isMobileApp && that._firstTap) {
+                    this._firstTap = false;
+                    that._clearTimeOut();
+                    that._initTimeOut();
+                } else {
+                    that.props.playerStartActions.startPause()
+                }
+
             }
 
             if (_isPauseFrame) {
@@ -97,7 +108,8 @@ class Frame extends Component {
 
     _initTimeOut(){
         if (!this.props.paused) {
-            this._timer = setTimeout(function () {
+            this._timer = setTimeout(() => {
+                this._firstTap = true;
                 $('body').addClass('fade');
             }, 7000);
         } else {
@@ -271,6 +283,7 @@ class Frame extends Component {
 
 function mapStateToProps(state) {
     return {
+        isMobileApp: state.app.isMobileApp,
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
         course: state.singleLesson.course,
