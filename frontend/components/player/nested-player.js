@@ -44,7 +44,9 @@ class NestedPlayer {
         let  that = this
         setTimeout(() => {
             fakeClick(function() {
-                that.play();
+                alert('begin load')
+                that.audioState.audio.load();
+                // that.play();
             });
         }, 2000)
     }
@@ -306,7 +308,7 @@ class NestedPlayer {
 
                 if (!that._hasStoppedOnSwitch) {
                     if (_state.stopped) {
-                        // that.play()
+                        that.play()
                     }
                 }
 
@@ -383,7 +385,7 @@ class NestedPlayer {
 
                     if (!that._hasStoppedOnSwitch) {
                         if (_state.stopped) {
-                            // that.play()
+                            that.play()
                         }
                     }
 
