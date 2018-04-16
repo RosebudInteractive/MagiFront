@@ -4,12 +4,14 @@ import {
     SWITCH_TO_FULL_PLAYER,
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
+    SET_APP_TYPE_MOBILE,
 } from '../constants/app'
 
 const initialState = {
     size: null,
     showSmallPlayer: false,
     isLessonMenuOpened: false,
+    isMobileApp: false,
 };
 
 export default function app(state = initialState, action) {
@@ -46,6 +48,10 @@ export default function app(state = initialState, action) {
             } else {
                 return state
             }
+
+        case SET_APP_TYPE_MOBILE: {
+            return {...state, isMobileApp: true}
+        }
 
         default:
             return state;

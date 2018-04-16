@@ -5,6 +5,7 @@ import {
     SWITCH_TO_FULL_PLAYER,
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
+    SET_APP_TYPE_MOBILE,
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
@@ -49,6 +50,13 @@ export const hideLessonMenu = () => {
 export const showLessonMenu = () => {
     return {
         type: SHOW_LESSON_MENU,
+        payload: null
+    }
+}
+
+export const setAppTypeMobile = () => {
+    return {
+        type: SET_APP_TYPE_MOBILE,
         payload: null
     }
 }
