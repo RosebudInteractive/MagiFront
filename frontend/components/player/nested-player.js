@@ -40,7 +40,9 @@ class NestedPlayer {
         this._setInitState(initState);
         this._currentTime = 0;
 
-        this.play();
+        setTimeout(() => {
+            // this.play();
+        }, 2000)
     }
 
 
@@ -125,7 +127,7 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
-            this.play();
+            // this.play();
         }
 
         this._hasStoppedOnSwitch = false;
@@ -300,7 +302,7 @@ class NestedPlayer {
 
                 if (!that._hasStoppedOnSwitch) {
                     if (_state.stopped) {
-                        that.play()
+                        // that.play()
                     }
                 }
 
@@ -314,12 +316,6 @@ class NestedPlayer {
                 }
 
                 that._setCurrentTime(e.currentTime)
-            },
-            onSetPosition: function () {
-            },
-            onFocused: function () {
-            },
-            onSetTextData: function () {
             },
             onVolumeChanged: (value) => {
                 store.dispatch(playerActions.setVolume(value))

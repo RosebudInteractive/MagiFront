@@ -144,6 +144,9 @@ class LessonPage extends React.Component {
             let _isPlayingLesson = playInfo ? (playInfo.id === _lesson.Id) : false;
 
             if (_isPlayingLesson) {
+                if (this.props.isMobileApp) {
+                    this.props.appActions.startPlay()
+                }
                 this.props.appActions.switchToFullPlayer()
             } else {
                 this.props.playerStartActions.startPlayLesson(_lesson)
@@ -415,7 +418,8 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.lessonPlayInfo.playInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
-        playingLesson: state.player.playingLesson
+        playingLesson: state.player.playingLesson,
+        isMobileApp: state.app.isMobileApp,
     }
 }
 
