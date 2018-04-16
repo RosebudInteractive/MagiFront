@@ -5,11 +5,20 @@ import CWSResourceLoader from "./resource-loader"
 //    ],
 //    function (CWSResourceLoader) {
 export default class CWSResourceLoaderDesign extends CWSResourceLoader {
-    changeElements(trackId, elements) {
+    _getEpisode() {
         let data = this._state.data;
-        if (!data.episodes || data.episodes.length == 0) return;
+        if (!data.episodes || data.episodes.length == 0) return null;
         // дизайнер работает только с одним эпизодом
         let ep = data.episodes[0];
+
+        return ep
+    }
+
+    // do not call this method for deletion!
+    // Because of here we don't know if we must delete element from ep.elements array too
+    changeElements(trackId, elements) {
+        let ep = this._getEpisode();
+        if (!ep) return;
         let tIdx = ep.tracksIdx[trackId];
         if (tIdx === undefined) return;
         let track = ep.tracks[tIdx];
@@ -29,21 +38,21 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
         // update/insert rest elements
         for (let i = 0; i < elements.length; i ++) {
             let found = CWSResourceLoaderDesign._findElementById(elements[i].id, trackElements);
+            let newEl = null;
             if (!found) {
-                let newEl = $.extend(true, {}, elements[i]);
+                newEl = $.extend(true, {}, elements[i]);
                 trackElements.push(newEl);
             } else {
                 let oldEl = found.element;
-                trackElements[found.idx] = $.extend(true, oldEl, elements[i]);
+                newEl = $.extend(true, oldEl, elements[i]);
+                trackElements[found.idx] = newEl;
             }
 
             found = CWSResourceLoaderDesign._findElementById(elements[i].id, ep.elements);
             if (!found) {
-                let newEl = $.extend(true, {}, elements[i]);
                 ep.elements.push(newEl);
             } else {
-                let oldEl = found.element;
-                ep.elements[found.idx] = $.extend(true, oldEl, elements[i]);
+                ep.elements[found.idx] = newEl;
             }
         }
     }
@@ -57,6 +66,27 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
 
         ep.tracksIdx[newTrack.id] = ep.tracks.length;
         ep.tracks.push(newTrack);
+    }
+
+    setElementPosition(e) {
+        let trackElId = e.trackElId;
+
+        let ep = this._getEpisode();
+        if (!ep) return;
+
+        for (let i = 0; i < ep.tracks.length; i++) {
+            let trackElements = ep.tracks[i].elements;
+            let el = CWSResourceLoaderDesign._findElementById(trackElId, trackElements);
+            if (el) {
+                el.element.content.position = $.extend(true, {}, e.position);
+                break;
+            }
+        }
+
+        let el = CWSResourceLoaderDesign._findElementById(trackElId, ep.elements);
+        if (el) {
+            el.element.content.position = $.extend(true, {}, e.position);
+        }
     }
 
     static _findElementById(id, elements) {
