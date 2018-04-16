@@ -145,7 +145,7 @@ class LessonPage extends React.Component {
 
             if (_isPlayingLesson) {
                 if (this.props.isMobileApp) {
-                    this.props.appActions.startPlay()
+                    this.props.playerStartActions.startPlay()
                 }
                 this.props.appActions.switchToFullPlayer()
             } else {
