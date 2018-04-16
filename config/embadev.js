@@ -1,14 +1,24 @@
 const path = require('path');
 const defer = require('config/defer').deferConfig;
 
-module.exports = {
-    root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
-    proxyServer: {
+let proxyServer = {
+    protocol: 'http',
+    address: '0.0.0.0',
+    port: 3000
+};
+
+if (process.env.EMBA_TEST_HOST === "dragonegg") {
+    proxyServer = {
         protocol: 'https',
         address: '172.16.0.12',
         port: null
-    },
+    }
+}
+
+module.exports = {
+    root: process.cwd(),
+    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    proxyServer: proxyServer,
     server: {
         protocol: 'http',
         address: '0.0.0.0',
