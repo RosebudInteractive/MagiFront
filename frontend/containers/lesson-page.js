@@ -150,13 +150,6 @@ class LessonPage extends React.Component {
             }
         }
 
-        if (this.props.isMobileApp) {
-            let _playBtn = $('.play-button');
-            if (_playBtn.length) {
-                _playBtn.click()
-            }
-        }
-
         if (_lesson) {
             document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
         }

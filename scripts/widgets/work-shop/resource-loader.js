@@ -520,6 +520,7 @@ export default class CWSResourceLoader {
         if (id && !this._alreadyLoadedAudio(id)) {
             var url = "/data/" + id;
             var audio = new Audio();
+            audio.play();
 
             audio.onerror = function () {
                 console.error("resource loader: " + audio.error);
@@ -531,6 +532,7 @@ export default class CWSResourceLoader {
                 id: id,
                 body: audio
             };
+            audio.play();
         }
     }
 
