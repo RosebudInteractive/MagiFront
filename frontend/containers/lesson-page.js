@@ -144,12 +144,16 @@ class LessonPage extends React.Component {
             let _isPlayingLesson = playInfo ? (playInfo.id === _lesson.Id) : false;
 
             if (_isPlayingLesson) {
-                if (this.props.isMobileApp) {
-                    this.props.playerStartActions.startPlay()
-                }
                 this.props.appActions.switchToFullPlayer()
             } else {
                 this.props.playerStartActions.startPlayLesson(_lesson)
+            }
+        }
+
+        if (this.props.isMobileApp) {
+            let _playBtn = $('.play-button');
+            if (_playBtn.length) {
+                _playBtn.click()
             }
         }
 
