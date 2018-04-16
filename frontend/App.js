@@ -43,7 +43,10 @@ class App extends Component {
         };
         this._handleScroll = this._handleScroll.bind(this);
 
-        let _isMobile = Platform.product === 'iPad';
+        let _isMobile = ((Platform.os.family === 'Andriod') || (Platform.os.family === "iOS"));
+        if (_isMobile) {
+            this.props.appActions.setAppTypeMobile()
+        }
     }
 
     get width() {
