@@ -36,7 +36,7 @@ export default class CWSPropEditorImage extends CWSPropEditor {
 
         var title = "";
         if (resource) {
-            title = resource.title + "<br>" +
+            title = (resource.title ? resource.title : "")  + "<br>" +
                 resource.info.size.width + "x" +
                 resource.info.size.height;
         }

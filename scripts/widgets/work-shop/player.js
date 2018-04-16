@@ -861,28 +861,7 @@ export default class CWSPlayer extends CWSBase {
         return {
             data: elData,
             designMode: this._options.designMode,
-            loader: this._options.loader,
-            onSetPosition: function (e) {
-                if (that._options.onSetPosition) that._options.onSetPosition(e);
-            },
-            onFocused: function (e) {
-                for (let i = 0; i < that._elements.array.length; i++) {
-                    let el = that._elements.array[i];
-                    if (el.Id != elData.id) el.Focused = false;
-                }
-                that.renderPosition(null);
-                if (that._options.onFocused) that._options.onFocused(e);
-            },
-            onSetTextData: function (e) {
-                for (let i = 0; i < that._elements.array.length; i++) {
-                    let el = that._elements.array[i];
-                    if (el.Data.trackElement == e.trackElId) {
-                        // elData.data = e.data
-                        if (that._options.onSetTextData) that._options.onSetTextData(e);
-                    }
-                }
-
-            }
+            loader: this._options.loader
         }
     }
 

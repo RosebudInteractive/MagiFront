@@ -1509,7 +1509,7 @@ export default class CWSTracks extends CWSBase {
     setElementPosition(elementId, position) {
         let el = this._findElement(elementId);
         let pos = $.extend(true, {}, position);
-        el.position = pos;
+        el.content.position = pos;
     }
 
     setFocused(elementId) {
