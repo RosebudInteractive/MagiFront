@@ -39,6 +39,16 @@ class NestedPlayer {
         this._applyData(playingData)
         this._setInitState(initState);
         this._currentTime = 0;
+
+
+        let  that = this
+        setTimeout(() => {
+            fakeClick(function() {
+                alert('begin load')
+                that.audioState.audio.load();
+                // that.play();
+            });
+        }, 2000)
     }
 
 
@@ -123,6 +133,7 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
+            // this.play();
         }
 
         this._hasStoppedOnSwitch = false;
@@ -312,12 +323,6 @@ class NestedPlayer {
 
                 that._setCurrentTime(e.currentTime)
             },
-            onSetPosition: function () {
-            },
-            onFocused: function () {
-            },
-            onSetTextData: function () {
-            },
             onVolumeChanged: (value) => {
                 store.dispatch(playerActions.setVolume(value))
             },
@@ -471,6 +476,29 @@ class NestedPlayer {
     _onGetAudio(content) {
         console.log(content)
     }
+}
+
+function fakeClick(fn) {
+    var $a = $('<a href="#" id="fakeClick"></a>');
+    $a.bind("click", function(e) {
+        e.preventDefault();
+        fn();
+    });
+
+    $("body").append($a);
+
+    var evt,
+        el = $("#fakeClick").get(0);
+
+    if (document.createEvent) {
+        evt = document.createEvent("MouseEvents");
+        if (evt.initMouseEvent) {
+            evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            el.dispatchEvent(evt);
+        }
+    }
+
+    $(el).remove();
 }
 
 export default (options) => {

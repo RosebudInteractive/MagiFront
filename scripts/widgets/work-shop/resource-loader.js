@@ -525,16 +525,13 @@ export default class CWSResourceLoader {
                 console.error("resource loader: " + audio.error);
             }
 
-            audio.preload = true;
+            // audio.preload = true;
+            audio.preload = 'none';
             audio.src = url;
             this._state.loadedData.audios[id] = {
                 id: id,
                 body: audio
             };
-
-            setTimeout(()=>{
-                audio.play()
-            }, 0)
         }
     }
 

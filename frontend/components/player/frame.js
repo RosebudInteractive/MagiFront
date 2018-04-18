@@ -216,7 +216,6 @@ class Frame extends Component {
         }
     }
 
-
     render() {
         let _id = this.props.lesson ? this.props.lesson.Id : '';
 

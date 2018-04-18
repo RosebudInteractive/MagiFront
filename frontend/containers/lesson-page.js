@@ -415,7 +415,8 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.lessonPlayInfo.playInfo,
         course: state.singleLesson.course,
         lessons: state.lessons,
-        playingLesson: state.player.playingLesson
+        playingLesson: state.player.playingLesson,
+        isMobileApp: state.app.isMobileApp,
     }
 }
 
