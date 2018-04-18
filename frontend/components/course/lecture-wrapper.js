@@ -101,14 +101,25 @@ class PlayBlock extends React.Component {
     }
 
     _play() {
-        alert('mega play')
-        let _audio = $('#myAudio')[0];
+        let _audio = $('#myAudio')[0],
+            _audio2 = $('#myAudio2')[0];
+
         _audio.src = '/data/2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3';
-        _audio.play()
-            .then(() => {
-                _audio.pause();
-                this.setState({redirect: true});
-            });
+        _audio.load();
+        _audio.src='';
+
+        _audio2.src = '/data/2018/02/Vinogradov_01_Old_Russian_Architecture_Mono_128Kbps_15-01-2018.mp3'
+        _audio2.load();
+
+        this.setState({redirect: true});
+        // _audio.play()
+        //     .then(() => {
+        //         _audio.pause();
+        //         _audio.src = '';
+        //         _audio.src = '/data/2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3';
+        //         _audio.load()
+        //         // this.setState({redirect: true});
+        //     });
     }
 
     render() {

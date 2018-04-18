@@ -42,7 +42,7 @@ class NestedPlayer {
 
         setTimeout(() => {
             this.play()
-        }, 2000)
+        }, 1000)
     }
 
 
@@ -127,7 +127,7 @@ class NestedPlayer {
             this._applyData(data);
             this._setInitState(initState);
             setTimeout(() => {
-                this.play()
+                // this.play()
             }, 2000)
         }
 
@@ -166,8 +166,6 @@ class NestedPlayer {
     }
 
     play() {
-        alert('begin play')
-
         if (!this._initState) {
             let _state = this.player._audioState;
 
@@ -178,7 +176,6 @@ class NestedPlayer {
 
         this.player.play()
             .then(() => {
-                alert('then')
                 if (this._initState) {
                     let _state = Object.assign({}, this._initState);
                     this._initState = null;
@@ -201,8 +198,6 @@ class NestedPlayer {
                         store.dispatch(playerActions.setVolume(_audioState.volume))
                     }
                 }
-
-                alert('then end')
             })
 
         this._hasStoppedOnSwitch = false;
@@ -385,7 +380,7 @@ class NestedPlayer {
 
                     if (!that._hasStoppedOnSwitch) {
                         if (_state.stopped) {
-                            that.play()
+                            // that.play()
                         }
                     }
 

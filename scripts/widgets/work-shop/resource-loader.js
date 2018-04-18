@@ -519,14 +519,18 @@ export default class CWSResourceLoader {
 
         if (id && !this._alreadyLoadedAudio(id)) {
             var url = "/data/" + id;
-            var audio = $('#myAudio')[0]//new Audio();
+            var audio = $('#myAudio2')[0]//new Audio();
             // audio.id = 'myAudio';
+
+            let _audio = $('#myAudio')[0];
+            _audio.src = '/data/2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3';
+            _audio.load()
 
             audio.onerror = function () {
                 console.error("resource loader: " + audio.error);
             }
 
-            audio.preload = true;
+            // audio.preload = true;
             audio.src = url;
             this._state.loadedData.audios[id] = {
                 id: id,
