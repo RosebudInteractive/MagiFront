@@ -194,15 +194,18 @@ const COURSE_LESSONS_MYSQL =
     "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select c.[Id], l.[Id] as [LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "lc.[State], l.[Cover] as [LCover], l.[CoverMeta] as [LCoverMeta], l.[URL] as [LURL],\n" +
-    "ll.[Name] as [LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from [Course] c\n" +
+    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
+    "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "  join[LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = <%= languageId %>\n" +
-    "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and (l.[ParentId] is NULL)\n" +
-    "order by lc.[State] desc, lc.[ReadyDate] desc";
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
+    "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and(l.[ParentId] is NULL)\n" +
+    "order by lc.[State] desc, lc.[ReadyDate] desc, el.[Number]";
 const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from[AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -219,15 +222,18 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "order by cc.[CourseId]";
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select c.`Id`, l.`Id` as `LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "lc.`State`, l.`Cover` as `LCover`, l.`CoverMeta` as `LCoverMeta`, l.`URL` as `LURL`,\n" +
-    "ll.`Name` as `LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from `Course` c\n" +
+    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
+    "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "  join`LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = <%= languageId %>\n" +
-    "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and (l.`ParentId` is NULL)\n" +
-    "order by lc.`State` desc, lc.`ReadyDate` desc";
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
+    "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and(l.`ParentId` is NULL)\n" +
+    "order by lc.`State` desc, lc.`ReadyDate` desc, el.`Number`";
 const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from`AuthorToCourse` ac\n" +
     "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
@@ -245,15 +251,18 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
-    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "where c.[URL] = '<%= courseUrl %>'\n" +
-    "order by lc.[ParentId], lc.[Number]";
+    "order by lc.[ParentId], lc.[Number], el.[Number]";
 const AUTHOR_COURSE_MSSQL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] from [AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -280,15 +289,18 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
-    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "where c.`URL` = '<%= courseUrl %>'\n" +
-    "order by lc.`ParentId`, lc.`Number`";
+    "order by lc.`ParentId`, lc.`Number`, el.`Number`";
 const CATEGORY_COURSE_MYSQL_WHERE = "where cc.`CourseId` = <%= courseId %>\n";
 const COURSE_REF_MYSQL_PUBLIC_REQ =
     "select l.`Id`, count(r.`Id`) as `NRef` from `Course` c\n" +
@@ -339,6 +351,7 @@ const DbCourse = class DbCourse extends DbObject {
         let authors = [];
         let categories = [];
         let courses_list = {};
+        let lessons_list = {};
         let authors_list = {};
         let categories_list = {};
         let languageId = (typeof (langId) === "number") && (!isNaN(langId)) ? langId : LANGUAGE_ID;
@@ -376,20 +389,26 @@ const DbCourse = class DbCourse extends DbObject {
                                         courses.push(curr_course);
                                     }
                                 };
-                                curr_course.Lessons.push({
-                                    Id: elem.LessonId,
-                                    Number: elem.Number,
-                                    ReadyDate: elem.ReadyDate,
-                                    State: elem.State,
-                                    Cover: elem.LCover,
-                                    CoverMeta: elem.LCoverMeta,
-                                    URL: elem.LURL,
-                                    Name: elem.LName,
-                                    ShortDescription: elem.ShortDescription,
-                                    Duration: elem.Duration,
-                                    DurationFmt: elem.DurationFmt,
-                                    AuthorId: elem.AuthorId
-                                });
+                                let lesson = lessons_list[elem.LessonId];
+                                if (!lesson) {
+                                    curr_course.Lessons.push(lesson = {
+                                        Id: elem.LessonId,
+                                        Number: elem.Number,
+                                        ReadyDate: elem.ReadyDate,
+                                        State: elem.State,
+                                        Cover: elem.LCover,
+                                        CoverMeta: elem.LCoverMeta,
+                                        URL: elem.LURL,
+                                        Name: elem.LName,
+                                        ShortDescription: elem.ShortDescription,
+                                        Duration: elem.Duration,
+                                        DurationFmt: elem.DurationFmt,
+                                        AuthorId: elem.AuthorId,
+                                        Audios: []
+                                    });
+                                    lessons_list[elem.LessonId] = lesson;
+                                }
+                                lesson.Audios.push(elem.Audio);
                             })
                             return $data.execSql({
                                 dialect: {
@@ -503,37 +522,42 @@ const DbCourse = class DbCourse extends DbObject {
                                         Books: []
                                     };
                                 };
-                                let lsn = {
-                                    Id: elem.LessonId,
-                                    Number: elem.Number,
-                                    ReadyDate: elem.ReadyDate,
-                                    State: elem.State,
-                                    Cover: elem.LCover,
-                                    CoverMeta: elem.LCoverMeta,
-                                    URL: elem.LURL,
-                                    Name: elem.LName,
-                                    ShortDescription: elem.ShortDescription,
-                                    Duration: elem.Duration,
-                                    DurationFmt: elem.DurationFmt,
-                                    AuthorId: elem.AuthorId,
-                                    NSub: 0,
-                                    NRefBooks: 0,
-                                    NBooks: 0,
-                                    Lessons: []
-                                };
-                                authors_list[elem.AuthorId] = true;
-                                if (!elem.ParentId) {
-                                    course.Lessons.push(lsn);                                   
-                                    lc_list[elem.LcId] = lsn;
-                                }
-                                else {
-                                    let parent = lc_list[elem.ParentId];
-                                    if (parent) {
-                                        parent.Lessons.push(lsn);
-                                        parent.NSub++;
+                                let lsn = lsn_list[elem.LessonId];
+                                if (!lsn) {
+                                    lsn = {
+                                        Id: elem.LessonId,
+                                        Number: elem.Number,
+                                        ReadyDate: elem.ReadyDate,
+                                        State: elem.State,
+                                        Cover: elem.LCover,
+                                        CoverMeta: elem.LCoverMeta,
+                                        URL: elem.LURL,
+                                        Name: elem.LName,
+                                        ShortDescription: elem.ShortDescription,
+                                        Duration: elem.Duration,
+                                        DurationFmt: elem.DurationFmt,
+                                        AuthorId: elem.AuthorId,
+                                        NSub: 0,
+                                        NRefBooks: 0,
+                                        NBooks: 0,
+                                        Lessons: [],
+                                        Audios: []
+                                    };
+                                    authors_list[elem.AuthorId] = true;
+                                    if (!elem.ParentId) {
+                                        course.Lessons.push(lsn);
+                                        lc_list[elem.LcId] = lsn;
                                     }
+                                    else {
+                                        let parent = lc_list[elem.ParentId];
+                                        if (parent) {
+                                            parent.Lessons.push(lsn);
+                                            parent.NSub++;
+                                        }
+                                    }
+                                    lsn_list[elem.LessonId] = lsn;
                                 }
-                                lsn_list[elem.LessonId] = lsn;
+                                lsn.Audios.push(elem.Audio);
                             })
                             let authors = "";
                             isFirst = true;
