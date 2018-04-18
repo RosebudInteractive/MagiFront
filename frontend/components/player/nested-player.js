@@ -40,21 +40,14 @@ class NestedPlayer {
         this._setInitState(initState);
         this._currentTime = 0;
 
-
-        let  that = this
         setTimeout(() => {
-            fakeClick(function() {
-                alert('begin load')
-                that.audioState.audio.load();
-                // that.play();
-            });
+            this.play()
         }, 2000)
     }
 
 
     applyViewPorts() {
         let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
-
 
 
         let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
@@ -133,7 +126,9 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
-            // this.play();
+            setTimeout(() => {
+                this.play()
+            }, 2000)
         }
 
         this._hasStoppedOnSwitch = false;
@@ -171,6 +166,8 @@ class NestedPlayer {
     }
 
     play() {
+        alert('begin play')
+
         if (!this._initState) {
             let _state = this.player._audioState;
 
@@ -181,6 +178,7 @@ class NestedPlayer {
 
         this.player.play()
             .then(() => {
+                alert('then')
                 if (this._initState) {
                     let _state = Object.assign({}, this._initState);
                     this._initState = null;
@@ -203,6 +201,8 @@ class NestedPlayer {
                         store.dispatch(playerActions.setVolume(_audioState.volume))
                     }
                 }
+
+                alert('then end')
             })
 
         this._hasStoppedOnSwitch = false;
@@ -308,7 +308,7 @@ class NestedPlayer {
 
                 if (!that._hasStoppedOnSwitch) {
                     if (_state.stopped) {
-                        that.play()
+                        // that.play()
                     }
                 }
 
@@ -478,27 +478,34 @@ class NestedPlayer {
     }
 }
 
-function fakeClick(fn) {
-    var $a = $('<a href="#" id="fakeClick"></a>');
-    $a.bind("click", function(e) {
-        e.preventDefault();
-        fn();
+function fakeClick() {
+    sendTouchEvent(150, 150, $('.player-frame__screen')[0], 'touchstart');
+}
+
+function sendTouchEvent(x, y, element, eventType) {
+    const touchObj = new Touch({
+        identifier: Date.now(),
+        target: element,
+        clientX: x,
+        clientY: y,
+        radiusX: 15,
+        radiusY: 15,
+        rotationAngle: 10,
+        force: 1,
+
     });
 
-    $("body").append($a);
+    const touchEvent = new TouchEvent(eventType, {
+        cancelable: true,
+        bubbles: true,
+        touches: [touchObj],
+        targetTouches: [],
+        changedTouches: [touchObj],
+        shiftKey: true,
+        view: window
+    });
 
-    var evt,
-        el = $("#fakeClick").get(0);
-
-    if (document.createEvent) {
-        evt = document.createEvent("MouseEvents");
-        if (evt.initMouseEvent) {
-            evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            el.dispatchEvent(evt);
-        }
-    }
-
-    $(el).remove();
+    element.dispatchEvent(touchEvent);
 }
 
 export default (options) => {

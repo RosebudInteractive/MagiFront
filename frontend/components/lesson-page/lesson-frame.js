@@ -24,7 +24,7 @@ class LessonFrame extends React.Component {
             _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
 
         return (
-            <div className="lecture-frame">
+            <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
                 <div className="lecture-frame__header">
                     <div className="lecture-frame__play-link">
                         {this.props.isMain ? null :

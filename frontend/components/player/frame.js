@@ -99,14 +99,14 @@ class Frame extends Component {
         }
     }
 
-    _clearTimeOut(){
+    _clearTimeOut() {
         $('body').removeClass('fade');
         if (this._timer) {
             clearTimeout(this._timer);
         }
     }
 
-    _initTimeOut(){
+    _initTimeOut() {
         if (!this.props.paused) {
             this._timer = setTimeout(() => {
                 this._firstTap = true;
@@ -226,7 +226,7 @@ class Frame extends Component {
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}} tabIndex="0">
+            <div style={this.props.visible ? null : {display: 'none'}}>
                 <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>

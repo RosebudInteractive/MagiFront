@@ -43,7 +43,7 @@ class App extends Component {
         };
         this._handleScroll = this._handleScroll.bind(this);
 
-        // console.log(Platform)
+        console.log(Platform)
         let _isMobile = ((Platform.os.family === "Android") || (Platform.os.family === "iOS"));
         if (_isMobile) {
             this.props.appActions.setAppTypeMobile()
@@ -147,6 +147,7 @@ class App extends Component {
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
+                {/*<LessonPage visible={false}/>*/}
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
