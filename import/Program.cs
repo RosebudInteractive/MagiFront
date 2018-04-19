@@ -1675,8 +1675,9 @@ namespace MagImport
                 lesson_course.Fields.LessonId = lesson.Fields.Id;
                 lesson_course.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson_course.Fields.State = "R";
-                lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_modified").Date;
-
+                //lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_modified").Date;
+                lesson_course.Fields.ReadyDate = rdr.GetDateTime("post_date").Date;
+                
                 Episode episode = new Episode();
                 episode.Fields.LessonId = lesson.Fields.Id;
                 episode.Fields.EpisodeType = "L";
@@ -2376,7 +2377,7 @@ namespace MagImport
         const string sql_get_lessons =
             "select `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name`,\n" +
             "  `p`.`id` as `lesson_id`, coalesce(`pm`.`meta_value`,'0') `is_ext`, `p`.`post_title` as `lesson_name`, `p`.`post_content`, `p`.`post_excerpt`,\n" +
-            "  `p`.`post_status`, `p`.`comment_status`, `p`.`ping_status`, `p`.`post_name`, `p`.`post_modified` from `wp_terms` `t`\n" +
+            "  `p`.`post_status`, `p`.`comment_status`, `p`.`ping_status`, `p`.`post_name`, `p`.`post_modified`, `p`.`post_date` from `wp_terms` `t`\n" +
             "  join `wp_term_taxonomy` `m` on `t`.`term_id` = `m`.`term_id` and `m`.`taxonomy` = 'autor'\n" +
             "  join `wp_term_relationships` `r` on `r`.`term_taxonomy_id` = `m`.`term_taxonomy_id`\n" +
             "  join `wp_posts` `p` on `p`.`id` = `r`.`object_id`\n" +
