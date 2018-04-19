@@ -452,25 +452,31 @@ const LESSONS_ALL_MSSQL_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
     "  lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
-    "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from [Course] c\n" +
+    "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], ell.Audio, el.[Number] Eln from [Course] c\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join [LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = cl.[LanguageId]\n" +
+    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "where c.[URL] = '<%= courseUrl %>'\n" +
-    "order by lc.[ParentId], lc.[Number]";
+    "order by lc.[ParentId], lc.[Number], el.[Number]";
 
 const LESSONS_ALL_MYSQL_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`, ll.`LanguageId`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
     "  lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
-    "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from `Course` c\n" +
+    "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, ell.Audio, el.`Number` Eln from `Course` c\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = cl.`LanguageId`\n" +
+    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "where c.`URL` = '<%= courseUrl %>'\n" +
-    "order by lc.`ParentId`, lc.`Number`";
+    "order by lc.`ParentId`, lc.`Number`, el.`Number`";
 
 const GET_COURSE_LANG_MSSQL =
     "select l.[LanguageId] from [Course] c\n" +
@@ -627,38 +633,44 @@ const DbLesson = class DbLesson extends DbObject {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let isFirst = true;
                             let authors_list = {};
+                            let lesson_list = {};
                             result.detail.forEach((elem) => {
-                                let lsn = {
-                                    Id: elem.LessonId,
-                                    LanguageId: elem.LanguageId,
-                                    Number: elem.Number,
-                                    ReadyDate: elem.ReadyDate,
-                                    State: elem.State,
-                                    Cover: elem.LCover,
-                                    CoverMeta: elem.LCoverMeta,
-                                    URL: elem.LURL,
-                                    Name: elem.LName,
-                                    Duration: elem.Duration,
-                                    DurationFmt: elem.DurationFmt,
-                                    AuthorId: elem.AuthorId,
-                                    Lessons: []
-                                };
-                                authors_list[elem.AuthorId] = true;
-                                let isCurrent = lesson_url === elem.LURL;
-                                if (!elem.ParentId) {
-                                    lc_list[elem.LcId] = { lesson: lsn, idx: lessons.length };
-                                    if (isCurrent)
-                                        currLesson = [lessons.length];
-                                    lessons.push(lsn);
-                                }
-                                else {
-                                    let parent = lc_list[elem.ParentId];
-                                    if (parent) {
+                                let lsn = lesson_list[elem.LessonId];
+                                if (!lsn) {
+                                    lesson_list[elem.LessonId] = lsn = {
+                                        Id: elem.LessonId,
+                                        LanguageId: elem.LanguageId,
+                                        Number: elem.Number,
+                                        ReadyDate: elem.ReadyDate,
+                                        State: elem.State,
+                                        Cover: elem.LCover,
+                                        CoverMeta: elem.LCoverMeta,
+                                        URL: elem.LURL,
+                                        Name: elem.LName,
+                                        Duration: elem.Duration,
+                                        DurationFmt: elem.DurationFmt,
+                                        AuthorId: elem.AuthorId,
+                                        Lessons: [],
+                                        Audios: []
+                                    };
+                                    authors_list[elem.AuthorId] = true;
+                                    let isCurrent = lesson_url === elem.LURL;
+                                    if (!elem.ParentId) {
+                                        lc_list[elem.LcId] = { lesson: lsn, idx: lessons.length };
                                         if (isCurrent)
-                                            currLesson = [parent.idx, parent.lesson.Lessons.length];
-                                        parent.lesson.Lessons.push(lsn);
+                                            currLesson = [lessons.length];
+                                        lessons.push(lsn);
                                     }
-                                }
+                                    else {
+                                        let parent = lc_list[elem.ParentId];
+                                        if (parent) {
+                                            if (isCurrent)
+                                                currLesson = [parent.idx, parent.lesson.Lessons.length];
+                                            parent.lesson.Lessons.push(lsn);
+                                        }
+                                    }
+                                };
+                                lsn.Audios.push(elem.Audio);
                             })
                             let authors = "";
                             isFirst = true;
