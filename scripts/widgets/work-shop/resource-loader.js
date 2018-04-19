@@ -537,6 +537,7 @@ export default class CWSResourceLoader {
             }
 
             audio.src = url;
+            audio.load();
 
             audio.onerror = function () {
                 console.error("resource loader: " + audio.error);
