@@ -276,7 +276,7 @@ const PARENT_MSSQL_REQ =
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const LESSON_MSSQL_TRANSCRIPT_REQ =
-    "select pl.[Number], e.[Id], l.[Name], l.[Transcript]\n" +
+    "select pl.[Number], e.[Id], l.[Name], l.[Transcript], l.[Audio]\n" +
     "from[EpisodeLesson] pl\n" +
     "  join[Episode] e on e.[Id] = pl.[EpisodeId]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -385,7 +385,7 @@ const PARENT_MYSQL_REQ =
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const LESSON_MYSQL_TRANSCRIPT_REQ =
-    "select pl.`Number`, e.`Id`, l.`Name`, l.`Transcript`\n" +
+    "select pl.`Number`, e.`Id`, l.`Name`, l.`Transcript`, l.`Audio`\n" +
     "from`EpisodeLesson` pl\n" +
     "  join`Episode` e on e.`Id` = pl.`EpisodeId`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -826,7 +826,7 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getLessonText(course_url, lesson_url) {
-        let data = { Galery: [], Episodes: [], Refs: [], Books: [] };
+        let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [] };
         let epi_list = {};
         let assets_list = {};
         let parentUrl = lesson_url;
@@ -901,6 +901,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     Toc: []
                                 };
                                 data.Episodes.push(curr_episode);
+                                data.Audios.push(elem.Audio);
                                 epi_list[elem.Id] = curr_episode;
                             });
                         }
