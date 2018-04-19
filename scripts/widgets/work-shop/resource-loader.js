@@ -1,12 +1,23 @@
-//define (
-//    [],
-//    function () {
 const PRELOAD_TIME = 15;
 const FAIL_TIME = 60;
 const PRELOAD_AUDIO_TIME = 20;
 const FAIL_AUDIO_TIME = 120;
 
+let _audioMap = new Map();
+
 export default class CWSResourceLoader {
+
+    static preinitAudio(sources) {
+        sources.forEach((src) => {
+            let _audio = new Audio()
+            _audio.src = src;
+            _audio.load();
+            _audio.src = '';
+
+            _audioMap.set(src, _audio);
+        })
+    }
+
     constructor() {
         this._position = 0;
         this._state = this._getInitialState();
@@ -505,39 +516,36 @@ export default class CWSResourceLoader {
     }
 
     _loadFromAudioQueue() {
-        if (this._state.loadAudioQueue.length == 0) {
+        if (this._state.loadAudioQueue.length === 0) {
             return;
         }
 
         let id = this._state.loadAudioQueue.shift();
         while (this._alreadyLoadedAudio(id)) {
             id = this._state.loadAudioQueue.shift();
-            if (this._state.loadAudioQueue.length == 0) {
+            if (this._state.loadAudioQueue.length === 0) {
                 break;
             }
         }
 
         if (id && !this._alreadyLoadedAudio(id)) {
-            var url = "/data/" + id;
-            var audio = $('#myAudio2')[0]//new Audio();
-            // audio.id = 'myAudio';
+            let url = "/data/" + id;
+            let audio = _audioMap.get(url)
 
-            let _audio = $('#myAudio')[0];
-            _audio.src = '/data/2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3';
-            _audio.load()
+            if (!audio) {
+                throw new Error(`undefined audio for ${url}`)
+            }
+
+            audio.src = url;
 
             audio.onerror = function () {
                 console.error("resource loader: " + audio.error);
             }
 
-            // audio.preload = true;
-            audio.src = url;
             this._state.loadedData.audios[id] = {
                 id: id,
                 body: audio
             };
-
-            // $("body").append(audio);
         }
     }
 
