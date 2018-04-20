@@ -94,9 +94,12 @@ export default class CWSPlayerElement extends CWSBase {
         this._getItem();
         let data = this._options.data;
         this._playState.startedAt = new Date();
+
+        let _timeInterval = (data.content.duration - this._playState.position) * 1000 / rate
+
         this._playState.interval = setTimeout(() => {
             this.stop();
-        }, (data.content.duration - this._playState.position) * 1000 / rate);
+        }, _timeInterval);
 
         let ass = this.Asset;
         if (ass && ass.info.type !== "text") this._playImage();

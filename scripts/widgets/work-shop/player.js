@@ -360,7 +360,7 @@ export default class CWSPlayer extends CWSBase {
         let rate = +(this._audioState.playbackRate || 1);
         for (let i = 0; i < this._elements.array.length; i++) {
             let el = this._elements.array[i];
-            if (position >= el.Start && position <= (el.Start + el.Duration)) {
+            if (position >= el.Start && position < (el.Start + el.Duration)) {
                 el.setRate(rate);
                 el.play();
                 if (this._audioState.playingNow[el.Id] === undefined) {
@@ -771,7 +771,7 @@ export default class CWSPlayer extends CWSBase {
         let deleteOld = false;
         for (let i = 0; i < this._elements.array.length; i++) {
             let el = this._elements.array[i];
-            if (position >= el.Start && position <= (el.Start + el.Duration)) {
+            if (position >= el.Start && position < (el.Start + el.Duration)) {
                 el.Position = position - el.Start;
 
                 if (this._audioState.playingNow[el.Id] === undefined) {
