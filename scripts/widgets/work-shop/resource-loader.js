@@ -8,6 +8,8 @@ let _audioMap = new Map();
 export default class CWSResourceLoader {
 
     static preinitAudio(sources) {
+        _audioMap.clear();
+
         sources.forEach((src) => {
             let _src = '/data/' + src,
                 _audio = new Audio();
@@ -560,7 +562,6 @@ export default class CWSResourceLoader {
         clearInterval(this._state.interval);
         clearInterval(this._state.loaderInt);
         clearInterval(this._state.loaderAudioInt);
-        _audioMap.clear();
 
         this._state = this._getInitialState();
     }

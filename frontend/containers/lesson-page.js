@@ -24,7 +24,6 @@ class LessonPage extends React.Component {
         this.state = {
             total: 0,
             currentActive: 0,
-            isMobile: $(window).width() < 900,
             redirectToPlayer: false,
         }
 
@@ -195,9 +194,10 @@ class LessonPage extends React.Component {
         }
     }
 
-    _mountMouseMoveHandler() {}
+    _mountMouseMoveHandler() {
+    }
 
-    _mountKeydownHandler(){
+    _mountKeydownHandler() {
         $(window).keydown((e) => {
             if (e.which === 32) {
                 this._handleWhitespace = true;
@@ -303,12 +303,12 @@ class LessonPage extends React.Component {
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
-            navigation: (!this.state.isMobile && (_anchors.length > 1)),
+            navigation: (!this.props.isMobileApp && (_anchors.length > 1)),
             navigationTooltips: _anchors.map((anchor) => {
                 return anchor.title
             }),
             css3: true,
-            autoScrolling: !this.state.isMobile,
+            autoScrolling: !this.props.isMobileApp,
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
