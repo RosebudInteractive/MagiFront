@@ -43,7 +43,7 @@ class App extends Component {
         };
         this._handleScroll = this._handleScroll.bind(this);
 
-        // console.log(Platform)
+        console.log(Platform)
         let _isMobile = ((Platform.os.family === "Android") || (Platform.os.family === "iOS"));
         if (_isMobile) {
             this.props.appActions.setAppTypeMobile()

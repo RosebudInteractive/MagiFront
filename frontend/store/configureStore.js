@@ -10,6 +10,7 @@ import history from '../history'
 import playerMiddleware from './player-middleware';
 import loaderMiddleware from './loader-middleware';
 import LessonInfoStorageMiddleware from './lesson-info-storage-middleware';
+import AudioLoaderMiddleware from './audio-loader-middleware';
 
 export const store = configureStore();
 
@@ -28,6 +29,7 @@ function configureStore(initialState) {
                 applyMiddleware(playerMiddleware),
                 applyMiddleware(loaderMiddleware),
                 applyMiddleware(LessonInfoStorageMiddleware),
+                applyMiddleware(AudioLoaderMiddleware),
             )
         ) :
         createStore(
@@ -39,6 +41,7 @@ function configureStore(initialState) {
                 applyMiddleware(playerMiddleware),
                 applyMiddleware(loaderMiddleware),
                 applyMiddleware(LessonInfoStorageMiddleware),
+                applyMiddleware(AudioLoaderMiddleware),
             )
         );
 

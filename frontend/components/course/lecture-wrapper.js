@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-
-import * as svg from '../../tools/svg-paths';
+import PlayBlock from './play-block'
 
 export default class Wrapper extends React.Component {
 
@@ -57,9 +56,11 @@ class SingleLecture extends React.Component {
 
         return (
             <section className="lecture">
-                <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}/>
+                <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL}
+                           courseUrl={this.props.courseUrl} audios={lesson.Audios}/>
                 <div className='lecture__descr'>
-                    <Link to={this.props.courseUrl + '/' + lesson.URL}><h3><span className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3></Link>
+                    <Link to={this.props.courseUrl + '/' + lesson.URL}><h3><span
+                        className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3></Link>
                     <p>{lesson.ShortDescription}</p>
                 </div>
             </section>
@@ -78,42 +79,6 @@ class LecturesList extends React.Component {
         return this.props.lessons.map((item, index) => {
             return <SingleLecture lesson={item} key={index} courseUrl={this.props.courseUrl}/>
         })
-    }
-}
-
-class PlayBlock extends React.Component {
-
-    static propTypes = {
-        lessonUrl: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired
-    }
-
-    render() {
-        return (
-            <div className='lecture__play-block'>
-
-                <div className="lecture__image-wrapper">
-                    <img src={this.props.cover} width="126" height="126" alt=""/>
-                </div>
-                <div className="lecture__loader" id="cont" data-pct="100">
-                    <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1"
-                         xmlns="http://www.w3.org/2000/svg">
-                        <circle r="98.25" cx="100" cy="100" fill="transparent" strokeDasharray="620"
-                                strokeDashoffset="0"/>
-                        <circle className="bar" id="bar" r="98.25" cx="100" cy="100" fill="transparent"
-                                strokeDasharray="383.274" strokeDashoffset="157.142"/>
-                    </svg>
-                </div>
-                <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
-                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'} className="lecture__btn">
-                    <svg width="41" height="36">
-                        {svg.play}
-                    </svg>
-                </Link>
-                <div className="lecture__tooltip">Смотреть</div>
-                <div className='duration'>{this.props.duration}</div>
-            </div>
-        )
     }
 }
 

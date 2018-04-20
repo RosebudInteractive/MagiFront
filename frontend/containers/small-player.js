@@ -137,8 +137,6 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         playerActions: bindActionCreators(playerActions, dispatch),
-        // pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-        // appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

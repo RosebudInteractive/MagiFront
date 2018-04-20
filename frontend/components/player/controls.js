@@ -25,7 +25,6 @@ class Controls extends React.Component {
         this.props.playerStartActions.startSetVolume(value)
     }
 
-
     render() {
         const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',

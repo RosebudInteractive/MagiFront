@@ -40,21 +40,14 @@ class NestedPlayer {
         this._setInitState(initState);
         this._currentTime = 0;
 
-
-        let  that = this
         setTimeout(() => {
-            fakeClick(function() {
-                alert('begin load')
-                that.audioState.audio.load();
-                // that.play();
-            });
-        }, 2000)
+            this.play()
+        }, 1000)
     }
 
 
     applyViewPorts() {
         let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
-
 
 
         let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
@@ -133,7 +126,9 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             this._setInitState(initState);
-            // this.play();
+            setTimeout(() => {
+                this.play()
+            }, 1000)
         }
 
         this._hasStoppedOnSwitch = false;
@@ -308,7 +303,7 @@ class NestedPlayer {
 
                 if (!that._hasStoppedOnSwitch) {
                     if (_state.stopped) {
-                        that.play()
+                        // that.play()
                     }
                 }
 
@@ -318,10 +313,10 @@ class NestedPlayer {
             },
             onCurrentTimeChanged: (e) => {
                 if (that._onCurrentTimeChanged) {
-                    that._onCurrentTimeChanged(e.currentTime)
+                    that._onCurrentTimeChanged(e.globalTime)
                 }
 
-                that._setCurrentTime(e.currentTime)
+                that._setCurrentTime(e.globalTime)
             },
             onVolumeChanged: (value) => {
                 store.dispatch(playerActions.setVolume(value))
@@ -402,6 +397,9 @@ class NestedPlayer {
             },
             onEnded: () => {
                 store.dispatch(playerActions.end())
+            },
+            onBuffered: (value) => {
+                store.dispatch(playerActions.setBufferedTime(value))
             }
         };
     }
@@ -476,29 +474,6 @@ class NestedPlayer {
     _onGetAudio(content) {
         console.log(content)
     }
-}
-
-function fakeClick(fn) {
-    var $a = $('<a href="#" id="fakeClick"></a>');
-    $a.bind("click", function(e) {
-        e.preventDefault();
-        fn();
-    });
-
-    $("body").append($a);
-
-    var evt,
-        el = $("#fakeClick").get(0);
-
-    if (document.createEvent) {
-        evt = document.createEvent("MouseEvents");
-        if (evt.initMouseEvent) {
-            evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            el.dispatchEvent(evt);
-        }
-    }
-
-    $(el).remove();
 }
 
 export default (options) => {

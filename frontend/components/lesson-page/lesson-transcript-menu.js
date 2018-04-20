@@ -88,6 +88,17 @@ class TableOfContents extends React.Component {
             let $target = $($(this).attr('href')),
                 targetOffset = $target.offset().top;
 
+            let _currentPosition = $(window).scrollTop(),
+                _delta = 0;
+
+            if (_currentPosition > targetOffset) {
+                _delta = 175
+            } else {
+                _delta = 75
+            }
+
+            targetOffset -= _delta;
+
             if ($target.length) {
                 e.preventDefault();
 

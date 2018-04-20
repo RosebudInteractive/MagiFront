@@ -5917,6 +5917,9 @@ ul.user-tooltip {
     position: absolute;
     top: 50%;
     left: 50%;
+    background-color: transparent;
+    border: none;
+    outline:none;
     -webkit-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -6309,6 +6312,9 @@ ul.user-tooltip {
     position: absolute;
     top: 50%;
     left: 50%;
+    background-color: transparent;
+    border: none;
+    outline:none;
     -webkit-transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
@@ -10568,6 +10574,7 @@ ul.lectures-tab {
     position: absolute;
     top: 0;
     left: 0;
+    margin-top: 5px;
     height: 5px;
     background-color: rgba(255, 255, 255, 0.3); }
   .player-block__timeline {

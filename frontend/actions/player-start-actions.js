@@ -7,6 +7,7 @@ import {
     PLAYER_TOGGLE_MUTE,
     PLAYER_START_SET_VOLUME,
     PLAYER_START_SET_RATE,
+    PLAYER_PREINIT_AUDIOS,
 } from '../constants/player'
 
 export const startPlayLesson = (lesson) => {
@@ -70,6 +71,13 @@ export const startSetVolume = (value) => {
 export const startSetRate = (value) => {
     return {
         type: PLAYER_START_SET_RATE,
+        payload: value
+    };
+}
+
+export const preinitAudios = (value) => {
+    return {
+        type: PLAYER_PREINIT_AUDIOS,
         payload: value
     };
 }

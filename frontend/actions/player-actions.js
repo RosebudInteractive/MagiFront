@@ -11,7 +11,9 @@ import {
     PLAYER_SET_CURRENT_CONTENT,
     PLAYER_SET_RATE,
     PLAYER_SET_SMALL_VIEWPORT,
-    PLAYER_SET_FULL_VIEWPORT, PLAYER_CLEAR_FULL_VIEWPORT,
+    PLAYER_SET_FULL_VIEWPORT,
+    PLAYER_CLEAR_FULL_VIEWPORT,
+    PLAYER_SET_BUFFERED_TIME,
 } from '../constants/player'
 
 export const play = () => {
@@ -109,5 +111,12 @@ export const clearFullViewPort = (div) => {
     return {
         type: PLAYER_CLEAR_FULL_VIEWPORT,
         payload: div
+    }
+}
+
+export const setBufferedTime = (value) => {
+    return {
+        type: PLAYER_SET_BUFFERED_TIME,
+        payload: value
     }
 }

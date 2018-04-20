@@ -1,24 +1,23 @@
-
 export function registry() {
     if (!String.prototype.padStart) {
-        String.prototype.padStart = function padStart(targetLength,padString) {
-            targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        String.prototype.padStart = function padStart(targetLength, padString) {
+            targetLength = targetLength >> 0; //truncate if number or convert non-number to 0;
             padString = String((typeof padString !== 'undefined' ? padString : ' '));
             if (this.length > targetLength) {
                 return String(this);
             }
             else {
-                targetLength = targetLength-this.length;
+                targetLength = targetLength - this.length;
                 if (targetLength > padString.length) {
-                    padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+                    padString += padString.repeat(targetLength / padString.length); //append to original to ensure we are longer than needed
                 }
-                return padString.slice(0,targetLength) + String(this);
+                return padString.slice(0, targetLength) + String(this);
             }
         };
     }
 
     if (!Array.prototype.find) {
-        Array.prototype.find = function(predicate) {
+        Array.prototype.find = function (predicate) {
             if (this == null) {
                 throw new TypeError('Array.prototype.find called on null or undefined');
             }
@@ -41,7 +40,7 @@ export function registry() {
     }
 
     if (!Array.prototype.findIndex) {
-        Array.prototype.findIndex = function(predicate) {
+        Array.prototype.findIndex = function (predicate) {
             if (this == null) {
                 throw new TypeError('Array.prototype.findIndex called on null or undefined');
             }
@@ -62,4 +61,27 @@ export function registry() {
             return -1;
         };
     }
+
+
+    if ("performance" in window === false) {
+        window.performance = {};
+    }
+
+    Date.now = (Date.now || function () {  // thanks IE8
+        return new Date().getTime();
+    });
+
+    if ("now" in window.performance === false) {
+
+        let nowOffset = Date.now();
+
+        if (performance.timing && performance.timing.navigationStart) {
+            nowOffset = performance.timing.navigationStart
+        }
+
+        window.performance.now = function now() {
+            return Date.now() - nowOffset;
+        }
+    }
+
 }
