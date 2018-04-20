@@ -83,7 +83,8 @@ export default class CWSResourceLoader {
             this._state.episodeStarts[e.id] = {
                 start: cur,
                 end: cur + (+e.audio.info.length),
-                episode: e
+                episode: e,
+                isLast: i === (this._state.data.episodes.length - 1)
             };
             cur += +e.audio.info.length;
         }
@@ -408,8 +409,15 @@ export default class CWSResourceLoader {
     _getEpisodeAt(position) {
         for (let eId in this._state.episodeStarts) {
             let e = this._state.episodeStarts[eId];
-            if (position >= e.start && position <= e.end) {
-                return e.episode;
+
+            if (e.isLast) {
+                if (position >= e.start && position <= e.end) {
+                    return e.episode;
+                }
+            } else {
+                if (position >= e.start && position < e.end) {
+                    return e.episode;
+                }
             }
         }
 

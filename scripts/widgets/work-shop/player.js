@@ -288,8 +288,8 @@ export default class CWSPlayer extends CWSBase {
                             let inf = $.extend(true, {}, episode.audio.info);
                             inf.data = a.data;
                             that._setAudio(inf)
-                            if (this._audioState.audio.readyState >= 1) {
-                                this._onAudioLoadedHandler(this._audioState.audio);
+                            if (that._audioState.audio.readyState >= 1) {
+                                that._onAudioLoadedHandler(this._audioState.audio);
                             }
                         });
                 }
