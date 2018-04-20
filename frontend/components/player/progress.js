@@ -56,12 +56,14 @@ class Progress extends React.Component {
     }
 
     render() {
-        let {currentTime, totalDuration} = this.props;
-        let _playPercent = totalDuration ? ((currentTime * 100) / totalDuration) : 0;
+        let {currentTime, bufferedTime, totalDuration} = this.props;
+        let _playPercent = totalDuration ? ((currentTime * 100) / totalDuration) : 0,
+            _bufferedPercent = totalDuration ? ((bufferedTime * 100) / totalDuration) : 0;
 
         return (
             <div className="player-block__progress" id={"timeline" + this.props.id} onClick={::this._setCurrentPosition}>
                 <div className='player-block__timeline'/>
+                <div className="player-block__load" style={{width: _bufferedPercent + '%'}}/>
                 <div className="player-block__play" style={{width: _playPercent + '%'}}>
                     <span className="indicator"/>
                 </div>
@@ -75,6 +77,7 @@ class Progress extends React.Component {
 function mapStateToProps(state) {
     return {
         currentTime: state.player.currentTime,
+        bufferedTime: state.player.bufferedTime,
         contentArray: state.player.contentArray,
         totalDuration: state.player.totalDuration,
     }

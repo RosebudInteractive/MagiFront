@@ -127,8 +127,8 @@ class NestedPlayer {
             this._applyData(data);
             this._setInitState(initState);
             setTimeout(() => {
-                // this.play()
-            }, 2000)
+                this.play()
+            }, 1000)
         }
 
         this._hasStoppedOnSwitch = false;
@@ -313,10 +313,10 @@ class NestedPlayer {
             },
             onCurrentTimeChanged: (e) => {
                 if (that._onCurrentTimeChanged) {
-                    that._onCurrentTimeChanged(e.currentTime)
+                    that._onCurrentTimeChanged(e.globalTime)
                 }
 
-                that._setCurrentTime(e.currentTime)
+                that._setCurrentTime(e.globalTime)
             },
             onVolumeChanged: (value) => {
                 store.dispatch(playerActions.setVolume(value))
@@ -380,7 +380,7 @@ class NestedPlayer {
 
                     if (!that._hasStoppedOnSwitch) {
                         if (_state.stopped) {
-                            // that.play()
+                            that.play()
                         }
                     }
 
@@ -397,6 +397,9 @@ class NestedPlayer {
             },
             onEnded: () => {
                 store.dispatch(playerActions.end())
+            },
+            onBuffered: (value) => {
+                store.dispatch(playerActions.setBufferedTime(value))
             }
         };
     }
@@ -471,36 +474,6 @@ class NestedPlayer {
     _onGetAudio(content) {
         console.log(content)
     }
-}
-
-function fakeClick() {
-    sendTouchEvent(150, 150, $('.player-frame__screen')[0], 'touchstart');
-}
-
-function sendTouchEvent(x, y, element, eventType) {
-    const touchObj = new Touch({
-        identifier: Date.now(),
-        target: element,
-        clientX: x,
-        clientY: y,
-        radiusX: 15,
-        radiusY: 15,
-        rotationAngle: 10,
-        force: 1,
-
-    });
-
-    const touchEvent = new TouchEvent(eventType, {
-        cancelable: true,
-        bubbles: true,
-        touches: [touchObj],
-        targetTouches: [],
-        changedTouches: [touchObj],
-        shiftKey: true,
-        view: window
-    });
-
-    element.dispatchEvent(touchEvent);
 }
 
 export default (options) => {

@@ -9,12 +9,13 @@ export default class CWSResourceLoader {
 
     static preinitAudio(sources) {
         sources.forEach((src) => {
-            let _audio = new Audio()
-            _audio.src = src;
+            let _src = '/data/' + src,
+                _audio = new Audio();
+            _audio.src = _src;
             _audio.load();
             _audio.src = '';
 
-            _audioMap.set(src, _audio);
+            _audioMap.set(_src, _audio);
         })
     }
 
@@ -533,7 +534,8 @@ export default class CWSResourceLoader {
             let audio = _audioMap.get(url)
 
             if (!audio) {
-                throw new Error(`undefined audio for ${url}`)
+                audio = new Audio()
+                _audioMap.set(url, audio)
             }
 
             audio.src = url;
@@ -558,6 +560,7 @@ export default class CWSResourceLoader {
         clearInterval(this._state.interval);
         clearInterval(this._state.loaderInt);
         clearInterval(this._state.loaderAudioInt);
+        _audioMap.clear();
 
         this._state = this._getInitialState();
     }

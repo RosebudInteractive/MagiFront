@@ -237,7 +237,9 @@ export default class CWSPlayer extends CWSBase {
             .off('pause')
             .off('play')
             .off('error')
-            .off("canplay");
+            .off("canplay")
+            .off("progress")
+            .off("loadedmetadata");
     }
 
     _onAudioLoadedHandler(audio) {
@@ -309,8 +311,20 @@ export default class CWSPlayer extends CWSBase {
             .on("error", function (e) {
                 that.pause();
                 that._broadcastError(e);
-            });
+            })
+            .on("progress", function() {
+                that._calcBuffered(this)
+            })
+            .on("loadedmetadata", function() {
+                that._calcBuffered(this)
+            })
+    }
 
+    _calcBuffered(player) {
+        let _bufferedLength = player.buffered.length;
+        let _time = _bufferedLength ? (this._audioState.baseTime + player.buffered.end(_bufferedLength - 1)) : 0;
+
+        this._broadcastBuffered(_time)
     }
 
     _chechAndFireContentChanged() {
@@ -441,6 +455,12 @@ export default class CWSPlayer extends CWSBase {
             this._options.onError(e);
     }
 
+    _broadcastBuffered(value) {
+        if (this._options.onBuffered) {
+            this._options.onBuffered(value)
+        }
+    }
+
     getAudioState() {
         let result = $.extend(true, {}, this._audioState);
         return result;
@@ -462,21 +482,15 @@ export default class CWSPlayer extends CWSBase {
     }
 
     play() {
-        // let that = this;
-        // let tmInt = null;
         return new Promise((resolve) => {
             if (!this._audioState.audio) {
-                alert('no audio')
-                // return Promise.reject(new Error('Audio is undefined'))
                 resolve()
                 return
             }
 
             if (this._audioState.stopped) {
-                alert('play')
                 resolve(this._audioState.audio.play())
             } else {
-                alert('played')
                 resolve()
             }
         })

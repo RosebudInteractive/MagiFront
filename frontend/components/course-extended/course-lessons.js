@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
-
-import * as svg from '../../tools/svg-paths'
+import PlayBlock from './play-block'
 
 class CourseLessons extends React.Component {
 
@@ -21,6 +20,7 @@ class CourseLessons extends React.Component {
                     subLessons={lesson.NSub}
                     refs={lesson.NRefBooks}
                     books={lesson.NBooks}
+                    audios={lesson.Audios}
                     key={index}/>
                 :
                 <LessonPreview
@@ -68,46 +68,12 @@ class LessonFull extends React.Component {
     }
 }
 
-class PlayBlock extends React.Component {
-
-    static propTypes = {
-        cover : PropTypes.string.isRequired,
-        courseUrl : PropTypes.string.isRequired,
-        lessonUrl : PropTypes.string.isRequired,
-    }
-
-    render() {
-        return (
-            <div className="lecture-full__play-block">
-                <div className="play-block play-block--big">
-                    <div className="play-block__image-wrapper" style={{backgroundImage: 'url(/data/' + this.props.cover + ')'}}/>
-                    <div className="play-block__loader" id="cont" data-pct="100">
-                        <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200"
-                             version="1.1" xmlns="http://www.w3.org/2000/svg">
-                            <circle r={98.75} cx="100" cy="100" fill="transparent" strokeDasharray={565.48}
-                                    strokeDashoffset={0}/>
-                            <circle className="bar" id="bar" r={98.75} cx="100" cy="100" fill="transparent"
-                                    strokeDasharray={565.48} strokeDashoffset={0}
-                            />
-                        </svg>
-                    </div>
-                    <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'} className="play-block__btn">
-                        <svg width="41" height="36">
-                            {svg.play}
-                        </svg>
-                    </Link>
-                    <div className="play-block__tooltip">Смотреть</div>
-                    <div className="play-block__duration">{this.props.duration}</div>
-                </div>
-            </div>
-        )
-    }
-}
-
-{/*<svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}></svg>*/}
-
 class InfoBlock extends React.Component {
     render() {
+        const _eps = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#eps"/>',
+            _lit = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lit"/>',
+            _books = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#books"/>';
+
         return (
             <div className="lecture-full__info-block">
                 <div className="lecture-full__text-block">
@@ -117,31 +83,21 @@ class InfoBlock extends React.Component {
                 <div className="lecture-full__info-table">
                     <div className="lecture-full__info-table-col">
                                                 <span className="icon">
-                                                    <svg width="18" height="18">
-                                                        {svg.eps}
-                                                    </svg>
+                                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _eps}}/>
                                                 </span>
                         <p className="lecture-full__info-table-label">Доп. эпизоды</p>
                         <p className="lecture-full__info-table-value">{this.props.subLessons}</p>
                     </div>
                     <div className="lecture-full__info-table-col">
                                                 <span className="icon">
-                                                    <svg width="18" height="18">
-                                                        {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
-                                                        {/*xlink:href="#lit"></use>*/}
-                                                        {svg.lit}
-                                                    </svg>
+                                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _lit}}/>
                                                 </span>
                         <p className="lecture-full__info-table-label">Источники</p>
                         <p className="lecture-full__info-table-value">{this.props.refs}</p>
                     </div>
                     <div className="lecture-full__info-table-col">
                                                 <span className="icon">
-                                                    <svg width="18" height="18">
-                                                        {/*<use xmlns:xlink="http://www.w3.org/1999/xlink"*/}
-                                                        {/*xlink:href="#books"></use>*/}
-                                                        {svg.book}
-                                                    </svg>
+                                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _books}}/>
                                                 </span>
                         <p className="lecture-full__info-table-label">Книги</p>
                         <p className="lecture-full__info-table-value">{this.props.books}</p>

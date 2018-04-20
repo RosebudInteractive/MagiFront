@@ -91,11 +91,6 @@ class App extends Component {
                 tooltips.removeClass('opened');
             }
         });
-
-        window.onload = () => {
-            let _player = $('#myAudio')[0];
-            _player.addEventListener('progress', _onProgress, false)
-               }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -152,57 +147,12 @@ class App extends Component {
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
-                {/*<LessonPage visible={false}/>*/}
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
             </div>
         );
     }
-}
-
-function _onProgress() {
-    //get the buffered ranges data
-    var ranges = [];
-    for (var i = 0; i < this.buffered.length; i++) {
-        ranges.push([
-            this.buffered.start(i),
-            this.buffered.end(i)
-        ]);
-    }
-
-    //get the current collection of spans inside the container
-    // var spans = progress.getElementsByTagName('span');
-    //
-    // //then add or remove spans so we have the same number as time ranges
-    // while (spans.length < media.buffered.length) {
-    //     progress.appendChild(document.createElement('span'));
-    // }
-    // while (spans.length > media.buffered.length) {
-    //     progress.removeChild(progress.lastChild);
-    // }
-
-    //now iterate through the ranges and convert each set of timings
-    //to a percentage position and width for the corresponding span
-    // for (var i = 0; i < media.buffered.length; i++) {
-    //     spans[i].style.left = Math.round
-    //         (
-    //             (100 / media.duration) //the width of 1s
-    //             *
-    //             ranges[i][0]
-    //         )
-    //         + '%';
-    //
-    //     spans[i].style.width = Math.round
-    //         (
-    //             (100 / media.duration) //the width of 1s
-    //             *
-    //             (ranges[i][1] - ranges[i][0])
-    //         )
-    //         + '%';
-    // }
-
-    alert(`ranges :  ${ranges.length} ended : ${ranges[ranges.length - 1][1]}`)
 }
 
 function mapStateToProps(state, ownProps) {

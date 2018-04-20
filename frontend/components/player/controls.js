@@ -25,22 +25,6 @@ class Controls extends React.Component {
         this.props.playerStartActions.startSetVolume(value)
     }
 
-    // _play() {
-    //     // this.props.playerStartActions.startPlay
-    //     let _player = $('#myAudio')[0];
-    //     // _player.src=''
-    //     _player.play()
-    //         .then(() => {
-    //             setTimeout(() => {
-    //                 _player.pause();
-    //                 setTimeout(() => {
-    //                     _player.src = '/data/2016/09/Listov_Pushkin_02_Biography_Stereo_128Kbps_Feb_02_2016.mp3';
-    //                     _player.play()
-    //                 }, 2000)
-    //             }, 2000)
-    //         })
-    // }
-
     render() {
         const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',

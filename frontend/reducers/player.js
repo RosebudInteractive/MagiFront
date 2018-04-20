@@ -8,7 +8,9 @@ import {
     PLAYER_SET_VOLUME,
     PLAYER_SET_CURRENT_CONTENT,
     PLAYER_SET_RATE,
-    PLAYER_SET_CONTENT_ARRAY, PLAYER_ENDED,
+    PLAYER_SET_CONTENT_ARRAY,
+    PLAYER_ENDED,
+    PLAYER_SET_BUFFERED_TIME,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -20,6 +22,7 @@ import {
 
 const initialState = {
     currentTime: 0,
+    bufferedTime: 0,
     currentContent: null,
     paused: true,
     ended: false,
@@ -66,6 +69,10 @@ export default function player(state = initialState, action) {
             } else {
                 return state
             }
+        }
+
+        case PLAYER_SET_BUFFERED_TIME: {
+            return {...state, bufferedTime: action.payload}
         }
 
         case PLAYER_SET_TITLE: {
