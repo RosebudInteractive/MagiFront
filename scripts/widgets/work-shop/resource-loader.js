@@ -206,7 +206,7 @@ export default class CWSResourceLoader {
                     if (result.success) {
                         clearInterval(int);
                         resolve(result.audio);
-                        return;
+                        return ;
                     }
 
                     let now = new Date();

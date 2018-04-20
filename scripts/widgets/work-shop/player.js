@@ -180,14 +180,14 @@ export default class CWSPlayer extends CWSBase {
         })
     }
 
-    _setAudio(audio) {
+    _setAudio(audio, currentTime) {
         if (this._audioState.source && audio.data.id == this._audioState.source.data.id) return;
         this._audioState.source = audio;
 
-        this._initAudioTrack();
+        this._initAudioTrack(currentTime);
     }
 
-    _initAudioTrack() {
+    _initAudioTrack(currentTime) {
         if (this._audioState.audio) {
             this._audioState.audio.pause();
             this._destroyAudioEvents(this._audioState.$audio);
@@ -201,6 +201,7 @@ export default class CWSPlayer extends CWSBase {
             let audio = this._audioState.source.data.body;
             audio.pause();
             audio.muted = this.getMute();
+            audio.currentTime = currentTime ? currentTime : 0;
             audio.currentTime = 0;
             //this.currentTime = 0;`
             this._audioState.audio = audio;
@@ -212,7 +213,7 @@ export default class CWSPlayer extends CWSBase {
             let starts = this._options.loader.getEpisodesStartTimes();
 
             let startPos = starts[data.episodes[this._audioState.currentEpisode].id];
-            this._audioState.globalTime = startPos.start;
+            this._audioState.globalTime = startPos.start + audio.currentTime;
             this._audioState.baseTime = startPos.start;
             audio.volume = this._audioState.volume;
             audio.playbackRate = this._audioState.playbackRate;
@@ -220,7 +221,6 @@ export default class CWSPlayer extends CWSBase {
             this._setAudioEvents(this._audioState.$audio);
             this._options.loader.setPosition(this._audioState.globalTime);
             if (!this._audioState.stopped) audio.play();
-            //this._audioState.audio.load();
             // this._broadcastAudioInitialized();
             // if ready state is greater, then onloaded event was already fired for the current element
             if (this._audioState.audio.readyState >= 2) {
@@ -264,7 +264,7 @@ export default class CWSPlayer extends CWSBase {
             .on("timeupdate", function () {
                 that._audioState.currentTime = this.currentTime;
                 that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
-                that._broadcastCurrentTimeChanged();
+                that._broadcastCurrentTimeChanged(true);
                 //if (!that._audioState.stopped) {
                 //    that._playElements(that._audioState.globalTime);
                 //}
@@ -424,9 +424,9 @@ export default class CWSPlayer extends CWSBase {
     //        this._options.onAudioInitialized(this.getAudioState());
     //}
 
-    _broadcastCurrentTimeChanged() {
+    _broadcastCurrentTimeChanged(value) {
         if (this._options.onCurrentTimeChanged)
-            this._options.onCurrentTimeChanged(this.getAudioState());
+            this._options.onCurrentTimeChanged(this.getAudioState(), value);
     }
 
     _broadcastCanPlay(e) {
@@ -615,7 +615,9 @@ export default class CWSPlayer extends CWSBase {
 
             if (this._audioState.currentEpisode != epIdx) {
                 this._audioState.currentEpisode = epIdx;
-                this._audioState.audio.pause();
+                // this._audioState.audio.pause();
+                this._destroyAudioEvents(this._audioState.$audio);
+
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
                 let savedState = $.extend(true, {}, this._audioState);
@@ -626,9 +628,22 @@ export default class CWSPlayer extends CWSBase {
                         inf.data = a.data;
                         this._audioState.currentEpisode = epIdx;
 
-                        this._setAudio(inf);
+                        this._audioState.audio.pause();
+                        this._audioState.stopped = true;
+
+                        this._setAudio(inf, savedState.currentTime);
 
                         this._audioState.audio.currentTime = savedState.currentTime;
+
+                        let _func = () => {
+                            if (this._audioState.audio.currentTime < savedState.currentTime) {
+                                this._audioState.audio.currentTime = savedState.currentTime;
+                            }
+
+                            this._audioState.audio.removeEventListener('canplay', _func)
+                        }
+
+                        this._audioState.audio.addEventListener('canplay', _func)
                         this._audioState.currentEpisode = epIdx;
                         this._audioState.globalTime = savedState.globalTime;
                         this._audioState.currentTime = savedState.currentTime;

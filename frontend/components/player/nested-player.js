@@ -311,7 +311,9 @@ class NestedPlayer {
                 store.dispatch(playerActions.setMuteState(_state.muted))
                 store.dispatch(playerActions.setRate(_state.playbackRate))
             },
-            onCurrentTimeChanged: (e) => {
+            onCurrentTimeChanged: (e, isRealTimeChanged) => {
+                if (!isRealTimeChanged) return
+
                 if (that._onCurrentTimeChanged) {
                     that._onCurrentTimeChanged(e.globalTime)
                 }
