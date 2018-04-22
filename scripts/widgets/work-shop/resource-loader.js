@@ -12,12 +12,14 @@ export default class CWSResourceLoader {
 
         sources.forEach((src) => {
             let _src = '/data/' + src,
-                _audio = new Audio();
+                _audio = new Audio()
+
             _audio.src = _src;
             _audio.load();
             _audio.src = '';
 
             _audioMap.set(_src, _audio);
+            $('body').append(_audio);
         })
     }
 
@@ -176,7 +178,7 @@ export default class CWSResourceLoader {
             let beg = new Date();
             let result = this._getFromLoaded(ids);
             if (!result.success) {
-                console.warn("resource loader: begin to waiting for resource download");
+                console.warn("resource loader: begin to waiting for resource download " +  JSON.stringify(ids));
                 let int = setInterval(() => {
                     result = this._getFromLoaded(ids);
                     if (result.success) {
@@ -575,5 +577,3 @@ export default class CWSResourceLoader {
     }
 
 }
-//    }
-//);
