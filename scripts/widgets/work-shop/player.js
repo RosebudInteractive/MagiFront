@@ -187,7 +187,7 @@ export default class CWSPlayer extends CWSBase {
         this._initAudioTrack(currentTime);
     }
 
-    _initAudioTrack(currentTime) {
+    _initAudioTrack() {
         if (this._audioState.audio) {
             this._audioState.audio.pause();
             this._destroyAudioEvents(this._audioState.$audio);
@@ -201,7 +201,6 @@ export default class CWSPlayer extends CWSBase {
             let audio = this._audioState.source.data.body;
             audio.pause();
             audio.muted = this.getMute();
-            audio.currentTime = currentTime ? currentTime : 0;
             audio.currentTime = 0;
             //this.currentTime = 0;`
             this._audioState.audio = audio;
@@ -239,6 +238,7 @@ export default class CWSPlayer extends CWSBase {
             .off('error')
             .off("canplay")
             .off("progress")
+            .off("seeked")
             .off("loadedmetadata");
     }
 
@@ -256,17 +256,12 @@ export default class CWSPlayer extends CWSBase {
         let that = this;
         audio
             .on("canplay", () => {
-                console.log('canplay broadcast', this._audioState.audio.currentTime, new Date())
-                that._addDevInfo('canplay broadcast')
                 that._broadcastCanPlay(that);
             })
             .on("loadeddata", function () {
-                console.log('canplay loadeddata')
-                that._addDevInfo('canplay loadeddata')
                 that._onAudioLoadedHandler(this);
             })
             .on("timeupdate", function () {
-                console.log('canplay timeupdate')
                 that._audioState.currentTime = this.currentTime;
                 that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
                 that._broadcastCurrentTimeChanged(true);
@@ -302,9 +297,6 @@ export default class CWSPlayer extends CWSBase {
                 }
             })
             .on("pause", function () {
-                console.log('canplay pause')
-                that._addDevInfo('canplay pause')
-                // that.pause();
                 that._audioState.stopped = true;
                 that._broadcastPaused();
                 if (this.ended) {
@@ -312,9 +304,6 @@ export default class CWSPlayer extends CWSBase {
                 }
             })
             .on("play", function () {
-                console.log('canplay play')
-                that._addDevInfo('canplay play')
-                // that.play();
                 that._audioState.stopped = false;
                 that._audioState.requestAnimationFrameID = requestAnimationFrame(::that._proccessAnimationFrame);
                 that._broadcastStarted();
@@ -326,13 +315,9 @@ export default class CWSPlayer extends CWSBase {
                 that._broadcastError(e);
             })
             .on("progress", function() {
-                that._addDevInfo('canplay progress')
-                console.log('canplay progress')
                 that._calcBuffered(this)
             })
             .on("loadedmetadata", function() {
-                that._addDevInfo('canplay loadedmetadata')
-                console.log('canplay loadedmetadata')
                 that._calcBuffered(this)
             })
     }
@@ -664,7 +649,15 @@ export default class CWSPlayer extends CWSBase {
 
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
-                let savedState = $.extend(true, {}, this._audioState);
+                var savedState = {
+                    currentTime: this._audioState.currentTime,
+                    globalTime: this._audioState.globalTime,
+                    baseTime: this._audioState.baseTime,
+                    src: this._audioState.audio.src,
+                }
+                this._addDevWarn('--- MEGA BEFORE ---')
+                this._addDevInfo('current time: ' + savedState.currentTime);
+                this._addDevInfo('source: ' + savedState.src);
                 this._options.loader
                     .getAudioResource(newStart.episode.audio.file)
                     .then((a) => {
@@ -679,28 +672,48 @@ export default class CWSPlayer extends CWSBase {
 
                         this._audioState.audio.currentTime = savedState.currentTime;
 
-                        // let _time = (this._audioState.audio.buffered.end(this._audioState.audio.buffered.length - 1))
-                        let _time = 0
+                        this._addDevErr('BEFORE PROGRESS')
+                        this._addDevInfo('current time: ' + this._audioState.audio.currentTime);
+                        this._addDevInfo('saved current time: ' + savedState.currentTime);
 
-                        console.warn('canplay start', this._audioState.audio.currentTime, new Date())
-
-                        this._addDevWarn('canplay start : '  + this._audioState.audio.buffered.length + ' buf :' + _time + ' cur:' + this._audioState.audio.currentTime )
                         let _func = () => {
-                            this._audioState.audio.removeEventListener('progress', _func)
+                            this._addDevErr('----- PROGRESS START -----')
+                            this._addDevInfo('seeking : ' + this._audioState.audio.seeking)
 
-                            if (this._audioState.audio.currentTime < savedState.currentTime) {
-                                this._audioState.audio.currentTime = savedState.currentTime;
+                            if (this._audioState.audio.seeking) {
+                                this._addDevErr('----- PROGRESS FINISH -----')
+                                return
                             }
 
-                            console.log('canplay internal', this._audioState.audio.currentTime, new Date())
-                            this._addDevInfo('canplay internal')
+                            this._audioState.$audio.off('progress', _func)
 
-                            if (this._audioState.audio.readyState >= 1) {
-                                this._onAudioLoadedHandler(this._audioState.audio);
+                            this._addDevInfo('current time: ' + this._audioState.audio.currentTime);
+                            this._addDevInfo('saved current time: ' + savedState.currentTime);
+                            this._addDevInfo('source: ' + savedState.src);
+                            this._addDevWarn('setPosition internal')
+
+                            this._audioState.audio.currentTime = savedState.currentTime;
+
+                            if (this._audioState.audio.paused) {
+                                this._audioState.audio.play()
                             }
+                            this._addDevErr('----- PROGRESS FINISH -----')
                         }
 
-                        this._audioState.audio.addEventListener('progress', _func)
+                        let _func2 = () => {
+                            this._addDevErr('----- SEEKED START -----')
+                            this._audioState.$audio.off('seeked', _func2)
+                            this._addDevInfo('current time: ' + this._audioState.audio.currentTime);
+                            this._addDevInfo('saved current time: ' + savedState.currentTime);
+
+                            if (this._audioState.audio.paused) {
+                                this._audioState.audio.play()
+                            }
+                            this._addDevErr('----- SEEKED FINISH -----')
+                        }
+
+                        this._audioState.$audio.on('progress', _func)
+                        this._audioState.$audio.on('seeked', _func2)
                         this._audioState.currentEpisode = epIdx;
                         this._audioState.globalTime = savedState.globalTime;
                         this._audioState.currentTime = savedState.currentTime;
@@ -716,7 +729,8 @@ export default class CWSPlayer extends CWSBase {
                         this._options.loader.enableChangePosition();
                     })
                     .catch((err) => {
-                        this._addDevErr('canplay error')
+                        this._addDevErr('setPosition error')
+                        console.error('setPosition', err)
                         this._options.loader.enableChangePosition();
                         if (!this._audioState.stopped)
                             this._audioState.audio.play();
@@ -726,9 +740,6 @@ export default class CWSPlayer extends CWSBase {
                 this._options.loader.setPosition(position);
                 this._audioState.audio.currentTime = this._audioState.currentTime;
                 this._setElementsPosition(position);
-                //this._renderPosition(position);
-                //this._playElements(position);
-                //if (this._audioState.stopped) this._pauseElements();
             }
         }
     }
