@@ -461,11 +461,13 @@ export default class CWSPlayerElement extends CWSBase {
         // масштаб изображения
         let effects = this.Data.effects;
         if (!effects) effects = [];
-        if (effects.length != 0){
+        if (effects.length != 0) {
             let effect = effects[0];
             let imgPlayPos = this._playState.position - effect.start;
             let offset = 0;
-            if (imgPlayPos > 0) {
+            if (imgPlayPos > 0
+                && effect.duration > 0
+                && imgPlayPos < this._playState.position - effect.start + effect.duration) {
                 let timeFraction = imgPlayPos / effect.duration;
                 if (timeFraction > 1) timeFraction = 1;
                 let animationFunc = makeEaseInOut(quad);
@@ -481,7 +483,8 @@ export default class CWSPlayerElement extends CWSBase {
                 left: (-offset) + "%",
                 top: (-offset) + "%",
                 width: (100 + offset * 2) + "%",
-                height: (100 + offset * 2) + "%"
+                height: (100 + offset * 2) + "%",
+                transform: "none"
             });
         }
 

@@ -89,6 +89,27 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
         }
     }
 
+    deleteElement(elId) {
+        let trackElId = elId;
+
+        let ep = this._getEpisode();
+        if (!ep) return;
+
+        for (let i = 0; i < ep.tracks.length; i++) {
+            let trackElements = ep.tracks[i].elements;
+            let el = CWSResourceLoaderDesign._findElementById(trackElId, trackElements);
+            if (el) {
+                ep.tracks[i].elements.splice(el.idx, 1);
+                break;
+            }
+        }
+
+        let el = CWSResourceLoaderDesign._findElementById(trackElId, ep.elements);
+        if (el) {
+            ep.elements.splice(el.idx, 1);
+        }
+    }
+
     static _findElementById(id, elements) {
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].id != id) continue;

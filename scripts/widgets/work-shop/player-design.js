@@ -375,6 +375,11 @@ export default class CWSPlayerDesign extends CWSPlayer {
         this._prepareElements();
     }
 
+    deleteElement(elId) {
+        this._options.loader.deleteElement(elId);
+        this._prepareElements();
+    }
+
     addTrack(track) {
         this._options.loader.addTrack(track);
     }
