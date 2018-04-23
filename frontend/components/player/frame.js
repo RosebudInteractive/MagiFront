@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "./progress";
 import Controls from "./controls";
+// import MobileControls from "./mobile-controls";
 
 import $ from 'jquery'
 import PauseScreen from "./pause-screen";
@@ -279,6 +280,8 @@ class Frame extends Component {
         )
     }
 }
+
+
 
 function mapStateToProps(state) {
     return {

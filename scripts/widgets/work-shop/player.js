@@ -649,12 +649,7 @@ export default class CWSPlayer extends CWSBase {
 
                 this._options.loader.setPosition(position);
                 this._options.loader.disableChangePosition();
-                var savedState = {
-                    currentTime: this._audioState.currentTime,
-                    globalTime: this._audioState.globalTime,
-                    baseTime: this._audioState.baseTime,
-                    src: this._audioState.audio.src,
-                }
+                let savedState = $.extend(true, {}, this._audioState);
                 this._addDevWarn('--- MEGA BEFORE ---')
                 this._addDevInfo('current time: ' + savedState.currentTime);
                 this._addDevInfo('source: ' + savedState.src);
