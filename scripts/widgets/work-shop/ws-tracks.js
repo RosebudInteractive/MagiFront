@@ -283,9 +283,9 @@ export default class CWSTracks extends CWSBase {
             for (let j = 0; j < track.elements.length; j++) {
                 let el = track.elements[j];
                 if (el.focused) {
+                    let elId = el.id;
                     track.elements.splice(j, 1);
-                    let item = $("#t_" + track.id);
-                    this._broadcastEditElement(item, track.elements);
+                    this._broadcastDeleteElement(elId);
                 }
             }
         }
@@ -1161,6 +1161,12 @@ export default class CWSTracks extends CWSBase {
         }
     }
 
+    _broadcastDeleteElement(elementId) {
+        if (this._options.onDeleteElement) {
+            this._options.onDeleteElement(elementId);
+        }
+    }
+
     _broadcastAddElement(item, elements) {
         let trackId = item.attr("id").replace(/^t_/, '');
         if (this._options.onAddElement) {
@@ -1356,11 +1362,11 @@ export default class CWSTracks extends CWSBase {
     _setDurationMeter() {
         function msToTime(duration) {
             duration = +duration;
-            let milliseconds = duration%1000
-                , seconds = (duration/1000)%60
+            let milliseconds = Math.trunc(duration%1000)
+                , seconds = Math.trunc((duration/1000)%60)
                 , minutes = Math.trunc(duration/(1000*60));
             seconds = (seconds < 10) ? "0" + seconds : seconds;
-            if (milliseconds > 99) milliseconds = parseInt(milliseconds/10);
+            if (milliseconds > 99) milliseconds = Math.trunc(milliseconds/10);
             milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
             return minutes + ":" + seconds + ":" + milliseconds;
         }
