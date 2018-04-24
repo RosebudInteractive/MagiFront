@@ -67,6 +67,10 @@ sub {
 img {
   border: 0; }
 
+svg {
+  pointer-events: none;
+}
+
 svg:not(:root) {
   overflow: hidden; }
 
@@ -7437,6 +7441,10 @@ body[data-page="fullpage-player"] .lectures-menu {
         display: inline;
         margin-bottom: 18px;
         line-height: 19px; } }
+
+.player-frame__screen .lecture-frame {
+  margin-top: inherit;
+}
 
 .social-block {
   display: -webkit-box;
