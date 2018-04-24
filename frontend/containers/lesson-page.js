@@ -43,7 +43,6 @@ class LessonPage extends React.Component {
     componentDidMount() {
         $(document).ready(() => {
             this._mountFullpage();
-            this._mountMouseMoveHandler();
         });
 
         this._mountKeydownHandler();
@@ -157,7 +156,6 @@ class LessonPage extends React.Component {
 
     componentWillUnmount() {
         this._unmountFullpage();
-        this._unmountMouseMoveHandler();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
     }
@@ -194,9 +192,6 @@ class LessonPage extends React.Component {
         }
     }
 
-    _mountMouseMoveHandler() {
-    }
-
     _mountKeydownHandler() {
         $(window).keydown((e) => {
             if (e.which === 32) {
@@ -204,11 +199,6 @@ class LessonPage extends React.Component {
                 e.preventDefault();
             }
         })
-    }
-
-    _unmountMouseMoveHandler() {
-        $(document).off('mousemove');
-        clearTimeout(this._timer);
     }
 
     _createBundle(lesson, key, isMain) {

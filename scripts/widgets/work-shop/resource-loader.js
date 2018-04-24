@@ -554,7 +554,7 @@ export default class CWSResourceLoader {
             audio.load();
 
             audio.onerror = function () {
-                console.error("resource loader: " + audio.error);
+                console.error("resource loader: " + JSON.stringify(audio.error) );
             }
 
             this._state.loadedData.audios[id] = {

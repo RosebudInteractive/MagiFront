@@ -182,12 +182,19 @@ export default class CWSPlayer extends CWSBase {
 
     _setAudio(audio, currentTime) {
         if (this._audioState.source && audio.data.id == this._audioState.source.data.id) return;
+        if (!audio) {
+            this._addDevWarn('_setAudio : No audio')
+        } else {
+            this._addDevInfo('_setAudio : audio ' + audio.data.body.src)
+        }
         this._audioState.source = audio;
 
         this._initAudioTrack(currentTime);
     }
 
     _initAudioTrack() {
+        this._addDevInfo('_initAudioTrack')
+
         if (this._audioState.audio) {
             this._audioState.audio.pause();
             this._destroyAudioEvents(this._audioState.$audio);
@@ -198,33 +205,49 @@ export default class CWSPlayer extends CWSBase {
             this._audioState.$audio = null;
             this._audioState.duration = 0;
         } else {
-            let audio = this._audioState.source.data.body;
-            audio.pause();
-            audio.muted = this.getMute();
-            audio.currentTime = 0;
-            //this.currentTime = 0;`
-            this._audioState.audio = audio;
-            this._audioState.$audio = $(audio);
+            try {
+                let audio = this._audioState.source.data.body;
+                this._addDevInfo('before pause')
+                audio.pause();
+                this._addDevInfo('before muted')
+                audio.muted = this.getMute();
+                this._addDevInfo('before currentTime');
+                this._addDevInfo('ready state : ' + audio.readyState);
+                // if (audio.readyState > 0) {
+                    audio.currentTime = 0;
+                // }
 
-            this._audioState.duration = audio.duration;
-            this._audioState.currentTime = audio.currentTime;
-            let data = this._options.loader.getData();
-            let starts = this._options.loader.getEpisodesStartTimes();
+                //this.currentTime = 0;`
 
-            let startPos = starts[data.episodes[this._audioState.currentEpisode].id];
-            this._audioState.globalTime = startPos.start + audio.currentTime;
-            this._audioState.baseTime = startPos.start;
-            audio.volume = this._audioState.volume;
-            audio.playbackRate = this._audioState.playbackRate;
+                this._addDevInfo('before audio')
+                this._audioState.audio = audio;
+                this._audioState.$audio = $(audio);
+                this._addDevInfo('audio added')
 
-            this._setAudioEvents(this._audioState.$audio);
-            this._options.loader.setPosition(this._audioState.globalTime);
-            if (!this._audioState.stopped) audio.play();
-            // this._broadcastAudioInitialized();
-            // if ready state is greater, then onloaded event was already fired for the current element
-            if (this._audioState.audio.readyState >= 2) {
-                this._broadcastAudioLoaded();
+                this._audioState.duration = audio.duration;
+                this._audioState.currentTime = audio.currentTime;
+                let data = this._options.loader.getData();
+                let starts = this._options.loader.getEpisodesStartTimes();
+
+                let startPos = starts[data.episodes[this._audioState.currentEpisode].id];
+                this._audioState.globalTime = startPos.start + audio.currentTime;
+                this._audioState.baseTime = startPos.start;
+                audio.volume = this._audioState.volume;
+                audio.playbackRate = this._audioState.playbackRate;
+
+                this._setAudioEvents(this._audioState.$audio);
+                this._options.loader.setPosition(this._audioState.globalTime);
+                if (!this._audioState.stopped) audio.play();
+                // this._broadcastAudioInitialized();
+                // if ready state is greater, then onloaded event was already fired for the current element
+                if (this._audioState.audio.readyState >= 2) {
+                    this._broadcastAudioLoaded();
+                }
+            } catch (e) {
+                this._addDevErr(e.message)
+                console.log(e)
             }
+
         }
     }
 
@@ -256,6 +279,7 @@ export default class CWSPlayer extends CWSBase {
         let that = this;
         audio
             .on("canplay", () => {
+                that._addDevInfo('canplay')
                 that._broadcastCanPlay(that);
             })
             .on("loadeddata", function () {
@@ -486,6 +510,7 @@ export default class CWSPlayer extends CWSBase {
     play() {
         return new Promise((resolve) => {
             if (!this._audioState.audio) {
+                this._addDevErr('No audio!!!')
                 resolve()
                 return
             }

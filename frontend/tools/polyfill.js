@@ -84,4 +84,18 @@ export function registry() {
         }
     }
 
+
+    if (typeof(Element.prototype.closest === 'undefined')) {
+        Element.prototype.closest = function(property, value) {
+            var x = this;
+            while (x = x.parentElement) {
+                if (x[property] == value) {
+                    return this;
+                }
+            }
+            return null;
+        }
+    }
+
+    // ((Element.prototype));
 }
