@@ -41,7 +41,7 @@ class NestedPlayer {
         this._currentTime = 0;
 
         setTimeout(() => {
-            // this.play()
+            this.play()
         }, 1000)
     }
 

@@ -5,6 +5,7 @@ import CWSBase from './ws-base';
 import CPlayerElement from './player-element';
 import Loader from './resource-loader';
 import tpl from 'text!./templates/work-shop.html'
+import Platform from 'platform';
 
 // define(
 //     ["./ws-base", './player-element', './resource-loader', 'text!./templates/work-shop.html'],
@@ -213,11 +214,15 @@ export default class CWSPlayer extends CWSBase {
                 audio.muted = this.getMute();
                 this._addDevInfo('before currentTime');
                 this._addDevInfo('ready state : ' + audio.readyState);
-                // if (audio.readyState > 0) {
-                    audio.currentTime = 0;
-                // }
 
-                //this.currentTime = 0;`
+                if (Platform.os.family === "iOS") {
+                    // Данная установка необходима только для iOS, так как при переходе между аудио-эпизодами в
+                    // лекции курсор не устанавливается в выбраное место нового (незагруженного) эпизода, а
+                    // устанавливается в нулевую позицию и там остается.
+                    // Данный костыль позволяет установить курсор в нужное место.
+                    // Но если оставить для всех, то IE11 падает при этом.
+                    audio.currentTime = 0;
+                }
 
                 this._addDevInfo('before audio')
                 this._audioState.audio = audio;
