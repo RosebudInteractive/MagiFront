@@ -32,7 +32,6 @@ class App extends Component {
 
     constructor(props) {
 
-
         super(props);
         this.state = {
             direction: '',
@@ -160,6 +159,7 @@ function mapStateToProps(state, ownProps) {
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         playInfo: state.player.playingLesson,
+        showSignInForm: state.app.showSignInForm,
         ownProps,
     }
 }

@@ -7,11 +7,16 @@ import {
     SET_APP_TYPE_MOBILE,
 } from '../constants/app'
 
+import {
+    SHOW_SIGN_IN_FORM,
+} from '../constants/user'
+
 const initialState = {
     size: null,
     showSmallPlayer: false,
     isLessonMenuOpened: false,
     isMobileApp: false,
+    showSignInForm: false,
 };
 
 export default function app(state = initialState, action) {
@@ -51,6 +56,10 @@ export default function app(state = initialState, action) {
 
         case SET_APP_TYPE_MOBILE: {
             return {...state, isMobileApp: true}
+        }
+
+        case SHOW_SIGN_IN_FORM: {
+            return {...state, showSignInForm: true}
         }
 
         default:

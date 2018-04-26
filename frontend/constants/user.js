@@ -1,0 +1,14 @@
+export const START_SIGN_UP = 'START_SIGN_UP';
+export const SUCCESS_SIGN_UP = 'SUCCESS_SIGN_UP';
+export const FAIL_SIGN_UP = 'FAIL_SIGN_UP';
+
+export const START_SIGN_IN = 'START_SIGN_IN';
+export const SUCCESS_SIGN_IN = 'SUCCESS_SIGN_IN';
+export const FAIL_SIGN_IN = 'FAIL_SIGN_IN';
+
+export const SHOW_SIGN_IN_FORM = 'SHOW_SIGN_IN_FORM';
+export const CLOSE_SIGN_IN_FORM = 'CLOSE_SIGN_IN_FORM';
+
+export const AUTHORIZATION_STATE = {
+    START_SIGN_IN : 'START_SIGN_IN'
+}
