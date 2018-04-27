@@ -2,7 +2,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 
 import ButtonsBlock from './buttons-block'
-import Form from './sign-in-form'
+import SignInSubform from './sign-in-subform'
+// import SignUpSubform from '../sign-up/sign-up-subform'
 
 class SignInWrapper extends React.Component {
 
@@ -10,7 +11,7 @@ class SignInWrapper extends React.Component {
         return <div className="register-block-wrapper">
             <ButtonsBlock/>
             <span className="register-block-wrapper__label">или</span>
-            <Form/>
+            <SignInSubform/>
         </div>
 
     }
@@ -18,9 +19,7 @@ class SignInWrapper extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        paused: state.player.paused,
-        title: state.player.title,
-        subTitle: state.player.subTitle,
+        authorizationState: state.user.authorizationState,
     }
 }
 

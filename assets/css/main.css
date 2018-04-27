@@ -4487,6 +4487,9 @@ li.fancybox-thumbs-loading {
         color: rgba(255, 255, 255, 0.6); } }
 
 .login-btn {
+  background-color: transparent;
+  border: none;
+  outline: none;
   position: relative;
   display: -webkit-box;
   display: -webkit-flex;

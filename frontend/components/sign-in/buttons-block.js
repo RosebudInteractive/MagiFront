@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {AUTHORIZATION_STATE} from '../../constants/user'
 
 class ButtonsBlock extends React.Component {
 
@@ -8,25 +9,31 @@ class ButtonsBlock extends React.Component {
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk-blue"/>',
             _facebook = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#facebook"/>';
 
-        <div className="register-block">
-            <p className="register-block__title">Регистрация с помошью</p>
+        return <div className="register-block">
+            {
+                this.props.authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?
+                    <p className="register-block__title">Войти с помошью</p>
+                    :
+                    <p className="register-block__title">Регистрация с помошью</p>
+            }
+
             <a href="#" className="btn btn--white register-block__btn register-block__btn--fullwidth">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _google}}/>
                         </span>
                 <span className="text">Google</span>
             </a>
-            <a href="#" class="btn btn--white register-block__btn register-block__btn--fullwidth">
-                        <span class="icon">
+            <a href="#" className="btn btn--white register-block__btn register-block__btn--fullwidth">
+                        <span className="icon">
                             <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </span>
-                <span class="text">Вконтакте</span>
+                <span className="text">Вконтакте</span>
             </a>
             <a href="#" className="btn btn--white register-block__btn register-block__btn--fullwidth">
-                        <span class="icon">
+                        <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
                         </span>
-                <span class="text">Facebook</span>
+                <span className="text">Facebook</span>
             </a>
         </div>
     }
@@ -34,9 +41,7 @@ class ButtonsBlock extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        paused: state.player.paused,
-        title: state.player.title,
-        subTitle: state.player.subTitle,
+        authorizationState: state.user.authorizationState,
     }
 }
 

@@ -21,6 +21,7 @@ import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
+import SingInPopup from './containers/sign-in-form'
 
 import Platform from 'platform';
 
@@ -148,6 +149,12 @@ class App extends Component {
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
+                {
+                    this.props.showSignInForm ?
+                        <SingInPopup/>
+                        :
+                        null
+                }
             </div>
         );
     }
