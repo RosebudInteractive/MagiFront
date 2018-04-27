@@ -4,16 +4,15 @@ import {connect} from 'react-redux';
 
 import Wrapper from '../components/sign-in/sign-in-wrapper'
 
-import * as playerStartActions from '../actions/player-start-actions'
-import * as playerActions from '../actions/player-actions'
+import * as userActions from '../actions/user-actions'
 
 class SmallPlayer extends React.Component {
     render() {
         return (
             <div className="popup js-popup _registration opened">
-                <button className="popup-close js-popup-close">Закрыть</button>
+                <button className="popup-close js-popup-close" onClose={::this.props.userActions.closeSignInForm}>Закрыть</button>
                 <div className="sign-in-block">
-                    <p className="sign-in-block__label">Уже есть экаунт?</p>
+                    <p className="sign-in-block__label">Уже зарегистрирован?</p>
                     <button className="btn btn--light sign-in-block__link">Вход</button>
                 </div>
                 <Wrapper/>
@@ -35,8 +34,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        playerStartActions: bindActionCreators(playerStartActions, dispatch),
-        playerActions: bindActionCreators(playerActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
