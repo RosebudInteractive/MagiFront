@@ -31,8 +31,8 @@ module.exports = {
         scanCount: 100
     },
     authentication: {
-        enabled: false,
-        useJWT: false,
+        enabled: true,
+        useJWT: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'local'// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
     },

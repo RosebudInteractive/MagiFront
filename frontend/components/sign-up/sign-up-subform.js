@@ -9,7 +9,7 @@ class SignInForm extends React.Component {
 
         return <form action="#" method="post" className="form register-form">
             <div className="form__field-wrapper register-form__field-wrapper">
-                <label for="email" className="form__field-label register-form__field-label">Почта</label>
+                <label htmlFor="email" className="form__field-label register-form__field-label">Почта</label>
                 <input type="email" id="email" className="form__field register-form__field" placeholder="Ваш E-mail"/>
                 <span className="status-icon">
                             <svg className="success" width="20" height="20"
