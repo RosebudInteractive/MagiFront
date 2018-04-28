@@ -66,7 +66,7 @@ class AuthLocal {
 
         passport.use(strategy);
 
-        app.post("/api/login", StdLoginProcessor('local', true));
+        app.post("/api/login", StdLoginProcessor('local', config.authentication.useCapture));
 
         app.get("/api/logout", (req, res) => {
             AuthLocal.destroySession(req)
@@ -99,7 +99,7 @@ class AuthLocal {
         });
 
         app.post("/api/pwdrecovery", (req, res) => {
-            chechRecapture(true, req, res, () => {
+            chechRecapture(config.authentication.useCapture, req, res, () => {
                 let activationKey = req.body.activationKey;
                 let password = req.body.password;
                 this._usersCache.userPwdRecovery({ key: { ActivationKey: activationKey }, Password: password })
@@ -113,7 +113,7 @@ class AuthLocal {
         });
 
         app.post("/api/register", (req, res) => {
-            chechRecapture(true, req, res, () => {
+            chechRecapture(config.authentication.useCapture, req, res, () => {
                 let data = { Login: req.body.login };
                 let password = req.body.password;
                 UserRegister(password, data, this._usersCache)

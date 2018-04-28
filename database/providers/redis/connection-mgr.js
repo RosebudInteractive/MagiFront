@@ -54,6 +54,10 @@ class RedisConnection {
         this.expireAsync = promisify(this._client.expire).bind(this._client);
         this.pexpireAsync = promisify(this._client.pexpire).bind(this._client);
         this.mgetAsync = promisify(this._client.mget).bind(this._client);
+        this.hgetAll = promisify(this._client.hgetall).bind(this._client);
+        this.hset = promisify(this._client.hset).bind(this._client);
+        this.hget = promisify(this._client.hget).bind(this._client);
+        this.hdel = promisify(this._client.hdel).bind(this._client);
     }
 
     client() { return this._client; }

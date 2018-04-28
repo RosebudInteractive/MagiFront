@@ -24,6 +24,7 @@ const { setupLanguages } = require('./languages');
 const { setupLessons } = require('./lessons');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
+const setupLessonPositions = require('./lesson-positions');
 
 function setupAPI(express, app) {
     var path = require('path');
@@ -80,6 +81,7 @@ function setupAPI(express, app) {
     }
 
     setupProtectedStatic(app);
+    setupLessonPositions(app);
     setupEpisodes(app);
     setupAuthors(app);
     setupCategories(app);

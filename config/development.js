@@ -30,9 +30,14 @@ module.exports = {
         prefix: 'ses:',
         scanCount: 100
     },
+    lessonPositions: {
+        storage: 'local',// 'redis' or 'local' (not applicable for cluster mode)
+        keyPrefix: 'lpos:uid:'
+    },
     authentication: {
         enabled: false,
         useJWT: false,
+        useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'local'// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
     },

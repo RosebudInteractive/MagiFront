@@ -31,6 +31,7 @@ module.exports = {
     authentication: {
         enabled: false,
         useJWT: false,
+        useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },

@@ -1,6 +1,5 @@
 'use strict';
 
-const redis = require('redis');
 const config = require('config');
 const { UsersBaseCache } = require('./users-base-cache');
 const { RedisConnections, ConnectionWrapper } = require('../database/providers/redis/redis-connections');
