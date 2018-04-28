@@ -114,7 +114,11 @@ class AuthLocal {
 
         app.post("/api/register", (req, res) => {
             chechRecapture(config.authentication.useCapture, req, res, () => {
-                let data = { Login: req.body.login, Name: req.body.name ? req.body.name : req.body.login };
+                let data =
+                    {
+                        Login: req.body.login,
+                        Name: (req.body.name && (req.body.name.trim().length > 0)) ? req.body.name.trim() : req.body.login
+                    };
                 let password = req.body.password;
                 UserRegister(password, data, this._usersCache)
                     .then((user) => {
