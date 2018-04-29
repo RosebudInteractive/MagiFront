@@ -128,7 +128,7 @@ export default class CWSTracks extends CWSBase {
                 this._list.prepend(item);
                 let delBtn = $(closeTpl);
                 delBtn.attr("id", "close_t_" + track.id).attr("data-track", track.id);
-                this._closeButtonsList.append(delBtn);
+                this._closeButtonsList.prepend(delBtn);
                 this._setDeleteBtnEvents(delBtn);
                 this._setTrackEvents(item);
                 this._setZoomEvents();
@@ -582,11 +582,11 @@ export default class CWSTracks extends CWSBase {
         let elData = elItem.data("data");
 
         function msToTime(duration) {
-            let milliseconds = (+duration)%1000
-                , seconds = ((+duration)/1000)%60
+            let milliseconds = Math.trunc(+duration%1000)
+                , seconds = Math.trunc((+duration)/1000)%60
                 , minutes = Math.trunc((+duration)/(1000*60));
             seconds = (seconds < 10) ? "0" + seconds : seconds;
-            if (milliseconds > 99) milliseconds = parseInt(milliseconds/10);
+            if (milliseconds > 99) milliseconds = Math.trunc(milliseconds/10);
             milliseconds = (milliseconds < 10) ? "0" + milliseconds : milliseconds;
             return minutes + ":" + seconds + ":" + milliseconds;
         }
@@ -795,6 +795,8 @@ export default class CWSTracks extends CWSBase {
 
         this._pointer = $(CWSTracks.template("pointer-top"));
         this._container.find(".ws-tracks-list-content").append(this._pointer);
+
+        $(window).resize(this._onResize.bind(this, horBar, verBar));
     }
 
     _setToolsEvents() {
@@ -1458,10 +1460,18 @@ export default class CWSTracks extends CWSBase {
         div.text("00:00:00");
     }
 
-    _destroyAudioEvents(audio) {
-        audio.off("loadeddata");
-        audio.off("timeupdate");
+    _onResize(horBar, verBar) {
+        horBar.update();
+        verBar.update();
+        let cont = this._container.find(".ws-tracks-list-content");
+        let b1 = cont.find(".ws-track-liner").find(".ws-liner-list");
+        let b2= cont.find(".ws-tracks-list-scroll").find(".list");
+        b1.width(b1.parent().width());
+        b2.width(b2.parent().width());
+
+        this._renderLiner(this._getAudioState());
     }
+
 
     _correctElementsIntersection(track, editedData, shift) {
         let audioState = this._getAudioState();

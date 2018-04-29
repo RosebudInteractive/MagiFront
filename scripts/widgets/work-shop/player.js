@@ -156,13 +156,16 @@ export default class CWSPlayer extends CWSBase {
 
     _setRatio(item) {
         // console.log(window.textId);
-        let contW = this._container.width();
-        let contH = this._container.height();
+            //item.css({height: "100%", width: "100%"});//, fontSize: fontSize + 'px'});
+        item.hide();
+        let that = this;
+        let contW = that._container.width();
+        let contH = that._container.height();
         let contRatio = contW == 0 ? 0 : contH/contW;
-        let playerRatio = this._options.ratioY/this._options.ratioX;
+        let playerRatio = that._options.ratioY/that._options.ratioX;
+        item.show();
         // console.log(fontSize);
 
-        item.css({height: null, width: null});//, fontSize: fontSize + 'px'});
 
         if (contRatio == playerRatio) {
             item.height(contH);
@@ -178,7 +181,7 @@ export default class CWSPlayer extends CWSBase {
         $('.ws-text-element').each((index, element) => {
             element._textTools.setRatio(contRatio);
             element._textTools.update();
-        })
+        });
     }
 
     _setAudio(audio, currentTime) {

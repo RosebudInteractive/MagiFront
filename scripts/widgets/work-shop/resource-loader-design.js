@@ -68,6 +68,22 @@ export default class CWSResourceLoaderDesign extends CWSResourceLoader {
         ep.tracks.push(newTrack);
     }
 
+    deleteTrack(trackId) {
+        let ep = this._getEpisode();
+        if (!ep) return;
+
+        let tIdx = ep.tracksIdx[trackId];
+        if (tIdx !== undefined & tIdx != null) {
+            let track = ep.tracks[tIdx];
+            for (let i = 0; i < track.elements.length; i++) {
+                this.deleteElement(track.elements[i].id);
+            }
+
+            delete ep.tracksIdx[trackId];
+            ep.tracks.splice(tIdx, 1);
+        }
+    }
+
     setElementPosition(e) {
         let trackElId = e.trackElId;
 

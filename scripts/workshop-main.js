@@ -73,6 +73,7 @@ window.Utils = Utils;
                         onGetAudio: onGetAudio,
                         onAddElement: onAddElement,
                         onMoveElement: onMoveElement,
+                        onDeleteElement: null,
                         onAddAsset: onAddAssetFromTrack
                     },
                     player: {
@@ -147,15 +148,6 @@ window.Utils = Utils;
             }
 
             function onDeleteTrack(e) {
-                setTimeout(function () {
-                    var id = e.id;
-                    for (var i = 0; i < tracksList.length; i++) {
-                        if (tracksList[i].id == id) break;
-                    }
-                    tracksList.splice(i, 1);
-
-                    ws.render();
-                }, 0);
             }
 
             function onAddElement(e) {

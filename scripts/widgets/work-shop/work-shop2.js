@@ -128,6 +128,7 @@ export default class CWorkShop extends CWSBase {
     }
 
     refreshItem() {
+        this._data = this._playerWidget.getData();
         super.refreshItem();
         this._renderAssets();
         this._renderTracks();
@@ -148,11 +149,9 @@ export default class CWorkShop extends CWSBase {
         let tracks = this._options.tracks.data;
         let that = this;
         this._readDataProperty(tracks).then(function (tracks) {
-            console.log("render tracks begin")
             that._tracksWidget.render(tracks);
-            console.log("render tracks success")
         }).catch(function (err) {
-            console.error(err)
+            console.error(err);
         });
     }
 
@@ -263,6 +262,8 @@ export default class CWorkShop extends CWSBase {
                 that.render();
             },
             onDelete: function (e) {
+                that._playerWidget.deleteTrack(e.id);
+                that.render();
                 if (that._options.tracks.onDeleteTrack)
                     that._options.tracks.onDeleteTrack(e);
             },
@@ -291,8 +292,8 @@ export default class CWorkShop extends CWSBase {
             },
             onDeleteElement: function(e) {
                 that._playerWidget.deleteElement(e);
-                if (that._options.tracks.onMoveElement)
-                    that._options.tracks.onMoveElement(e);
+                if (that._options.tracks.onDeleteElement)
+                    that._options.tracks.onDeleteElement(e);
                 that.render();
             },
             onGetAudioState: function () {
