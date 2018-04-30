@@ -1005,15 +1005,15 @@ export default class CWSTracks extends CWSBase {
             id: Utils.guid(),
             asset: null,
             start: startTime,
-            position: {
-                left: 0,
-                top: 0,
-                right: 30,
-                bottom: 40
-            },
             content: {
                 duration: p.duration,
                 track: trackId,
+                position: {
+                    left: 0,
+                    top: 0,
+                    right: 30,
+                    bottom: 40
+                },
             },
             effects:[
                 {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}

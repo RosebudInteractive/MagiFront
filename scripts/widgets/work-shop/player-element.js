@@ -212,7 +212,6 @@ export default class CWSPlayerElement extends CWSBase {
             let cont = item.find(".ws-player-elem-content");
 
             if (ass) {
-                let imgDiv = null;
                 if (ass.info.type === 'text') {
 
                     let textToolsDiv = $('.ws-text-element-tools');
