@@ -1,5 +1,6 @@
 import {combineReducers} from 'redux';
 import { routerReducer } from 'react-router-redux';
+import { reducer as formReducer } from 'redux-form'
 import pageHeader from './page-header';
 import courses from './courses';
 import filters from './filters';
@@ -12,8 +13,6 @@ import app from './app';
 import player from './player';
 import user from './user'
 import lessonInfoStorage from './lesson-info-storage';
-// import { routerReducer } from 'react-router-redux';
-
 
 export default combineReducers({
 
@@ -30,14 +29,5 @@ export default combineReducers({
     lessonInfoStorage,
     user,
     routing: routerReducer,
-    // browser: responsiveStateReducer({
-    //     mobile: 500,
-    //     xxs: 640,
-    //     xs: 768,
-    //     s: 900,
-    //     m: 1024,
-    //     l: 1280,
-    //     xl: 1400,
-    //     xxl: 1900,
-    // }),
+    form: formReducer,
 })

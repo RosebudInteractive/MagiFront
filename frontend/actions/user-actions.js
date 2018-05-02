@@ -6,6 +6,7 @@ import {
     START_SIGN_IN,
     SUCCESS_SIGN_IN,
     FAIL_SIGN_IN,
+    SET_SIGN_IN_CAPTCHA,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -39,8 +40,58 @@ export const switchToSignUp = () => {
     }
 };
 
+export const clearValidation = () => {
+    return {
+        type: SWITCH_TO_SIGN_UP,
+        payload: null
+    }
+}
+
+export const clearCaptcha = () => {
+    return {
+        type: SWITCH_TO_SIGN_UP,
+        payload: null
+    }
+}
+
+export const setCaptcha = (value) => {
+    return {
+        type: SET_SIGN_IN_CAPTCHA,
+        payload: value
+    }
+}
+
+
+
 export const loginViaFB = () => {
     return (dispatch) => {
+        dispatch({
+            type: START_SIGN_IN,
+            payload: null
+        });
+
+        fetch("/api/fblogin/", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: SUCCESS_SIGN_IN,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: FAIL_SIGN_IN,
+                    payload: err
+                });
+            });
+    }
+}
+
+export const login = () => {
+    return (dispatch, getState) => {
+        let _userState = getState().user
+
         dispatch({
             type: START_SIGN_IN,
             payload: null

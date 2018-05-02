@@ -1,20 +1,48 @@
 import React from 'react';
+import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import { reduxForm } from 'redux-form';
 import Captcha from './captcha'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
+import * as userActions from '../../actions/user-actions'
+// import validator from 'validator';
 
-class SignInForm extends React.Component {
+
+const validate = values => {
+    const errors = {}
+    if (!values.login) {
+        errors.login = 'Required'
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
+        errors.login = 'Invalid email address'
+    }
+    if (!values.password) {
+        errors.password = 'Required'
+    }
+    return errors
+}
+
+
+let SignInForm = class SignInForm extends React.Component {
+
+    _handleSubmit(values) {
+        console.log(values)
+    }
 
     render() {
-        return <form action="#" method="post" className="form register-form">
-            <LoginEdit/>
-            <PasswordEdit/>
-            <p class="form__error-message js-error-message">Неправильный пароль</p>
-            <LoginButton/>
+        return <form className="form register-form" onSubmit={this._handleSubmit}>
+            <LoginEdit {...this.props}/>
+            <PasswordEdit {...this.props}/>
+            <p className="form__error-message js-error-message">Неправильный пароль</p>
+            <LoginButton onClick={::this.props.userActions.login}/>
             <Captcha/>
         </form>
     }
-}
+};
+
+SignInForm = reduxForm({
+    form: 'SignInForm',
+    validate
+})(SignInForm);
 
 function mapStateToProps(state) {
     return {
@@ -22,4 +50,10 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(SignInForm);
+function mapDispatchToProps(dispatch) {
+    return {
+        userActions: bindActionCreators(userActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignInForm);
