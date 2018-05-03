@@ -46,7 +46,7 @@ export class PasswordEdit extends React.Component {
         return (
             <div className="form__field-wrapper register-form__field-wrapper  js-field-wrapper">
                 <label htmlFor="password" className="form__field-label register-form__field-label">Пароль</label>
-                <Field name='password' component="input" type="password" id="password"
+                <input type="password" id="password"
                        className="form__field register-form__field" placeholder="Пароль"/>
                 <span className="icon-eye">
                             <svg width="16" height="12" dangerouslySetInnerHTML={{__html: _eye}}/>

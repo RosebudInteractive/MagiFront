@@ -23,7 +23,7 @@ const validate = values => {
 }
 
 
-let SignInForm = class SignInForm extends React.Component {
+class SignInForm extends React.Component {
 
     _handleSubmit(values) {
         console.log(values)
@@ -36,27 +36,27 @@ let SignInForm = class SignInForm extends React.Component {
             <Field name = "login" component = {PasswordEdit}/>
             {/*<PasswordEdit {...this.props}/>*/}
             <p className="form__error-message js-error-message">Неправильный пароль</p>
-            <LoginButton onClick={::this.props.userActions.login}/>
+            <LoginButton/>
             <Captcha/>
         </form>
     }
 };
 
-SignInForm = reduxForm({
+export default reduxForm({
     form: 'SignInForm',
     validate
 })(SignInForm);
 
-function mapStateToProps(state) {
-    return {
-        authorizationState: state.user.authorizationState,
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        userActions: bindActionCreators(userActions, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignInForm);
+// function mapStateToProps(state) {
+//     return {
+//         authorizationState: state.user.authorizationState,
+//     }
+// }
+//
+// function mapDispatchToProps(dispatch) {
+//     return {
+//         userActions: bindActionCreators(userActions, dispatch),
+//     }
+// }
+//
+// export default connect(mapStateToProps, mapDispatchToProps)(SignInForm);
