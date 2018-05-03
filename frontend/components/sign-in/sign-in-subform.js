@@ -1,7 +1,7 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { reduxForm } from 'redux-form';
+import { reduxForm, Field } from 'redux-form';
 import Captcha from './captcha'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
 import * as userActions from '../../actions/user-actions'
@@ -10,6 +10,7 @@ import * as userActions from '../../actions/user-actions'
 
 const validate = values => {
     const errors = {}
+
     if (!values.login) {
         errors.login = 'Required'
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
@@ -30,8 +31,10 @@ let SignInForm = class SignInForm extends React.Component {
 
     render() {
         return <form className="form register-form" onSubmit={this._handleSubmit}>
-            <LoginEdit {...this.props}/>
-            <PasswordEdit {...this.props}/>
+            <Field name = "login" component = {LoginEdit}/>
+            {/*<LoginEdit {...this.props}/>*/}
+            <Field name = "login" component = {PasswordEdit}/>
+            {/*<PasswordEdit {...this.props}/>*/}
             <p className="form__error-message js-error-message">Неправильный пароль</p>
             <LoginButton onClick={::this.props.userActions.login}/>
             <Captcha/>

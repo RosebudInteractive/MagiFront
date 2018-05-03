@@ -1,26 +1,34 @@
 import React from 'react';
-import {Field} from 'redux-form';
+
+// import {Field} from 'redux-form';
 
 export class LoginEdit extends React.Component {
 
     render() {
         const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
-            _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>'
+            _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
+
+        const {input, type, meta: {error, touched}} = this.props
 
         return (
             <div className="form__field-wrapper register-form__field-wrapper">
                 <label htmlFor="email" className="form__field-label register-form__field-label">Почта</label>
-                <Field name='login' component="input" type="email" id="email"
+                <input id="email" type={type}
                        className="form__field register-form__field" placeholder="Ваш E-mail"/>
-                <span className="status-icon">
-                    {this.props.invalid ?
-                        <svg className="failure" width="16" height="16"
-                             dangerouslySetInnerHTML={{__html: _failure}}/>
-                        :
-                        <svg className="success" width="20" height="20"
-                             dangerouslySetInnerHTML={{__html: _checkGreen}}/>
-                    }
-                    </span>
+                {
+                    touched ?
+                        <span className="status-icon">
+                            {error ?
+                                <svg className="failure" width="16" height="16"
+                                     dangerouslySetInnerHTML={{__html: _failure}}/>
+                                :
+                                <svg className="success" width="20" height="20"
+                                     dangerouslySetInnerHTML={{__html: _checkGreen}}/>
+                            }
+                        </span> :
+                        null
+                }
+
             </div>
         );
     }
@@ -33,6 +41,8 @@ export class PasswordEdit extends React.Component {
             _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>',
             _eye = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#eye"/>'
 
+        const {meta: {error, touched}} = this.props
+
         return (
             <div className="form__field-wrapper register-form__field-wrapper  js-field-wrapper">
                 <label htmlFor="password" className="form__field-label register-form__field-label">Пароль</label>
@@ -41,17 +51,21 @@ export class PasswordEdit extends React.Component {
                 <span className="icon-eye">
                             <svg width="16" height="12" dangerouslySetInnerHTML={{__html: _eye}}/>
                         </span>
-
-                <span className="status-icon">
-                    {this.props.invalid ?
-                        <svg className="failure" width="16" height="16"
-                             dangerouslySetInnerHTML={{__html: _failure}}/>
+                {
+                    touched ?
+                        <span className="status-icon">
+                            {error ?
+                                <svg className="failure" width="16" height="16"
+                                     dangerouslySetInnerHTML={{__html: _failure}}/>
+                                :
+                                <svg className="success" width="20" height="20"
+                                     dangerouslySetInnerHTML={{__html: _checkGreen}}/>
+                            }
+                        </span>
                         :
-                        <svg className="success" width="20" height="20"
-                             dangerouslySetInnerHTML={{__html: _checkGreen}}/>
-                    }
+                        null
+                }
 
-                </span>
             </div>
         );
     }
