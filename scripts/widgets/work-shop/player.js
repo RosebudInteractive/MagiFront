@@ -219,7 +219,7 @@ export default class CWSPlayer extends CWSBase {
                 this._addDevInfo('before currentTime');
                 this._addDevInfo('ready state : ' + audio.readyState);
 
-                if (Platform.os.family === "iOS") {
+                if (Platform.name !== "IE") {
                     // Данная установка необходима только для iOS, так как при переходе между аудио-эпизодами в
                     // лекции курсор не устанавливается в выбраное место нового (незагруженного) эпизода, а
                     // устанавливается в нулевую позицию и там остается.
