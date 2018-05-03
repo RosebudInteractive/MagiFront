@@ -1,9 +1,6 @@
-import CWSPlayerElement from "./player-element";
+import CWSPlayerElementImage from "./player-element-image";
 
-//define(
-//    ["./player-element"],
-//    function (CWSPlayerElement) {
-export default class CWSPlayerElementDesign extends CWSPlayerElement {
+export default class CWSPlayerElementImageDesign extends CWSPlayerElementImage {
     _setEvents(item) {
         item.draggable({
             start: (/*event, ui*/) => {
