@@ -48,15 +48,15 @@ class MobileControls extends React.Component {
                     <svg className="on" width="18" height="18">
                         <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _sound}}/>
                     </svg>
-                    <svg class="off" width="18" height="18">
+                    <svg className="off" width="18" height="18">
                         <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _mute}}/>
                     </svg>
                 </button>
                 <div className="sound-control">
                     <div className="sound-control__bar">
-                        <div className="sound-control__progress" style="width: 66%"></div>
+                        <div className="sound-control__progress" style={{width: "66%"}}></div>
                     </div>
-                    <button type="button" className="sound-control__btn" style="left: 66%">Громкость</button>
+                    <button type="button" className="sound-control__btn" style={{left: "66%"}}>Громкость</button>
                 </div>
             </div>
         )
