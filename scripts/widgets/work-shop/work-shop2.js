@@ -155,13 +155,13 @@ export default class CWorkShop extends CWSBase {
         });
     }
 
-    _findAudio(tracks) {
-        if (!tracks) return null;
-        for (let i = 0; i < tracks.length; i++) {
-            if (tracks[i].type == "MP3") return tracks[i];
-        }
-        return null;
-    }
+    //_findAudio(tracks) {
+    //    if (!tracks) return null;
+    //    for (let i = 0; i < tracks.length; i++) {
+    //        if (tracks[i].type == "MP3") return tracks[i];
+    //    }
+    //    return null;
+    //}
 
     _loadAudio(audio) {
         let that = this;
@@ -188,12 +188,12 @@ export default class CWorkShop extends CWSBase {
 
         this._readDataProperty(assets).then(function (assets) {
             that._assetsWidget.render(assets);
-            let audioObj = that._findAudio(assets);
-            if (audioObj) {
-                that._loadAudio(audioObj).then(function (audio) {
-                    that._playerWidget.setAudio(audio);
-                });
-            }
+            //let audioObj = that._findAudio(assets);
+            //if (audioObj) {
+            //    that._loadAudio(audioObj).then(function (audio) {
+            //        that._playerWidget.setAudio(audio);
+            //    });
+            //}
 
         }).catch(function (err) {
             console.error(err);

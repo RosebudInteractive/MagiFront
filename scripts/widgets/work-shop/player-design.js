@@ -1,5 +1,6 @@
-import CWSPlayer from "./player";
-import CWSPlayerElementDesign from "./player-element-design"
+import CWSPlayerElementImageDesign from "./player-element-image-design"
+import CWSPlayerElementTextDesign from "./player-element-text-design"
+import CWSPlayer from "work-shop/player";
 
 //define(
 //    ["./player", './player-element-design'],
@@ -19,8 +20,12 @@ export default class CWSPlayerDesign extends CWSPlayer {
         this._setTextToolsEvents();
     }
 
-    _getElementConstructor() {
-        return CWSPlayerElementDesign;
+    _getElementConstructor(data) {
+        let type = CWSPlayer._getElementType(data);
+        switch (type) {
+            case "text": return CWSPlayerElementTextDesign;
+            case "image": return CWSPlayerElementImageDesign;
+        }
     }
 
     _setEvents() {

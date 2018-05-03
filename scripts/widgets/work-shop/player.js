@@ -2,10 +2,11 @@
  * Created by levan.kiknadze on 13/06/2017.
  */
 import CWSBase from './ws-base';
-import CPlayerElement from './player-element';
 import Loader from './resource-loader';
 import tpl from 'text!./templates/work-shop.html'
 import Platform from 'platform';
+import CWSPlayerElementImage from "work-shop/player-element-image";
+import CWSPlayerElementText from "work-shop/player-element-text";
 
 // define(
 //     ["./ws-base", './player-element', './resource-loader', 'text!./templates/work-shop.html'],
@@ -907,7 +908,6 @@ export default class CWSPlayer extends CWSBase {
         let assets = [];
         let elemsIdx = {};
         let cont = this._container.find(".ws-player-content");
-        const ElConstructor = this._getElementConstructor();
 
         // Удалим элементы плеера, которые относятся к уже не существующим элементам трека
         this._deleteUnusedElements(data);
@@ -924,6 +924,7 @@ export default class CWSPlayer extends CWSBase {
                         elem.Data = elData;
                     } else {
                         let elOptions = this._getElementOptions(elData);
+                        let ElConstructor = this._getElementConstructor(elData);
                         elem = new ElConstructor(cont, elOptions);
 
                         this._elements.trackElIdx[elData.trackElement] = elem;
@@ -1058,9 +1059,27 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
-    _getElementConstructor() {
-        return CPlayerElement;
+    _getElementConstructor(data) {
+        let type = CWSPlayer._getElementType(data);
+        switch (type) {
+            case "text": return CWSPlayerElementText;
+            case "image": return CWSPlayerElementImage;
+        }
     }
+
+    static _getElementType(data) {
+        if (data && data.asset) {
+            if (data.asset.info["mime-type"] === undefined ||
+                (data.asset.info["mime-type"] && data.asset.info["mime-type"].startsWith("image")))
+                return "image";
+            else
+                return "text";
+        }
+        else
+            return "image";
+
+    }
+
 }
 //    }
 //);
