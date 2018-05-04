@@ -1,11 +1,8 @@
 import React from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
 import { reduxForm, Field } from 'redux-form';
 import Captcha from './captcha'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
-import * as userActions from '../../actions/user-actions'
-// import validator from 'validator';
+// import * as userActions from '../../actions/user-actions'
 
 
 const validate = values => {
@@ -40,7 +37,7 @@ class SignInForm extends React.Component {
             <Captcha/>
         </form>
     }
-};
+}
 
 export default reduxForm({
     form: 'SignInForm',

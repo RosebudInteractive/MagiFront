@@ -9,7 +9,7 @@ class Controls extends React.Component {
 
     componentDidMount() {
         let _id = this.props.lesson ? this.props.lesson.Id : '';
-        
+
         $("#sound-bar" + _id).click((event) => {
             let _current = event.pageX - event.currentTarget.offsetLeft,
                 _total = event.currentTarget.offsetWidth - 1;

@@ -1,8 +1,8 @@
 import {
     SUCCESS_SIGN_IN,
-    SUCCESS_SIGN_UP,
-    FAIL_SIGN_IN,
-    FAIL_SIGN_UP,
+    // SUCCESS_SIGN_UP,
+    // FAIL_SIGN_IN,
+    // FAIL_SIGN_UP,
     SWITCH_TO_SIGN_IN,
     SWITCH_TO_SIGN_UP,
 

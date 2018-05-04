@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
-// import {Redirect} from 'react-router';
 import * as playerStartActions from '../../actions/player-start-actions'
 import { bindActionCreators } from 'redux';
 
@@ -31,15 +29,6 @@ class LessonFrame extends React.Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
-
-        // if (this._redirect) {
-        //     this._redirect = false;
-        //     // return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}/>;
-        // }
-
-    //             <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}>
-    //         <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
-    // </Link>
 
         return (
             <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
