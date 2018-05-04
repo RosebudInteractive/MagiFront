@@ -8,7 +8,9 @@ import * as playerStartActions from '../../actions/player-start-actions'
 class Controls extends React.Component {
 
     componentDidMount() {
-        $("#sound-bar").click((event) => {
+        let _id = this.props.lesson ? this.props.lesson.Id : '';
+        
+        $("#sound-bar" + _id).click((event) => {
             let _current = event.pageX - event.currentTarget.offsetLeft,
                 _total = event.currentTarget.offsetWidth - 1;
             this._setVolume(_current, _total)
@@ -37,6 +39,8 @@ class Controls extends React.Component {
             _sound = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sound"/>',
             _mute = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mute"/>';
 
+        let _id = this.props.lesson ? this.props.lesson.Id : '';
+
         return (
             <div className="player-block__controls">
                 <button type="button" className="backwards" onClick={::this._onBackward}>
@@ -59,7 +63,7 @@ class Controls extends React.Component {
                             <svg className="on" width="18" height="18" dangerouslySetInnerHTML={{__html: _sound}}/>
                     }
                 </button>
-                <div className="sound-control" id='sound-bar' style={this.props.muted ? {display: 'none'} : null}>
+                <div className="sound-control" id={'sound-bar' + _id} style={this.props.muted ? {display: 'none'} : null}>
                     <div className="sound-control__bar">
                         <div className="sound-control__progress" style={{width: (this.props.volume * 100) + "%"}}/>
                     </div>
