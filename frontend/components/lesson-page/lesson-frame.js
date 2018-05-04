@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {connect} from 'react-redux';
+// import {Redirect} from 'react-router';
+import * as playerStartActions from '../../actions/player-start-actions'
+import { bindActionCreators } from 'redux';
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -14,6 +17,12 @@ class LessonFrame extends React.Component {
         isMain: true
     };
 
+    _play() {
+        this.props.playerStartActions.preinitAudios(this.props.audios);
+        this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
+        this.forceUpdate()
+    }
+
     render() {
         const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
 
@@ -22,6 +31,15 @@ class LessonFrame extends React.Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
+
+        // if (this._redirect) {
+        //     this._redirect = false;
+        //     // return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}/>;
+        // }
+
+    //             <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}>
+    //         <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
+    // </Link>
 
         return (
             <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
@@ -36,9 +54,9 @@ class LessonFrame extends React.Component {
                             </button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            <Link to={'/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play'}>
+                            <div style={{cursor: 'pointer'}} onClick={::this._play}>
                                 <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
-                            </Link>
+                            </div>
                             <span className="title-text">
                                 <span className="number">{_number}</span>
                                 {lesson.Name + '\n'}
@@ -105,4 +123,10 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(LessonFrame);
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LessonFrame);

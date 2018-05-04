@@ -25,7 +25,6 @@ class CoursesPage extends React.Component {
 
     _getCoursesBundles() {
 
-
         let {filters} = this.props;
         let _courses = this.props.courses.items;
 

@@ -62,6 +62,20 @@ export function registry() {
         };
     }
 
+    Math.sign = Math.sign || function(x) {
+        x = +x; // преобразуем в число
+        if (x === 0 || isNaN(x)) {
+            return x;
+        }
+        return x > 0 ? 1 : -1;
+    }
+
+    if (!String.prototype.startsWith) {
+        String.prototype.startsWith = function(search, pos) {
+            return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+        };
+    }
+
 
     if ("performance" in window === false) {
         window.performance = {};

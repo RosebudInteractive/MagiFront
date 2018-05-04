@@ -212,8 +212,14 @@ class LessonPage extends React.Component {
         let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
             _isManyLessonsOnPage = this._getAnchors().length > 0,
             _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
-        if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
 
+        let _lessonAudios = this.props.lessons.object.find((item) => {
+            return item.Id == lesson.Id
+        })
+
+        let _audios = _lessonAudios ? _lessonAudios.Audios : null;
+
+        if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
             return <Wrapper key={key}
                             lesson={lesson}
                             courseUrl={this.props.courseUrl}
@@ -221,6 +227,8 @@ class LessonPage extends React.Component {
                             isMain={isMain}
                             active={this.state.currentActive}
                             isPlayer={true}
+                            audios={_audios}
+                            history={this.props.history}
             />
         } else {
             return <Wrapper key={key}
@@ -230,6 +238,8 @@ class LessonPage extends React.Component {
                             isMain={isMain}
                             active={this.state.currentActive}
                             isPlayer={false}
+                            audios={_audios}
+                            history={this.props.history}
             />
         }
     }

@@ -25,6 +25,11 @@ class Controls extends React.Component {
         this.props.playerStartActions.startSetVolume(value)
     }
 
+    _startPlay() {
+        this.props.playerStartActions.preinitAudios(this.props.audios);
+        this.props.playerStartActions.startPlay()
+    }
+
     render() {
         const _backwards = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#backward"/>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
@@ -38,7 +43,7 @@ class Controls extends React.Component {
                     <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _backwards}}/>
                 </button>
                 {this.props.paused ?
-                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPlay}>
+                    <button type="button" className="play-button" onClick={::this._startPlay}>
                         <svg className="play" width="19" height="19" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
                     :

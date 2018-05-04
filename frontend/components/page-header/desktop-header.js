@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import * as svg from '../../tools/svg-paths';
 import * as tools from '../../tools/page-tools';
+import * as userActions from '../../actions/user-actions'
 
-export default class DesktopHeaderRow extends React.Component {
+
+class DesktopHeaderRow extends React.Component {
 
     static propTypes = {
         filterActive: PropTypes.bool.isRequired,
@@ -20,7 +23,12 @@ export default class DesktopHeaderRow extends React.Component {
                 <Navigator {...this.props}/>
                 <Languages/>
                 <Search/>
-                <User/>
+                {
+                    this.props.authorized ?
+                        <UserBlock/>
+                        :
+                        <SignInBlock onButtonClick={::this.props.userActions.showSignInForm}/>
+                }
             </div>
         )
     }
@@ -139,7 +147,7 @@ class Search extends React.Component {
     }
 }
 
-class User extends React.Component {
+class UserBlock extends React.Component {
 
     constructor(props){
         super(props);
@@ -155,6 +163,8 @@ class User extends React.Component {
     }
 
     render(){
+        const _logout = '<use xlink:href="#logout"/>'
+
         return(
             <div className={"user-block" + (this.state.showForm ? ' opened' : '')}>
                 <div className="user-block__header" onClick={::this._onClick}>
@@ -169,9 +179,7 @@ class User extends React.Component {
                     </li>
                     <li>
                         <a href="#" className="logout-btn">
-                            <svg width="15" height="16">
-                                {svg.logout}
-                            </svg>
+                            <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>
                             <span>Выйти</span>
                         </a>
                     </li>
@@ -180,3 +188,40 @@ class User extends React.Component {
         )
     }
 }
+
+class SignInBlock extends React.Component {
+
+    static propTypes = {
+        onButtonClick: PropTypes.func.isRequired
+    }
+
+    constructor(props){
+        super(props);
+    }
+
+    render(){
+        const _login = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#login"/>'
+
+        return(
+            <div className="user-block">
+                <button className="login-btn js-login" onClick={::this.props.onButtonClick}>
+                    <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _login}}/>
+                    <span>Вход</span>
+                </button>
+            </div>
+        )
+    }
+}
+function mapStateToProps(state) {
+    return {
+        authorized: state.user.authorized,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        userActions: bindActionCreators(userActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(DesktopHeaderRow);

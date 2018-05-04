@@ -102,6 +102,7 @@ class Frame extends Component {
 
     _clearTimeOut() {
         $('body').removeClass('fade');
+        $('.player-block__controls').addClass('show')
         if (this._timer) {
             clearTimeout(this._timer);
         }
@@ -112,6 +113,7 @@ class Frame extends Component {
             this._timer = setTimeout(() => {
                 this._firstTap = true;
                 $('body').addClass('fade');
+                $('.player-block__controls').removeClass('show')
             }, 7000);
         } else {
             this._timer = null
@@ -241,7 +243,7 @@ class Frame extends Component {
                                 <div className="player-block">
                                     <Progress id={_id}/>
                                     <div className="player-block__row">
-                                        <Controls/>
+                                        <Controls {...this.props}/>
                                         <div className="player-block__stats">
                                             <TimeInfo/>
                                             <button type="button" className="speed-button js-speed-trigger"

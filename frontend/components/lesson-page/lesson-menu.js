@@ -61,7 +61,7 @@ class Menu extends React.Component {
             _total = lessons.object.length;
 
         return (
-            <div className={"lectures-menu js-lesson-menu _dark" + (this.props.isLessonMenuOpened ? ' opened' : '')} id={this.props.id} style={this.props.isMain ? null : {display: 'none'}}>
+            <div className={"lectures-menu js-lesson-menu _dark" + (this.props.isPlayer ? ' player-wrapper' : '') + (this.props.isLessonMenuOpened ? ' opened' : '')} id={this.props.id} style={this.props.isMain ? null : {display: 'none'}}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
                         <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>

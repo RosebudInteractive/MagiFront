@@ -21,6 +21,7 @@ import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
+import SingInPopup from './containers/sign-in-form'
 
 import Platform from 'platform';
 
@@ -31,7 +32,6 @@ let _homePath = '/';
 class App extends Component {
 
     constructor(props) {
-
 
         super(props);
         this.state = {
@@ -149,6 +149,12 @@ class App extends Component {
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
+                {
+                    this.props.showSignInForm ?
+                        <SingInPopup/>
+                        :
+                        null
+                }
             </div>
         );
     }
@@ -160,6 +166,7 @@ function mapStateToProps(state, ownProps) {
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         playInfo: state.player.playingLesson,
+        showSignInForm: state.app.showSignInForm,
         ownProps,
     }
 }

@@ -51,7 +51,7 @@ export default class Wrapper extends React.Component {
                         </div>
                 }
                 <PlayerFrame {...this.props} visible={this.props.isPlayer}/>
-                <LessonFrame lesson={this.props.lesson} isMain={this.props.isMain}
+                <LessonFrame {...this.props} lesson={this.props.lesson} isMain={this.props.isMain}
                              courseUrl={this.props.courseUrl}
                              visible={!this.props.isPlayer}
                 />

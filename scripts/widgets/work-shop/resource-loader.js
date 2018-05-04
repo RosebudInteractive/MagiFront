@@ -1,3 +1,5 @@
+import Platform from 'platform';
+
 const PRELOAD_TIME = 15;
 const FAIL_TIME = 60;
 const PRELOAD_AUDIO_TIME = 20;
@@ -8,19 +10,29 @@ let _audioMap = new Map();
 export default class CWSResourceLoader {
 
     static preinitAudio(sources) {
-        _audioMap.clear();
+        if ((Platform.os.family === "iOS") || (Platform.os.family === "Android")) {
+            let _mapKeys = _audioMap.keys();
+            let _sourceNotEqual = (_audioMap.size !== sources.length) || sources.some((src) => {
+                let _source = '/data/' + src,
+                    _key = _mapKeys.next()
+                return _source !== _key.value
+            })
 
-        sources.forEach((src) => {
-            let _src = '/data/' + src,
-                _audio = new Audio()
+            if (_sourceNotEqual) {
+                _audioMap.clear();
+                sources.forEach((src) => {
+                    let _src = '/data/' + src,
+                        _audio = new Audio()
 
-            _audio.src = _src;
-            _audio.load();
-            _audio.src = '';
+                    _audio.src = _src;
+                    _audio.load();
+                    _audio.src = '';
 
-            _audioMap.set(_src, _audio);
-            $('body').append(_audio);
-        })
+                    _audioMap.set(_src, _audio);
+                    $('body').append(_audio);
+                })
+            }
+        }
     }
 
     constructor() {

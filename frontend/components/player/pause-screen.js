@@ -15,6 +15,11 @@ class PauseScreen extends React.Component {
         isMain: true,
     };
 
+    _startPlay() {
+        this.props.playerStartActions.preinitAudios(this.props.audios);
+        this.props.playerStartActions.startPlay()
+    }
+
     render() {
         let {lesson} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
@@ -41,7 +46,7 @@ class PauseScreen extends React.Component {
                             <h2 className="lecture-frame__title">
                                 <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                                 <span className="play-btn-big lecture-frame__play-btn" style={{cursor: 'pointer'}}
-                                      onClick={::this.props.playerStartActions.startPlay}>Воспроизвести</span>
+                                      onClick={::this._startPlay}>Воспроизвести</span>
                                 <span className="title-text">
                                             <span className="number">{_number}</span>{lesson.Name}</span>
                             </h2>
