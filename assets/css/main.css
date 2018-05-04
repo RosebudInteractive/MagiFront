@@ -7256,7 +7256,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     color: rgba(255, 255, 255, 0.8); }
     @media (max-width: 600px) {
       .lecture-frame__chapter {
-        margin-top: -11px;
+        margin-top: auto;
         margin-bottom: 50px;
         font-size: 15px;
         line-height: 19px;
@@ -11041,7 +11041,8 @@ ul.lectures-tab {
     @media (max-width: 600px) {
       .player-frame__screen {
         bottom: 0;
-        top: 0; } }
+        top: 0;
+        padding-bottom: 0} }
   .player-frame__screen.hide{
     opacity: 0;
     visibility: hidden;}
