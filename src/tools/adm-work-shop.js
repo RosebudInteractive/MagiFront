@@ -23,7 +23,9 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
+/* eslint-disable */
 var _instance = null
+/* eslint-enable */
 let _data = null;
 
 class AdmWorkShop {
@@ -49,10 +51,7 @@ class AdmWorkShop {
 
         let result = {
             data: that._onGetData,
-            assets: {
-                // onAddAsset: onAddAsset,
-                // onDeleteAsset: onDeleteAsset
-            },
+            assets: {},
             tracks: {
                 onDeleteTrack: this._onDeleteTrack,
                 onGetAudio: this._onGetAudio,
@@ -106,15 +105,6 @@ class AdmWorkShop {
 
     _onDeleteTrack(e) {
         console.log('_onDeleteTrack', e)
-        // setTimeout(function () {
-        //     var id = e.id;
-        //     for (var i = 0; i < tracksList.length; i++) {
-        //         if (tracksList[i].id == id) break;
-        //     }
-        //     tracksList.splice(i, 1);
-        //
-        //     ws.render();
-        // }, 0);
     }
 
     _onAddElement(e) {
@@ -125,95 +115,16 @@ class AdmWorkShop {
         console.log('_onMoveElement', e)
     }
 
-    _findTrack(id) {
-        var track = null;
-        for (var i = 0; i < tracksList.length; i++) {
-            var cur = tracksList[i];
-            if (cur.id == id) {
-                track = cur;
-                break;
-            }
-        }
-
-        return track;
-    }
-
-    _findElement(id) {
-        var element = null;
-        for (var i = 0; i < tracksList.length; i++) {
-            var cur = tracksList[i];
-            for (var j = 0; j < cur.elements.length; j++) {
-                if (cur.elements[j].id == id) {
-                    element = cur.elements[j];
-                    break;
-                }
-            }
-        }
-
-        return element;
-    }
-
-    _getAssets(ids) {
-        ids = ids || [];
-        if (!Array.isArray(ids)) ids = [ids];
-
-        var idsMap = {};
-
-        for (var i = 0; i < ids.length; i++) {
-            idsMap[ids[i]] = true;
-        }
-
-        var result = [];
-        for (var i = 0; i < assetsList.length; i++) {
-            var asset = assetsList[i];
-            if (asset.id in idsMap) {
-                result.push(asset);
-            }
-        }
-
-        return result;
-    }
-
     _setPlayerElementPosition(e) {
         console.log('_setPlayerElementPosition', e)
-        // var elId = e.trackElId;
-        // var el = findElement(elId);
-        // el.position = e.position;
     }
 
     _setPlayerElementFocused(e) {
         console.log('_setPlayerElementFocused', e)
-        // var elId = e.trackElId;
-        // var el = findElement(elId);
-        // el.focused = true;
-        // if (e.oldFocusedId) {
-        //     var old = findElement(e.oldFocusedId);
-        //     old.focused = false;
-        // }
     }
 
     _onAddAssetFromTrack(e) {
         console.log('_onMoveElement', e)
-        // return new Promise((resolve, reject) => {
-        //     $.post('/svc/uploadAsset', {
-        //         fileName: e.filename,
-        //         body: e.body
-        //     }).done(function (resp) {
-        //         var newId = Utils.guid();
-        //         assetsList.push({
-        //             "id": newId,
-        //             "title": "Новое изображение_" + assetsList.length,
-        //             "type": "PNG",
-        //             "size": e.size,
-        //             "icon": resp.url,
-        //             "content": resp.url,
-        //             "contentBody": e.body
-        //         });
-        //         resolve(newId);
-        //     }).fail(function (err) {
-        //         reject(err);
-        //     });
-        // });
     }
 }
 

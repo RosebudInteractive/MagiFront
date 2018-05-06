@@ -22,13 +22,11 @@ class RateTooltip extends Component {
     _getRates() {
         let that = this;
         const _rates = [
-            // {value: 0.25}, // Todo : надо убрать 0.25
-            // {value: 0.5},
             {value: 0.75},
             {value: 1.0, title: 'Обычная'},
             {value: 1.25},
+            {value: 1.5},
             {value: 1.75},
-            // {value: 2},
         ];
 
         return _rates.map((item, index) => {

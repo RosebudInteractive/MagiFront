@@ -89,8 +89,8 @@ export const loginViaFB = () => {
 }
 
 export const login = () => {
-    return (dispatch, getState) => {
-        let _userState = getState().user
+    return (dispatch) => {
+        // let _userState = getState().user
 
         dispatch({
             type: START_SIGN_IN,
