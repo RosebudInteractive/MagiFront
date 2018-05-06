@@ -2384,7 +2384,8 @@ namespace MagImport
             "  join `wp_term_relationships` `rc` on `rc`.`object_id` = `r`.`object_id`\n" +
             "  join `wp_term_taxonomy` `mc` on `rc`.`term_taxonomy_id` = `mc`.`term_taxonomy_id` and `mc`.`taxonomy` = 'category'\n" +
             "  join `wp_terms` `tc` on `tc`.`term_id` = `mc`.`term_id`\n" +
-            "  left join(select `post_id`, `meta_value` from `wp_postmeta` where `meta_key` = 'dop_lecture_bool') `pm` on `pm`.`post_id` = `p`.`id`\n" +
+            "  join (select `post_id` from `wp_postmeta` where `meta_key` = '_access_user') `xx` on `xx`.`post_id` = `p`.`id`\n" +
+            "  left join (select `post_id`, `meta_value` from `wp_postmeta` where `meta_key` = 'dop_lecture_bool') `pm` on `pm`.`post_id` = `p`.`id`\n" +
             "order by `t`.`term_id`, `tc`.`term_id`, `p`.`id`";
 
         Encoding enc = new UTF8Encoding(false); // UTF8 w/o BOM 
