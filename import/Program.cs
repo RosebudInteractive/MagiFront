@@ -31,7 +31,7 @@ namespace MagImport
             {
                 string json = ToJSONString(fmt, settings);
                 string dir = Path.GetDirectoryName(outFile);
-                string file = Path.GetDirectoryName(outFile);
+                string file = Path.GetFileName(outFile);
                 string ext = Path.GetExtension(outFile);
 
                 if (String.IsNullOrEmpty(ext))
@@ -2025,7 +2025,7 @@ namespace MagImport
             foreach (RootDataObject root in allData)
                 root_path = root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
-            users.ToJSONFile(Path.Combine(root_path + Path.DirectorySeparatorChar, "users"), JSONFormatting, JSONEncoding, JSONSettings);
+            users.ToJSONFile(Path.Combine(root_path, "users", "users.json"), JSONFormatting, JSONEncoding, JSONSettings);
         }
 
         static string ErrInvSymbolExpMsg = "MagisteryToJSON::_JSONParse: Invalid symbol \"{0}\" at position {1}. Expected one is \"{2}\".";
