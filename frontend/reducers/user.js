@@ -1,26 +1,41 @@
 import {
-    SUCCESS_SIGN_IN,
+    SIGN_IN_START,
+
+    SIGN_IN_SUCCESS,
     // SUCCESS_SIGN_UP,
-    // FAIL_SIGN_IN,
-    // FAIL_SIGN_UP,
+    SIGN_IN_FAIL,
+    SIGN_UP_FAIL,
+
+    SIGN_UP_START,
+
     SWITCH_TO_SIGN_IN,
     SWITCH_TO_SIGN_UP,
 
-    AUTHORIZATION_STATE
+    AUTHORIZATION_STATE, SIGN_UP_SUCCESS, SIGN_OUT_SUCCESS
 
 } from '../constants/user'
 
 const initialState = {
     authorizationState: AUTHORIZATION_STATE.START_SIGN_IN,
     authorized: false,
+    loading: false,
     name: '',
-    email: ''
+    email: '',
+    error: null,
 };
 
 export default function app(state = initialState, action) {
-    switch (action.type) {
-        case SUCCESS_SIGN_IN:
-            return {...state, authorized: true, size: action.payload};
+    const {type, payload} = action
+
+    switch (type) {
+        case SIGN_IN_START:
+        case SIGN_UP_START:
+            return { ...state, error: null, loading: true};
+
+        case SIGN_IN_SUCCESS:
+        case SIGN_UP_SUCCESS:
+        case SIGN_OUT_SUCCESS:
+            return { ...state, loading: false, user: payload.user}
 
         case SWITCH_TO_SIGN_IN: {
             if (state.authorizationState !== AUTHORIZATION_STATE.START_SIGN_IN) {
@@ -36,6 +51,10 @@ export default function app(state = initialState, action) {
             } else {
                 return state
             }
+
+        case SIGN_IN_FAIL:
+        case SIGN_UP_FAIL:
+            return { ...state, loading: false, error: payload.error.message}
 
         default:
             return state;

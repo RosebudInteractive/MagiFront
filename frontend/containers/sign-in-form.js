@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import {AUTHORIZATION_STATE} from '../constants/user'
 
-import Wrapper from '../components/sign-in/sign-in-wrapper'
+import Wrapper from '../components/auth/sign-in-wrapper'
 
 import * as userActions from '../actions/user-actions'
 
