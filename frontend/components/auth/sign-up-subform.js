@@ -15,6 +15,9 @@ const validate = values => {
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
         errors.login = 'Invalid email address'
     }
+    if (!values.username) {
+        errors.username = 'Required'
+    }
     if (!values.password1) {
         errors.password1 = 'Required'
     }
@@ -52,7 +55,8 @@ let SignUpForm = class SignUpForm extends React.Component {
     _handleSubmit(values) {
         this.props.onSubmit({
             login: values.login,
-            password: values.password,
+            name: values.username,
+            password: values.password1,
             'g-recaptcha-response': this.state.captcha
         })
     }
@@ -99,10 +103,9 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>
 
-                            <div class="register-form__buttons">
+                            <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={!this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}
-                                              onClick={::this._showPasswordScreen}/>
+                                <SignUpButton disabled={!this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
 
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>

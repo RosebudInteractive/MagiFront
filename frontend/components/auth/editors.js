@@ -46,7 +46,7 @@ export class UserNameEdit extends React.Component {
         return (
             <div className="form__field-wrapper register-form__field-wrapper">
                 <label htmlFor="username" className="form__field-label register-form__field-label">Представьтесь</label>
-                <input type="text" id="username" className="form__field register-form__field" placeholder="Ваше имя"/>
+                <input {...input} type="text" id="username" className="form__field register-form__field" placeholder="Ваше имя"/>
                 {
                     touched ?
                         <span className="status-icon">
@@ -96,7 +96,6 @@ export class PasswordEdit extends React.Component {
                         :
                         null
                 }
-
             </div>
         );
     }
@@ -126,9 +125,15 @@ export class SignUpButton extends React.Component {
         type: PropTypes.string
     };
 
+    _onClick() {
+        if (this.props.onClick) {
+            this.props.onClick()
+        }
+    }
+
     render() {
         return <button className={"btn btn--brown register-form__enter" + (this.props.disabled ? " disabled" : "")}
-                       onClick={::this.props.onClick} type={this.props.type}>
+                       onClick={::this._onClick} type={this.props.type}>
             <span className="text">{this.props.caption}</span>
         </button>
     }
@@ -144,9 +149,9 @@ export class BackButton extends React.Component {
 
         return (
             <div className="register-form__link-back" onClick={::this.props.onBackward}>
-                            <span className="icon">
-                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _arrowBack}}/>
-                            </span>
+                <span className="icon">
+                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _arrowBack}}/>
+                </span>
             </div>
         )
     }
