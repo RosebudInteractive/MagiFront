@@ -50,7 +50,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
             .addField("ProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
             .addField("Identifier", { type: "string", length: 50, allowNull: false })
-            .addField("URL", { type: "string", length: 100, allowNull: true })
+            .addField("URL", { type: "string", length: 255, allowNull: true })
             .addField("WebSite", { type: "string", length: 255, allowNull: true })
             .addField("PhotoUrl", { type: "string", length: 255, allowNull: true })
             .addField("DisplayName", { type: "string", length: 50, allowNull: true })

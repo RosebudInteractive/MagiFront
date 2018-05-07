@@ -31,7 +31,7 @@ namespace MagImport
             {
                 string json = ToJSONString(fmt, settings);
                 string dir = Path.GetDirectoryName(outFile);
-                string file = Path.GetDirectoryName(outFile);
+                string file = Path.GetFileName(outFile);
                 string ext = Path.GetExtension(outFile);
 
                 if (String.IsNullOrEmpty(ext))
@@ -2025,7 +2025,7 @@ namespace MagImport
             foreach (RootDataObject root in allData)
                 root_path = root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
-            users.ToJSONFile(Path.Combine(root_path + Path.DirectorySeparatorChar, "users"), JSONFormatting, JSONEncoding, JSONSettings);
+            users.ToJSONFile(Path.Combine(root_path, "users", "users.json"), JSONFormatting, JSONEncoding, JSONSettings);
         }
 
         static string ErrInvSymbolExpMsg = "MagisteryToJSON::_JSONParse: Invalid symbol \"{0}\" at position {1}. Expected one is \"{2}\".";
@@ -2384,7 +2384,8 @@ namespace MagImport
             "  join `wp_term_relationships` `rc` on `rc`.`object_id` = `r`.`object_id`\n" +
             "  join `wp_term_taxonomy` `mc` on `rc`.`term_taxonomy_id` = `mc`.`term_taxonomy_id` and `mc`.`taxonomy` = 'category'\n" +
             "  join `wp_terms` `tc` on `tc`.`term_id` = `mc`.`term_id`\n" +
-            "  left join(select `post_id`, `meta_value` from `wp_postmeta` where `meta_key` = 'dop_lecture_bool') `pm` on `pm`.`post_id` = `p`.`id`\n" +
+            "  join (select `post_id` from `wp_postmeta` where `meta_key` = '_access_user') `xx` on `xx`.`post_id` = `p`.`id`\n" +
+            "  left join (select `post_id`, `meta_value` from `wp_postmeta` where `meta_key` = 'dop_lecture_bool') `pm` on `pm`.`post_id` = `p`.`id`\n" +
             "order by `t`.`term_id`, `tc`.`term_id`, `p`.`id`";
 
         Encoding enc = new UTF8Encoding(false); // UTF8 w/o BOM 
