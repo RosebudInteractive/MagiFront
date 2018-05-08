@@ -3,13 +3,13 @@ import {
     CLOSE_SIGN_IN_FORM,
     SWITCH_TO_SIGN_IN,
     SWITCH_TO_SIGN_UP,
-    START_SIGN_IN,
-    SUCCESS_SIGN_IN,
-    FAIL_SIGN_IN,
     SET_SIGN_IN_CAPTCHA,
+    SIGN_IN_START, SIGN_IN_SUCCESS, SIGN_IN_FAIL, SIGN_UP_START, SIGN_UP_SUCCESS, SIGN_UP_FAIL,
 } from '../constants/user'
 
 import 'whatwg-fetch';
+
+import {readResponseBody} from '../tools/fetch-tools'
 
 export const showSignInForm = () => {
     return {
@@ -88,41 +88,91 @@ export const loginViaFB = () => {
     }
 }
 
-export const login = () => {
+export const login = (values) => {
     return (dispatch) => {
         // let _userState = getState().user
 
         dispatch({
-            type: START_SIGN_IN,
+            type: SIGN_IN_START,
             payload: null
         });
 
-        fetch("/api/fblogin/", {credentials: 'include'})
+        fetch("/api/login", {
+            method: 'POST',
+                headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+                credentials: 'include'
+        })
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
                 dispatch({
-                    type: SUCCESS_SIGN_IN,
+                    type: SIGN_IN_SUCCESS,
                     payload: data
                 });
             })
-            .catch((err) => {
+            .catch((error) => {
                 dispatch({
-                    type: FAIL_SIGN_IN,
-                    payload: err
+                    type: SIGN_IN_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const signUp = (values) => {
+    return (dispatch) => {
+
+        dispatch({
+            type: SIGN_UP_START,
+            payload: null
+        });
+
+        fetch("/api/register", {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: SIGN_UP_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SIGN_UP_FAIL,
+                    payload: {error}
                 });
             });
     }
 }
 
 const checkStatus = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        let error = new Error(response.statusText);
-        error.response = response;
-        throw error
-    }
+    return new Promise((resolve, reject) => {
+        if (response.status >= 200 && response.status < 300) {
+            resolve(response)
+        } else {
+            readResponseBody(response)
+                .then( data => {
+                    let _message = response.statusText;
+
+                    if (data) {
+                        let _serverError = JSON.parse(data);
+                        _message = _serverError.message;
+                    }
+                    let error = new Error(_message);
+                    reject(error)
+                })
+        }
+    })
 };
 
 const parseJSON = (response) => {

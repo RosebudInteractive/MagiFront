@@ -13448,6 +13448,13 @@ ul.lectures-tab {
   .captcha-block iframe {
     width: 100%; }
 
+.g-recaptcha{
+  margin-top: 20px;
+  transform:scale(0.9);
+  transform-origin:0 0;
+  background: none;
+}
+
 /*# sourceMappingURL=main.css.map */
 
 /*# sourceMappingURL=main.css.map */

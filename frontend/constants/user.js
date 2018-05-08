@@ -1,10 +1,11 @@
-export const START_SIGN_UP = 'START_SIGN_UP';
-export const SUCCESS_SIGN_UP = 'SUCCESS_SIGN_UP';
-export const FAIL_SIGN_UP = 'FAIL_SIGN_UP';
+export const SIGN_UP_START = 'SIGN_UP_START';
+export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
+export const SIGN_UP_FAIL = 'SIGN_UP_FAIL';
+export const SIGN_OUT_SUCCESS = 'SIGN_OUT_SUCCESS';
 
-export const START_SIGN_IN = 'START_SIGN_IN';
-export const SUCCESS_SIGN_IN = 'SUCCESS_SIGN_IN';
-export const FAIL_SIGN_IN = 'FAIL_SIGN_IN';
+export const SIGN_IN_START = 'SIGN_IN_START';
+export const SIGN_IN_SUCCESS = 'SIGN_IN_SUCCESS';
+export const SIGN_IN_FAIL = 'SIGN_IN_FAIL';
 
 export const SHOW_SIGN_IN_FORM = 'SHOW_SIGN_IN_FORM';
 export const CLOSE_SIGN_IN_FORM = 'CLOSE_SIGN_IN_FORM';
