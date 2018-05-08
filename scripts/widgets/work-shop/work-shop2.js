@@ -259,22 +259,26 @@ export default class CWorkShop extends CWSBase {
             onAdd: function () {
                 let newTrack = that._addTrack();
                 that._playerWidget.addTrack(newTrack);
+                that._data = that._playerWidget.getData();
                 that.render();
             },
             onDelete: function (e) {
                 that._playerWidget.deleteTrack(e.id);
+                that._data = that._playerWidget.getData();
                 that.render();
                 if (that._options.tracks.onDeleteTrack)
                     that._options.tracks.onDeleteTrack(e);
             },
             onAddElement: function (e) {
                 that._playerWidget.addElement(e.track, e.elements);
+                that._data = that._playerWidget.getData();
                 if (that._options.tracks.onAddElement)
                     that._options.tracks.onAddElement(e);
                 that.render();
             },
             onEditElement: function (e) {
                 that._playerWidget.editElement(e.track, e.elements);
+                that._data = that._playerWidget.getData();
                 for (let i = 0; i < e.elements.length; i++) {
                     let el = e.elements[i];
                     if (el.focused) {
@@ -288,10 +292,12 @@ export default class CWorkShop extends CWSBase {
                 that._playerWidget.moveElements(e);
                 if (that._options.tracks.onMoveElement)
                     that._options.tracks.onMoveElement(e);
+                that._data = that._playerWidget.getData();
                 that.render();
             },
             onDeleteElement: function(e) {
                 that._playerWidget.deleteElement(e);
+                that._data = that._playerWidget.getData();
                 if (that._options.tracks.onDeleteElement)
                     that._options.tracks.onDeleteElement(e);
                 that.render();
@@ -356,7 +362,10 @@ export default class CWorkShop extends CWSBase {
                 let elId = e.trackElId;
                 that._tracksWidget.setElementPosition(elId, e.position);
                 let data = that._tracksWidget.getElementData(elId);
-                that._propeditorWidget.render(data);
+                if (data.focused) {
+                    that._renderPropEditor(elId);
+                }
+                //that._propeditorWidget.render(data);
                 if (that._options.player.onSetElementPosition)
                     that._options.player.onSetElementPosition(e);
             },
@@ -374,14 +383,21 @@ export default class CWorkShop extends CWSBase {
             },
             onSetTextData: function (e) {
                 let elId = e.trackElId;
+                that._tracksWidget.setTextElementData(elId, e.data);
                 let data = that._tracksWidget.getElementData(elId);
-                that._propeditorWidget.render(data);
-                if (that._options.player.onSetTextData) {
-                    that._options.player.onSetTextData({
-                        trackElId: e.trackElId,
-                        data: e.data
-                    })
+
+                if (data.focused) {
+                    that._renderPropEditor(elId);
                 }
+                that._data = that._playerWidget.getData();
+
+                //that._propeditorWidget.render(data);
+                //if (that._options.player.onSetTextData) {
+                //    that._options.player.onSetTextData({
+                //        trackElId: e.trackElId,
+                //        data: e.data
+                //    })
+                //}
             },
             onAddElement: function (e) {
                 if (that._options.tracks.onAddElement)
@@ -398,7 +414,7 @@ export default class CWorkShop extends CWSBase {
             this._propeditorWidget.destroy();
         }
 
-        if (data.data && data.data.type !== undefined && data.data.type === 'text') {
+        if (CWSPlayer._getElementType(data) == "text") {
             // if () {
             //
             this._propeditorWidget = new CWSPropEditorText(

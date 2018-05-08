@@ -209,6 +209,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
             console.log('?');
             textDiv._textTools.setCurrentSize(0);
             textDiv._textTools.setRatio(ratio);
+            textDiv._textTools.grabContent();
             textDiv._textTools.update();
             $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
             $(e.target).addClass('ws-text-element-tools-a-selected');
@@ -222,6 +223,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
             let ratio = this._container.height() / this._container.width();
             textDiv._textTools.setCurrentSize(1);
             textDiv._textTools.setRatio(ratio);
+            textDiv._textTools.grabContent();
             textDiv._textTools.update();
             $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
             $(e.target).addClass('ws-text-element-tools-a-selected');
@@ -235,6 +237,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
             let ratio = this._container.height() / this._container.width();
             textDiv._textTools.setCurrentSize(2);
             textDiv._textTools.setRatio(ratio);
+            textDiv._textTools.grabContent();
             textDiv._textTools.update();
             $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
             $(e.target).addClass('ws-text-element-tools-a-selected');
@@ -246,13 +249,8 @@ export default class CWSPlayerDesign extends CWSPlayer {
             e.stopImmediatePropagation();
             $('#' + window.textId).focus();
             document.execCommand('Italic', false, null);
-        });
-
-        $('.ws-text-element-tools-i').on('click', (e) => {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            $('#' + window.textId).focus();
-            document.execCommand('Italic', false, null);
+            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
+            textDiv._textTools.grabContent();
         });
 
         $('.ws-text-element-tools-b').on('click', (e) => {
@@ -260,6 +258,8 @@ export default class CWSPlayerDesign extends CWSPlayer {
             e.stopImmediatePropagation();
             $('#' + window.textId).focus();
             document.execCommand('Bold', false, null);
+            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
+            textDiv._textTools.grabContent();
         });
 
         $('.ws-text-element-tools-ol').on('click', (e) => {
@@ -267,6 +267,8 @@ export default class CWSPlayerDesign extends CWSPlayer {
             e.stopImmediatePropagation();
             $('#' + window.textId).focus();
             document.execCommand('insertUnorderedList', false, null);
+            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
+            textDiv._textTools.grabContent();
         });
 
         let clEl = $('.ws-text-element-tools-color');
@@ -286,6 +288,8 @@ export default class CWSPlayerDesign extends CWSPlayer {
             // console.log(getComputedStyle($('.ws-text-element-tools-color')[0]).backgroundColor);
 
             document.execCommand('hiliteColor', false, getComputedStyle($('.ws-text-element-tools-color')[0]).backgroundColor);
+            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
+            textDiv._textTools.grabContent();
         });
         $('.ws-text-element-tools-color').on('mouseheld', (e) => {
             e.preventDefault();
@@ -341,20 +345,42 @@ export default class CWSPlayerDesign extends CWSPlayer {
                 if (that._options.onFocused) that._options.onFocused(e);
             },
             onSetTextData: function (e) {
-                for (let i = 0; i < that._elements.array.length; i++) {
-                    let el = that._elements.array[i];
-                    if (el.Data.trackElement == e.trackElId) {
-                        // elData.data = e.data
-                        if (that._options.onSetTextData) that._options.onSetTextData(e);
+                let elId = e.trackElId;
+                //let data = that._tracksWidget.getElementData(elId);
+
+                let tracks = that._getTracksList();
+                let element = null;
+                let track = null;
+                for (let i = 0; i < tracks.length; i++) {
+                    let tr = tracks[i];
+                    for (let j = 0; j < tr.elements.length; j++) {
+                        if (tr.elements[j].id == elId) {
+                            track = tr;
+                            element = tr.elements[j];
+                            break;
+                        }
+                    }
+
+                    if (track) {
+                        break;
                     }
                 }
 
+                if (element) {
+                    element.data = e.data;
+                    that._options.loader.changeElements(track.id, track.elements);
+                    that._prepareElements();
+
+                }
+
+                if (that._options.onSetTextData) that._options.onSetTextData(e);
             }
         }
     }
 
     _setDesignElementPosition(e) {
         this._options.loader.setElementPosition(e)
+        this._prepareElements();
     }
 
     addElement(trackId, elements) {
@@ -368,10 +394,10 @@ export default class CWSPlayerDesign extends CWSPlayer {
     }
 
     moveElements(e) {
-        var trackId = e.track;
-        var oldTrackId = e.oldTrackId;
-        var elemsData = e.elements;
-        var oldElementsData = e.oldTrackElements;
+        let trackId = e.track;
+        let oldTrackId = e.oldTrackId;
+        let elemsData = e.elements;
+        let oldElementsData = e.oldTrackElements;
 
         this._options.loader.changeElements(trackId, elemsData);
         if (trackId != oldTrackId) {
