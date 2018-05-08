@@ -78,7 +78,8 @@ class AuthLocal {
                 });
         });
 
-        app.get(config.authentication.activationRoute + "/:activationKey", (req, res) => {
+        // app.get(config.authentication.activationRoute + "/:activationKey", (req, res) => {
+        app.get("/api/activation/:activationKey", (req, res) => {
             UserActivate(req.params.activationKey, this._usersCache)
                 .then((user) => {
                     StdLogin(req, res, user, { message: "Activation key has expired." });

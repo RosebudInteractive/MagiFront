@@ -57,7 +57,12 @@ exports.UserRegister = (password, data, userCache) => {
             };
             return SendMail(MAIL_CFG_NAME, mailOptions)
                 .then((mailResult) => {
-                    return userCache.userToClientJSON(user);
+                    let _obj = userCache.userToClientJSON(user);
+                    if (mailResult && mailResult.msgUrl) {
+                        _obj.msgUrl = mailResult.msgUrl
+                    }
+
+                    return _obj;
                 });
         });
 };

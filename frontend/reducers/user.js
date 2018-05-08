@@ -22,6 +22,7 @@ const initialState = {
     name: '',
     email: '',
     error: null,
+    user: null,
 };
 
 export default function app(state = initialState, action) {

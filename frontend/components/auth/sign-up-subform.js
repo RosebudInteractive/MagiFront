@@ -44,7 +44,7 @@ let SignUpForm = class SignUpForm extends React.Component {
             // login: null,
             password1: null,
             password2: null,
-            captcha: null
+            captcha: true
         }
     }
 
@@ -81,24 +81,23 @@ let SignUpForm = class SignUpForm extends React.Component {
         const {invalid} = this.props;
 
         return (
-            <div className="register-block-wrapper">
+            <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                 {
                     this.state.screen === screens.email
                         ?
                         <div>
                             <ButtonsBlock/>
                             <span className="register-block-wrapper__label">или</span>
-                            <form className="form register-form"
-                                  onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
+                            <div className="form register-form">
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
                                     <SignUpButton disabled={invalid || !this.props.login} caption={'Зарегистрироваться'}
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         :
-                        <form className="form register-form">
+                        <div className="form register-form">
                             <Field name="username" component={UserNameEdit}/>
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>
@@ -109,10 +108,10 @@ let SignUpForm = class SignUpForm extends React.Component {
                             </div>
 
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
-                        </form>
+                        </div>
                 }
 
-            </div>
+            </form>
         )
 
 

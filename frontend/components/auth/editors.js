@@ -2,6 +2,36 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 // import {Field} from 'redux-form';
+export class Editor extends React.Component {
+    render() {
+        const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
+            _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
+
+        const {input, meta: {error, touched}} = this.props
+
+        return (
+            <div className="form__field-wrapper register-form__field-wrapper">
+                <label htmlFor="email" className="form__field-label register-form__field-label">Почта</label>
+                <input {...input} id="email" type="email"
+                       className="form__field register-form__field" placeholder="Ваш E-mail"/>
+                {
+                    touched ?
+                        <span className="status-icon">
+                                {error ?
+                                    <svg className="failure" width="16" height="16" style={{display: "block"}}
+                                         dangerouslySetInnerHTML={{__html: _failure}}/>
+                                    :
+                                    <svg className="success" width="20" height="20" style={{display: "block"}}
+                                         dangerouslySetInnerHTML={{__html: _checkGreen}}/>
+                                }
+                            </span> :
+                        null
+                }
+
+            </div>
+        );
+    }
+}
 
 export class LoginEdit extends React.Component {
 
