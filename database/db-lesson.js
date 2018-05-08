@@ -1523,6 +1523,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_obj.coverMeta(inpFields["CoverMeta"]);
                         if (typeof (inpFields["URL"]) !== "undefined")
                             lsn_obj.uRL(inpFields["URL"]);
+                        if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
+                            lsn_obj.isAuthRequired(inpFields["IsAuthRequired"]);
 
                         if (typeof (inpFields["State"]) !== "undefined")
                             lsn_lng_obj.state(inpFields["State"]);
@@ -1760,6 +1762,9 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["CoverMeta"] = inpFields["CoverMeta"];
                         if (typeof (inpFields["URL"]) !== "undefined")
                             fields["URL"] = inpFields["URL"];
+                        fields["IsAuthRequired"] = false;
+                        if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
+                            fields["IsAuthRequired"] = inpFields["IsAuthRequired"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);

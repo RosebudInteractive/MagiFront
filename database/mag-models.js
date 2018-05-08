@@ -148,6 +148,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("CoverMeta", { type: "string", allowNull: true })
             .addField("RawCoverMeta", { type: "string", allowNull: true })
+            .addField("IsAuthRequired", { type: "boolean", allowNull: false })
             .addField("URL", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("LessonLng", "7012a967-e186-43d8-b39c-1409b7f198b1", "RootLessonLng", "4dde1122-7556-4929-a81c-5c7679a5bbee")
@@ -237,6 +238,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("Name", { type: "string", allowNull: false })
             .addField("Description", { type: "string", allowNull: true })
+            .addField("AltAttribute", { type: "string", length: 255, allowNull: true })
             .addField("MetaData", { type: "string", allowNull: true })
             .addField("RawMetaData", { type: "string", allowNull: true });
 

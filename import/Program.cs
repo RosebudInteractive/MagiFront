@@ -413,7 +413,9 @@ namespace MagImport
             public string Cover { get; set; }
             public string CoverMeta { get; set; }
             public string RawCoverMeta { get; set; }
+            public bool IsAuthRequired { get; set; }
             public string URL { get; set; }
+            public LessonFields() { IsAuthRequired = false; }
         };
 
         public class Lesson : DataObjTyped<LessonFields, LessonRoot>
@@ -667,6 +669,7 @@ namespace MagImport
             public int LanguageId { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }
+            public string AltAttribute { get; set; }
             public string RawMetaData { get; set; }
             public string MetaData { get; set; }
         };
@@ -1929,6 +1932,8 @@ namespace MagImport
                                                 throw new Exception(String.Format("Picture (Id={0}): Description is empty.", picture_id));
                                             if (file_desc.TryGetValue("ExtDescription", out fn))
                                                 res_lng.Fields.Description = fn;
+                                            if (file_desc.TryGetValue("AltAttribute", out fn))
+                                                res_lng.Fields.AltAttribute = fn;
                                             if (file_desc.TryGetValue("MetaData", out fn))
                                             {
                                                 res_lng.Fields.RawMetaData = fn;
@@ -2265,11 +2270,15 @@ namespace MagImport
                 string meta_key = rdr.GetString("meta_key");
                 if (meta_key == attached_file_meta)
                     res["FileName"] = rdr.GetString("meta_value");
-                if (meta_key == attachment_metadata)
-                {
-                    raw_meta = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value"));
-                    res["MetaData"] = raw_meta.ToJSON();
-                }
+                else
+                    if (meta_key == attachment_image_alt)
+                        res["AltAttribute"] = rdr.GetString("meta_value");
+                    else
+                        if (meta_key == attachment_metadata)
+                        {
+                            raw_meta = MagisteryToJSON.MagJSONParse(rdr.GetString("meta_value"));
+                            res["MetaData"] = raw_meta.ToJSON();
+                        }
             }
             rdr.Close();
             return res;
@@ -2317,6 +2326,7 @@ namespace MagImport
 
         const string attached_file_meta = "_wp_attached_file";
         const string attachment_metadata = "_wp_attachment_metadata";
+        const string attachment_image_alt = "_wp_attachment_image_alt";
 
         const string sql_get_postmeta_val =
             "select `m`.`meta_value` from `wp_posts` `p`\n" +

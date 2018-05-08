@@ -5,13 +5,13 @@ const { ACCOUNT_ID } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const LESSON_FILE_MSSQL_REQ =
-    "select l.[Id] from[EpisodeLng] el\n" +
+    "select l.[Id], l.[IsAuthRequired] from[EpisodeLng] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
     "where el.[Audio] = '<%= file %>'";
     
 const LESSON_FILE_MYSQL_REQ =
-    "select l.`Id` from`EpisodeLng` el\n" +
+    "select l.`Id`, l.`IsAuthRequired` from`EpisodeLng` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `Lesson` l on l.`Id` = e.`LessonId`\n" +
     "where el.`Audio` = '<%= file %>'";
@@ -27,9 +27,13 @@ exports.AccessRights = class {
                 }
             }, {})
                 .then((result) => {
-                    let res = true;
+                    let res = false;
                     if (result && result.detail && (result.detail.length === 1))
-                        res = result.detail[0].Id ? true : false; // Temporary solution (field "Id" should be changed to another one)!!!
+                        res = result.detail[0].IsAuthRequired ? true : false;
+                    if (!res)
+                        res = true
+                    else
+                        res = user ? true : false;    
                     return res;
                 });
             resolve(canAccess);
