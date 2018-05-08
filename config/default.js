@@ -47,7 +47,7 @@ module.exports = {
         enabled: false,
         useJWT: false,
         useCapture: true,
-        activationRoute: "/activation",
+        activationRoute: "/activation-confirm",
         recoveryRoute: "/testrecovery",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
