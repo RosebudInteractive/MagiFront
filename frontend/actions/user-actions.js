@@ -66,7 +66,7 @@ export const setCaptcha = (value) => {
 export const loginViaFB = () => {
     return (dispatch) => {
         dispatch({
-            type: START_SIGN_IN,
+            type: SIGN_IN_START,
             payload: null
         });
 
@@ -75,13 +75,13 @@ export const loginViaFB = () => {
             .then(parseJSON)
             .then(data => {
                 dispatch({
-                    type: SUCCESS_SIGN_IN,
+                    type: SIGN_IN_SUCCESS,
                     payload: data
                 });
             })
             .catch((err) => {
                 dispatch({
-                    type: FAIL_SIGN_IN,
+                    type: SIGN_IN_FAIL,
                     payload: err
                 });
             });
@@ -90,7 +90,6 @@ export const loginViaFB = () => {
 
 export const login = (values) => {
     return (dispatch) => {
-        // let _userState = getState().user
 
         dispatch({
             type: SIGN_IN_START,
@@ -111,6 +110,11 @@ export const login = (values) => {
                 dispatch({
                     type: SIGN_IN_SUCCESS,
                     payload: data
+                });
+
+                dispatch({
+                    type: CLOSE_SIGN_IN_FORM,
+                    payload: null
                 });
             })
             .catch((error) => {
@@ -139,7 +143,7 @@ export const signUp = (values) => {
             credentials: 'include'
         })
             .then(checkStatus)
-            .then(parseJSON)
+            // .then(parseJSON)
             .then(data => {
                 dispatch({
                     type: SIGN_UP_SUCCESS,
@@ -158,7 +162,10 @@ export const signUp = (values) => {
 const checkStatus = (response) => {
     return new Promise((resolve, reject) => {
         if (response.status >= 200 && response.status < 300) {
-            resolve(response)
+            readResponseBody(response)
+                .then( data => {
+                    return data
+                })
         } else {
             readResponseBody(response)
                 .then( data => {
