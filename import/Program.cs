@@ -1206,7 +1206,7 @@ namespace MagImport
             providers.Add(provider.Fields.Code, provider);
 
             provider = new SNetProvider();
-            provider.Fields.Code = "vkontakte";
+            provider.Fields.Code = vk_code;
             provider.Fields.Name = "VKontakte";
             provider.Fields.URL = "http://vk.com";
             providers.Add(provider.Fields.Code, provider);
@@ -1267,12 +1267,14 @@ namespace MagImport
             int curr_id = -1;
             user = null;
             bool isFirstTime = true;
+            Dictionary<int, SNetProvider> curr_providers = new Dictionary<int, SNetProvider>();
 
             while (rdr.Read())
             {
                 int db_id = rdr.GetInt32("ID");
                 if (db_id != curr_id)
                 {
+                    curr_providers.Clear();
                     user = users.newUser();
                     users_mag.Add(db_id, user);
 
@@ -1291,54 +1293,70 @@ namespace MagImport
                 }
                 if (!rdr.IsDBNull(rdr.GetOrdinal("user_id")))
                 {
-                    string provider_code= String.IsNullOrEmpty(rdr.GetString("provider")) ? null : rdr.GetString("provider").ToLower();
+                    string provider_code = String.IsNullOrEmpty(rdr.GetString("provider")) ? null : rdr.GetString("provider").ToLower();
                     SNetProvider curr_provider = null;
                     if (!providers.TryGetValue(provider_code, out curr_provider))
                         throw new Exception(String.Format("Unknown provider \"{0}\" for user (Id={1})!", curr_provider, curr_id));
 
-                    if (isFirstTime)
+                    SNetProvider tmp_provider = null;
+                    if (!curr_providers.TryGetValue(curr_provider.Fields.Id, out tmp_provider))
                     {
-                        SNetProfile.AllData = allData;
-                        isFirstTime = false;
-                    }
+                        curr_providers.Add(curr_provider.Fields.Id, tmp_provider);
 
-                    SNetProfile profile = new SNetProfile();
-                    profile.Fields.UserId = user.fields.Id;
-                    profile.Fields.ProviderId = curr_provider.Fields.Id;
-                    profile.Fields.Identifier = String.IsNullOrEmpty(rdr.GetString("identifier")) ? null : rdr.GetString("identifier");
-                    profile.Fields.URL = String.IsNullOrEmpty(rdr.GetString("profileurl")) ? null : rdr.GetString("profileurl");
-                    profile.Fields.WebSite = String.IsNullOrEmpty(rdr.GetString("websiteurl")) ? null : rdr.GetString("websiteurl");
-                    profile.Fields.PhotoUrl = String.IsNullOrEmpty(rdr.GetString("photourl")) ? null : rdr.GetString("photourl");
-                    profile.Fields.DisplayName = String.IsNullOrEmpty(rdr.GetString("displayname")) ? null : rdr.GetString("displayname");
-                    profile.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
-                    profile.Fields.FirstName = String.IsNullOrEmpty(rdr.GetString("firstname")) ? null : rdr.GetString("firstname");
-                    if (profile.Fields.FirstName != null)
-                        profile.Fields.FirstName = profile.Fields.FirstName.Length > 50 ? profile.Fields.FirstName.Substring(0, 50) : profile.Fields.FirstName;
-                    profile.Fields.LastName = String.IsNullOrEmpty(rdr.GetString("lastname")) ? null : rdr.GetString("lastname");
-                    profile.Fields.Gender = String.IsNullOrEmpty(rdr.GetString("gender")) ? null : rdr.GetString("gender");
-                    profile.Fields.Language = String.IsNullOrEmpty(rdr.GetString("language")) ? null : rdr.GetString("language");
-                    if (!rdr.IsDBNull(rdr.GetOrdinal("age")))
-                    {
-                        int age;
-                        if (Int32.TryParse(rdr.GetString("age"), out age))
-                            profile.Fields.Age = age;
+                        if (isFirstTime)
+                        {
+                            SNetProfile.AllData = allData;
+                            isFirstTime = false;
+                        }
+
+                        SNetProfile profile = new SNetProfile();
+                        profile.Fields.UserId = user.fields.Id;
+                        profile.Fields.ProviderId = curr_provider.Fields.Id;
+                        profile.Fields.Identifier = String.IsNullOrEmpty(rdr.GetString("identifier")) ? null : rdr.GetString("identifier");
+                        profile.Fields.URL = String.IsNullOrEmpty(rdr.GetString("profileurl")) ? null : rdr.GetString("profileurl");
+                        profile.Fields.WebSite = String.IsNullOrEmpty(rdr.GetString("websiteurl")) ? null : rdr.GetString("websiteurl");
+                        profile.Fields.PhotoUrl = String.IsNullOrEmpty(rdr.GetString("photourl")) ? null : rdr.GetString("photourl");
+                        profile.Fields.DisplayName = String.IsNullOrEmpty(rdr.GetString("displayname")) ? null : rdr.GetString("displayname");
+                        profile.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
+                        profile.Fields.FirstName = String.IsNullOrEmpty(rdr.GetString("firstname")) ? null : rdr.GetString("firstname");
+                        if (profile.Fields.FirstName != null)
+                            profile.Fields.FirstName = profile.Fields.FirstName.Length > 50 ? profile.Fields.FirstName.Substring(0, 50) : profile.Fields.FirstName;
+                        profile.Fields.LastName = String.IsNullOrEmpty(rdr.GetString("lastname")) ? null : rdr.GetString("lastname");
+                        profile.Fields.Gender = String.IsNullOrEmpty(rdr.GetString("gender")) ? null : rdr.GetString("gender");
+                        profile.Fields.Language = String.IsNullOrEmpty(rdr.GetString("language")) ? null : rdr.GetString("language");
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("age")))
+                        {
+                            int age;
+                            if (Int32.TryParse(rdr.GetString("age"), out age))
+                                profile.Fields.Age = age;
+                        }
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
+                            profile.Fields.Age = rdr.GetInt32("birthday");
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
+                            profile.Fields.DayOfBirth = rdr.GetInt32("birthday");
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("birthmonth")))
+                            profile.Fields.MonthOfBirth = rdr.GetInt32("birthmonth");
+                        if (!rdr.IsDBNull(rdr.GetOrdinal("birthyear")))
+                            profile.Fields.YearOfBirth = rdr.GetInt32("birthyear");
+                        profile.Fields.Email = String.IsNullOrEmpty(rdr.GetString("email")) ? null : rdr.GetString("email");
+                        profile.Fields.EmailVerified = String.IsNullOrEmpty(rdr.GetString("emailverified")) ? null : rdr.GetString("emailverified");
+                        profile.Fields.Phone = String.IsNullOrEmpty(rdr.GetString("phone")) ? null : rdr.GetString("phone");
+                        profile.Fields.Address = String.IsNullOrEmpty(rdr.GetString("address")) ? null : rdr.GetString("address");
+                        profile.Fields.Country = String.IsNullOrEmpty(rdr.GetString("country")) ? null : rdr.GetString("country");
+                        profile.Fields.Region = String.IsNullOrEmpty(rdr.GetString("region")) ? null : rdr.GetString("region");
+                        profile.Fields.City = String.IsNullOrEmpty(rdr.GetString("city")) ? null : rdr.GetString("city");
+                        profile.Fields.Zip = String.IsNullOrEmpty(rdr.GetString("zip")) ? null : rdr.GetString("zip");
+
+                        if (String.Compare(provider_code, vk_code, true) == 0)
+                        {
+                            if ((profile.Fields.Identifier != null) && (user.fields.DisplayName != null))
+                            {
+                                if (String.Compare("id" + profile.Fields.Identifier, user.fields.DisplayName) == 0)
+                                    if ((profile.Fields.FirstName != null) && (profile.Fields.LastName != null))
+                                        user.fields.DisplayName = profile.Fields.FirstName + " " + profile.Fields.LastName;
+                            }
+                        }
                     }
-                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
-                        profile.Fields.Age = rdr.GetInt32("birthday");
-                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthday")))
-                        profile.Fields.DayOfBirth = rdr.GetInt32("birthday");
-                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthmonth")))
-                        profile.Fields.MonthOfBirth = rdr.GetInt32("birthmonth");
-                    if (!rdr.IsDBNull(rdr.GetOrdinal("birthyear")))
-                        profile.Fields.YearOfBirth = rdr.GetInt32("birthyear");
-                    profile.Fields.Email = String.IsNullOrEmpty(rdr.GetString("email")) ? null : rdr.GetString("email");
-                    profile.Fields.EmailVerified = String.IsNullOrEmpty(rdr.GetString("emailverified")) ? null : rdr.GetString("emailverified");
-                    profile.Fields.Phone = String.IsNullOrEmpty(rdr.GetString("phone")) ? null : rdr.GetString("phone");
-                    profile.Fields.Address = String.IsNullOrEmpty(rdr.GetString("address")) ? null : rdr.GetString("address");
-                    profile.Fields.Country = String.IsNullOrEmpty(rdr.GetString("country")) ? null : rdr.GetString("country");
-                    profile.Fields.Region = String.IsNullOrEmpty(rdr.GetString("region")) ? null : rdr.GetString("region");
-                    profile.Fields.City = String.IsNullOrEmpty(rdr.GetString("city")) ? null : rdr.GetString("city");
-                    profile.Fields.Zip = String.IsNullOrEmpty(rdr.GetString("zip")) ? null : rdr.GetString("zip");
                 }
             }
             rdr.Close();
@@ -2288,6 +2306,7 @@ namespace MagImport
         const int ACCOUNT_ID = 1;
         string conn_str;
 
+        const string vk_code = "vkontakte";
         const string sql_get_category =
             "select `t`.`term_id` as `id`, `t`.`name`, `m`.`description`, `t`.`slug` as `alias` from `wp_term_taxonomy` `m`\n" +
             "  join `wp_terms` `t` on `t`.`term_id`=`m`.`term_id`\n" +
@@ -2358,7 +2377,7 @@ namespace MagImport
             "  p.`phone`, p.`address`, p.`country`, p.`region`, p.`city`, p.`zip`\n" +
             "from `wp_users` u\n" +
             "  left join `wp_wslusersprofiles` p on p.user_id = u.id\n" +
-            "order by u.id";
+            "order by u.`ID`, p.`id` desc";
 
         const string sql_users_roles =
             "select `user_id`, `meta_value` from wp_usermeta\n" +
