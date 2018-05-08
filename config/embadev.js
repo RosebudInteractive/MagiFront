@@ -47,7 +47,7 @@ let options = {
     authentication: {
         enabled: true,
         useJWT: true,
-        useCapture: false,
+        useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },
