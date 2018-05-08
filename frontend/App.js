@@ -21,7 +21,7 @@ import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
-import SingInPopup from './containers/sign-in-form'
+import AuthPopup from './containers/auth-form'
 
 import Platform from 'platform';
 
@@ -151,7 +151,7 @@ class App extends Component {
                     <PageFooter/> : null}
                 {
                     this.props.showSignInForm ?
-                        <SingInPopup/>
+                        <AuthPopup/>
                         :
                         null
                 }

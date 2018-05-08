@@ -22,6 +22,7 @@ const initialState = {
     name: '',
     email: '',
     error: null,
+    user: null,
 };
 
 export default function app(state = initialState, action) {
@@ -35,7 +36,7 @@ export default function app(state = initialState, action) {
         case SIGN_IN_SUCCESS:
         case SIGN_UP_SUCCESS:
         case SIGN_OUT_SUCCESS:
-            return { ...state, loading: false, user: payload.user}
+            return { ...state, loading: false, user: Object.assign({}, payload)}
 
         case SWITCH_TO_SIGN_IN: {
             if (state.authorizationState !== AUTHORIZATION_STATE.START_SIGN_IN) {
