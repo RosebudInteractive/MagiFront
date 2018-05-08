@@ -53,7 +53,7 @@ let options = {
     },
     mail: {
         userReg: {
-            type: "smtp",
+            type: "test",//"smtp",
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
             sender: '"Magisteria" <' + process.env.YANDEX_USER + '@yandex.ru>',
@@ -69,7 +69,7 @@ let options = {
             }
         },
         pwdRecovery: {
-            type: "smtp",
+            type: "test",//"smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
             sender: '"Magisteria" <' + process.env.GMAIL_USER + '@gmail.com>',
