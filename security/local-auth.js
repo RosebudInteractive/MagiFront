@@ -68,6 +68,13 @@ class AuthLocal {
 
         app.post("/api/login", StdLoginProcessor('local', config.authentication.useCapture));
 
+        app.get("/api/whoami", (req, res) => {
+            if (req.user)
+                res.json(usersCache.userToClientJSON(req.user))
+            else
+                res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
+        });
+
         app.get("/api/logout", (req, res) => {
             AuthLocal.destroySession(req)
                 .then(() => {
