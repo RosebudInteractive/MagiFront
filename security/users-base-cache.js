@@ -532,12 +532,14 @@ exports.UsersBaseCache = class UsersBaseCache {
                     for (let i = 0; i < collection.count(); i++) {
                         let prof = collection.get(i);
                         if (prof.providerId() === providerId) {
-                            if (prof.identifier() === profile.identifier) {
+                            // Temporary skip identity check (NEED TO BE REFACTORED !!!)
+                            //
+                            // if (prof.identifier() === profile.identifier) {
                                 curr_prof = prof;
                                 break;
-                            }
-                            else
-                                throw new Error("UsersBaseCache::getUserByEmailOrCreate: Conflicting values of \"email\" and \"identifier\".");
+                            // }
+                            // else
+                            //     throw new Error("UsersBaseCache::getUserByEmailOrCreate: Conflicting values of \"email\" and \"identifier\".");
                         }
                     }
                     if (!curr_prof) {
