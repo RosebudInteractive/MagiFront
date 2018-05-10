@@ -74,6 +74,7 @@ module.exports = {
         facebook: {
             appId: '591000364592228',
             appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
+            redirectURL: '/',
             callBack: '/api/facebook/oauth',
             profileURL: 'https://graph.facebook.com/v2.12/me',
             profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
@@ -86,6 +87,7 @@ module.exports = {
         google: {
             appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
             appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
+            redirectURL: '/',
             callBack: '/api/google/oauth',
             // appId: '794235726914-7bkpl8nhtulqo4thna0kha48db611jg9.apps.googleusercontent.com',
             // appSecret: 'C28iY7NssUCe-yGgpS3wFSiW',
@@ -99,6 +101,7 @@ module.exports = {
             appSecret: 'LsrNgANtMnP0ofdT4dKB',
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
             apiVersion: '5.17',
+            redirectURL: '/',
             callBack: '/api/vk/oauth',
             passportOptions: {
                 display: 'popup',

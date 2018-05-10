@@ -68,7 +68,9 @@ class AuthVK {
         }
 
         app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
-        app.get(config.snets.vk.callBack, StdLoginProcessor('vkontakte'));
+        let processor = (!config.snets.vk.redirectURL) ? StdLoginProcessor('vkontakte') :
+            StdLoginProcessor('vkontakte', false, config.proxyServer.siteHost + config.snets.vk.redirectURL);
+        app.get(config.snets.vk.callBack, processor);
     }
 };
 

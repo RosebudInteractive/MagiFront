@@ -139,7 +139,7 @@ class AuthLocal {
     }
 };
 
-let StdLogin = (req, res, user, info) => {
+let StdLogin = (req, res, user, info, redirectUrl) => {
     if (!user) {
         AuthLocal.destroySession(req)
             .then(() => {
@@ -157,7 +157,10 @@ let StdLogin = (req, res, user, info) => {
                         message: err instanceof Error ? err.message : err.toString()
                     });
             }
-            res.json(usersCache.userToClientJSON(user));
+            if (redirectUrl)
+                res.redirect(redirectUrl)
+            else
+                res.json(usersCache.userToClientJSON(user));
         });
 }
 
@@ -178,7 +181,7 @@ let chechRecapture = (hasCapture, req, res, processor) => {
         });
 }
 
-let StdLoginProcessor = (strategy, hasCapture) => {
+let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
     return (req, res, next) => {
         chechRecapture(hasCapture, req, res, () => {
             passport.authenticate(strategy, (err, user, info) => {
@@ -193,7 +196,7 @@ let StdLoginProcessor = (strategy, hasCapture) => {
                         });
                 }
                 else
-                    StdLogin(req, res, user);
+                    StdLogin(req, res, user, null, redirectUrl);
             })(req, res, next);
         })
     }

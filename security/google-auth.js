@@ -54,7 +54,9 @@ class AuthGoogle {
         }
 
         app.get('/api/googlelogin', passport.authenticate('google', config.snets.google.passportOptions));
-        app.get(config.snets.google.callBack, StdLoginProcessor('google'));
+        let processor = (!config.snets.google.redirectURL) ? StdLoginProcessor('google') :
+            StdLoginProcessor('google', false, config.proxyServer.siteHost + config.snets.google.redirectURL);
+        app.get(config.snets.google.callBack, processor);
     }
 };
 
