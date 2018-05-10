@@ -137,7 +137,7 @@ export class LoginButton extends React.Component {
         const _login = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#login"/>'
 
         return <div className="register-form__buttons">
-            <a href="#" className="register-form__password-recovery">Забыли пароль?</a>
+            <div className="register-form__password-recovery" style={{cursor: "pointer"}} onClick={this.props.onStartRecovery}>Забыли пароль?</div>
             <button className={"btn btn--brown register-form__enter" + (this.props.disabled ? " disabled" : "")}
                     type={'submit'}>
                 <span className="text">{this.props.caption}</span>

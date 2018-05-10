@@ -217,7 +217,7 @@ class SignInBlock extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        authorized: state.user.authorized,
+        authorized: !!state.user.user,
     }
 }
 

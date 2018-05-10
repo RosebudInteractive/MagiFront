@@ -48,7 +48,7 @@ module.exports = {
         useJWT: false,
         useCapture: true,
         activationRoute: "/activation-confirm",
-        recoveryRoute: "/testrecovery",
+        recoveryRoute: "/recovery",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
         reCapture: {

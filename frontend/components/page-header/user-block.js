@@ -29,7 +29,7 @@ class userBlock extends React.Component {
         return(
             <div className={"user-block" + (this.state.showForm ? ' opened' : '')}>
                 <div className="user-block__header" onClick={::this._onClick}>
-                    <p className="user-block__name">this.props.user.DisplayName</p>
+                    <p className="user-block__name">{this.props.user.DisplayName}</p>
                 </div>
                 <ul className="user-tooltip">
                     <li>

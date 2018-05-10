@@ -4,7 +4,15 @@ import {
     SWITCH_TO_SIGN_IN,
     SWITCH_TO_SIGN_UP,
     SET_SIGN_IN_CAPTCHA,
-    SIGN_IN_START, SIGN_IN_SUCCESS, SIGN_IN_FAIL, SIGN_UP_START, SIGN_UP_SUCCESS, SIGN_UP_FAIL,
+    SIGN_IN_START,
+    SIGN_IN_SUCCESS,
+    SIGN_IN_FAIL,
+    SIGN_UP_START,
+    SIGN_UP_SUCCESS,
+    SIGN_UP_FAIL,
+    ACTIVATION_START,
+    ACTIVATION_SUCCESS,
+    ACTIVATION_FAIL, SWITCH_TO_RECOVERY_PASSWORD,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -40,6 +48,13 @@ export const switchToSignUp = () => {
     }
 };
 
+export const switchToRecoveryPassword = () => {
+    return {
+        type: SWITCH_TO_RECOVERY_PASSWORD,
+        payload: null
+    }
+};
+
 export const clearValidation = () => {
     return {
         type: SWITCH_TO_SIGN_UP,
@@ -62,15 +77,66 @@ export const setCaptcha = (value) => {
 }
 
 
-
 export const loginViaFB = () => {
+    // return (dispatch) => {
+    //     dispatch({
+    //         type: SIGN_IN_START,
+    //         payload: null
+    //     });
+    //
+    //     var request = new XMLHttpRequest();
+    //     request.open("GET", "/api/fblogin", true);
+    //     request.send();
+    //
+    //     request.onreadystatechange = function () {
+    //         if (this.readyState == this.HEADERS_RECEIVED) {
+    //
+    //             // Get the raw header string
+    //             var headers = request.getAllResponseHeaders();
+    //
+    //             // Convert the header string into an array
+    //             // of individual headers
+    //             var arr = headers.trim().split(/[\r\n]+/);
+    //
+    //             // Create a map of header names to values
+    //             var headerMap = {};
+    //             arr.forEach(function (line) {
+    //                 var parts = line.split(': ');
+    //                 var header = parts.shift();
+    //                 var value = parts.join(': ');
+    //                 headerMap[header] = value;
+    //             });
+    //         }
+    //     }
+    //
+    //     request.addEventListener('error', ev => {
+    //         console.error(ev)
+    //     })
+    // }
+
     return (dispatch) => {
         dispatch({
             type: SIGN_IN_START,
             payload: null
         });
 
-        fetch("/api/fblogin/", {credentials: 'include'})
+
+        var myInit = {
+            method: 'GET',
+            mode: 'no-cors',
+            // cache: 'default',
+            // redirect: 'manual',
+            credentials: 'include',
+            header: new Headers({
+                'Accept': '*',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Headers': '*',
+            })
+        };
+
+        var myRequest = new Request('/api/fblogin', myInit);
+
+        fetch(myRequest, myInit)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -98,11 +164,11 @@ export const login = (values) => {
 
         fetch("/api/login", {
             method: 'POST',
-                headers: {
+            headers: {
                 "Content-type": "application/json"
             },
             body: JSON.stringify(values),
-                credentials: 'include'
+            credentials: 'include'
         })
             .then(checkStatus)
             .then(parseJSON)
@@ -143,7 +209,7 @@ export const signUp = (values) => {
             credentials: 'include'
         })
             .then(checkStatus)
-            // .then(parseJSON)
+            .then(parseJSON)
             .then(data => {
                 dispatch({
                     type: SIGN_UP_SUCCESS,
@@ -159,16 +225,105 @@ export const signUp = (values) => {
     }
 }
 
+export const recoveryPassword = (values) => {
+    return (dispatch) => {
+        dispatch({
+            type: SIGN_UP_START,
+            payload: null
+        });
+
+        fetch("/api/recovery/" + values.email, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: SIGN_UP_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SIGN_UP_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+
+export const sendActivationKey = (key) => {
+    return (dispatch) => {
+
+        dispatch({
+            type: ACTIVATION_START,
+            payload: null
+        });
+
+        fetch("/api/activation/" + key, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: ACTIVATION_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: ACTIVATION_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const sendNewPassword = (values) => {
+    return (dispatch) => {
+        dispatch({
+            type: SIGN_UP_START,
+            payload: null
+        });
+
+        fetch("/api/pwdrecovery", {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: SIGN_UP_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SIGN_UP_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+
 const checkStatus = (response) => {
     return new Promise((resolve, reject) => {
-        if (response.status >= 200 && response.status < 300) {
-            readResponseBody(response)
-                .then( data => {
-                    return data
+        if (response.status === 0) {
+            console.log(response.type); // returns basic by default
+            response.blob()
+                .then((myBlob) => {
+                    let _url = URL.createObjectURL(myBlob)
+                    resolve(_url);
                 })
+        } else if (response.status >= 200 && response.status < 300) {
+            resolve(response)
         } else {
             readResponseBody(response)
-                .then( data => {
+                .then(data => {
                     let _message = response.statusText;
 
                     if (data) {

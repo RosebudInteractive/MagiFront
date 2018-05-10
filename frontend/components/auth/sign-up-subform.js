@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field, formValueSelector} from 'redux-form';
+    import {reduxForm, Field, formValueSelector} from 'redux-form';
 import ButtonsBlock from './buttons-block'
 import Captcha from './captcha'
 import {connect} from 'react-redux'
 import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton} from './editors'
-
 
 const validate = values => {
     const errors = {}
@@ -104,7 +103,7 @@ let SignUpForm = class SignUpForm extends React.Component {
 
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={!this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}/>
+                                <SignUpButton disabled={invalid || !this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
 
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>

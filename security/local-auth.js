@@ -99,9 +99,12 @@ class AuthLocal {
         });
 
         app.post("/api/pwdrecovery", (req, res) => {
+			console.log(JSON.stringify(req.body))
             chechRecapture(config.authentication.useCapture, req, res, () => {
-                let activationKey = req.body.activationKey;
+                console.log(JSON.stringify(req.body))
+				let activationKey = req.body.activationKey;
                 let password = req.body.password;
+				console.log('ak = ' + activationKey + ' pwd = ' + password)
                 this._usersCache.userPwdRecovery({ key: { ActivationKey: activationKey }, Password: password })
                     .then((user) => {
                         StdLogin(req, res, user, { message: "User Password Recovery: Unknown error." });

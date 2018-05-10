@@ -111,18 +111,7 @@ const _devConfig = {
     ],
     module: {
         rules: [
-            {
-                enforce: "pre",
-                test: /\.js$/,
-                loaders: ['eslint-loader'],
-                include: [
-                    path.resolve(__dirname, "src"),
-                    path.resolve(__dirname, "frontend"),
-                ],
-                exclude: [
-                    path.resolve(__dirname, 'scripts')
-                ]
-            },
+
             {
                 loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
                 include: [

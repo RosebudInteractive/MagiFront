@@ -22,6 +22,8 @@ import {pages} from "./tools/page-tools";
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
 import AuthPopup from './containers/auth-form'
+import AuthConfirmForm from './containers/auth-confirm-form'
+import PasswordConfirmForm from './containers/password-confirm-form'
 
 import Platform from 'platform';
 
@@ -132,11 +134,14 @@ class App extends Component {
         return (
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
+                <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
+                <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
+
             </Switch>
         )
     }

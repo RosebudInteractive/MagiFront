@@ -75,6 +75,8 @@
     "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^16.2.0",
     "react-easy-swipe": "0.0.13",
+    "react-facebook-login": "^4.0.1",
+    "react-icons": "^2.2.7",
     "react-intl": "^2.4.0",
     "react-recaptcha": "^2.3.7",
     "react-redux": "^5.0.6",
