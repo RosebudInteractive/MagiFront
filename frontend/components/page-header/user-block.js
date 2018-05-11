@@ -1,5 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import * as userActions from '../../actions/user-actions'
 // import PropTypes from 'prop-types';
 
 class userBlock extends React.Component {
@@ -39,10 +41,10 @@ class userBlock extends React.Component {
                         <a href="#">Настройки</a>
                     </li>
                     <li>
-                        <a href="#" className="logout-btn">
+                        <div className="logout-btn" style={{cursor: 'pointer'}} onClick={::this.props.userActions.logout}>
                             <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>
                             <span>Выйти</span>
-                        </a>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -57,4 +59,10 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(userBlock);
+function mapDispatchToProps(dispatch) {
+    return {
+        userActions: bindActionCreators(userActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(userBlock);

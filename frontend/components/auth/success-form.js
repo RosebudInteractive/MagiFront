@@ -11,13 +11,12 @@ class AuthConfirmForm extends React.Component {
     }
 
     componentWillMount(){
-        this.props.userActions.sendActivationKey(this.props.activationKey)
+        // this.props.userActions.sendActivationKey(this.props.activationKey)
     }
 
     render() {
-        let {error} = this.props;
-
-        // let _text = error ? <p>{'При активации произошла ошибка'} <br/>{error}</p> : <p>{'Активация прошла успшно'}</p>
+        let {user} = this.props,
+            _link = user ? user.PData.msgUrl : '#';
 
         return (
             <div className="popup js-popup _registration opened">
@@ -26,7 +25,7 @@ class AuthConfirmForm extends React.Component {
                     <div className="success-message">
                         <p className="success-message__text">Мы отправили письмо с дальнешими инструкциями на почту
                             mail@mail.com</p>
-                        <a href="#" className="success-message__check-link">Mail.com</a>
+                        <a href={_link} className="success-message__check-link">Открыть тестовое письмо</a>
                         <p className="success-message__note">Письмо не пришло?</p>
                         <a href="#" className="success-message__link">Отправить еще раз</a>
                     </div>
@@ -36,10 +35,9 @@ class AuthConfirmForm extends React.Component {
     }
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
     return {
-        error: state.user.error,
-        activationKey: ownProps.match.params.activationKey
+        user: state.user.user,
     }
 }
 

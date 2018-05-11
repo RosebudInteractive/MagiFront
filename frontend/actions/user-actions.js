@@ -12,7 +12,12 @@ import {
     SIGN_UP_FAIL,
     ACTIVATION_START,
     ACTIVATION_SUCCESS,
-    ACTIVATION_FAIL, SWITCH_TO_RECOVERY_PASSWORD,
+    ACTIVATION_FAIL,
+    SWITCH_TO_RECOVERY_PASSWORD,
+    LOGOUT_START,
+    LOGOUT_SUCCESS,
+    LOGOUT_FAIL,
+    SWITCH_TO_SIGN_UP_SUCCESS,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -77,66 +82,15 @@ export const setCaptcha = (value) => {
 }
 
 
-export const loginViaFB = () => {
-    // return (dispatch) => {
-    //     dispatch({
-    //         type: SIGN_IN_START,
-    //         payload: null
-    //     });
-    //
-    //     var request = new XMLHttpRequest();
-    //     request.open("GET", "/api/fblogin", true);
-    //     request.send();
-    //
-    //     request.onreadystatechange = function () {
-    //         if (this.readyState == this.HEADERS_RECEIVED) {
-    //
-    //             // Get the raw header string
-    //             var headers = request.getAllResponseHeaders();
-    //
-    //             // Convert the header string into an array
-    //             // of individual headers
-    //             var arr = headers.trim().split(/[\r\n]+/);
-    //
-    //             // Create a map of header names to values
-    //             var headerMap = {};
-    //             arr.forEach(function (line) {
-    //                 var parts = line.split(': ');
-    //                 var header = parts.shift();
-    //                 var value = parts.join(': ');
-    //                 headerMap[header] = value;
-    //             });
-    //         }
-    //     }
-    //
-    //     request.addEventListener('error', ev => {
-    //         console.error(ev)
-    //     })
-    // }
-
+export const whoAmI = () => {
     return (dispatch) => {
+
         dispatch({
             type: SIGN_IN_START,
             payload: null
         });
 
-
-        var myInit = {
-            method: 'GET',
-            mode: 'no-cors',
-            // cache: 'default',
-            // redirect: 'manual',
-            credentials: 'include',
-            header: new Headers({
-                'Accept': '*',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Headers': '*',
-            })
-        };
-
-        var myRequest = new Request('/api/fblogin', myInit);
-
-        fetch(myRequest, myInit)
+        fetch("/api/whoami", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -145,10 +99,10 @@ export const loginViaFB = () => {
                     payload: data
                 });
             })
-            .catch((err) => {
+            .catch((error) => {
                 dispatch({
                     type: SIGN_IN_FAIL,
-                    payload: err
+                    payload: {error}
                 });
             });
     }
@@ -215,6 +169,11 @@ export const signUp = (values) => {
                     type: SIGN_UP_SUCCESS,
                     payload: data
                 });
+
+                dispatch({
+                    type: SWITCH_TO_SIGN_UP_SUCCESS,
+                    payload: null
+                });
             })
             .catch((error) => {
                 dispatch({
@@ -240,6 +199,11 @@ export const recoveryPassword = (values) => {
                     type: SIGN_UP_SUCCESS,
                     payload: data
                 });
+
+                dispatch({
+                    type: SWITCH_TO_SIGN_UP_SUCCESS,
+                    payload: null
+                });
             })
             .catch((error) => {
                 dispatch({
@@ -249,7 +213,6 @@ export const recoveryPassword = (values) => {
             });
     }
 }
-
 
 export const sendActivationKey = (key) => {
     return (dispatch) => {
@@ -299,6 +262,11 @@ export const sendNewPassword = (values) => {
                     type: SIGN_UP_SUCCESS,
                     payload: data
                 });
+
+                dispatch({
+                    type: SWITCH_TO_SIGN_UP_SUCCESS,
+                    payload: null
+                });
             })
             .catch((error) => {
                 dispatch({
@@ -309,17 +277,36 @@ export const sendNewPassword = (values) => {
     }
 }
 
+export const logout = () => {
+    return (dispatch) => {
+
+        dispatch({
+            type: LOGOUT_START,
+            payload: null
+        });
+
+        fetch("/api/logout", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: LOGOUT_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: LOGOUT_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
 
 const checkStatus = (response) => {
     return new Promise((resolve, reject) => {
-        if (response.status === 0) {
-            console.log(response.type); // returns basic by default
-            response.blob()
-                .then((myBlob) => {
-                    let _url = URL.createObjectURL(myBlob)
-                    resolve(_url);
-                })
-        } else if (response.status >= 200 && response.status < 300) {
+        if (response.status >= 200 && response.status < 300) {
             resolve(response)
         } else {
             readResponseBody(response)

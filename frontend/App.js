@@ -15,6 +15,7 @@ import PageFooter from './components/page-footer/page-footer';
 
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
+import * as userActions from './actions/user-actions';
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -79,6 +80,10 @@ class App extends Component {
         }
 
         this.height = window.innerHeight;
+    }
+
+    componentWillMount() {
+        this.props.userActions.whoAmI()
     }
 
     componentDidMount() {
@@ -179,6 +184,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         appActions: bindActionCreators(appActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
