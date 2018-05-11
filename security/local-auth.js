@@ -7,6 +7,7 @@ const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
 const { UsersRedisCache } = require("./users-redis-cache");
 const { UserRegister } = require("./user-register");
+const { SendRegMail } = require("./user-register");
 const { UserActivate } = require("./user-activate");
 const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
@@ -81,7 +82,7 @@ class AuthLocal {
                     if (user)
                         res.json(user);
                     else
-                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User not found." });
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
                 })
                 .catch((err) => {
                     res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
@@ -148,6 +149,32 @@ class AuthLocal {
                         res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
                     });
             });
+        });
+
+        app.get("/api/reg-resend-mail/:id", (req, res) => {
+            let id = parseInt(req.params.id);
+            usersCache.getUserInfo(id, false, ["Id", "Email", "PData", "ActivationKey"])
+                .then((user) => {
+                    if (user) {
+                        if (user.PData && user.PData.roles && user.PData.roles.p && user.ActivationKey) {
+                            SendRegMail(usersCache, user, user.Email, user.ActivationKey)
+                                .then((result) => {
+                                    res.json(result);
+                                })
+                                .catch((err) => {
+                                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                                });
+                        }
+                        else {
+                            res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is already activated." });
+                        }
+                    }
+                    else
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
+                })
+                .catch((err) => {
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
         });
     }
 };

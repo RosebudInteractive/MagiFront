@@ -17,10 +17,12 @@ const STATUS_PENDING = 2;
 
 const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData"];
 const CONV_USER_DATA_FN = (rawUser) => {
-    try {
-        rawUser.PData = JSON.parse(rawUser.PData);
+    if (typeof (rawUser.PData) === "string") {
+        try {
+            rawUser.PData = JSON.parse(rawUser.PData);
+        }
+        catch (e) { rawUser.PData = {}; }
     }
-    catch (e) { rawUser.PData = {}; }
     return rawUser;
 };
 
@@ -677,8 +679,8 @@ exports.UsersBaseCache = class UsersBaseCache {
             });
     }
 
-    getUserInfo(condition, isClient) {
-        return $dbUser.getUser(condition, this._userFields)
+    getUserInfo(condition, isClient, fields) {
+        return $dbUser.getUser(condition, fields || this._userFields)
             .then(((result) => {
                 let rc = result;
                 if (result) {
