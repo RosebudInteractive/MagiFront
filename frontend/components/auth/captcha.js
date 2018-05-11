@@ -30,6 +30,7 @@ export default class Captcha extends React.Component {
                 verifyCallback ={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
                 theme="dark"
+                hl={'ru'}
             />
         );
     }

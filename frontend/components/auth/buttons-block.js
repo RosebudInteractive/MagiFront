@@ -2,8 +2,6 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
-import FacebookLogin from 'react-facebook-login';
-// import TiSocialFacebookCircular from 'react-icons/lib/ti/social-facebook-circular';
 import {AUTHORIZATION_STATE} from '../../constants/user'
 
 import * as userActions from '../../actions/user-actions'
@@ -48,15 +46,6 @@ class ButtonsBlock extends React.Component {
                     <span className="text">Facebook</span>
                 </button>
             </Link>
-            <FacebookLogin
-                appId="1584514044907807"
-                autoLoad={true}
-                fields="name,email,picture"
-                scope="email,public_profile"
-                callback={::this._responseFacebook}
-                cssClass="btn btn--white register-block__btn register-block__btn--fullwidth"
-                icon={<svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>}
-            />
         </div>
     }
 }
