@@ -75,6 +75,19 @@ class AuthLocal {
                 res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
         });
 
+        app.get("/api/get-activated-user/:activationKey", (req, res) => {
+            usersCache.getUserInfo({ field: "ActivationKey", op: "=", value: req.params.activationKey }, true)
+                .then((user) => {
+                    if (user)
+                        res.json(user);
+                    else
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User not found." });
+                })
+                .catch((err) => {
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
+        });
+
         app.get("/api/logout", (req, res) => {
             AuthLocal.destroySession(req)
                 .then(() => {

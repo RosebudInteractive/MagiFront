@@ -53,6 +53,15 @@ const USER_USERROLE_EXPRESSION = {
 
 exports.UsersBaseCache = class UsersBaseCache {
 
+    static UserToClientJSON(user) {
+        return {
+            Id: user.Id,
+            Name: user.Name,
+            DisplayName: user.DisplayName,
+            PData: user.PData
+        };
+    }
+
     constructor(opts) {
         let options = opts || {};
         this._loginField = options.loginField || LOGIN_FIELD;
@@ -68,12 +77,7 @@ exports.UsersBaseCache = class UsersBaseCache {
     }
 
     userToClientJSON(user) {
-        return {
-            Id: user.Id,
-            Name: user.Name,
-            DisplayName: user.DisplayName,
-            PData: user.PData
-        };
+        return UsersBaseCache.UserToClientJSON(user);
     }
 
     getSNProviderByCode(code) {
@@ -671,6 +675,19 @@ exports.UsersBaseCache = class UsersBaseCache {
                         }).bind(this));
                 return user;
             });
+    }
+
+    getUserInfo(condition, isClient) {
+        return $dbUser.getUser(condition, this._userFields)
+            .then(((result) => {
+                let rc = result;
+                if (result) {
+                    rc = this._convUserDataFn ? this._convUserDataFn(result) : result;
+                    if (isClient)
+                        rc = this.userToClientJSON(rc);
+                }
+                return rc;
+            }).bind(this));
     }
 
     checkToken(token, isNew) {
