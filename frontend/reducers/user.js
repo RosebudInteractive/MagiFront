@@ -17,12 +17,13 @@ import {
     ACTIVATION_SUCCESS,
     ACTIVATION_START,
     ACTIVATION_FAIL,
-    SWITCH_TO_RECOVERY_PASSWORD, RECOVERY_FAIL,
+    SWITCH_TO_RECOVERY_PASSWORD,
+    RECOVERY_FAIL,
     LOGOUT_START,
     LOGOUT_FAIL,
     LOGOUT_SUCCESS,
     SHOW_SIGN_IN_FORM,
-    SWITCH_TO_SIGN_UP_SUCCESS,
+    SWITCH_TO_SIGN_UP_SUCCESS, GET_ACTIVATION_USER_SUCCESS, GET_ACTIVATION_USER_FAIL, GET_ACTIVATION_USER_START,
 
 } from '../constants/user'
 
@@ -47,12 +48,14 @@ export default function app(state = initialState, action) {
         case SIGN_UP_START:
         case ACTIVATION_START:
         case LOGOUT_START:
+        case GET_ACTIVATION_USER_START:
             return {...state, error: null, loading: true};
 
         case SIGN_IN_SUCCESS:
         case SIGN_UP_SUCCESS:
         case SIGN_OUT_SUCCESS:
         case ACTIVATION_SUCCESS:
+        case GET_ACTIVATION_USER_SUCCESS:
             return {...state, loading: false, user: Object.assign({}, payload)}
 
         case LOGOUT_SUCCESS:
@@ -92,6 +95,7 @@ export default function app(state = initialState, action) {
         case ACTIVATION_FAIL:
         case RECOVERY_FAIL:
         case LOGOUT_FAIL:
+        case GET_ACTIVATION_USER_FAIL:
             return {...state, loading: false, error: payload.error.message, user: null}
 
         default:

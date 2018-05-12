@@ -17,7 +17,7 @@ import {
     LOGOUT_START,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
-    SWITCH_TO_SIGN_UP_SUCCESS,
+    SWITCH_TO_SIGN_UP_SUCCESS, GET_ACTIVATION_USER_START, GET_ACTIVATION_USER_SUCCESS, GET_ACTIVATION_USER_FAIL,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -208,6 +208,32 @@ export const recoveryPassword = (values) => {
             .catch((error) => {
                 dispatch({
                     type: SIGN_UP_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const getActivationUser = (key) => {
+    return (dispatch) => {
+
+        dispatch({
+            type: GET_ACTIVATION_USER_START,
+            payload: null
+        });
+
+        fetch("/api/get-activated-user/" + key, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: GET_ACTIVATION_USER_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: GET_ACTIVATION_USER_FAIL,
                     payload: {error}
                 });
             });
