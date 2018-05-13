@@ -78,7 +78,7 @@ class AuthFB {
 
         app.get('/api/fblogin', passport.authenticate('facebook', config.snets.facebook.passportOptions));
         let processor = (!config.snets.facebook.redirectURL) ? StdLoginProcessor('facebook') :
-            StdLoginProcessor('facebook', false, config.proxyServer.siteHost + config.snets.facebook.redirectURL);
+            StdLoginProcessor('facebook', false, config.snets.facebook.redirectURL);
         app.get(config.snets.facebook.callBack, processor);
     }
 };
