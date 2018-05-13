@@ -33,7 +33,7 @@ let PasswordConfirmForm = class PasswordConfirmForm extends React.Component {
     }
 
     componentWillMount() {
-        // this.props.userActions.sendActivationKey(this.props.activationKey)
+        this.props.userActions.getActivationUser(this.props.activationKey)
     }
 
     _handleSubmit(values) {
@@ -85,6 +85,7 @@ PasswordConfirmForm = reduxForm({
 function mapStateToProps(state, ownProps) {
     return {
         error: state.user.error,
+        user: state.user.user,
         activationKey: ownProps.match.params.activationKey
     }
 }
