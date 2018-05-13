@@ -1,22 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// import {Field} from 'redux-form';
-export class Editor extends React.Component {
+class Editor extends React.Component {
+
+    static propTypes = {
+        id: PropTypes.string,
+        type: PropTypes.string,
+        label: PropTypes.string,
+        placeholder: PropTypes.string,
+    };
+
     render() {
         const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
             _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
 
-        const {input, meta: {error, touched}} = this.props
+        const {input, meta: {error, touched}, id, type, label, placeholder} = this.props;
+        const _errorText = touched && error &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>{error}</p>
 
         return (
             <div className="form__field-wrapper register-form__field-wrapper">
-                <label htmlFor="email" className="form__field-label register-form__field-label">Почта</label>
-                <input {...input} id="email" type="email"
-                       className="form__field register-form__field" placeholder="Ваш E-mail"/>
+                <label htmlFor={id} className="form__field-label register-form__field-label">{label}</label>
+                <input {...input} id={id} type={type}
+                       className="form__field register-form__field" placeholder={placeholder}/>
                 {
                     touched ?
-                        <span className="status-icon">
+                            <span className="status-icon">
                                 {error ?
                                     <svg className="failure" width="16" height="16" style={{display: "block"}}
                                          dangerouslySetInnerHTML={{__html: _failure}}/>
@@ -24,78 +33,35 @@ export class Editor extends React.Component {
                                     <svg className="success" width="20" height="20" style={{display: "block"}}
                                          dangerouslySetInnerHTML={{__html: _checkGreen}}/>
                                 }
-                            </span> :
+                            </span>
+                        :
                         null
                 }
-
+                {_errorText}
             </div>
         );
     }
 }
 
-export class LoginEdit extends React.Component {
-
+export class LoginEdit extends Editor {
     render() {
-        const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
-            _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
-
-        const {input, meta: {error, touched}} = this.props
-
-        return (
-            <div className="form__field-wrapper register-form__field-wrapper">
-                <label htmlFor="email" className="form__field-label register-form__field-label">Почта</label>
-                <input {...input} id="email" type="email"
-                       className="form__field register-form__field" placeholder="Ваш E-mail"/>
-                {
-                    touched ?
-                        <span className="status-icon">
-                                {error ?
-                                    <svg className="failure" width="16" height="16" style={{display: "block"}}
-                                         dangerouslySetInnerHTML={{__html: _failure}}/>
-                                    :
-                                    <svg className="success" width="20" height="20" style={{display: "block"}}
-                                         dangerouslySetInnerHTML={{__html: _checkGreen}}/>
-                                }
-                            </span> :
-                        null
-                }
-
-            </div>
-        );
+        return <Editor label={'Почта'} placeholder={'Ваш E-mail'} type={'email'} {...this.props}/>;
     }
 }
 
-export class UserNameEdit extends React.Component {
-
+export class UserNameEdit extends Editor{
     render() {
-        const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
-            _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
-
-        const {input, meta: {error, touched}} = this.props
-
-        return (
-            <div className="form__field-wrapper register-form__field-wrapper">
-                <label htmlFor="username" className="form__field-label register-form__field-label">Представьтесь</label>
-                <input {...input} type="text" id="username" className="form__field register-form__field" placeholder="Ваше имя"/>
-                {
-                    touched ?
-                        <span className="status-icon">
-                                {error ?
-                                    <svg className="failure" width="16" height="16" style={{display: "block"}}
-                                         dangerouslySetInnerHTML={{__html: _failure}}/>
-                                    :
-                                    <svg className="success" width="20" height="20" style={{display: "block"}}
-                                         dangerouslySetInnerHTML={{__html: _checkGreen}}/>
-                                }
-                            </span> :
-                        null
-                }
-            </div>
-        );
+        return <Editor label={'Представьтесь'} placeholder={'Ваше имя'} type={'text'} {...this.props}/>;
     }
 }
 
-export class PasswordEdit extends React.Component {
+export class PasswordEdit extends Editor {
+    render() {
+        return <Editor label={'Пароль'} placeholder={'Пароль'} type={'password'} {...this.props}/>;
+    }
+}
+
+export class PasswordEditOld extends React.Component {
 
     render() {
         const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
@@ -137,7 +103,9 @@ export class LoginButton extends React.Component {
         const _login = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#login"/>'
 
         return <div className="register-form__buttons">
-            <div className="register-form__password-recovery" style={{cursor: "pointer"}} onClick={this.props.onStartRecovery}>Забыли пароль?</div>
+            <div className="register-form__password-recovery" style={{cursor: "pointer"}}
+                 onClick={this.props.onStartRecovery}>Забыли пароль?
+            </div>
             <button className={"btn btn--brown register-form__enter" + (this.props.disabled ? " disabled" : "")}
                     type={'submit'}>
                 <span className="text">{this.props.caption}</span>
