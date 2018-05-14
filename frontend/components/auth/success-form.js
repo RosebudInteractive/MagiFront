@@ -19,8 +19,7 @@ class AuthConfirmForm extends React.Component {
             _link = user ? user.PData.msgUrl : '#';
 
         return (
-            <div className="popup js-popup _registration opened">
-                <button className="popup-close js-popup-close">Закрыть</button>
+
                 <div className="register-block-wrapper">
                     <div className="success-message">
                         <p className="success-message__text">Мы отправили письмо с дальнешими инструкциями на почту
@@ -30,7 +29,6 @@ class AuthConfirmForm extends React.Component {
                         <a href="#" className="success-message__link">Отправить еще раз</a>
                     </div>
                 </div>
-            </div>
         )
     }
 }
