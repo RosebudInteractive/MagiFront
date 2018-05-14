@@ -17,7 +17,11 @@ import {
     LOGOUT_START,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
-    SWITCH_TO_SIGN_UP_SUCCESS, GET_ACTIVATION_USER_START, GET_ACTIVATION_USER_SUCCESS, GET_ACTIVATION_USER_FAIL,
+    SWITCH_TO_SIGN_UP_SUCCESS,
+    GET_ACTIVATION_USER_START,
+    GET_ACTIVATION_USER_SUCCESS,
+    GET_ACTIVATION_USER_FAIL,
+    RESEND_MESSAGE
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -138,10 +142,17 @@ export const login = (values) => {
                 });
             })
             .catch((error) => {
-                dispatch({
-                    type: SIGN_IN_FAIL,
-                    payload: {error}
-                });
+                if (error.message === '"Old style" user.') {
+                    dispatch({
+                        type: SWITCH_TO_RECOVERY_PASSWORD,
+                        payload: values
+                    })
+                } else {
+                    dispatch({
+                        type: SIGN_IN_FAIL,
+                        payload: {error}
+                    });
+                }
             });
     }
 }
@@ -151,7 +162,7 @@ export const signUp = (values) => {
 
         dispatch({
             type: SIGN_UP_START,
-            payload: null
+            payload: values
         });
 
         fetch("/api/register", {
@@ -188,7 +199,7 @@ export const recoveryPassword = (values) => {
     return (dispatch) => {
         dispatch({
             type: SIGN_UP_START,
-            payload: null
+            payload: {login : values.email}
         });
 
         fetch("/api/recovery/" + values.email, {credentials: 'include'})
@@ -326,6 +337,16 @@ export const logout = () => {
                     payload: {error}
                 });
             });
+    }
+}
+
+export const resendMessage = () =>{
+    return (dispatch) => {
+
+        dispatch({
+            type: RESEND_MESSAGE,
+            payload: null
+        });
     }
 }
 

@@ -42,14 +42,16 @@ export default function app(state = initialState, action) {
 
     switch (type) {
         case SHOW_SIGN_IN_FORM:
-            return {... state, error : null, loading: false,}
+            return {... state, error : null, loading: false, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN}
 
         case SIGN_IN_START:
-        case SIGN_UP_START:
         case ACTIVATION_START:
         case LOGOUT_START:
         case GET_ACTIVATION_USER_START:
-            return {...state, error: null, loading: true};
+            return {...state, error: null, loading: true, email: null};
+
+        case SIGN_UP_START:
+            return {...state, error: null, loading: true, email: payload.login};
 
         case SIGN_IN_SUCCESS:
         case SIGN_UP_SUCCESS:
@@ -63,7 +65,7 @@ export default function app(state = initialState, action) {
 
         case SWITCH_TO_SIGN_IN: {
             if (state.authorizationState !== AUTHORIZATION_STATE.START_SIGN_IN) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN};
+                return {...state, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN, error: null};
             } else {
                 return state
             }
@@ -71,21 +73,21 @@ export default function app(state = initialState, action) {
 
         case SWITCH_TO_SIGN_UP:
             if (state.authorizationState !== AUTHORIZATION_STATE.START_SIGN_UP) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.START_SIGN_UP};
+                return {...state, authorizationState: AUTHORIZATION_STATE.START_SIGN_UP, error: null};
             } else {
                 return state
             }
 
         case SWITCH_TO_SIGN_UP_SUCCESS:
             if (state.authorizationState !== AUTHORIZATION_STATE.SIGN_UP_SUCCESS) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.SIGN_UP_SUCCESS};
+                return {...state, authorizationState: AUTHORIZATION_STATE.SIGN_UP_SUCCESS, error: null};
             } else {
                 return state
             }
 
         case SWITCH_TO_RECOVERY_PASSWORD:
             if (state.authorizationState !== AUTHORIZATION_STATE.RECOVERY_PASSWORD) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.RECOVERY_PASSWORD};
+                return {...state, authorizationState: AUTHORIZATION_STATE.RECOVERY_PASSWORD, error: null, email: (payload ? payload.login : null)};
             } else {
                 return state
             }

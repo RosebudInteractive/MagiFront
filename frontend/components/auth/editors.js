@@ -14,18 +14,24 @@ class Editor extends React.Component {
         const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
             _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
 
-        const {input, meta: {error, touched}, id, type, label, placeholder} = this.props;
+        const {input, meta: {error, touched}, id, type, label, placeholder, text, disabled} = this.props;
         const _errorText = touched && error &&
             <p className="form__error-message js-error-message" style={{display: "block"}}>{error}</p>
 
         return (
             <div className="form__field-wrapper register-form__field-wrapper">
                 <label htmlFor={id} className="form__field-label register-form__field-label">{label}</label>
-                <input {...input} id={id} type={type}
-                       className="form__field register-form__field" placeholder={placeholder}/>
+                {disabled ?
+                    <input {...input} id={id} type={type} value={text}
+                           className="form__field register-form__field" placeholder={placeholder} disabled/>
+                    :
+                    <input {...input} id={id} type={type} value={text}
+                           className="form__field register-form__field" placeholder={placeholder}/>
+                }
+
                 {
                     touched ?
-                            <span className="status-icon">
+                        <span className="status-icon">
                                 {error ?
                                     <svg className="failure" width="16" height="16" style={{display: "block"}}
                                          dangerouslySetInnerHTML={{__html: _failure}}/>
@@ -49,7 +55,7 @@ export class LoginEdit extends Editor {
     }
 }
 
-export class UserNameEdit extends Editor{
+export class UserNameEdit extends Editor {
     render() {
         return <Editor label={'Представьтесь'} placeholder={'Ваше имя'} type={'text'} {...this.props}/>;
     }

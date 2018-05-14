@@ -21,6 +21,9 @@ const _prodConfig = {
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
+        }),
+        new webpack.DefinePlugin({
+            NODE_ENV: JSON.stringify(NODE_ENV)
         })
     ],
     module: {
@@ -107,6 +110,9 @@ const _devConfig = {
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
+        }),
+        new webpack.DefinePlugin({
+            NODE_ENV: JSON.stringify(NODE_ENV)
         })
     ],
     module: {
@@ -126,7 +132,7 @@ const _devConfig = {
             },
             {
                 test: /\.css$/,
-                loader: ["style-loader","css-loader"]
+                loader: ["style-loader", "css-loader"]
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,

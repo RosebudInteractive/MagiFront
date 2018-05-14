@@ -26,7 +26,8 @@ class PwdRecoveryForm extends React.Component {
     }
 
     static propTypes = {
-        onSubmit: PropTypes.func.require,
+        onSubmit: PropTypes.func,
+        email: PropTypes.string,
     };
 
     _handleSubmit(values) {
@@ -45,20 +46,21 @@ class PwdRecoveryForm extends React.Component {
     }
 
     render() {
-        const {invalid, serverError} = this.props;
+        const {invalid, serverError, email} = this.props;
         const _errorText = serverError &&
             <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
         return (
             <div className="register-block-wrapper">
-                <span className="register-block-wrapper__label">или</span>
+                <p className="register-block-wrapper__label">Восстановление пароля</p>
+                <p className="register-block-wrapper__note">{'Мы пришлем инструкции на ' + (email ? (' почту ' + email) : 'указанный адрес.')}</p>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
-                    <Field name="login" component={LoginEdit}/>
+                    <Field name="login" component={LoginEdit} id={'email'} text={email} disabled={!!email}/>
                     {_errorText}
+                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     <div className="register-form__buttons">
                         <SignUpButton disabled={invalid || !this.state.captcha} caption={'Отправить'} type={'submit'}/>
                     </div>
-                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                 </form>
             </div>
         )
@@ -66,6 +68,6 @@ class PwdRecoveryForm extends React.Component {
 }
 
 export default reduxForm({
-    form: 'SignInForm',
+    form: 'PasswordRecoveryForm',
     validate
 })(PwdRecoveryForm);

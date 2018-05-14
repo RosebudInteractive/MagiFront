@@ -61,8 +61,8 @@ class SignInForm extends React.Component {
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <LoginButton disabled={invalid || !this.state.captcha} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                     <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <LoginButton disabled={invalid || !this.state.captcha} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
             </div>
         )
