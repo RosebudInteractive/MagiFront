@@ -197,6 +197,16 @@ export default class CWSPlayerDesign extends CWSPlayer {
         }
     }
 
+    _setSize(sizeIdx, target) {
+        let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
+        textDiv._textTools.setCurrentSize(sizeIdx);
+        textDiv._textTools.grabContent();
+        textDiv._textTools.update();
+        $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
+        $(target).addClass('ws-text-element-tools-a-selected');
+        this._setRatio(this._player);
+    }
+
     _setTextToolsEvents() {
 
         console.log('_setTextToolsEvents');
@@ -204,44 +214,19 @@ export default class CWSPlayerDesign extends CWSPlayer {
         $('.ws-text-element-tools-a1').on('click', (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
-            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            let ratio = this._container.height() / this._container.width();
-            console.log('?');
-            textDiv._textTools.setCurrentSize(0);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.grabContent();
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
-            $(e.target).addClass('ws-text-element-tools-a-selected');
-            this._setRatio(this._player);
+            this._setSize(0, e.target);
         });
 
         $('.ws-text-element-tools-a2').on('click', (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
-            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            let ratio = this._container.height() / this._container.width();
-            textDiv._textTools.setCurrentSize(1);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.grabContent();
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
-            $(e.target).addClass('ws-text-element-tools-a-selected');
-            this._setRatio(this._player);
+            this._setSize(1, e.target);
         });
 
         $('.ws-text-element-tools-a3').on('click', (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
-            let textDiv = document.getElementById(window.textId);// $('#' + window.textId)[0];
-            let ratio = this._container.height() / this._container.width();
-            textDiv._textTools.setCurrentSize(2);
-            textDiv._textTools.setRatio(ratio);
-            textDiv._textTools.grabContent();
-            textDiv._textTools.update();
-            $('.ws-text-element-tools-a').each((index, item) => {$(item).removeClass('ws-text-element-tools-a-selected');});
-            $(e.target).addClass('ws-text-element-tools-a-selected');
-            this._setRatio(this._player);
+            this._setSize(2, e.target);
         });
 
         $('.ws-text-element-tools-i').on('click', (e) => {
@@ -386,11 +371,13 @@ export default class CWSPlayerDesign extends CWSPlayer {
     addElement(trackId, elements) {
         this._options.loader.changeElements(trackId, elements);
         this._prepareElements();
+        this.renderPosition(null);
     }
 
     editElement(trackId, elements) {
         this._options.loader.changeElements(trackId, elements);
         this._prepareElements();
+        this.renderPosition(null);
     }
 
     moveElements(e) {
@@ -404,20 +391,24 @@ export default class CWSPlayerDesign extends CWSPlayer {
             this._options.loader.changeElements(oldTrackId, oldElementsData);
         }
         this._prepareElements();
+        this.renderPosition(null);
     }
 
     deleteElement(elId) {
         this._options.loader.deleteElement(elId);
         this._prepareElements();
+        this.renderPosition(null);
     }
 
     addTrack(track) {
         this._options.loader.addTrack(track);
+        this.renderPosition(null);
     }
 
     deleteTrack(track) {
         this._options.loader.deleteTrack(track);
         this._prepareElements();
+        this.renderPosition(null);
     }
 
     getData() {

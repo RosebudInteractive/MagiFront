@@ -1039,14 +1039,11 @@ export default class CWSTracks extends CWSBase {
         } else if (type == "text") {
             element.data = {
                 title: "New text",
-                fileName: null,
                 type,
                 size: {width: 0, height: 0},
-                icon: null,
                 content: 'New text',
                 sizes: [60, 50, 40],
-                ratio: 0.5,
-                currentSize: 0,
+                currentSize: 2,
             }
             // this._newElemData = element;
         }

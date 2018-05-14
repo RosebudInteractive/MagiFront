@@ -1,5 +1,6 @@
 import CWSPlayerElementText from "./player-element-text";
 import CWSElementDesignTools from "work-shop/player-element-design-tools";
+import {etalonWidth} from "work-shop/player-element-text";
 
 export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
     _setEvents(item) {
@@ -60,7 +61,10 @@ export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
                 if (!overTools) {
                     textDiv.contentEditable = "false";
                     $(textToolsDiv).removeClass('ws-text-element-tools-show');
-                    if (item.hasClass('ui-draggable')) item.draggable('enable');
+                    if (item.hasClass('ui-draggable')) {
+                        item.draggable('enable');
+                        item.resizable('enable');
+                    }
                     document.removeEventListener('mousemove', mousemoveFn);
                     document.removeEventListener("selectionchange", selectionchangeFn);
                 }
@@ -72,6 +76,9 @@ export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
                 let data = that._options.data;
                 data.data.content = $(textDiv).html();
                 that._broadcastSetTextData();
+                if (overTools) {
+                    textDiv.focus();
+                }
             }, 50);
         });
 
@@ -82,13 +89,16 @@ export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
             window.textId = textDiv.id;
             textDiv.contentEditable = "true";
             item.draggable('disable');
+            item.resizable('disable');
+
             textDiv.focus();
             $(textToolsDiv).addClass('ws-text-element-tools-show');
             document.addEventListener('mousemove', mousemoveFn);
             document.addEventListener("selectionchange", selectionchangeFn);
             let oRect = window.getSelection().getRangeAt(0).getBoundingClientRect();
+            let ratio = this._container.width() / etalonWidth;
             $(textToolsDiv).css({
-                'top': oRect.top - 30,
+                'top': oRect.top - 30 - (2/ratio),
                 'left': oRect.right - $(textToolsDiv).width() / 2 - oRect.width / 2
             });
             $('.ws-text-element-tools-a').each((index, item) => {
@@ -109,7 +119,7 @@ export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
         });
 
         item.draggable({
-            start: (/*event, ui*/) => {
+            start: () => {
                 item.css({
                     bottom: null,
                     right: null,
@@ -121,7 +131,7 @@ export default class CWSPlayerElementTextDesign extends CWSPlayerElementText {
                 that._options.data.focused = true;
                 that._broadcastFocused();
             },
-            stop: (/*event, ui*/) => {
+            stop: () => {
                 item.css({
                     bottom: that._options.data.content.position.bottom + "%",
                     right: that._options.data.content.position.right + "%",

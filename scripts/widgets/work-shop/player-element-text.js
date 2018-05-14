@@ -1,5 +1,7 @@
 import CWSPlayerElement from "./player-element"
 
+export const etalonWidth = 1024;
+
 export default class CWSPlayerElementText extends CWSPlayerElement {
     constructor (container, options) {
         super(container, options);
@@ -19,8 +21,11 @@ export default class CWSPlayerElementText extends CWSPlayerElement {
 
         textDiv._textTools = {
             update: () => {
+                let fSize = data.data.sizes[data.data.currentSize];
+                let ratio = this._container.width() / etalonWidth;
                 textDiv.style.fontSize =
-                    (data.data.sizes[data.data.currentSize] * data.data.ratio) + 'px';
+                    (fSize * ratio) + 'px';
+                textDiv.style.padding = (5 * ratio) + "px";
             }
         };
 
