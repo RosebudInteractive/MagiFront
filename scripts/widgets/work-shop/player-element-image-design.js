@@ -1,4 +1,5 @@
 import CWSPlayerElementImage from "./player-element-image";
+import CWSElementDesignTools from "./player-element-design-tools";
 
 export default class CWSPlayerElementImageDesign extends CWSPlayerElementImage {
     _setEvents(item) {
@@ -27,13 +28,17 @@ export default class CWSPlayerElementImageDesign extends CWSPlayerElementImage {
                 this._broadcastPosition();
             },
             drag: (event, ui) => {
-                this._recalcPosition(event, ui);
+                this._options.data.content.position =
+                    CWSElementDesignTools.recalcPosition(
+                        this._container, this._options.data.content.position, event, ui
+                    );
             }
         }).resizable({
             handles: "n, e, s, w, ne, se, sw, nw",
             aspectRatio: item.height() ? item.width() / item.height() : 1,
             resize: (event, ui) => {
-                this._recalcSize(event, ui);
+                this._options.data.content.position =
+                    CWSElementDesignTools.recalcSize(this._container, event, ui);
             },
             stop: (event, ui) => {
                 ui.element.css({
@@ -126,16 +131,11 @@ export default class CWSPlayerElementImageDesign extends CWSPlayerElementImage {
     }
 
     _broadcastPosition() {
-        if (this._options.onSetPosition)
-            this._options.onSetPosition({
-                trackElId: this._options.data.trackElement,
-                position: {
-                    bottom: this._options.data.content.position.bottom,
-                    right: this._options.data.content.position.right,
-                    left: this._options.data.content.position.left,
-                    top: this._options.data.content.position.top
-                }
-            });
+        CWSElementDesignTools.broadcastPosition(
+            this._options.onSetPosition,
+            this._options.data.trackElement,
+            this._options.data.content.position
+        );
     }
 }
 //    }

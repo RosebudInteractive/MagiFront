@@ -213,15 +213,6 @@ export default class CWSPlayerElement extends CWSBase {
     _calcMaxSize() {
     }
 
-    _broadcastSetTextData() {
-        if (this._options.onSetTextData) {
-            this._options.onSetTextData({
-                trackElId: this._options.data.trackElement,
-                data: this._options.data.data
-            })
-        }
-    }
-
     renderPosition(position) {
         this._getItem();
         this._playState.position = position - this.Start;

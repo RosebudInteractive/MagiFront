@@ -45,7 +45,7 @@
   top: 17px;
   right: 0px;
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,00dbff+100&0+43,1+50,1+100 */
-  background: -moz-li/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#00dbff+0,00dbff+100&0+49,0+49,1+50,1+100 */
+  /*background: -moz-li Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#00dbff+0,00dbff+100&0+49,0+49,1+50,1+100 */
   background: -moz-linear-gradient(45deg, rgba(0,219,255,0) 0%, rgba(0,219,255,0) 49%, rgba(0,219,255,1) 50%, rgba(0,219,255,1) 100%); /* FF3.6-15 */
   background: -webkit-linear-gradient(45deg, rgba(0,219,255,0) 0%,rgba(0,219,255,0) 49%,rgba(0,219,255,1) 50%,rgba(0,219,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(45deg, rgba(0,219,255,0) 0%,rgba(0,219,255,0) 49%,rgba(0,219,255,1) 50%,rgba(0,219,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
@@ -104,7 +104,7 @@
 /* Скорость проигрывания */
 .ws-rate-select-wrapper {
   position: relative;
-  box-shadow: 0px 5px 9px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 5px 9px rgba(0, 0, 0, 0.4);
   left: 0;
   top: 0;
   width: 32px;
@@ -114,8 +114,8 @@
 /* Rectangle 37 */
 .ws-rate-select-holder {
   position: absolute;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   width: 32px;
   height: 118px;
   background: #2F2F2F;
@@ -125,7 +125,7 @@
 .ws-rate-select-value {
   pointer-events: none;
   position: absolute;
-  left: 0px;
+  left: 0;
   bottom: 0;
   width: 32px;
   height: 59px;
@@ -136,10 +136,10 @@
 .ws-rate-select-middle {
   pointer-events: none;
   position: absolute;
-  left: 0px;
+  left: 0;
   top: 59px;
   width: 32px;
-  height: 0px;
+  height: 0;
   border: 1px solid rgba(47, 47, 47, 0.2);
 }
 
@@ -148,7 +148,7 @@
 .ws-rate-select-text {
   pointer-events: none;
   position: absolute;
-  left: 0px;
+  left: 0;
   top: 14px;
   width: 32px;
   height: 13px;
@@ -183,7 +183,7 @@
   display: block;
   position: absolute;
   right: 4px;
-  top: 0px;
+  top: 0;
   width: 6px;
   background-color: #fff;
   opacity: 0.3;
@@ -202,7 +202,7 @@
   font-size: inherit;
   width: inherit;
   height: inherit;
-  padding: 35px 5px 5px 5px;
+  padding: 5px 5px 5px 5px;
   color: #fff;
   /*cursor: pointer;*/
 
@@ -220,7 +220,7 @@
   bottom:0;
   width: 264px;
   height: 36px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   background: #FFFFFF;
   border-radius: 25px;
   -webkit-transform: translate3d(0, 0, 0);
@@ -275,7 +275,7 @@
 .ws-text-element-tools-i {
   position: absolute;
   left: 116px;
-  top: 0px;
+  top: 0;
   width: 30px;
   height: 30px;
   font-family: PT Serif;
@@ -292,7 +292,7 @@
 .ws-text-element-tools-b {
   position: absolute;
   left: 151px;
-  top: 0px;
+  top: 0;
   width: 30px;
   height: 30px;
   font-family: PT Sans Caption;
@@ -341,7 +341,7 @@
 .ws-text-element-tools-sep {
   position: absolute;
   left: 111px;
-  top: 0px;
+  top: 0;
   width: 1px;
   height: 36px;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -372,7 +372,7 @@
   height: 85px;
   background: #FFFFFF;
   border: 4px solid #FFFFFF;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   top: -8px;
   left: 24px;
   position: absolute;
@@ -380,7 +380,6 @@
   padding-top: 8px;
   border-radius: 5px;
   display: none;
-  position: absolute;;
 }
 .ws-text-element-tools-color-arrow {
   position: absolute;
