@@ -179,7 +179,7 @@ export default class CWSPlayer extends CWSBase {
         }
 
         $('.ws-text-element').each((index, element) => {
-            element._textTools.setRatio(contRatio);
+            //element._textTools.setRatio(contRatio);
             element._textTools.update();
         });
     }
@@ -1106,8 +1106,10 @@ export default class CWSPlayer extends CWSBase {
                 return "image";
             else
                 return "text";
-        }
-        else
+        } else if (data.data) {
+            if (data.data.type && data.data.type == "text") return "text";
+            else return "image";
+        } else
             return "image";
 
     }

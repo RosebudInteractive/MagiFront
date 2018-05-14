@@ -18,14 +18,15 @@ class AuthWrapper extends React.Component {
         return (state === AUTHORIZATION_STATE.START_SIGN_IN) && <SignInSubform onSubmit={::this.props.userActions.login} serverError={this.props.error} onStartRecovery={::this.props.userActions.switchToRecoveryPassword}/> ||
                 (state === AUTHORIZATION_STATE.START_SIGN_UP) && <SignUpSubform onSubmit={::this.props.userActions.signUp} serverError={this.props.error}/> ||
                 (state === AUTHORIZATION_STATE.SIGN_UP_SUCCESS) && <SuccessForm onSubmit={::this.props.userActions.signUp} serverError={this.props.error}/> ||
-                (state === AUTHORIZATION_STATE.RECOVERY_PASSWORD) && <PwdRecoveryForm onSubmit={::this.props.userActions.recoveryPassword} serverError={this.props.error}/>
+                (state === AUTHORIZATION_STATE.RECOVERY_PASSWORD) && <PwdRecoveryForm onSubmit={::this.props.userActions.recoveryPassword} serverError={this.props.error} email={this.props.email}/>
     }
 }
 
 function mapStateToProps(state) {
     return {
         authorizationState: state.user.authorizationState,
-        error: state.user.error
+        error: state.user.error,
+        email: state.user.email,
     }
 }
 

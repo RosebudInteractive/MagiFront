@@ -33,7 +33,7 @@ let PasswordConfirmForm = class PasswordConfirmForm extends React.Component {
     }
 
     componentWillMount() {
-        // this.props.userActions.sendActivationKey(this.props.activationKey)
+        this.props.userActions.getActivationUser(this.props.activationKey)
     }
 
     _handleSubmit(values) {
@@ -53,23 +53,23 @@ let PasswordConfirmForm = class PasswordConfirmForm extends React.Component {
     }
 
     render() {
-        let {invalid, error} = this.props;
+        let {invalid, error, user} = this.props;
 
         let _text = error && <p>{'Произошла ошибка'} <br/>{error}</p>
 
         return (
             <div className="popup js-popup _registration opened">
                 <div className="register-block-wrapper">
+                    <span className="register-block-wrapper__label">{user ? user.DisplayName : ''}</span>
                     <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
-                        <Field name="password1" component={PasswordEdit}/>
-                        <Field name="password2" component={PasswordEdit}/>
-
+                        <Field name="password1" component={PasswordEdit} id={'password1'}/>
+                        <Field name="password2" component={PasswordEdit} id={'password2'}/>
+                        {_text}
+                        <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                         <div className="register-form__buttons">
                             <SignUpButton disabled={invalid || !this.state.captcha} caption={'Отправить'}
                                           type={'submit'}/>
                         </div>
-                        {_text}
-                        <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     </form>
                 </div>
             </div>
@@ -85,6 +85,7 @@ PasswordConfirmForm = reduxForm({
 function mapStateToProps(state, ownProps) {
     return {
         error: state.user.error,
+        user: state.user.user,
         activationKey: ownProps.match.params.activationKey
     }
 }

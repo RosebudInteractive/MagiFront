@@ -69,28 +69,28 @@ export default class CWSPropEditorText extends CWSPropEditor {
             parent.append(pItem);
         }
 
-        var resource = this._getResource(data);
+
 
         var content = pItem.children();
 
-        var bk = null;
-        if (resource.icon) bk = "url(" + resource.icon + ") no-repeat center center";
-
-        content.find(".icon")
-            .css({
-                "background": bk,
+        let ic = content.find(".icon");
+        ic.css({
                 "-webkit-background-size" : "cover",
                 "-moz-background-size: cover" : "cover",
                 "-o-background-size: cover" : "cover",
                 "background-size": "cover"
-            });
-        content.find(".left div").text(data.position.left.toFixed(2) + "%");
-        content.find(".right div").text(data.position.right.toFixed(2) + "%");
-        content.find(".top div").text(data.position.top.toFixed(2) + "%");
-        content.find(".bottom div").text(data.position.bottom.toFixed(2) + "%");
+        });
+        let d = $("<div/>");
+        d.addClass("text-icon").text("A");
+        ic.append(d);
+        content.find(".left div").text(data.content.position.left.toFixed(2) + "%");
+        content.find(".right div").text(data.content.position.right.toFixed(2) + "%");
+        content.find(".top div").text(data.content.position.top.toFixed(2) + "%");
+        content.find(".bottom div").text(data.content.position.bottom.toFixed(2) + "%");
     }
 
-    _renderEffect(parent, effect, i) {
+    _renderEffect(/*parent, effect, i*/) {
+        /*
         var template = CWSPropEditor.template("prop-editor-panel");
         var templateEditor = CWSPropEditor.template("prop-editor-zoom-panel");
 
@@ -111,13 +111,14 @@ export default class CWSPropEditorText extends CWSPropEditor {
         pItem.find("[role='start']").text(effect.start.toFixed(1))
         pItem.find("[role='duration']").text(effect.duration.toFixed(1))
         pItem.find("[role='acceleration']").text(effect.acceleration.toFixed(1))
+        */
     }
 
     _renderDescription(parent) {
         var template = CWSPropEditor.template("prop-editor-panel");
         var templateEditor = CWSPropEditor.template("prop-editor-desc-panel");
         var data = this._options.data;
-        data.description = data.description || "";
+        data.data.content = data.data.content || "";
 
         var pItem = parent.find(".ws-prop-panel[role='description-panel']");
         if (pItem.length == 0) {
@@ -126,7 +127,8 @@ export default class CWSPropEditorText extends CWSPropEditor {
             parent.append(pItem);
         }
 
-        pItem.find("[role='description']").text(data.description)
+        let tmpEl = $("<div>" + data.data.content + "</div>");
+        pItem.find("[role='description']").text(tmpEl.text());
     }
 
     _propChange(role, text) {

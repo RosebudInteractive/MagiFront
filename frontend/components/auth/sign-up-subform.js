@@ -100,16 +100,13 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Field name="username" component={UserNameEdit}/>
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>
-
+                            <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
                                 <SignUpButton disabled={invalid || !this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
-
-                            <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                         </div>
                 }
-
             </form>
         )
 

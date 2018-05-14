@@ -58,11 +58,11 @@ class SignInForm extends React.Component {
                 <ButtonsBlock/>
                 <span className="register-block-wrapper__label">или</span>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)} >
-                    <Field name="login" component={LoginEdit}/>
+                    <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <LoginButton disabled={invalid || !this.state.captcha} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                     <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <LoginButton disabled={invalid || !this.state.captcha} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
             </div>
         )

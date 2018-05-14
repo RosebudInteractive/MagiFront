@@ -1,4 +1,5 @@
 'use strict'
+const { URL, URLSearchParams } = require('url');
 const config = require('config');
 const passport = require('passport');
 const passportLocal = require('passport-local');
@@ -7,6 +8,7 @@ const { HttpCode } = require("../const/http-codes");
 const { UsersMemCache } = require("./users-mem-cache");
 const { UsersRedisCache } = require("./users-redis-cache");
 const { UserRegister } = require("./user-register");
+const { SendRegMail } = require("./user-register");
 const { UserActivate } = require("./user-activate");
 const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
@@ -75,6 +77,19 @@ class AuthLocal {
                 res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
         });
 
+        app.get("/api/get-activated-user/:activationKey", (req, res) => {
+            usersCache.getUserInfo({ field: "ActivationKey", op: "=", value: req.params.activationKey }, true)
+                .then((user) => {
+                    if (user)
+                        res.json(user);
+                    else
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
+                })
+                .catch((err) => {
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
+        });
+
         app.get("/api/logout", (req, res) => {
             AuthLocal.destroySession(req)
                 .then(() => {
@@ -136,29 +151,70 @@ class AuthLocal {
                     });
             });
         });
+
+        app.get("/api/reg-resend-mail/:id", (req, res) => {
+            let id = parseInt(req.params.id);
+            usersCache.getUserInfo(id, false, ["Id", "Email", "PData", "ActivationKey"])
+                .then((user) => {
+                    if (user) {
+                        if (user.PData && user.PData.roles && user.PData.roles.p && user.ActivationKey) {
+                            SendRegMail(usersCache, user, user.Email, user.ActivationKey)
+                                .then((result) => {
+                                    res.json(result);
+                                })
+                                .catch((err) => {
+                                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                                });
+                        }
+                        else {
+                            res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is already activated." });
+                        }
+                    }
+                    else
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
+                })
+                .catch((err) => {
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
+        });
     }
+};
+
+let buildRedirectUrl = (redirectUrl, errMsg) => {
+    let path = errMsg ? redirectUrl.error : redirectUrl.success;
+    const url = new URL(config.proxyServer.siteHost + path);
+    if(errMsg)
+        url.searchParams.append('message', errMsg);
+    return url.href;
 };
 
 let StdLogin = (req, res, user, info, redirectUrl) => {
     if (!user) {
         AuthLocal.destroySession(req)
             .then(() => {
-                res.status(HttpCode.ERR_UNAUTH).json(info);
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
+                else
+                    res.status(HttpCode.ERR_UNAUTH).json(info);
             })
             .catch((err) => {
-                res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, err.message))
+                else
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
             });
     }
     else
         req.logIn(user, (err) => {
             if (err) {
-                res.status(HttpCode.ERR_INTERNAL).json(
-                    {
-                        message: err instanceof Error ? err.message : err.toString()
-                    });
+                let msg = err instanceof Error ? err.message : err.toString();
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, msg))
+                else
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: msg });
             }
             if (redirectUrl)
-                res.redirect(redirectUrl)
+                res.redirect(buildRedirectUrl(redirectUrl))
             else
                 res.json(usersCache.userToClientJSON(user));
         });
@@ -188,11 +244,26 @@ let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
                 if (err || !user) {
                     AuthLocal.destroySession(req)
                         .then(() => {
-                            if (err) { return res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() }); }
-                            if (!user) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
+                            if (err) {
+                                if (redirectUrl)
+                                    res.redirect(buildRedirectUrl(redirectUrl, err.toString()))
+                                else
+                                    res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() });
+                                return;
+                            }
+                            if (!user) {
+                                if (redirectUrl)
+                                    res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
+                                else
+                                    res.status(HttpCode.ERR_UNAUTH).json(info);
+                                return;
+                            }
                         })
                         .catch((err) => {
-                            res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                            if (redirectUrl)
+                                res.redirect(buildRedirectUrl(redirectUrl, err.message))
+                            else
+                                res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
                         });
                 }
                 else

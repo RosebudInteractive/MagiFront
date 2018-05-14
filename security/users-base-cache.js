@@ -17,10 +17,12 @@ const STATUS_PENDING = 2;
 
 const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData"];
 const CONV_USER_DATA_FN = (rawUser) => {
-    try {
-        rawUser.PData = JSON.parse(rawUser.PData);
+    if (typeof (rawUser.PData) === "string") {
+        try {
+            rawUser.PData = JSON.parse(rawUser.PData);
+        }
+        catch (e) { rawUser.PData = {}; }
     }
-    catch (e) { rawUser.PData = {}; }
     return rawUser;
 };
 
@@ -53,6 +55,15 @@ const USER_USERROLE_EXPRESSION = {
 
 exports.UsersBaseCache = class UsersBaseCache {
 
+    static UserToClientJSON(user) {
+        return {
+            Id: user.Id,
+            Name: user.Name,
+            DisplayName: user.DisplayName,
+            PData: user.PData
+        };
+    }
+
     constructor(opts) {
         let options = opts || {};
         this._loginField = options.loginField || LOGIN_FIELD;
@@ -68,12 +79,7 @@ exports.UsersBaseCache = class UsersBaseCache {
     }
 
     userToClientJSON(user) {
-        return {
-            Id: user.Id,
-            Name: user.Name,
-            DisplayName: user.DisplayName,
-            PData: user.PData
-        };
+        return UsersBaseCache.UserToClientJSON(user);
     }
 
     getSNProviderByCode(code) {
@@ -671,6 +677,19 @@ exports.UsersBaseCache = class UsersBaseCache {
                         }).bind(this));
                 return user;
             });
+    }
+
+    getUserInfo(condition, isClient, fields) {
+        return $dbUser.getUser(condition, fields || this._userFields)
+            .then(((result) => {
+                let rc = result;
+                if (result) {
+                    rc = this._convUserDataFn ? this._convUserDataFn(result) : result;
+                    if (isClient)
+                        rc = this.userToClientJSON(rc);
+                }
+                return rc;
+            }).bind(this));
     }
 
     checkToken(token, isNew) {

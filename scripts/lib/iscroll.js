@@ -616,7 +616,6 @@ var IScroll = (function (window, document, Math) {
             clearTimeout(this.resizeTimeout);
 
             this.resizeTimeout = setTimeout(function () {
-                console.log("setTimeout iscroll 1");
                 that.refresh();
             }, this.options.resizePolling);
         },

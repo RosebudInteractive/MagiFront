@@ -1039,14 +1039,11 @@ export default class CWSTracks extends CWSBase {
         } else if (type == "text") {
             element.data = {
                 title: "New text",
-                fileName: null,
                 type,
                 size: {width: 0, height: 0},
-                icon: null,
-                content: '/images/queen1.jpg',
+                content: 'New text',
                 sizes: [60, 50, 40],
-                ratio: 0.5,
-                currentSize: 0,
+                currentSize: 2,
             }
             // this._newElemData = element;
         }
@@ -1526,6 +1523,21 @@ export default class CWSTracks extends CWSBase {
         let el = this._findElement(elementId);
         let pos = $.extend(true, {}, position);
         el.content.position = pos;
+    }
+
+    setTextElementData(elementId, data) {
+        let newData = $.extend(true, {}, data);
+
+        for (let i = 0; i < this._tracks.length; i++) {
+            let track = this._tracks[i];
+            for (let j = 0; j < track.elements.length; j++) {
+                if (track.elements[j].id == elementId) {
+                    track.elements[j].data = newData;
+                    break;
+                }
+            }
+        }
+
     }
 
     setFocused(elementId) {
