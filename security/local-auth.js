@@ -1,4 +1,5 @@
 'use strict'
+const { URL, URLSearchParams } = require('url');
 const config = require('config');
 const passport = require('passport');
 const passportLocal = require('passport-local');
@@ -179,26 +180,41 @@ class AuthLocal {
     }
 };
 
+let buildRedirectUrl = (redirectUrl, errMsg) => {
+    let path = errMsg ? redirectUrl.error : redirectUrl.success;
+    const url = new URL(config.proxyServer.siteHost + path);
+    if(errMsg)
+        url.searchParams.append('message', errMsg);
+    return url.href;
+};
+
 let StdLogin = (req, res, user, info, redirectUrl) => {
     if (!user) {
         AuthLocal.destroySession(req)
             .then(() => {
-                res.status(HttpCode.ERR_UNAUTH).json(info);
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
+                else
+                    res.status(HttpCode.ERR_UNAUTH).json(info);
             })
             .catch((err) => {
-                res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, err.message))
+                else
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
             });
     }
     else
         req.logIn(user, (err) => {
             if (err) {
-                res.status(HttpCode.ERR_INTERNAL).json(
-                    {
-                        message: err instanceof Error ? err.message : err.toString()
-                    });
+                let msg = err instanceof Error ? err.message : err.toString();
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl, msg))
+                else
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: msg });
             }
             if (redirectUrl)
-                res.redirect(redirectUrl)
+                res.redirect(buildRedirectUrl(redirectUrl))
             else
                 res.json(usersCache.userToClientJSON(user));
         });
@@ -228,11 +244,26 @@ let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
                 if (err || !user) {
                     AuthLocal.destroySession(req)
                         .then(() => {
-                            if (err) { return res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() }); }
-                            if (!user) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
+                            if (err) {
+                                if (redirectUrl)
+                                    res.redirect(buildRedirectUrl(redirectUrl, err.toString()))
+                                else
+                                    res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() });
+                                return;
+                            }
+                            if (!user) {
+                                if (redirectUrl)
+                                    res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
+                                else
+                                    res.status(HttpCode.ERR_UNAUTH).json(info);
+                                return;
+                            }
                         })
                         .catch((err) => {
-                            res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                            if (redirectUrl)
+                                res.redirect(buildRedirectUrl(redirectUrl, err.message))
+                            else
+                                res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
                         });
                 }
                 else
