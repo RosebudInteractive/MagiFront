@@ -538,14 +538,19 @@ exports.UsersBaseCache = class UsersBaseCache {
                     for (let i = 0; i < collection.count(); i++) {
                         let prof = collection.get(i);
                         if (prof.providerId() === providerId) {
-                            // Temporary skip identity check (NEED TO BE REFACTORED !!!)
-                            //
-                            // if (prof.identifier() === profile.identifier) {
+                            if (prof.identifier() === profile.identifier) {
                                 curr_prof = prof;
                                 break;
-                            // }
-                            // else
-                            //     throw new Error("UsersBaseCache::getUserByEmailOrCreate: Conflicting values of \"email\" and \"identifier\".");
+                            }
+                            else {
+                                if (prof.isOld() && (!prof.isUpdated())) {
+                                    prof.identifier(profile.identifier);
+                                    prof.isUpdated(true);
+                                    return root_obj.save();
+                                }
+                                else
+                                    throw new Error("UsersBaseCache::getUserByEmailOrCreate: Conflicting values of \"email\" and \"identifier\".");
+                            }
                         }
                     }
                     if (!curr_prof) {
@@ -567,7 +572,9 @@ exports.UsersBaseCache = class UsersBaseCache {
                             Address: profile.address,
                             Country: profile.country,
                             City: profile.city,
-                            Zip: profile.zip
+                            Zip: profile.zip,
+                            IsOld: false,
+                            IsUpdated: false
                         }
                         if (profile.photos && (profile.photos.length > 0) && profile.photos[0].value)
                             fields.PhotoUrl = profile.photos[0].value;

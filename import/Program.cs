@@ -791,6 +791,13 @@ namespace MagImport
             public string Region { get; set; }
             public string City { get; set; }
             public string Zip { get; set; }
+            public bool IsOld { get; set; }
+            public bool IsUpdated { get; set; }
+            public SNetProfileFields()
+            {
+                IsOld = true;
+                IsUpdated = false;
+            }
         };
 
         public class SNetProfile : DataObjTyped<SNetProfileFields, SNetProfileRoot>

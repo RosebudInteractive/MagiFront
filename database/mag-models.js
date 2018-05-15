@@ -70,7 +70,9 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Country", { type: "string", length: 50, allowNull: true })
             .addField("Region", { type: "string", length: 50, allowNull: true })
             .addField("City", { type: "string", length: 50, allowNull: true })
-            .addField("Zip", { type: "string", length: 50, allowNull: true });
+            .addField("Zip", { type: "string", length: 50, allowNull: true })
+            .addField("IsOld", { type: "boolean", allowNull: false })
+            .addField("IsUpdated", { type: "boolean", allowNull: false });
         
         metaDataMgr.addModel("UserRole", "86e022dd-13d9-4c9d-811c-76b2ac807cff", "RootUserRole", "87c43f07-15f7-47d3-9309-263c14d71959")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
