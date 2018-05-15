@@ -77,7 +77,8 @@ module.exports = {
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/facebook/oauth',
             profileURL: 'https://graph.facebook.com/v2.12/me',
-            profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
+            // profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
+            profileFields: ['id', 'about', 'email', 'name', 'photos'],
             passportOptions: {
                 display: 'popup',
                 scope: ['email', 'public_profile'] // don't require application review
