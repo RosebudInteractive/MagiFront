@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field} from 'redux-form';
+import {reduxForm, Field, change } from 'redux-form';
 import Captcha from './captcha'
 import {LoginEdit, SignUpButton} from './editors'
 
@@ -45,6 +45,11 @@ class PwdRecoveryForm extends React.Component {
         this.setState({captcha: null});
     }
 
+    componentDidMount() {
+        if (this.props.email)
+            this.props.dispatch(change('PasswordRecoveryForm', 'login', this.props.email));
+    }
+
     render() {
         const {invalid, serverError, email} = this.props;
         const _errorText = serverError &&
@@ -55,11 +60,11 @@ class PwdRecoveryForm extends React.Component {
                 <p className="register-block-wrapper__label">Восстановление пароля</p>
                 <p className="register-block-wrapper__note">{'Мы пришлем инструкции на ' + (email ? (' почту ' + email) : 'указанный адрес.')}</p>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
-                    <Field name="login" component={LoginEdit} id={'email'} text={email} disabled={!!email}/>
+                    <Field name="login" component={LoginEdit} id={'email'} disabled={!!email}/>
                     {_errorText}
                     <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     <div className="register-form__buttons">
-                        <SignUpButton disabled={invalid || !this.state.captcha} caption={'Отправить'} type={'submit'}/>
+                        <SignUpButton disabled={(!email && invalid) || !this.state.captcha} caption={'Отправить'} type={'submit'}/>
                     </div>
                 </form>
             </div>

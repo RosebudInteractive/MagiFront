@@ -22,3 +22,31 @@ export function readResponseBody(response) {
         return _reader.read().then(processText);
     })
 }
+
+export const checkStatus = (response) => {
+    return new Promise((resolve, reject) => {
+        if (response.status >= 200 && response.status < 300) {
+            resolve(response)
+        } else {
+            readResponseBody(response)
+                .then(data => {
+                    let _message = response.statusText;
+
+                    if (data) {
+                        let _serverError = JSON.parse(data);
+                        if (_serverError.hasOwnProperty('message')) {
+                            _message = _serverError.message;
+                        } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
+                            _message = _serverError.errors.join(',\n')
+                        }
+                    }
+                    let error = new Error(_message);
+                    reject(error)
+                })
+        }
+    })
+};
+
+export const parseJSON = (response) => {
+    return response.json()
+};

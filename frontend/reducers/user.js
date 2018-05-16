@@ -18,13 +18,24 @@ import {
     ACTIVATION_START,
     ACTIVATION_FAIL,
     SWITCH_TO_RECOVERY_PASSWORD,
+    SWITCH_TO_PASSWORD_CONFIRM,
     RECOVERY_FAIL,
     LOGOUT_START,
     LOGOUT_FAIL,
     LOGOUT_SUCCESS,
     SHOW_SIGN_IN_FORM,
-    SWITCH_TO_SIGN_UP_SUCCESS, GET_ACTIVATION_USER_SUCCESS, GET_ACTIVATION_USER_FAIL, GET_ACTIVATION_USER_START,
-
+    SWITCH_TO_SIGN_UP_SUCCESS,
+    GET_ACTIVATION_USER_SUCCESS,
+    GET_ACTIVATION_USER_FAIL,
+    GET_ACTIVATION_USER_START,
+    SWITCH_TO_RECOVERY_PASSWORD_MESSAGE,
+    SEND_NEW_PASSWORD_START,
+    SEND_NEW_PASSWORD_SUCCESS,
+    SEND_NEW_PASSWORD_FAIL,
+    SWITCH_TO_RECOVERY_PASSWORD_SUCCESS,
+    RECOVERY_PASSWORD_START,
+    RECOVERY_PASSWORD_SUCCESS,
+    RECOVERY_PASSWORD_FAIL,
 } from '../constants/user'
 
 const initialState = {
@@ -42,21 +53,25 @@ export default function app(state = initialState, action) {
 
     switch (type) {
         case SHOW_SIGN_IN_FORM:
-            return {... state, error : null, loading: false, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN}
+            return {...state, error: null, loading: false, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN}
 
         case SIGN_IN_START:
         case ACTIVATION_START:
         case LOGOUT_START:
+        case SEND_NEW_PASSWORD_START:
         case GET_ACTIVATION_USER_START:
             return {...state, error: null, loading: true, email: null};
 
         case SIGN_UP_START:
+        case RECOVERY_PASSWORD_START:
             return {...state, error: null, loading: true, email: payload.login};
 
         case SIGN_IN_SUCCESS:
         case SIGN_UP_SUCCESS:
         case SIGN_OUT_SUCCESS:
         case ACTIVATION_SUCCESS:
+        case RECOVERY_PASSWORD_SUCCESS:
+        case SEND_NEW_PASSWORD_SUCCESS:
         case GET_ACTIVATION_USER_SUCCESS:
             return {...state, loading: false, user: Object.assign({}, payload)}
 
@@ -85,9 +100,35 @@ export default function app(state = initialState, action) {
                 return state
             }
 
+        case SWITCH_TO_RECOVERY_PASSWORD_SUCCESS:
+            if (state.authorizationState !== AUTHORIZATION_STATE.RECOVERY_PASSWORD_SUCCESS) {
+                return {...state, authorizationState: AUTHORIZATION_STATE.RECOVERY_PASSWORD_SUCCESS, error: null};
+            } else {
+                return state
+            }
+
         case SWITCH_TO_RECOVERY_PASSWORD:
             if (state.authorizationState !== AUTHORIZATION_STATE.RECOVERY_PASSWORD) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.RECOVERY_PASSWORD, error: null, email: (payload ? payload.login : null)};
+                return {
+                    ...state,
+                    authorizationState: AUTHORIZATION_STATE.RECOVERY_PASSWORD,
+                    error: null,
+                    email: (payload ? payload.login : null)
+                };
+            } else {
+                return state
+            }
+
+        case SWITCH_TO_PASSWORD_CONFIRM:
+            if (state.authorizationState !== AUTHORIZATION_STATE.PASSWORD_CONFIRM) {
+                return {...state, authorizationState: AUTHORIZATION_STATE.PASSWORD_CONFIRM, error: null};
+            } else {
+                return state
+            }
+
+        case SWITCH_TO_RECOVERY_PASSWORD_MESSAGE:
+            if (state.authorizationState !== AUTHORIZATION_STATE.PASSWORD_CONFIRM_FINISHED) {
+                return {...state, authorizationState: AUTHORIZATION_STATE.PASSWORD_CONFIRM_FINISHED, error: null};
             } else {
                 return state
             }
@@ -95,8 +136,9 @@ export default function app(state = initialState, action) {
         case SIGN_IN_FAIL:
         case SIGN_UP_FAIL:
         case ACTIVATION_FAIL:
-        case RECOVERY_FAIL:
+        case RECOVERY_PASSWORD_FAIL:
         case LOGOUT_FAIL:
+        case SEND_NEW_PASSWORD_FAIL:
         case GET_ACTIVATION_USER_FAIL:
             return {...state, loading: false, error: payload.error.message, user: null}
 

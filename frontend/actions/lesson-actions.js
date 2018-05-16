@@ -102,6 +102,10 @@ export const getLessonText = (courseUrl, lessonUrl) => {
     }
 }
 
+export const updateLessonPositions = () => {
+
+}
+
 export const clearLessonPlayInfo = () => {
     return {
         type: CLEAR_LESSON_PLAY_INFO,

@@ -16,6 +16,7 @@ import PageFooter from './components/page-footer/page-footer';
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
+import * as playerActions from './actions/player-actions';
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -25,6 +26,7 @@ import SmallPlayer from "./containers/small-player";
 import AuthPopup from './containers/auth-form'
 import AuthConfirmForm from './containers/auth-confirm-form'
 import PasswordConfirmForm from './containers/password-confirm-form'
+import AuthErrorForm from './containers/auth-error-form'
 
 import Platform from 'platform';
 
@@ -83,7 +85,11 @@ class App extends Component {
     }
 
     componentWillMount() {
-        this.props.userActions.whoAmI()
+        let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
+            _recoveryRout = this.props.location.pathname.startsWith('/recovery')
+
+        if (!(_recoveryRout || _errorRout))
+            this.props.userActions.whoAmI()
     }
 
     componentDidMount() {
@@ -97,6 +103,8 @@ class App extends Component {
                 tooltips.removeClass('opened');
             }
         });
+
+        this.props.playerActions.startInit()
     }
 
     componentWillReceiveProps(nextProps) {
@@ -140,6 +148,7 @@ class App extends Component {
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
+                <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
@@ -185,6 +194,7 @@ function mapDispatchToProps(dispatch) {
     return {
         appActions: bindActionCreators(appActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        playerActions: bindActionCreators(playerActions, dispatch),
     }
 }
 

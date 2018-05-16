@@ -14,6 +14,7 @@ import {
     ACTIVATION_SUCCESS,
     ACTIVATION_FAIL,
     SWITCH_TO_RECOVERY_PASSWORD,
+    SWITCH_TO_PASSWORD_CONFIRM,
     LOGOUT_START,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
@@ -21,7 +22,15 @@ import {
     GET_ACTIVATION_USER_START,
     GET_ACTIVATION_USER_SUCCESS,
     GET_ACTIVATION_USER_FAIL,
-    RESEND_MESSAGE
+    RESEND_MESSAGE,
+    SEND_NEW_PASSWORD_START,
+    SEND_NEW_PASSWORD_SUCCESS,
+    SEND_NEW_PASSWORD_FAIL,
+    SWITCH_TO_RECOVERY_PASSWORD_SUCCESS,
+    SWITCH_TO_RECOVERY_PASSWORD_MESSAGE,
+    RECOVERY_PASSWORD_START,
+    RECOVERY_PASSWORD_SUCCESS,
+    RECOVERY_PASSWORD_FAIL,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -63,6 +72,14 @@ export const switchToRecoveryPassword = () => {
         payload: null
     }
 };
+
+export const switchToPasswordConfirm = () => {
+    return {
+        type: SWITCH_TO_PASSWORD_CONFIRM,
+        payload: null
+    }
+};
+
 
 export const clearValidation = () => {
     return {
@@ -198,7 +215,7 @@ export const signUp = (values) => {
 export const recoveryPassword = (values) => {
     return (dispatch) => {
         dispatch({
-            type: SIGN_UP_START,
+            type: RECOVERY_PASSWORD_START,
             payload: {login : values.email}
         });
 
@@ -207,18 +224,18 @@ export const recoveryPassword = (values) => {
             .then(parseJSON)
             .then(data => {
                 dispatch({
-                    type: SIGN_UP_SUCCESS,
+                    type: RECOVERY_PASSWORD_SUCCESS,
                     payload: data
                 });
 
                 dispatch({
-                    type: SWITCH_TO_SIGN_UP_SUCCESS,
+                    type: SWITCH_TO_RECOVERY_PASSWORD_SUCCESS,
                     payload: null
                 });
             })
             .catch((error) => {
                 dispatch({
-                    type: SIGN_UP_FAIL,
+                    type: RECOVERY_PASSWORD_FAIL,
                     payload: {error}
                 });
             });
@@ -280,7 +297,7 @@ export const sendActivationKey = (key) => {
 export const sendNewPassword = (values) => {
     return (dispatch) => {
         dispatch({
-            type: SIGN_UP_START,
+            type: SEND_NEW_PASSWORD_START,
             payload: null
         });
 
@@ -296,19 +313,24 @@ export const sendNewPassword = (values) => {
             .then(parseJSON)
             .then(data => {
                 dispatch({
-                    type: SIGN_UP_SUCCESS,
+                    type: SEND_NEW_PASSWORD_SUCCESS,
                     payload: data
                 });
 
                 dispatch({
-                    type: SWITCH_TO_SIGN_UP_SUCCESS,
+                    type: SWITCH_TO_RECOVERY_PASSWORD_MESSAGE,
                     payload: null
                 });
             })
             .catch((error) => {
                 dispatch({
-                    type: SIGN_UP_FAIL,
+                    type: SEND_NEW_PASSWORD_FAIL,
                     payload: {error}
+                });
+
+                dispatch({
+                    type: SWITCH_TO_RECOVERY_PASSWORD_MESSAGE,
+                    payload: null
                 });
             });
     }
@@ -340,13 +362,29 @@ export const logout = () => {
     }
 }
 
-export const resendMessage = () =>{
+export const resendMessage = (userId) =>{
     return (dispatch) => {
 
         dispatch({
             type: RESEND_MESSAGE,
-            payload: null
+            payload: userId
         });
+
+        fetch("/api/reg-resend-mail/" + userId, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: SIGN_UP_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SIGN_UP_FAIL,
+                    payload: {error}
+                });
+            });
     }
 }
 
@@ -362,7 +400,11 @@ const checkStatus = (response) => {
 
                     if (data) {
                         let _serverError = JSON.parse(data);
-                        _message = _serverError.message;
+                        if (_serverError.hasOwnProperty('message')) {
+                            _message = _serverError.message;
+                        } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
+                            _message = _serverError.errors.join(',\n')
+                        }
                     }
                     let error = new Error(_message);
                     reject(error)
