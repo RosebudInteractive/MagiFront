@@ -14,6 +14,10 @@ exports.LessonPositionsBase = class LessonPositionsBase {
         this._keyPrefix = opts.keyPrefix ? opts.keyPrefix : KEY_PREFIX;
     }
 
+    getAllLessonPositions(userId) {
+        return this._getAllPos(userId);
+    }
+
     setLessonPositions(userId, pos) {
         return new Promise((resolve) => {
             resolve(
@@ -30,17 +34,24 @@ exports.LessonPositionsBase = class LessonPositionsBase {
 
                         for (let lsnId in lessons) {
                             let cpos = currPos[lsnId];
+                            let t = 0;
+                            let ut = 0;
                             if (cpos) {
+                                t = cpos.t ? cpos.t : 0;
+                                ut = cpos.ut ? cpos.ut : 0;
                                 if (cpos.ts > resData.ts)
                                     resData.ts = cpos.ts;
                                 delete currPos[lsnId];
                             }
-                            if (lessons[lsnId].pos || lessons[lsnId].isFinished) {
-                                let pos = { id: lsnId, data: {} };
-                                if (lessons[lsnId].isFinished)
+                            let lpos = lessons[lsnId];
+                            if (lpos.pos || lpos.isFinished) {
+                                let dt = lpos.dt ? lpos.dt : 0;
+                                let r = lpos.r ? lpos.r : 1;
+                                let pos = { id: lsnId, data: { t: t + dt, ut: ut + (dt / r) } };
+                                if (lpos.isFinished)
                                     pos.data.isFinished = true
                                 else
-                                    pos.data.pos = lessons[lsnId].pos;
+                                    pos.data.pos = lpos.pos;
                                 newPos.push(pos);
                             }
                         }
