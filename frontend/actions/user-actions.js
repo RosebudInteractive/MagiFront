@@ -394,12 +394,13 @@ const checkStatus = (response) => {
         if (response.status >= 200 && response.status < 300) {
             resolve(response)
         } else {
-            readResponseBody(response)
+            // readResponseBody(response)
+            response.json()
                 .then(data => {
                     let _message = response.statusText;
 
                     if (data) {
-                        let _serverError = JSON.parse(data);
+                        let _serverError = data;
                         if (_serverError.hasOwnProperty('message')) {
                             _message = _serverError.message;
                         } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {

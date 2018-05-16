@@ -184,17 +184,24 @@ const convertToStorageFormat = (object) => {
 const mapToObject = (map) => {
     let _obj = Object.create(null);
 
-    for (let [key, value] of map) {
-        _obj[key] = value;
-    }
+    // for (let [key, value] of map) {
+    //     _obj[key] = value;
+    // }
+
+    map.forEach((value, key) => {
+        _obj[key] = value
+    })
 
     return _obj;
 }
 
 const objectToMap = (obj) => {
-    let strMap = new Map();
-    for (let key of Object.keys(obj)) {
+    let strMap = new Map(),
+        _keys = Object.keys(obj);
+
+    _keys.forEach((key) => {
         strMap.set(parseInt(key), obj[key]);
-    }
+    })
+
     return strMap;
 }
