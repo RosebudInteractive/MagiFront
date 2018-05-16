@@ -10,7 +10,6 @@ export default class LessonInfoStorage {
     }
 
     _init() {
-        this._saveForce();
         this._clearTimers();
 
         this._isUserAuthorized = !!store.getState().user.user;
@@ -127,6 +126,7 @@ export default class LessonInfoStorage {
             let _state = store.getState().lessonInfoStorage;
             if (_state.lessons.size > 0) {
                 let _dbObj = this._convertToDbFormat(_state.lessons)
+                console.log(JSON.stringify(_dbObj))
                 store.dispatch(storageActions.updateDbState(_dbObj))
             }
         }
@@ -142,18 +142,25 @@ export default class LessonInfoStorage {
 
         let lsn = {};
         object.forEach((value, key) => {
+            let _pos = Math.round(value.currentTime * 100) / 100;
+
             if (key === _playingLessonId) {
                 let _lessonsMap = _state.lessonInfoStorage.lessons,
                     _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
-                let _dt = _currentPosition - this._dtStart,
+                let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
                     _rate = _state.player.rate;
 
                 this._dtStart = undefined;
 
-                lsn[key] = {pos: value.currentTime, dt: _dt, r: _rate}
+
+                let _obj = {pos: _pos, dt: _dt}
+                if (_rate !== 1) {
+                    _obj.r = _rate
+                }
+                lsn[key] = _obj;
             } else {
-                lsn[key] = {pos: value.currentTime}
+                lsn[key] = {pos: _pos}
             }
 
         })
