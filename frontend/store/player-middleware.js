@@ -1,4 +1,4 @@
-import * as Player from '../components/player/nested-player';
+import * as Player from '../tools/player/nested-player';
 
 import {
     PLAYER_START_PLAY,

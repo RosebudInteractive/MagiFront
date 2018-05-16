@@ -31,6 +31,7 @@ let fullViewPort = null,
 class NestedPlayer {
 
     constructor(playingData, initState) {
+        // store.dispatch(playerActions.startInit())
         this._playingData = null;
         this._fullPlayer = null;
         this._setAssetsList(playingData);

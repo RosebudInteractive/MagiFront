@@ -1,4 +1,5 @@
 import {
+    PLAYER_START_INIT,
     PLAYER_PLAYED,
     PLAYER_PAUSED,
     PLAYER_STOPPED,
@@ -15,6 +16,13 @@ import {
     PLAYER_CLEAR_FULL_VIEWPORT,
     PLAYER_SET_BUFFERED_TIME,
 } from '../constants/player'
+
+export const startInit = () => {
+    return {
+        type: PLAYER_START_INIT,
+        payload: null
+    }
+}
 
 export const play = () => {
     return {

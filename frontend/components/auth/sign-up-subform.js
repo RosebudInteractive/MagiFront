@@ -77,7 +77,7 @@ let SignUpForm = class SignUpForm extends React.Component {
     }
 
     render() {
-        const {invalid} = this.props;
+        const {invalid, loading} = this.props;
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
@@ -90,7 +90,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <div className="form register-form">
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
-                                    <SignUpButton disabled={invalid || !this.props.login} caption={'Зарегистрироваться'}
+                                    <SignUpButton disabled={invalid || !this.props.login || loading} caption={'Зарегистрироваться'}
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={invalid || !this.state.captcha} caption={'Зарегистрироваться'} type={'submit'}/>
+                                <SignUpButton disabled={invalid || !this.state.captcha || loading} caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
                         </div>
                 }
@@ -119,19 +119,11 @@ SignUpForm = reduxForm({
     validate
 })(SignUpForm)
 
-const selector = formValueSelector('SignUpForm') // <-- same as form name
+const selector = formValueSelector('SignUpForm')
 SignUpForm = connect(
     state => {
-        // can select values individually
         const login = selector(state, 'login')
-        // const favoriteColorValue = selector(state, 'favoriteColor')
-        // or together as a group
-        // const { firstName, lastName } = selector(state, 'firstName', 'lastName')
-        return {
-            login,
-            // favoriteColorValue,
-            // fullName: `${firstName || ''} ${lastName || ''}`
-        }
+        return {login}
     }
 )(SignUpForm)
 

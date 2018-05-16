@@ -50,7 +50,7 @@ class SignInForm extends React.Component {
     }
 
     render() {
-        const {invalid, serverError} = this.props;
+        const {invalid, serverError, loading} = this.props;
         const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
         return (
@@ -62,7 +62,7 @@ class SignInForm extends React.Component {
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
                     <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
-                    <LoginButton disabled={invalid || !this.state.captcha} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
+                    <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
             </div>
         )
