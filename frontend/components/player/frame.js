@@ -111,9 +111,11 @@ class Frame extends Component {
     _initTimeOut() {
         if (!this.props.paused) {
             this._timer = setTimeout(() => {
-                this._firstTap = true;
-                $('body').addClass('fade');
-                $('.player-block__controls').removeClass('show')
+                if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
+                    this._firstTap = true;
+                    $('body').addClass('fade');
+                    $('.player-block__controls').removeClass('show')
+                }
             }, 7000);
         } else {
             this._timer = null
@@ -171,6 +173,7 @@ class Frame extends Component {
 
     _openContent() {
         if (!this._hideContentTooltip) {
+            this._clearTimeOut()
             this.setState({showContent: !this.state.showContent})
         } else {
             this._hideContentTooltip = false
@@ -179,6 +182,7 @@ class Frame extends Component {
 
     _openRate() {
         if (!this._hideRateTooltip) {
+            this._clearTimeOut()
             this.setState({showRate: !this.state.showRate})
         } else {
             this._hideRateTooltip = false
@@ -294,6 +298,7 @@ function mapStateToProps(state) {
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }
 

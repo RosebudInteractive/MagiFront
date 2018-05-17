@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
 
@@ -48,26 +48,35 @@ class Logo extends React.Component {
     }
 }
 
-class Navigator extends  React.Component {
+class Navigator extends React.Component {
 
     render() {
-        const _filter = '<use xlink:href="#filter"/>'
+        const _filter = '<use xlink:href="#filter"/>',
+            _isCoursesPage = this.props.currentPage.name === tools.pages.courses.name;
 
-        return(
+        return (
             <nav className="navigation">
                 <ul>
-                    <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''}>
+                    <li className={_isCoursesPage ? "current" : ''}>
                         <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
                     <li>
                         <a>Календарь</a>
                     </li>
-                    <li className={"filter" + (this.props.filterActive ? ' active' : '')} onClick={this.props.onFilterClick}>
-                        <a>
-                            <span className="hidden">Фильтры</span>
-                            <svg width="22" height="21" dangerouslySetInnerHTML={{__html: _filter}}/>
-                        </a>
-                    </li>
+                    {
+                        _isCoursesPage
+                            ?
+                            <li className={"filter" + (this.props.filterActive ? ' active' : '')}
+                                onClick={this.props.onFilterClick}>
+                                <a>
+                                    <span className="hidden">Фильтры</span>
+                                    <svg width="22" height="21" dangerouslySetInnerHTML={{__html: _filter}}/>
+                                </a>
+                            </li>
+                            :
+                            null
+                    }
+
                 </ul>
             </nav>
         )
@@ -75,20 +84,20 @@ class Navigator extends  React.Component {
 }
 
 class Languages extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
-            showPicker : false
+            showPicker: false
         }
     }
 
-    _onClick(){
+    _onClick() {
         let _newState = !this.state.showPicker;
-        this.setState({showPicker : _newState})
+        this.setState({showPicker: _newState})
     }
 
-    render () {
+    render() {
         return (
             <div className={"language-block" + (this.state.showPicker ? ' opened' : '')}>
                 <button type="button" className="language-indicator" onClick={::this._onClick}><span>Рус</span></button>
@@ -111,26 +120,26 @@ class Languages extends React.Component {
 
 class Search extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
         this.state = {
-            showForm : false
+            showForm: false
         }
     }
 
-    _showForm(){
-        this.setState({showForm : true})
+    _showForm() {
+        this.setState({showForm: true})
     }
 
     _closeForm() {
-        this.setState({showForm : false})
+        this.setState({showForm: false})
     }
 
     render() {
         const _search = '<use xlink:href="#search"/>'
 
-        return(
+        return (
             <div className={"search-block" + (this.state.showForm ? ' opened' : '')}>
                 {
                     this.state.showForm ?
@@ -149,62 +158,20 @@ class Search extends React.Component {
     }
 }
 
-// class UserBlock extends React.Component {
-//
-//     constructor(props){
-//         super(props);
-//
-//         this.state = {
-//             showForm : false
-//         }
-//     }
-//
-//     _onClick(){
-//         let _newState = !this.state.showForm;
-//         this.setState({showForm : _newState})
-//     }
-//
-//     render(){
-//         const _logout = '<use xlink:href="#logout"/>'
-//
-//         return(
-//             <div className={"user-block" + (this.state.showForm ? ' opened' : '')}>
-//                 <div className="user-block__header" onClick={::this._onClick}>
-//                     <p className="user-block__name">Борода Бородкин</p>
-//                 </div>
-//                 <ul className="user-tooltip">
-//                     <li>
-//                         <a href="#">История</a>
-//                     </li>
-//                     <li>
-//                         <a href="#">Настройки</a>
-//                     </li>
-//                     <li>
-//                         <a href="#" className="logout-btn">
-//                             <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>
-//                             <span>Выйти</span>
-//                         </a>
-//                     </li>
-//                 </ul>
-//             </div>
-//         )
-//     }
-// }
-
 class SignInBlock extends React.Component {
 
     static propTypes = {
         onButtonClick: PropTypes.func.isRequired
     }
 
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    render(){
+    render() {
         const _login = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#login"/>'
 
-        return(
+        return (
             <div className="user-block">
                 <button className="login-btn js-login" onClick={::this.props.onButtonClick}>
                     <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _login}}/>

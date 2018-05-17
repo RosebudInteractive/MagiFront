@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import $ from 'jquery'
+import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 
 export default class Gallery extends React.Component {
 
@@ -12,11 +14,18 @@ export default class Gallery extends React.Component {
         gallery: []
     };
 
+    componentDidMount() {
+        $('[data-fancybox]').fancybox();
+    }
+
     _getList() {
         return this.props.gallery.map((item, index) => {
-            return <Link to={'#'} className={'gallery-item'} key={index}>
+            let _number = index + 1,
+                _numberWithLeadZero = _number.toString().padStart(2, '0');
+
+            return <Link to={"gallery" + _numberWithLeadZero} data-src={"#gallery" + _numberWithLeadZero} data-fancybox="gallery-group" className="gallery-item" key={index}>
                 <div className="gallery-item__preview">
-                    <span className="number">{index + 1 + '.'}</span>
+                    <span className="number">{_number + '.'}</span>
                     <div className="gallery-item__image">
                         <img src={'/data/' + item.FileName}/>
                     </div>

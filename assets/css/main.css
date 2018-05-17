@@ -8506,7 +8506,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   .gallery-slide__image {
     padding-left: 120px;
     height: 100%;
-    width: 75%;
+    width: 100%;
     border-right: 1px solid #d5d6db;
     overflow: hidden; }
     @media (max-width: 1279px) {

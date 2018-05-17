@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import Gallery from './gallery';
+import GallerySlides from './gallery-slides';
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -17,6 +18,7 @@ export default class TranscriptPage extends React.Component {
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
                 <Gallery {...this.props}/>
+                <GallerySlides {...this.props}/>
             </div>
         )
     }
@@ -32,7 +34,8 @@ class TextBlock extends React.Component {
         const _re = /^<h2>(.+)<\/h2>/gim;
         let _matches;
 
-        let _text = episode.Transcript;
+        let _text = episode.Transcript,
+            _isFirstParagraph = true;
 
         while ((_matches = _re.exec(_text) ) !== null) {
             let _toc = episode.Toc.find((toc) => {
@@ -51,16 +54,29 @@ class TextBlock extends React.Component {
             }
 
             _content = _content.trim();
-            let _firstLetter = _content.slice(0, 1);
-            _content = _content.slice(1);
+            if (_isFirstParagraph) {
+                let _firstLetter = _content.slice(0, 1);
+                _content = _content.slice(1);
 
-            _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
-                <p className='text-intro'>
-                    <span className="first-letter">{_firstLetter}</span>
-                    <div dangerouslySetInnerHTML={{__html: _content}}/>
-                </p>
-            </div>)
+                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                    <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
+                    <p className='text-intro'>
+                        <span className="first-letter">{_firstLetter}</span>
+                        <div dangerouslySetInnerHTML={{__html: _content}}/>
+                    </p>
+                </div>)
+
+                _isFirstParagraph = false;
+            } else {
+                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                    <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
+                    <p className='text-intro'>
+                        <div dangerouslySetInnerHTML={{__html: _content}}/>
+                    </p>
+                </div>)
+            }
+
+
 
             _re.lastIndex = 0;
         }
