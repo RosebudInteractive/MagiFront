@@ -1,6 +1,7 @@
 'use strict'
 const _ = require('lodash');
 const randomstring = require('randomstring');
+const hasher = require('wordpress-hash-node');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
@@ -635,22 +636,35 @@ exports.UsersBaseCache = class UsersBaseCache {
                 let root_user = user.getParent();
                 if ((user.status() & STATUS_ACTIVE) === 0)
                     throw new UserLoginError(UserLoginError.REG_BLOCKED);
-                if(user.isOld())
-                    throw new UserLoginError(UserLoginError.REG_OLDSTYLE);
-                if ((user.status() & STATUS_PENDING) !== 0)
-                    if (user.expDate()) {
-                        let delta = user.expDate() - (new Date());
-                        if (delta < 0) {
-                            result = root_user.edit()
-                                .then(() => {
-                                    root_user.getCol("DataElements")._del(user);
-                                    return root_user.save();
-                                })
-                                .then(() => {
-                                    throw new UserLoginError(UserLoginError.REG_EXPIRED);
-                                });
+                if (user.isOld()) {
+                    let checked = hasher.CheckPassword(password, user.pwdHashOld());
+                    if (!checked)
+                        throw new UserLoginError(UserLoginError.AUTH_FAIL);
+                    result = root_user.edit()
+                        .then(() => {
+                            user.pwdHash($dbUser.getPwdHash(password, user));
+                            user.isOld(false);
+                            return root_user.save();
+                        })
+                        .then(() => {
+                            return ({ checked: true });
+                        })
+                }
+                else
+                    if ((user.status() & STATUS_PENDING) !== 0)
+                        if (user.expDate()) {
+                            let delta = user.expDate() - (new Date());
+                            if (delta < 0) {
+                                result = root_user.edit()
+                                    .then(() => {
+                                        root_user.getCol("DataElements")._del(user);
+                                        return root_user.save();
+                                    })
+                                    .then(() => {
+                                        throw new UserLoginError(UserLoginError.REG_EXPIRED);
+                                    });
+                            }
                         }
-                    }
                 resolve(result);
             });
         }

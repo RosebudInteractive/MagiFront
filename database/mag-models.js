@@ -44,7 +44,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("ActivationKey", { type: "string", length: 50, allowNull: true })
             .addField("Status", { type: "int", allowNull: true })
             .addField("IsOld", { type: "boolean", allowNull: true })
-            .addField("PData", { type: "string", allowNull: true });
+            .addField("PData", { type: "string", allowNull: true })
+            .addField("PwdHashOld", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("SNetProfile", "54c9008e-4916-4972-a5f3-7325d229df68", "RootSNetProfile", "45d677c1-9784-426a-b255-024eaa6f1ebc")
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })

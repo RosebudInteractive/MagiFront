@@ -861,6 +861,7 @@ namespace MagImport
             public int? Status { get; set; }
             public bool? IsOld { get; set; }
             public string PData { get { return _PData == null ? null : _PData.ToJSONString(); } }
+            public string PwdHashOld { get; set; }
             [JsonIgnore]
             public UserAccessRights _PData= new UserAccessRights();
             public UserFields()
@@ -1290,6 +1291,9 @@ namespace MagImport
                     user.fields.Email = String.IsNullOrEmpty(rdr.GetString("user_email")) ? null : rdr.GetString("user_email");
                     if (user.fields.Email == null)
                         throw new Exception(String.Format("User email (Id={0}) is empty!", db_id));
+                    user.fields.PwdHashOld = String.IsNullOrEmpty(rdr.GetString("user_pass")) ? null : rdr.GetString("user_pass");
+                    if (user.fields.PwdHashOld == null)
+                        throw new Exception(String.Format("User password (Id={0}) is empty!", db_id));
                     user.fields.URL = String.IsNullOrEmpty(rdr.GetString("user_url")) ? null : rdr.GetString("user_url");
                     user.fields.RegDate = null;
                     if (!rdr.IsDBNull(rdr.GetOrdinal("user_registered")))
@@ -2376,7 +2380,7 @@ namespace MagImport
             "order by `t`.`term_id`, `tc`.`term_id`";
 
         const string sql_users_profile =
-            "select u.`ID`, u.`user_login`, u.`user_nicename`, u.`user_email`, u.`user_url`, u.`user_registered`,\n" +
+            "select u.`ID`, u.`user_login`, u.`user_nicename`, u.`user_pass`, u.`user_email`, u.`user_url`, u.`user_registered`,\n" +
             "  u.`user_status`, u.`display_name`,\n" +
             "  p.`user_id`, p.`provider`, p.`identifier`, p.`profileurl`, p.`websiteurl`,\n" +
             "  p.`photourl`, p.`displayname`, p.`description`, p.`firstname`, p.`lastname`, p.`gender`,\n" +
