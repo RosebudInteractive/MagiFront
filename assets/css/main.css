@@ -8441,6 +8441,8 @@ body[data-page="fullpage-player"] .lectures-menu {
   max-height: 207px;
   max-width: -webkit-calc(100% - 26px);
   max-width: calc(100% - 26px);
+  background: no-repeat center;
+  background-size: contain;
   overflow: hidden; }
   @media (max-width: 1279px) {
     .gallery-item__image {
@@ -8462,6 +8464,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   max-width: 100%; }
   @media (max-width: 1279px) {
     .gallery-item img {
+      display: none;
       max-width: 1000px;
       max-height: 1000px; } }
 
@@ -8508,14 +8511,16 @@ body[data-page="fullpage-player"] .lectures-menu {
     height: 100%;
     width: 100%;
     border-right: 1px solid #d5d6db;
+    background: no-repeat center;
+    background-size: contain;
     overflow: hidden; }
     @media (max-width: 1279px) {
       .gallery-slide__image {
         position: relative;
-        padding-left: 41px;
-        padding-right: 41px;
+        margin-left: 41px;
+        margin-right: 41px;
         height: auto;
-        width: 100%;
+        width: auto;
         -webkit-box-flex: 1;
         -webkit-flex-grow: 1;
         -moz-box-flex: 1;

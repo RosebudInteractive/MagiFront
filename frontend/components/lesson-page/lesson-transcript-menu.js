@@ -13,6 +13,7 @@ export default class Menu extends React.Component {
         this.state = {
             opened: false,
             showToc: false,
+            showNavigationButtons: false,
         }
     }
 
@@ -32,6 +33,15 @@ export default class Menu extends React.Component {
         this.setState({showToc: !this.state.showToc})
     }
 
+    _switchNavigation() {
+        this.setState({showNavigationButtons : !this.state.showNavigationButtons})
+    }
+
+    componentWillMount(){
+        // if ($(window).width() > 1279) {
+        //     $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+        // }
+    }
 
     render() {
         const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>'
@@ -54,9 +64,9 @@ export default class Menu extends React.Component {
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
-                    <section className="lectures-menu__section lectures-menu-nav" style={{width: 350.109}}>
-                        <button className="lectures-menu-nav__trigger">Меню</button>
-                        <div className="lectures-menu-nav__list">
+                    <section className={"lectures-menu__section lectures-menu-nav"}>
+                        <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
+                        <div className={"lectures-menu-nav__list"  + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">
                                 <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
                                     onClick={::this._switchToc}>

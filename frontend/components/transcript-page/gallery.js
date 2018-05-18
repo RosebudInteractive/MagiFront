@@ -26,7 +26,7 @@ export default class Gallery extends React.Component {
             return <Link to={"gallery" + _numberWithLeadZero} data-src={"#gallery" + _numberWithLeadZero} data-fancybox="gallery-group" className="gallery-item" key={index}>
                 <div className="gallery-item__preview">
                     <span className="number">{_number + '.'}</span>
-                    <div className="gallery-item__image">
+                    <div className="gallery-item__image"  style={{backgroundImage: 'url(' + '/data/' + item.FileName + ')'}}>
                         <img src={'/data/' + item.FileName}/>
                     </div>
                     <p className="gallery-item__caption">{item.Name}<br/>{item.Description}</p>

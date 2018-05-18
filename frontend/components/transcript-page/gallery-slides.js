@@ -21,10 +21,10 @@ export default class Gallery extends React.Component {
     _getList() {
         return this.props.gallery.map((item, index) => {
             let _number = index + 1,
-                _numberWtihLeadZero = _number.toString().padStart(2, '0');
+                _numberWithLeadZero = _number.toString().padStart(2, '0');
 
-            return <div id={"gallery" + _numberWtihLeadZero} className="gallery-slide" style={{display: 'none'}}>
-                <div className="gallery-slide__image" style={{backgroundImage: 'url(' + '/data/' + item.FileName + ')', backgroundPosition: 'center', backgroundRepeat:'no-repeat', marginLeft: 10}}/>
+            return <div id={"gallery" + _numberWithLeadZero} className="gallery-slide" style={{display: 'none'}}>
+                <div className="gallery-slide__image" style={{backgroundImage: 'url(' + '/data/' + item.FileName + ')'}}/>
                 <p className="gallery-slide__caption">
                     <span className="number">{_number + '.'}</span>{item.Name}<br/>{item.Description}</p>
             </div>
