@@ -37,10 +37,12 @@ export default class Menu extends React.Component {
         this.setState({showNavigationButtons : !this.state.showNavigationButtons})
     }
 
-    componentWillMount(){
-        // if ($(window).width() > 1279) {
-        //     $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
-        // }
+    componentDidUpdate(){
+        if ($(window).width() > 1279) {
+            $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+        } else {
+            $('.js-lectures-menu-nav').css('width', '');
+        }
     }
 
     render() {
@@ -64,7 +66,7 @@ export default class Menu extends React.Component {
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
-                    <section className={"lectures-menu__section lectures-menu-nav"}>
+                    <section className={"lectures-menu__section lectures-menu-nav js-lectures-menu-nav"}>
                         <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
                         <div className={"lectures-menu-nav__list"  + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">

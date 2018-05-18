@@ -27,6 +27,7 @@ export default class Wrapper extends React.Component {
 
         return (
             <section className='fullpage-section lecture-wrapper'
+                     id={this.props.isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                      style={{
                          backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
                          // backgroundImage: "-webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")"
