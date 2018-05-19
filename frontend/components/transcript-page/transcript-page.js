@@ -55,10 +55,16 @@ class TextBlock extends React.Component {
 
             _content = _content.trim();
 
-            let _array = _content.split('\n');
+            let _array = _content.split('\r\n\r\n');
 
             _array.forEach((item, index) => {
                 let _paragraph = item;
+
+                _paragraph.trim();
+                if (_paragraph.length === 0) {
+                    return
+                }
+
                 if (_isFirstParagraph) {
                     let _firstLetter = _paragraph.slice(0, 1);
                     _paragraph = _content.slice(1);
@@ -74,9 +80,7 @@ class TextBlock extends React.Component {
                     _isFirstParagraph = false;
                 } else {
                     if (index > 0) {
-                        _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                            <p dangerouslySetInnerHTML={{__html: _paragraph}}/>
-                        </div>)
+                        _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
                     } else {
                         _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                             <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
@@ -88,9 +92,6 @@ class TextBlock extends React.Component {
 
                 }
             })
-
-
-
 
             _re.lastIndex = 0;
         }
