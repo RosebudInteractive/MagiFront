@@ -10,6 +10,7 @@ class CourseLessons extends React.Component {
         return this.props.course.Lessons.map((lesson, index) => {
             return lesson.State === 'R' ?
                 <LessonFull
+                    id={lesson.Id}
                     title={lesson.Name}
                     url={'../' + this.props.courseUrl + '/' + lesson.URL}
                     courseUrl={this.props.courseUrl}
@@ -17,6 +18,7 @@ class CourseLessons extends React.Component {
                     descr={lesson.ShortDescription}
                     cover={lesson.Cover}
                     duration={lesson.DurationFmt}
+                    totalDuration={lesson.Duration}
                     subLessons={lesson.NSub}
                     refs={lesson.NRefBooks}
                     books={lesson.NBooks}
