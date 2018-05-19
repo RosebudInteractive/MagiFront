@@ -30,7 +30,8 @@ class PlayBlock extends React.Component {
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
-            _timeLineLength = 2 * 3.14 * _playedPart * _radius;
+            _timeLineLength = 2 * 3.14 * _playedPart * _radius,
+            _offset = 2 * 3.14 * 0.25 * _radius;
 
 
         if (this._redirect) {
@@ -42,13 +43,12 @@ class PlayBlock extends React.Component {
             <div className="lecture-full__play-block">
                 <div className="play-block play-block--big">
                     <div className="play-block__image-wrapper" style={{backgroundImage: 'url(/data/' + this.props.cover + ')'}}/>
-                    <div className="play-block__loader" id="cont" data-pct="100">
+                    <div className="play-block__loader">
                         <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200"
                              version="1.1" xmlns="http://www.w3.org/2000/svg">
-                            <circle r={_radius} cx="100" cy="100" fill="transparent" strokeDasharray={0}
-                                    strokeDashoffset={0}/>
                             <circle className="bar" id="bar" r={_radius} cx="100" cy="100" fill="transparent"
                                     strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                    strokeDashoffset={_offset}
                             />
                         </svg>
                     </div>

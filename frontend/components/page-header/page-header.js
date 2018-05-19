@@ -19,6 +19,13 @@ class Header extends React.Component {
         this._isMobile = tools.isMobile.bind(this);
     }
 
+    componentDidUpdate() {
+        let _isCoursesPage = this.props.pageHeaderState.currentPage.name === tools.pages.courses.name;
+        if (!_isCoursesPage && this.props.pageHeaderState.showFiltersForm) {
+            this.props.pageHeaderActions.hideFiltersForm()
+        }
+    }
+
     _onClickMenuTrigger() {
         this.props.pageHeaderState.showMenu ? this.props.pageHeaderActions.hideMenu() : this.props.pageHeaderActions.showMenu();
     }

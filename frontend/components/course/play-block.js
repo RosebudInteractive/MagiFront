@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Redirect} from 'react-router';
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 
 class PlayBlock extends React.Component {
@@ -28,14 +28,15 @@ class PlayBlock extends React.Component {
 
     render() {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
-            _radius = 98.25;
+            _radius = 97.25;
 
         let {id, totalDuration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
-            _timeLineLength = 2 * 3.14 * _playedPart * _radius;
+            _timeLineLength = 2 * 3.14 * _playedPart * _radius,
+            _offset = 2 * 3.14 * 0.25 * _radius;
 
 
         if (this._redirect) {
@@ -52,10 +53,9 @@ class PlayBlock extends React.Component {
                 <div className="lecture__loader" id="cont" data-pct="100">
                     <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1"
                          xmlns="http://www.w3.org/2000/svg">
-                        <circle r={_radius} cx="100" cy="100" fill="transparent" strokeDasharray="0"
-                                strokeDashoffset="0"/>
                         <circle className="bar" id="bar" r={_radius} cx="100" cy="100" fill="transparent"
-                                strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]} strokeDashoffset=""/>
+                                strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
                     </svg>
                 </div>
                 <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>

@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import * as filtersActions from '../../actions/filters-actions';
+import * as pageHeaderActions from "../../actions/page-header-actions";
 
 class FiltersRow extends React.Component {
 
@@ -25,7 +26,8 @@ class FiltersRow extends React.Component {
     }
 
     _clearFilter() {
-        this.props.filtersActions.clear()
+        this.props.filtersActions.clear();
+        this.props.pageHeaderActions.hideFiltersForm();
     }
 
     render() {
@@ -54,6 +56,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         filtersActions: bindActionCreators(filtersActions, dispatch),
+        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
     }
 }
 

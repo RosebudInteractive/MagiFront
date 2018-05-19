@@ -23,7 +23,7 @@ class AuthPopup extends React.Component {
                             ]
                             :
                             [
-                                <p className="sign-in-block__label" key={'label'}>Уже зарегистрирован?</p>,
+                                <p className="sign-in-block__label" key={'label'}>Уже зарегистрированы?</p>,
                                 <button className="btn btn--light sign-in-block__link" onClick={::this.props.userActions.switchToSignIn} key={'button'}>Вход</button>
                             ]
                     }

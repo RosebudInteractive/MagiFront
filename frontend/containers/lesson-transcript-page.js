@@ -1,5 +1,4 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
@@ -40,7 +39,7 @@ class TranscriptLessonPage extends React.Component {
         TranscriptLessonPage._handleScroll()
 
         if (this.props.lessonInfo.object) {
-            document.title = 'Лекция[Транскрипт]: ' + this.props.lessonInfo.object.Name + ' - Магистерия'
+            document.title = 'Транскрипт: ' + this.props.lessonInfo.object.Name + ' - Магистерия'
         }
     }
 
