@@ -6336,8 +6336,8 @@ ul.user-tooltip {
     .play-block__btn svg {
       display: block;
       width: 40px;
-      -webkit-transition: all .2s ease-in-out;
-      transition: all .2s ease-in-out;
+      -webkit-transition: all ease-in-out;
+      transition: all ease-in-out;
       fill-opacity: .8; }
   .play-block--big {
     width: 311px;

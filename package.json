@@ -33,6 +33,7 @@
     "webpack-hot-middleware": "^2.21.0"
   },
   "dependencies": {
+    "@fancyapps/fancybox": "^3.3.5",
     "amdefine": "^1.0.1",
     "babel-plugin-es6-promise": "^1.1.1",
     "babel-plugin-transform-object-assign": "^6.22.0",
