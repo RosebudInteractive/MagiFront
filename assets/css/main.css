@@ -6339,6 +6339,8 @@ ul.user-tooltip {
       -webkit-transition: all ease-in-out;
       transition: all ease-in-out;
       fill-opacity: .8; }
+  .play-block__btn.paused {
+    margin-left: 0;}
   .play-block--big {
     width: 311px;
     height: 311px; }
