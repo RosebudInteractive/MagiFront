@@ -23,6 +23,10 @@ class TranscriptLessonPage extends React.Component {
             this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         }
 
+        if (!this.props.lessons.loaded) {
+            this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
+        }
+
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.transcript, courseUrl, lessonUrl);
     }
