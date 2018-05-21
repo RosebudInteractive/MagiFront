@@ -63,7 +63,8 @@ class NestedPlayer {
                     this._fullPlayer.initContainer(this._fullDiv);
                     this._fullPlayer.render();
                     if (this.audioState.audio) {
-                        this.play()
+                        // todo : Отключено пока нет второго вьюпорта
+                        // this.play()
                     }
                 }
             }

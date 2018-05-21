@@ -18,7 +18,7 @@ class AuthPopup extends React.Component {
                     {
                         this.props.authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?
                             [
-                                <p className="sign-in-block__label" key={'label'}>Не зарегистрирован?</p>,
+                                <p className="sign-in-block__label" key={'label'}>Не зарегистрированы?</p>,
                                 <button className="btn btn--light sign-in-block__link" onClick={::this.props.userActions.switchToSignUp} key={'button'}>Регистрация</button>
                             ]
                             :
