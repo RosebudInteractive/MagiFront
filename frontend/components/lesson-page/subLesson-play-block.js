@@ -29,11 +29,13 @@ class SubLessonPlayBlock extends React.Component {
 
     render() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+            _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
             _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
         let {id, totalDuration, playingLesson, paused, duration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
@@ -63,20 +65,39 @@ class SubLessonPlayBlock extends React.Component {
                         ?
                         (paused)
                             ?
-                            <button type="button" className="play-btn-small" onClick={::this.props.playerStartActions.startPlay}>
-                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                <span>Воспроизвести</span>
-                            </button>
+                            (_isFinished)
+                                ?
+                                <button type="button" className="play-btn-small paused"
+                                        onClick={::this.props.playerStartActions.startPlay}>
+                                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+                                    <span>Пауза</span>
+                                </button>
+                                :
+                                <button type="button" className="play-btn-small"
+                                        onClick={::this.props.playerStartActions.startPlay}>
+                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                                    <span>Воспроизвести</span>
+                                </button>
+
                             :
-                            <button type="button" className="play-btn-small paused" onClick={::this.props.playerStartActions.startPause}>
+                            <button type="button" className="play-btn-small paused"
+                                    onClick={::this.props.playerStartActions.startPause}>
                                 <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _pauseSmall}}/>
                                 <span>Пауза</span>
                             </button>
                         :
-                        <button type="button" className="play-btn-small" onClick={::this._play}>
-                            <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                            <span>Воспроизвести</span>
-                        </button>
+                        (_isFinished)
+                            ?
+                            <button type="button" className="play-btn-small paused"
+                                    onClick={::this._play}>
+                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+                                <span>Пауза</span>
+                            </button>
+                            :
+                            <button type="button" className="play-btn-small" onClick={::this._play}>
+                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                                <span>Воспроизвести</span>
+                            </button>
                 }
                 <span className="lectures-sublist__item-duration">{duration}</span>
             </div>

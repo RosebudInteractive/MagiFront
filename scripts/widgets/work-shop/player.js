@@ -347,6 +347,7 @@ export default class CWSPlayer extends CWSBase {
                     if (!that._audioState.stopped) {
                         that._audioState.stopped = true;
                         that._broadcastPaused();
+                        that._broadcastCurrentTimeChanged(true);
                         that._broadcastEnded();
                     }
                 }
@@ -357,8 +358,11 @@ export default class CWSPlayer extends CWSBase {
                     that._audioState.stopped = true;
                     that._broadcastPaused();
                 }
-                if (this.ended)
+                if (this.ended) {
+                    that._broadcastCurrentTimeChanged(true);
                     that._broadcastEnded();
+                }
+
             })
             .on("play", function () {
                 that._addDevInfo('play event')

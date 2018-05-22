@@ -176,6 +176,14 @@ class NestedPlayer {
         return this.player.pause()
     }
 
+    replay() {
+        if (this._initState) {
+            this._initState.currentTime = 0;
+        }
+
+        this.play()
+    }
+
     play() {
         this.player.play()
             .then(() => {

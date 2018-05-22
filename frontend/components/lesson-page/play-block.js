@@ -29,6 +29,7 @@ class PlayBlock extends React.Component {
 
     render() {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"></use>',
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
             _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
@@ -36,6 +37,7 @@ class PlayBlock extends React.Component {
         let {id, totalDuration, playingLesson, paused} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
@@ -69,18 +71,31 @@ class PlayBlock extends React.Component {
                             ?
                             (paused)
                                 ?
-                                <button className="play-block__btn" onClick={::this.props.playerStartActions.startPlay}>
-                                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                                </button>
+                                (_isFinished)
+                                    ?
+                                    <button type="button" className="lecture__btn paused" onClick={::this.props.playerStartActions.startPlay}>
+                                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                                    </button>
+                                    :
+                                    <button type="button" className="lecture__btn" onClick={::this.props.playerStartActions.startPlay}>
+                                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                                    </button>
                                 :
                                 <button className="play-block__btn paused"
                                         onClick={::this.props.playerStartActions.startPause}>
                                     <svg width="23" height="36" dangerouslySetInnerHTML={{__html: _pause}}/>
                                 </button>
                             :
-                            <button className="play-block__btn" onClick={::this._play}>
-                                <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                            </button>
+                            (_isFinished)
+                                ?
+                                <button type="button" className="lecture__btn paused" onClick={::this._play}>
+                                    <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                                </button>
+                                :
+                                <button type="button" className="lecture__btn" onClick={::this._play}>
+                                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                                </button>
+
 
                     }
                     <div className="play-block__tooltip">{_tooltipText}</div>
@@ -94,12 +109,14 @@ class PlayBlock extends React.Component {
                                 ?
                                 (paused)
                                     ?
-                                    <button type="button" className="play-btn-small" onClick={::this.props.playerStartActions.startPlay}>
+                                    <button type="button" className="play-btn-small"
+                                            onClick={::this.props.playerStartActions.startPlay}>
                                         <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                                         <span>Воспроизвести</span>
                                     </button>
                                     :
-                                    <button type="button" className="play-btn-small" onClick={::this.props.playerStartActions.startPause}>
+                                    <button type="button" className="play-btn-small"
+                                            onClick={::this.props.playerStartActions.startPause}>
                                         <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>
                                         <span>Воспроизвести</span>
                                     </button>
