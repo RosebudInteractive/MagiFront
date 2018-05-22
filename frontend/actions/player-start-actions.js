@@ -21,14 +21,10 @@ export const startPlayLesson = (lesson) => {
 };
 
 export const startPlay = () => {
-    return (dispatch, getState) => {
-        // let _state = getState()
-
-        dispatch({
-            type: PLAYER_START_PLAY,
-            payload: null
-        });
-    }
+    return {
+        type: PLAYER_START_PLAY,
+        payload: null
+    };
 };
 
 export const startReplay = () => {

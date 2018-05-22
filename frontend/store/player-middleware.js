@@ -24,8 +24,6 @@ import {
     SWITCH_TO_FULL_PLAYER,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
-import * as storageActions from "../actions/lesson-info-storage-actions";
-import LessonInfoStorage from "../tools/player/lesson-info-storage";
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {

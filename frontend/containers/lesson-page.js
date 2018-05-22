@@ -53,6 +53,7 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         this._needStartPlayer = this.props.params === '?play'
+        this._isRedirectedByMount = this.props.params !== '?play';
     }
 
     componentDidMount() {

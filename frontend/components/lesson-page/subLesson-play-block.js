@@ -25,6 +25,7 @@ class SubLessonPlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
         this.forceUpdate()
+        this.props.playerStartActions.startPlay()
     }
 
     render() {
