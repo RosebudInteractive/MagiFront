@@ -61,11 +61,27 @@ export default class LessonInfoStorage {
             let _jsonObj = localStorage.getItem('user_anon');
             if (_jsonObj) {
                 let _obj = JSON.parse(_jsonObj)
-                let _map = objectToMap(_obj);
+                let _map = _obj.lessons ? objectToMap(_obj.lessons) : new Map(),
+                    _volume = _obj.volume;
 
-                store.dispatch(storageActions.setInitialState(_map))
+                store.dispatch(storageActions.setInitialState(_map));
+
+                if (_volume !== undefined) {
+                    store.dispatch(storageActions.setVolume(_volume))
+                }
             }
         } else {
+            let _userId = store.getState().user.user.Id;
+            let _jsonObj = localStorage.getItem(_userId);
+            if (_jsonObj) {
+                let _obj = JSON.parse(_jsonObj),
+                    _volume = _obj.volume;
+
+                if (_volume !== undefined) {
+                    store.dispatch(storageActions.setVolume(_volume))
+                }
+            }
+
             store.dispatch(storageActions.loadInitialStateFromDB())
         }
     }
@@ -110,7 +126,10 @@ export default class LessonInfoStorage {
         let _state = store.getState().lessonInfoStorage;
         if (_state.lessons.size > 0) {
             let _userId = this._isUserAuthorized ? store.getState().user.user.Id : 'user_anon'
-            localStorage.setItem(_userId, JSON.stringify(mapToObject(_state.lessons)));
+            let _map = mapToObject(_state.lessons),
+                _object = {lessons: _map, volume: _state.volume}
+
+            localStorage.setItem(_userId, JSON.stringify(_object));
         }
 
         if (this._localTimer) {
@@ -183,10 +202,6 @@ const convertToStorageFormat = (object) => {
 
 const mapToObject = (map) => {
     let _obj = Object.create(null);
-
-    // for (let [key, value] of map) {
-    //     _obj[key] = value;
-    // }
 
     map.forEach((value, key) => {
         _obj[key] = value
