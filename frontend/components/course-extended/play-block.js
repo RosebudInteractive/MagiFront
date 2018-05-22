@@ -2,16 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Redirect} from 'react-router';
 
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 
 class PlayBlock extends React.Component {
 
     static propTypes = {
-        cover : PropTypes.string.isRequired,
-        courseUrl : PropTypes.string.isRequired,
-        lessonUrl : PropTypes.string.isRequired,
+        cover: PropTypes.string.isRequired,
+        courseUrl: PropTypes.string.isRequired,
+        lessonUrl: PropTypes.string.isRequired,
         audios: PropTypes.array.isRequired,
     }
 
@@ -23,11 +23,13 @@ class PlayBlock extends React.Component {
 
     render() {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
             _radius = 98.75;
 
         let {id, totalDuration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
@@ -42,7 +44,8 @@ class PlayBlock extends React.Component {
         return (
             <div className="lecture-full__play-block">
                 <div className="play-block play-block--big">
-                    <div className="play-block__image-wrapper" style={{backgroundImage: 'url(/data/' + this.props.cover + ')'}}/>
+                    <div className="play-block__image-wrapper"
+                         style={{backgroundImage: 'url(/data/' + this.props.cover + ')'}}/>
                     <div className="play-block__loader">
                         <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200"
                              version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -53,9 +56,14 @@ class PlayBlock extends React.Component {
                         </svg>
                     </div>
                     <button className="play-block__btn" onClick={::this._play}>
-                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                        {_isFinished
+                            ?
+                            <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                            :
+                            <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                        }
                     </button>
-                    <div className="play-block__tooltip">Смотреть</div>
+                    <div className="play-block__tooltip">{_isFinished ? "Сначала" : "Смотреть"}</div>
                     <div className="play-block__duration">{this.props.duration}</div>
                 </div>
             </div>

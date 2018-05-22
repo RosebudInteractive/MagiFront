@@ -28,11 +28,13 @@ class PlayBlock extends React.Component {
 
     render() {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
             _radius = 97.25;
 
         let {id, totalDuration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
@@ -59,10 +61,17 @@ class PlayBlock extends React.Component {
                     </svg>
                 </div>
                 <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
-                <button type="button" className="lecture__btn" onClick={::this._play}>
-                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                </button>
-                <div className="lecture__tooltip">Смотреть</div>
+                {_isFinished
+                    ?
+                    <button type="button" className="lecture__btn paused" onClick={::this._play}>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                    </button>
+                    :
+                    <button type="button" className="lecture__btn" onClick={::this._play}>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                    </button>
+                }
+                <div className="lecture__tooltip">{_isFinished ? "Сначала" : "Смотреть"}</div>
                 <div className='duration'>{this.props.duration}</div>
             </div>
         )

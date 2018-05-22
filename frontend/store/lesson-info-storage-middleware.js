@@ -3,7 +3,7 @@ import {
     PLAYER_SET_VOLUME,
     PLAYER_SET_MUTE_STATE,
     PLAYER_START_INIT,
-    PLAYER_SET_RATE, PLAYER_PAUSED, PLAYER_STOPPED, PLAYER_ENDED,
+    PLAYER_SET_RATE, PLAYER_PAUSED, PLAYER_STOPPED, PLAYER_ENDED, PLAYER_START_PLAY,
 } from '../constants/player'
 
 import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS} from "../constants/user";
@@ -31,6 +31,7 @@ const LessonInfoStorageMiddleware = store => next => action => {
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
                 let _id = _state.player.playingLesson.lessonId,
+                    _totalDuration = _state.player.totalDuration,
                     _lessonsMap = _state.lessonInfoStorage.lessons,
                     _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
                     _newPosition = action.payload;
@@ -43,7 +44,11 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     LessonInfoStorage.hasChangedPosition();
                 }
 
-                store.dispatch(storageActions.setCurrentTimeForLesson({id : _state.player.playingLesson.lessonId, currentTime: _newPosition}))
+                store.dispatch(storageActions.setCurrentTimeForLesson({
+                    id: _state.player.playingLesson.lessonId,
+                    currentTime: _newPosition,
+                    isFinished: Math.round(_newPosition) === _totalDuration
+                }))
             }
 
             return next(action)
@@ -71,11 +76,9 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
-                let _id = _state.player.playingLesson.lessonId,
-                    _lessonsMap = _state.lessonInfoStorage.lessons,
-                    _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0;
+                let _id = _state.player.playingLesson.lessonId;
 
-                store.dispatch(storageActions.setCurrentTimeForLesson({id : _state.player.playingLesson.lessonId, currentTime: _currentPosition, isFinished: true}))
+                store.dispatch(storageActions.setLessonEnded({id: _id}))
                 LessonInfoStorage.saveChanges()
             }
 

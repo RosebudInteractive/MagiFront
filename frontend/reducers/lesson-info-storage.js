@@ -5,7 +5,7 @@ import {
     LESSON_INFO_STORAGE_SET_MUTE_STATE,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_START,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS,
-    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
+    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS, LESSON_INFO_STORAGE_SET_LESSON_ENDED,
 } from '../constants/lesson-info-storage'
 
 const initialState = {
@@ -22,7 +22,7 @@ export default function lessonInfoStorage(state = initialState, action) {
             if (!action.payload) {
                 return state
             } else {
-                return {...state, lessons:  action.payload}
+                return {...state, lessons: action.payload}
             }
         }
 
@@ -30,12 +30,23 @@ export default function lessonInfoStorage(state = initialState, action) {
             let _lesson = state.lessons.get(action.payload.id);
             let _currentTime = _lesson ? _lesson.currentTime : 0;
             if (_currentTime !== action.payload.currentTime) {
-                let _obj = {};
-                _obj.currentTime = action.payload.currentTime;
-                if (action.payload.hasOwnProperty('isFinished')) {
-                    _obj.isFinished = action.payload.isFinished
-                }
-                state.lessons.set(action.payload.id, _obj)
+
+                state.lessons.set(action.payload.id, {currentTime : action.payload.currentTime, isFinished: action.payload.isFinished})
+                return {...state, lessons: state.lessons}
+            } else {
+                return state
+            }
+        }
+
+        case LESSON_INFO_STORAGE_SET_LESSON_ENDED: {
+            let _lesson = state.lessons.get(action.payload.id);
+            let _isFinished = _lesson ? _lesson.isFinished : false
+            if (!_isFinished) {
+                let _newLessonState = Object.assign({}, _lesson);
+
+                _newLessonState.isFinished = true;
+
+                state.lessons.set(action.payload.id, _newLessonState)
                 return {...state, lessons: state.lessons}
             } else {
                 return state
