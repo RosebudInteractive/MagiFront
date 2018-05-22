@@ -30,7 +30,12 @@ export default function lessonInfoStorage(state = initialState, action) {
             let _lesson = state.lessons.get(action.payload.id);
             let _currentTime = _lesson ? _lesson.currentTime : 0;
             if (_currentTime !== action.payload.currentTime) {
-                state.lessons.set(action.payload.id, {currentTime: action.payload.currentTime})
+                let _obj = {};
+                _obj.currentTime = action.payload.currentTime;
+                if (action.payload.hasOwnProperty('isFinished')) {
+                    _obj.isFinished = action.payload.isFinished
+                }
+                state.lessons.set(action.payload.id, _obj)
                 return {...state, lessons: state.lessons}
             } else {
                 return state

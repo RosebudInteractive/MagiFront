@@ -61,9 +61,24 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
         case PLAYER_SET_RATE:
         case PLAYER_PAUSED:
-        case PLAYER_STOPPED:
-        case PLAYER_ENDED: {
+        case PLAYER_STOPPED: {
             LessonInfoStorage.saveChanges();
+            return next(action)
+        }
+
+        case PLAYER_ENDED: {
+            let _state = store.getState();
+
+            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            if (_isPlayingLessonExists) {
+                let _id = _state.player.playingLesson.lessonId,
+                    _lessonsMap = _state.lessonInfoStorage.lessons,
+                    _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0;
+
+                store.dispatch(storageActions.setCurrentTimeForLesson({id : _state.player.playingLesson.lessonId, currentTime: _currentPosition, isFinished: true}))
+                LessonInfoStorage.saveChanges()
+            }
+
             return next(action)
         }
 
