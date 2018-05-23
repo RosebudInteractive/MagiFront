@@ -7,6 +7,7 @@ import PlayBlock from './play-block'
 import SubLessonPlayBlock from './subLesson-play-block'
 
 import * as lessonActions from '../../actions/lesson-actions';
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -63,13 +64,15 @@ class ListItem extends React.Component {
     }
 
     _getReadyLesson(lesson) {
-        let _isActive = this.props.active === this.props.lesson.Number;
+        let _isActive = this.props.active === this.props.lesson.Number,
+            _cover = getCoverPath(lesson, ImageSize.small);
+
 
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL}
+                    <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
                                courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
                                totalDuration={lesson.Duration}/>
                 </Link>

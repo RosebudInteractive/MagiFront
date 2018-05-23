@@ -4,12 +4,13 @@ import {Link} from 'react-router-dom';
 
 import InfoBlock from './info-block';
 import * as svg from '../../tools/svg-paths';
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 export default class CourseModule extends React.Component {
 
     render() {
-        let {course, isMobile} =
-            this.props;
+        let {course, isMobile} = this.props,
+            _cover = getCoverPath(course, ImageSize.medium)
 
         return (
             (course) ?
@@ -19,7 +20,7 @@ export default class CourseModule extends React.Component {
                                course={course}
                                isMobile={isMobile}
                     />
-                    <ImageBlock cover={course.Cover} url={course.URL}/>
+                    <ImageBlock cover={_cover} url={course.URL}/>
                 </div>
                 :
                 ''
@@ -46,6 +47,7 @@ class ImageBlock extends React.Component {
 
     render() {
         const {cover} = this.props;
+
         const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" width="724" height="503"/>';
 
         return (

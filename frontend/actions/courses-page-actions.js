@@ -141,6 +141,10 @@ const handleCourses = (data) => {
             });
 
             item.readyLessonCount = _readyLessonCount;
+
+            if (item.CoverMeta) {
+                item.CoverMeta = JSON.parse(item.CoverMeta)
+            }
         });
     }
     catch (err) {
@@ -169,6 +173,10 @@ const handleCourse = (data) => {
                 _readyLessonCount++
             } else {
                 _lessonCount++
+            }
+
+            if (lesson.CoverMeta) {
+                lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
 
             let _readyDate = new Date(lesson.ReadyDate);

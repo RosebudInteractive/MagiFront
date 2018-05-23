@@ -49,3 +49,35 @@ export const pages = {
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
 }
+
+
+export const ImageSize = {
+    icon: 'icon',
+    small: 's',
+    medium: 'm',
+    large: 'l'
+}
+
+export const getImagePath = (fileInfo, size) => {
+    let _fileName = '';
+
+    if ((fileInfo.MetaData) && (fileInfo.MetaData.content) && (fileInfo.MetaData.content[size])) {
+        _fileName = fileInfo.MetaData.path + fileInfo.MetaData.content[size]
+    } else {
+        _fileName = fileInfo.FileName
+    }
+
+    return _fileName;
+}
+
+export const getCoverPath = (coverOwner, size) => {
+    let _fileName = '';
+
+    if ((coverOwner.CoverMeta) && (coverOwner.CoverMeta.content) && (coverOwner.CoverMeta.content[size])) {
+        _fileName = coverOwner.CoverMeta.path + coverOwner.CoverMeta.content[size]
+    } else {
+        _fileName = coverOwner.Cover
+    }
+
+    return _fileName;
+}

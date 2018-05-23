@@ -58,7 +58,7 @@ class PlayBlock extends React.Component {
             <div>
                 <div className="play-block">
                     <div className="play-block__image-wrapper"
-                         style={{backgroundImage: "url(" + '/data/' + this.props.cover + ")"}}/>
+                         style={{backgroundImage: "url( + " + '/data/' + this.props.cover + ")"}}/>
                     <div className="play-block__loader">
                         <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
                              version="1.1" xmlns="http://www.w3.org/2000/svg">

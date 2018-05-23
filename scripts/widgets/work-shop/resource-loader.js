@@ -10,7 +10,11 @@ let _audioMap = new Map();
 export default class CWSResourceLoader {
 
     static preinitAudio(sources) {
-        if ((Platform.os.family === "iOS") || (Platform.os.family === "Android")) {
+        const _isIOS = Platform.os.family === "iOS",
+            _isAndroid = Platform.os.family === "Android",
+            _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari");
+
+        if (_isIOS || _isAndroid || _isSafariOnMac) {
             let _mapKeys = _audioMap.keys();
             let _sourceNotEqual = (_audioMap.size !== sources.length) || sources.some((src) => {
                 let _source = '/data/' + src,

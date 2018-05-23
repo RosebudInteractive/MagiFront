@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
 import PlayBlock from './play-block'
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class CourseLessons extends React.Component {
 
     _getList() {
         return this.props.course.Lessons.map((lesson, index) => {
+            let _cover = getCoverPath(lesson, ImageSize.small)
+
             return lesson.State === 'R' ?
                 <LessonFull
                     id={lesson.Id}
@@ -16,7 +19,7 @@ class CourseLessons extends React.Component {
                     courseUrl={this.props.courseUrl}
                     lessonUrl={lesson.URL}
                     descr={lesson.ShortDescription}
-                    cover={lesson.Cover}
+                    cover={_cover}
                     duration={lesson.DurationFmt}
                     totalDuration={lesson.Duration}
                     subLessons={lesson.NSub}
