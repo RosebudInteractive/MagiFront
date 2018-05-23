@@ -73,11 +73,19 @@ export const getImagePath = (fileInfo, size) => {
 export const getCoverPath = (coverOwner, size) => {
     let _fileName = '';
 
-    if ((coverOwner.CoverMeta) && (coverOwner.CoverMeta.content) && (coverOwner.CoverMeta.content[size])) {
-        _fileName = coverOwner.CoverMeta.path + coverOwner.CoverMeta.content[size]
-    } else {
-        _fileName = coverOwner.Cover
+    if ((coverOwner.CoverMeta) && (coverOwner.CoverMeta.content)) { 
+        if (size === ImageSize.icon) {
+            if (coverOwner.CoverMeta.icon) {
+                _fileName = coverOwner.CoverMeta.path + coverOwner.CoverMeta.icon
+            }
+        } else {
+            if (coverOwner.CoverMeta.content[size]) {
+                _fileName = coverOwner.CoverMeta.path + coverOwner.CoverMeta.content[size]
+            }
+        }
     }
+
+    _fileName = _fileName ? _fileName : coverOwner.Cover
 
     return _fileName;
 }

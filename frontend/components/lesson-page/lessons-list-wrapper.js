@@ -65,8 +65,7 @@ class ListItem extends React.Component {
 
     _getReadyLesson(lesson) {
         let _isActive = this.props.active === this.props.lesson.Number,
-            _cover = getCoverPath(lesson, ImageSize.small);
-
+            _cover = getCoverPath(lesson, ImageSize.icon);
 
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')}>
