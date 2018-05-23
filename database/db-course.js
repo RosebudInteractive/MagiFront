@@ -91,7 +91,7 @@ const COURSE_MSSQL_AUTHOR_REQ =
 const COURSE_MSSQL_CATEGORY_REQ =
     "select [CategoryId] as [Id] from [CourseCategory] where [CourseId] = <%= id %>";
 const COURSE_MSSQL_LESSON_REQ =
-    "select ls.[Id], lsl.[Name], lsl.[ShortDescription], lsl.[FullDescription], lc.[Number], lc.[ReadyDate], lc.[State], l.[Language] as [LanguageName] from [Lesson] ls\n" +
+    "select ls.[Id], ls.[IsAuthRequired], lsl.[Name], lsl.[ShortDescription], lsl.[FullDescription], lc.[Number], lc.[ReadyDate], lc.[State], l.[Language] as [LanguageName] from [Lesson] ls\n" +
     "  join [LessonLng] lsl on ls.[Id] = lsl.[LessonId]\n" +
     "  join [Language] l on lsl.[LanguageId] = l.[Id]\n" +
     "  join [LessonCourse] lc on lc.[LessonId] = ls.[Id]\n" +
@@ -106,7 +106,7 @@ const COURSE_MYSQL_AUTHOR_REQ =
 const COURSE_MYSQL_CATEGORY_REQ =
     "select `CategoryId` as `Id` from `CourseCategory` where `CourseId` = <%= id %>";
 const COURSE_MYSQL_LESSON_REQ =
-    "select ls.`Id`, lc.`CourseId`, lsl.`Name`, lsl.`ShortDescription`, lsl.`FullDescription`, lc.`Number`, lc.`ReadyDate`, lc.`State`, l.`Language` as `LanguageName` from `Lesson` ls\n" +
+    "select ls.`Id`, ls.`IsAuthRequired`, lc.`CourseId`, lsl.`Name`, lsl.`ShortDescription`, lsl.`FullDescription`, lc.`Number`, lc.`ReadyDate`, lc.`State`, l.`Language` as `LanguageName` from `Lesson` ls\n" +
     "  join `LessonLng` lsl on ls.`Id` = lsl.`LessonId`\n" +
     "  join `Language` l on lsl.`LanguageId` = l.`Id`\n" +
     "  join `LessonCourse` lc on lc.`LessonId` = ls.`Id`\n" +
@@ -195,7 +195,7 @@ const COURSE_LESSONS_MYSQL =
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -223,7 +223,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -252,7 +252,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -290,7 +290,7 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -399,6 +399,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Cover: elem.LCover,
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
+                                        IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -532,6 +533,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Cover: elem.LCover,
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
+                                        IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -737,6 +739,9 @@ const DbCourse = class DbCourse extends DbObject {
                     .then((result) => {
                         course.Lessons = [];
                         if (result && result.detail && (result.detail.length > 0))
+                            result.detail.forEach((elem) => {
+                                elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                            });
                             course.Lessons = result.detail;
                         return course;
                     })
