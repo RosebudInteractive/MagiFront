@@ -213,10 +213,11 @@ let StdLogin = (req, res, user, info, redirectUrl) => {
                 else
                     res.status(HttpCode.ERR_INTERNAL).json({ message: msg });
             }
-            if (redirectUrl)
-                res.redirect(buildRedirectUrl(redirectUrl))
             else
-                res.json(usersCache.userToClientJSON(user));
+                if (redirectUrl)
+                    res.redirect(buildRedirectUrl(redirectUrl))
+                else
+                    res.json(usersCache.userToClientJSON(user));
         });
 }
 
