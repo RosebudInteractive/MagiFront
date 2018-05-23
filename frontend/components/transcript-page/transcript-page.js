@@ -54,29 +54,44 @@ class TextBlock extends React.Component {
             }
 
             _content = _content.trim();
-            if (_isFirstParagraph) {
-                let _firstLetter = _content.slice(0, 1);
-                _content = _content.slice(1);
 
-                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                    <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
-                    <p className='text-intro'>
-                        <span className="first-letter">{_firstLetter}</span>
-                        <div dangerouslySetInnerHTML={{__html: _content}}/>
-                    </p>
-                </div>)
+            let _array = _content.split('\r\n\r\n');
 
-                _isFirstParagraph = false;
-            } else {
-                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                    <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
-                    <p className='text-intro'>
-                        <div dangerouslySetInnerHTML={{__html: _content}}/>
-                    </p>
-                </div>)
-            }
+            _array.forEach((item, index) => {
+                let _paragraph = item;
 
+                _paragraph.trim();
+                if (_paragraph.length === 0) {
+                    return
+                }
 
+                if (_isFirstParagraph) {
+                    let _firstLetter = _paragraph.slice(0, 1);
+                    _paragraph = _content.slice(1);
+
+                    _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                        <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
+                        <p className='text-intro'>
+                            <span className="first-letter">{_firstLetter}</span>
+                            <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
+                        </p>
+                    </div>)
+
+                    _isFirstParagraph = false;
+                } else {
+                    if (index > 0) {
+                        _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
+                    } else {
+                        _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                            <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
+                            <p>
+                                <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
+                            </p>
+                        </div>)
+                    }
+
+                }
+            })
 
             _re.lastIndex = 0;
         }

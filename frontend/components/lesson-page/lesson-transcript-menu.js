@@ -34,13 +34,15 @@ export default class Menu extends React.Component {
     }
 
     _switchNavigation() {
-        this.setState({showNavigationButtons : !this.state.showNavigationButtons})
+        this.setState({showNavigationButtons: !this.state.showNavigationButtons})
     }
 
-    componentWillMount(){
-        // if ($(window).width() > 1279) {
-        //     $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
-        // }
+    componentDidUpdate() {
+        if ($(window).width() > 1279) {
+            $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+        } else {
+            $('.js-lectures-menu-nav').css('width', '');
+        }
     }
 
     render() {
@@ -64,9 +66,9 @@ export default class Menu extends React.Component {
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
-                    <section className={"lectures-menu__section lectures-menu-nav"}>
+                    <section className={"lectures-menu__section lectures-menu-nav js-lectures-menu-nav"}>
                         <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
-                        <div className={"lectures-menu-nav__list"  + (this.state.showNavigationButtons ? ' show' : '')}>
+                        <div className={"lectures-menu-nav__list" + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">
                                 <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
                                     onClick={::this._switchToc}>
@@ -74,7 +76,8 @@ export default class Menu extends React.Component {
                                     <TableOfContents episodes={this.props.episodes}/>
                                 </li>
                                 <li className="menu-nav-list__item">
-                                    <a href="#recommend" className="menu-nav-list__item-head js-scroll-link">Источники</a>
+                                    <a href="#recommend"
+                                       className="menu-nav-list__item-head js-scroll-link">Источники</a>
                                 </li>
                                 <li className="menu-nav-list__item">
                                     <a href="#gallery" className="menu-nav-list__item-head js-scroll-link">Галерея</a>
@@ -90,9 +93,9 @@ export default class Menu extends React.Component {
 
 class TableOfContents extends React.Component {
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         let _links = $('.js-scroll-link');
-        _links.prop('onclick',null).off('click');
+        _links.prop('onclick', null).off('click');
 
         _links.on("click", function (e) {
             let $target = $($(this).attr('href')),
@@ -122,7 +125,7 @@ class TableOfContents extends React.Component {
 
     componentWillUnmount() {
         let _links = $('.js-scroll-link');
-        _links.prop('onclick',null).off('click');
+        _links.prop('onclick', null).off('click');
     }
 
     _getList() {
@@ -130,11 +133,8 @@ class TableOfContents extends React.Component {
             return
         }
 
-        // return this.props.episodes.map((episode, episodeIndex) => {
         return this.props.episodes.map((episode) => {
-            // return episode.Toc.map((item, index) => {
             return episode.Toc.map((item) => {
-                // const _id = episodeIndex + '-' + index;
                 const _id = 'toc' + item.Id;
                 return <li className="menu-nav-sublist__item current" key={_id}>
                     <a href={"#" + _id} className="menu-nav-sublist__link js-scroll-link">{item.Topic}</a>

@@ -2,6 +2,7 @@ import * as Player from '../tools/player/nested-player';
 
 import {
     PLAYER_START_PLAY,
+    PLAYER_START_REPLAY,
     PLAYER_START_PAUSE,
     PLAYER_START_STOP,
     PLAYER_START_SET_CURRENT_TIME,
@@ -44,8 +45,34 @@ const playerMiddleware = store => next => action => {
         }
 
         case PLAYER_START_PLAY: {
+            let _state = store.getState(),
+                _isFinished = false;
+
+            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            if (_isPlayingLessonExists) {
+                let _id = _state.player.playingLesson.lessonId,
+                    _lessonsMap = _state.lessonInfoStorage.lessons;
+
+                _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false;
+            }
+
+
             if (Player.getInstance()) {
-                Player.getInstance().play()
+                if (_isFinished) {
+                    Player.getInstance().replay()
+                } else {
+                    Player.getInstance().play()
+                }
+            }
+            return next(action)
+        }
+
+        case PLAYER_START_REPLAY: {
+
+
+
+            if (Player.getInstance()) {
+                Player.getInstance().replay()
             }
             return next(action)
         }

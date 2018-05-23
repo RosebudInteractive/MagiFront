@@ -25,10 +25,10 @@ export default class InfoBlock extends React.Component {
 }
 
 InfoBlock.propTypes = {
-    course: PropTypes.object.isRequired,
-    title: PropTypes.string.isRequired,
-    url: PropTypes.string.isRequired,
-    isMobile: PropTypes.bool.isRequired,
+    course: PropTypes.object,
+    title: PropTypes.string,
+    url: PropTypes.string,
+    isMobile: PropTypes.bool,
 };
 
 class Header extends React.Component {

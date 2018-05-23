@@ -14,19 +14,19 @@ import CWSPlayerElementText from "work-shop/player-element-text";
 const ratioX = 16, ratioY = 9;
 
 export default class CWSPlayer extends CWSBase {
-    constructor(container, options) {
+    constructor(container, options, audioOptions) {
         super(container, tpl);
         this._options = options;
         this._initDefaultOptions();
         this._validateOptions();
         this._audioState = {
             stopped: true,
-            currentTime: 0,
+            currentTime: (audioOptions && (audioOptions.currentTime !== undefined)) ? audioOptions.currentTime : 0,
             globalTime: 0,
             baseTime: 0,
             playingNow: {},
-            volume: 0.3,
-            muted: false,
+            volume: (audioOptions && (audioOptions.volume !== undefined)) ? audioOptions.volume : 0.3,
+            muted: (audioOptions && (audioOptions.muted !== undefined)) ? audioOptions.muted : false,
             playbackRate: 1.0,
             requestAnimationFrameID: null,
             videoOff: false,
@@ -347,6 +347,7 @@ export default class CWSPlayer extends CWSBase {
                     if (!that._audioState.stopped) {
                         that._audioState.stopped = true;
                         that._broadcastPaused();
+                        that._broadcastCurrentTimeChanged(true);
                         that._broadcastEnded();
                     }
                 }
@@ -357,8 +358,11 @@ export default class CWSPlayer extends CWSBase {
                     that._audioState.stopped = true;
                     that._broadcastPaused();
                 }
-                if (this.ended)
+                if (this.ended) {
+                    that._broadcastCurrentTimeChanged(true);
                     that._broadcastEnded();
+                }
+
             })
             .on("play", function () {
                 that._addDevInfo('play event')

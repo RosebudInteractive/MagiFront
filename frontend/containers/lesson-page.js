@@ -29,6 +29,21 @@ class LessonPage extends React.Component {
 
         this._internalRedirect = false;
         this._mountPlayerGuard = true;
+
+        this._resizeHandler = (e) => {
+            let text = window.screen.availHeight  + ' : '  + window.screen.availWidth
+            alert(text)
+            alert(e.handleObj.type + ' innerHeight: ' + window.innerHeight);
+
+            let _height = $('.fp-tableCell').css('height');
+            alert(e.handleObj.type + ' current css height: ' + _height);
+
+            $('.fp-tableCell').css('height', window.innerHeight);
+            $('.fullpage-section').css('height', window.innerHeight);
+
+            _height = $('.fp-tableCell').css('height');
+            alert(e.handleObj.type + ' new css height: ' + _height)
+        }
     }
 
     componentWillMount() {
@@ -38,6 +53,7 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         this._needStartPlayer = this.props.params === '?play'
+        this._isRedirectedByMount = this.props.params !== '?play';
     }
 
     componentDidMount() {
@@ -46,6 +62,8 @@ class LessonPage extends React.Component {
         });
 
         this._mountKeydownHandler();
+        // $(window).resize(::this._resizeHandler)
+        // $(window).on('orientationchange', ::this._resizeHandler)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -158,6 +176,7 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {

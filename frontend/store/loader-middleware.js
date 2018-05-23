@@ -8,6 +8,8 @@ import {
     GET_LESSON_PLAY_INFO_SUCCESS,
 } from '../constants/lesson'
 
+import * as playerActions from '../actions/player-actions'
+
 const loaderMiddleware = store => next => action => {
 
     switch (action.type) {
@@ -39,7 +41,10 @@ const loaderMiddleware = store => next => action => {
                         currentTime : _currentTime,
                         muted: _state.lessonInfoStorage.muted,
                         volume: _state.lessonInfoStorage.volume,
-                    }
+                    };
+
+                store.dispatch(playerActions.setVolume(_state.lessonInfoStorage.volume));
+                store.dispatch(playerActions.setMuteState(_state.lessonInfoStorage.muted));
 
                 Loader.notyfyPlayInfoLoaded({
                     lessonId : _id,

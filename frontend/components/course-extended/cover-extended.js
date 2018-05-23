@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 
 import Info from '../course/course-module-info';
 import * as svg from '../../tools/svg-paths';
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class Cover extends React.Component {
 
@@ -11,9 +12,11 @@ class Cover extends React.Component {
             return null
         }
 
-        let _authors = this.props.course.Authors ? this.props.course.Authors : [];
-        let _categories = this.props.course.Categories ? this.props.course.Categories : [];
-        let _cover = this.props.course.Cover ? '/data/' + this.props.course.Cover : null;
+        let {course} = this.props,
+            _authors = course.Authors ? course.Authors : [],
+            _categories = course.Categories ? course.Categories : [],
+            _coverPath = getCoverPath(course, ImageSize.medium),
+            _cover = _coverPath ? '/data/' + _coverPath : null;
 
         return (
             <div className="course-module__info-block">

@@ -4,8 +4,10 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import PlayBlock from './play-block'
+import SubLessonPlayBlock from './subLesson-play-block'
 
 import * as lessonActions from '../../actions/lesson-actions';
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -62,14 +64,16 @@ class ListItem extends React.Component {
     }
 
     _getReadyLesson(lesson) {
-        let _isActive = this.props.active === this.props.lesson.Number;
+        let _isActive = this.props.active === this.props.lesson.Number,
+            _cover = getCoverPath(lesson, ImageSize.icon);
 
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={lesson.Cover} lessonUrl={lesson.URL}
-                               courseUrl={this.props.courseUrl} audios={lesson.Audios}/>
+                    <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
+                               courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
+                               totalDuration={lesson.Duration}/>
                 </Link>
                 <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
             </li>
@@ -116,7 +120,7 @@ class SubList extends React.Component {
     };
 
     _getItems() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
+        // const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
         const {active} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
@@ -128,15 +132,9 @@ class SubList extends React.Component {
                 </Link>
                 <div className="lectures-sublist__item-info">
                     <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
-                    <div className="lectures-sublist__play-block">
-                        <Link to={'/' + this.props.courseUrl + '/' + lesson.URL + '?play'}>
-                            <button type="button" className="play-btn-small">
-                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                <span>Воспроизвести</span>
-                            </button>
-                        </Link>
-                        <span className="lectures-sublist__item-duration">{lesson.DurationFmt}</span>
-                    </div>
+                    <SubLessonPlayBlock duration={lesson.DurationFmt} lessonUrl={lesson.URL}
+                                        courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
+                                        totalDuration={lesson.Duration}/>
                 </div>
             </li>
         })

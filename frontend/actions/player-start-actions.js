@@ -8,6 +8,7 @@ import {
     PLAYER_START_SET_VOLUME,
     PLAYER_START_SET_RATE,
     PLAYER_PREINIT_AUDIOS,
+    PLAYER_START_REPLAY,
 } from '../constants/player'
 
 export const startPlayLesson = (lesson) => {
@@ -20,9 +21,16 @@ export const startPlayLesson = (lesson) => {
 };
 
 export const startPlay = () => {
+    return {
+        type: PLAYER_START_PLAY,
+        payload: null
+    };
+};
+
+export const startReplay = () => {
     return (dispatch) => {
         dispatch({
-            type: PLAYER_START_PLAY,
+            type: PLAYER_START_REPLAY,
             payload: null
         });
     }

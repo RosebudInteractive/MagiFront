@@ -71,11 +71,9 @@ class TitleWrapper extends React.Component {
     render() {
         return (
             <div className="course-module__title-wrapper">
-                <h1 className="course-module__title">
+                <h1 className="course-module__title no_underline">
                     <span className="favourites">В закладки</span>
-                    <a href="#">
-                        <p className="course-module__label">Курс:</p> <span>{' ' + this.props.title}</span>
-                    </a>
+                    <p className="course-module__label">Курс:</p> <span>{' ' + this.props.title}</span>
                 </h1>
             </div>
         )
@@ -115,7 +113,8 @@ class CourseTabs extends React.Component {
 
     _getList() {
         return (
-            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons courseUrl={this.props.courseUrl}/> : <CourseBooks/>
+            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons courseUrl={this.props.courseUrl}/> :
+                <CourseBooks/>
         )
     }
 

@@ -9,6 +9,7 @@ import {
     LESSON_INFO_STORAGE_UPDATE_DB_START,
     LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
     LESSON_INFO_STORAGE_UPDATE_DB_FAIL,
+    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
 } from '../constants/lesson-info-storage'
 
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
@@ -40,6 +41,13 @@ export const setMuteState = (value) => {
         payload: value
     }
 };
+
+export const setLessonEnded = (data) => {
+    return {
+        type: LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+        payload: data
+    }
+}
 
 export const loadInitialStateFromDB = () => {
     return (dispatch) => {

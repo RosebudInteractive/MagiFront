@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import { bindActionCreators } from 'redux';
+import $ from 'jquery'
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -15,10 +16,35 @@ class LessonFrame extends React.Component {
         isMain: true
     };
 
+    componentDidMount() {
+        let that = this
+
+        $(document).mouseup((e) => {
+            let _isLessonScreen = e.target.closest('#lesson-' + that.props.lesson.Id),
+                _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
+                _isSocialBlock = e.target.closest('.social-block'),
+                _isTranscriptLink = e.target.closest('.link-to-transcript'),
+                _isPlayerBlock = e.target.closest('.player-frame');
+
+            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink) {
+                that._play()
+            }
+        })
+    }
+
+    componentWillUnmount() {
+        this._removeListeners();
+    }
+
+    _removeListeners() {
+        $(document).off('mouseup');
+    }
+
     _play() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
         this.forceUpdate()
+        this.props.playerStartActions.startPlay()
     }
 
     render() {

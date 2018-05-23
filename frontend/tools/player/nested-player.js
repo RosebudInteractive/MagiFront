@@ -34,11 +34,11 @@ class NestedPlayer {
         // store.dispatch(playerActions.startInit())
         this._playingData = null;
         this._fullPlayer = null;
+        this._setInitState(initState);
         this._setAssetsList(playingData);
         this.applyViewPorts();
         this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
-        this._setInitState(initState);
         this._currentTime = 0;
 
         setTimeout(() => {
@@ -56,14 +56,15 @@ class NestedPlayer {
             this._fullDiv = fullViewPort;
             if (!this._fullPlayer) {
                 let _options = this._getPlayerOptions();
-                this._fullPlayer = new Player(fullViewPort, _options);
+                this._fullPlayer = new Player(fullViewPort, _options, this._initState);
                 this._fullPlayer.render();
             } else {
                 if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)) {
                     this._fullPlayer.initContainer(this._fullDiv);
                     this._fullPlayer.render();
                     if (this.audioState.audio) {
-                        this.play()
+                        // todo : Отключено пока нет второго вьюпорта
+                        // this.play()
                     }
                 }
             }
@@ -123,10 +124,11 @@ class NestedPlayer {
             this._fullPlayer = null;
             this._smallPlayer = null;
 
+            this._setInitState(initState);
             this._setAssetsList(data);
             this.applyViewPorts();
             this._applyData(data);
-            this._setInitState(initState);
+
             setTimeout(() => {
                 this.play()
             }, 1000)
@@ -138,6 +140,14 @@ class NestedPlayer {
     _setInitState(state) {
         if (state) {
             this._initState = Object.assign({}, state)
+            if (!this._initState) {
+                let _state = this.player._audioState;
+
+                store.dispatch(playerActions.setMuteState(_state.muted))
+
+                store.dispatch(playerActions.setRate(_state.playbackRate))
+            }
+
         } else {
             this._initState = null;
         }
@@ -166,15 +176,15 @@ class NestedPlayer {
         return this.player.pause()
     }
 
-    play() {
-        if (!this._initState) {
-            let _state = this.player._audioState;
-
-            store.dispatch(playerActions.setMuteState(_state.muted))
-
-            store.dispatch(playerActions.setRate(_state.playbackRate))
+    replay() {
+        if (this._initState) {
+            this._initState.currentTime = 0;
         }
 
+        this.play()
+    }
+
+    play() {
         this.player.play()
             .then(() => {
                 if (this._initState) {
