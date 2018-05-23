@@ -5,7 +5,7 @@ module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     proxyServer: {
-        protocol: 'https',
+        protocol: 'http',
         address: 'magadmin.calypsoid.com',
         port: null
     },
