@@ -5,6 +5,7 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
+import * as userActions from "../../actions/user-actions"
 
 class PlayBlock extends React.Component {
 
@@ -29,7 +30,7 @@ class PlayBlock extends React.Component {
     }
 
     _unlock() {
-
+        this.props.userActions.showSignInForm();
     }
 
     _getButton(isFinished) {
@@ -129,6 +130,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

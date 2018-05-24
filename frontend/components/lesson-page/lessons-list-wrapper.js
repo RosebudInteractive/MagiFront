@@ -73,7 +73,7 @@ class ListItem extends React.Component {
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
                     <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
                                courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                               totalDuration={lesson.Duration}/>
+                               totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}/>
                 </Link>
                 <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
             </li>

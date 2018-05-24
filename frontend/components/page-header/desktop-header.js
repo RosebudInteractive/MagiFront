@@ -9,7 +9,6 @@ import UserBlock from './user-block';
 import * as tools from '../../tools/page-tools';
 import * as userActions from '../../actions/user-actions'
 
-
 class DesktopHeaderRow extends React.Component {
 
     static propTypes = {
