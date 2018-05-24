@@ -63,6 +63,19 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
+    _getTooltip(isThisLessonPlaying, isFinished){
+        let {isAuthRequired, authorized, paused} = this.props,
+            _tooltip = null;
+
+        if (isAuthRequired && !authorized) {
+            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
+        } else {
+            _tooltip = isThisLessonPlaying ? (paused ? (isFinished ? "С начала" : "Смотреть") : 'Пауза') : (isFinished ? "С начала" : "Смотреть");
+        }
+
+        return _tooltip;
+    }
+
     render() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
@@ -80,7 +93,7 @@ class PlayBlock extends React.Component {
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === id;
 
-        let _tooltipText = _isThisLessonPlaying ? (paused ? 'Смотреть' : 'Пауза') : 'Смотреть';
+        let _tooltipText = this._getTooltip(_isThisLessonPlaying, _isFinished);
 
         if (this._redirect) {
             this._redirect = false;

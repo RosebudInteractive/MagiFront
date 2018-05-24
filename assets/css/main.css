@@ -7265,6 +7265,15 @@ body[data-page="fullpage-player"] .lectures-menu {
     @media (max-width: 1023px) {
       .play-btn-big:after {
         border-width: 20.5px 0 20.5px 47px; } }
+  .play-btn-big.lock:after {
+    border: none;
+  }
+  .play-btn-big.lock .icon-lock {
+    position: absolute;
+    left: 26px;
+    top: 28px;
+    width: 18px;
+  }
 
 .lecture-frame {
   margin-top: auto;

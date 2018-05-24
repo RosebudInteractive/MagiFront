@@ -71,7 +71,7 @@ class PlayBlock extends React.Component {
         if (isAuthRequired && !authorized) {
             _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
         } else {
-            _tooltip = isFinished ? "Сначала" : "Смотреть"
+            _tooltip = isFinished ? "С начала" : "Смотреть"
         }
 
         return _tooltip;

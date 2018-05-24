@@ -35,7 +35,7 @@ module.exports = {
         keyPrefix: 'lpos:uid:'
     },
     authentication: {
-        enabled: false,
+        enabled: true,
         useJWT: true,
         useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
