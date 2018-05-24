@@ -115,7 +115,7 @@ class App extends Component {
                 if (nextProps.ownProps.location.pathname !== _targetUrl) {
                     this.props.appActions.switchToSmallPlayer()
                     // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
-                    this.props.playerStartActions.clearAudios()
+                    // this.props.playerStartActions.clearAudios()
                 }
             }
         }
