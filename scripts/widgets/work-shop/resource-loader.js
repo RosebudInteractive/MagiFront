@@ -9,6 +9,14 @@ let _audioMap = new Map();
 
 export default class CWSResourceLoader {
 
+    static clearAudios() {
+        _audioMap.forEach((audio) => {
+            audio.src = ''
+        })
+
+        _audioMap.clear()
+    }
+
     static preinitAudio(sources) {
         const _isIOS = Platform.os.family === "iOS",
             _isAndroid = Platform.os.family === "Android",

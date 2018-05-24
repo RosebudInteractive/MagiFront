@@ -4411,6 +4411,7 @@ li.fancybox-thumbs-loading {
     transform: translateY(-50%) rotate(-135deg);
     margin-top: -2px; }
   .user-block__header {
+    margin-top: 8px;
     position: relative;
     padding-left: 25px;
     cursor: pointer; }

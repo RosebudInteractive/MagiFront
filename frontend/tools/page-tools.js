@@ -73,7 +73,7 @@ export const getImagePath = (fileInfo, size) => {
 export const getCoverPath = (coverOwner, size) => {
     let _fileName = '';
 
-    if ((coverOwner.CoverMeta) && (coverOwner.CoverMeta.content)) { 
+    if ((coverOwner.CoverMeta) && (coverOwner.CoverMeta.content)) {
         if (size === ImageSize.icon) {
             if (coverOwner.CoverMeta.icon) {
                 _fileName = coverOwner.CoverMeta.path + coverOwner.CoverMeta.icon

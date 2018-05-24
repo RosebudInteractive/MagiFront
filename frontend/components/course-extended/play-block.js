@@ -9,10 +9,11 @@ import * as playerStartActions from '../../actions/player-start-actions'
 class PlayBlock extends React.Component {
 
     static propTypes = {
-        cover: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-        lessonUrl: PropTypes.string.isRequired,
-        audios: PropTypes.array.isRequired,
+        cover: PropTypes.string,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
+        audios: PropTypes.array,
+        isAuthRequired: PropTypes.bool,
     }
 
     _play() {
@@ -22,10 +23,38 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.startPlay()
     }
 
-    render() {
+    _unlock() {
+
+    }
+
+    _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _radius = 98.75;
+            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+
+        let {isAuthRequired, authorized} = this.props,
+            _button = null;
+
+        if (isAuthRequired && !authorized) {
+            _button = <button className="play-block__btn" onClick={::this._unlock}>
+                <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _lock}}/>
+            </button>
+        } else {
+            _button = <button className="play-block__btn" onClick={::this._play}>
+                {isFinished
+                    ?
+                    <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                    :
+                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                }
+            </button>
+        }
+
+        return _button;
+    }
+
+    render() {
+        const _radius = 98.75;
 
         let {id, totalDuration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
@@ -56,14 +85,7 @@ class PlayBlock extends React.Component {
                             />
                         </svg>
                     </div>
-                    <button className="play-block__btn" onClick={::this._play}>
-                        {_isFinished
-                            ?
-                            <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
-                            :
-                            <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                        }
-                    </button>
+                    {this._getButton(_isFinished)}
                     <div className="play-block__tooltip">{_isFinished ? "Сначала" : "Смотреть"}</div>
                     <div className="play-block__duration">{this.props.duration}</div>
                 </div>
@@ -75,6 +97,7 @@ class PlayBlock extends React.Component {
 function mapStateToProps(state) {
     return {
         lessonInfoStorage: state.lessonInfoStorage,
+        authorized: !!state.user.user,
     }
 }
 
