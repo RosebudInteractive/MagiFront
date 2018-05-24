@@ -42,8 +42,8 @@ class TranscriptLessonPage extends React.Component {
     componentDidUpdate() {
         TranscriptLessonPage._handleScroll()
 
-        if (this.props.lessonInfo.object) {
-            document.title = 'Транскрипт: ' + this.props.lessonInfo.object.Name + ' - Магистерия'
+        if (this.props.lesson) {
+            document.title = 'Транскрипт: ' + this.props.lesson.Name + ' - Магистерия'
         }
     }
 
@@ -55,18 +55,18 @@ class TranscriptLessonPage extends React.Component {
         let _link = $('.link-to-lecture');
         const _recommend = $('#gallery');
 
-        if ((_link.length) && (_recommend.length)){
+        if ((_link.length) && (_recommend.length)) {
             let coordTop = _recommend.offset().top;
 
             let _scrollTop = $(window).scrollTop();
 
-            if (( _scrollTop + 550) >= coordTop) {
+            if ((_scrollTop + 550) >= coordTop) {
                 _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
             } else {
                 _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
             }
 
-            if ($(window).width() < 768 ) {
+            if ($(window).width() < 768) {
                 if ((_scrollTop + 650) >= coordTop) {
                     _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
                 } else {
@@ -85,9 +85,10 @@ class TranscriptLessonPage extends React.Component {
 
     render() {
         let {
-            lessonInfo,
+            lesson,
             lessonText,
-            fetching
+            fetching,
+            authorized
         } = this.props;
 
         return (
@@ -98,17 +99,21 @@ class TranscriptLessonPage extends React.Component {
                       style={{
                           position: 'fixed',
                           top: '50%',
-                          marginTop: 0}}
-                    >Смотреть <br/>лекцию</Link>
+                          marginTop: 0
+                      }}
+                >Смотреть <br/>лекцию</Link>
                 <SocialBlock/>
                 {
                     fetching ?
                         <p>Загрузка...</p>
                         :
-                        (lessonInfo.object && lessonText.loaded) ?
+                        (lesson && lessonText.loaded) ?
                             <div>
                                 <div className="transcript-page">
-                                    <TranscriptPage episodes={lessonText.episodes} refs={lessonText.refs} gallery={lessonText.gallery}/>
+                                    <TranscriptPage episodes={lessonText.episodes}
+                                                    refs={lessonText.refs}
+                                                    gallery={lessonText.gallery}
+                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}/>
                                 </div>
                             </div>
 
@@ -129,7 +134,7 @@ class SocialBlock extends React.Component {
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>'
 
-        return(
+        return (
             <div className="social-block-vertical">
                 <a href="#" className="social-btn-dark">
                     <div className="social-btn-dark__icon">
@@ -165,10 +170,11 @@ function mapStateToProps(state, ownProps) {
         courseUrl: ownProps.match.params.courseUrl,
         lessonUrl: ownProps.match.params.lessonUrl,
         fetching: state.singleLesson.fetching || state.lessonText.fetching,
-        lessonInfo: state.singleLesson,
+        lesson: state.singleLesson.object,
         lessonText: state.lessonText,
         course: state.singleLesson.course,
         lessons: state.lessons,
+        authorized: !!state.user.user,
     }
 }
 

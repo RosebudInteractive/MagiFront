@@ -7,18 +7,21 @@ import GallerySlides from './gallery-slides';
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
-        episodes: PropTypes.array.isRequired,
-        refs: PropTypes.array.isRequired,
-        gallery: PropTypes.array.isRequired,
+        episodes: PropTypes.array,
+        refs: PropTypes.array,
+        gallery: PropTypes.array,
+        isNeedHideGallery: PropTypes.bool,
     };
 
     render() {
+        let {isNeedHideGallery} = this.props;
+
         return (
             <div>
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
-                <Gallery {...this.props}/>
-                <GallerySlides {...this.props}/>
+                {isNeedHideGallery ? null : <Gallery {...this.props}/>}
+                {isNeedHideGallery ? null : <GallerySlides {...this.props}/>}
             </div>
         )
     }
@@ -37,7 +40,7 @@ class TextBlock extends React.Component {
         let _text = episode.Transcript,
             _isFirstParagraph = true;
 
-        while ((_matches = _re.exec(_text) ) !== null) {
+        while ((_matches = _re.exec(_text)) !== null) {
             let _toc = episode.Toc.find((toc) => {
                 return toc.Topic.trim() === _matches[1].trim()
             });

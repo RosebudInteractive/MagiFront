@@ -7,7 +7,7 @@ import {
     EDIT_MODE_EDIT
 } from '../constants/Common';
 
-export const labelWidth = 120;
+export const labelWidth = 240;
 
 export default class ObjectEditor extends React.Component {
     constructor(props) {

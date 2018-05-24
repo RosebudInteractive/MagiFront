@@ -37,7 +37,7 @@ class PlayBlock extends React.Component {
 
         if (isAuthRequired && !authorized) {
             _button = <button className="play-block__btn" onClick={::this._unlock}>
-                <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _lock}}/>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
         } else {
             _button = <button className="play-block__btn" onClick={::this._play}>
@@ -51,6 +51,19 @@ class PlayBlock extends React.Component {
         }
 
         return _button;
+    }
+
+    _getTooltip(isFinished){
+        let {isAuthRequired, authorized} = this.props,
+            _tooltip = null;
+
+        if (isAuthRequired && !authorized) {
+            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
+        } else {
+            _tooltip = isFinished ? "Сначала" : "Смотреть"
+        }
+
+        return _tooltip;
     }
 
     render() {
@@ -86,7 +99,7 @@ class PlayBlock extends React.Component {
                         </svg>
                     </div>
                     {this._getButton(_isFinished)}
-                    <div className="play-block__tooltip">{_isFinished ? "Сначала" : "Смотреть"}</div>
+                    <div className="play-block__tooltip">{this._getTooltip(_isFinished)}</div>
                     <div className="play-block__duration">{this.props.duration}</div>
                 </div>
             </div>
