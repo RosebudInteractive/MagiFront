@@ -102,7 +102,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentWillUnmount() {
-        window.$$('editor-form').clear()
+        // window.$$('editor-form').clear()
         // this._clearObjectInStorage()
     }
 

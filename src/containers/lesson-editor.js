@@ -62,7 +62,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getInsertRout() {
-        return '/lessons/new';
+        return '/lessons/new/';
     }
 
     get objectIdPropName() {
@@ -605,6 +605,7 @@ export class LessonEditor extends ObjectEditor {
                 label: "Автор",
                 placeholder: "Выберите автора",
                 options: this._getCourseAuthorsArray(),
+                // value: this._getCourseAuthorsArray().length === 1 ? this._getCourseAuthorsArray()[0].value : null,
                 labelWidth: labelWidth,
                 validate: window.webix.rules.isNotEmpty,
                 invalidMessage: "Значение не может быть пустым",
