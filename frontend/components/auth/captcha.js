@@ -2,10 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Recaptcha from 'react-recaptcha';
 
+let recaptchaInstance;
+
 export default class Captcha extends React.Component {
 
     static propTypes = {
-        onSetCapture: PropTypes.func.require,
+        onSetCapture: PropTypes.func,
         onClearCaptcha: PropTypes.func,
     };
 
@@ -23,9 +25,15 @@ export default class Captcha extends React.Component {
         }
     }
 
+    reset() {
+        recaptchaInstance.reset()
+    }
+
     render() {
         return (
             <Recaptcha
+                ref={e => recaptchaInstance = e}
+                render="explicit"
                 sitekey="6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t"
                 verifyCallback ={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
