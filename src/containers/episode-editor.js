@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 import * as singleEpisodeActions from "../actions/episode/episode-actions";
 import * as singleLessonActions from "../actions/lesson/lesson-actions";
+// import * as singleCourseActions from "../actions/course/courseActions";
 import * as episodeTocActions from '../actions/episode/episode-tocs-actions';
 import * as episodeContentActions from '../actions/episode/episode-contents-actions';
 import * as tocActions from '../actions/toc-actions';
@@ -14,13 +15,40 @@ import {EpisodeToc, EpisodeContent} from '../components/episodeGrids'
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {EDIT_MODE_EDIT} from '../constants/Common';
+import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import EpisodeTocForm from "../components/episode-toc-form";
 import EpisodeResourceForm from "../components/episode-content-form";
 
 class EpisodeEditor extends ObjectEditor {
+
+    constructor(props) {
+        super(props);
+        const {
+            lessonActions,
+            lessonId,
+            courseId,
+            lesson
+        } = this.props;
+
+        if ((!lesson) || (lesson.id !== lessonId)) {
+            lessonActions.get(lessonId, courseId);
+        }
+    }
+
+    componentWillReceiveProps(next) {
+        const {
+            lesson,
+            episode,
+        } = next;
+
+        if (this.editMode === EDIT_MODE_INSERT) {
+            if ((lesson) && (!episode)) {
+                this.objectActions.create(this._getInitStateOfNewObject(next));
+            }
+        }
+    }
 
     getObject() {
         return this.props.episode
@@ -58,6 +86,10 @@ class EpisodeEditor extends ObjectEditor {
         let _lessonId = !this.props.subLessonId ? this.props.lessonId : this.props.subLessonId
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId, _lessonId);
+    }
+
+    _initInsertMode() {
+        this.editMode = EDIT_MODE_INSERT;
     }
 
     _getInitStateOfNewObject(props) {
@@ -285,6 +317,13 @@ class EpisodeEditor extends ObjectEditor {
                 placeholder: "Выберите тип эпизода",
                 options: [{id: 'L', value: 'Лекция'}],
                 labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
             {
                 cols: [
@@ -366,12 +405,19 @@ class EpisodeEditor extends ObjectEditor {
                 name: "State",
                 label: "Состояние",
                 placeholder: "Выберите состояние",
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
                 options: [
                     {id: 'D', value: 'Черновик'},
                     {id: 'R', value: 'Готовый'},
                     {id: 'A', value: 'Архив'}
                 ],
                 labelWidth: labelWidth,
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
             {
                 view: "richtext",
@@ -417,7 +463,7 @@ function mapStateToProps(state, ownProps) {
         lessonId: parseInt(ownProps.match.params.lessonId),
         courseId: parseInt(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
-        fetching: state.singleLesson.fetching || state.singleEpisode.fetching, // || state.singleCourse.fetching
+        fetching: state.singleLesson.fetching || state.singleEpisode.fetching,
 
         ownProps: ownProps,
     }
@@ -426,6 +472,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         episodeActions: bindActionCreators(singleEpisodeActions, dispatch),
+        // courseActions: bindActionCreators(singleCourseActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         episodeTocActions: bindActionCreators(episodeTocActions, dispatch),
         tocActions: bindActionCreators(tocActions, dispatch),

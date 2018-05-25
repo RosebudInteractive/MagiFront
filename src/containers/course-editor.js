@@ -241,7 +241,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     _createLesson() {
-        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
+        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new');
     }
 
     _moveUpLesson(id) {

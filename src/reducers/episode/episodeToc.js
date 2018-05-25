@@ -30,22 +30,50 @@ const initialState = {
     hasChanges: false,
     internalId: -1,
     editMode: EDIT_MODE_INSERT,
+    fetching: false,
 };
 
 export default function episodeToc(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_EPISODE:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                internalId: -1,
+                editMode: EDIT_MODE_INSERT,
+                fetching: false,
+            };
 
         case GET_SINGLE_EPISODE_REQUEST:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                internalId: -1,
+                editMode: EDIT_MODE_INSERT,
+                fetching: true,
+            };
 
         case GET_SINGLE_EPISODE_SUCCESS: {
             let _data = action.payload.Toc;
 
             if (!_data) {
-                return initialState
+                return {
+                    ...state,
+                    initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    internalId: -1,
+                    editMode: EDIT_MODE_INSERT,
+                    fetching: false,
+                }
             } else {
                 return {
                     ...state,
@@ -53,6 +81,7 @@ export default function episodeToc(state = initialState, action) {
                     current: [..._data],
                     selected: (_data.length > 0) ? _data[0].id : null,
                     hasChanges: false,
+                    fetching: false,
                 }
             }
 
@@ -121,7 +150,16 @@ export default function episodeToc(state = initialState, action) {
         }
 
         case CLEAR_EPISODE:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                internalId: -1,
+                editMode: EDIT_MODE_INSERT,
+                fetching: false,
+            };
 
         case SAVE_EPISODE_SUCCESS: {
             return {

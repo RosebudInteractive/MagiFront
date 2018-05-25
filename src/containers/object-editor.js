@@ -86,7 +86,11 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentDidMount() {
-
+        // if (this.objectId > 0) {
+        //     this._initEditMode()
+        // } else {
+        //     this._initInsertMode()
+        // }
     }
 
     _onUpdate() {}
@@ -107,7 +111,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentWillMount() {
-        // this._clearObjectInStorage()
+        this._clearObjectInStorage()
     }
 
     _clearObjectInStorage() {

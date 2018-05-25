@@ -23,22 +23,45 @@ const initialState = {
     current: [],
     selected: null,
     hasChanges: false,
+    fetching: false,
 };
 
 export default function episodeContent(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_EPISODE:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                fetching: false,
+
+            };
 
         case GET_SINGLE_EPISODE_REQUEST:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                fetching: true,
+            };
 
         case GET_SINGLE_EPISODE_SUCCESS: {
             let _data = action.payload.Content;
 
             if (!_data) {
-                return initialState
+                return {
+                    ...state,
+                    initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    fetching: false,
+                }
             } else {
                 return {
                     ...state,
@@ -46,6 +69,7 @@ export default function episodeContent(state = initialState, action) {
                     current: [..._data],
                     selected: (_data.length > 0) ? _data[0].id : null,
                     hasChanges: false,
+                    fetching: false,
                 }
             }
         }
@@ -121,7 +145,14 @@ export default function episodeContent(state = initialState, action) {
         }
 
         case CLEAR_EPISODE:
-            return initialState;
+            return {
+                ...state,
+                initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                fetching: false,
+            };
 
         case SAVE_EPISODE_SUCCESS: {
             return {

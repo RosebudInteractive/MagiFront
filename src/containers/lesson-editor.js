@@ -62,7 +62,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getInsertRout() {
-        return '/lessons/new/';
+        return '/lessons/new';
     }
 
     get objectIdPropName() {
