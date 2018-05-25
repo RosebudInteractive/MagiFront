@@ -39,7 +39,7 @@ function setupAPI(express, app) {
 
     //app.use(express.favicon()); // отдаем стандартную фавиконку, можем здесь же свою задать
     //app.use("/api", exprLogger('dev')); // выводим все запросы со статусами в консоль
-    app.use("/api", bodyParser.json()); // стандартный модуль, для парсинга JSON в запросах
+    app.use("/api", bodyParser.json({ limit: '128mb' })); // стандартный модуль, для парсинга JSON в запросах
     app.use("/api", bodyParser.urlencoded({ extended: true }));
 
     if (config.has('redisSession.enabled') && config.redisSession.enabled) {
