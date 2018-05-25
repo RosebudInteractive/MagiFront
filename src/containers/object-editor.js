@@ -85,6 +85,10 @@ export default class ObjectEditor extends React.Component {
         this._onUpdate();
     }
 
+    componentDidMount() {
+
+    }
+
     _onUpdate() {}
 
     _switchToEditObject(objId){
@@ -99,10 +103,11 @@ export default class ObjectEditor extends React.Component {
 
     componentWillUnmount() {
         window.$$('editor-form').clear()
+        // this._clearObjectInStorage()
     }
 
     componentWillMount() {
-        this._clearObjectInStorage()
+        // this._clearObjectInStorage()
     }
 
     _clearObjectInStorage() {
@@ -137,6 +142,12 @@ export default class ObjectEditor extends React.Component {
             errorDlgShown,
             hasChanges
         } = this.props;
+
+        if (fetching) {
+            this._dataLoaded = false;
+            this._validateResult = {};
+        }
+
         return (
             <div className={this._getMainDivClassName()}>
                 {

@@ -176,7 +176,7 @@ const parseJSON = (response) => {
 
 const handleCourse = (course) => {
     course.id = course.Id;
-    course.ColorHex = course.Color.toString(16);
+    course.ColorHex = course.Color.toString(16).padStart(6, "0");
 
     course.Lessons.forEach((lesson) => {
         lesson.id = lesson.Id

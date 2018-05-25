@@ -27,16 +27,31 @@ export default function courseLessons(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_COURSE:
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+            };
 
         case GET_SINGLE_COURSE_REQUEST:
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+            };
 
         case GET_SINGLE_COURSE_SUCCESS: {
             let _data = action.payload.Lessons;
 
             if (!_data) {
-                return initialState
+                return {
+                    ...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                };
             } else {
                 return {
                     ...state,
@@ -49,7 +64,7 @@ export default function courseLessons(state = initialState, action) {
         }
 
         case SELECT_COURSE_LESSON : {
-            return { ...state, selected: action.payload}
+            return {...state, selected: action.payload}
         }
 
         case REMOVE_LESSON: {
@@ -81,7 +96,12 @@ export default function courseLessons(state = initialState, action) {
         }
 
         case CLEAR_COURSE: {
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+            };
         }
 
         case SAVE_COURSE_DATA: {

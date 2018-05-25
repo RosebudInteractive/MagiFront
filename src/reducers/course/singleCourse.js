@@ -13,7 +13,7 @@ const initialState = {
     initial: null,
     current: null,
     fetching: false,
-    hasChanges : false,
+    hasChanges: false,
 };
 
 export default function singleCourse(state = initialState, action) {
@@ -23,7 +23,7 @@ export default function singleCourse(state = initialState, action) {
         case CREATE_NEW_COURSE: {
             let _newObject = {
                 ColorHex: '#FFFFFF',
-                State:'D',
+                State: 'D',
             };
 
             return {
@@ -31,7 +31,7 @@ export default function singleCourse(state = initialState, action) {
                 initial: _newObject,
                 current: Object.assign({}, _newObject),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
@@ -50,11 +50,16 @@ export default function singleCourse(state = initialState, action) {
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
 
         case GET_SINGLE_COURSE_FAIL:
-            return initialState;
+            return {
+                ...state, initial: null,
+                current: null,
+                fetching: false,
+                hasChanges: false,
+            };
 
         case SAVE_COURSE_DATA : {
             let _id = action.payload.id ? action.payload.id : state.current.id;
@@ -65,25 +70,30 @@ export default function singleCourse(state = initialState, action) {
                 ...state,
                 initial: Object.assign({}, state.current),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
-        case CLEAR_COURSE:{
-            return initialState
+        case CLEAR_COURSE: {
+            return {
+                ...state, initial: null,
+                current: null,
+                fetching: false,
+                hasChanges: false,
+            }
         }
 
         case CHANGE_COURSE_DATA : {
             let _course = Object.assign({}, action.payload);
 
-            return {...state, current: _course, hasChanges: true };
+            return {...state, current: _course, hasChanges: true};
         }
 
         case CANCEL_CHANGE_COURSE_DATA: {
             return {
                 ...state,
-                current: Object.assign({},state.initial),
-                hasChanges : false,
+                current: Object.assign({}, state.initial),
+                hasChanges: false,
             };
         }
 

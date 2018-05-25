@@ -34,6 +34,15 @@ class CourseEditor extends ObjectEditor {
         languagesActions.getLanguages();
     }
 
+    componentWillReceiveProps(next) {
+        const {
+            course,
+        } = next;
+
+        this.cover = course ? course.Cover : null;
+        this.coverMeta = course ? course.CoverMeta : null;
+    }
+
     getObject() {
         return this.props.course
     }
@@ -88,12 +97,6 @@ class CourseEditor extends ObjectEditor {
         } else {
             this._coverMeta = value
         }
-    }
-
-    _onUpdate() {
-        let _course = this.getObject();
-        this.cover = _course ? _course.Cover : null;
-        this.coverMeta = _course ? _course.CoverMeta : null;
     }
 
     _getCoverInfo() {
@@ -521,7 +524,9 @@ class CourseEditor extends ObjectEditor {
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover_template').refresh();
                             },
-
+                            onFileUploadError: (file, response) => {
+                                console.log(file, response)
+                            },
                         }
                     },
                 ]

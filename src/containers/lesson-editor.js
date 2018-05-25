@@ -101,6 +101,9 @@ export class LessonEditor extends ObjectEditor {
                 this.objectActions.create(this._getInitStateOfNewObject(next));
             }
         }
+
+        this.cover = lesson ? lesson.Cover : null;
+        this.coverMeta = lesson ? lesson.CoverMeta : null;
     }
 
     _getInitStateOfNewObject(props) {
@@ -130,12 +133,6 @@ export class LessonEditor extends ObjectEditor {
         } else {
             this._coverMeta = value
         }
-    }
-
-    _onUpdate() {
-        let _lesson = this.getObject();
-        this.cover = _lesson ? _lesson.Cover : null;
-        this.coverMeta = _lesson ? _lesson.CoverMeta : null;
     }
 
     _getCoverInfo() {
@@ -727,6 +724,9 @@ export class LessonEditor extends ObjectEditor {
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover_template').refresh();
                             },
+                            onFileUploadError: (file, response) => {
+                                console.log(file, response)
+                            }
 
                         }
                     },

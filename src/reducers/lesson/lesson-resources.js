@@ -35,7 +35,12 @@ export default function lessonResources(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_LESSON:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                loaded: false,
+                fetching: false,};
 
         case GET_SINGLE_LESSON_REQUEST:
             return {
@@ -63,7 +68,12 @@ export default function lessonResources(state = initialState, action) {
             let _data = action.payload.Resources;
 
             if (!_data) {
-                return initialState
+                return {...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    loaded: false,
+                    fetching: false,}
             } else {
                 return {
                     ...state,
@@ -82,7 +92,12 @@ export default function lessonResources(state = initialState, action) {
             let _data = action.payload;
 
             if (!_data) {
-                return initialState
+                return {...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    loaded: false,
+                    fetching: false,}
             } else {
                 return {
                     ...state,
@@ -98,10 +113,20 @@ export default function lessonResources(state = initialState, action) {
         }
 
         case GET_SINGLE_LESSON_FAIL:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                loaded: false,
+                fetching: false,};
 
         case GET_LESSON_RESOURCES_FAIL:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                loaded: false,
+                fetching: false,};
 
         case SELECT_RESOURCE:
             return {...state, selected: action.payload};
