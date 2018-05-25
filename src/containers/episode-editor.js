@@ -295,8 +295,6 @@ class EpisodeEditor extends ObjectEditor {
                         id: 'file-name',
                         placeholder: "",
                         labelWidth: labelWidth,
-                        validate: window.webix.rules.isNotEmpty,
-                        invalidMessage: "Значение не может быть пустым",
                         on: {
                             onChange: function () {
                                 that._externalValidate(this);

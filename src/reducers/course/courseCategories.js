@@ -29,16 +29,34 @@ export default function courseCategories(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_COURSE:
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,
+            };
 
         case GET_SINGLE_COURSE_REQUEST:
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,
+            };
 
         case GET_SINGLE_COURSE_SUCCESS: {
             let _data = action.payload.Categories;
 
             if (!_data) {
-                return initialState
+                return {
+                    ...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    showAddDialog: false,
+                };
             } else {
                 return {
                     ...state,
@@ -93,7 +111,13 @@ export default function courseCategories(state = initialState, action) {
         }
 
         case CLEAR_COURSE: {
-            return initialState;
+            return {
+                ...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,
+            };
         }
 
         case SAVE_COURSE_DATA: {

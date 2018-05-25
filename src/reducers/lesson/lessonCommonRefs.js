@@ -29,16 +29,25 @@ export default function lessonCommonRefs(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_LESSON:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,};
 
         case GET_SINGLE_LESSON_REQUEST:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,};
 
         case GET_SINGLE_LESSON_SUCCESS: {
             let _data = action.payload.commonRef;
 
             if (!_data) {
-                return initialState
+                return {...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,}
             } else {
                 return {
                     ...state,
@@ -113,7 +122,10 @@ export default function lessonCommonRefs(state = initialState, action) {
         }
 
         case CLEAR_LESSON:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,};
 
         case SAVE_LESSON_SUCCESS: {
             return {

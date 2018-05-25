@@ -15,6 +15,12 @@ import {
     HIDE_ADD_AUTHOR_DIALOG,
 } from '../../constants/course/courseAuthor';
 
+import {
+    GET_COURSE_AUTHORS_REQUEST,
+    GET_COURSE_AUTHORS_SUCCESS,
+    GET_COURSE_AUTHORS_FAIL,
+} from '../../constants/course/courseAuthorsList';
+
 import * as tools from '../tools';
 
 const initialState = {
@@ -23,22 +29,47 @@ const initialState = {
     selected: null,
     hasChanges: false,
     showAddDialog: false,
+    fetching: false,
 };
 
 export default function courseAuthors(state = initialState, action) {
 
     switch (action.type) {
+        case GET_COURSE_AUTHORS_REQUEST: {
+            return {...state, fetching: true};
+        }
+
+        case GET_COURSE_AUTHORS_SUCCESS:
+        case GET_COURSE_AUTHORS_FAIL: {
+            return {...state, fetching: false};
+        }
+
+
         case CREATE_NEW_COURSE:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,
+                fetching: false,};
 
         case GET_SINGLE_COURSE_REQUEST:
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,};
 
         case GET_SINGLE_COURSE_SUCCESS: {
             let _data = action.payload.Authors;
 
             if (!_data) {
-                return initialState
+                return {...state, initial: [],
+                    current: [],
+                    selected: null,
+                    hasChanges: false,
+                    showAddDialog: false,
+                    fetching: false,}
             } else {
                 return {
                     ...state,
@@ -91,7 +122,11 @@ export default function courseAuthors(state = initialState, action) {
         }
 
         case CLEAR_COURSE: {
-            return initialState;
+            return {...state, initial: [],
+                current: [],
+                selected: null,
+                hasChanges: false,
+                showAddDialog: false,};
         }
 
         case SAVE_COURSE_DATA: {

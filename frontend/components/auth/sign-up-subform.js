@@ -43,7 +43,7 @@ let SignUpForm = class SignUpForm extends React.Component {
             // login: null,
             password1: null,
             password2: null,
-            captcha: true
+            captcha: false
         }
     }
 

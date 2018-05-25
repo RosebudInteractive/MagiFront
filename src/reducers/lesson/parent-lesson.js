@@ -20,7 +20,8 @@ export default function parentLesson(state = initialState, action) {
         }
 
         case CLEAR_PARENT_LESSON:{
-            return initialState
+            return {...state, id: null,
+                name: null,}
         }
 
         default:

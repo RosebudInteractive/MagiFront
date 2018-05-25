@@ -62,7 +62,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getInsertRout() {
-        return '/lessons/new';
+        return '/lessons/new/';
     }
 
     get objectIdPropName() {
@@ -101,13 +101,16 @@ export class LessonEditor extends ObjectEditor {
                 this.objectActions.create(this._getInitStateOfNewObject(next));
             }
         }
+
+        this.cover = lesson ? lesson.Cover : null;
+        this.coverMeta = lesson ? lesson.CoverMeta : null;
     }
 
     _getInitStateOfNewObject(props) {
         return {
             CourseId: props.courseId,
             CourseName: props.course.Name,
-            Number: props.course.Lessons.length + 1,
+            Number: props.course.Lessons ? (props.course.Lessons.length + 1) : 1,
             LessonType: 'L'
         }
     }
@@ -130,12 +133,6 @@ export class LessonEditor extends ObjectEditor {
         } else {
             this._coverMeta = value
         }
-    }
-
-    _onUpdate() {
-        let _lesson = this.getObject();
-        this.cover = _lesson ? _lesson.Cover : null;
-        this.coverMeta = _lesson ? _lesson.CoverMeta : null;
     }
 
     _getCoverInfo() {
@@ -608,6 +605,7 @@ export class LessonEditor extends ObjectEditor {
                 label: "Автор",
                 placeholder: "Выберите автора",
                 options: this._getCourseAuthorsArray(),
+                // value: this._getCourseAuthorsArray().length === 1 ? this._getCourseAuthorsArray()[0].value : null,
                 labelWidth: labelWidth,
                 validate: window.webix.rules.isNotEmpty,
                 invalidMessage: "Значение не может быть пустым",
@@ -727,6 +725,9 @@ export class LessonEditor extends ObjectEditor {
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover_template').refresh();
                             },
+                            onFileUploadError: (file, response) => {
+                                console.log(file, response)
+                            }
 
                         }
                     },

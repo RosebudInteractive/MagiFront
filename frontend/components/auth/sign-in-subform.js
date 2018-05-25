@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field} from 'redux-form';
+import {reduxForm, Field, reset} from 'redux-form';
 import Captcha from './captcha'
 import ButtonsBlock from './buttons-block'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
@@ -19,7 +19,6 @@ const validate = values => {
     return errors
 }
 
-
 class SignInForm extends React.Component {
 
     constructor(props){
@@ -27,6 +26,8 @@ class SignInForm extends React.Component {
         this.state = {
             captcha: null
         }
+
+        this._recaptchaInstance = null;
     }
 
     static propTypes = {
@@ -49,6 +50,22 @@ class SignInForm extends React.Component {
         this.setState({captcha : null});
     }
 
+    componentWillReceiveProps(props) {
+        if (props.serverError) {
+            this.setState({captcha : null})
+            if (this._recaptchaInstance) {
+                this._recaptchaInstance.reset();
+            }
+        }
+    }
+
+    componentDidMount() {
+        this.props.reset();
+        if (this._recaptchaInstance) {
+            this._recaptchaInstance.reset();
+        }
+    }
+
     render() {
         const {invalid, serverError, loading} = this.props;
         const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
@@ -61,7 +78,7 @@ class SignInForm extends React.Component {
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <Captcha ref={e => this._recaptchaInstance = e} onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
             </div>
