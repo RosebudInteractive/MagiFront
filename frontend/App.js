@@ -171,12 +171,7 @@ class App extends Component {
                 {this._getMainDiv()}
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
-                {
-                    this.props.showSignInForm ?
-                        <AuthPopup/>
-                        :
-                        null
-                }
+                <AuthPopup visible={this.props.showSignInForm}/>
             </div>
         );
     }
