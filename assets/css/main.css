@@ -3434,6 +3434,7 @@ li.fancybox-thumbs-loading {
       padding-bottom: 0;
       border-bottom: none; } }
   .page-header._fixed {
+    height: 96px;
     position: fixed;
     top: 0;
     left: 0;
@@ -3473,6 +3474,7 @@ li.fancybox-thumbs-loading {
         height: auto;
         border-bottom: none; } }
   .page-header__wrapper {
+    background-color: white;
     display: -webkit-box;
     display: -webkit-flex;
     display: -moz-box;
@@ -4643,15 +4645,17 @@ ul.user-tooltip {
       position: static; } }
 
 .filters-row {
-  max-height: 0;
   overflow: hidden;
+  z-index: -1;
+  top: -96px;
   border-bottom: none;
-  -webkit-transition: max-height 0.3s ease;
-  transition: max-height 0.3s ease; }
+  -webkit-transition: transform 0.3s ease;
+  transition: transform 0.3s ease; }
   @media (max-width: 899px) {
     .filters-row {
       display: none; } }
   .filters-row.opened {
+    transform: translateY(96px);
     max-height: 96px;
     border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
   .filters-row__wrapper {
@@ -13189,6 +13193,20 @@ ul.lectures-tab {
       .password-form__reset-btn {
         position: static; } }
 
+.popup._registration{
+  top: -110vh;
+  opacity: 1;
+  bottom: auto;
+  z-index: 1000;
+  height: 100vh;
+  -webkit-transition: transform 0.5s ease;
+  transition: transform 0.5s ease;
+}
+.popup._registration.opened {
+  position: absolute;
+  transform: translateY(110vh);
+}
+
 ._registration {
   position: fixed;
   padding-bottom: 50px;
@@ -13212,6 +13230,7 @@ ul.lectures-tab {
         ._registration .popup-close:before, ._registration .popup-close:after {
           top: 23px;
           left: 11px; } }
+
 
 .success-message {
   margin-top: 56px;

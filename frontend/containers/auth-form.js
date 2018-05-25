@@ -1,6 +1,7 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
 
 import {AUTHORIZATION_STATE} from '../constants/user'
 
@@ -10,9 +11,19 @@ import * as userActions from '../actions/user-actions'
 
 class AuthPopup extends React.Component {
 
+    static propTypes = {
+        visible: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        visible: false
+    };
+
     render() {
+        let {visible} = this.props;
+
         return (
-            <div className="popup js-popup _registration opened">
+            <div className={"popup js-popup _registration" + (visible ? " opened" : "")}>
                 <button className="popup-close js-popup-close" onClick={::this.props.userActions.closeSignInForm}>Закрыть</button>
                 <div className="sign-in-block">
                     {
