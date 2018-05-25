@@ -18,11 +18,12 @@ export default class Menu extends React.Component {
     }
 
     static propTypes = {
-        courseTitle: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-        current: PropTypes.string.isRequired,
-        total: PropTypes.number.isRequired,
+        courseTitle: PropTypes.string,
+        courseUrl: PropTypes.string,
+        current: PropTypes.string,
+        total: PropTypes.number,
         episodes: PropTypes.array,
+        isNeedHideGallery: PropTypes.bool,
     };
 
     _switchMenu() {
@@ -46,6 +47,8 @@ export default class Menu extends React.Component {
     }
 
     render() {
+        let {isNeedHideGallery} = this.props;
+
         const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>'
 
         return (
@@ -79,9 +82,15 @@ export default class Menu extends React.Component {
                                     <a href="#recommend"
                                        className="menu-nav-list__item-head js-scroll-link">Источники</a>
                                 </li>
-                                <li className="menu-nav-list__item">
-                                    <a href="#gallery" className="menu-nav-list__item-head js-scroll-link">Галерея</a>
-                                </li>
+                                {
+                                    !isNeedHideGallery ?
+                                        <li className="menu-nav-list__item">
+                                            <a href="#gallery" className="menu-nav-list__item-head js-scroll-link">Галерея</a>
+                                        </li>
+                                        :
+                                        null
+                                }
+
                             </ul>
                         </div>
                     </section>

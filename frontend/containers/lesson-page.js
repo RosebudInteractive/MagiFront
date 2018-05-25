@@ -119,7 +119,7 @@ class LessonPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {lessonInfo, playInfo, courseUrl, lessonUrl} = this.props;
+        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
         this._mountFullpage();
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
@@ -162,7 +162,12 @@ class LessonPage extends React.Component {
             if (_isPlayingLesson) {
                 this.props.appActions.switchToFullPlayer()
             } else {
-                this.props.playerStartActions.startPlayLesson(_lesson)
+                if (_lesson.IsAuthRequired && !authorized) {
+                    let _newUrl = '/' + courseUrl + '/' + lessonUrl;
+                    this.props.history.replace(_newUrl)
+                } else {
+                    this.props.playerStartActions.startPlayLesson(_lesson)
+                }
             }
         }
 
@@ -436,6 +441,7 @@ function mapStateToProps(state, ownProps) {
         lessons: state.lessons,
         playingLesson: state.player.playingLesson,
         isMobileApp: state.app.isMobileApp,
+        authorized: !!state.user.user,
     }
 }
 

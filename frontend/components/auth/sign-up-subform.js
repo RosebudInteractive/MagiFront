@@ -90,7 +90,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <div className="form register-form">
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
-                                    <SignUpButton disabled={invalid || !this.props.login || loading} caption={'Зарегистрироваться'}
+                                    <SignUpButton disabled={invalid || !this.props.login || loading} caption={'Продолжить'}
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
                             </div>

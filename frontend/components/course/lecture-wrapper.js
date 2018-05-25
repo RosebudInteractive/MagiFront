@@ -59,7 +59,7 @@ class SingleLecture extends React.Component {
             <section className="lecture">
                 <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL}
                            courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                           totalDuration={lesson.Duration}/>
+                           totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}/>
                 <div className='lecture__descr'>
                     <Link to={this.props.courseUrl + '/' + lesson.URL}><h3><span
                         className='number'>{lesson.Number + '.'}</span>{' ' + lesson.Name + ' '}</h3></Link>

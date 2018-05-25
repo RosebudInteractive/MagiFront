@@ -44,21 +44,25 @@ class Header extends React.Component {
     }
 
     _getLessonInfo(info){
-        let _subLesson = info.object.Lessons;
-        return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+        if (info.object) {
+            let _subLesson = info.object.Lessons;
+            return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
+        }
     }
 
     render() {
-        let _menuOpened = this.props.pageHeaderState.showMenu;
-        let _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!this.props.visible ? ' _animate' : ''));
-        const _showTranscriptMenu = (this.props.pageHeaderState.currentPage === pages.transcript) && this.props.lessonInfo.loaded;
+        let {authorized, lessonInfo, pageHeaderState, visible} = this.props,
+            _menuOpened = pageHeaderState.showMenu,
+            _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!visible ? ' _animate' : '')),
+            _showTranscriptMenu = (pageHeaderState.currentPage === pages.transcript) && lessonInfo.loaded,
+            _currentLesson = this._getLessonInfo(lessonInfo)
 
         return (
             this.props.pageHeaderState.visibility ?
                 <header className={_headerClass}>
                     {this._isMobile() ?
                         <div>
-                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={this.props.pageHeaderState.currentPage}/>
+                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={pageHeaderState.currentPage}/>
                             <MenuMobile/>
                         </div>
                         :
@@ -66,17 +70,18 @@ class Header extends React.Component {
                             <DesktopHeaderRow
                                 onFilterClick={::this._onFilterClick}
                                 onNavigateClick={::this._onNavigateClick}
-                                currentPage={this.props.pageHeaderState.currentPage}
-                                filterActive={this.props.pageHeaderState.showFiltersForm}/>
+                                currentPage={pageHeaderState.currentPage}
+                                filterActive={pageHeaderState.showFiltersForm}/>
                             <FilterRow/>
                         </div>
                     }
                     {_showTranscriptMenu ?
                         <TranscriptMenu
                             courseUrl={this.props.courseUrl}
-                            courseTitle={this.props.lessonInfo.course.Name}
+                            courseTitle={lessonInfo.course.Name}
                             total={this.props.lessons.object.length}
-                            current={::this._getLessonInfo(this.props.lessonInfo).Number}
+                            current={_currentLesson.Number}
+                            isNeedHideGallery={_currentLesson.IsAuthRequired && !authorized}
                             episodes={this.props.lessonText.episodes}
                         />
                         :
@@ -97,6 +102,7 @@ function mapStateToProps(state, ownProps) {
         lessonInfo: state.singleLesson,
         lessonText: state.lessonText,
         lessons: state.lessons,
+        authorized: !!state.user.user,
         ownProps,
     }
 }

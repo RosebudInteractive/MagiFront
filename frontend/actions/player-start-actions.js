@@ -9,6 +9,7 @@ import {
     PLAYER_START_SET_RATE,
     PLAYER_PREINIT_AUDIOS,
     PLAYER_START_REPLAY,
+    PLAYER_CLEAR_AUDIOS,
 } from '../constants/player'
 
 export const startPlayLesson = (lesson) => {
@@ -86,6 +87,13 @@ export const startSetRate = (value) => {
 export const preinitAudios = (value) => {
     return {
         type: PLAYER_PREINIT_AUDIOS,
+        payload: value
+    };
+}
+
+export const clearAudios = (value) => {
+    return {
+        type: PLAYER_CLEAR_AUDIOS,
         payload: value
     };
 }

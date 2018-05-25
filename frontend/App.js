@@ -17,6 +17,7 @@ import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
+import * as playerStartActions from './actions/player-start-actions';
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -113,6 +114,8 @@ class App extends Component {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
                 if (nextProps.ownProps.location.pathname !== _targetUrl) {
                     this.props.appActions.switchToSmallPlayer()
+                    // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
+                    // this.props.playerStartActions.clearAudios()
                 }
             }
         }
@@ -195,6 +198,7 @@ function mapDispatchToProps(dispatch) {
         appActions: bindActionCreators(appActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         playerActions: bindActionCreators(playerActions, dispatch),
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
     }
 }
 

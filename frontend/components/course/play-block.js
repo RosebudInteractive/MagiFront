@@ -5,6 +5,7 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
+import * as userActions from "../../actions/user-actions"
 
 class PlayBlock extends React.Component {
 
@@ -15,9 +16,10 @@ class PlayBlock extends React.Component {
     }
 
     static propTypes = {
-        lessonUrl: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-        audios: PropTypes.array.isRequired,
+        lessonUrl: PropTypes.string,
+        courseUrl: PropTypes.string,
+        audios: PropTypes.array,
+        isAuthRequired: PropTypes.bool,
     }
 
     _play() {
@@ -27,10 +29,56 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.startPlay()
     }
 
-    render() {
+    _unlock() {
+        this.props.userActions.showSignInForm();
+    }
+
+    _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _radius = 97.25;
+            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+
+        let {isAuthRequired, authorized} = this.props,
+            _button = null;
+
+        if (isAuthRequired && !authorized) {
+            _button = (
+                <button type="button" className="lecture__btn paused" onClick={::this._unlock}>
+                    <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+                </button>
+            )
+        } else {
+            _button = (
+                isFinished
+                    ?
+                    <button type="button" className="lecture__btn paused" onClick={::this._play}>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                    </button>
+                    :
+                    <button type="button" className="lecture__btn" onClick={::this._play}>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                    </button>
+            )
+        }
+
+        return _button;
+    }
+
+    _getTooltip(isFinished) {
+        let {isAuthRequired, authorized} = this.props,
+            _tooltip = null;
+
+        if (isAuthRequired && !authorized) {
+            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
+        } else {
+            _tooltip = isFinished ? "С начала" : "Смотреть"
+        }
+
+        return _tooltip;
+    }
+
+    render() {
+        const _radius = 97.25;
 
         let {id, totalDuration} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
@@ -62,17 +110,8 @@ class PlayBlock extends React.Component {
                     </svg>
                 </div>
                 <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
-                {_isFinished
-                    ?
-                    <button type="button" className="lecture__btn paused" onClick={::this._play}>
-                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
-                    </button>
-                    :
-                    <button type="button" className="lecture__btn" onClick={::this._play}>
-                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                    </button>
-                }
-                <div className="lecture__tooltip">{_isFinished ? "Сначала" : "Смотреть"}</div>
+                {this._getButton(_isFinished)}
+                <div className="lecture__tooltip">{this._getTooltip(_isFinished)}</div>
                 <div className='duration'>{this.props.duration}</div>
             </div>
         )
@@ -84,12 +123,14 @@ function mapStateToProps(state) {
         lessonInfoStorage: state.lessonInfoStorage,
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
+        authorized: !!state.user.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

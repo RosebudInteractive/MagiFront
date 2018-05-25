@@ -5,14 +5,16 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
+import * as userActions from "../../actions/user-actions";
 
 class PlayBlock extends React.Component {
     static propTypes = {
-        cover: PropTypes.string.isRequired,
-        duration: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-        lessonUrl: PropTypes.string.isRequired,
-        audios: PropTypes.array.isRequired,
+        cover: PropTypes.string,
+        duration: PropTypes.string,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
+        audios: PropTypes.array,
+        isAuthRequired: PropTypes.bool,
     };
 
     constructor(props) {
@@ -28,10 +30,54 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.startPlay()
     }
 
-    render() {
-        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"></use>',
+    _unlock() {
+        this.props.userActions.showSignInForm();
+    }
+
+    _getButton(isFinished) {
+        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+
+        let {isAuthRequired, authorized} = this.props,
+            _button = null;
+
+        if (isAuthRequired && !authorized) {
+            _button = <button className="lecture__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+            </button>
+        } else {
+            _button = (
+                isFinished
+                    ?
+                    <button type="button" className="lecture__btn paused" onClick={::this.props.playerStartActions.startPlay}>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                    </button>
+                    :
+                    <button type="button" className="lecture__btn" onClick={::this.props.playerStartActions.startPlay}>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                    </button>
+            )
+        }
+
+        return _button;
+    }
+
+    _getTooltip(isThisLessonPlaying, isFinished){
+        let {isAuthRequired, authorized, paused} = this.props,
+            _tooltip = null;
+
+        if (isAuthRequired && !authorized) {
+            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
+        } else {
+            _tooltip = isThisLessonPlaying ? (paused ? (isFinished ? "С начала" : "Смотреть") : 'Пауза') : (isFinished ? "С начала" : "Смотреть");
+        }
+
+        return _tooltip;
+    }
+
+    render() {
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
@@ -47,7 +93,7 @@ class PlayBlock extends React.Component {
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === id;
 
-        let _tooltipText = _isThisLessonPlaying ? (paused ? 'Смотреть' : 'Пауза') : 'Смотреть';
+        let _tooltipText = this._getTooltip(_isThisLessonPlaying, _isFinished);
 
         if (this._redirect) {
             this._redirect = false;
@@ -72,32 +118,14 @@ class PlayBlock extends React.Component {
                             ?
                             (paused)
                                 ?
-                                (_isFinished)
-                                    ?
-                                    <button type="button" className="lecture__btn paused" onClick={::this.props.playerStartActions.startPlay}>
-                                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
-                                    </button>
-                                    :
-                                    <button type="button" className="lecture__btn" onClick={::this.props.playerStartActions.startPlay}>
-                                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                                    </button>
+                                this._getButton(_isFinished)
                                 :
                                 <button className="play-block__btn paused"
                                         onClick={::this.props.playerStartActions.startPause}>
                                     <svg width="23" height="36" dangerouslySetInnerHTML={{__html: _pause}}/>
                                 </button>
                             :
-                            (_isFinished)
-                                ?
-                                <button type="button" className="lecture__btn paused" onClick={::this._play}>
-                                    <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
-                                </button>
-                                :
-                                <button type="button" className="lecture__btn" onClick={::this._play}>
-                                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
-                                </button>
-
-
+                            this._getButton(_isFinished)
                     }
                     <div className="play-block__tooltip">{_tooltipText}</div>
                     <div className="play-block__duration">{this.props.duration}</div>
@@ -141,13 +169,14 @@ function mapStateToProps(state) {
         lessonInfoStorage: state.lessonInfoStorage,
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
-
+        authorized: !!state.user.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

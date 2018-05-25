@@ -2,13 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
-import { bindActionCreators } from 'redux';
+import {bindActionCreators} from 'redux';
 import $ from 'jquery'
+import * as userActions from "../../actions/user-actions";
 
 class LessonFrame extends React.Component {
     static propTypes = {
-        courseUrl: PropTypes.string.isRequired,
-        lesson: PropTypes.object.isRequired,
+        courseUrl: PropTypes.string,
+        lesson: PropTypes.object,
         isMain: PropTypes.bool,
     };
 
@@ -47,6 +48,37 @@ class LessonFrame extends React.Component {
         this.props.playerStartActions.startPlay()
     }
 
+    _unlock() {
+        this.props.userActions.showSignInForm();
+    }
+
+    _getButton() {
+        const _playLock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-lock"/>',
+            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+
+        let {lesson, authorized} = this.props,
+            _button = null;
+
+        if (lesson.IsAuthRequired && !authorized) {
+            _button = (
+                <div style={{cursor: 'pointer'}} onClick={::this._unlock}>
+                    <span className="play-btn-big lecture-frame__play-btn lock">
+                        <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _playLock}}/>
+                        <svg className='icon-lock' width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+                    </span>
+                </div>
+            )
+        } else {
+            _button = (
+                <div style={{cursor: 'pointer'}} onClick={::this._play}>
+                    <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
+                </div>
+            )
+        }
+
+        return _button;
+    }
+
     render() {
         const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
 
@@ -69,9 +101,7 @@ class LessonFrame extends React.Component {
                             </button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            <div style={{cursor: 'pointer'}} onClick={::this._play}>
-                                <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
-                            </div>
+                            {this._getButton()}
                             <span className="title-text">
                                 <span className="number">{_number}</span>
                                 {lesson.Name + '\n'}
@@ -135,12 +165,14 @@ class SocialBlock extends React.Component {
 function mapStateToProps(state) {
     return {
         lessonInfoStorage: state.lessonInfoStorage,
+        authorized: !!state.user.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
