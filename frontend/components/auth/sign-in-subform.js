@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field} from 'redux-form';
+import {reduxForm, Field, reset} from 'redux-form';
 import Captcha from './captcha'
 import ButtonsBlock from './buttons-block'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
@@ -56,6 +56,13 @@ class SignInForm extends React.Component {
             if (this._recaptchaInstance) {
                 this._recaptchaInstance.reset();
             }
+        }
+    }
+
+    componentDidMount() {
+        this.props.reset();
+        if (this._recaptchaInstance) {
+            this._recaptchaInstance.reset();
         }
     }
 

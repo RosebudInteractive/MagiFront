@@ -107,7 +107,7 @@ export class LessonEditor extends ObjectEditor {
         return {
             CourseId: props.courseId,
             CourseName: props.course.Name,
-            Number: props.course.Lessons.length + 1,
+            Number: props.course.Lessons ? (props.course.Lessons.length + 1) : 1,
             LessonType: 'L'
         }
     }
