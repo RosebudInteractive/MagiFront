@@ -727,7 +727,7 @@ export class LessonEditor extends ObjectEditor {
                                 window.$$('cover_template').refresh();
                             },
                             onFileUploadError: () => {
-                                that.props.appActions('При загрузке файла произошла ошибка')
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
                             }
                         }
                     },

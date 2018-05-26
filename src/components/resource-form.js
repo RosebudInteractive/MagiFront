@@ -181,7 +181,7 @@ class ResourceForm extends React.Component {
                                         onFileUploadError: () => {
                                             window.$$('res-form-btnOk').enable();
                                             window.$$('res-form-btnCancel').enable();
-                                            that.props.appActions('При загрузке файла произошла ошибка')
+                                            that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
                                         }
                                     }
                                 },

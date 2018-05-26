@@ -376,7 +376,7 @@ class EpisodeEditor extends ObjectEditor {
                                 window.$$('file-name').setValue(response[0].file);
                             },
                             onFileUploadError: () => {
-                                that.props.appActions('При загрузке файла произошла ошибка')
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
                             },
                         }
                     },
