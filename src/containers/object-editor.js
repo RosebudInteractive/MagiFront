@@ -67,7 +67,7 @@ export default class ObjectEditor extends React.Component {
 
     _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
-        this.objectActions.create(this._getInitStateOfNewObject(this.props))
+        // this.objectActions.create(this._getInitStateOfNewObject(this.props))
     }
 
     _getInitStateOfNewObject(){

@@ -19,6 +19,7 @@ import {CourseAuthors, CourseCategories, CourseLessons} from '../components/cour
 import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
+import {EDIT_MODE_INSERT} from "../constants/Common";
 
 class CourseEditor extends ObjectEditor {
 
@@ -39,6 +40,12 @@ class CourseEditor extends ObjectEditor {
         const {
             course,
         } = next;
+
+        if (this.editMode === EDIT_MODE_INSERT) {
+            if (!course) {
+                this.objectActions.create(this._getInitStateOfNewObject(next));
+            }
+        }
 
         this.cover = course ? course.Cover : null;
         this.coverMeta = course ? course.CoverMeta : null;
