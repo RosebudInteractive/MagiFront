@@ -33,13 +33,13 @@ export default class CWSAssets extends CWSBase {
              * }
      */
     render(assets) {
-        var template = CWSAssets.template("asset");
-        var assetsGuids = {};
+        let template = CWSAssets.template("asset");
+        let assetsGuids = {};
         assets = assets || [];
-        for (var i = 0; i < assets.length; i++) {
-            var asset = assets[i];
+        for (let i = 0; i < assets.length; i++) {
+            let asset = assets[i];
             assetsGuids["a_" + asset.id] = true;
-            var item = this._list.find("#a_" + asset.id);
+            let item = this._list.find("#a_" + asset.id);
             if (item.length == 0) {
                 item = $(template);
                 item.attr("id", "a_" + asset.id);
@@ -50,14 +50,14 @@ export default class CWSAssets extends CWSBase {
             }
 
             item.find(".ws-assets-item-num-cont").text(i + 1);
-            var title = "";
+            let title = "";
             if (asset.type == "MP3") {
                 title = asset.title + "<br>";
-                var d = new Date(asset.duration * 1000).toISOString().substr(11, 8);
+                let d = new Date(asset.duration * 1000).toISOString().substr(11, 8);
                 title += d;
-                var icon = item.find(".ws-assets-item-icon");
+                let icon = item.find(".ws-assets-item-icon");
                 if (icon.children().length == 0) {
-                    var div = $("<div/>");
+                    let div = $("<div/>");
                     icon.append(div);
                     div.addClass("ws-audio-icon").text("♫");
                 }
@@ -109,7 +109,7 @@ export default class CWSAssets extends CWSBase {
     }
 
     _deleteAsset(item) {
-        var id = item.attr("id");
+        let id = item.attr("id");
         this._broadcastDeleteAsset(id);
     }
 
@@ -139,34 +139,34 @@ export default class CWSAssets extends CWSBase {
     }
 
     _setUserEvents() {
-        var that = this;
-        var fileInput = that._container.find(".ws-assets-top").children("input");
+        let that = this;
+        let fileInput = that._container.find(".ws-assets-top").children("input");
         this._container.find(".ws-assets-plus").click(function () {
             fileInput.click();
         });
 
         fileInput.change(function (evt) {
-            var files = evt.target.files; // FileList object
+            let files = evt.target.files; // FileList object
 
             // Loop through the FileList and render image files as thumbnails.
-            for (var i = 0, f; f = files[i]; i++) {
+            for (let i = 0, f; f = files[i]; i++) {
 
                 // Only process image files.
                 if (!f.type.match('image.*')) {
                     continue;
                 }
 
-                var reader = new FileReader();
+                let reader = new FileReader();
 
                 // Closure to capture the file information.
                 reader.onload = (function(theFile) {
                     return function(e) {
-                        var dataUrl = e.target.result;
-                        var base64 = dataUrl.split(',')[1];
-                        var img = $("<img style='display: none'/>");
+                        let dataUrl = e.target.result;
+                        let base64 = dataUrl.split(',')[1];
+                        let img = $("<img style='display: none'/>");
                         that._container.append(img);
                         img.load(function () {
-                            var size = {
+                            let size = {
                                 width: this.naturalWidth,
                                 height: this.naturalHeight
                             };
@@ -199,6 +199,25 @@ export default class CWSAssets extends CWSBase {
                 id: id
             });
         }
+    }
+
+    destroy() {
+        this._unSetUserEvents();
+
+        this._list.children().each((index, value) => {
+            let item = $(value);
+            item.off('click');
+            if (item.attr("role") != "audio") {
+                item.draggable("destroy");
+                item.find(".ws-assets-item-menu").off("click");
+            }
+        });
+    }
+
+    _unSetUserEvents() {
+        let fileInput = this._container.find(".ws-assets-top").children("input");
+        this._container.find(".ws-assets-plus").off("click");
+        fileInput.off("change");
     }
 }
 //    }

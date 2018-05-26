@@ -473,6 +473,14 @@ export default class CWorkShop extends CWSBase {
         return data;
     }
 
+    destroy() {
+        this._assetsWidget.destroy();
+        this._tracksWidget.destroy();
+        this._playerWidget.destroy();
+
+
+    }
+
 }
 //    }
 //);
