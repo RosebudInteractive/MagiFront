@@ -331,7 +331,7 @@ export default class CWSTracks extends CWSBase {
             if (this._lineWrapper.hasClass('ws-zoom-over') && lineWrapperDown === true) {
                 this._setZoomCircle(e.offsetX)
             }
-        })
+        });
 
     }
 
@@ -1688,6 +1688,58 @@ export default class CWSTracks extends CWSBase {
             type: STEP_TYPE_MIN,
             stepWidth: STEP_WIDTH_MIN
         };
+    }
+
+    destroy() {
+        this._unsetToolsEvents();
+        this._unsetFileEvents();
+
+        this._unsetDeleteBtnEvents();
+        this._unsetTrackEvents();
+        this._unsetZoomEvents();
+    }
+
+    _unsetZoomEvents() {
+        this._lineWrapper.off('mouseenter');
+        this._lineWrapper.off('mouseleave');
+        this._lineWrapper.off('mousedown');
+        this._lineWrapper.off('mouseup');
+        this._lineWrapper.off('mousemove');
+    }
+
+    _unsetTrackEvents() {
+        this._list.children().each(function () {
+            let cont = $(this).children(".ws-track-content");
+            cont.droppable("destroy");
+        });
+    }
+
+    _unsetDeleteBtnEvents() {
+        this._closeButtonsList.children().each(function() {
+            $(this).off("click");
+        });
+    }
+
+    _unsetFileEvents() {
+        this._fileInput = this._container.find("input[type='file']");
+        this._fileInput.off("change");
+    }
+
+    _unsetToolsEvents() {
+        let addButton = this._container.find("[role='add-panel']");
+        addButton.off("click");
+        let playButton = this._container.find(".ws-tools-top")
+            .find(".ws-tools-top-play");
+        playButton.off('mouseup');
+        playButton.off('mouseheld');
+        let mute = this._container.find(".ws-mute-button");
+        mute.off('click');
+        let meter = this._container.find(".ws-volume-meter");
+        meter.off('mouseenter');
+        meter.off('mouseleave');
+        meter.off('mousemove');
+        meter.off('mouseup');
+        meter.off('mousedown');
     }
 }
 //}

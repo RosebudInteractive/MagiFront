@@ -208,9 +208,6 @@ export default class CWSPlayerDesign extends CWSPlayer {
     }
 
     _setTextToolsEvents() {
-
-        console.log('_setTextToolsEvents');
-
         $('.ws-text-element-tools-a1').on('click', (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -295,7 +292,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
                 });
                 $(value).addClass('ws-text-element-tools-color-selected');
             });
-        })
+        });
     }
 
     _getEpisode() {
@@ -415,6 +412,32 @@ export default class CWSPlayerDesign extends CWSPlayer {
         return $.extend(true, {}, this._options.loader.getData())
     }
 
+    destroy() {
+        let item = this._container.children();
+        let cont = item.children(".ws-player-content");
+        cont.droppable("destroy");
+        this._unSetTextToolsEvents();
+
+        super.destroy();
+
+        this._container.empty();
+    }
+
+
+    _unSetTextToolsEvents() {
+        $('.ws-text-element-tools-a1').off('click');
+        $('.ws-text-element-tools-a2').off('click');
+        $('.ws-text-element-tools-a3').off('click');
+        $('.ws-text-element-tools-i').off('click');
+        $('.ws-text-element-tools-b').off('click');
+        $('.ws-text-element-tools-ol').off('click');
+        $('.ws-text-element-tools-color').off('click');
+        $('.ws-text-element-tools-color').off('mouseheld');
+        $('.ws-text-element-tools-color-pal').off('mouseleave');
+        $('.ws-text-element-tools-color-item').each((index, value) => {
+            $(value).off('click');
+        });
+    }
 }
 //    }
 //);
