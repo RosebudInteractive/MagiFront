@@ -6,7 +6,6 @@ import {
     WORK_SHOP_GET_DATA_SUCCESS, WORK_SHOP_HIDE, WORK_SHOP_SAVE_DATA,
 } from '../constants/work-shop'
 
-
 const loaderMiddleware = store => next => action => {
 
     switch (action.type) {

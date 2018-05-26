@@ -2,9 +2,9 @@ import React from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
 
+import * as appActions from "../actions/app-actions";
 import * as singleEpisodeActions from "../actions/episode/episode-actions";
 import * as singleLessonActions from "../actions/lesson/lesson-actions";
-// import * as singleCourseActions from "../actions/course/courseActions";
 import * as episodeTocActions from '../actions/episode/episode-tocs-actions';
 import * as episodeContentActions from '../actions/episode/episode-contents-actions';
 import * as tocActions from '../actions/toc-actions';
@@ -375,7 +375,9 @@ class EpisodeEditor extends ObjectEditor {
                             onUploadComplete: (response) => {
                                 window.$$('file-name').setValue(response[0].file);
                             },
-
+                            onFileUploadError: () => {
+                                that.props.appActions('При загрузке файла произошла ошибка')
+                            },
                         }
                     },
                     {
@@ -471,8 +473,8 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        appActions: bindActionCreators(appActions, dispatch),
         episodeActions: bindActionCreators(singleEpisodeActions, dispatch),
-        // courseActions: bindActionCreators(singleCourseActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         episodeTocActions: bindActionCreators(episodeTocActions, dispatch),
         tocActions: bindActionCreators(tocActions, dispatch),

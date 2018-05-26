@@ -6,6 +6,7 @@ import * as courseAuthorsActions from '../actions/course/courseAuthorsActions';
 import * as courseCategoriesActions from '../actions/course/courseCategoriesActions';
 import * as courseLessonsActions from '../actions/course/courseLessonsActions';
 
+import * as appActions from '../actions/app-actions';
 import * as coursesActions from '../actions/coursesListActions';
 import * as authorsActions from "../actions/authorsListActions";
 import * as categoriesActions from "../actions/categoriesListActions";
@@ -524,8 +525,8 @@ class CourseEditor extends ObjectEditor {
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover_template').refresh();
                             },
-                            onFileUploadError: (file, response) => {
-                                console.log(file, response)
+                            onFileUploadError: () => {
+                                that.props.appActions('При загрузке файла произошла ошибка')
                             },
                         }
                     },
@@ -585,6 +586,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        appActions: bindActionCreators(appActions, dispatch),
         courseActions: bindActionCreators(singleCourseActions, dispatch),
         courseAuthorsActions: bindActionCreators(courseAuthorsActions, dispatch),
         courseCategoriesActions: bindActionCreators(courseCategoriesActions, dispatch),
