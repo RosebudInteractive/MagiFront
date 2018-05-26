@@ -35,6 +35,7 @@ class AdmWorkShop {
     }
 
     static close() {
+        _instance.destroy();
         _instance = null
     }
 
@@ -44,6 +45,10 @@ class AdmWorkShop {
         let div = $('.ws-container');
         this._ws = new CWorkShop(div, _options);
         this._ws.render();
+    }
+
+    destroy() {
+        this._ws.destroy();
     }
 
     _initOptions() {

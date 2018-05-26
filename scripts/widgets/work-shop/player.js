@@ -267,17 +267,19 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _destroyAudioEvents($audio) {
-        $audio.off("loadeddata")
-            .off('volumechange')
-            .off('timeupdate')
-            .off('ended')
-            .off('pause')
-            .off('play')
-            .off('error')
-            .off("canplay")
-            .off("progress")
-            .off("seeked")
-            .off("loadedmetadata");
+        if ($audio) {
+            $audio.off("loadeddata")
+                .off('volumechange')
+                .off('timeupdate')
+                .off('ended')
+                .off('pause')
+                .off('play')
+                .off('error')
+                .off("canplay")
+                .off("progress")
+                .off("seeked")
+                .off("loadedmetadata");
+        }
     }
 
     _onAudioLoadedHandler(audio) {
