@@ -59,7 +59,7 @@ export const getResources = (lessonId) => {
     }
 };
 
-export const get = (id, courseId)=> {
+export const get = (id, courseId) => {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_LESSON_REQUEST,
@@ -93,11 +93,9 @@ export const get = (id, courseId)=> {
 };
 
 export const create = (obj) => {
-    return (dispatch) => {
-        dispatch({
-            type: CREATE_NEW_LESSON,
-            payload: obj
-        });
+    return {
+        type: CREATE_NEW_LESSON,
+        payload: obj
     }
 };
 
@@ -148,7 +146,7 @@ export const changeData = (object) => {
     }
 };
 
-export const cancelChanges = ()=> {
+export const cancelChanges = () => {
     return (dispatch) => {
         dispatch({
             type: CANCEL_CHANGE_LESSON_DATA,
@@ -157,7 +155,7 @@ export const cancelChanges = ()=> {
     }
 };
 
-export const clear = ()=> {
+export const clear = () => {
     return (dispatch) => {
         dispatch({
             type: CLEAR_LESSON,
@@ -213,7 +211,7 @@ const handleLesson = (lesson) => {
     }
 
     lesson.mainEpisodes.sort((a, b) => {
-       return a.Number - b.Number
+        return a.Number - b.Number
     });
 
     lesson.suppEpisodes.sort((a, b) => {

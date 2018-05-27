@@ -22,7 +22,7 @@ export default function singleEpisode(state = initialState, action) {
         case CREATE_NEW_EPISODE: {
             let _newObject = {
                 Number: action.payload.Number,
-                State:'D',
+                State: 'D',
                 EpisodeType: action.payload.EpisodeType,
                 Supp: action.payload.Supp,
             };
@@ -51,13 +51,19 @@ export default function singleEpisode(state = initialState, action) {
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
 
         }
 
         case GET_SINGLE_EPISODE_FAIL:
-            return initialState;
+            return {
+            ...state,
+            initial: null,
+            current: null,
+            fetching: false,
+            hasChanges: false,
+        };
 
         case SAVE_EPISODE_SUCCESS: {
             let _id = action.payload.id ? action.payload.id : state.current.id;
@@ -68,27 +74,33 @@ export default function singleEpisode(state = initialState, action) {
                 ...state,
                 initial: Object.assign({}, state.current),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
         case CHANGE_EPISODE_DATA : {
             let _object = Object.assign({}, action.payload);
 
-            return {...state, current: _object, hasChanges: true };
+            return {...state, current: _object, hasChanges: true};
         }
 
         case CANCEL_CHANGE_EPISODE_DATA: {
             return {
                 ...state,
-                current: Object.assign({},state.initial),
+                current: Object.assign({}, state.initial),
                 fetching: false,
-                hasChanges : false,
+                hasChanges: false,
             };
         }
 
-        case CLEAR_EPISODE:{
-            return initialState
+        case CLEAR_EPISODE: {
+            return {
+                ...state,
+                initial: null,
+                current: null,
+                fetching: true,
+                hasChanges: false,
+            }
         }
 
         default:

@@ -6,7 +6,6 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 
 import 'webix/webix';
-import 'webix/webix.css';
 
 class Webix extends Component {
     render() {

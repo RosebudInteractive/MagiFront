@@ -67,7 +67,7 @@ export default class ObjectEditor extends React.Component {
 
     _initInsertMode() {
         this.editMode = EDIT_MODE_INSERT;
-        this.objectActions.create(this._getInitStateOfNewObject(this.props))
+        // this.objectActions.create(this._getInitStateOfNewObject(this.props))
     }
 
     _getInitStateOfNewObject(){
@@ -86,7 +86,11 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentDidMount() {
-
+        // if (this.objectId > 0) {
+        //     this._initEditMode()
+        // } else {
+        //     this._initInsertMode()
+        // }
     }
 
     _onUpdate() {}
@@ -107,7 +111,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     componentWillMount() {
-        // this._clearObjectInStorage()
+        this._clearObjectInStorage()
     }
 
     _clearObjectInStorage() {

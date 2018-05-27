@@ -78,7 +78,7 @@ export default function singleCourse(state = initialState, action) {
             return {
                 ...state, initial: null,
                 current: null,
-                fetching: false,
+                fetching: true,
                 hasChanges: false,
             }
         }

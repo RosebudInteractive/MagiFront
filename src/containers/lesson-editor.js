@@ -6,6 +6,7 @@ import * as lessonMainEpisodesActions from '../actions/lesson/lessonMainEpisodes
 import * as lessonCommonRefsActions from '../actions/lesson/lessonCommonRefsActions'
 import * as lessonRecommendedRefsActions from '../actions/lesson/lessonRecommendedRefsActions'
 
+import * as appActions from "../actions/app-actions";
 import * as singleCourseActions from "../actions/course/courseActions";
 import * as referenceActions from '../actions/references-actions';
 import * as resourcesActions from '../actions/resources-actions';
@@ -62,7 +63,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getInsertRout() {
-        return '/lessons/new/';
+        return '/lessons/new';
     }
 
     get objectIdPropName() {
@@ -725,10 +726,9 @@ export class LessonEditor extends ObjectEditor {
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover_template').refresh();
                             },
-                            onFileUploadError: (file, response) => {
-                                console.log(file, response)
+                            onFileUploadError: () => {
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
                             }
-
                         }
                     },
                 ]
@@ -841,6 +841,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        appActions: bindActionCreators(appActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         lessonMainEpisodesActions: bindActionCreators(lessonMainEpisodesActions, dispatch),
         lessonCommonRefsActions: bindActionCreators(lessonCommonRefsActions, dispatch),

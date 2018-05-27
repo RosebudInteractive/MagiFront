@@ -6469,6 +6469,7 @@ ul.user-tooltip {
       background-color: rgba(200, 104, 76, 0.3); }
 
 .lectures-menu-row {
+  top: 96px;
   height: 53px;
   position: fixed;
   left: 0;
@@ -13194,17 +13195,17 @@ ul.lectures-tab {
         position: static; } }
 
 .popup._registration{
-  top: -110vh;
+  top: -200vh;
   opacity: 1;
   bottom: auto;
   z-index: 1000;
   height: 100vh;
-  -webkit-transition: transform 0.5s ease;
-  transition: transform 0.5s ease;
+  -webkit-transition: transform 0.7s ease;
+  transition: transform 0.7s ease;
 }
 .popup._registration.opened {
   position: absolute;
-  transform: translateY(110vh);
+  transform: translateY(200vh);
 }
 
 ._registration {

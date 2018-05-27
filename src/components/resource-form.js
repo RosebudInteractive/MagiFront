@@ -6,6 +6,7 @@ import ErrorDialog from './ErrorDialog';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import * as appActions from "../actions/app-actions";
 
 class ResourceForm extends React.Component {
 
@@ -89,7 +90,7 @@ class ResourceForm extends React.Component {
     }
 
     getUI(save, cancel) {
-
+        let that = this;
 
         return {
             view: "form",
@@ -180,6 +181,7 @@ class ResourceForm extends React.Component {
                                         onFileUploadError: () => {
                                             window.$$('res-form-btnOk').enable();
                                             window.$$('res-form-btnCancel').enable();
+                                            that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
                                         }
                                     }
                                 },
@@ -296,6 +298,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        appActions: bindActionCreators(appActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
     }
 }

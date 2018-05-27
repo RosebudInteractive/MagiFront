@@ -99,7 +99,7 @@ export default function singleLesson(state = initialState, action) {
         case CLEAR_LESSON: {
             return {...state, initial: null,
                 current: null,
-                fetching: false,
+                fetching: true,
                 hasChanges: false,}
         }
 
