@@ -117,7 +117,7 @@ const COURSE_MSSQL_DELETE_SCRIPT =
     [
         "delete el from [Course] c\n" +
         "  join[Lesson] l on c.[Id] = l.[CourseId]\n" +
-        "  join[EpisodeLesson] el on l.[Id] = el.[EpisodeId]\n" +
+        "  join[EpisodeLesson] el on l.[Id] = el.[LessonId]\n" +
         "where c.[Id] = <%= id %>",
         "delete l from [LessonCourse] l\n" +
         "where l.[CourseId] = <%= id %> and (not l.[ParentId] is NULL)",
@@ -141,7 +141,7 @@ const COURSE_MYSQL_DELETE_SCRIPT =
     [
         "delete el from `Course` c\n" +
         "  join`Lesson` l on c.`Id` = l.`CourseId`\n" +
-        "  join`EpisodeLesson` el on l.`Id` = el.`EpisodeId`\n" +
+        "  join`EpisodeLesson` el on l.`Id` = el.`LessonId`\n" +
         "where c.`Id` = <%= id %>",
         "delete l from `LessonCourse` l\n" +
         "where l.`CourseId` = <%= id %> and (not l.`ParentId` is NULL)",
