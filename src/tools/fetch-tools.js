@@ -2,7 +2,7 @@ export function readResponseBody(response) {
     let _reader = response.body.getReader();
     let _data = '';
 
-    return _reader.read().then(function processText({ done, value }) {
+    return _reader.read().then(function processText({done, value}) {
         // Result objects contain two properties:
         // done  - true if the stream has already given you all its data.
         // value - some data. Always undefined when done is true.
@@ -47,27 +47,17 @@ export const checkStatus = (response) => {
     })
 };
 
-export const checkJsonStatus = (response) => {
-    return new Promise((resolve, reject) => {
-        if (response.status >= 200 && response.status < 300) {
-            resolve(response)
-        } else {
-            response.json()
-                .then(data => {
-                    let _message = response.statusText;
+export const handleJsonError = (error) => {
+    return new Promise((resolve) => {
+        error.response.json()
+            .then(data => {
+                let _message = error.response.statusText;
 
-                    if (data) {
-                        let _serverError = JSON.parse(data);
-                        if (_serverError.hasOwnProperty('message')) {
-                            _message = _serverError.message;
-                        } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
-                            _message = _serverError.errors.join(',\n')
-                        }
-                    }
-                    let error = new Error(_message);
-                    reject(error)
-                })
-        }
+                if (data && data.hasOwnProperty('message')) {
+                    _message = data.message;
+                }
+                resolve(_message)
+            })
     })
 };
 

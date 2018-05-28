@@ -10,6 +10,8 @@ import {
     SHOW_ERROR_DIALOG,
 } from '../constants/Common';
 
+import {handleJsonError} from '../tools/fetch-tools';
+
 export const show = () => {
     return {
         type: WORK_SHOP_SHOW,
@@ -36,15 +38,18 @@ export const loadData = (object) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: WORK_SHOP_GET_DATA_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: WORK_SHOP_GET_DATA_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    })
             });
 
     }
