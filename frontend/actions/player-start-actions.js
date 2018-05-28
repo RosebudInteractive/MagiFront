@@ -21,10 +21,10 @@ export const startPlayLesson = (lesson) => {
     }
 };
 
-export const startPlay = () => {
+export const startPlay = (lessonId) => {
     return {
         type: PLAYER_START_PLAY,
-        payload: null
+        payload: lessonId
     };
 };
 

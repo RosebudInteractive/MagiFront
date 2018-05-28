@@ -26,7 +26,7 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay()
+        this.props.playerStartActions.startPlay(this.props.id)
     }
 
     _unlock() {
@@ -109,7 +109,7 @@ class PlayBlock extends React.Component {
                                 strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
                     </svg>
                 </div>
-                <input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>
+                {/*<input className="loader-field" id="percent" name="percent" value="75" readOnly={true}/>*/}
                 {this._getButton(_isFinished)}
                 <div className="lecture__tooltip">{this._getTooltip(_isFinished)}</div>
                 <div className='duration'>{this.props.duration}</div>

@@ -46,18 +46,18 @@ const playerMiddleware = store => next => action => {
 
         case PLAYER_START_PLAY: {
             let _state = store.getState(),
-                _isFinished = false;
+                _isFinished = false,
+                _id = null;
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
-                let _id = _state.player.playingLesson.lessonId,
-                    _lessonsMap = _state.lessonInfoStorage.lessons;
+                _id = _state.player.playingLesson.lessonId;
+                let _lessonsMap = _state.lessonInfoStorage.lessons;
 
                 _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false;
             }
 
-
-            if (Player.getInstance()) {
+            if ((_id === action.payload) && Player.getInstance()) {
                 if (_isFinished) {
                     Player.getInstance().replay()
                 } else {

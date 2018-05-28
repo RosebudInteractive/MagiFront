@@ -26,7 +26,9 @@ export default class Captcha extends React.Component {
     }
 
     reset() {
-        recaptchaInstance.reset()
+        if (recaptchaInstance) {
+            recaptchaInstance.reset()
+        }
     }
 
     render() {

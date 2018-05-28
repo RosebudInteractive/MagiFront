@@ -45,7 +45,7 @@ class LessonFrame extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
         this.forceUpdate()
-        this.props.playerStartActions.startPlay()
+        this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
     _unlock() {

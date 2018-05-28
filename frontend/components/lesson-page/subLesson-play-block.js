@@ -8,11 +8,11 @@ import * as playerStartActions from '../../actions/player-start-actions'
 
 class SubLessonPlayBlock extends React.Component {
     static propTypes = {
-        cover: PropTypes.string.isRequired,
-        duration: PropTypes.string.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-        lessonUrl: PropTypes.string.isRequired,
-        audios: PropTypes.array.isRequired,
+        cover: PropTypes.string,
+        duration: PropTypes.string,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
+        audios: PropTypes.array,
     };
 
     constructor(props) {
@@ -25,7 +25,7 @@ class SubLessonPlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay()
+        this.props.playerStartActions.startPlay(this.props.id)
     }
 
     render() {

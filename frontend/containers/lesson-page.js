@@ -31,7 +31,7 @@ class LessonPage extends React.Component {
         this._mountPlayerGuard = true;
 
         this._resizeHandler = (e) => {
-            let text = window.screen.availHeight  + ' : '  + window.screen.availWidth
+            let text = window.screen.availHeight + ' : ' + window.screen.availWidth
             alert(text)
             alert(e.handleObj.type + ' innerHeight: ' + window.innerHeight);
 
@@ -53,7 +53,6 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         this._needStartPlayer = this.props.params === '?play'
-        this._isRedirectedByMount = this.props.params !== '?play';
     }
 
     componentDidMount() {
@@ -62,8 +61,6 @@ class LessonPage extends React.Component {
         });
 
         this._mountKeydownHandler();
-        // $(window).resize(::this._resizeHandler)
-        // $(window).on('orientationchange', ::this._resizeHandler)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -237,8 +234,22 @@ class LessonPage extends React.Component {
             _isManyLessonsOnPage = this._getAnchors().length > 0,
             _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
 
-        let _lessonAudios = this.props.lessons.object.find((item) => {
-            return item.Id == lesson.Id
+        let _lessonAudios = null;
+
+        this.props.lessons.object.some((item) => {
+            let _founded = item.Id === lesson.Id
+
+            if (!_founded && (item.Lessons.length > 0)) {
+                return item.Lessons.some((subItem) => {
+                    if (subItem.Id === lesson.Id) {
+                        _lessonAudios = subItem;
+                    }
+                    return subItem.Id === lesson.Id
+                })
+            } else {
+                _lessonAudios = item;
+                return true
+            }
         })
 
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
