@@ -18,7 +18,7 @@ function setupEpisodes(app) {
             });
     });
 
-    app.get('/api/episodes/play/:id/:lessonId', (req, res, next) => {
+    app.get('/api/adm/episodes/play/:id/:lessonId', (req, res, next) => {
         LessonsService()
             .getPlayerData(parseInt(req.params.lessonId), parseInt(req.params.id))
             .then(rows => {

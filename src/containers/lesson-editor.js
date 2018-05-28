@@ -6,7 +6,6 @@ import * as lessonMainEpisodesActions from '../actions/lesson/lessonMainEpisodes
 import * as lessonCommonRefsActions from '../actions/lesson/lessonCommonRefsActions'
 import * as lessonRecommendedRefsActions from '../actions/lesson/lessonRecommendedRefsActions'
 
-import * as appActions from "../actions/app-actions";
 import * as singleCourseActions from "../actions/course/courseActions";
 import * as referenceActions from '../actions/references-actions';
 import * as resourcesActions from '../actions/resources-actions';
@@ -63,7 +62,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getInsertRout() {
-        return '/lessons/new';
+        return '/lessons/new/';
     }
 
     get objectIdPropName() {
@@ -139,7 +138,7 @@ export class LessonEditor extends ObjectEditor {
     _getCoverInfo() {
         let _meta = this.coverMeta;
         return {
-            path: _meta ? ('/data/' + _meta.path + _meta.content.s) : null,
+            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.cover)) : null,
             heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
         };
     }
@@ -221,6 +220,7 @@ export class LessonEditor extends ObjectEditor {
                 LanguageId: resource.LanguageId,
                 FileName: resource.FileName,
                 Name: resource.Name,
+                MetaData: resource.MetaData,
                 ResType: resource.ResType,
             })
         });
@@ -722,13 +722,14 @@ export class LessonEditor extends ObjectEditor {
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
-                                window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover-file').setValue(response[0].file);
+                                window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
                             },
-                            onFileUploadError: () => {
-                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                            onFileUploadError: (file, response) => {
+                                console.log(file, response)
                             }
+
                         }
                     },
                 ]
@@ -841,7 +842,6 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        appActions: bindActionCreators(appActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         lessonMainEpisodesActions: bindActionCreators(lessonMainEpisodesActions, dispatch),
         lessonCommonRefsActions: bindActionCreators(lessonCommonRefsActions, dispatch),
