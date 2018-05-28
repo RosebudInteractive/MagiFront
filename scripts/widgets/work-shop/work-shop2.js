@@ -400,8 +400,10 @@ export default class CWorkShop extends CWSBase {
                 //}
             },
             onAddElement: function (e) {
+                that._tracksWidget.addElement(e.track, e.elements);
                 if (that._options.tracks.onAddElement)
                     that._options.tracks.onAddElement(e);
+                that._tracksWidget.render();
             }
         };
     }
