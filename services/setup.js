@@ -11,6 +11,7 @@ const expressSession = require('express-session');
 const passport = require('passport');
 const methodOverride = require('method-override');
 
+const { HttpCode } = require("../const/http-codes");
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
@@ -25,6 +26,10 @@ const { setupLessons } = require('./lessons');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const setupLessonPositions = require('./lesson-positions');
+
+function errorHandler(err, req, res, next) {
+    res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
+}
 
 function setupAPI(express, app) {
     var path = require('path');
@@ -92,6 +97,8 @@ function setupAPI(express, app) {
     app.get('/api', function (req, res) {
         res.send('API is running');
     });
+
+    app.use("/api", errorHandler);
 }
 
 exports.setupAPI = setupAPI;

@@ -292,9 +292,33 @@ export default class CWSTracks extends CWSBase {
 
     }
 
+    addElement(trackId, elements) {
+        for (let k = 0; k < elements.length; k++) {
+            let data = elements[k];
+            for (let i = 0; i < this._tracks.length; i++) {
+                let track = this._tracks[i];
+                if (data.content.track != track.id) {
+                    continue;
+                }
+                let found = false;
+                for (let j = 0; j < track.elements.length; j++) {
+                    if (track.elements[j].id == data.id) {
+                        track.elements[j] = data;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    track.elements.push(data);
+                }
+            }
+        }
+    }
+
     _setZoomCircle(e_offsetX) {
         let maxZoomPos = this._getMaxZoomPosition();
-        let new_position = e_offsetX
+        let new_position = e_offsetX;
         if (new_position < 0) new_position = 0;
         if (new_position > maxZoomPos) new_position = maxZoomPos;
         this._recalcZoomState(new_position);
@@ -333,6 +357,33 @@ export default class CWSTracks extends CWSBase {
             }
         });
 
+        let zoomLeft = this._container.find(".zoom-left");
+        let zoomRight = this._container.find(".zoom-right");
+
+        zoomLeft.click(() => {
+            this._zoomByStep(-1);
+        });
+        zoomRight.click(() => {
+            this._zoomByStep(1);
+        });
+    }
+
+    // koef = -1 for left, +1 for right
+    _zoomByStep(koef) {
+        let position = this._circle.position();
+        let left = position.left;
+
+        let maxZoomPos = this._getMaxZoomPosition();
+        let new_position = left + this._circle.width()/2 + (koef * 10);
+
+        if (new_position < 0) new_position = 0;
+        if (new_position > maxZoomPos) new_position = maxZoomPos;
+
+        this._recalcZoomState(new_position);
+        this._circle.css('left', new_position - this._circle.width()/2 + 'px');
+        this._renderZoom(false);
+        this._scrollerDiv.scrollerData.scrollBy(0,0);
+        this.render();
     }
 
     _renderElements(elements, item) {
@@ -715,7 +766,7 @@ export default class CWSTracks extends CWSBase {
                     this._scrollerDiv.scrollerData.horBar.mousedownOffset = e.clientX;
                     this._scrollerDiv.scrollerData.scrollBy(-deltaX*ratio, 0);
                 },
-                eventMouseUp: (e) => {
+                eventMouseUp: () => {
                     this._scrollerDiv.scrollerData.horBar.element.classList.remove('ws-scroller-mousedown');
                     this._scrollerDiv.scrollerData.horBar.mousedown = false;
                     window.removeEventListener('mouseup', this._scrollerDiv.scrollerData.horBar.eventMouseUp);
@@ -863,7 +914,7 @@ export default class CWSTracks extends CWSBase {
             meter_mouse_down = false;
         });
         meter.on('mouseleave', function(e) {
-            meter.removeClass('ws-volume-meter-over')
+            meter.removeClass('ws-volume-meter-over');
             if (meter_mouse_down) that.setVolumeMeter.bind(this, e, that)();
             meter_mouse_down = false;
         });
@@ -1597,7 +1648,7 @@ export default class CWSTracks extends CWSBase {
 
     _renderZoom(reposPointer, audioState) {
         if (reposPointer) {
-            this._circle.css("left", this._zoomState.position);
+            this._circle.css("left", this._zoomState.position - this._circle.width()/2);
         }
 
         this._renderLiner(audioState);
@@ -1705,6 +1756,13 @@ export default class CWSTracks extends CWSBase {
         this._lineWrapper.off('mousedown');
         this._lineWrapper.off('mouseup');
         this._lineWrapper.off('mousemove');
+
+        let zoomLeft = this._container.find(".zoom-left");
+        let zoomRight = this._container.find(".zoom-right");
+
+        zoomLeft.off("click");
+        zoomRight.off("click");
+
     }
 
     _unsetTrackEvents() {

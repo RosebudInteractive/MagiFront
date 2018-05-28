@@ -83,7 +83,8 @@ export default class CWSPlayerDesign extends CWSPlayer {
 
         let element = {
             id: Utils.guid(),
-            asset: {id: ui.draggable.data("data").id, body: null},
+            asset: ui.draggable.data("data"),
+            assetId: ui.draggable.data("data").id,
             start: startTime,
             content: {
                 duration: 5,
@@ -100,6 +101,11 @@ export default class CWSPlayerDesign extends CWSPlayer {
             ],
         };
         track.elements.push(element);
+
+        this._options.loader.changeElements(trackId, track.elements);
+        this._prepareElements();
+        this.renderPosition(null);
+
         if (this._correctElementsIntersection(track, element, false))
             this._broadcastAddElement(trackId, track.elements);
     }
@@ -114,7 +120,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
             let trackIsFree = true;
             for (let j = 0; j < track.elements.length; j++) {
                 let el = track.elements[j];
-                if (el.start <= pos && pos <= el.start + el.duration) {
+                if (el.start <= pos && pos <= el.start + el.content.duration) {
                     trackIsFree = false;
                     break;
                 }
@@ -165,14 +171,14 @@ export default class CWSPlayerDesign extends CWSPlayer {
             }
             // если не зажат Shift, то пытаемся ужать следующий элемент
             if (!shift && oldStart != element.start) {
-                element.duration -= element.start - oldStart;
-                if (element.duration < 1) element.duration = 1;
+                element.content.duration -= element.start - oldStart;
+                if (element.content.duration < 1) element.content.duration = 1;
             }
 
-            currentPos = element.start + element.duration;
+            currentPos = element.start + element.content.duration;
         }
         let last = elements[elements.length - 1];
-        if (last.start + last.duration > audioState.duration) {
+        if (last.start + last.content.duration > audioState.duration) {
             return false;
         }
 
@@ -182,7 +188,7 @@ export default class CWSPlayerDesign extends CWSPlayer {
                 if (track.elements[j].id == el.id) {
                     let tEl = track.elements[j];
                     tEl.start = el.start;
-                    tEl.duration = el.duration;
+                    tEl.content.duration = el.content.duration;
                     break;
                 }
             }
