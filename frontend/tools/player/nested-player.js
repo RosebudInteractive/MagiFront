@@ -116,8 +116,11 @@ class NestedPlayer {
 
     _loadOtherLesson(data, initState) {
         if (data) {
-            this.player.pause();
-            this.player = null;
+            if (this.player) {
+                this.player.pause();
+                this.player = null;
+            }
+
             this._fullPlayer.destroy();
             // this._smallPlayer.destroy();
 
@@ -172,6 +175,9 @@ class NestedPlayer {
     }
 
     pause() {
+        if (!this.player) {
+            return
+        }
         this._hasStoppedOnSwitch = false;
         return this.player.pause()
     }
@@ -185,6 +191,10 @@ class NestedPlayer {
     }
 
     play() {
+        if (!this.player) {
+            return
+        }
+
         this.player.play()
             .then(() => {
                 if (this._initState) {
@@ -218,8 +228,9 @@ class NestedPlayer {
         this.player.pause()
             .then(() => {
                 store.dispatch(playerActions.stop())
-                this.player = null;
-                this._playingData = null;
+                // this.player = null;
+                // this.clearPlayInfo();
+                this._stopped = true;
             })
         this._hasStoppedOnSwitch = false;
 

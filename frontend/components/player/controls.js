@@ -29,7 +29,7 @@ class Controls extends React.Component {
 
     _startPlay() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
-        this.props.playerStartActions.startPlay()
+        this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
     render() {

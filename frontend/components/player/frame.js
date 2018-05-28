@@ -62,7 +62,7 @@ class Frame extends Component {
             }
 
             if (_isPauseFrame) {
-                this.props.playerStartActions.startPlay()
+                this.props.playerStartActions.startPlay(this.props.lesson.Id)
             }
 
             this._hideContentTooltip = this.state.showContent;
@@ -190,7 +190,7 @@ class Frame extends Component {
 
     _onPause() {
         if (this.props.paused) {
-            this.props.playerStartActions.startPlay()
+            this.props.playerStartActions.startPlay(this.props.lesson.Id)
         }
         else {
             this.props.playerStartActions.startPause()

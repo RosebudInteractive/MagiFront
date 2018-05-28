@@ -31,7 +31,7 @@ class SignInForm extends React.Component {
     }
 
     static propTypes = {
-        onSubmit: PropTypes.func.require,
+        onSubmit: PropTypes.func,
     };
 
     _handleSubmit(values) {

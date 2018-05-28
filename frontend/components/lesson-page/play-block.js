@@ -27,14 +27,18 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay()
+        this.props.playerStartActions.startPlay(this.props.id)
+    }
+
+    _startPlay() {
+        this.props.playerStartActions.startPlay(this.props.id)
     }
 
     _unlock() {
         this.props.userActions.showSignInForm();
     }
 
-    _getButton(isFinished) {
+    _getButton(isThisLessonPlaying, isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
@@ -50,11 +54,13 @@ class PlayBlock extends React.Component {
             _button = (
                 isFinished
                     ?
-                    <button type="button" className="lecture__btn paused" onClick={::this.props.playerStartActions.startPlay}>
+                    <button type="button" className="lecture__btn paused"
+                            onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
                         <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
                     </button>
                     :
-                    <button type="button" className="lecture__btn" onClick={::this.props.playerStartActions.startPlay}>
+                    <button type="button" className="lecture__btn"
+                            onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
                         <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
             )
@@ -63,7 +69,7 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
-    _getTooltip(isThisLessonPlaying, isFinished){
+    _getTooltip(isThisLessonPlaying, isFinished) {
         let {isAuthRequired, authorized, paused} = this.props,
             _tooltip = null;
 
@@ -118,14 +124,14 @@ class PlayBlock extends React.Component {
                             ?
                             (paused)
                                 ?
-                                this._getButton(_isFinished)
+                                this._getButton(_isThisLessonPlaying, _isFinished)
                                 :
                                 <button className="play-block__btn paused"
                                         onClick={::this.props.playerStartActions.startPause}>
                                     <svg width="23" height="36" dangerouslySetInnerHTML={{__html: _pause}}/>
                                 </button>
                             :
-                            this._getButton(_isFinished)
+                            this._getButton(_isThisLessonPlaying, _isFinished)
                     }
                     <div className="play-block__tooltip">{_tooltipText}</div>
                     <div className="play-block__duration">{this.props.duration}</div>
