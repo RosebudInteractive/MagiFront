@@ -267,13 +267,22 @@ class EpisodeEditor extends ObjectEditor {
         return _dialogs;
     }
 
+    _notifyDataLoaded() {
+        super._notifyDataLoaded();
+
+        if (!this.props.lessonId || !this.props.episodeId) {
+            window.$$('btn-work-shop').disable()
+        } else {
+            window.$$('btn-work-shop').enable()
+        }
+    }
 
     _getExtElements() {
         let that = this;
 
         return [
             {
-                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол',
+                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id:'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
                     let {lessonId, episodeId} = that.props;
@@ -286,7 +295,7 @@ class EpisodeEditor extends ObjectEditor {
 
                         that.props.workShopActions.loadData(_object)
                     }
-                }
+                },
             },
             {
                 view: "text",

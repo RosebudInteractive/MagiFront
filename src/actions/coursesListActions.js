@@ -13,7 +13,9 @@ import {
 
 import 'whatwg-fetch';
 
-export const getCourses = ()=> {
+import {checkJsonStatus} from '../tools/fetch-tools';
+
+export const getCourses = () => {
     return (dispatch) => {
         dispatch({
             type: GET_COURSES_REQUEST,
@@ -75,10 +77,13 @@ export const deleteCourse = (id) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                checkJsonStatus(err.response)
+                    .then((data) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: data
+                        })
+                    })
             });
 
     }

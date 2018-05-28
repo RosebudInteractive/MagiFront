@@ -28,6 +28,8 @@ export default function singleLesson(state = initialState, action) {
                 LessonType: action.payload.LessonType,
                 CurrParentName: action.payload.CurrParentName,
                 CurrParentId: action.payload.CurrParentId,
+                suppEpisodes: [],
+                mainEpisodes: [],
             };
 
             return {
