@@ -1063,16 +1063,14 @@ const DbLesson = class DbLesson extends DbObject {
                         if (result && result.detail && (result.detail.length > 0)) {
                             result.detail.forEach((elem) => {
                                 data.title = elem.Name;
-                                if (curr_id !== elem.Episode) {
+                                if (curr_id !== elem.Episode)
                                     curr_episode = epi_list[elem.Episode];
-                                    if (!curr_episode)
-                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");
-                                }
-                                curr_episode.contents.push({
-                                    id: elem.Id,
-                                    title: elem.Topic,
-                                    begin: elem.StartTime / 1000.
-                                });
+                                if (curr_episode)
+                                    curr_episode.contents.push({
+                                        id: elem.Id,
+                                        title: elem.Topic,
+                                        begin: elem.StartTime / 1000.
+                                    });
                             });
                         }
                         return data;
