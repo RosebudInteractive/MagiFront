@@ -1,46 +1,222 @@
 {
-    "$sys": {
-        "typeGuid": "feebc518-1fa6-4051-b39e-7958ed30feb7"
-    }, 
-    "fields": {
-        "Id": 1000, 
-        "Name": "DataRoot"
-    }, 
-    "collections": {
-        "DataElements": [
-            {
-                "$sys": {
-                    "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
-                }, 
-                "fields": {
-                    "Id": 1,
-                    "AuthorId": 1, 
-                    "CourseId": 1
-                }, 
-                "collections": { }
-            },
-            {
-                "$sys": {
-                    "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
-                },
-                "fields": {
-                    "Id": 2,
-                    "AuthorId": 2,
-                    "CourseId": 2
-                },
-                "collections": {}
-            },
-            {
-                "$sys": {
-                    "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
-                },
-                "fields": {
-                    "Id": 3,
-                    "AuthorId": 3,
-                    "CourseId": 3
-                },
-                "collections": {}
-            }
-        ]
-    }
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 2,
+          "CourseId": 1,
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 3,
+          "CourseId": 2,
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 4,
+          "CourseId": 3,
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 1,
+          "CourseId": 4,
+          "Id": 4
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 5,
+          "CourseId": 5,
+          "Id": 5
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 6,
+          "CourseId": 6,
+          "Id": 6
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 7,
+          "CourseId": 7,
+          "Id": 7
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 8,
+          "CourseId": 8,
+          "Id": 8
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 9,
+          "CourseId": 9,
+          "Id": 9
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 10,
+          "CourseId": 10,
+          "Id": 10
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 11,
+          "CourseId": 11,
+          "Id": 11
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 3,
+          "CourseId": 12,
+          "Id": 12
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 7,
+          "CourseId": 13,
+          "Id": 13
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 12,
+          "CourseId": 14,
+          "Id": 14
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 8,
+          "CourseId": 15,
+          "Id": 15
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 13,
+          "CourseId": 16,
+          "Id": 16
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 14,
+          "CourseId": 16,
+          "Id": 17
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 7,
+          "CourseId": 17,
+          "Id": 18
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "2f0ce749-4169-4ec0-9a87-0ffd405a4337"
+        },
+        "fields": {
+          "AuthorId": 15,
+          "CourseId": 18,
+          "Id": 19
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "feebc518-1fa6-4051-b39e-7958ed30feb7"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
 }

@@ -1,0 +1,223 @@
+{
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2016/12/Kukin-Mihail-YUrevich.jpg",
+          "PortraitMeta": "{\"path\":\"2016/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Kukin-Mihail-YUrevich-360x540.jpg\"},\"icon\":\"Kukin-Mihail-YUrevich-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2016/12/Kukin-Mihail-YUrevich.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Kukin-Mihail-YUrevich-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Kukin-Mihail-YUrevich-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1480374588\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"1600\",\"shutter_speed\":\"0.008\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "mihail-kukin",
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2016/12/Viktor-Semenovich-Listov.jpg",
+          "PortraitMeta": "{\"path\":\"2016/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":803,\"height\":1071},\"content\":{\"m\":\"Viktor-Semenovich-Listov-768x1024.jpg\",\"s\":\"Viktor-Semenovich-Listov-360x480.jpg\"},\"icon\":\"Viktor-Semenovich-Listov-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":803,\"height\":1071,\"file\":\"2016/12/Viktor-Semenovich-Listov.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Viktor-Semenovich-Listov-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"medium_large\":{\"file\":\"Viktor-Semenovich-Listov-768x1024.jpg\",\"width\":768,\"height\":1024,\"mime-type\":\"image/jpeg\"},\"img_768\":{\"file\":\"Viktor-Semenovich-Listov-768x1024.jpg\",\"width\":768,\"height\":1024,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Viktor-Semenovich-Listov-360x480.jpg\",\"width\":360,\"height\":480,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481116360\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"2000\",\"shutter_speed\":\"0.002\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "viktor-listov",
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2016/12/Lekmanov-Oleg-Andershanovich.jpg",
+          "PortraitMeta": "{\"path\":\"2016/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Lekmanov-Oleg-Andershanovich-360x540.jpg\"},\"icon\":\"Lekmanov-Oleg-Andershanovich-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2016/12/Lekmanov-Oleg-Andershanovich.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Lekmanov-Oleg-Andershanovich-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Lekmanov-Oleg-Andershanovich-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481635032\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"1250\",\"shutter_speed\":\"0.01\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "oleg-lekmanov",
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2016/12/Roman-Aleksandrovich-Nasonov.jpg",
+          "PortraitMeta": "{\"path\":\"2016/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":803,\"height\":1071},\"content\":{\"m\":\"Roman-Aleksandrovich-Nasonov-768x1024.jpg\",\"s\":\"Roman-Aleksandrovich-Nasonov-360x480.jpg\"},\"icon\":\"Roman-Aleksandrovich-Nasonov-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":803,\"height\":1071,\"file\":\"2016/12/Roman-Aleksandrovich-Nasonov.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Roman-Aleksandrovich-Nasonov-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"medium_large\":{\"file\":\"Roman-Aleksandrovich-Nasonov-768x1024.jpg\",\"width\":768,\"height\":1024,\"mime-type\":\"image/jpeg\"},\"img_768\":{\"file\":\"Roman-Aleksandrovich-Nasonov-768x1024.jpg\",\"width\":768,\"height\":1024,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Roman-Aleksandrovich-Nasonov-360x480.jpg\",\"width\":360,\"height\":480,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481203631\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"800\",\"shutter_speed\":\"0.0025\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "roman-nasonov",
+          "Id": 4
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2016/12/Melnikov-Sergej-Anatolevich.jpg",
+          "PortraitMeta": "{\"path\":\"2016/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Melnikov-Sergej-Anatolevich-360x540.jpg\"},\"icon\":\"Melnikov-Sergej-Anatolevich-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2016/12/Melnikov-Sergej-Anatolevich.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Melnikov-Sergej-Anatolevich-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Melnikov-Sergej-Anatolevich-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481377195\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"800\",\"shutter_speed\":\"0.00625\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "sergei-melnikov",
+          "Id": 5
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/04/Sergey_Sherbak-2.jpg",
+          "PortraitMeta": "{\"path\":\"2017/04/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1036},\"content\":{\"s\":\"Sergey_Sherbak-2-360x540.jpg\"},\"icon\":\"Sergey_Sherbak-2-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1036,\"file\":\"2017/04/Sergey_Sherbak-2.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Sergey_Sherbak-2-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Sergey_Sherbak-2-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1487687971\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"800\",\"shutter_speed\":\"0.00625\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "sergey-sherbak",
+          "Id": 6
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/04/Irina_Yazykova2.jpg",
+          "PortraitMeta": "{\"path\":\"2017/04/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1036},\"content\":{\"s\":\"Irina_Yazykova2-360x540.jpg\"},\"icon\":\"Irina_Yazykova2-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1036,\"file\":\"2017/04/Irina_Yazykova2.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Irina_Yazykova2-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Irina_Yazykova2-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1487767089\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"500\",\"shutter_speed\":\"0.005\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "irina-yazykova",
+          "Id": 7
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/04/Fedor_Sinelnikov.jpg",
+          "PortraitMeta": "{\"path\":\"2017/04/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1036},\"content\":{\"s\":\"Fedor_Sinelnikov-360x540.jpg\"},\"icon\":\"Fedor_Sinelnikov-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1036,\"file\":\"2017/04/Fedor_Sinelnikov.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Fedor_Sinelnikov-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Fedor_Sinelnikov-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481543879\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"800\",\"shutter_speed\":\"0.005\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "sinelnikov",
+          "Id": 8
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/09/Olga_Alieva_01.jpg",
+          "PortraitMeta": "{\"path\":\"2017/09/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Olga_Alieva_01-360x540.jpg\"},\"icon\":\"Olga_Alieva_01-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2017/09/Olga_Alieva_01.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Olga_Alieva_01-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Olga_Alieva_01-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1487598642\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"500\",\"shutter_speed\":\"0.0125\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "olga_alieva",
+          "Id": 9
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/09/Eugenia_Koltsova.jpg",
+          "PortraitMeta": "{\"path\":\"2017/09/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Eugenia_Koltsova-360x540.jpg\"},\"icon\":\"Eugenia_Koltsova-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2017/09/Eugenia_Koltsova.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Eugenia_Koltsova-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Eugenia_Koltsova-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Edward Tadevossian\",\"camera\":\"Canon EOS 7D\",\"caption\":\"\",\"created_timestamp\":\"1481547263\",\"copyright\":\"Edward Tadevossian\",\"focal_length\":\"85\",\"iso\":\"800\",\"shutter_speed\":\"0.0015625\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "eugenia_koltsova",
+          "Id": 10
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/10/Oleg_Voskoboinikov.jpg",
+          "PortraitMeta": "{\"path\":\"2017/10/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":741,\"height\":1036},\"content\":{\"s\":\"Oleg_Voskoboinikov-360x503.jpg\"},\"icon\":\"Oleg_Voskoboinikov-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":741,\"height\":1036,\"file\":\"2017/10/Oleg_Voskoboinikov.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Oleg_Voskoboinikov-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Oleg_Voskoboinikov-360x503.jpg\",\"width\":360,\"height\":503,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"1.8\",\"credit\":\"Ed Tadevossian\",\"camera\":\"Canon EOS-1D X\",\"caption\":\"\",\"created_timestamp\":\"1506945472\",\"copyright\":\"Ed Tadevossian\",\"focal_length\":\"85\",\"iso\":\"1250\",\"shutter_speed\":\"0.002\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "oleg_voskoboinikov",
+          "Id": 11
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2017/12/Kirill_Svetlyakov_chb.jpg",
+          "PortraitMeta": "{\"path\":\"2017/12/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":360,\"height\":540},\"content\":{\"s\":\"Kirill_Svetlyakov_chb-360x540.jpg\"},\"icon\":\"Kirill_Svetlyakov_chb-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":360,\"height\":540,\"file\":\"2017/12/Kirill_Svetlyakov_chb.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Kirill_Svetlyakov_chb-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Kirill_Svetlyakov_chb-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"0\",\"credit\":\"Evgeny Alekseev\",\"camera\":\"\",\"caption\":\"\",\"created_timestamp\":\"0\",\"copyright\":\"\",\"focal_length\":\"0\",\"iso\":\"0\",\"shutter_speed\":\"0\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "kirill_svetlyakov",
+          "Id": 12
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2018/02/Sanches1.jpg",
+          "PortraitMeta": "{\"path\":\"2018/02/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":691,\"height\":1037},\"content\":{\"s\":\"Sanches1-360x540.jpg\"},\"icon\":\"Sanches1-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":691,\"height\":1037,\"file\":\"2018/02/Sanches1.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Sanches1-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Sanches1-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"2.8\",\"credit\":\"\",\"camera\":\"Canon EOS 6D\",\"caption\":\"\",\"created_timestamp\":\"1419173979\",\"copyright\":\"\",\"focal_length\":\"64\",\"iso\":\"500\",\"shutter_speed\":\"0.002\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "lev_maciel_sanches",
+          "Id": 13
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2018/02/Vinogradov.jpg",
+          "PortraitMeta": "{\"path\":\"2018/02/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":692,\"height\":1037},\"content\":{\"s\":\"Vinogradov-360x539.jpg\"},\"icon\":\"Vinogradov-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":692,\"height\":1037,\"file\":\"2018/02/Vinogradov.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Vinogradov-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Vinogradov-360x539.jpg\",\"width\":360,\"height\":539,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"0\",\"credit\":\"\",\"camera\":\"\",\"caption\":\"\",\"created_timestamp\":\"0\",\"copyright\":\"\",\"focal_length\":\"0\",\"iso\":\"0\",\"shutter_speed\":\"0\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "andrey_vinogradov",
+          "Id": 14
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "47b13680-c656-4ba4-82e6-3bd14badfcef"
+        },
+        "fields": {
+          "AccountId": 1,
+          "Portrait": "2018/04/Anna-Guseva.jpg",
+          "PortraitMeta": "{\"path\":\"2018/04/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":640,\"height\":960},\"content\":{\"s\":\"Anna-Guseva-360x540.jpg\"},\"icon\":\"Anna-Guseva-150x150.jpg\"}",
+          "RawPortraitMeta": "{\"width\":640,\"height\":960,\"file\":\"2018/04/Anna-Guseva.jpg\",\"sizes\":{\"thumbnail\":{\"file\":\"Anna-Guseva-150x150.jpg\",\"width\":150,\"height\":150,\"mime-type\":\"image/jpeg\"},\"img_360\":{\"file\":\"Anna-Guseva-360x540.jpg\",\"width\":360,\"height\":540,\"mime-type\":\"image/jpeg\"}},\"image_meta\":{\"aperture\":\"0\",\"credit\":\"\",\"camera\":\"\",\"caption\":\"\",\"created_timestamp\":\"0\",\"copyright\":\"\",\"focal_length\":\"0\",\"iso\":\"0\",\"shutter_speed\":\"0\",\"title\":\"\",\"orientation\":\"1\",\"keywords\":{}}}",
+          "URL": "anna_guseva",
+          "Id": 15
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "065a0fce-be87-45db-8aa6-0581e7846c83"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
+}

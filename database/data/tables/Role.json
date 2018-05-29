@@ -1,0 +1,61 @@
+{
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "e788831c-6f91-4bf6-ae6f-a21f0243d670"
+        },
+        "fields": {
+          "Code": "ADM",
+          "Name": "Administrator",
+          "ShortCode": "a",
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "e788831c-6f91-4bf6-ae6f-a21f0243d670"
+        },
+        "fields": {
+          "Code": "EDT",
+          "Name": "Editor",
+          "ShortCode": "e",
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "e788831c-6f91-4bf6-ae6f-a21f0243d670"
+        },
+        "fields": {
+          "Code": "SBS",
+          "Name": "Subscriber",
+          "ShortCode": "s",
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "e788831c-6f91-4bf6-ae6f-a21f0243d670"
+        },
+        "fields": {
+          "Code": "PND",
+          "Name": "Pending",
+          "ShortCode": "p",
+          "Id": 4
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "b23a3900-6f89-4df4-b4e4-ca6d475b3d60"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
+}

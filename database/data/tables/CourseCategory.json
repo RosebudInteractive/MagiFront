@@ -1,57 +1,211 @@
 {
-    "$sys": {
-        "typeGuid": "6b65ee98-e1fa-4580-9f90-ad835349a8e5"
-    }, 
-    "fields": {
-        "Id": 1000, 
-        "Name": "DataRoot"
-    }, 
-    "collections": {
-        "DataElements": [
-            {
-                "$sys": {
-                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
-                }, 
-                "fields": {
-                    "Id": 1,
-                    "CategoryId": 8, 
-                    "CourseId": 1
-                }, 
-                "collections": { }
-            },
-            {
-                "$sys": {
-                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
-                },
-                "fields": {
-                    "Id": 2,
-                    "CategoryId": 10,
-                    "CourseId": 1
-                },
-                "collections": {}
-            },
-            {
-                "$sys": {
-                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
-                },
-                "fields": {
-                    "Id": 3,
-                    "CategoryId": 9,
-                    "CourseId": 2
-                },
-                "collections": {}
-            },
-            {
-                "$sys": {
-                    "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
-                },
-                "fields": {
-                    "Id": 4,
-                    "CategoryId": 7,
-                    "CourseId": 3
-                },
-                "collections": {}
-            }
-        ]
-    }
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 1,
+          "CategoryId": 5,
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 2,
+          "CategoryId": 5,
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 3,
+          "CategoryId": 4,
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 4,
+          "CategoryId": 6,
+          "Id": 4
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 5,
+          "CategoryId": 3,
+          "Id": 5
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 6,
+          "CategoryId": 7,
+          "Id": 6
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 7,
+          "CategoryId": 6,
+          "Id": 7
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 8,
+          "CategoryId": 2,
+          "Id": 8
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 9,
+          "CategoryId": 3,
+          "Id": 9
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 10,
+          "CategoryId": 1,
+          "Id": 10
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 11,
+          "CategoryId": 6,
+          "Id": 11
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 12,
+          "CategoryId": 5,
+          "Id": 12
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 13,
+          "CategoryId": 6,
+          "Id": 13
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 14,
+          "CategoryId": 6,
+          "Id": 14
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 15,
+          "CategoryId": 2,
+          "Id": 15
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 16,
+          "CategoryId": 2,
+          "Id": 16
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 17,
+          "CategoryId": 6,
+          "Id": 17
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "61e14112-019b-42ac-9834-073af99a1597"
+        },
+        "fields": {
+          "CourseId": 18,
+          "CategoryId": 6,
+          "Id": 18
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "6b65ee98-e1fa-4580-9f90-ad835349a8e5"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
 }

@@ -1,0 +1,73 @@
+{
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fc1d1d24-7d61-4d38-a963-c617a022560e"
+        },
+        "fields": {
+          "Code": "facebook",
+          "Name": "FaceBook",
+          "URL": "https://www.facebook.com",
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fc1d1d24-7d61-4d38-a963-c617a022560e"
+        },
+        "fields": {
+          "Code": "google",
+          "Name": "Google+",
+          "URL": "https://plus.google.com",
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fc1d1d24-7d61-4d38-a963-c617a022560e"
+        },
+        "fields": {
+          "Code": "mailru",
+          "Name": "MailRu",
+          "URL": "https://my.mail.ru",
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fc1d1d24-7d61-4d38-a963-c617a022560e"
+        },
+        "fields": {
+          "Code": "vkontakte",
+          "Name": "VKontakte",
+          "URL": "http://vk.com",
+          "Id": 4
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fc1d1d24-7d61-4d38-a963-c617a022560e"
+        },
+        "fields": {
+          "Code": "yandex",
+          "Name": "Yandex",
+          "URL": "https://www.yandex.ru",
+          "Id": 5
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "0f0b2dfb-6899-413a-8af5-644598bbef6b"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "courses":{
+        "pushkin":"Пушкин. Однажды и навсегда (Pushkin_derzhavin).jpg",
+        "silver-age": "Серебряный век (Вывеска кабаре Бродячая собака).jpg",
+        "liturgical_year_with_bach": "Литургический год с И.С. Бахом (Bach-01).jpg",
+        "ancient-text-in-painting": "Традиционный текст и его живописная интерпретация (Padenie-Ikara.-Ok.-1558.-Hudozhnik-Piter-Brejgel-Starshij-niderl.-Pieter-Bruegel-de-Oude-ok.-1525-1569).jpg",
+        "aristotle-intro": "Введение в философию Аристотеля (Model-mira).jpg",
+        "buddhism": "Буддизм. История, философия, доктрина, практика (Budda-SHakyamuni-v-okruzhenii-bodhisattv.-XII-XIV-vv.-Metropoliten-muzej-Nyu-Jork).jpg",
+        "icon": "История иконописи (Beseduyushhie-apostoly-i-angely.-1408.-Hudozhnik-Andrej-Rublev-Ok.-1360-1428.-Freska-Uspenskogo-sobora-vo-Vladimire).jpg",
+        "civilizations": "Империи и цивилизации древней Евразии (Ruiny-drevnej-Palmiry.-Siriya).jpg",
+        "philosophic-text": "Философский текст в античности (Aristotel-i-Platon.-Freska-monastyrya-Megalo-Meteory-Gretsiya).jpg",
+        "existential-therapy": "Экзистенциальный анализ Альфрида Лэнгле (Melanholiya.-1892.-Hudozhnik-Edvard-Munk-norv.-Edvard-Munch_-1863-1944.-Natsionalnaya-galereya_-Oslo).jpg",
+        "medieval-art": "Язык средневекового искусства (Snyatie-s-kresta.-1260-e.-Slonovaya-kost.-Luvr-Parizh).jpg",
+        "pre-war-soviet-literature": "Довоенная советская литература (Razvorot-zhurnala-SSSR-na-strojke-.-1940.-Avtory-Aleksandr-Rodchenko-1891-1956-Varvara-Stepanova-1894-1958).jpg",
+        "proto-renaissance": "Искусство раннего Возрождения (Maesta.-1308-1311.-Hudozhnik-Duchcho-di-Buoninsenya-ital.-Duccio-di-Buoninsegna-ok.-1255-1319.-Muzej-Opera-del-Duomo-Siena).jpg",
+        "avant-garde": "От авангарда до современности (Velosipedist.-1913.-Hudozhnik-Natalya-Goncharova-1881-1962.-Russkij-muzej-Sankt-Peterburg).jpg"
+    }
+}

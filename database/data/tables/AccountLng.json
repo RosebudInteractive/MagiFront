@@ -1,0 +1,25 @@
+{
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "a3d4d86b-aa83-4a31-b655-88a8a846e36d"
+        },
+        "fields": {
+          "AccountId": 1,
+          "LanguageId": 1,
+          "Name": "Пост Модерн Текнолоджи",
+          "Id": 1
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "a0399798-fb12-4080-bb8e-82cc4bc0bb2d"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
+}

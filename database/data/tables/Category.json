@@ -1,0 +1,90 @@
+{
+  "collections": {
+    "DataElements": [
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "psychology",
+          "Id": 1
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "history",
+          "Id": 2
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "philosophy",
+          "Id": 3
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "music",
+          "Id": 4
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "literature",
+          "Id": 5
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "fine-arts",
+          "Id": 6
+        }
+      },
+      {
+        "collections": {},
+        "$sys": {
+          "typeGuid": "fa44e670-4ee6-4227-ab4d-083924a92d8a"
+        },
+        "fields": {
+          "AccountId": 1,
+          "URL": "religion",
+          "Id": 7
+        }
+      }
+    ]
+  },
+  "$sys": {
+    "typeGuid": "6479905e-bdc3-45a8-8690-568ce3e698b9"
+  },
+  "fields": {
+    "Name": "DataRoot",
+    "Id": 1000
+  }
+}
