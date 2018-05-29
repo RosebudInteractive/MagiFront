@@ -9,7 +9,8 @@ import {
     LESSON_INFO_STORAGE_UPDATE_DB_START,
     LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
     LESSON_INFO_STORAGE_UPDATE_DB_FAIL,
-    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+    LESSON_INFO_STORAGE_SET_LESSON_ENDED, LESSON_INFO_STORAGE_REFRESH_DB_START, LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+    LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
 } from '../constants/lesson-info-storage'
 
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
@@ -49,11 +50,11 @@ export const setLessonEnded = (data) => {
     }
 }
 
-export const loadInitialStateFromDB = () => {
+export const loadInitialStateFromDB = (ts) => {
     return (dispatch) => {
         dispatch({
             type: LESSON_INFO_STORAGE_LOAD_FROM_DB_START,
-            payload: null
+            payload: ts
         });
 
         fetch("/api/lsnpos", {
@@ -61,7 +62,7 @@ export const loadInitialStateFromDB = () => {
             headers: {
                 "Content-type": "application/json"
             },
-            body: JSON.stringify({ts:0}),
+            body: JSON.stringify({ts: ts}),
             credentials: 'include'
         })
             .then(checkStatus)
@@ -112,6 +113,41 @@ export const updateDbState = (data) => {
             .catch((error) => {
                 dispatch({
                     type: LESSON_INFO_STORAGE_UPDATE_DB_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const refreshState = () => {
+    return (dispatch, getState) => {
+        dispatch({
+            type: LESSON_INFO_STORAGE_REFRESH_DB_START,
+            payload: null
+        });
+
+        let _ts = getState().lessonInfoStorage.ts;
+
+
+        fetch("/api/lsnpos", {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({ts: _ts}),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
                     payload: {error}
                 });
             });

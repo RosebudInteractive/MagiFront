@@ -3,12 +3,15 @@ import {
     PLAYER_SET_VOLUME,
     PLAYER_SET_MUTE_STATE,
     PLAYER_START_INIT,
-    PLAYER_SET_RATE, PLAYER_PAUSED, PLAYER_STOPPED, PLAYER_ENDED, PLAYER_START_PLAY,
+    PLAYER_SET_RATE, PLAYER_PAUSED, PLAYER_STOPPED, PLAYER_ENDED,
 } from '../constants/player'
 
 import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS} from "../constants/user";
 
-import {LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS} from "../constants/lesson-info-storage";
+import {
+    LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS, LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS
+} from "../constants/lesson-info-storage";
 
 import LessonInfoStorage from '../tools/player/lesson-info-storage'
 
@@ -85,7 +88,9 @@ const LessonInfoStorageMiddleware = store => next => action => {
             return next(action)
         }
 
-        case LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS: {
+        case LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS:
+        case LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS:
+        case LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS: {
             LessonInfoStorage.applyLoadedPosition(action.payload)
             return next(action)
         }

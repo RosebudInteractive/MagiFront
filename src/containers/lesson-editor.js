@@ -585,6 +585,13 @@ export class LessonEditor extends ObjectEditor {
                 placeholder: "Выберите тип урока",
                 options: [{id: 'L', value: 'Лекция'}],
                 labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
             {
                 view: "text",

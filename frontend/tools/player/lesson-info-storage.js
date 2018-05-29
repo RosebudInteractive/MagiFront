@@ -73,16 +73,23 @@ export default class LessonInfoStorage {
         } else {
             let _userId = store.getState().user.user.Id;
             let _jsonObj = localStorage.getItem(_userId);
+            let _ts = 0;
+
             if (_jsonObj) {
                 let _obj = JSON.parse(_jsonObj),
+                    _map = _obj.lessons ? objectToMap(_obj.lessons) : new Map(),
                     _volume = _obj.volume;
+
+                _ts = _obj.ts ? _obj.ts : 0;
+
+                store.dispatch(storageActions.setInitialState(_map));
 
                 if (_volume !== undefined) {
                     store.dispatch(storageActions.setVolume(_volume))
                 }
             }
 
-            store.dispatch(storageActions.loadInitialStateFromDB())
+            store.dispatch(storageActions.loadInitialStateFromDB(_ts))
         }
     }
 
@@ -125,9 +132,10 @@ export default class LessonInfoStorage {
     _saveToLocalStorage() {
         let _state = store.getState().lessonInfoStorage;
         if (_state.lessons.size > 0) {
-            let _userId = this._isUserAuthorized ? store.getState().user.user.Id : 'user_anon'
+            let _userId = this._isUserAuthorized ? store.getState().user.user.Id : 'user_anon',
+                _ts = _state.ts;
             let _map = mapToObject(_state.lessons),
-                _object = {lessons: _map, volume: _state.volume}
+                _object = {lessons: _map, volume: _state.volume, ts: _ts}
 
             localStorage.setItem(_userId, JSON.stringify(_object));
         }
@@ -160,29 +168,50 @@ export default class LessonInfoStorage {
             _playingLessonId = _isPlayingLessonExists ? _state.player.playingLesson.lessonId : null;
 
         let lsn = {};
-        object.forEach((value, key) => {
-            let _pos = Math.round(value.currentTime * 100) / 100;
 
-            if (key === _playingLessonId) {
-                let _lessonsMap = _state.lessonInfoStorage.lessons,
-                    _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
+        if (_playingLessonId) {
+            let _value = object.get(_playingLessonId);
 
-                let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
-                    _rate = _state.player.rate;
+            let _pos = Math.round(_value.currentTime * 100) / 100,
+                _lessonsMap = _state.lessonInfoStorage.lessons,
+                _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
-                this._dtStart = undefined;
+            let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
+                _rate = _state.player.rate;
+
+            this._dtStart = undefined;
 
 
-                let _obj = {pos: _pos, dt: _dt}
-                if (_rate !== 1) {
-                    _obj.r = _rate
-                }
-                lsn[key] = _obj;
-            } else {
-                lsn[key] = {pos: _pos}
+            let _obj = {pos: _pos, dt: _dt}
+            if (_rate !== 1) {
+                _obj.r = _rate
             }
+            lsn[_playingLessonId] = _obj;
+        }
 
-        })
+        // object.forEach((value, key) => {
+        //     let _pos = Math.round(value.currentTime * 100) / 100;
+        //
+        //     if (key === _playingLessonId) {
+        //         let _lessonsMap = _state.lessonInfoStorage.lessons,
+        //             _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
+        //
+        //         let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
+        //             _rate = _state.player.rate;
+        //
+        //         this._dtStart = undefined;
+        //
+        //
+        //         let _obj = {pos: _pos, dt: _dt}
+        //         if (_rate !== 1) {
+        //             _obj.r = _rate
+        //         }
+        //         lsn[key] = _obj;
+        //     } else {
+        //         lsn[key] = {pos: _pos}
+        //     }
+        //
+        // })
 
         return {lsn}
     }

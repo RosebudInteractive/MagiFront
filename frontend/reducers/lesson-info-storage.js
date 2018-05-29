@@ -5,7 +5,9 @@ import {
     LESSON_INFO_STORAGE_SET_MUTE_STATE,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_START,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS,
-    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS, LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
+    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+    LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
 } from '../constants/lesson-info-storage'
 
 const initialState = {
@@ -22,7 +24,10 @@ export default function lessonInfoStorage(state = initialState, action) {
             if (!action.payload) {
                 return state
             } else {
-                return {...state, lessons: action.payload}
+                action.payload.forEach((value, key) => {
+                    state.lessons.set(key, Object.assign({}, value))
+                })
+                return {...state, lessons: state.lessons}
             }
         }
 
@@ -70,11 +75,12 @@ export default function lessonInfoStorage(state = initialState, action) {
         }
 
         case LESSON_INFO_STORAGE_LOAD_FROM_DB_START: {
-            return {...state, ts: 0}
+            return {...state, ts: action.payload}
         }
 
         case LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS:
-        case LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS: {
+        case LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS:
+        case LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS: {
             return {...state, ts: action.payload.ts}
         }
 

@@ -9,6 +9,7 @@ import CourseBooks from '../components/course-extended/course-books';
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
+import * as storageActions from '../actions/lesson-info-storage-actions';
 
 import {pages} from '../tools/page-tools';
 
@@ -19,6 +20,7 @@ class Main extends React.Component {
     }
 
     componentWillMount() {
+        this.props.storageActions.refreshState();
         this.props.coursesActions.getCourse(this.props.courseUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
@@ -198,6 +200,7 @@ function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        storageActions: bindActionCreators(storageActions, dispatch),
     }
 }
 
