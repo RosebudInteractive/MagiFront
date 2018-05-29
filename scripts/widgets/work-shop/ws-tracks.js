@@ -1392,17 +1392,18 @@ export default class CWSTracks extends CWSBase {
         audioState = audioState || this._getAudioState();
 
         // set circle initial position
-        //let maxZoomPos = this._getMaxZoomPosition();
-        //let new_position = Math.trunc(maxZoomPos / 2);
+        let maxZoomPos = this._getMaxZoomPosition();
+        let new_position = Math.trunc(maxZoomPos / 2);
 
         this._zoomState = {
             params: this._getMaxStep(audioState),
-            position: 0
-        }
+            position: new_position
+        };
 
+        this._recalcZoomState(new_position);
+        this._renderZoom(true, audioState);
         this.renderAudioState(audioState);
         this._renderLiner(audioState);
-        this._renderZoom(true, audioState);
         this.render();
     }
 
