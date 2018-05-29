@@ -212,22 +212,22 @@ const LESSON_EPI_MSSQL_TOC_REQ =
     "order by e.[Id], t.[Number]";
 
 const LESSON_MSSQL_CONTENT_REQ =
-    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
-    "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
-    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
-    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
-    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
-    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
+    "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
+    "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
+    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
+    "  left join[EpisodeContent] t on t.[EpisodeLngId] = l.[Id]\n" +
+    "  left join[Resource] r on t.[ResourceId] = r.[Id]\n" +
     "where pl.[LessonId] = <%= id %>\n" +
     "order by pl.[Number], e.[Id], t.[StartTime]";
 
 const LESSON_EPI_MSSQL_CONTENT_REQ =
-    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as [AssetId],\n" +
-    "  t.[StartTime], t.[Content] from [EpisodeContent] t\n" +
-    "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
-    "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
-    "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
-    "  join [EpisodeLesson] pl on pl.[EpisodeId] = e.[Id]" +
+    "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
+    "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
+    "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
+    "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
+    "  left join[EpisodeContent] t on t.[EpisodeLngId] = l.[Id]\n" +
+    "  left join[Resource] r on t.[ResourceId] = r.[Id]\n" +
     "where pl.[LessonId] = <%= id %> and e.[Id] = <%= episodeId %>\n" +
     "order by pl.[Number], e.[Id], t.[StartTime]";
 
@@ -321,22 +321,22 @@ const LESSON_EPI_MYSQL_TOC_REQ =
     "order by e.`Id`, t.`Number`";
 
 const LESSON_MYSQL_CONTENT_REQ =
-    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
-    "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
-    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
-    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
-    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
-    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
+    "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
+    "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
+    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
+    "  left join`EpisodeContent` t on t.`EpisodeLngId` = l.`Id`\n" +
+    "  left join`Resource` r on t.`ResourceId` = r.`Id`\n" +
     "where pl.`LessonId` = <%= id %>\n" +
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
 
 const LESSON_EPI_MYSQL_CONTENT_REQ =
-    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as `AssetId`,\n" +
-    "  t.`StartTime`, t.`Content` from `EpisodeContent` t\n" +
-    "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
-    "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
-    "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
-    "  join `EpisodeLesson` pl on pl.`EpisodeId` = e.`Id`" +
+    "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
+    "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
+    "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
+    "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
+    "  left join`EpisodeContent` t on t.`EpisodeLngId` = l.`Id`\n" +
+    "  left join`Resource` r on t.`ResourceId` = r.`Id`\n" +
     "where pl.`LessonId` = <%= id %> and e.`Id` = <%= episodeId %>\n" +
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
 
@@ -1037,15 +1037,17 @@ const DbLesson = class DbLesson extends DbObject {
                                     epi_list[elem.Episode] = curr_episode;
                                     curr_id = elem.Episode;
                                 }
-                                let curr_elem = {
-                                    id: elem.Id,
-                                    assetId: assetId,
-                                    start: elem.StartTime / 1000.,
-                                    content: JSON.parse(elem.Content),
-                                };
-                                curr_episode.elements.push(curr_elem);
-                                if (!assets_list[assetId])
-                                    throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode + ").");
+                                if (elem.Id) {
+                                    let curr_elem = {
+                                        id: elem.Id,
+                                        assetId: assetId,
+                                        start: elem.StartTime / 1000.,
+                                        content: JSON.parse(elem.Content),
+                                    };
+                                    curr_episode.elements.push(curr_elem);
+                                    if (!assets_list[assetId])
+                                        throw new Error("Unknown asset (Id=" + assetId + ") in episode (Id=" + elem.Episode + ").");
+                                }
                             });
                         }
                         return $data.execSql({
