@@ -52,9 +52,9 @@ class LessonsListWrapper extends React.Component {
 class ListItem extends React.Component {
 
     static propTypes = {
-        lesson: PropTypes.object.isRequired,
+        lesson: PropTypes.object,
         // currentNumber: PropTypes.string.isRequired,
-        active: PropTypes.string.isRequired
+        active: PropTypes.string,
     };
 
     render() {
