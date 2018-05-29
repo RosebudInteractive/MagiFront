@@ -13,6 +13,8 @@ import {
 
 import 'whatwg-fetch';
 
+import {handleJsonError} from '../tools/fetch-tools';
+
 export const getAuthors = () => {
     return (dispatch) => {
         dispatch({
@@ -32,48 +34,14 @@ export const getAuthors = () => {
                 })
             })
             .catch((err) => {
-                // err.response.json()
-                //     .then((object) => {
-                //         dispatch({
-                //             type: GET_AUTHORS_LIST_FAIL,
-                //             payload: object.message
-                //         })
-                //     })
-                //     .catch((err) => {
-                //         console.log(err)
-                //     })
-
-                let _reader = err.response.body.getReader();
-                let _data = '';
-
-                _reader.read().then(function processText({ done, value }) {
-                    // Result objects contain two properties:
-                    // done  - true if the stream has already given you all its data.
-                    // value - some data. Always undefined when done is true.
-                    if (done) {
-                        return _data;
-                    }
-
-                    // value for fetch streams is a Uint8Array
-                    // charsReceived += value.length;
-                    const chunk = new TextDecoder("utf-8").decode(value);
-                    // let listItem = document.createElement('li');
-                    // listItem.textContent = 'Received ' + charsReceived + ' characters so far. Current chunk = ' + chunk;
-                    // list2.appendChild(listItem);
-
-                    _data += chunk;
-
-                    // Read some more, and call this function again
-                    return _reader.read().then(processText);
-                }).then((data) => {
-                    dispatch({
-                        type: GET_AUTHORS_LIST_FAIL,
-                        payload: data
-                    })
-                });
-
-            });
-
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_AUTHORS_LIST_FAIL,
+                            payload: message
+                        })
+                    });
+            })
     }
 };
 
@@ -106,12 +74,14 @@ export const deleteAuthor = (id) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
     }
 };
 

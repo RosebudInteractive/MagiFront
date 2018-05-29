@@ -110,7 +110,7 @@ class CourseEditor extends ObjectEditor {
     _getCoverInfo() {
         let _meta = this.coverMeta;
         return {
-            path: _meta ? ('/data/' + _meta.path + _meta.content.s) : null,
+            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.cover)) : null,
             heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
         };
     }
@@ -249,7 +249,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     _createLesson() {
-        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new');
+        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
     }
 
     _moveUpLesson(id) {
@@ -428,7 +428,7 @@ class CourseEditor extends ObjectEditor {
                         rows: [
                             {
                                 view: "label",
-                                label: "Обложка лекции",
+                                label: "Обложка курса",
                                 width: labelWidth,
                                 height: 38,
                             }
@@ -528,8 +528,8 @@ class CourseEditor extends ObjectEditor {
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
-                                window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover-file').setValue(response[0].file);
+                                window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
                             },
                             onFileUploadError: () => {

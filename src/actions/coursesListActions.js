@@ -13,7 +13,9 @@ import {
 
 import 'whatwg-fetch';
 
-export const getCourses = ()=> {
+import {handleJsonError} from '../tools/fetch-tools';
+
+export const getCourses = () => {
     return (dispatch) => {
         dispatch({
             type: GET_COURSES_REQUEST,
@@ -32,16 +34,19 @@ export const getCourses = ()=> {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_COURSES_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_COURSES_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };
@@ -75,10 +80,13 @@ export const deleteCourse = (id) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    })
             });
 
     }

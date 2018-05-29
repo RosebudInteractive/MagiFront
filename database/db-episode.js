@@ -743,6 +743,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                         let root_lng = new_obj.getDataRoot("EpisodeLng");
 
                         let fields = { LanguageId: languageId };
+                        if (typeof (inpFields["Supp"]) === "undefined")
+                            inpFields["Supp"] = false;    
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["Name"]) !== "undefined")

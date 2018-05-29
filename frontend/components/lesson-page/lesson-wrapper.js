@@ -10,11 +10,11 @@ import LessonFrame from './lesson-frame';
 export default class Wrapper extends React.Component {
 
     static propTypes = {
-        lesson: PropTypes.object.isRequired,
-        courseUrl: PropTypes.string.isRequired,
+        lesson: PropTypes.object,
+        courseUrl: PropTypes.string,
         isMain: PropTypes.bool,
-        active: PropTypes.string.isRequired,
-        isPlayer: PropTypes.bool.isRequired
+        active: PropTypes.string,
+        isPlayer: PropTypes.bool,
     };
 
     static defaultProps = {

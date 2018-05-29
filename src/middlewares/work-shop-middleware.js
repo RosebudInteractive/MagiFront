@@ -19,7 +19,6 @@ const loaderMiddleware = store => next => action => {
         case WORK_SHOP_SAVE_DATA : {
             let _data = Adapter.convertAssetsToContent(action.payload);
             store.dispatch(episodeContentActions.applyFromWorkShop(_data));
-            WorkShop.close()
             return next(action)
         }
 

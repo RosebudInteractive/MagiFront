@@ -6,6 +6,7 @@ import CourseModule from '../components/course/course-module'
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
+import * as storageActions from '../actions/lesson-info-storage-actions';
 
 import * as tools from '../tools/page-tools';
 
@@ -19,7 +20,7 @@ class CoursesPage extends React.Component {
         if (!this.props.courses.loaded) {
             this.props.coursesActions.getCourses();
         }
-
+        this.props.storageActions.refreshState();
         this.props.pageHeaderActions.setCurrentPage(tools.pages.courses);
     }
 
@@ -80,6 +81,7 @@ function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        storageActions: bindActionCreators(storageActions, dispatch),
     }
 }
 
