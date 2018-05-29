@@ -34,6 +34,7 @@ function compareElements(a,b) {
 export default class CWSTracks extends CWSBase {
     constructor(container, options){
         super(container, tpl);
+        this._zoomInitialized = false;
         this._scrollerDiv = container.find(".ws-tracks-list-scroll");
         this._list = this._scrollerDiv.children("div.list");
         this._createScroll();
@@ -329,43 +330,47 @@ export default class CWSTracks extends CWSBase {
     }
 
     _setZoomEvents() {
-        let lineWrapperDown = false;
-        this._lineWrapper.on('mouseenter', (e) => {
-            this._lineWrapper.addClass('ws-zoom-over');
-            lineWrapperDown = false;
-        });
+        if (!this._zoomInitialized) {
+            this._zoomInitialized = true;
 
-        this._lineWrapper.on('mouseleave', (e) => {
-            this._lineWrapper.removeClass('ws-zoom-over');
-            if (lineWrapperDown) this._setZoomCircle(e.offsetX)
-            lineWrapperDown = false;
-        });
+            let lineWrapperDown = false;
+            this._lineWrapper.on('mouseenter', (e) => {
+                this._lineWrapper.addClass('ws-zoom-over');
+                lineWrapperDown = false;
+            });
 
-        this._lineWrapper.on('mousedown', (e) => {
-            lineWrapperDown = true;
-            this._setZoomCircle(e.offsetX)
-        });
+            this._lineWrapper.on('mouseleave', (e) => {
+                this._lineWrapper.removeClass('ws-zoom-over');
+                if (lineWrapperDown) this._setZoomCircle(e.offsetX)
+                lineWrapperDown = false;
+            });
 
-        this._lineWrapper.on('mouseup', (e) => {
-            if (lineWrapperDown) this._setZoomCircle(e.offsetX)
-            lineWrapperDown = false;
-        });
-
-        this._lineWrapper.on('mousemove', (e) => {
-            if (this._lineWrapper.hasClass('ws-zoom-over') && lineWrapperDown === true) {
+            this._lineWrapper.on('mousedown', (e) => {
+                lineWrapperDown = true;
                 this._setZoomCircle(e.offsetX)
-            }
-        });
+            });
 
-        let zoomLeft = this._container.find(".zoom-left");
-        let zoomRight = this._container.find(".zoom-right");
+            this._lineWrapper.on('mouseup', (e) => {
+                if (lineWrapperDown) this._setZoomCircle(e.offsetX)
+                lineWrapperDown = false;
+            });
 
-        zoomLeft.click(() => {
-            this._zoomByStep(-1);
-        });
-        zoomRight.click(() => {
-            this._zoomByStep(1);
-        });
+            this._lineWrapper.on('mousemove', (e) => {
+                if (this._lineWrapper.hasClass('ws-zoom-over') && lineWrapperDown === true) {
+                    this._setZoomCircle(e.offsetX)
+                }
+            });
+
+            let zoomLeft = this._container.find(".zoom-left");
+            let zoomRight = this._container.find(".zoom-right");
+
+            zoomLeft.click(() => {
+                this._zoomByStep(-1);
+            });
+            zoomRight.click(() => {
+                this._zoomByStep(1);
+            });
+        }
     }
 
     // koef = -1 for left, +1 for right
@@ -1386,14 +1391,19 @@ export default class CWSTracks extends CWSBase {
     initAudio(audioState) {
         audioState = audioState || this._getAudioState();
 
+        // set circle initial position
+        let maxZoomPos = this._getMaxZoomPosition();
+        let new_position = Math.trunc(maxZoomPos / 2);
+
         this._zoomState = {
             params: this._getMaxStep(audioState),
-            position: 0
-        }
+            position: new_position
+        };
 
+        this._recalcZoomState(new_position);
+        this._renderZoom(true, audioState);
         this.renderAudioState(audioState);
         this._renderLiner(audioState);
-        this._renderZoom(true, audioState);
         this.render();
     }
 

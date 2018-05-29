@@ -10,6 +10,7 @@ export function animate(options, playState) {
         // timeFraction от 0 до 1
         let timeFraction = (time - start + options.curTime) / options.duration;
         if (timeFraction > 1) timeFraction = 1;
+        if (timeFraction < 0) timeFraction = 0;
 
         // текущее состояние анимации от 0 до 1
         let progress = options.timing(timeFraction);
