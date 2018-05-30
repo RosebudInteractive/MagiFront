@@ -311,9 +311,11 @@ exports.UsersBaseCache = class UsersBaseCache {
 
                     let fields = data;
 
-                    fields.PwdHash = $dbUser.getPwdHash(password, fields);
-
-                    return root_obj.newObject({ fields: fields }, {})
+                    return $dbUser.getPwdHash(password)
+                        .then((hash) => {
+                            fields.PwdHash = hash;
+                            return root_obj.newObject({ fields: fields }, {});
+                        });
                 })
                 .then((result) => {
                     user = this._db.getObj(result.newObject);
@@ -419,7 +421,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                             throw new Error("UsersBaseCache::userPwdRecovery: User doesn't exist or duplicate.");
 
                     user = collection.get(0);
-
+                    let rc = Promise.resolve();
                     if (isRecovery) {
                         user.activationKey(user_data.ActivationKey);                  
                         user.expDate(user_data.ExpDate);                  
@@ -431,15 +433,20 @@ exports.UsersBaseCache = class UsersBaseCache {
                         user.expDate(null);
                         if (!activationExpired) {
                             user.isOld(false);
-                            user.pwdHash($dbUser.getPwdHash(user_data.Password, { Login: user.login() }));
+                            rc = $dbUser.getPwdHash(user_data.Password)
+                                .then((hash) => {
+                                    user.pwdHash(hash);
+                                });
                         }
                     }
-                    return root_obj.save()
-                        .then(() => {
-                            if (activationExpired)
-                                throw new Error("Activation key has expired.")
-                            return this.getUserInfoById(user.id(), true)
-                        });
+                    return rc.then(() => {
+                        return root_obj.save()
+                            .then(() => {
+                                if (activationExpired)
+                                    throw new Error("Activation key has expired.")
+                                return this.getUserInfoById(user.id(), true)
+                            });
+                    });
                 })
         }).bind(this), options);
     }
@@ -517,18 +524,21 @@ exports.UsersBaseCache = class UsersBaseCache {
                             PData: JSON.stringify({ isAdmin: false, roles: { s: 1 } }) // Role: "subscriber"
                         };
                     
-                        fields.PwdHash = $dbUser.getPwdHash(randomstring.generate(15), fields);
+                        return getPwdHash(randomstring.generate(15))
+                            .then((hash) => {
+                                fields.PwdHash = hash;
 
-                        return root_obj.newObject({ fields: fields }, {})
-                            .then((result) => {
-                                user = this._db.getObj(result.newObject);
-                                if (!user)
-                                    throw new Error("UsersBaseCache::getUserByEmailOrCreate: Failed to create new user.");
-                                return this.getRoleByCode("s");
-                            })
-                            .then((role) => {
-                                let root_role = user.getDataRoot("UserRole");
-                                return root_role.newObject({ fields: { AccountId: ACCOUNT_ID, RoleId: role.Id } }, {});
+                                return root_obj.newObject({ fields: fields }, {})
+                                    .then((result) => {
+                                        user = this._db.getObj(result.newObject);
+                                        if (!user)
+                                            throw new Error("UsersBaseCache::getUserByEmailOrCreate: Failed to create new user.");
+                                        return this.getRoleByCode("s");
+                                    })
+                                    .then((role) => {
+                                        let root_role = user.getDataRoot("UserRole");
+                                        return root_role.newObject({ fields: { AccountId: ACCOUNT_ID, RoleId: role.Id } }, {});
+                                    });
                             });
                     }
                 })
@@ -642,9 +652,12 @@ exports.UsersBaseCache = class UsersBaseCache {
                         throw new UserLoginError(UserLoginError.AUTH_FAIL);
                     result = root_user.edit()
                         .then(() => {
-                            user.pwdHash($dbUser.getPwdHash(password, user));
-                            user.isOld(false);
-                            return root_user.save();
+                            return $dbUser.getPwdHash(password)
+                                .then((hash) => {
+                                    user.pwdHash(hash);
+                                    user.isOld(false);
+                                    return root_user.save();
+                                });
                         })
                         .then(() => {
                             return ({ checked: true });

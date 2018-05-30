@@ -28,7 +28,7 @@ const RedisStoreSession = require('../security/session-storage/redis-storage');
 const setupLessonPositions = require('./lesson-positions');
 
 function errorHandler(err, req, res, next) {
-    console.error("Error: " + err.toString());
+    console.error("setup::errorHandler ==> " + err.toString());
     res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
 }
 

@@ -22,10 +22,6 @@ CREATE INDEX [idx_CourseLng_State] ON [CourseLng]([State]);
 GO
 CREATE INDEX [idx_EpisodeLng_State] ON [EpisodeLng]([State]);
 GO
-CREATE UNIQUE INDEX [u_Idx_EpisodeLesson_LessonId_Number] ON [EpisodeLesson]([LessonId], [Number]);
-GO
-CREATE UNIQUE INDEX [u_Idx_EpisodeToc_EpisodeId_Number] ON [EpisodeToc]([EpisodeId], [Number]);
-GO
 CREATE UNIQUE INDEX [u_Idx_Language_Code] ON [Language]([Code]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Language_LangTag] ON [Language]([LangTag]);
@@ -36,13 +32,9 @@ CREATE UNIQUE INDEX [u_Idx_Language_Language] ON [Language]([Language]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Lesson_URL] ON [Lesson]([URL]);
 GO
-CREATE UNIQUE INDEX [u_Idx_LessonCourse_CourseId_ParentId_Number] ON [LessonCourse]([CourseId], [ParentId], [Number]);
-GO
 CREATE INDEX [idx_LessonCourse_State] ON [LessonCourse]([State]);
 GO
 CREATE INDEX [idx_LessonCourse_ReadyDate] ON [LessonCourse]([ReadyDate]);
-GO
-CREATE UNIQUE INDEX [u_Idx_Reference_LessonLngId_Number] ON [Reference]([LessonLngId], [Number]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Role_Code] ON [Role]([Code]);
 GO

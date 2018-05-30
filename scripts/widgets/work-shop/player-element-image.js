@@ -124,14 +124,22 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                 let calcProgress = effect.acceleration * effect.duration * progress;
 
                 offset = calcProgress / 2;
+            } else if (imgPlayPos > 0
+                && effect.duration > 0
+                && imgPlayPos >= this._playState.position - effect.start + effect.duration) {
+                let animationFunc = makeEaseInOut(quad);
+                let progress = animationFunc(1);
+                let calcProgress = effect.acceleration * effect.duration * progress;
+
+                offset = calcProgress / 2;
             }
             let img = item.find("img");
             img.css({
-                left: (-offset) + "%",
-                top: (-offset) + "%",
+                //left: (50) + "%",
+                //top: (50) + "%",
                 width: (100 + offset * 2) + "%",
                 height: (100 + offset * 2) + "%",
-                transform: "none"
+                //transform: "translate(-50%, -50%)"
             });
         }
     }
