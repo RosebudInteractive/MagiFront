@@ -22,7 +22,7 @@ export const getAuthors = () => {
             payload: null
         });
 
-        fetch("/api/authors", {credentials: 'include'})
+        fetch("/api/adm/authors", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -54,7 +54,7 @@ export const selectAuthor = (id) => {
 
 export const deleteAuthor = (id) => {
     return (dispatch) => {
-        fetch("/api/authors/" + id,
+        fetch("/api/adm/authors/" + id,
             {
                 method: "DELETE",
                 credentials: 'include'

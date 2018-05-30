@@ -214,7 +214,7 @@ export default class ObjectEditor extends React.Component {
                     (that._hasChanges() && that._enableApplyChanges()) ?
                         this.elements.btnOk.enable() : this.elements.btnOk.disable();
                 },
-            }
+            },
         }
     }
 

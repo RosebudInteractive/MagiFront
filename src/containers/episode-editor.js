@@ -35,6 +35,19 @@ class EpisodeEditor extends ObjectEditor {
         if ((!lesson) || (lesson.id !== lessonId)) {
             lessonActions.get(lessonId, courseId);
         }
+
+        window.webix.protoUI({
+                name: 'myUploader',
+                $updateProgress: (size, percent) => {
+                    if (percent < 100) {
+                        window.$$('file-name').getInputNode().style.background = "linear-gradient(to left, #f1f7ff " + (100 - percent) + "%, #75b5ff 0%)"
+                    } else {
+                        window.$$('file-name').getInputNode().style.background = "none"
+                    }
+
+                }
+            },
+            window.webix.ui.uploader)
     }
 
     componentWillReceiveProps(next) {
@@ -282,7 +295,7 @@ class EpisodeEditor extends ObjectEditor {
 
         return [
             {
-                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id:'btn-work-shop',
+                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
                     let {lessonId, episodeId} = that.props;
@@ -350,21 +363,21 @@ class EpisodeEditor extends ObjectEditor {
                         },
                     },
                     {
-                        view: "uploader",
+                        view: "myUploader",
                         id: "file-uploader",
                         type: "iconButton",
                         icon: 'upload',
-                        // link: "file-list",
+                        link: "file-name",
                         upload: "/upload",
                         multiple: false,
                         datatype: "json",
-                        accept:"audio/*",
+                        accept: "audio/*",
                         validate: window.webix.rules.isNotEmpty,
                         invalidMessage: "Значение не может быть пустым",
-                        inputHeight:38,
+                        inputHeight: 38,
                         width: 38,
                         on: {
-                            onBeforeFileAdd: (item)=> {
+                            onBeforeFileAdd: (item) => {
                                 // todo : ЗДЕСЬ ДОЛЖНА БЫТЬ ПРОВЕРКА ТИПА ФАЙЛА
                                 let _type = item.file.type.toLowerCase();
                                 if (!_type) {
@@ -373,7 +386,7 @@ class EpisodeEditor extends ObjectEditor {
                                 }
 
                                 let _metaType = _type.split('/')[0];
-                                if (_metaType !== "audio"){
+                                if (_metaType !== "audio") {
                                     window.webix.message("Поддерживаются только аудио файлы");
                                     return false;
                                 }
@@ -393,10 +406,10 @@ class EpisodeEditor extends ObjectEditor {
                         view: "button",
                         type: "iconButton",
                         icon: 'trash',
-                        inputHeight:38,
+                        inputHeight: 38,
                         width: 38,
                         on: {
-                            onClick: ()=> {
+                            onClick: () => {
 
                             },
                         }
