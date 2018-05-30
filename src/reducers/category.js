@@ -78,7 +78,12 @@ export default function category(state = initialState, action) {
         }
 
         case CLEAR_CATEGORY:{
-            return initialState
+            return {
+                initial: null,
+                current: null,
+                fetching: true,
+                hasChanges: false,
+            }
         }
 
         default:

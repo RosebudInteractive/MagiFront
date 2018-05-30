@@ -217,7 +217,7 @@ export class LessonEditor extends ObjectEditor {
             array.push({
                 Id: resource.Id,
                 Description: resource.Description,
-                LanguageId: resource.LanguageId,
+                ResLanguageId: resource.ResLanguageId,
                 FileName: resource.FileName,
                 Name: resource.Name,
                 MetaData: resource.MetaData,
@@ -431,6 +431,17 @@ export class LessonEditor extends ObjectEditor {
         return "lesson-content";
     }
 
+    _notifyDataLoaded() {
+        super._notifyDataLoaded();
+
+        let _authors = this._getCourseAuthorsArray();
+        if (_authors.length === 1) {
+            window.$$('author').setValue(_authors[0].id);
+        }
+    }
+
+
+
     _getWebixForm() {
         const {
             mainEpisodes,
@@ -610,6 +621,7 @@ export class LessonEditor extends ObjectEditor {
             {
                 view: "combo",
                 name: "AuthorId",
+                id: 'author',
                 label: "Автор",
                 placeholder: "Выберите автора",
                 options: this._getCourseAuthorsArray(),

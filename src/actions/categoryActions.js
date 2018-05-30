@@ -33,7 +33,7 @@ export const get = (id)=> {
             payload: null
         });
 
-        fetch("/api/categories/" + id, {credentials: 'include'})
+        fetch("/api/adm/categories/" + id, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -63,7 +63,7 @@ export const save = (values, mode) => {
 
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
-        let _url = "/api/categories";
+        let _url = "/api/adm/categories";
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id
         }

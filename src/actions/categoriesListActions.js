@@ -20,7 +20,7 @@ export const getCategories = () => {
             payload: null
         });
 
-        fetch("/api/categories", {credentials: 'include'})
+        fetch("/api/adm/categories", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -65,7 +65,7 @@ export const cancelDelete = () => {
 
 export const deleteCategory = (id) => {
     return (dispatch) => {
-        fetch("/api/categories/" + id,
+        fetch("/api/adm/categories/" + id,
             {
                 method: "DELETE",
                 credentials: 'include'
