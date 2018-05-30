@@ -66,6 +66,7 @@ export default class CWorkShop extends CWSBase {
         if (this._options.data) {
             this._readDataProperty(this._options.data)
                 .then(result => {
+                    this._correctData(result);
                     this._playerWidget.render();
                     this._playerWidget.setData(result);
                     this._data = result;
@@ -482,6 +483,26 @@ export default class CWorkShop extends CWSBase {
         this._container.empty()
     }
 
+    _correctData(data) {
+        for (let i = 0; i < data.episodes.length; i++) {
+            let ep = data.episodes[i];
+            for (let j = 0; j < ep.elements.length; j++) {
+                let el = ep.elements[j];
+                if (el.effects === undefined) {
+                    el.effects = [];
+                }
+
+                if (el.effects.length === 0) {
+                    el.effects.push({
+                        "type": "zoom",
+                        "start": 0,
+                        "duration": 0,
+                        "acceleration": 0
+                    });
+                }
+            }
+        }
+    }
 }
 //    }
 //);
