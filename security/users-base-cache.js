@@ -524,7 +524,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                             PData: JSON.stringify({ isAdmin: false, roles: { s: 1 } }) // Role: "subscriber"
                         };
                     
-                        return getPwdHash(randomstring.generate(15))
+                        return $dbUser.getPwdHash(randomstring.generate(15))
                             .then((hash) => {
                                 fields.PwdHash = hash;
 
