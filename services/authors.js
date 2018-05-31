@@ -1,6 +1,18 @@
 let { AuthorsService } = require('./../database/db-author');
 
 function setupAuthors(app) {
+
+    app.get('/api/authors/:url', (req, res, next) => {
+        AuthorsService()
+            .getPublic(req.params.url)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/authors', (req, res, next) => {
         AuthorsService()
             .getAll()
@@ -8,7 +20,7 @@ function setupAuthors(app) {
                 res.send(rows);
             })
             .catch(err => {
-                res.status(500).send(err.message);//next(err);
+                next(err);
             });
     });
 
