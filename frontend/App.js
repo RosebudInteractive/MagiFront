@@ -127,11 +127,13 @@ class App extends Component {
     }
 
     _handleScroll(event) {
+        this._addDevWarn('last : ' + this.state.lastScrollPos + ' top : ' + event.target.scrollingElement.scrollTop)
+
         if (!event.target.scrollingElement) {
             return
         }
 
-        if (this.state.lastScrollPos > event.target.scrollingElement.scrollTop) {
+        if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
             this.setState({
                 direction: 'top',
                 showHeader: true,
@@ -161,6 +163,15 @@ class App extends Component {
 
             </Switch>
         )
+    }
+
+    _addDevWarn(text) {
+        let _dev = $('#dev'),
+            isVisible = _dev.is(':visible');
+
+        if (isVisible === true) {
+            _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
+        }
     }
 
     render() {
