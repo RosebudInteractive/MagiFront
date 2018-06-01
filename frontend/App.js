@@ -34,6 +34,7 @@ import Platform from 'platform';
 Polifyll.registry();
 
 let _homePath = '/';
+const _scrollDelta = 80;
 
 class App extends Component {
 
@@ -131,6 +132,16 @@ class App extends Component {
 
         if (!event.target.scrollingElement) {
             return
+        }
+
+        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop)
+        if (_delta < _scrollDelta) {
+            return
+        }
+
+        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
+            this.setState({showHeader : true})
+
         }
 
         if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
