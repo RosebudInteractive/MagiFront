@@ -19,13 +19,14 @@ const { AuthFBInit } = require('../security/fb-auth');
 const { AuthGoogleInit } = require('../security/google-auth');
 const { setupEpisodes } = require('./episodes');
 const { setupAuthors } = require('./authors');
+const { setupUsers } = require('./users');
 const { setupCategories } = require('./categories');
 const { setupCourses } = require('./courses');
 const { setupLanguages } = require('./languages');
 const { setupLessons } = require('./lessons');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
-const setupLessonPositions = require('./lesson-positions');
+const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 
 function errorHandler(err, req, res, next) {
     console.error("setup::errorHandler ==> " + err.toString());
@@ -89,6 +90,7 @@ function setupAPI(express, app) {
     setupProtectedStatic(app);
     setupLessonPositions(app);
     setupEpisodes(app);
+    setupUsers(app);
     setupAuthors(app);
     setupCategories(app);
     setupCourses(app);
