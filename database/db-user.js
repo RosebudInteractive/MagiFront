@@ -137,7 +137,7 @@ const DbUser = class DbUser extends DbObject {
                                             lsn = {
                                                 Id: elem.LessonId,
                                                 CourseId: elem.Id,
-                                                Number: elem.Number + ".",
+                                                Number: elem.Number + "",
                                                 ReadyDate: elem.ReadyDate,
                                                 State: elem.State,
                                                 Cover: elem.LCover,
@@ -166,13 +166,14 @@ const DbUser = class DbUser extends DbObject {
                                             else {
                                                 let parent = lc_list[elem.ParentId];
                                                 if (parent) {
-                                                    lsn.Number = parent.Number + lsn.Number;
+                                                    lsn.Number = parent.Number + "." + lsn.Number;
                                                 }
                                             }
                                             lsn_list[elem.LessonId] = lsn;
                                             if (lessons[elem.LessonId]) {
                                                 lsn.Pos = positions[elem.LessonId].pos;
                                                 lsn.LastVisit = new Date(positions[elem.LessonId].ts);
+                                                lsn.isFinished = positions[elem.LessonId].isFinished ? true : false;
                                                 history.Lessons.push(lsn);
                                             }
                                         }
