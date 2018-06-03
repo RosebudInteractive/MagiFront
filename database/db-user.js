@@ -191,7 +191,7 @@ const DbUser = class DbUser extends DbObject {
 
     update(id, data) {
         return new Promise((resolve, reject) => {
-            resolve();
+            resolve(this._usersCache.editUser(id, data));
         })
     }
 };
