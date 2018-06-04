@@ -619,6 +619,20 @@ export class LessonEditor extends ObjectEditor {
                 },
             },
             {
+                view: 'text',
+                name: 'URL',
+                label: 'URL',
+                placeholder: "Введите URL",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
+            },
+            {
                 view: "combo",
                 name: "AuthorId",
                 id: 'author',

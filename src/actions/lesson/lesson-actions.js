@@ -25,6 +25,7 @@ import {
 
 
 import 'whatwg-fetch';
+import {handleJsonError} from '../../tools/fetch-tools';
 
 export const getResources = (lessonId) => {
     return (dispatch) => {
@@ -45,17 +46,19 @@ export const getResources = (lessonId) => {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_LESSON_RESOURCES_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_LESSON_RESOURCES_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
             });
-
     }
 };
 
@@ -78,17 +81,19 @@ export const get = (id, courseId) => {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_SINGLE_LESSON_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_SINGLE_LESSON_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
             });
-
     }
 };
 
@@ -104,7 +109,7 @@ export const save = (values, mode) => {
     return (dispatch) => {
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/adm/lessons";
-        // let _parentPosfix = values.ParentId ? '/' + values.ParentId : '/0';
+
         if (mode === EDIT_MODE_EDIT) {
             _url += "/" + values.id + '/' + values.CourseId + '/' + values.ParentId
         } else {
@@ -128,10 +133,13 @@ export const save = (values, mode) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
             });
 
     }

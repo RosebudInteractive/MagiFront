@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import InfoBlock from './info-block';
-import * as svg from '../../tools/svg-paths';
-import {ImageSize, getCoverPath} from '../../tools/page-tools'
+import {ImageSize, getCoverPath, getRandomInt} from '../../tools/page-tools'
 
 export default class CourseModule extends React.Component {
 
@@ -30,19 +29,15 @@ export default class CourseModule extends React.Component {
 
 CourseModule.propTypes = {
     course: PropTypes.object,
-    isMobile: PropTypes.bool.isRequired,
+    isMobile: PropTypes.bool,
 };
 
 
 class ImageBlock extends React.Component {
     constructor(props) {
         super(props);
-        let _number = svg.getRandomInt(1, 12);
-        _number = _number.toString().padStart(2, '0');
-
-        this.state = {
-            maskNumber: _number
-        }
+        let _number = getRandomInt(1, 12);
+        this.maskNumber = _number.toString().padStart(2, '0');
     }
 
     render() {
@@ -52,7 +47,7 @@ class ImageBlock extends React.Component {
 
         return (
             <Link to={'/category/' + this.props.url}>
-                <div className={'course-module__image-block _mask' + this.state.maskNumber}>
+                <div className={'course-module__image-block _mask' + this.maskNumber}>
                     <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </Link>

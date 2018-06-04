@@ -9,6 +9,7 @@ import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
+import AuthorPage from './containers/author-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -167,6 +168,7 @@ class App extends Component {
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
