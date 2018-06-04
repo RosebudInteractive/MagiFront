@@ -1719,7 +1719,8 @@ namespace MagImport
                 episode_lng.Fields.LanguageId = LANGUAGE_ID;
                 episode_lng.Fields.State = "R";
                 episode_lng.Fields.Name = lesson_lng.Fields.Name;
-                episode_lng.Fields.Transcript = String.IsNullOrEmpty(rdr.GetString("post_content")) ? null : rdr.GetString("post_content");
+                episode_lng.Fields.Transcript =
+                    setParagraph(String.IsNullOrEmpty(rdr.GetString("post_content")) ? null : rdr.GetString("post_content"));
 
                 EpisodeLesson episode_lsn = new EpisodeLesson();
                 episode_lsn.Fields.EpisodeId = episode.Fields.Id;
@@ -2226,6 +2227,42 @@ namespace MagImport
             }
             _getNext(sb, ref curr_pos, '}');
             return res;
+        }
+
+        string setParagraph(string in_str) {
+            const string PARAGRAPH_SEP = "\r\n\r\n";
+            int PARAGRAPH_SEP_LEN = PARAGRAPH_SEP.Length;
+            string rc = null;
+            if (in_str != null)
+            {
+                StringBuilder sb = new StringBuilder();
+                int curr_pos = 0;
+                int length = in_str.Length;
+                bool is_opened = false;
+                while (curr_pos < length)
+                {
+                    int pos = in_str.IndexOf(PARAGRAPH_SEP, curr_pos);
+                    if (pos >= 0)
+                    {
+                        if (pos > curr_pos)
+                            sb.Append(in_str, curr_pos, pos - curr_pos);
+                        if (is_opened)
+                            sb.Append("</p>");
+                        is_opened = true;
+                        sb.Append("<p>");
+                        curr_pos = pos + PARAGRAPH_SEP_LEN;
+                    }
+                    else
+                    {
+                        sb.Append(in_str, curr_pos, length - curr_pos);
+                        curr_pos = length;
+                    }
+                }
+                if (is_opened)
+                    sb.Append("</p>");
+                rc = sb.ToString();
+            }
+            return rc;
         }
 
         Dictionary<string, int> monthes = new Dictionary<string, int>()
