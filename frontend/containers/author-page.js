@@ -4,6 +4,7 @@ import {bindActionCreators} from 'redux';
 
 import {authorSelector, loadingSelector, getAuthor} from '../ducks/author'
 import AuthorBlock from '../components/author/author-block';
+import CoursesBlock from '../components/author/courses-and-lessons';
 // import Content from '../components/course-extended/content-extended';
 // import CourseLessons from '../components/course-extended/course-lessons';
 // import CourseBooks from '../components/course-extended/course-books';
@@ -28,7 +29,7 @@ class Main extends React.Component {
 
     componentDidUpdate() {
         if (this.props.author) {
-            document.title = 'Автор : '
+            document.title = 'Автор : ' + this.props.author.FirstName + ' ' + this.props.author.LastName;
         }
     }
 
@@ -44,11 +45,7 @@ class Main extends React.Component {
                         author ?
                             <div className="author-page">
                                 <AuthorBlock/>
-                                <CourseTabs
-                                    lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
-                                    books={{total: course.Books.length}}
-                                    courseUrl={this.props.courseUrl}
-                                />
+                                <CoursesBlock/>
                             </div> : null
                 }
             </div>
@@ -68,7 +65,7 @@ function mapDispatchToProps(dispatch) {
     return {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
-        getAuthor,
+        getAuthor: bindActionCreators(getAuthor, dispatch),
     }
 }
 

@@ -3474,6 +3474,7 @@ li.fancybox-thumbs-loading {
         height: auto;
         border-bottom: none; } }
   .page-header__wrapper {
+    z-index: 1;
     background-color: white;
     display: -webkit-box;
     display: -webkit-flex;
@@ -4646,7 +4647,7 @@ ul.user-tooltip {
 
 .filters-row {
   overflow: hidden;
-  z-index: -1;
+  z-index: 0;
   top: -96px;
   border-bottom: none;
   -webkit-transition: transform 0.3s ease;
@@ -5234,6 +5235,9 @@ ul.user-tooltip {
         font-size: 13px;
         letter-spacing: 0.05px;
         line-height: 15px; } }
+  .course-module__info-col-descr a {
+    color: #2f2f2f
+  }
   .course-module__title-wrapper {
     padding-left: 8.333333%;
     padding-top: 65px;
@@ -13204,7 +13208,7 @@ ul.lectures-tab {
   transition: transform 0.7s ease;
 }
 .popup._registration.opened {
-  position: absolute;
+  position: fixed;
   transform: translateY(200vh);
 }
 

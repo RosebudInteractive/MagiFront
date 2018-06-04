@@ -3,6 +3,10 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record} from 'immutable'
+import 'whatwg-fetch';
+import {checkStatus, parseJSON} from "../tools/fetch-tools";
+
+
 // import {replace} from 'react-router-redux'
 
 /**
@@ -36,12 +40,12 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_AUTHOR_SUCCESS:
             return state
                 .set('loading', false)
-                .set('author', payload.author)
+                .set('author', payload)
 
         case GET_AUTHOR_ERROR:
             return state
                 .set('loading', false)
-                .set('error', payload.error.message)
+                .set('error', payload.error)
 
         default:
             return state
@@ -62,103 +66,87 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
  * */
 
 export function getAuthor(url) {
-    return {
-        type: GET_AUTHOR_REQUEST,
-        payload: { url }
+    return (dispatch) => {
+        dispatch({
+            type: GET_AUTHOR_REQUEST,
+            payload: {url}
+        });
+
+        fetch("/api/authors/" + url, {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                handleData(data);
+                dispatch({
+                    type: GET_AUTHOR_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_AUTHOR_ERROR,
+                    payload: err
+                });
+            });
     }
 }
 
+const handleData = (data) => {
+    if (data.Courses) {
+        data.Courses.forEach(course => handleCourse(course))
+    }
 
-// export function signIn(email, password) {
-//     return {
-//         type: SIGN_IN_REQUEST,
-//         payload: { email, password }
-//     }
-// }
-//
-// export function signOut() {
-//     return {
-//         type: SIGN_OUT_REQUEST
-//     }
-// }
+    if (data.Lessons) {
+        data.Lessons.forEach((lesson) => {
+            handleLesson(lesson);
 
-/**
- * Sagas
- */
+            let _course = data.Courses.find((course) => {
+                return course.Id === lesson.CourseId
+            })
 
-// export const signUpSaga = function * () {
-//     while (true) {
-//         const action = yield take(SIGN_UP_REQUEST)
-//         const {email, password} = action.payload
-//
-//         yield put({
-//             type: SIGN_UP_START
-//         })
-//
-//         try {
-//             const auth = firebase.auth()
-//             yield call([auth, auth.createUserWithEmailAndPassword], email, password)
-//         } catch (error) {
-//             yield put({
-//                 type: SIGN_UP_ERROR,
-//                 payload: {error}
-//             })
-//         }
-//     }
-// }
-//
-// export const signInSaga = function * (action) {
-//     const { email, password } = action.payload
-//
-//     yield put({
-//         type: SIGN_IN_START
-//     })
-//
-//     try {
-//         const auth = firebase.auth()
-//         yield apply(auth, auth.signInWithEmailAndPassword, [email, password])
-//     } catch (error) {
-//         yield put({
-//             type: SIGN_IN_ERROR,
-//             payload: { error }
-//         })
-//     }
-// }
-//
-// export const signOutSaga = function * () {
-//     const auth = firebase.auth()
-//     yield apply(auth, auth.signOut)
-// }
-//
-// const createAuthChannel = () => eventChannel(emit => firebase.auth().onAuthStateChanged(user => emit({ user })))
-//
-// export const watchStatusChangeSaga = function * () {
-//     const chan = yield call(createAuthChannel)
-//     while (true) {
-//         const { user } = yield take(chan)
-//
-//         if (user) {
-//             yield put({
-//                 type: SIGN_IN_SUCCESS,
-//                 payload: { user }
-//             })
-//
-//         } else {
-//             yield put({
-//                 type: SIGN_OUT_SUCCESS,
-//                 payload: { user }
-//             })
-//             yield put(replace('/auth/sign-in'))
-//         }
-//     }
-// }
-//
-//
-// export const saga = function * () {
-//     yield all([
-//         takeEvery(SIGN_IN_REQUEST, signInSaga),
-//         takeEvery(SIGN_OUT_REQUEST, signOutSaga),
-//         signUpSaga(),
-//         watchStatusChangeSaga()
-//     ])
-// }
+            lesson.courseUrl = _course ? _course.URL : null;
+        })
+    }
+
+    if (data.PortraitMeta) {
+        data.PortraitMeta = JSON.parse(data.PortraitMeta)
+    }
+}
+
+const handleCourse = (data) => {
+    if (data.CoverMeta) {
+        data.CoverMeta = JSON.parse(data.CoverMeta)
+    }
+};
+
+const handleLesson = (lesson) => {
+    let _readyDate = new Date(lesson.ReadyDate);
+    lesson.readyYear = _readyDate.getFullYear();
+    lesson.readyMonth = Months[_readyDate.getMonth()];
+
+    if (lesson.CoverMeta) {
+        lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
+    }
+
+    if (lesson.Lessons) {
+        let _parentNumber = lesson.Number;
+        lesson.Lessons.forEach((subLesson) => {
+            subLesson.Number = _parentNumber + '.' + subLesson.Number
+        })
+    }
+};
+
+const Months = [
+    'Январь',
+    'Февраль',
+    'Март',
+    'Апрель',
+    'Май',
+    'Июнь',
+    'Июль',
+    'Август',
+    'Сентябрь',
+    'Октябрь',
+    'Ноябрь',
+    'Декабрь',
+];
