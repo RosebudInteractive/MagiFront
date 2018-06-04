@@ -50,6 +50,15 @@ const AUTHOR_MSSQL_CL_PUB_REQ =
     "where(l.[AuthorId] = <%= authorId %>) and(lc.[State] = 'R')\n" +
     "order by c.[Id], lc.[ParentId], lc.[Number], el.[Number]";
 
+const AUTHOR_MSSQL_CNT_PUB_REQ =
+    "select c.[Id], count(*) Total, sum(case when lc.[State] = 'R' then 1 else 0 end) Ready\n" +
+    "from[Lesson] l\n" +
+    "  join[LessonCourse] lc on lc.[LessonId] = l.[Id]\n" +
+    "  join[Course] c on lc.[CourseId] = c.[Id]\n" +
+    "  join[AuthorToCourse] ac on ac.[CourseId] = c.[Id]\n" +
+    "where(ac.[AuthorId] = <%= authorId %>) and(lc.[ParentId] is NULL)\n" +
+    "group by c.[Id]";
+
 const AUTHOR_MSSQL_REF_PUB_REQ =
     "select l.[Id], sum(case when r.[Recommended] = 0 then 1 else 0 end) as[NRef],\n" +
     "  sum(convert(int, r.[Recommended])) as [NRec]\n" +
@@ -82,6 +91,15 @@ const AUTHOR_MYSQL_CL_PUB_REQ =
     "where(l.`AuthorId` = <%= authorId %>) and(lc.`State` = 'R')\n" +
     "order by c.`Id`, lc.`ParentId`, lc.`Number`, el.`Number`";
 
+const AUTHOR_MYSQL_CNT_PUB_REQ =
+    "select c.`Id`, count(*) Total, sum(case when lc.`State` = 'R' then 1 else 0 end) Ready\n" +
+    "from`Lesson` l\n" +
+    "  join`LessonCourse` lc on lc.`LessonId` = l.`Id`\n" +
+    "  join`Course` c on lc.`CourseId` = c.`Id`\n" +
+    "  join`AuthorToCourse` ac on ac.`CourseId` = c.`Id`\n" +
+    "where(ac.`AuthorId` = <%= authorId %>) and(lc.`ParentId` is NULL)\n" +
+    "group by c.`Id`";
+
 const AUTHOR_MYSQL_REF_PUB_REQ =
     "select l.`Id`, sum(IF(r.`Recommended` = 0, 1, 0)) as `NRef`,\n" +
     "  sum(r.`Recommended`) as `NRec`\n" +
@@ -107,6 +125,7 @@ const DbAuthor = class DbAuthor extends DbObject {
         let author = {};
         let lsn_list = {};
         let lc_list = {};
+        let couse_list = {};
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -116,7 +135,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                     }
                 }, {})
                     .then((result) => {
-                        if (result && result.detail && (result.detail.length = 1)) {
+                        if (result && result.detail && (result.detail.length === 1)) {
                             author = result.detail[0];
                             author.Courses = [];
                             author.Lessons = [];
@@ -146,8 +165,11 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: elem.URL,
+                                        Total: 0,
+                                        Ready: 0
                                     };
                                     author.Courses.push(course);
+                                    couse_list[elem.Id] = course;
                                 };
                                 let lsn = lsn_list[elem.LessonId];
                                 if (!lsn) {
@@ -188,11 +210,29 @@ const DbAuthor = class DbAuthor extends DbObject {
                             })
                             return $data.execSql({
                                 dialect: {
+                                    mysql: _.template(AUTHOR_MYSQL_CNT_PUB_REQ)({ authorId: author.Id }),
+                                    mssql: _.template(AUTHOR_MSSQL_CNT_PUB_REQ)({ authorId: author.Id })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let course = couse_list[elem.Id]
+                                if (course) {
+                                    course.Total = elem.Total;
+                                    course.Ready = elem.Ready;
+                                }
+                            })
+                            return $data.execSql({
+                                dialect: {
                                     mysql: _.template(AUTHOR_MYSQL_REF_PUB_REQ)({ authorId: author.Id }),
                                     mssql: _.template(AUTHOR_MSSQL_REF_PUB_REQ)({ authorId: author.Id })
                                 }
                             }, {});
                         }
+                        return author;
                     })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
