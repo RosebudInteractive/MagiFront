@@ -153,7 +153,7 @@ export default class CWSPlayerElement extends CWSBase {
     _getItem() {
         let item = $("#" + this.Id);
 
-        if (item.length == 0) {
+        if (item.length === 0) {
             let pos = this._options.data.content.position;
             if (!pos) {
                 this._calcMaxSize();
