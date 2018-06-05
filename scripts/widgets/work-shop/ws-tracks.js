@@ -713,7 +713,7 @@ export default class CWSTracks extends CWSBase {
         elementData.start = startTime;
         elementData.content.duration = duration;
 
-        let success = this._correctElementsIntersection(track, elementData, event.altKey);
+        let success = this._correctElementsIntersectionForResize(track, elementData, event.altKey);
 
         if (!success) {
             ui.position.left = prevLeft;
@@ -1146,7 +1146,7 @@ export default class CWSTracks extends CWSBase {
             // this._newElemData = element;
         }
 
-        if (this._correctElementsIntersection(track, element, event.altKey))
+        if (this._correctElementsIntersection(track, element, true))
             this._broadcastAddElement(item, track.elements);
         // this._selectImage(element);
     }
@@ -1198,8 +1198,8 @@ export default class CWSTracks extends CWSBase {
                 {"type": "zoom", "start": 0, "duration": 0, "acceleration": 0}
             ]
         };
-        track.elements.push(element);
-        if (this._correctElementsIntersection(track, element, event.altKey))
+
+        if (this._correctElementsIntersection(track, element, true))
             this._broadcastAddElement(item, track.elements);
     }
 
@@ -1222,7 +1222,7 @@ export default class CWSTracks extends CWSBase {
         elementData.start = startTime;
         newTrackId = item.attr("id").replace(/^t_/, '');
 
-        if (this._correctElementsIntersectionForMoveElement(newTrack, elementData)) {
+        if (this._correctElementsIntersection(newTrack, elementData, false)) {
             if (oldTrack != newTrack) {
                 for (let i = 0; i < oldTrack.elements.length; i++) {
                     if (oldTrack.elements[i].id == elementData.id) {
@@ -1579,7 +1579,7 @@ export default class CWSTracks extends CWSBase {
         this._renderLiner(this._getAudioState());
     }
 
-    _correctElementsIntersectionForMoveElement(track, editedData) {
+    _correctElementsIntersectionForNewElement(track, editedData) {
         let audioState = this._getAudioState();
         editedData = $.extend(true, {}, editedData);
 
@@ -1622,11 +1622,62 @@ export default class CWSTracks extends CWSBase {
             if (editedData.start < lBound) return false;
         }
 
+
+    }
+    _correctElementsIntersection(track, editedData, tryResize) {
+        let audioState = this._getAudioState();
+        editedData = $.extend(true, {}, editedData);
+
+        let elements = [];
+        let edDataFound = false;
+        for (let i = 0; i < track.elements.length; i++) {
+            if (track.elements[i].id == editedData.id) {
+                elements.push(editedData);
+                edDataFound = true;
+            } else
+                elements.push($.extend(true, {}, track.elements[i]));
+        }
+        if (!edDataFound) {
+            elements.push(editedData);
+        }
+        elements = elements.sort(compareElements);
+
+        let editedElIdx = 0;
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].id == editedData.id) {
+                editedElIdx = i;
+                break;
+            }
+        }
+
+        let beforeEl = null;
+        let afterEl = null;
+        if (editedElIdx > 0) beforeEl = elements[editedElIdx - 1];
+        if (editedElIdx < elements.length - 1) afterEl = elements[editedElIdx + 1];
+
+        let lBound = 0;
+        let rBound = audioState.duration;
+        if (beforeEl) {
+            lBound = beforeEl.start + beforeEl.content.duration;
+        }
+        if (afterEl) rBound = afterEl.start;
+        if (editedData.start < lBound) editedData.start = lBound;
+        if (editedData.start + editedData.content.duration > rBound) {
+            editedData.start = rBound - editedData.content.duration;
+            if (editedData.start < lBound) {
+                if (!tryResize || lBound == rBound) return false;
+                else {
+                    editedData.start = lBound;
+                    editedData.content.duration = rBound - lBound;
+                }
+            }
+        }
+
         this._copyTrackElements(track, elements);
         return true;
     }
 
-    _correctElementsIntersection(track, editedData, altKey) {
+    _correctElementsIntersectionForResize(track, editedData, altKey) {
         let audioState = this._getAudioState();
 
         let elements = [];
