@@ -14,11 +14,17 @@ function intFmtWithLeadingZeros(val, width) {
 exports.DbUtils = {
     intFmtWithLeadingZeros: intFmtWithLeadingZeros,
 
-    fmtDuration: (duration) => {
+    fmtDuration: (duration, options) => {
         let hours = (duration / 3600) ^ 0;
         let minSecs = duration - hours * 3600;
-        return (hours > 0 ? (hours.toString() + ":") : "") + intFmtWithLeadingZeros((minSecs / 60) ^ 0, 2) +
-            ":" + intFmtWithLeadingZeros(minSecs - ((minSecs / 60) ^ 0) * 60, 2);
+        let secs = minSecs - ((minSecs / 60) ^ 0) * 60;
+        let msecs = ((secs - (secs ^ 0)) * 1000) ^ 0;
+        let opts = options || {};
+        let hSep = opts.h ? opts.h : ":";
+        let mSep = opts.m ? opts.m : ":";
+        let sSep = opts.s ? opts.s : "";
+        return (hours > 0 ? (hours.toString() + hSep) : "") + intFmtWithLeadingZeros((minSecs / 60) ^ 0, 2) +
+            mSep + intFmtWithLeadingZeros((secs ^ 0), 2) + (opts.ms ? ("." + intFmtWithLeadingZeros(msecs, 3)) : "") + sSep;
     },
 
     execSqlScript: (mysql_script, mssql_script, opts) => {

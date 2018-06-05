@@ -5,9 +5,10 @@ const { AccessRights } = require('../security/access-rights');
 const { HttpCode } = require("../const/http-codes");
 
 let uploadPath = config.get('uploadPath');
+let dataUrl = config.get('dataUrl');
 
 exports.setupProtectedStatic = (app) => {
-    app.use('/data', (req, res, next) => {
+    app.use(dataUrl, (req, res, next) => {
         AccessRights.canAccessFile(req.user, req.url)
             .then((canAccess) => {
                 if (canAccess) {
