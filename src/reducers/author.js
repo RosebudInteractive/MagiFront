@@ -79,7 +79,12 @@ export default function author(state = initialState, action) {
         }
 
         case CLEAR_AUTHOR:{
-            return initialState
+            return {
+                initial: null,
+                current: null,
+                fetching: true,
+                hasChanges: false,
+            }
         }
 
         default:

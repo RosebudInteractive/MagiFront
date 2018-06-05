@@ -9,6 +9,7 @@ import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
+import AuthorPage from './containers/author-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -34,6 +35,7 @@ import Platform from 'platform';
 Polifyll.registry();
 
 let _homePath = '/';
+const _scrollDelta = 80;
 
 class App extends Component {
 
@@ -127,11 +129,23 @@ class App extends Component {
     }
 
     _handleScroll(event) {
+        this._addDevWarn('last : ' + this.state.lastScrollPos + ' top : ' + event.target.scrollingElement.scrollTop)
+
         if (!event.target.scrollingElement) {
             return
         }
 
-        if (this.state.lastScrollPos > event.target.scrollingElement.scrollTop) {
+        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop)
+        if (_delta < _scrollDelta) {
+            return
+        }
+
+        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
+            this.setState({showHeader : true})
+
+        }
+
+        if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
             this.setState({
                 direction: 'top',
                 showHeader: true,
@@ -154,6 +168,7 @@ class App extends Component {
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
@@ -161,6 +176,15 @@ class App extends Component {
 
             </Switch>
         )
+    }
+
+    _addDevWarn(text) {
+        let _dev = $('#dev'),
+            isVisible = _dev.is(':visible');
+
+        if (isVisible === true) {
+            _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
+        }
     }
 
     render() {

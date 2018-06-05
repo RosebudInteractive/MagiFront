@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 
 import Gallery from './gallery';
 import GallerySlides from './gallery-slides';
+import $ from 'jquery'
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -11,6 +12,7 @@ export default class TranscriptPage extends React.Component {
         refs: PropTypes.array,
         gallery: PropTypes.array,
         isNeedHideGallery: PropTypes.bool,
+        lesson: PropTypes.object,
     };
 
     render() {
@@ -126,11 +128,30 @@ class TextBlock extends React.Component {
         return _div;
     }
 
+    componentDidMount(){
+        this._setIndent()
+    }
+
+    componentDidUpdate(){
+        this._setIndent()
+    }
+
+    _setIndent() {
+        let _number = $('.title-text .number')
+
+        if ((window.clientWidth > 899) && _number.length > 0) {
+            let _width = _number[0].offsetWidth;
+            $('.title-text').css('text-indent', -_width);
+        }
+    }
+
     render() {
+        let {lesson} = this.props;
+
         return (
             <section className={'text-block'} id='text'>
                 <div className={'text-block__wrapper'}>
-                    {/*<div dangerouslySetInnerHTML={{__html: this._getText()}}/>*/}
+                    <div className='title-text'><span className="number">{lesson.Number + '.'}</span>{' ' + lesson.Name}</div>
                     {this._getText()}
                     <Refs {...this.props}/>
                 </div>

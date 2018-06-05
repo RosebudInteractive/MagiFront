@@ -296,7 +296,7 @@ exports.DbEngineInit = class DbEngineInit {
         UCCELLO_CONFIG.dataman.createTypeData = true;
         new Dataman(router, rpc, memDbController, $constructors);
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
-        global.$dbUser = new DbUser(USER_MODEL_NAME);
+        global.$dbUser = new DbUser(USER_MODEL_NAME, { saltRounds: config.authentication.saltRounds });
 
         if (autoImportImgFlag) {
             const { FileUpload } = require("./file-upload");

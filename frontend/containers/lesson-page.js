@@ -340,12 +340,12 @@ class LessonPage extends React.Component {
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
-            navigation: (!this.props.isMobileApp && (_anchors.length > 1)),
+            navigation: (_anchors.length > 1),
             navigationTooltips: _anchors.map((anchor) => {
                 return anchor.title
             }),
             css3: true,
-            autoScrolling: !this.props.isMobileApp,
+            autoScrolling: true,
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,

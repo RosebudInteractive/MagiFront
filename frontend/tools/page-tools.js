@@ -48,6 +48,7 @@ export const pages = {
     lesson: {name: 'lesson', url: null},
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
+    author: {name: 'author', url: null},
 }
 
 
@@ -89,3 +90,7 @@ export const getCoverPath = (coverOwner, size) => {
 
     return _fileName;
 }
+
+export const getRandomInt = (min, max) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};

@@ -380,7 +380,14 @@ class CourseEditor extends ObjectEditor {
                 name: 'URL',
                 label: 'URL',
                 placeholder: "Введите URL",
-                labelWidth: labelWidth
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
             {
                 view: "colorpicker",

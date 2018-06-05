@@ -47,6 +47,7 @@ module.exports = {
         enabled: false,
         useJWT: false,
         useCapture: true,
+        saltRounds: 10,
         activationRoute: "/activation-confirm",
         recoveryRoute: "/recovery",
         secret: 'zxcvv8708xulsajfois23h32',

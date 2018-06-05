@@ -534,7 +534,7 @@ export default class CWSPlayer extends CWSBase {
 
     _proccessAnimationFrame() {
         if (this._audioState.audio) {
-            this._audioState.currentTime = this._audioState.audio.currentTime;
+            this._audioState.currentTime = (this._audioState.currentTime < this._audioState.audio.currentTime) ? this._audioState.audio.currentTime : this._audioState.currentTime;
             this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
             this._broadcastCurrentTimeChanged();
             if (!this._audioState.stopped) {

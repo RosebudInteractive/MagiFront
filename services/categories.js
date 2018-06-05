@@ -2,7 +2,7 @@
 let { CategoriesService } = require('./../database/db-category');
 
 function setupCategories(app) {
-    app.get('/api/categories', (req, res, next) => {
+    app.get('/api/adm/categories', (req, res, next) => {
         CategoriesService()
             .getAll()
             .then(rows => {
@@ -13,7 +13,7 @@ function setupCategories(app) {
             });
     });
 
-    app.get('/api/categories/:id', (req, res, next) => {
+    app.get('/api/adm/categories/:id', (req, res, next) => {
         CategoriesService()
             .get(parseInt(req.params.id))
             .then(rows => {
@@ -24,7 +24,7 @@ function setupCategories(app) {
             });
     });
 
-    app.post('/api/categories', (req, res, next) => {
+    app.post('/api/adm/categories', (req, res, next) => {
         CategoriesService()
             .insert(req.body)
             .then(rows => {
@@ -35,7 +35,7 @@ function setupCategories(app) {
             });
     });
 
-    app.put('/api/categories/:id', (req, res, next) => {
+    app.put('/api/adm/categories/:id', (req, res, next) => {
         CategoriesService()
             .update(parseInt(req.params.id), req.body)
             .then(rows => {
@@ -46,7 +46,7 @@ function setupCategories(app) {
             });
     });
 
-    app.delete('/api/categories/:id', (req, res, next) => {
+    app.delete('/api/adm/categories/:id', (req, res, next) => {
         CategoriesService()
             .del(parseInt(req.params.id))
             .then(() => {

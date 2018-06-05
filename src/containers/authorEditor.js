@@ -1,14 +1,10 @@
 import React  from 'react'
 import Webix from '../components/Webix';
-// import ErrorDialog from '../components/ErrorDialog';
 
 import * as authorActions from "../actions/authorActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-// import {
-//     EDIT_MODE_INSERT,
-//     EDIT_MODE_EDIT
-// } from '../constants/Common';
+import {EDIT_MODE_INSERT} from "../constants/Common";
 
 import ObjectEditor, {labelWidth, } from './object-editor';
 
@@ -32,6 +28,18 @@ class AuthorEditor extends ObjectEditor {
 
     get objectActions() {
         return this.props.authorActions;
+    }
+
+    componentWillReceiveProps(next) {
+        const {
+            author,
+        } = next;
+
+        if (this.editMode === EDIT_MODE_INSERT) {
+            if (!author) {
+                this.objectActions.create();
+            }
+        }
     }
 
     _getWebixForm(){
@@ -58,6 +66,20 @@ class AuthorEditor extends ObjectEditor {
             {
                 view: "text", name: "LastName", label: "Фамилия",
                 placeholder: "Введите фамилию",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
+            },
+            {
+                view: 'text',
+                name: 'URL',
+                label: 'URL',
+                placeholder: "Введите URL",
                 labelWidth: labelWidth,
                 validate: window.webix.rules.isNotEmpty,
                 invalidMessage: "Значение не может быть пустым",

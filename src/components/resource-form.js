@@ -17,8 +17,8 @@ class ResourceForm extends React.Component {
     }
 
     _save(value) {
-        value.LanguageId ?
-            value.Language = this._getLanguageName(value.LanguageId) :
+        value.ResLanguageId ?
+            value.Language = this._getLanguageName(value.ResLanguageId) :
             value.Language = '';
         value.Id = this.props.data.Id;
         this.props.save(value)
@@ -194,7 +194,7 @@ class ResourceForm extends React.Component {
                     cols: [
                         {
                             view: "combo",
-                            name: "LanguageId",
+                            name: "ResLanguageId",
                             label: "Язык",
                             placeholder: "Выберите язык",
                             labelPosition: "top",

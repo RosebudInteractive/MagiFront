@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {Link} from 'react-router-dom'
 
 export default class Info extends React.Component {
 
@@ -8,8 +9,10 @@ export default class Info extends React.Component {
         let _multipleCategories = this.props.categories.length > 1;
 
         let _authors = this.props.authors.map((author) => {
-            return author.FirstName + ' ' + author.LastName;
-        }).join(', ');
+            return (<Link to={'/autor/' + author.URL}>{author.FirstName + ' ' + author.LastName}</Link>);
+        });
+
+        _authors = (_authors.length > 1) ? <div>{_authors[0]}, {_authors[1]}</div> : _authors
 
         const _categories = this.props.categories.map((category) => {
             return category.Name
@@ -32,8 +35,6 @@ export default class Info extends React.Component {
 
 
         _portrait = '/data/' + (_portrait ? (_author.PortraitMeta.path + _portrait) : _author.Portrait);
-
-        // const _portrait = this.props.authors[0] ? "/data/" + this.props.authors[0].Portrait : null;
 
         return (
             <div className='course-module__info'>

@@ -6,6 +6,7 @@ import * as categoriesActions from "../actions/categoriesListActions";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import ObjectEditor, {labelWidth, } from './object-editor';
+import {EDIT_MODE_INSERT} from "../constants/Common";
 
 class CategoryForm extends ObjectEditor {
 
@@ -27,6 +28,18 @@ class CategoryForm extends ObjectEditor {
 
     get objectActions() {
         return this.props.categoryActions;
+    }
+
+    componentWillReceiveProps(next) {
+        const {
+            category,
+        } = next;
+
+        if (this.editMode === EDIT_MODE_INSERT) {
+            if (!category) {
+                this.objectActions.create();
+            }
+        }
     }
 
     _initEditMode(){
@@ -81,6 +94,20 @@ class CategoryForm extends ObjectEditor {
                 placeholder: "Введите категорию",
                 options : _options,
                 labelWidth: labelWidth,
+            },
+            {
+                view: 'text',
+                name: 'URL',
+                label: 'URL',
+                placeholder: "Введите URL",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
             },
         ];
     }
