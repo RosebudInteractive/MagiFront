@@ -22,7 +22,7 @@ export default class GallerySlides extends React.Component {
             let _number = index + 1,
                 _numberWithLeadZero = _number.toString().padStart(2, '0');
 
-            return <div id={"gallery" + _numberWithLeadZero} className="gallery-slide" style={{display: 'none'}}>
+            return <div id={"gallery" + _numberWithLeadZero} className="gallery-slide" style={{display: 'none'}} key={index}>
                 <div className="gallery-slide__image" style={{backgroundImage: 'url(' + '/data/' + item.FileName + ')'}}/>
                 <p className="gallery-slide__caption">
                     <span className="number">{_number + '.'}</span>{item.Name}<br/>{item.Description}</p>

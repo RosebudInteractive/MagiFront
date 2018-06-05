@@ -11,6 +11,7 @@ export default class TranscriptPage extends React.Component {
         refs: PropTypes.array,
         gallery: PropTypes.array,
         isNeedHideGallery: PropTypes.bool,
+        lesson: PropTypes.object,
     };
 
     render() {
@@ -127,10 +128,12 @@ class TextBlock extends React.Component {
     }
 
     render() {
+        let {lesson} = this.props;
+
         return (
             <section className={'text-block'} id='text'>
                 <div className={'text-block__wrapper'}>
-                    {/*<div dangerouslySetInnerHTML={{__html: this._getText()}}/>*/}
+                    <div className='title-text'><span className="number">{lesson.Number + '.'}</span>{' ' + lesson.Name}</div>
                     {this._getText()}
                     <Refs {...this.props}/>
                 </div>

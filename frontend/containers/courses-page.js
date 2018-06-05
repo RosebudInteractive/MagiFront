@@ -24,6 +24,10 @@ class CoursesPage extends React.Component {
         this.props.pageHeaderActions.setCurrentPage(tools.pages.courses);
     }
 
+    componentDidMount() {
+        document.title = 'Магистерия'
+    }
+
     _getCoursesBundles() {
 
         let {filters} = this.props;
