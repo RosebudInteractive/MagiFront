@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 
 import Gallery from './gallery';
 import GallerySlides from './gallery-slides';
+import $ from 'jquery'
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -125,6 +126,23 @@ class TextBlock extends React.Component {
         });
 
         return _div;
+    }
+
+    componentDidMount(){
+        this._setIndent()
+    }
+
+    componentDidUpdate(){
+        this._setIndent()
+    }
+
+    _setIndent() {
+        let _number = $('.title-text .number')
+
+        if ((window.clientWidth > 899) && _number.length > 0) {
+            let _width = _number[0].offsetWidth;
+            $('.title-text').css('text-indent', -_width);
+        }
     }
 
     render() {
