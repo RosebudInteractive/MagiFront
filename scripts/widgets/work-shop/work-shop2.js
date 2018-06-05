@@ -114,6 +114,16 @@ export default class CWorkShop extends CWSBase {
         this._container.keydown((e) => {
             if ((e.keyCode == 46 || e.keyCode == 8) && this._container.is(":focus"))
                 this._tracksWidget.deleteFocused();
+            else if (e.keyCode == 32) {
+                let audioState = this._playerWidget.getAudioState();
+                if (audioState.stopped) {
+                    this._playerWidget.play();
+                    this._tracksWidget.play();
+                } else {
+                    this._playerWidget.pause();
+                    this._tracksWidget.pause();
+                }
+            }
         }).click(function () {
             $(this).focus();
         });

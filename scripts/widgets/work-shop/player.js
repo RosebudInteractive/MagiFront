@@ -550,15 +550,15 @@ export default class CWSPlayer extends CWSBase {
     play() {
         return new Promise((resolve) => {
             if (!this._audioState.audio) {
-                this._addDevErr('No audio!!!')
-                resolve()
+                this._addDevErr('No audio!!!');
+                resolve();
                 return
             }
 
             if (this._audioState.stopped) {
-                resolve(this._audioState.audio.play())
+                resolve(this._audioState.audio.play());
             } else {
-                resolve()
+                resolve();
             }
         })
     }
