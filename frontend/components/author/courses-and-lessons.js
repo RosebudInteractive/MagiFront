@@ -117,8 +117,8 @@ class Course extends React.Component {
                     <div className="course-announce__row">
                         <div className="course-announce__progress">
                             <span className="course-announce__progress-label">Вышло</span>
-                            <span className="course-announce__progress-actual">10</span>
-                            <span className="course-announce__progress-total">/13</span>
+                            <span className="course-announce__progress-actual">{course.Ready}</span>
+                            <span className="course-announce__progress-total">{'/' + course.Total}</span>
                         </div>
                         <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">Подробнее о курсе</Link>
                     </div>
