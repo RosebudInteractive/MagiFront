@@ -3929,6 +3929,38 @@ li.fancybox-thumbs-loading {
     .transcript-page {
       padding-top: 42px; } }
 
+  .transcript-page .title-text {
+      text-indent: -1.3em;
+      font-family: PT Serif;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 57px;
+      font-size: 54px;
+      letter-spacing: -0.02em;
+      color: #2F2F2F;
+      margin-bottom: 64px;
+      margin-top: 0;}
+  @media (max-width: 899px) {
+      .transcript-page .title-text {
+          text-indent: 0;
+          line-height: 30px;
+          font-size: 30px;
+          margin-bottom: 37px;}}
+
+  .transcript-page .title-text .number{
+    font-family: Fira Sans;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 54px;
+    font-size: 55px;
+    text-align: right;
+    letter-spacing: -0.02em;
+    color: #C8684C;}
+  @media (max-width: 899px) {
+    .transcript-page .title-text .number{
+      line-height: 30px;
+      font-size: 30px;}}
+
 .btn {
   display: inline-block;
   vertical-align: top;
@@ -9062,14 +9094,14 @@ ul.lectures-tab {
       .lecture-full__play-block, .lecture-full__info-block {
         width: 100%; } }
   .lecture-full__play-block {
-    padding-right: 12%;
+    padding-right: 12.65%;
     max-height: 311px; }
     .lecture-full__play-block .play-block {
       margin-left: auto;
       margin-right: auto; }
     @media (max-width: 1399px) {
       .lecture-full__play-block {
-        padding-left: 12%; }
+        padding-left: 12.65%; }
         .lecture-full__play-block .play-block {
           -webkit-box-sizing: border-box;
           -moz-box-sizing: border-box;
@@ -9388,10 +9420,10 @@ ul.lectures-tab {
   @media (max-width: 899px) {
     .author-page {
       padding-top: 64px; } }
-  @media (max-width: 1399px) {
-    .author-page .lecture-full__play-block {
-      padding-left: 7%;
-      padding-right: 7%; } }
+  /*@media (max-width: 1399px) {*/
+    /*.author-page .lecture-full__play-block {*/
+      /*padding-left: 7%;*/
+      /*padding-right: 7%; } }*/
   @media (max-width: 768px) {
     .author-page .lecture-full__play-block {
       padding-left: 9%;
@@ -9585,6 +9617,7 @@ ul.lectures-tab {
   border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
   @media (max-width: 899px) {
     .author-block__subtitle {
+      cursor: pointer;
       position: relative;
       padding-top: 28px;
       padding-bottom: 30px;

@@ -150,9 +150,14 @@ export default class CWSResourceLoader {
                 el.start = start.start + el.start;
             }
 
-            tracks.sort((a, b) => {
-                return Math.sign(a.id - b.id);
-            });
+            if (tracks.length == 0) {
+                tracks.push({id: 1, elements: []});
+                tracksIdx[1] = 0;
+            } else {
+                tracks.sort((a, b) => {
+                    return Math.sign(a.id - b.id);
+                });
+            }
 
             episode.tracks = tracks;
             episode.tracksIdx = tracksIdx;

@@ -129,6 +129,7 @@ export default class CWSTracks extends CWSBase {
                 this._list.prepend(item);
                 let delBtn = $(closeTpl);
                 delBtn.attr("id", "close_t_" + track.id).attr("data-track", track.id);
+                delBtn.find(".number-text").text(track.id);
                 this._closeButtonsList.prepend(delBtn);
                 this._setDeleteBtnEvents(delBtn);
                 this._setTrackEvents(item);
@@ -136,6 +137,12 @@ export default class CWSTracks extends CWSBase {
             }
 
             this._renderElements(track.elements, item);
+        }
+
+        if (tracks.length <= 1) {
+            this._closeButtonsList.find(".ws-track-tools-panel").children(".delete-btn").hide();
+        } else {
+            this._closeButtonsList.find(".ws-track-tools-panel").children(".delete-btn").show();
         }
 
         this._list.children().each(function () {
@@ -508,7 +515,7 @@ export default class CWSTracks extends CWSBase {
         };
 
         elItem.draggable({
-            helper: "clone",
+            //helper: "clone",
             appendTo: this._options.mainContainer,
             zIndex: 10,
             scroll: false,
@@ -524,7 +531,7 @@ export default class CWSTracks extends CWSBase {
                     }
                 };
                 that._setSideTime.bind(this, uiHelper)();
-                elItem.hide();
+                //elItem.hide();
             },
             over: () => {
 
@@ -575,12 +582,15 @@ export default class CWSTracks extends CWSBase {
 
                 that._setSideTime.bind(this, uiHelper)();
             },
-            stop: (/*event, ui*/) => {
-                elItem.show();
+            stop: (event, ui) => {
                 that._setFocusedWithBroadcast.bind(this, elItem)();
+                setTimeout(() => {
+                    elItem.css({top: "0px"})
+                }, 0);
             }
         }).resizable({
             handles: 'e, w',
+            aspectRatio: false,
             start: (event, ui) => {
                 this._elementResizeData.stepParams = this._getStepParams();
                 this._elementResizeData.prevLeft = ui.originalPosition.left;
@@ -589,6 +599,12 @@ export default class CWSTracks extends CWSBase {
                 that._setFocusedWithBroadcast.bind(this, elItem)();
             },
             resize: (event, ui) => {
+                if (event.shiftKey) {
+                    event.preventDefault();
+                    this.render();
+                    that._setSideTime.bind(this, elItem)();
+                    return false;
+                }
                 this._resizeElement(elItem, event, ui,
                     this._elementResizeData.prevLeft,
                     this._elementResizeData.prevWidth);
@@ -608,6 +624,8 @@ export default class CWSTracks extends CWSBase {
                     prevWidth: null,
                     prevLeft: null
                 };
+                this.render();
+
                 that._hideSideTime.bind(this, elItem)();
             }
         }).click(() => {
@@ -616,6 +634,9 @@ export default class CWSTracks extends CWSBase {
         });
 
         elItem.find(".ws-track-element-menu").click(() => {
+            if (!confirm("Delete element?")) {
+                return;
+            }
             let elementData = elItem.data("data");
             let oldTrackId = elItem.data("parentId");
             let oldTrack = this._findTrack(oldTrackId);
@@ -714,7 +735,7 @@ export default class CWSTracks extends CWSBase {
             scrollAuto: false,
             scrollAutoValue: 0,
             scrollAnimationFrame: null,
-            scrollAnimationFrameTime: null,
+            //scrollAnimationFrameTime: null,
             scrollBy: (deltaX, deltaY) => {
                 if (scrollerData.scrollX + deltaX < 0) {
                     scrollerData.scrollX = 0;
@@ -871,23 +892,13 @@ export default class CWSTracks extends CWSBase {
         let playButton = this._container.find(".ws-tools-top")
             .find(".ws-tools-top-play");
         let pause = playButton.find("[role='pause']");
-        let play = playButton.find("[role='play']");
         pause.hide();
         playButton.on('mouseup', function () {
             let audioState = that._getAudioState();
             if (audioState.stopped) {
-                that._play();
-                play.hide();
-                pause.show();
+                that.play();
             } else {
-                that._pause();
-                pause.hide();
-                play.show();
-                that._scrollerDiv.scrollerData.scrollAuto = false;
-                if (that._scrollerDiv.scrollerData.scrollAnimationFrame) {
-                    cancelAnimationFrame(that._scrollerDiv.scrollerData.scrollAnimationFrame);
-                    that._scrollerDiv.scrollerData.scrollAnimationFrame = null;
-                }
+                that.pause();
             }
         });
 
@@ -936,6 +947,31 @@ export default class CWSTracks extends CWSBase {
             meter_mouse_down = true;
             that.setVolumeMeter.bind(this, e, that)();
         });
+    }
+
+    play() {
+        let playButton = this._container.find(".ws-tools-top")
+        let pause = playButton.find("[role='pause']");
+        let play = playButton.find("[role='play']");
+
+        this._play();
+        play.hide();
+        pause.show();
+    }
+
+    pause() {
+        let playButton = this._container.find(".ws-tools-top")
+        let pause = playButton.find("[role='pause']");
+        let play = playButton.find("[role='play']");
+
+        this._pause();
+        pause.hide();
+        play.show();
+        this._scrollerDiv.scrollerData.scrollAuto = false;
+        if (this._scrollerDiv.scrollerData.scrollAnimationFrame) {
+            cancelAnimationFrame(this._scrollerDiv.scrollerData.scrollAnimationFrame);
+            this._scrollerDiv.scrollerData.scrollAnimationFrame = null;
+        }
     }
 
     setVolumeMeter(e, that) {
@@ -1019,8 +1055,12 @@ export default class CWSTracks extends CWSBase {
 
     _setDeleteBtnEvents(deleteBtn) {
         let that = this;
-        deleteBtn.click(function () {
-            let id = $(this).attr("data-track");
+        deleteBtn.find(".delete-btn").click(function () {
+            if (!confirm("Delete track?")) {
+                return;
+            }
+
+            let id = deleteBtn.attr("data-track");
             if (that._options.onDelete) that._options.onDelete({id: id});
         });
     }
@@ -1034,12 +1074,14 @@ export default class CWSTracks extends CWSBase {
                     el.hasClass("ws-palette-btn");
             },
             drop: ( event, ui ) => {
+                event.preventDefault();
                 if (ui.draggable.hasClass("ws-assets-item"))
                     this._onDropAsset(item, event, ui);
-                else if (ui.draggable.hasClass("ws-track-element"))
+                else if (ui.draggable.hasClass("ws-track-element")) {
                     this._onDropElement(item, event, ui);
-                else
+                } else
                     this._onDropPaletteBtn(item, event, ui);
+                return false;
             }
         });
     }
@@ -1162,22 +1204,13 @@ export default class CWSTracks extends CWSBase {
     }
 
     _onDropElement(item, event, ui) {
-        let elementData = ui.draggable.data("data");
+        let elementData = $.extend(true, {}, ui.draggable.data("data"));
         let oldTrackId = ui.draggable.data("parentId");
-        let newTrackId = item.attr("id").replace(/^t_/, '');;
+        let newTrackId = item.attr("id").replace(/^t_/, '');
         let oldTrack = this._findTrack(oldTrackId);
         let newTrack = this._findTrack(newTrackId);
 
         if (!(oldTrack && newTrack)) return;
-        if (oldTrack != newTrack) {
-            for (let i = 0; i < oldTrack.elements.length; i++) {
-                if (oldTrack.elements[i].id == elementData.id) {
-                    oldTrack.elements.splice(i, 1);
-                }
-            }
-            elementData.content.track = newTrack.id;
-            newTrack.elements.push(elementData);
-        }
 
         let hOffset = ui.helper.offset();
         let position = {
@@ -1189,7 +1222,17 @@ export default class CWSTracks extends CWSBase {
         elementData.start = startTime;
         newTrackId = item.attr("id").replace(/^t_/, '');
 
-        if (this._correctElementsIntersection(newTrack, elementData, event.altKey)) {
+        if (this._correctElementsIntersectionForMoveElement(newTrack, elementData)) {
+            if (oldTrack != newTrack) {
+                for (let i = 0; i < oldTrack.elements.length; i++) {
+                    if (oldTrack.elements[i].id == elementData.id) {
+                        oldTrack.elements.splice(i, 1);
+                        break;
+                    }
+                }
+                elementData.content.track = newTrack.id;
+            }
+
             if (oldTrackId == newTrackId)
                 this._broadcastEditElement(item, newTrack.elements);
             else
@@ -1437,14 +1480,21 @@ export default class CWSTracks extends CWSBase {
 
     _animationFrame(timestamp) {
         let state = this._getAudioState();
-        let fps = 30;
-        let interval = 1000/fps;
-        let scrollBy = (this._getStepParams().pixelsInSencond/fps) * state.playbackRate;
-
-        if (timestamp >= this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
-            //missed step
-            this._scrollerDiv.scrollerData.scrollAnimationFrameTime = timestamp + interval;
+        //let fps = 80;
+        //let interval = 1000/fps;
+        //let scrollBy = (this._getStepParams().pixelsInSencond/fps) * state.playbackRate;
+        let scrollBy = 0;
+        let pPos = this._getPointerLeft(state.currentTime);
+        if (pPos >= this._scrollerDiv.width() - PTR_SCROLL_BOUND) {
+            scrollBy = pPos - (this._scrollerDiv.width() - PTR_SCROLL_BOUND);
         }
+
+        console.log(pPos);
+
+        //if (timestamp >= this._scrollerDiv.scrollerData.scrollAnimationFrameTime) {
+        //    //missed step
+        //    this._scrollerDiv.scrollerData.scrollAnimationFrameTime = timestamp + interval;
+        //}
 
         this._scrollerDiv.scrollerData.scrollBy(scrollBy, 0);
         if (this._scrollerDiv.scrollerData.scrollAnimationFrame && !state.stopped)
@@ -1455,12 +1505,11 @@ export default class CWSTracks extends CWSBase {
     }
 
     _altScrollToPointer() {
-
         let audioState = this._getAudioState();
         let p = this._getStepParams();
         if (!audioState.stopped) {
             let pos = PTR_SCROLL_NONE;
-            let pPos = this._getPointerLeft(audioState.currentTime)
+            let pPos = this._getPointerLeft(audioState.currentTime);
             if (pPos < 0) pos = PTR_SCROLL_LEFT;
             else if (pPos >= this._scrollerDiv.width() - PTR_SCROLL_BOUND) pos = PTR_SCROLL_RIGHT;
 
@@ -1468,7 +1517,7 @@ export default class CWSTracks extends CWSBase {
                 if (!this._scrollerDiv.scrollerData.scrollAuto) {
                     this._scrollerDiv.scrollerData.scrollAuto = true;
                     this._scrollerDiv.scrollerData.scrollAnimationFrame = requestAnimationFrame(this._animationFrame.bind(this));
-                    this._scrollerDiv.scrollerData.scrollAnimationFrameTime = performance.now();
+                    //this._scrollerDiv.scrollerData.scrollAnimationFrameTime = performance.now();
                 } else {
 
                     if (parseFloat(this._pointer.css('left')) > this._scrollerDiv.scrollerData.viewportWidth()) {
@@ -1530,8 +1579,54 @@ export default class CWSTracks extends CWSBase {
         this._renderLiner(this._getAudioState());
     }
 
+    _correctElementsIntersectionForMoveElement(track, editedData) {
+        let audioState = this._getAudioState();
+        editedData = $.extend(true, {}, editedData);
 
-    _correctElementsIntersection(track, editedData, shift) {
+        let elements = [];
+        let edDataFound = false;
+        for (let i = 0; i < track.elements.length; i++) {
+            if (track.elements[i].id == editedData.id) {
+                elements.push(editedData);
+                edDataFound = true;
+            } else
+                elements.push($.extend(true, {}, track.elements[i]));
+        }
+        if (!edDataFound) {
+            elements.push(editedData);
+        }
+        elements = elements.sort(compareElements);
+
+        let editedElIdx = 0;
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].id == editedData.id) {
+                editedElIdx = i;
+                break;
+            }
+        }
+
+        let beforeEl = null;
+        let afterEl = null;
+        if (editedElIdx > 0) beforeEl = elements[editedElIdx - 1];
+        if (editedElIdx < elements.length - 1) afterEl = elements[editedElIdx + 1];
+
+        let lBound = 0;
+        let rBound = audioState.duration;
+        if (beforeEl) {
+            lBound = beforeEl.start + beforeEl.content.duration;
+        }
+        if (afterEl) rBound = afterEl.start;
+        if (editedData.start < lBound) editedData.start = lBound;
+        if (editedData.start + editedData.content.duration > rBound) {
+            editedData.start = rBound - editedData.content.duration;
+            if (editedData.start < lBound) return false;
+        }
+
+        this._copyTrackElements(track, elements);
+        return true;
+    }
+
+    _correctElementsIntersection(track, editedData, altKey) {
         let audioState = this._getAudioState();
 
         let elements = [];
@@ -1552,8 +1647,8 @@ export default class CWSTracks extends CWSBase {
             if (currentPos > element.start) {
                 element.start = currentPos;
             }
-            // если не зажат Shift, то пытаемся ужать следующий элемент
-            if (!shift && oldStart != element.start) {
+            // если зажат Alt, то пытаемся ужать следующий элемент
+            if (altKey && oldStart != element.start) {
                 element.content.duration -= element.start - oldStart;
                 if (element.content.duration < 1) element.content.duration = 1;
             }
@@ -1565,19 +1660,29 @@ export default class CWSTracks extends CWSBase {
             return false;
         }
 
+        this._copyTrackElements(track, elements);
+        return true;
+    }
+
+    _copyTrackElements(track, elements) {
         for (let i = 0; i < elements.length; i++) {
             let el = elements[i];
+            let found = false;
             for (let j = 0; j < track.elements.length; j++) {
                 if (track.elements[j].id == el.id) {
                     let tEl = track.elements[j];
                     tEl.start = el.start;
                     tEl.content.duration = el.content.duration;
+                    found = true;
                     break;
                 }
             }
+
+            if (!found) {
+                track.elements.push(el);
+            }
         }
         track.elements = track.elements.sort(compareElements);
-        return true;
     }
 
     setElementPosition(elementId, position) {

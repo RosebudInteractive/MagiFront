@@ -113,10 +113,10 @@ class TranscriptLessonPage extends React.Component {
                                     <TranscriptPage episodes={lessonText.episodes}
                                                     refs={lessonText.refs}
                                                     gallery={lessonText.gallery}
-                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}/>
+                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                                    lesson={lesson}/>
                                 </div>
                             </div>
-
                             :
                             null
                 }

@@ -9,6 +9,15 @@ import {LessonFull} from "../common/lecture-full-wrapper";
 
 class CouresesBlock extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            coursesOpened: false,
+            lessonsOpened: false,
+        }
+    }
+
     _getCourses(courses) {
         return courses ? (
             courses.map((course, index) => {
@@ -42,21 +51,33 @@ class CouresesBlock extends React.Component {
         ) : null
     }
 
+    _switchCourses() {
+        this.setState({
+            coursesOpened : !this.state.coursesOpened
+        })
+    }
+
+    _switchLessons() {
+        this.setState({
+            lessonsOpened : !this.state.lessonsOpened
+        })
+    }
+
     render() {
         let {author} = this.props;
 
         return (
             <div className="author-block">
-                <div className="author-block__subtitle js-author-block-trigger active">
+                <div className={"author-block__subtitle" + (this.state.coursesOpened ? ' active' : '')} onClick={::this._switchCourses}>
                     <h3>Курсы</h3>
                 </div>
-                <div className="author-block__wrap js-author-block-content author-block__content opened">
+                <div className={"author-block__wrap author-block__content" + (this.state.coursesOpened ? ' opened' : '')}>
                     {this._getCourses(author.Courses)}
                 </div>
-                <div className="author-block__subtitle js-author-block-trigger active">
+                <div className={"author-block__subtitle" + (this.state.lessonsOpened ? ' active' : '')} onClick={::this._switchLessons}>
                     <h3>Лекции</h3>
                 </div>
-                <ol className="lectures-tab js-author-block-content author-block__content opened">
+                <ol className={"lectures-tab author-block__content" + (this.state.lessonsOpened ? ' opened' : '')}>
                     {this._getLessons(author.Lessons)}
                 </ol>
             </div>
@@ -96,8 +117,8 @@ class Course extends React.Component {
                     <div className="course-announce__row">
                         <div className="course-announce__progress">
                             <span className="course-announce__progress-label">Вышло</span>
-                            <span className="course-announce__progress-actual">10</span>
-                            <span className="course-announce__progress-total">/13</span>
+                            <span className="course-announce__progress-actual">{course.Ready}</span>
+                            <span className="course-announce__progress-total">{'/' + course.Total}</span>
                         </div>
                         <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">Подробнее о курсе</Link>
                     </div>

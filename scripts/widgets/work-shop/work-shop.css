@@ -86,8 +86,9 @@
 }
 .ws-footer .ws-track-delete-panel {
   width: 100%;
+  position: relative;
 }
-.ws-footer .ws-track-delete-panel div {
+.ws-footer .ws-track-delete-panel div.delete-btn {
   font-family: "DejaVu Sans";
   font-size: 1.25em;
   line-height: 100%;
@@ -95,6 +96,17 @@
   opacity: 1;
   margin-left: 0.4em;
   margin-top: 0.5em;
+  position: absolute;
+}
+.ws-footer .ws-track-delete-panel div.number-text {
+  font-family: "DejaVu Sans";
+  font-size: 1em;
+  line-height: 100%;
+  color: rgba(255,255,255,0.25);
+  opacity: 1;
+  margin-left: 0.75em;
+  margin-bottom: 0.75em;
+  bottom: 0;
   position: absolute;
 }
 .ws-footer .ws-tools-top-play {
