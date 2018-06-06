@@ -341,7 +341,7 @@ export default class CWSTracks extends CWSBase {
             this._zoomInitialized = true;
 
             let lineWrapperDown = false;
-            this._lineWrapper.on('mouseenter', (e) => {
+            this._lineWrapper.on('mouseenter', () => {
                 this._lineWrapper.addClass('ws-zoom-over');
                 lineWrapperDown = false;
             });
@@ -582,7 +582,7 @@ export default class CWSTracks extends CWSBase {
 
                 that._setSideTime.bind(this, uiHelper)();
             },
-            stop: (event, ui) => {
+            stop: (/*event, ui*/) => {
                 that._setFocusedWithBroadcast.bind(this, elItem)();
                 setTimeout(() => {
                     elItem.css({top: "0px"})
