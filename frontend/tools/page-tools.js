@@ -49,6 +49,7 @@ export const pages = {
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
     author: {name: 'author', url: null},
+    profile: {name: 'profile', url: '/profile/'},
 }
 
 

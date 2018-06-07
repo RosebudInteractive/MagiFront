@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Recaptcha from 'react-recaptcha';
+import Recaptcha from '../common/g-recaptcha';
 
 let recaptchaInstance;
 
@@ -31,6 +31,10 @@ export default class Captcha extends React.Component {
         }
     }
 
+    _onLoadCallback = function () {
+        console.log('Done!!!!');
+    };
+
     render() {
         return (
             <Recaptcha
@@ -40,6 +44,7 @@ export default class Captcha extends React.Component {
                 verifyCallback ={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
                 theme="dark"
+                onloadCallback={::this._onLoadCallback}
                 hl={'ru'}
             />
         );

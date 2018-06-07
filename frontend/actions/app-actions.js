@@ -6,6 +6,8 @@ import {
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
     SET_APP_TYPE_MOBILE,
+    SHOW_USER_BLOCK,
+    HIDE_USER_BLOCK,
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
@@ -60,3 +62,17 @@ export const setAppTypeMobile = () => {
         payload: null
     }
 }
+
+export const showUserBlock = () => {
+    return {
+        type: SHOW_USER_BLOCK,
+        payload: null
+    }
+};
+
+export const hideUserBlock = () => {
+    return {
+        type: HIDE_USER_BLOCK,
+        payload: null
+    }
+};

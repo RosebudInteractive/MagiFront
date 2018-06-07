@@ -5,9 +5,6 @@ import {bindActionCreators} from 'redux';
 import {authorSelector, loadingSelector, getAuthor} from '../ducks/author'
 import AuthorBlock from '../components/author/author-block';
 import CoursesBlock from '../components/author/courses-and-lessons';
-// import Content from '../components/course-extended/content-extended';
-// import CourseLessons from '../components/course-extended/course-lessons';
-// import CourseBooks from '../components/course-extended/course-books';
 
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from "../actions/lesson-info-storage-actions";
@@ -18,7 +15,6 @@ import {pages} from '../tools/page-tools';
 class Main extends React.Component {
     constructor(props) {
         super(props);
-        // this.props.coursesActions.getCourses();
     }
 
     componentWillMount() {

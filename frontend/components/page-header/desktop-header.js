@@ -100,17 +100,23 @@ class Languages extends React.Component {
         return (
             <div className={"language-block" + (this.state.showPicker ? ' opened' : '')}>
                 <button type="button" className="language-indicator" onClick={::this._onClick}><span>Рус</span></button>
-                <ul className="language-tooltip js-language-picker">
-                    <li className="selected">
-                        <a href="#" data-lang="Рус">Русский</a>
-                    </li>
-                    <li>
-                        <a href="#" data-lang="En">English</a>
-                    </li>
-                    <li>
-                        <a href="#" data-lang="Es">Espaniol</a>
-                    </li>
-                </ul>
+                {
+                    this.state.showPicker ?
+
+                        <ul className="language-tooltip js-language-picker">
+                            <li className="selected">
+                                <a href="#" data-lang="Рус">Русский</a>
+                            </li>
+                            <li>
+                                <a href="#" data-lang="En">English</a>
+                            </li>
+                            <li>
+                                <a href="#" data-lang="Es">Espaniol</a>
+                            </li>
+                        </ul>
+                        :
+                        null
+                }
             </div>
         )
     }

@@ -139,7 +139,7 @@ class TextBlock extends React.Component {
     _setIndent() {
         let _number = $('.title-text .number')
 
-        if ((window.clientWidth > 899) && _number.length > 0) {
+        if ((window.outerWidth > 899) && _number.length > 0) {
             let _width = _number[0].offsetWidth;
             $('.title-text').css('text-indent', -_width);
         }
