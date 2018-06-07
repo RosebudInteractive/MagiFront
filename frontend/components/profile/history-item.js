@@ -49,13 +49,6 @@ export default class Item extends React.Component {
                     <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
                                         courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
                                         totalDuration={item.Duration}/>
-                    {/*<div className="play-block-small">*/}
-                        {/*<span className="play-block-small__duration">{item.DurationFmt}</span>*/}
-                        {/*<button type="button" className="play-btn-small">*/}
-                            {/*<svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                            {/*<span>Воспроизвести</span>*/}
-                        {/*</button>*/}
-                    {/*</div>*/}
             </div>
         )
     }
