@@ -13,40 +13,47 @@ class UserBlock extends React.Component {
     static
     defaultProps = {};
 
-    constructor(props){
+    constructor(props) {
         super(props);
     }
 
-    _onClick(){
-        if  (this.props.showUserBlock) {
+    _onClick() {
+        if (this.props.showUserBlock) {
             this.props.appActions.hideUserBlock()
         } else {
             this.props.appActions.showUserBlock()
         }
     }
 
-    render(){
+    render() {
         const _logout = '<use xlink:href="#logout"/>'
 
-        return(
+        return (
             <div className={"user-block" + (this.props.showUserBlock ? ' opened' : '')}>
                 <div className="user-block__header" onClick={::this._onClick}>
                     <p className="user-block__name">{this.props.user.DisplayName}</p>
                 </div>
-                <ul className="user-tooltip">
-                    <li>
-                        <Link to="/history">История</Link>
-                    </li>
-                    <li>
-                        <Link to='/profile'>Настройки</Link>
-                    </li>
-                    <li>
-                        <div className="logout-btn" style={{cursor: 'pointer'}} onClick={::this.props.userActions.logout}>
-                            <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>
-                            <span>Выйти</span>
-                        </div>
-                    </li>
-                </ul>
+                {
+                    this.props.showUserBlock ?
+                        <ul className="user-tooltip">
+                            <li>
+                                <Link to="/history">История</Link>
+                            </li>
+                            <li>
+                                <Link to='/profile'>Настройки</Link>
+                            </li>
+                            <li>
+                                <div className="logout-btn" style={{cursor: 'pointer'}}
+                                     onClick={::this.props.userActions.logout}>
+                                    <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>
+                                    <span>Выйти</span>
+                                </div>
+                            </li>
+                        </ul>
+                        :
+                        null
+                }
+
             </div>
         )
     }

@@ -32,7 +32,7 @@ class ProfileBlock extends React.Component {
 
     _switchToPassword() {
         this.props.clearError()
-        
+
         this.setState({
             showNameForm: false,
             showPasswordForm: true

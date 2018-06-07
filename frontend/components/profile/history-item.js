@@ -18,9 +18,15 @@ export default class Item extends React.Component {
             <div className="history-item">
                 <div className="history-item__date-block">
                     <p className="history-item__date">{item.lastVisitDay}<br/>{item.lastVisitTime}</p>
-                    <span className="history-item__icon">
-                                        <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _ep}}/>
-                                    </span>
+                    {
+                        item.isSublesson ?
+                            <span className="history-item__icon">
+                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _ep}}/>
+                            </span>
+                            :
+                            null
+                    }
+
                 </div>
                 <div className="history-item__info-block">
                     <h3 className="history-item__title">
