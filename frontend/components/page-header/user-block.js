@@ -2,9 +2,10 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import * as userActions from '../../actions/user-actions'
-// import PropTypes from 'prop-types';
+import * as appActions from '../../actions/app-actions'
+import {Link} from 'react-router-dom';
 
-class userBlock extends React.Component {
+class UserBlock extends React.Component {
 
     static
     propTypes = {};
@@ -14,31 +15,30 @@ class userBlock extends React.Component {
 
     constructor(props){
         super(props);
-
-        this.state = {
-            showForm : false
-        }
     }
 
     _onClick(){
-        let _newState = !this.state.showForm;
-        this.setState({showForm : _newState})
+        if  (this.props.showUserBlock) {
+            this.props.appActions.hideUserBlock()
+        } else {
+            this.props.appActions.showUserBlock()
+        }
     }
 
     render(){
         const _logout = '<use xlink:href="#logout"/>'
 
         return(
-            <div className={"user-block" + (this.state.showForm ? ' opened' : '')}>
+            <div className={"user-block" + (this.props.showUserBlock ? ' opened' : '')}>
                 <div className="user-block__header" onClick={::this._onClick}>
                     <p className="user-block__name">{this.props.user.DisplayName}</p>
                 </div>
                 <ul className="user-tooltip">
                     <li>
-                        <a href="#">История</a>
+                        <Link to="/history">История</Link>
                     </li>
                     <li>
-                        <a href="#">Настройки</a>
+                        <Link to='/profile'>Настройки</Link>
                     </li>
                     <li>
                         <div className="logout-btn" style={{cursor: 'pointer'}} onClick={::this.props.userActions.logout}>
@@ -55,14 +55,16 @@ class userBlock extends React.Component {
 function mapStateToProps(state) {
     return {
         authorized: state.user.authorized,
-        user: state.user.user
+        user: state.user.user,
+        showUserBlock: state.app.showUserBlock,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         userActions: bindActionCreators(userActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(userBlock);
+export default connect(mapStateToProps, mapDispatchToProps)(UserBlock);

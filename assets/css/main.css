@@ -6505,6 +6505,7 @@ ul.user-tooltip {
       background-color: rgba(200, 104, 76, 0.3); }
 
 .lectures-menu-row {
+  z-index: 1;
   top: 96px;
   height: 53px;
   position: fixed;
@@ -12915,6 +12916,8 @@ ul.lectures-tab {
         font-size: 15px; } }
   .history-item .num {
     color: #c8684c; }
+  .history-item .text {
+    color: #2f2f2f; }
   .history-item__author {
     margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -13096,6 +13099,9 @@ ul.lectures-tab {
       margin-top: -16px; } }
 
 .form__change-password {
+  background-color: transparent;
+  border: none;
+  outline: none;
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
   font-family: "Fira Sans", Arial, sans-serif;
