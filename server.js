@@ -34,7 +34,8 @@ Promise.resolve()
         let express = require('express');
 
         let app = new express();
-
+        app.set('case sensitive routing', true);
+        
         let port = magisteryConfig.http.port;
         let address = magisteryConfig.http.address;
 

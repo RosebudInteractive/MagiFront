@@ -32,6 +32,20 @@ const GET_CATEGORIES_SM_MSSQL =
     "group by g.[URL]\n" +
     "order by 1 desc, g.[URL]";
 
+const GET_AUTHORS_SM_MSSQL =
+    "select distinct a.[TimeMdf] as [Atime], al.[TimeMdf] as [Altime], a.[URL], a.[Portrait], al.[FirstName], al.[LastName] from[Author] a\n" +
+    "  join[AuthorLng] al on al.[AuthorId] = a.[Id]\n" +
+    "  join[AuthorToCourse] ac on ac.[AuthorId] = a.[Id]\n" +
+    "  join[Course] c on c.[Id] = ac.[CourseId]\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "where lc.[State] = 'R'\n" +
+    "order by a.[URL]";
+
+const GET_LASTDATE_SM_MSSQL =
+    "select max(lc.[ReadyDate]) as [ReadyDate] from[Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "where lc.[State] = 'R'";
+
 const GET_LESSONS_SM_MYSQL =
     "select lc.`ReadyDate`, c.`URL`, l.`URL` as LURL, l.`Cover` from `Course` c\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -55,8 +69,23 @@ const GET_CATEGORIES_SM_MYSQL =
     "group by g.`URL`\n" +
     "order by 1 desc, g.`URL`";
 
+const GET_AUTHORS_SM_MYSQL =
+    "select distinct a.`TimeMdf` as `Atime`, al.`TimeMdf` as `Altime`, a.`URL`, a.`Portrait`, al.`FirstName`, al.`LastName` from`Author` a\n" +
+    "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
+    "  join`AuthorToCourse` ac on ac.`AuthorId` = a.`Id`\n" +
+    "  join`Course` c on c.`Id` = ac.`CourseId`\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "where lc.`State` = 'R'\n" +
+    "order by a.`URL`";
+
+const GET_LASTDATE_SM_MYSQL =
+    "select max(lc.`ReadyDate`) as `ReadyDate` from`Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "where lc.`State` = 'R'";
+
 let dfltSiteMapSettings = {
     lesson: {
+        xslUrl: "/main-sitemap.xsl",
         file: "post-sitemap.xml",
         guid: "596ca7cd-c367-4ac5-85a0-26e28ab60005",
         transcriptUrl: "/transcript"
@@ -75,6 +104,11 @@ let dfltSiteMapSettings = {
         file: "author-sitemap.xml",
         prefixUrl: "/author",
         guid: "300111dd-0432-4e8f-aed1-cbc056e0659b"
+    },
+    page: {
+        file: "page-sitemap.xml",
+        aboutUrl: "/about",
+        guid: "9902d23d-0dd6-4fb1-95f9-04f801762969"
     },
     index: {
         file: "sitemap_index.xml",
@@ -104,6 +138,7 @@ exports.SiteMapTask = class SiteMapTask extends Task {
         this._siteHost = config.proxyServer.siteHost;
         this._dataUrl = this._siteHost + config.get('dataUrl');
         this._siteMapSettings = _.defaultsDeep(opts.maps, dfltSiteMapSettings);
+        this._xslUrl = opts.xslUrl;
     }
 
     _getFileInfo(fileName, fileGuid) {
@@ -228,6 +263,12 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                 let sitemap;
                 if (result && result.detail && (result.detail.length > 0)) {
                     let urls = [];
+                    let firstTranscriptDate = new Date();
+                    if (this._siteMapSettings.lesson.firstTranscriptDate) {
+                        let d = Date.parse(this._siteMapSettings.lesson.firstTranscriptDate);
+                        if (!isNaN(d))
+                            firstTranscriptDate = new Date(d);
+                    }
                     result.detail.forEach((elem) => {
                         urls.push({
                             url: this._siteHost + "/" + elem.URL + "/" + elem.LURL,
@@ -239,12 +280,14 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                         });
                         urls.push({
                             url: this._siteHost + "/" + elem.URL + "/" + elem.LURL + this._siteMapSettings.lesson.transcriptUrl,
-                            lastmodISO: elem.ReadyDate.toISOString(),
+                            lastmodISO: firstTranscriptDate > elem.ReadyDate ? firstTranscriptDate.toISOString() : elem.ReadyDate.toISOString(),
                         });
                     });
-                    sitemap = sm.createSitemap({
-                        urls: urls
-                    }).toString();
+                    let siteMapOptions = { urls: urls };
+                    let xslUrl = this._siteMapSettings.lesson.xslUrl || this._xslUrl;
+                    if (xslUrl)
+                        siteMapOptions.xslUrl = xslUrl;
+                    sitemap = sm.createSitemap(siteMapOptions).toString();
                 }
                 return sitemap;
             });
@@ -277,9 +320,11 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                             }]
                         });
                     });
-                    sitemap = sm.createSitemap({
-                        urls: urls
-                    }).toString();
+                    let siteMapOptions = { urls: urls };
+                    let xslUrl = this._siteMapSettings.course.xslUrl || this._xslUrl;
+                    if (xslUrl)
+                        siteMapOptions.xslUrl = xslUrl;
+                    sitemap = sm.createSitemap(siteMapOptions).toString();
                 }
                 return sitemap;
             });
@@ -312,13 +357,93 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                             }]
                         });
                     });
-                    sitemap = sm.createSitemap({
-                        urls: urls
-                    }).toString();
+                    let siteMapOptions = { urls: urls };
+                    let xslUrl = this._siteMapSettings.category.xslUrl || this._xslUrl;
+                    if (xslUrl)
+                        siteMapOptions.xslUrl = xslUrl;
+                    sitemap = sm.createSitemap(siteMapOptions).toString();
                 }
                 return sitemap;
             });
         return this._genSM(data, this._siteMapSettings.category);
+    }
+
+    _genAuthorSM() {
+        let data = new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: GET_AUTHORS_SM_MYSQL,
+                        mssql: GET_AUTHORS_SM_MSSQL
+                    }
+                }, {})
+            );
+        })
+            .then((result) => {
+                let sitemap;
+                if (result && result.detail && (result.detail.length > 0)) {
+                    let urls = [];
+                    let prefixUrl = this._siteMapSettings.author.prefixUrl;
+                    result.detail.forEach((elem) => {
+                        urls.push({
+                            url: this._siteHost + prefixUrl + "/" + elem.URL,
+                            lastmodISO: elem.Atime > elem.Altime ? elem.Atime.toISOString() : elem.Altime.toISOString(),
+                            img: [{
+                                url: this._dataUrl + "/" + elem.Portrait,
+                                title: elem.FirstName + " " + elem.LastName
+                            }]
+                        });
+                    });
+                    let siteMapOptions = { urls: urls };
+                    let xslUrl = this._siteMapSettings.author.xslUrl || this._xslUrl;
+                    if (xslUrl)
+                        siteMapOptions.xslUrl = xslUrl;
+                    sitemap = sm.createSitemap(siteMapOptions).toString();
+                }
+                return sitemap;
+            });
+        return this._genSM(data, this._siteMapSettings.author);
+    }
+
+    _genPageSM() {
+        let data = new Promise((resolve, reject) => {
+            resolve(
+                $data.execSql({
+                    dialect: {
+                        mysql: GET_LASTDATE_SM_MYSQL,
+                        mssql: GET_LASTDATE_SM_MSSQL
+                    }
+                }, {})
+            );
+        })
+            .then((result) => {
+                let sitemap;
+                let urls = [];
+                if (result && result.detail && (result.detail.length > 0)) {
+                    let elem = result.detail[0];
+                    urls.push({
+                        url: this._siteHost,
+                        lastmodISO: elem.ReadyDate.toISOString()
+                    });
+                }
+                let firstAboutDate = new Date();
+                if (this._siteMapSettings.page.firstAboutDate) {
+                    let d = Date.parse(this._siteMapSettings.page.firstAboutDate);
+                    if (!isNaN(d))
+                        firstAboutDate = new Date(d);
+                }
+                urls.push({
+                    url: this._siteHost + this._siteMapSettings.page.aboutUrl,
+                    lastmodISO: firstAboutDate.toISOString()
+                });
+                let siteMapOptions = { urls: urls };
+                let xslUrl = this._siteMapSettings.page.xslUrl || this._xslUrl;
+                if (xslUrl)
+                    siteMapOptions.xslUrl = xslUrl;
+                sitemap = sm.createSitemap(siteMapOptions).toString();
+                return sitemap;
+            });
+        return this._genSM(data, this._siteMapSettings.page);
     }
 
     _genIndexSM() {
@@ -326,23 +451,32 @@ exports.SiteMapTask = class SiteMapTask extends Task {
         let lastmod = 0;
         let data = Utils.seqExec(this._siteMapSettings, (obj, key) => {
             let rc = Promise.resolve();
-            if (key !== "index"){
-                let fileName = path.join(this._path, obj.file);
-                let fileGuid = obj.guid;
-                rc = this._getFileInfo(fileName, fileGuid)
-                    .then((fileInfo) => {
-                        if (fileInfo.lastModif) {
-                            let t = fileInfo.lastModif - 0;
-                            lastmod = lastmod && (t > lastmod) ? t : ((!lastmod) ? t : lastmod);
-                        }
-                        urls.push(this._siteHost + "/" + obj.file);
-                    });
+            if (key !== "index") {
+                if (obj.file) {
+                    let fileName = path.join(this._path, obj.file);
+                    let fileGuid = obj.guid;
+                    rc = this._getFileInfo(fileName, fileGuid)
+                        .then((fileInfo) => {
+                            if (fileInfo.lastModif) {
+                                let t = fileInfo.lastModif - 0;
+                                lastmod = lastmod && (t > lastmod) ? t : ((!lastmod) ? t : lastmod);
+                            }
+                            urls.push(this._siteHost + "/" + obj.file);
+                        });
+                }
+                else
+                    rc = Promise.reject(`Sitemap file is undefined for "${key}".`);
             }
             return rc;
         })
             .then(() => {
-                if (urls.length > 0)
-                    return sm.buildSitemapIndex({ lastmod: lastmod ? new Date(lastmod) : new Date(), urls: urls });
+                if (urls.length > 0) {
+                    let siteMapIdxOptions = { lastmod: lastmod ? new Date(lastmod) : new Date(), urls: urls };
+                    let xslUrl = this._siteMapSettings.index.xslUrl || this._xslUrl;
+                    if (xslUrl)
+                        siteMapIdxOptions.xslUrl = xslUrl;
+                    return sm.buildSitemapIndex(siteMapIdxOptions);
+                }
             });
         return this._genSM(data, this._siteMapSettings.index);
     }
@@ -359,6 +493,14 @@ exports.SiteMapTask = class SiteMapTask extends Task {
             .then((result) => {
                 isModified = isModified || result;
                 return this._genCategorySM();
+            })
+            .then((result) => {
+                isModified = isModified || result;
+                return this._genAuthorSM();
+            })
+            .then((result) => {
+                isModified = isModified || result;
+                return this._genPageSM();
             })
             .then((result) => {
                 isModified = isModified || result;

@@ -138,6 +138,7 @@ const DbUser = class DbUser extends DbObject {
                                                 Id: elem.LessonId,
                                                 CourseId: elem.Id,
                                                 Number: elem.Number + "",
+                                                isSubLesson: false,
                                                 ReadyDate: elem.ReadyDate,
                                                 State: elem.State,
                                                 Cover: elem.LCover,
@@ -167,6 +168,7 @@ const DbUser = class DbUser extends DbObject {
                                                 let parent = lc_list[elem.ParentId];
                                                 if (parent) {
                                                     lsn.Number = parent.Number + "." + lsn.Number;
+                                                    lsn.isSubLesson = true;
                                                 }
                                             }
                                             lsn_list[elem.LessonId] = lsn;
