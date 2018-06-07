@@ -50,6 +50,7 @@ class ProfileSubForm extends React.Component {
 
         if ((email !== prevProps.email) || (name !== prevProps.name)) {
             this.props.dispatch(initialize('ProfileSubForm', this.props, ['name', 'email']));
+            this.props.dispatch(reset('ProfileSubForm'));
         }
     }
 

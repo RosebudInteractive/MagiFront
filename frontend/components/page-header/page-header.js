@@ -61,19 +61,19 @@ class Header extends React.Component {
             this.props.pageHeaderState.visibility ?
                 <header className={_headerClass}>
                     {this._isMobile() ?
-                        <div>
-                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={pageHeaderState.currentPage}/>
+                        [
+                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={pageHeaderState.currentPage}/>,
                             <MenuMobile/>
-                        </div>
+                        ]
                         :
-                        <div>
+                        [
                             <DesktopHeaderRow
                                 onFilterClick={::this._onFilterClick}
                                 onNavigateClick={::this._onNavigateClick}
                                 currentPage={pageHeaderState.currentPage}
-                                filterActive={pageHeaderState.showFiltersForm}/>
+                                filterActive={pageHeaderState.showFiltersForm}/>,
                             <FilterRow/>
-                        </div>
+                        ]
                     }
                     {_showTranscriptMenu ?
                         <TranscriptMenu

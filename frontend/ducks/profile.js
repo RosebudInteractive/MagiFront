@@ -6,10 +6,7 @@ import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {
-    RECOVERY_PASSWORD_FAIL,
-    RECOVERY_PASSWORD_START,
-    RECOVERY_PASSWORD_SUCCESS,
-    SWITCH_TO_RECOVERY_PASSWORD_SUCCESS
+    SIGN_IN_SUCCESS
 } from "../constants/user";
 
 /**
@@ -173,6 +170,11 @@ export const changePassword = (values) => {
                     type: CHANGE_PASSWORD_SUCCESS,
                     payload: data
                 });
+
+                dispatch({
+                    type: SIGN_IN_SUCCESS,
+                    payload: data
+                });
             })
             .catch((error) => {
                 dispatch({
@@ -243,17 +245,18 @@ const handleHistoryData = (data) => {
             let _lastVisitDate = new Date(lesson.LastVisit),
                 _year = _lastVisitDate.getFullYear(),
                 _month = Months[_lastVisitDate.getMonth()],
-                _day = _lastVisitDate.getDay(),
+                _day = _lastVisitDate.getDate(),
                 _hours = _lastVisitDate.getHours(),
                 _minutes = _lastVisitDate.getMinutes();
 
             let _today = new Date(),
                 _todayYear = _today.getFullYear(),
                 _todayMonth = Months[_today.getMonth()],
-                _todayDay = _today.getDay();
+                _todayDay = _today.getDate();
 
             let _isLastVisitToday = (_year === _todayYear) && (_month === _todayMonth) && (_day === _todayDay);
 
+            lesson.lastVisitDate = _lastVisitDate;
             lesson.lastVisitDay = _isLastVisitToday ? "Сегодня" : _day + ' ' + _month + ' ' + _year;
             lesson.lastVisitTime = _hours + ':' + _minutes;
 
@@ -265,7 +268,11 @@ const handleHistoryData = (data) => {
             let _author = data.Authors[lesson.AuthorId];
 
             lesson.authorUrl = _author ? _author.URL : null;
-            lesson.authorName = _author ? _author.FirstName + ' ' + _author.FirstName : null;
+            lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
+        })
+
+        data.Lessons.sort((a, b) => {
+            return (b.lastVisitDate.getTime() - a.lastVisitDate.getTime());
         })
     }
 }

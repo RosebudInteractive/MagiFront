@@ -112,7 +112,7 @@ class Course extends React.Component {
                 </div>
                 <div className="course-announce__col">
                     <h3 className="course-announce__title">
-                        <Link to={'/category/' + course.URL}><span className="course-announce__label">Курс:</span>{' ' + course.Name}</Link>
+                        <Link to={'/category/' + course.URL}><span className="course-announce__label">Курс: </span>{course.Name}</Link>
                     </h3>
                     <div className="course-announce__row">
                         <div className="course-announce__progress">

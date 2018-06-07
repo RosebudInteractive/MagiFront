@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import LessonPlayBlockSmall from './small-play-block'
 
 export default class Item extends React.Component {
 
@@ -9,8 +10,8 @@ export default class Item extends React.Component {
     }
 
     render() {
-        const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>',
-            _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
+        const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>';
+            // _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
 
         let {item} = this.props;
 
@@ -41,17 +42,20 @@ export default class Item extends React.Component {
                             <span className="text">{' ' + item.Name}</span>
                         </Link>
                     </h4>
-                    <p className="history-item__author">{item.authorName}</p>
+                    <Link to={'autor/' + item.authorUrl}>
+                        <p className="history-item__author">{item.authorName}</p>
+                    </Link>
                 </div>
-                <div className="history-item__play-block">
-                    <div className="play-block-small">
-                        <span className="play-block-small__duration">{item.DurationFmt}</span>
-                        <button type="button" className="play-btn-small">
-                            <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                            <span>Воспроизвести</span>
-                        </button>
-                    </div>
-                </div>
+                    <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
+                                        courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
+                                        totalDuration={item.Duration}/>
+                    {/*<div className="play-block-small">*/}
+                        {/*<span className="play-block-small__duration">{item.DurationFmt}</span>*/}
+                        {/*<button type="button" className="play-btn-small">*/}
+                            {/*<svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
+                            {/*<span>Воспроизвести</span>*/}
+                        {/*</button>*/}
+                    {/*</div>*/}
             </div>
         )
     }

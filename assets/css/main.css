@@ -7115,6 +7115,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   width: 36px;
   height: 36px;
   font-size: 0;
+  outline: none;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid #c8684c;
   border-radius: 50%; }
@@ -12858,6 +12859,9 @@ ul.lectures-tab {
         -ms-flex-align: start;
         align-items: flex-start;
         margin-top: -6px; } }
+  .history-item__play-block .play-block-small {
+    position: absolute;
+  }
   .history-item__info-block {
     padding-top: 36px;
     padding-bottom: 10px; }
