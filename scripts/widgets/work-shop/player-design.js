@@ -20,6 +20,13 @@ export default class CWSPlayerDesign extends CWSPlayer {
         this._setTextToolsEvents();
     }
 
+    render() {
+        super.render();
+        if (this._audioState.stopped) {
+            this._setElementsPosition(this._audioState.globalTime);
+        }
+    }
+
     _getElementConstructor(data) {
         let type = CWSPlayer._getElementType(data);
         switch (type) {

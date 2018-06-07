@@ -4,6 +4,7 @@ const defer = require('config/defer').deferConfig;
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    dataUrl: '/data',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',
