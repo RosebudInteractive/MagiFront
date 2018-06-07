@@ -22,9 +22,18 @@ let options = {
             module: "./site-map",
             type: "scheduled-task",
             disabled: false,
-            schedule: "*/10 * * * * *", // run every 10 sec
+            schedule: "0 */10 * * * *", // run every 10 min
             options: {
-                path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps"))
+                path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
+                xslUrl: "/main-sitemap.xsl",
+                maps: {
+                    lesson: {
+                        firstTranscriptDate: "2018-06-07"
+                    },
+                    page: {
+                        firstAboutDate: "2018-06-05"
+                    }
+                }
             }
         }
     ],
