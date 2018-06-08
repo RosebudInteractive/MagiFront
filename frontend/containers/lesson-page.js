@@ -11,6 +11,7 @@ import * as playerStartActions from '../actions/player-start-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
+import * as userActions from "../actions/user-actions";
 
 import Wrapper from '../components/lesson-page/lesson-wrapper';
 
@@ -57,6 +58,7 @@ class LessonPage extends React.Component {
     componentWillMount() {
         let {courseUrl, lessonUrl} = this.props;
 
+        this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
@@ -468,6 +470,7 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         appActions: bindActionCreators(appActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

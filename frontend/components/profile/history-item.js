@@ -11,7 +11,6 @@ export default class Item extends React.Component {
 
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>';
-            // _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
 
         let {item} = this.props;
 
@@ -20,7 +19,7 @@ export default class Item extends React.Component {
                 <div className="history-item__date-block">
                     <p className="history-item__date">{item.lastVisitDay}<br/>{item.lastVisitTime}</p>
                     {
-                        item.isSublesson ?
+                        item.isSubLesson ?
                             <span className="history-item__icon">
                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _ep}}/>
                             </span>

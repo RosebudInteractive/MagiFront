@@ -181,37 +181,17 @@ export default class LessonInfoStorage {
 
             this._dtStart = undefined;
 
-
             let _obj = {pos: _pos, dt: _dt}
+
+            if (_value.isFinished !== undefined) {
+                _obj.isFinished = _value.isFinished
+            }
+
             if (_rate !== 1) {
                 _obj.r = _rate
             }
             lsn[_playingLessonId] = _obj;
         }
-
-        // object.forEach((value, key) => {
-        //     let _pos = Math.round(value.currentTime * 100) / 100;
-        //
-        //     if (key === _playingLessonId) {
-        //         let _lessonsMap = _state.lessonInfoStorage.lessons,
-        //             _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
-        //
-        //         let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
-        //             _rate = _state.player.rate;
-        //
-        //         this._dtStart = undefined;
-        //
-        //
-        //         let _obj = {pos: _pos, dt: _dt}
-        //         if (_rate !== 1) {
-        //             _obj.r = _rate
-        //         }
-        //         lsn[key] = _obj;
-        //     } else {
-        //         lsn[key] = {pos: _pos}
-        //     }
-        //
-        // })
 
         return {lsn}
     }
