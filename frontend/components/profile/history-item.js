@@ -11,7 +11,6 @@ export default class Item extends React.Component {
 
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>';
-            // _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
 
         let {item} = this.props;
 
@@ -20,7 +19,7 @@ export default class Item extends React.Component {
                 <div className="history-item__date-block">
                     <p className="history-item__date">{item.lastVisitDay}<br/>{item.lastVisitTime}</p>
                     {
-                        item.isSublesson ?
+                        item.isSubLesson ?
                             <span className="history-item__icon">
                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _ep}}/>
                             </span>
@@ -49,13 +48,6 @@ export default class Item extends React.Component {
                     <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
                                         courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
                                         totalDuration={item.Duration}/>
-                    {/*<div className="play-block-small">*/}
-                        {/*<span className="play-block-small__duration">{item.DurationFmt}</span>*/}
-                        {/*<button type="button" className="play-btn-small">*/}
-                            {/*<svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                            {/*<span>Воспроизвести</span>*/}
-                        {/*</button>*/}
-                    {/*</div>*/}
             </div>
         )
     }

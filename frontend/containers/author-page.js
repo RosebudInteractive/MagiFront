@@ -8,9 +8,9 @@ import CoursesBlock from '../components/author/courses-and-lessons';
 
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from "../actions/lesson-info-storage-actions";
+import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
-
 
 class Main extends React.Component {
     constructor(props) {
@@ -18,6 +18,7 @@ class Main extends React.Component {
     }
 
     componentWillMount() {
+        this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getAuthor(this.props.authorUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.author);
@@ -59,6 +60,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        userActions: bindActionCreators(userActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
         getAuthor: bindActionCreators(getAuthor, dispatch),

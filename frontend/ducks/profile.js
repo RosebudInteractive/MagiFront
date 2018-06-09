@@ -6,7 +6,8 @@ import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {
-    SIGN_IN_SUCCESS
+    SIGN_IN_SUCCESS,
+    LOGOUT_SUCCESS,
 } from "../constants/user";
 
 /**
@@ -54,6 +55,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('user', payload)
+
+        case LOGOUT_SUCCESS:
+            return state
+                .set('user', null)
 
         case GET_USER_INFO_ERROR:
         case GET_HISTORY_ERROR:
@@ -113,10 +118,10 @@ export function getUserProfile() {
                     payload: data
                 });
             })
-            .catch((err) => {
+            .catch((error) => {
                 dispatch({
                     type: GET_USER_INFO_ERROR,
-                    payload: err
+                    payload: {error}
                 });
             });
     }
@@ -139,10 +144,10 @@ export function getUserHistory() {
                     payload: data.Lessons
                 });
             })
-            .catch((err) => {
+            .catch((error) => {
                 dispatch({
                     type: GET_HISTORY_ERROR,
-                    payload: err
+                    payload: {error}
                 });
             });
     }

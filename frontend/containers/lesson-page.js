@@ -11,6 +11,7 @@ import * as playerStartActions from '../actions/player-start-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
+import * as userActions from "../actions/user-actions";
 
 import Wrapper from '../components/lesson-page/lesson-wrapper';
 
@@ -45,11 +46,19 @@ class LessonPage extends React.Component {
             _height = $('.fp-tableCell').css('height');
             alert(e.handleObj.type + ' new css height: ' + _height)
         }
+
+        this._keydownHandler = (e) => {
+            if (e.which === 32) {
+                this._handleWhitespace = true;
+                e.preventDefault();
+            }
+        }
     }
 
     componentWillMount() {
         let {courseUrl, lessonUrl} = this.props;
 
+        this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
@@ -181,6 +190,7 @@ class LessonPage extends React.Component {
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
         $(window).unbind('resize', this._resizeHandler)
+        $(window).unbind('keydown', this._keydownHandler)
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
@@ -216,12 +226,7 @@ class LessonPage extends React.Component {
     }
 
     _mountKeydownHandler() {
-        $(window).keydown((e) => {
-            if (e.which === 32) {
-                this._handleWhitespace = true;
-                e.preventDefault();
-            }
-        })
+        $(window).keydown(this._keydownHandler)
     }
 
     _createBundle(lesson, key, isMain) {
@@ -465,6 +470,7 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         appActions: bindActionCreators(appActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

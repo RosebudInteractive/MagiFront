@@ -30,6 +30,32 @@ class AuthorEditor extends ObjectEditor {
         return this.props.authorActions;
     }
 
+    get portraitMeta() {
+        return this._portraitMeta;
+    }
+
+    set portraitMeta(value) {
+        if ((!!value) && (typeof (value) === 'string')) {
+            this._portraitMeta = JSON.parse(value)
+        } else {
+            this._portraitMeta = value
+        }
+    }
+
+    _getPortraitInfo() {
+        let _meta = this.portraitMeta;
+        return {
+            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.portrait)) : null,
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+        };
+    }
+
+    _save(value) {
+        value.PortraitMeta = JSON.stringify(this.portraitMeta)
+
+        super._save(value);
+    }
+
     componentWillReceiveProps(next) {
         const {
             author,
@@ -40,6 +66,9 @@ class AuthorEditor extends ObjectEditor {
                 this.objectActions.create();
             }
         }
+
+        this.portrait = author ? author.Portrait : null;
+        this.portraitMeta = author ? author.PortraitMeta : null;
     }
 
     _getWebixForm(){
@@ -88,6 +117,121 @@ class AuthorEditor extends ObjectEditor {
                         that._externalValidate(this);
                     },
                 },
+            },
+            {
+                cols: [
+                    {
+                        rows: [
+                            {
+                                view: "label",
+                                label: "Портрет автора",
+                                width: labelWidth,
+                                height: 38,
+                            }
+                        ]
+
+                    },
+                    {
+                        rows: [
+                            {
+                                view: 'text',
+                                name: 'Portrait',
+                                id: 'portrait-file',
+                                readonly: true,
+                                width: 360,
+                                on: {
+                                    onChange: function () {
+                                        that._externalValidate(this);
+                                        let _coverTemplate = window.$$('cover_template');
+                                        if (!this.getValue()) {
+                                            this.show();
+                                            _coverTemplate.hide()
+                                        } else {
+                                            this.hide();
+                                            _coverTemplate.show()
+                                        }
+                                    },
+                                },
+                            },
+                            {
+                                view: 'text',
+                                name: 'PortraitMeta',
+                                id: 'portrait-meta',
+                                hidden: true,
+                            },
+                            {
+                                view: 'template',
+                                datatype: 'image',
+                                id: 'cover_template',
+                                template: (obj) => {
+                                    return '<img class="cover" src="' + obj.src + '" />'
+                                },
+                                width: 360,
+                                borderless: true,
+                                on: {
+                                    onBeforeRender: (object) => {
+                                        let _coverInfo = that._getPortraitInfo();
+                                        object.src = _coverInfo.path;
+                                        let _width = window.$$('cover_template').config.width;
+                                        window.$$('cover_template').config.height = _width * _coverInfo.heightRatio;
+                                        window.$$('cover_template').resize()
+                                    },
+                                    validate: function (value) {
+                                        return that._checkEpisodesState(value)
+                                    },
+                                }
+
+                            },
+                            {}
+                        ]
+
+
+                    },
+                    {
+                        width: 10,
+                    },
+                    {
+                        view: "uploader",
+                        id: "file-uploader",
+                        type: "iconButton",
+                        icon: 'upload',
+                        upload: "/upload",
+                        multiple: false,
+                        datatype: "json",
+                        accept: "image/*",
+                        validate: window.webix.rules.isNotEmpty,
+                        invalidMessage: "Значение не может быть пустым",
+                        inputHeight: 38,
+                        width: 38,
+                        on: {
+                            onBeforeFileAdd: (item) => {
+                                let _type = item.file.type.toLowerCase();
+                                if (!_type) {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                let _metaType = _type.split('/')[0];
+                                if (_metaType !== "image") {
+                                    window.webix.message("Поддерживаются только изображения");
+                                    return false;
+                                }
+
+                                window.$$('btnOk').disable();
+                                window.$$('btnCancel').disable();
+                            },
+                            onUploadComplete: (response) => {
+                                let _portraitMeta = JSON.stringify(response[0].info);
+                                window.$$('portrait-file').setValue(response[0].file);
+                                window.$$('portrait-meta').setValue(_portraitMeta);
+                                window.$$('cover_template').refresh();
+                            },
+                            onFileUploadError: () => {
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                            },
+                        }
+                    },
+                ]
             },
             {
                 view: "textarea",

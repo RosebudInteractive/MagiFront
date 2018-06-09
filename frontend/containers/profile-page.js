@@ -1,11 +1,14 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
+import {Redirect} from 'react-router';
 
-import {userSelector, loadingSelector, getUserProfile} from '../ducks/profile'
+import {userSelector, loadingSelector, errorSelector, getUserProfile} from '../ducks/profile'
 
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
+import * as userActions from "../actions/user-actions";
+
 import HistoryBlock from '../components/profile/history-block'
 import ProfileBlock from '../components/profile/profile-block'
 
@@ -15,6 +18,8 @@ class ProfilePage extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this._redirect = false
 
         this.state = {
             showHistory: false,
@@ -29,6 +34,19 @@ class ProfilePage extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        if ((this.props.loading) && (!nextProps.loading)) {
+            if (nextProps.error === "Authorization required!") {
+                this._redirect = true;
+                this.forceUpdate();
+                this.props.userActions.showSignInForm();
+            }
+        }
+
+        if ((this.props.user) && (!nextProps.user)) {
+            this._redirect = true;
+            this.forceUpdate();
+        }
+
         this.setState({
             showHistory: nextProps.page === '/history',
             showProfile: nextProps.page === '/profile'
@@ -50,6 +68,11 @@ class ProfilePage extends React.Component {
 
     render() {
         let {profile, loading} = this.props;
+
+        if (this._redirect) {
+            this._redirect = false;
+            return <Redirect push to={'/'}/>;
+        }
 
         return (
             <div>
@@ -95,12 +118,15 @@ function mapStateToProps(state, ownProps) {
     return {
         profile: userSelector(state),
         loading: loadingSelector(state),
+        error: errorSelector(state),
+        user: state.user.user,
         page: ownProps.match.path,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
+        userActions: bindActionCreators(userActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         appActions: bindActionCreators(appActions, dispatch),
         getUserProfile: bindActionCreators(getUserProfile, dispatch),
