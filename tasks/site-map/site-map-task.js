@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { URL, URLSearchParams } = require('url');
 const _ = require('lodash');
 const sm = require('sitemap');
 const config = require('config');
@@ -10,25 +11,28 @@ const { DbUtils } = require('../../database/db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_LESSONS_SM_MSSQL =
-    "select lc.[ReadyDate], c.[URL], l.[URL] as LURL, l.[Cover] from [Course] c\n" +
+    "select lc.[ReadyDate], c.[URL], l.[URL] as LURL, l.[Cover], l.[CoverMeta] from [Course] c\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "where lc.[State] = 'R'\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P'\n" +
     "order by lc.[ReadyDate] desc, c.[URL], l.[URL]";
 
 const GET_COURSES_SM_MSSQL =
     "select max(lc.[ReadyDate]) as [ReadyDate], c.[URL], c.[Cover] from[Course] c\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
-    "where lc.[State] = 'R'\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P'\n" +
     "group by c.[URL], c.[Cover]\n" +
     "order by 1 desc, c.[URL]";
+
+const GET_COURSES_IMG_SM_MSSQL =
+    "select c.[URL], c.[CoverMeta] from[Course] c where c.[State] = 'P'";
 
 const GET_CATEGORIES_SM_MSSQL =
     "select max(lc.[ReadyDate]) as [ReadyDate], g.[URL] from[Course] c\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[CourseCategory] cc on cc.[CourseId] = c.[Id]\n" +
     "  join[Category] g on g.[Id] = cc.[CategoryId]\n" +
-    "where lc.[State] = 'R'\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P'\n" +
     "group by g.[URL]\n" +
     "order by 1 desc, g.[URL]";
 
@@ -38,34 +42,40 @@ const GET_AUTHORS_SM_MSSQL =
     "  join[AuthorToCourse] ac on ac.[AuthorId] = a.[Id]\n" +
     "  join[Course] c on c.[Id] = ac.[CourseId]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
-    "where lc.[State] = 'R'\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P'\n" +
     "order by a.[URL]";
+
+const GET_AUTHORS_IMG_SM_MSSQL =
+    "select a.[URL], a.[PortraitMeta] from[Author] a";
 
 const GET_LASTDATE_SM_MSSQL =
     "select max(lc.[ReadyDate]) as [ReadyDate] from[Course] c\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
-    "where lc.[State] = 'R'";
+    "where lc.[State] = 'R' and c.[State] = 'P'";
 
 const GET_LESSONS_SM_MYSQL =
-    "select lc.`ReadyDate`, c.`URL`, l.`URL` as LURL, l.`Cover` from `Course` c\n" +
+    "select lc.`ReadyDate`, c.`URL`, l.`URL` as LURL, l.`Cover`, l.`CoverMeta` from `Course` c\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "where lc.`State` = 'R'\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "order by lc.`ReadyDate` desc, c.`URL`, l.`URL`";
 
 const GET_COURSES_SM_MYSQL =
     "select max(lc.`ReadyDate`) as `ReadyDate`, c.`URL`, c.`Cover` from`Course` c\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
-    "where lc.`State` = 'R'\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "group by c.`URL`, c.`Cover`\n" +
     "order by 1 desc, c.`URL`";
+
+const GET_COURSES_IMG_SM_MYSQL =
+    "select c.`URL`, c.`CoverMeta` from`Course` c where c.`State` = 'P'";
 
 const GET_CATEGORIES_SM_MYSQL =
     "select max(lc.`ReadyDate`) as `ReadyDate`, g.`URL` from`Course` c\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`CourseCategory` cc on cc.`CourseId` = c.`Id`\n" +
     "  join`Category` g on g.`Id` = cc.`CategoryId`\n" +
-    "where lc.`State` = 'R'\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "group by g.`URL`\n" +
     "order by 1 desc, g.`URL`";
 
@@ -75,13 +85,16 @@ const GET_AUTHORS_SM_MYSQL =
     "  join`AuthorToCourse` ac on ac.`AuthorId` = a.`Id`\n" +
     "  join`Course` c on c.`Id` = ac.`CourseId`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
-    "where lc.`State` = 'R'\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "order by a.`URL`";
+
+const GET_AUTHORS_IMG_SM_MYSQL =
+    "select a.`URL`, a.`PortraitMeta` from`Author` a";
 
 const GET_LASTDATE_SM_MYSQL =
     "select max(lc.`ReadyDate`) as `ReadyDate` from`Course` c\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
-    "where lc.`State` = 'R'";
+    "where lc.`State` = 'R' and c.`State` = 'P'";
 
 let dfltSiteMapSettings = {
     lesson: {
@@ -248,6 +261,16 @@ exports.SiteMapTask = class SiteMapTask extends Task {
             });
     }
 
+    _href(rawUrl) {
+        let url = new URL(rawUrl);
+        return url.href;
+    }
+
+    _getFileName(fullName) {
+        let fn = path.parse(fullName);
+        return fn.name;
+    }
+
     _genLessonSM() {
         let data = new Promise((resolve, reject) => {
             resolve(
@@ -270,16 +293,23 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                             firstTranscriptDate = new Date(d);
                     }
                     result.detail.forEach((elem) => {
+                        let img = { url: this._href(this._dataUrl + "/" + elem.Cover), title: this._getFileName(elem.Cover) };
+                        if (elem.CoverMeta) {
+                            try {
+                                let meta = JSON.parse(elem.CoverMeta);
+                                if (meta.name)
+                                    img.title = meta.name;
+                                if (meta.description)
+                                    img.caption = meta.description;
+                            } catch (err) { };
+                        }
                         urls.push({
-                            url: this._siteHost + "/" + elem.URL + "/" + elem.LURL,
+                            url: this._href(this._siteHost + "/" + elem.URL + "/" + elem.LURL),
                             lastmodISO: elem.ReadyDate.toISOString(),
-                            img: [{
-                                url: this._dataUrl + "/" + elem.Cover,
-                                title: elem.Cover
-                            }]
+                            img: [img]
                         });
                         urls.push({
-                            url: this._siteHost + "/" + elem.URL + "/" + elem.LURL + this._siteMapSettings.lesson.transcriptUrl,
+                            url: this._href(this._siteHost + "/" + elem.URL + "/" + elem.LURL + this._siteMapSettings.lesson.transcriptUrl),
                             lastmodISO: firstTranscriptDate > elem.ReadyDate ? firstTranscriptDate.toISOString() : elem.ReadyDate.toISOString(),
                         });
                     });
@@ -295,29 +325,53 @@ exports.SiteMapTask = class SiteMapTask extends Task {
     }
 
     _genCourseSM() {
+        let imgs = {};
         let data = new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: GET_COURSES_SM_MYSQL,
-                        mssql: GET_COURSES_SM_MSSQL
+                        mysql: GET_COURSES_IMG_SM_MYSQL,
+                        mssql: GET_COURSES_IMG_SM_MSSQL
                     }
                 }, {})
             );
         })
+            .then((result) => {
+                if (result && result.detail && (result.detail.length > 0)) {
+                    result.detail.forEach((elem) => {
+                        if (elem.CoverMeta) {
+                            try {
+                                let meta = JSON.parse(elem.CoverMeta);
+                                imgs[elem.URL] = meta;
+                            } catch (err) { };
+                        }
+                    });
+                    return $data.execSql({
+                        dialect: {
+                            mysql: GET_COURSES_SM_MYSQL,
+                            mssql: GET_COURSES_SM_MSSQL
+                        }
+                    }, {});
+                }
+            })
             .then((result) => {
                 let sitemap;
                 if (result && result.detail && (result.detail.length > 0)) {
                     let urls = [];
                     let prefixUrl = this._siteMapSettings.course.prefixUrl;
                     result.detail.forEach((elem) => {
+                        let img = { url: this._href(this._dataUrl + "/" + elem.Cover), title: this._getFileName(elem.Cover) };
+                        let meta = imgs[elem.URL];
+                        if (meta) {
+                            if (meta.name)
+                                img.title = meta.name;
+                            if (meta.description)
+                                img.caption = meta.description;
+                        }
                         urls.push({
-                            url: this._siteHost + prefixUrl + "/" + elem.URL,
+                            url: this._href(this._siteHost + prefixUrl + "/" + elem.URL),
                             lastmodISO: elem.ReadyDate.toISOString(),
-                            img: [{
-                                url: this._dataUrl + "/" + elem.Cover,
-                                title: elem.Cover
-                            }]
+                            img: [img]
                         });
                     });
                     let siteMapOptions = { urls: urls };
@@ -349,10 +403,10 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                     let prefixUrl = this._siteMapSettings.category.prefixUrl;
                     result.detail.forEach((elem) => {
                         urls.push({
-                            url: this._siteHost + prefixUrl + "/" + elem.URL,
+                            url: this._href(this._siteHost + prefixUrl + "/" + elem.URL),
                             lastmodISO: elem.ReadyDate.toISOString(),
                             img: [{
-                                url: this._dataUrl + "/" + elem.Cover,
+                                url: this._href(this._dataUrl + "/" + elem.Cover),
                                 title: elem.Cover
                             }]
                         });
@@ -369,29 +423,53 @@ exports.SiteMapTask = class SiteMapTask extends Task {
     }
 
     _genAuthorSM() {
+        let imgs = {};
         let data = new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: GET_AUTHORS_SM_MYSQL,
-                        mssql: GET_AUTHORS_SM_MSSQL
+                        mysql: GET_AUTHORS_IMG_SM_MYSQL,
+                        mssql: GET_AUTHORS_IMG_SM_MSSQL
                     }
                 }, {})
             );
         })
+            .then((result) => {
+                if (result && result.detail && (result.detail.length > 0)) {
+                    result.detail.forEach((elem) => {
+                        if (elem.PortraitMeta) {
+                            try {
+                                let meta = JSON.parse(elem.PortraitMeta);
+                                imgs[elem.URL] = meta;
+                            } catch (err) { };
+                        }
+                    });
+                    return $data.execSql({
+                        dialect: {
+                            mysql: GET_AUTHORS_SM_MYSQL,
+                            mssql: GET_AUTHORS_SM_MSSQL
+                        }
+                    }, {});
+                }
+            })
             .then((result) => {
                 let sitemap;
                 if (result && result.detail && (result.detail.length > 0)) {
                     let urls = [];
                     let prefixUrl = this._siteMapSettings.author.prefixUrl;
                     result.detail.forEach((elem) => {
+                        let img = { url: this._href(this._dataUrl + "/" + elem.Portrait), title: elem.FirstName + " " + elem.LastName };
+                        let meta = imgs[elem.URL];
+                        if (meta) {
+                            if (meta.name)
+                                img.title = meta.name;
+                            if (meta.description)
+                                img.caption = meta.description;
+                        }
                         urls.push({
-                            url: this._siteHost + prefixUrl + "/" + elem.URL,
+                            url: this._href(this._siteHost + prefixUrl + "/" + elem.URL),
                             lastmodISO: elem.Atime > elem.Altime ? elem.Atime.toISOString() : elem.Altime.toISOString(),
-                            img: [{
-                                url: this._dataUrl + "/" + elem.Portrait,
-                                title: elem.FirstName + " " + elem.LastName
-                            }]
+                            img: [img]
                         });
                     });
                     let siteMapOptions = { urls: urls };
@@ -422,7 +500,7 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                 if (result && result.detail && (result.detail.length > 0)) {
                     let elem = result.detail[0];
                     urls.push({
-                        url: this._siteHost,
+                        url: this._href(this._siteHost),
                         lastmodISO: elem.ReadyDate.toISOString()
                     });
                 }
@@ -433,7 +511,7 @@ exports.SiteMapTask = class SiteMapTask extends Task {
                         firstAboutDate = new Date(d);
                 }
                 urls.push({
-                    url: this._siteHost + this._siteMapSettings.page.aboutUrl,
+                    url: this._href(this._siteHost + this._siteMapSettings.page.aboutUrl),
                     lastmodISO: firstAboutDate.toISOString()
                 });
                 let siteMapOptions = { urls: urls };
