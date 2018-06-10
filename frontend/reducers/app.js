@@ -5,6 +5,8 @@ import {
     HIDE_LESSON_MENU,
     SHOW_LESSON_MENU,
     SET_APP_TYPE_MOBILE,
+    SHOW_USER_BLOCK,
+    HIDE_USER_BLOCK,
 } from '../constants/app'
 
 import {
@@ -18,11 +20,20 @@ const initialState = {
     isLessonMenuOpened: false,
     isMobileApp: false,
     showSignInForm: false,
+    showUserBlock: false,
 };
 
 export default function app(state = initialState, action) {
 
     switch (action.type) {
+
+        case SHOW_USER_BLOCK:
+            return {...state, showUserBlock: true};
+
+        case HIDE_USER_BLOCK:
+                    return {...state, showUserBlock: false};
+
+
         case SWITCH_SIZE_TO:
             return {...state, size: action.payload};
 

@@ -996,11 +996,18 @@ namespace MagImport
             public Dictionary<string, int> size { get; set; }
             public Dictionary<string, string> content { get; set; }
             public string icon { get; set; }
+            public string name { get; set; }
+            public string description { get; set; }
 
-            public PictureResourceDescriptionObj(JSObject js_obj)
+            public PictureResourceDescriptionObj(JSObject js_obj, string pict_name = null, string pict_desc = null)
             {
                 size = new Dictionary<string, int>();
                 content = new Dictionary<string, string>();
+
+                if (!String.IsNullOrEmpty(pict_name))
+                    name = pict_name;
+                if (!String.IsNullOrEmpty(pict_name))
+                    description = pict_desc;
 
                 Tuple<JSObject.FieldType, bool, int, string, double, JSObject> data;
                 if (js_obj.obj.TryGetValue("width", out data) && (data.Item1 == JSObject.FieldType.Int))
@@ -1520,7 +1527,13 @@ namespace MagImport
                     if (file_desc.TryGetValue("MetaData", out fn))
                     {
                         au.Fields.RawPortraitMeta = fn;
-                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+
+                        string name = null;
+                        string description = null;
+                        file_desc.TryGetValue("Description", out name);
+                        file_desc.TryGetValue("ExtDescription", out description);
+
+                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta, name, description);
                         au.Fields.PortraitMeta = pict.ToJSONString();
                     }
                 }
@@ -1658,7 +1671,13 @@ namespace MagImport
                     if (file_desc.TryGetValue("MetaData", out fn))
                     {
                         course.Fields.RawCoverMeta = fn;
-                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+
+                        string name = null;
+                        string description = null;
+                        file_desc.TryGetValue("Description", out name);
+                        file_desc.TryGetValue("ExtDescription", out description);
+
+                            PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta, name, description);
                         course.Fields.CoverMeta = pict.ToJSONString(); ;
                     }
                 }
@@ -2045,7 +2064,13 @@ namespace MagImport
                     if (file_desc.TryGetValue("MetaData", out fn))
                     {
                         lesson.Fields.RawCoverMeta = fn;
-                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+
+                        string name = null;
+                        string description = null;
+                        file_desc.TryGetValue("Description", out name);
+                        file_desc.TryGetValue("ExtDescription", out description);
+
+                        PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta, name, description);
                         lesson.Fields.CoverMeta = pict.ToJSONString();
                     }
                 }

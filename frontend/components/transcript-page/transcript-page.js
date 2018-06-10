@@ -139,9 +139,13 @@ class TextBlock extends React.Component {
     _setIndent() {
         let _number = $('.title-text .number')
 
-        if ((window.clientWidth > 899) && _number.length > 0) {
-            let _width = _number[0].offsetWidth;
-            $('.title-text').css('text-indent', -_width);
+        if (_number.length > 0) {
+            if (window.outerWidth > 899) {
+                let _width = _number[0].offsetWidth;
+                $('.title-text').css('text-indent', -_width);
+            } else {
+                $('.title-text').css('text-indent', 0);
+            }
         }
     }
 
@@ -151,7 +155,7 @@ class TextBlock extends React.Component {
         return (
             <section className={'text-block'} id='text'>
                 <div className={'text-block__wrapper'}>
-                    <div className='title-text'><span className="number">{lesson.Number + '.'}</span>{' ' + lesson.Name}</div>
+                    <div className='title-text'><span className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
                     {this._getText()}
                     <Refs {...this.props}/>
                 </div>

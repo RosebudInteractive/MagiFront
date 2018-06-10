@@ -5037,8 +5037,7 @@ ul.user-tooltip {
           max-width: 350px;
           max-height: 300px; } }
     @media (max-width: 767px) {
-      .course-module__image-block {
-        width: 46.6%; } }
+      .course-module__image-block { } }
     @media (max-width: 700px) {
       .course-module__image-block svg {
         max-width: 320px;
@@ -6505,6 +6504,7 @@ ul.user-tooltip {
       background-color: rgba(200, 104, 76, 0.3); }
 
 .lectures-menu-row {
+  z-index: 1;
   top: 96px;
   height: 53px;
   position: fixed;
@@ -7114,6 +7114,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   width: 36px;
   height: 36px;
   font-size: 0;
+  outline: none;
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid #c8684c;
   border-radius: 50%; }
@@ -7487,6 +7488,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       line-height: 19px; } }
   .lecture-frame__descr {
     margin: 0;
+    padding-right: 8px;
     max-width: 800px;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 23px;
@@ -12857,6 +12859,9 @@ ul.lectures-tab {
         -ms-flex-align: start;
         align-items: flex-start;
         margin-top: -6px; } }
+  .history-item__play-block .play-block-small {
+    position: absolute;
+  }
   .history-item__info-block {
     padding-top: 36px;
     padding-bottom: 10px; }
@@ -12915,6 +12920,8 @@ ul.lectures-tab {
         font-size: 15px; } }
   .history-item .num {
     color: #c8684c; }
+  .history-item .text {
+    color: #2f2f2f; }
   .history-item__author {
     margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -13096,6 +13103,9 @@ ul.lectures-tab {
       margin-top: -16px; } }
 
 .form__change-password {
+  background-color: transparent;
+  border: none;
+  outline: none;
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease;
   font-family: "Fira Sans", Arial, sans-serif;

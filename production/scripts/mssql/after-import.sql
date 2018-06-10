@@ -16,6 +16,8 @@ CREATE UNIQUE INDEX [u_Idx_CategoryLng_Name] ON [CategoryLng]([Name]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Course_URL] ON [Course]([URL]);
 GO
+CREATE INDEX [idx_Course_State] ON [Course]([State]);
+GO
 CREATE UNIQUE INDEX [u_Idx_CourseLng_Name] ON [CourseLng]([Name]);
 GO
 CREATE INDEX [idx_CourseLng_State] ON [CourseLng]([State]);

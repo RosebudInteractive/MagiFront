@@ -7,6 +7,7 @@ import TranscriptPage from '../components/transcript-page/transcript-page';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
+import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
@@ -18,6 +19,8 @@ class TranscriptLessonPage extends React.Component {
 
     componentWillMount() {
         let {courseUrl, lessonUrl} = this.props;
+
+        this.props.userActions.whoAmI()
 
         if (!this._lessonLoaded(courseUrl, lessonUrl)) {
             this.props.lessonActions.getLesson(courseUrl, lessonUrl);
@@ -182,6 +185,7 @@ function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(lessonActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
