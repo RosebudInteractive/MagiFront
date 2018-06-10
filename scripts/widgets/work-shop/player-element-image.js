@@ -31,6 +31,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                 if (imgPlayPos < 0) imgPlayPos = 0;
                 let item = $("#" + that.Id);
                 let img = item.find("img");
+                let currentProgress = 0;
                 that._playState.imageAnimation = animate({
                     from: 0,
                     to: ef.acceleration * ef.duration,
@@ -38,10 +39,14 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                     duration: ef.duration * 1000 / rate,
                     timing: makeEaseInOut(quad),
                     draw: (progress) => {
-                        img.css({
+                        if (currentProgress > progress) return;
+                        currentProgress = progress;
+                        img[0].style.width = (100 + progress) + "%";
+                        img[0].style.height = (100 + progress) + "%";
+                        /*img.css({
                             width: (100 + progress) + "%",
                             height: (100 + progress) + "%"
-                        })
+                        });*/
                     }
                 }, that._playState);
             }, imgDelay);

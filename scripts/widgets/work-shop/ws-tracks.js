@@ -1707,7 +1707,9 @@ export default class CWSTracks extends CWSBase {
             currentPos = element.start + element.content.duration;
         }
         let last = elements[elements.length - 1];
-        if (last.start + last.content.duration > audioState.duration) {
+        if (last.start + last.content.duration > audioState.duration &&
+            last.start + last.content.duration - audioState.duration > 1
+        ) {
             return false;
         }
 
