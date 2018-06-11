@@ -341,7 +341,7 @@ class LessonPage extends React.Component {
 
         return {
             normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
-            fixedElements: '.js-lesson-menu',
+            fixedElements: (window.innerWidth > 600) ? '.js-lesson-menu' : '',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
