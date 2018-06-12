@@ -36,7 +36,7 @@ import Platform from 'platform';
 Polifyll.registry();
 
 let _homePath = '/';
-const _scrollDelta = 80;
+const _globalScrollDelta = 80;
 
 class App extends Component {
 
@@ -130,21 +130,33 @@ class App extends Component {
     }
 
     _handleScroll(event) {
-        this._addDevWarn('last : ' + this.state.lastScrollPos + ' top : ' + event.target.scrollingElement.scrollTop)
-
         if (!event.target.scrollingElement) {
             return
         }
 
-        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop)
+        let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
+
+        let _scrollDelta = _bellowScreen ? _globalScrollDelta / 2 : _globalScrollDelta;
+
+        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop);
         if (_delta < _scrollDelta) {
             return
         }
 
-        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
-            this.setState({showHeader : true})
-
+        let _header = $('.page-header._fixed');
+        if (_header && _header.length > 0) {
+            if (_bellowScreen) {
+                _header.css("-webkit-transition", "-webkit-transform 0.2s ease").css("transition", "-webkit-transform 0.2s ease")
+            } else {
+                _header.css("-webkit-transition", "-webkit-transform 0.4s ease").css("transition", "-webkit-transform 0.4s ease")
+            }
         }
+
+        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
+            this.setState({showHeader: true})
+        }
+
+
 
         if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
             this.setState({

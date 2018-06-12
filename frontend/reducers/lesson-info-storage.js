@@ -8,6 +8,7 @@ import {
     LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
     LESSON_INFO_STORAGE_SET_LESSON_ENDED,
     LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+    LESSON_INFO_STORAGE_CLEAR_INIT_STATE,
 } from '../constants/lesson-info-storage'
 
 const initialState = {
@@ -20,9 +21,19 @@ const initialState = {
 export default function lessonInfoStorage(state = initialState, action) {
 
     switch (action.type) {
+        case LESSON_INFO_STORAGE_CLEAR_INIT_STATE: {
+            return {...state, volume: 0.3,
+                muted: false,
+                lessons : new Map(),
+                ts: 0,}
+        }
+
         case LESSON_INFO_STORAGE_SET_INIT_STATE: {
             if (!action.payload) {
-                return state
+                return {...state, volume: 0.3,
+                    muted: false,
+                    lessons : new Map(),
+                    ts: 0,}
             } else {
                 action.payload.forEach((value, key) => {
                     state.lessons.set(key, Object.assign({}, value))

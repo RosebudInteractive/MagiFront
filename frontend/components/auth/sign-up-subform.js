@@ -4,7 +4,14 @@ import PropTypes from 'prop-types';
 import ButtonsBlock from './buttons-block'
 import Captcha from './captcha'
 import {connect} from 'react-redux'
+import PasswordValidator from 'password-validator';
 import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton} from './editors'
+
+let schema = new PasswordValidator();
+schema
+    .is().min(6)
+    .is().max(100)
+    .has().not().spaces()
 
 const validate = values => {
     const errors = {}
@@ -19,6 +26,8 @@ const validate = values => {
     }
     if (!values.password1) {
         errors.password1 = 'Required'
+    } else if (!schema.validate(values.password1)) {
+        errors.password1 = 'Пароль недостаточно надежен'
     }
     if (!values.password2) {
         errors.password2 = 'Required'
@@ -77,7 +86,8 @@ let SignUpForm = class SignUpForm extends React.Component {
     }
 
     render() {
-        const {invalid, loading} = this.props;
+        const {invalid, serverError, loading} = this.props;
+        const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
@@ -100,6 +110,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Field name="username" component={UserNameEdit}/>
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>
+                            {_errorText}
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>

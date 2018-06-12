@@ -190,7 +190,7 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
-        $(window).unbind('resize', this._resizeHandler)
+        // $(window).unbind('resize', this._resizeHandler)
         $(window).unbind('keydown', this._keydownHandler)
     }
 
@@ -228,7 +228,7 @@ class LessonPage extends React.Component {
 
     _mountKeydownHandler() {
         $(window).keydown(this._keydownHandler)
-        $(window).resize(this._resizeHandler)
+        // $(window).resize(this._resizeHandler)
     }
 
     _createBundle(lesson, key, isMain) {
