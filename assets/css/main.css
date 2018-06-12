@@ -7232,7 +7232,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     .link-to-transcript.controls-row:after {
       width: 28px;
       height: 28px;}
-    .link-to-transcript br {
+    .link-to-transcript.controls-row br {
       display: inline; } }
   .link-to-transcript:after {
     content: "";
