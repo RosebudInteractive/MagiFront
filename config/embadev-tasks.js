@@ -22,7 +22,7 @@ let options = {
             module: "./site-map",
             type: "scheduled-task",
             disabled: false,
-            schedule: "*/10 * * * * *", // run every 10 sec
+            schedule: "5,15,25,35,45,55 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
                 xslUrl: "/main-sitemap.xsl",
