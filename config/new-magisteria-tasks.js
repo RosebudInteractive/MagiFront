@@ -24,7 +24,7 @@ module.exports = {
         }
     ],
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
     proxyServer: {
         protocol: 'https',
         address: 'new.magisteria.ru',

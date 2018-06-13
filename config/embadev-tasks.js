@@ -19,10 +19,28 @@ let options = {
     tasks: [
         {
             name: "Sitemap Generation",
-            module: "./site-map",
+            module: "./rss",
             type: "scheduled-task",
             disabled: false,
             schedule: "5,15,25,35,45,55 * * * * *", // run every 10 sec
+            options: {
+                path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                channels: {
+                    'yandex-zen': {
+                        enabled: true
+                    },
+                    'rss': {
+                        enabled: false
+                    }
+                }
+            }
+        },
+        {
+            name: "Sitemap Generation",
+            module: "./site-map",
+            type: "scheduled-task",
+            disabled: true,
+            schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
                 xslUrl: "/main-sitemap.xsl",
@@ -38,7 +56,7 @@ let options = {
         }
     ],
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
     dataUrl: '/data',
     proxyServer: proxyServer,
     server: {
