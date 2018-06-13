@@ -79,7 +79,7 @@ export default class LessonInfoStorage {
             let _jsonObj = localStorage.getItem(_userId.toString());
             let _ts = 0;
 
-            if (_jsonObj !== undefined) {
+            if (_jsonObj) {
                 let _obj = JSON.parse(_jsonObj),
                     _map = _obj.lessons ? objectToMap(_obj.lessons) : new Map(),
                     _volume = _obj.volume;
