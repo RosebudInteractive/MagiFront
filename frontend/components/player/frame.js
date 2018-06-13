@@ -33,7 +33,7 @@ class Frame extends Component {
             fullScreen: false,
         }
 
-        this._firstTap = false;
+        this._firstTap = true;
     }
 
 
@@ -172,19 +172,23 @@ class Frame extends Component {
 
     _openContent() {
         if (!this._hideContentTooltip) {
+            $('#fp-nav').addClass('hide');
             this._clearTimeOut()
             this.setState({showContent: !this.state.showContent})
         } else {
             this._hideContentTooltip = false
+            $('#fp-nav').removeClass('hide');
         }
     }
 
     _openRate() {
         if (!this._hideRateTooltip) {
+            $('#fp-nav').addClass('hide');
             this._clearTimeOut()
             this.setState({showRate: !this.state.showRate})
         } else {
             this._hideRateTooltip = false
+            $('#fp-nav').removeClass('hide');
         }
     }
 

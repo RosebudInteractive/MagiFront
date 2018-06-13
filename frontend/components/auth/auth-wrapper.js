@@ -19,7 +19,8 @@ class AuthWrapper extends React.Component {
                 (state === AUTHORIZATION_STATE.START_SIGN_UP) && <SignUpSubform loading={loading} onSubmit={::userActions.signUp} serverError={error}/> ||
                 (state === AUTHORIZATION_STATE.SIGN_UP_SUCCESS) && <SuccessForm serverError={error} enableCountdown={true}/> ||
                 (state === AUTHORIZATION_STATE.RECOVERY_PASSWORD_SUCCESS) && <SuccessForm serverError={error} enableCountdown={false}/> ||
-                (state === AUTHORIZATION_STATE.RECOVERY_PASSWORD) && <PwdRecoveryForm loading={loading} onSubmit={::userActions.recoveryPassword} serverError={error} email={this.props.email}/>
+                (state === AUTHORIZATION_STATE.RECOVERY_PASSWORD) && <PwdRecoveryForm loading={loading} onSubmit={::userActions.recoveryPassword} serverError={error} email={this.props.email}/> ||
+                null
     }
 }
 

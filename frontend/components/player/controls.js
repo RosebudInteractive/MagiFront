@@ -2,6 +2,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import $ from 'jquery'
+import {Link} from 'react-router-dom';
 
 import * as playerStartActions from '../../actions/player-start-actions'
 
@@ -71,7 +72,7 @@ class Controls extends React.Component {
                             style={{left: (this.props.volume * 100) + "%"}}>Громкость
                     </button>
                 </div>
-
+                <Link to={this.props.lesson.URL + "/transcript"} className="link-to-transcript controls-row">Транскрипт <br/>и материалы</Link>
             </div>
         );
     }

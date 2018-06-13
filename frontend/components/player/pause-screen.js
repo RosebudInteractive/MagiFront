@@ -44,11 +44,16 @@ class PauseScreen extends React.Component {
                                     null
                             }
                             <h2 className="lecture-frame__title">
-                                <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                                <span className="play-btn-big lecture-frame__play-btn" style={{cursor: 'pointer'}}
-                                      onClick={::this._startPlay}>Воспроизвести</span>
-                                <span className="title-text">
-                                            <span className="number">{_number}</span>{lesson.Name}</span>
+                                <span className="lecture-frame__duration pause-screen">{lesson.DurationFmt}</span>
+                                <span className="play-btn-big lecture-frame__play-btn pause-screen" style={{cursor: 'pointer'}}
+                                      onClick={::this._startPlay}>Воспроизвести
+                                </span>
+                                <p className="title-paragraph pause-screen">
+                                    <span className="title-text">
+                                        <span className="number">{_number}</span>
+                                        {lesson.Name}
+                                    </span>
+                                </p>
                             </h2>
                             <div className="lecture-frame__text-block">
                                 <p className="lecture-frame__descr">{lesson.ShortDescription}</p>

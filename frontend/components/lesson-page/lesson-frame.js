@@ -102,11 +102,12 @@ class LessonFrame extends React.Component {
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
                             {this._getButton()}
-                            <span className="title-text">
-                                <span className="number">{_number}</span>
-                                {lesson.Name + '\n'}
-                            </span>
-
+                            <p className="title-paragraph">
+                                <span className="title-text">
+                                    <span className="number">{_number}</span>
+                                    {lesson.Name + '\n'}
+                                </span>
+                            </p>
                         </h2>
                         <div className="lecture-frame__text-block">
                             <p className="lecture-frame__descr">{lesson.ShortDescription}</p>
