@@ -248,13 +248,17 @@ class LessonPage extends React.Component {
         this.props.lessons.object.some((item) => {
             let _founded = item.Id === lesson.Id
 
-            if (!_founded && (item.Lessons.length > 0)) {
-                return item.Lessons.some((subItem) => {
-                    if (subItem.Id === lesson.Id) {
-                        _lessonAudios = subItem;
-                    }
-                    return subItem.Id === lesson.Id
-                })
+            if (!_founded) {
+                if (item.Lessons.length > 0) {
+                    return item.Lessons.some((subItem) => {
+                        if (subItem.Id === lesson.Id) {
+                            _lessonAudios = subItem;
+                        }
+                        return subItem.Id === lesson.Id
+                    })
+                } else {
+                    return false
+                }
             } else {
                 _lessonAudios = item;
                 return true
