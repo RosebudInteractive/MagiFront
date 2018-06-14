@@ -209,7 +209,7 @@ class LessonPage extends React.Component {
 
     _mountFullpage() {
         let _container = $('#fullpage-lesson');
-        if ((!this._mountFullPageGuard) && (_container.length > 0)) {
+        if ((!this._mountFullPageGuard) && (_container.length > 0) &&  !this.props.isMobileApp) {
             $('body').attr('data-page', 'fullpage-lesson');
             const _options = this._getFullpageOptions();
             _container.fullpage(_options)
