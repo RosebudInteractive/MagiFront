@@ -18,7 +18,7 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
-            name: "Sitemap Generation",
+            name: "RSS Generation",
             module: "./rss",
             type: "scheduled-task",
             disabled: false,
