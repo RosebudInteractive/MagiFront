@@ -338,10 +338,12 @@ class LessonPage extends React.Component {
         let that = this;
         let _anchors = this._getAnchors();
 
+        let {isMobileApp} = this.props;
+
 
         return {
             normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
-            fixedElements: '.js-lesson-menu',
+            fixedElements: isMobileApp ? '' : '.js-lesson-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
@@ -350,7 +352,7 @@ class LessonPage extends React.Component {
                 return anchor.title
             }),
             css3: true,
-            autoScrolling: true,
+            autoScrolling: !isMobileApp,
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
