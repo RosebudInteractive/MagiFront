@@ -33,19 +33,10 @@ class LessonPage extends React.Component {
         this._mountPlayerGuard = true;
 
 
-        this._resizeHandler = (e) => {
-            let _newHeight = window.screen.availHeight;
-            // alert(e.handleObj.type + ' innerHeight: ' + document.innerHeight + ' : ' + _newHeight);
-
-            let _height = $('.fp-tableCell').css('height');
-            alert(e.handleObj.type + ' current css height: ' + _height);
-
-            $('.fullpage-wrapper').css('height', _newHeight);
-            $('.fp-tableCell').css('height', _newHeight);
-            // $('.fullpage-section').css('height', _newHeight);
-
-            _height = $('.fp-tableCell').css('height');
-            alert(e.handleObj.type + ' new css height: ' + _height)
+        this._resizeHandler = () => {
+            if ($('#fullpage-lesson').length) {
+                $.fn.fullpage.reBuild();
+            }
         }
 
         this._keydownHandler = (e) => {
@@ -185,12 +176,11 @@ class LessonPage extends React.Component {
         }
     }
 
-
     componentWillUnmount() {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
-        // $(window).unbind('resize', this._resizeHandler)
+        $(window).unbind('resize', this._resizeHandler)
         $(window).unbind('keydown', this._keydownHandler)
     }
 
@@ -228,7 +218,7 @@ class LessonPage extends React.Component {
 
     _mountKeydownHandler() {
         $(window).keydown(this._keydownHandler)
-        // $(window).resize(this._resizeHandler)
+        $(window).resize(this._resizeHandler)
     }
 
     _createBundle(lesson, key, isMain) {
@@ -344,8 +334,6 @@ class LessonPage extends React.Component {
         let that = this;
         let _anchors = this._getAnchors();
 
-        let {isMobileApp} = this.props;
-
         return {
             normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
             fixedElements: '.js-lesson-menu',
@@ -357,7 +345,7 @@ class LessonPage extends React.Component {
                 return anchor.title
             }),
             css3: true,
-            autoScrolling: !isMobileApp,
+            autoScrolling: true,
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
