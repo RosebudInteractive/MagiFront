@@ -2,7 +2,6 @@ import {
     SIGN_IN_START,
 
     SIGN_IN_SUCCESS,
-    // SUCCESS_SIGN_UP,
     SIGN_IN_FAIL,
     SIGN_UP_FAIL,
 
@@ -19,7 +18,6 @@ import {
     ACTIVATION_FAIL,
     SWITCH_TO_RECOVERY_PASSWORD,
     SWITCH_TO_PASSWORD_CONFIRM,
-    RECOVERY_FAIL,
     LOGOUT_START,
     LOGOUT_FAIL,
     LOGOUT_SUCCESS,
@@ -35,11 +33,12 @@ import {
     SWITCH_TO_RECOVERY_PASSWORD_SUCCESS,
     RECOVERY_PASSWORD_START,
     RECOVERY_PASSWORD_SUCCESS,
-    RECOVERY_PASSWORD_FAIL,
+    RECOVERY_PASSWORD_FAIL, CLOSE_SIGN_IN_FORM,
 } from '../constants/user'
 
 const initialState = {
-    authorizationState: AUTHORIZATION_STATE.START_SIGN_IN,
+    authorizationState: AUTHORIZATION_STATE.NONE,
+    // authorizationState: AUTHORIZATION_STATE.START_SIGN_IN,
     authorized: false,
     loading: false,
     name: '',
@@ -54,6 +53,10 @@ export default function app(state = initialState, action) {
     switch (type) {
         case SHOW_SIGN_IN_FORM:
             return {...state, error: null, loading: false, authorizationState: AUTHORIZATION_STATE.START_SIGN_IN}
+
+        case CLOSE_SIGN_IN_FORM:{
+            return {...state, error: null, loading: false, authorizationState: AUTHORIZATION_STATE.NONE}
+        }
 
         case SIGN_IN_START:
         case ACTIVATION_START:
@@ -70,10 +73,12 @@ export default function app(state = initialState, action) {
         case SIGN_UP_SUCCESS:
         case SIGN_OUT_SUCCESS:
         case ACTIVATION_SUCCESS:
-        case RECOVERY_PASSWORD_SUCCESS:
         case SEND_NEW_PASSWORD_SUCCESS:
         case GET_ACTIVATION_USER_SUCCESS:
             return {...state, loading: false, user: Object.assign({}, payload)}
+
+        case RECOVERY_PASSWORD_SUCCESS:
+            return {...state, loading: false, user: null}
 
         case LOGOUT_SUCCESS:
             return {...state, loading: false, user: null}

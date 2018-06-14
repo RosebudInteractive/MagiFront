@@ -37,6 +37,15 @@ class LessonsListWrapper extends React.Component {
         });
     }
 
+    componentWillReceiveProps(nextProps) {
+        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
+            let _elem = document.getElementById(this.props.active);
+            if (_elem) {
+                _elem.scrollIntoView()
+            }
+        }
+    }
+
     render() {
         return this.props.fetching ? null : (
             <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
@@ -68,7 +77,7 @@ class ListItem extends React.Component {
             _cover = getCoverPath(lesson, ImageSize.icon);
 
         return (
-            <li className={"lectures-list__item" + (_isActive ? ' active' : '')}>
+            <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={this.props.lesson.Number}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author}/>
                     <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}

@@ -2,6 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {reduxForm, Field, reset} from 'redux-form';
 import ProfileEditor from './profile-editor';
+import PasswordValidator from 'password-validator';
+
+let schema = new PasswordValidator();
+schema
+    .is().min(6)
+    .is().max(100)
+    .has().not().spaces()
 
 const validate = values => {
     const errors = {}
@@ -12,8 +19,9 @@ const validate = values => {
 
     if (!values.newPassword) {
         errors.newPassword = 'Required'
+    } else if (!schema.validate(values.newPassword)) {
+        errors.newPassword = 'Пароль недостаточно надежен'
     }
-
     if (!values.repeatPassword) {
         errors.repeatPassword = 'Required'
     }

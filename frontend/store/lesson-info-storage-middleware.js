@@ -20,9 +20,16 @@ import * as storageActions from '../actions/lesson-info-storage-actions';
 const LessonInfoStorageMiddleware = store => next => action => {
 
     switch (action.type) {
-        case PLAYER_START_INIT:
+        case PLAYER_START_INIT:{
+            let result = next(action)
+            LessonInfoStorage.init()
+            return result
+        }
+
+
         case SIGN_IN_SUCCESS:
         case LOGOUT_SUCCESS: {
+            LessonInfoStorage.clear();
             let result = next(action)
             LessonInfoStorage.init()
             return result

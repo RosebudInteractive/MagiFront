@@ -32,16 +32,17 @@ class LessonPage extends React.Component {
         this._internalRedirect = false;
         this._mountPlayerGuard = true;
 
+
         this._resizeHandler = (e) => {
-            let text = window.screen.availHeight + ' : ' + window.screen.availWidth
-            alert(text)
-            alert(e.handleObj.type + ' innerHeight: ' + window.innerHeight);
+            let _newHeight = window.screen.availHeight;
+            // alert(e.handleObj.type + ' innerHeight: ' + document.innerHeight + ' : ' + _newHeight);
 
             let _height = $('.fp-tableCell').css('height');
             alert(e.handleObj.type + ' current css height: ' + _height);
 
-            $('.fp-tableCell').css('height', window.innerHeight);
-            $('.fullpage-section').css('height', window.innerHeight);
+            $('.fullpage-wrapper').css('height', _newHeight);
+            $('.fp-tableCell').css('height', _newHeight);
+            // $('.fullpage-section').css('height', _newHeight);
 
             _height = $('.fp-tableCell').css('height');
             alert(e.handleObj.type + ' new css height: ' + _height)
@@ -189,7 +190,7 @@ class LessonPage extends React.Component {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
-        $(window).unbind('resize', this._resizeHandler)
+        // $(window).unbind('resize', this._resizeHandler)
         $(window).unbind('keydown', this._keydownHandler)
     }
 
@@ -227,6 +228,7 @@ class LessonPage extends React.Component {
 
     _mountKeydownHandler() {
         $(window).keydown(this._keydownHandler)
+        // $(window).resize(this._resizeHandler)
     }
 
     _createBundle(lesson, key, isMain) {
@@ -246,13 +248,17 @@ class LessonPage extends React.Component {
         this.props.lessons.object.some((item) => {
             let _founded = item.Id === lesson.Id
 
-            if (!_founded && (item.Lessons.length > 0)) {
-                return item.Lessons.some((subItem) => {
-                    if (subItem.Id === lesson.Id) {
-                        _lessonAudios = subItem;
-                    }
-                    return subItem.Id === lesson.Id
-                })
+            if (!_founded) {
+                if (item.Lessons.length > 0) {
+                    return item.Lessons.some((subItem) => {
+                        if (subItem.Id === lesson.Id) {
+                            _lessonAudios = subItem;
+                        }
+                        return subItem.Id === lesson.Id
+                    })
+                } else {
+                    return false
+                }
             } else {
                 _lessonAudios = item;
                 return true
@@ -356,6 +362,7 @@ class LessonPage extends React.Component {
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
+            // responsiveSlides: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
@@ -436,11 +443,8 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div>
-                        <div className='fullpage-wrapper' id='fullpage-lesson'>
-                            {this._getLessonsBundles()}
-                        </div>
-
+                    <div className='fullpage-wrapper' id='fullpage-lesson'>
+                        {this._getLessonsBundles()}
                     </div>
                     :
                     null

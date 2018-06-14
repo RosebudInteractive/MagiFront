@@ -41,7 +41,6 @@ export default class CWSResourceLoader {
                     _audio.src = '';
 
                     _audioMap.set(_src, _audio);
-                    $('body').append(_audio);
                 })
             }
         }

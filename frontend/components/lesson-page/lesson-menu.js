@@ -75,7 +75,7 @@ class Menu extends React.Component {
                 </div>
                 <div className="lectures-menu__section lectures-list-block">
                     <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
-                            onClick={::this._switchMenu}><span>Лекция </span>
+                            onClick={::this._switchMenu}><span className='caption'>Лекция </span>
                         <span className="num"><span
                             className="current">{this.props.current}</span>{'/' + _total}</span></button>
                     <LessonsListWrapper {...this.props}/>

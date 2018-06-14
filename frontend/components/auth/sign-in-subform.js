@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {reduxForm, Field, reset} from 'redux-form';
+import {reduxForm, Field} from 'redux-form';
 import Captcha from './captcha'
 import ButtonsBlock from './buttons-block'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
@@ -50,8 +50,8 @@ class SignInForm extends React.Component {
         this.setState({captcha : null});
     }
 
-    componentWillReceiveProps(props) {
-        if (props.serverError) {
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.serverError)  {
             this.setState({captcha : null})
             if (this._recaptchaInstance) {
                 this._recaptchaInstance.reset();
