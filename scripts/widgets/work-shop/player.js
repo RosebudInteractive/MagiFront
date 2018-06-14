@@ -309,8 +309,10 @@ export default class CWSPlayer extends CWSBase {
                 that._onAudioLoadedHandler(this);
             })
             .on("timeupdate", function () {
-                that._audioState.currentTime = this.currentTime;
-                that._audioState.globalTime = that._audioState.baseTime + this.currentTime;
+
+                that._audioState.currentTime = (that._audioState.currentTime < this.currentTime) ? this.currentTime : that._audioState.currentTime;
+                that._audioState.globalTime = that._audioState.baseTime + that._audioState.currentTime;
+
                 that._broadcastCurrentTimeChanged(true);
                 //if (!that._audioState.stopped) {
                 //    that._playElements(that._audioState.globalTime);

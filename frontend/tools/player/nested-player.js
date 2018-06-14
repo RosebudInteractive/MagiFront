@@ -31,7 +31,6 @@ let fullViewPort = null,
 class NestedPlayer {
 
     constructor(playingData, initState) {
-        // store.dispatch(playerActions.startInit())
         this._playingData = null;
         this._fullPlayer = null;
         this._setInitState(initState);
@@ -40,10 +39,6 @@ class NestedPlayer {
         this._hasStoppedOnSwitch = false;
         this._applyData(playingData)
         this._currentTime = 0;
-
-        setTimeout(() => {
-            this.play()
-        }, 1000)
     }
 
 
@@ -131,10 +126,6 @@ class NestedPlayer {
             this._setAssetsList(data);
             this.applyViewPorts();
             this._applyData(data);
-
-            setTimeout(() => {
-                this.play()
-            }, 1000)
         }
 
         this._hasStoppedOnSwitch = false;
@@ -219,6 +210,9 @@ class NestedPlayer {
                         store.dispatch(playerActions.setVolume(_audioState.volume))
                     }
                 }
+            })
+            .catch((e) => {
+                console.log(e)
             })
 
         this._hasStoppedOnSwitch = false;
@@ -377,7 +371,7 @@ class NestedPlayer {
 
                 store.dispatch(playerActions.setCurrentContent(content))
             },
-            onAudioInitialized() {
+            onAudioInitialized: () => {
                 let _state = that.player._audioState;
 
                 if (that._onAudioLoaded) {
@@ -398,12 +392,14 @@ class NestedPlayer {
                 that._hasStoppedOnSwitch = false
             },
             onCanPlay: (e) => {
+                console.log('canPlay in')
                 if (e === that.player) {
 
                     let _state = that.player._audioState;
 
                     if (!that._hasStoppedOnSwitch) {
                         if (_state.stopped) {
+                            console.log('canPLay exec')
                             that.play()
                         }
                     }
