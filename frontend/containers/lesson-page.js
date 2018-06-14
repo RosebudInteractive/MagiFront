@@ -209,7 +209,7 @@ class LessonPage extends React.Component {
 
     _mountFullpage() {
         let _container = $('#fullpage-lesson');
-        if ((!this._mountFullPageGuard) && (_container.length > 0) &&  !this.props.isMobileApp) {
+        if ((!this._mountFullPageGuard) && (_container.length > 0)) {
             $('body').attr('data-page', 'fullpage-lesson');
             const _options = this._getFullpageOptions();
             _container.fullpage(_options)
@@ -346,10 +346,9 @@ class LessonPage extends React.Component {
 
         let {isMobileApp} = this.props;
 
-
         return {
             normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
-            fixedElements: isMobileApp ? '' : '.js-lesson-menu',
+            fixedElements: '.js-lesson-menu',
             anchors: _anchors.map((anchor) => {
                 return anchor.name
             }),
