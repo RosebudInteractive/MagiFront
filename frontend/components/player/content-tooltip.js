@@ -71,11 +71,25 @@ class ContentTooltip extends Component {
         let that = this;
 
         return this.props.contentArray.map((item, index) => {
-            let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0;
+            let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0,
+                _isActive = _currContentId === item.id;
 
-            return <li className={(_currContentId === item.id) ? 'active' : ''} key={index}
+            return <li className={_isActive ? 'active' : ''} key={index}
                        onClick={() => {that._goToContent(item.begin)}}>
                 <div className='contents-tooltip_item'>{item.title}</div>
+                {
+                    _isActive ?
+                        <div className="equalizer">
+                            <div/>
+                            <div/>
+                            <div/>
+                            <div/>
+                            <div/>
+                        </div>
+                        :
+                        null
+                }
+
             </li>
         }, this)
     }

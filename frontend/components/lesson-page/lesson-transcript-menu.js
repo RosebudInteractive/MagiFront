@@ -10,9 +10,12 @@ export default class Menu extends React.Component {
     constructor(props) {
         super(props);
 
+        this._isMobileWidth = !($(window).width() > 899);
+        this._scrollMounted = false;
+
         this.state = {
             opened: false,
-            showToc: false,
+            showToc: this._isMobileWidth,
             showNavigationButtons: false,
         }
     }
@@ -26,20 +29,68 @@ export default class Menu extends React.Component {
         isNeedHideGallery: PropTypes.bool,
     };
 
+    componentDidMount() {
+        // this._mountCustomScroll()
+    }
+
+    componentWillUnmount() {
+        // this._unmountCustomScroll();
+    }
+
+    _mountCustomScroll() {
+        let _div = $('.lectures-menu-nav__list');
+        if (_div.length && _div[0].childElementCount) {
+            _div.mCustomScrollbar();
+            this._scrollMounted = true;
+        }
+    }
+
+    _unmountCustomScroll() {
+        if (this._scrollMounted) {
+            let _div = $('.lectures-menu-nav__list');
+            if (_div.length) {
+                _div.mCustomScrollbar('destroy');
+                this._scrollMounted = false
+            }
+        }
+    }
+
+
     _switchMenu() {
         this.setState({opened: !this.state.opened})
     }
 
     _switchToc() {
-        this.setState({showToc: !this.state.showToc})
+        this.setState({showToc: !this.state.showToc || this._isMobileWidth})
     }
 
     _switchNavigation() {
         this.setState({showNavigationButtons: !this.state.showNavigationButtons})
     }
+    //
+
+    componentWillReceiveProps() {
+        let _newWidthIsDesktop = $(window).width() > 899;
+
+        if (this._isMobileWidth) {
+            if (_newWidthIsDesktop) {
+                this._isMobileWidth = false;
+                if (this.state.showToc) {
+                    this.setState({showToc: false})
+                }
+            }
+        } else {
+            if (!_newWidthIsDesktop) {
+                this._isMobileWidth = true;
+                if (this.state.showToc) {
+                    this.setState({showToc: true})
+                }
+            }
+        }
+    }
 
     componentDidUpdate() {
-        if ($(window).width() > 1279) {
+        if (!this._isMobileWidth) {
             $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
         } else {
             $('.js-lectures-menu-nav').css('width', '');
@@ -75,8 +126,16 @@ export default class Menu extends React.Component {
                             <ul className="menu-nav-list">
                                 <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
                                     onClick={::this._switchToc}>
-                                    <div className="menu-nav-list__item-head">Оглавление</div>
-                                    <TableOfContents episodes={this.props.episodes}/>
+                                    {
+                                        (this.props.episodes && this.props.episodes.length > 0) ?
+                                            [
+                                                <div className="menu-nav-list__item-head">Оглавление</div>,
+                                                <TableOfContents episodes={this.props.episodes}/>
+                                            ]
+                                            :
+                                            null
+                                    }
+
                                 </li>
                                 <li className="menu-nav-list__item">
                                     <a href="#recommend"
@@ -85,7 +144,8 @@ export default class Menu extends React.Component {
                                 {
                                     !isNeedHideGallery ?
                                         <li className="menu-nav-list__item">
-                                            <a href="#gallery" className="menu-nav-list__item-head js-scroll-link">Галерея</a>
+                                            <a href="#gallery"
+                                               className="menu-nav-list__item-head js-scroll-link">Галерея</a>
                                         </li>
                                         :
                                         null
@@ -127,7 +187,7 @@ class TableOfContents extends React.Component {
                 // trigger scroll
                 $('html, body').animate({
                     scrollTop: targetOffset
-                }, 600);
+                }, 300);
             }
         })
     }
