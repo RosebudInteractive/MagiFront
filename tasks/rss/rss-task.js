@@ -13,6 +13,14 @@ const GET_LESSONS_IDS_MSSQL =
     "where lc.[State] = 'R' and c.[State] = 'P'\n" +
     "order by lc.[ReadyDate] desc, lc.[Id] desc";
 
+const GET_CATEGORIES_MSSQL =
+    "select lc.[Id], cl.[Name] from [Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[CourseCategory] cc on cc.[CourseId] = c.[Id]\n" +
+    "  join[CategoryLng] cl on cl.[CategoryId] = cc.[CategoryId]\n" +
+    "where lc.[Id] in (<%= ids %>)";
+
 const GET_LESSONS_MSSQL =
     "select lc.[ReadyDate], l.[Id], c.[URL], l.[URL] as [LURL], l.[Cover], l.[CoverMeta],\n" +
     "  ell.[Transcript], ll.[ShortDescription], ll.[Name], cl.[Name] as [CName]\n" +
@@ -35,6 +43,14 @@ const GET_LESSONS_IDS_MYSQL =
     "order by lc.`ReadyDate` desc, lc.`Id` desc\n" +
     "limit <%= nrec %>";
 
+const GET_CATEGORIES_MYSQL =
+    "select lc.`Id`, cl.`Name` from `Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`CourseCategory` cc on cc.`CourseId` = c.`Id`\n" +
+    "  join`CategoryLng` cl on cl.`CategoryId` = cc.`CategoryId`\n" +
+    "where lc.`Id` in (<%= ids %>)";
+
 const GET_LESSONS_MYSQL =
     "select lc.`ReadyDate`, l.`Id`, c.`URL`, l.`URL` as `LURL`, l.`Cover`, l.`CoverMeta`,\n" +
     "  ell.`Transcript`, ll.`ShortDescription`, ll.`Name`, cl.`Name` as `CName`\n" +
@@ -54,6 +70,15 @@ const MAX_LESSONS_REQ_NUM = 20;
 let dfltRssSettings = {
     'yandex-zen': {
         enabled: false,
+        categoryMap: {
+            "Психология": "Психология",
+            "История": "Общество",
+            "Философия": "Культура",
+            "Музыка": "Музыка",
+            "Литература": "Литература",
+            "Искусство": "Культура",
+            "Религия": "Общество"
+        },
         title: "Магистерия",
         description: "Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом. Отличная помощь студентам, продвинутым старшеклассникам и всем людям с культурными запросами. Зачерпни знания у источника!",
         language: "ru",
@@ -67,7 +92,11 @@ let dfltRssSettings = {
     'rss': {
         enabled: false,
         description: "Аудио лекции",
+        language: "ru-RU",
+        updatePeriod: "hourly",
+        updateFrequency: "1",
         maxItems: 10,
+        author: "Magisteria.ru",
         file: "magisteria-rss.xml",
         feedUrl: "/feed",
         guid: "78d7b935-0b61-4df5-a540-57ebd394115b"
@@ -114,12 +143,35 @@ exports.RssTask = class RssTask extends FileTask {
                         currPos += len;
                     }
                     return Utils.seqExec(arrayOfIds, (elem) => {
+                        let categories = {};
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(GET_LESSONS_MYSQL)({ ids: elem.join() }),
-                                mssql: _.template(GET_LESSONS_MSSQL)({ ids: elem.join() })
+                                mysql: _.template(GET_CATEGORIES_MYSQL)({ ids: elem.join() }),
+                                mssql: _.template(GET_CATEGORIES_MSSQL)({ ids: elem.join() })
                             }
                         }, {})
+                            .then((result) => {
+                                if (result && result.detail && (result.detail.length > 0)) {
+                                    result.detail.forEach((elem) => {
+                                        let catLsn = categories[elem.Id];
+                                        if (!catLsn)
+                                            catLsn = categories[elem.Id] = {};
+                                        let cat;
+                                        if (chOptions.categoryMap)
+                                            cat = chOptions.categoryMap[elem.Name];
+                                        if ((!cat) && chOptions.category)
+                                            cat = chOptions.category;
+                                        if (cat)
+                                            catLsn[cat] = true;
+                                    })
+                                }
+                                return $data.execSql({
+                                    dialect: {
+                                        mysql: _.template(GET_LESSONS_MYSQL)({ ids: elem.join() }),
+                                        mssql: _.template(GET_LESSONS_MSSQL)({ ids: elem.join() })
+                                    }
+                                }, {});
+                            })
                             .then((result) => {
                                 let lsns = [];
                                 if (result && result.detail && (result.detail.length > 0)) {
@@ -135,6 +187,10 @@ exports.RssTask = class RssTask extends FileTask {
                                             lsn.title = elem.Name;
                                             lsn.description = elem.ShortDescription;
                                             lsn.transcript = "";
+                                            lsn.categories = [];
+                                            let ctg = categories[elem.Id];
+                                            if (ctg)
+                                                lsn.categories = Object.keys(ctg);
                                             lsns.push(lsn);
                                             items.push(lsn);
                                         }
@@ -155,7 +211,7 @@ exports.RssTask = class RssTask extends FileTask {
                                             });
                                     });
                                 }
-                            })
+                            });
                     });
                 }
             })
@@ -163,7 +219,7 @@ exports.RssTask = class RssTask extends FileTask {
                 let rssXml;
                 if (items.length > 0) {
                     let feedData = {
-                        site_url: this._href(this._siteHost),
+                        site_url: this._siteHost,
                         generator: RSS_GENERATOR_NAME,
                         custom_namespaces: {
                             'media': 'http://search.yahoo.com/mrss/'
@@ -185,15 +241,13 @@ exports.RssTask = class RssTask extends FileTask {
                             description: elem.description,
                             url: this._href(this._siteHost + "/" + elem.url),
                             date: elem.date,
-                            categories: [],
+                            categories: elem.categories,
                             enclosure: { url: imgUrl, size: elem.imgMeta.length }, // optional enclosure
                             custom_elements: [
                                 { 'author': chOptions.author },
                                 { 'media:rating': [{ _attr: { scheme: "urn:simple" } }, 'nonadult'] }
                             ]
                         };
-                        if (chOptions.category)
-                            item.categories.push(chOptions.category);
                         let content = _.template(FIGURE_TAG)(
                             {
                                 url: imgUrl,
@@ -260,6 +314,7 @@ exports.RssTask = class RssTask extends FileTask {
                                             lsn.imgFile = elem.Cover;
                                             lsn.imgMeta = JSON.parse(elem.CoverMeta);
                                             lsn.title = elem.Name;
+                                            lsn.category = elem.CName;
                                             lsn.description = elem.ShortDescription;
                                             lsn.transcript = "";
                                             lsns.push(lsn);
@@ -290,12 +345,17 @@ exports.RssTask = class RssTask extends FileTask {
                 let rssXml;
                 if (items.length > 0) {
                     let feedData = {
-                        site_url: this._href(this._siteHost),
+                        site_url: this._siteHost,
                         generator: RSS_GENERATOR_NAME,
                         custom_namespaces: {
-                            'media': 'http://search.yahoo.com/mrss/'
+                            sy: "http://purl.org/rss/1.0/modules/syndication/"
                         },
+                        custom_elements: []
                     };
+                    if (chOptions.updatePeriod)
+                        feedData.custom_elements.push({ 'sy:updatePeriod': chOptions.updatePeriod });
+                    if (chOptions.updateFrequency)
+                        feedData.custom_elements.push({ 'sy:updateFrequency': chOptions.updateFrequency });
                     if (chOptions.description)
                         feedData.description = chOptions.description;
                     if (chOptions.title)
@@ -312,24 +372,12 @@ exports.RssTask = class RssTask extends FileTask {
                             description: elem.description,
                             url: this._href(this._siteHost + "/" + elem.url),
                             date: elem.date,
+                            author: chOptions.author,
                             categories: [],
-                            enclosure: { url: imgUrl, size: elem.imgMeta.length }, // optional enclosure
-                            custom_elements: [
-                                { 'author': chOptions.author },
-                                { 'media:rating': [{ _attr: { scheme: "urn:simple" } }, 'nonadult'] }
-                            ]
+                            enclosure: { url: imgUrl, size: elem.imgMeta.length } // optional enclosure
                         };
-                        if (chOptions.category)
-                            item.categories.push(chOptions.category);
-                        let content = _.template(FIGURE_TAG)(
-                            {
-                                url: imgUrl,
-                                width: elem.imgMeta.size.width,
-                                height: elem.imgMeta.size.height,
-                                caption: elem.imgMeta.name
-                            });
-                        content += elem.transcript.replace(/<a\s.*>.*<\/a>/g, ''); // remove links (tags <a>) from transcript
-                        item.custom_elements.push({ 'content:encoded': { _cdata: content } });
+                        if (elem.category)
+                            item.categories.push(elem.category);
                         feed.item(item);
                     });
                     rssXml = { content: feed.xml({ indent: true }) };
