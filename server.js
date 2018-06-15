@@ -35,7 +35,7 @@ Promise.resolve()
 
         let app = new express();
         app.set('case sensitive routing', true);
-        
+
         let port = magisteryConfig.http.port;
         let address = magisteryConfig.http.address;
 
@@ -50,7 +50,20 @@ Promise.resolve()
                 console.log(e)
             }
         }
-
+// headers['Access-Control-Allow-Origin'] = '*'
+// headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, PATCH, DELETE, OPTIONS'
+// headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept, Authorization, Token'
+//         headers['Access-Control-Max-Age'] = '1728000'
+        
+        var allowCrossDomain = function (req, res, next) {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
+            res.header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization, Token");
+            res.header("Access-Control-Max-Age", "1728000");
+            // res.header("Access-Control-Allow-Headers", "X-Requested-With");
+            next();
+        };
+        app.use(allowCrossDomain);
         //////////////////////////////////////////
         // player begin
         //////////////////////////////////////////

@@ -4,6 +4,24 @@ const defer = require('config/defer').deferConfig;
 module.exports = {
     tasks: [
         {
+            name: "RSS Generation",
+            module: "./rss",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 5,15,25,35,45,55 * * * *", // run every 10 min
+            options: {
+                path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                channels: {
+                    'yandex-zen': {
+                        enabled: true
+                    },
+                    'rss': {
+                        enabled: true
+                    }
+                }
+            }
+        },
+        {
             name: "Sitemap Generation",
             module: "./site-map",
             type: "scheduled-task",

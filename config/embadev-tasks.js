@@ -30,7 +30,7 @@ let options = {
                         enabled: true
                     },
                     'rss': {
-                        enabled: false
+                        enabled: true
                     }
                 }
             }
