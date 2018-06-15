@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
+import FiltersRow from './mobile-filters';
 
 import * as tools from '../../tools/page-tools';
 import * as userActions from '../../actions/user-actions'
@@ -19,10 +20,11 @@ class DesktopHeaderRow extends React.Component {
 
     render() {
         return (
-            <div className="page-header__wrapper menu-mobile row">
+            <div className="page-header__wrapper menu-mobile">
                 <Logo/>
                 <Navigator {...this.props}/>
                 <Languages/>
+                <FiltersRow/>
                 <Search/>
                 {
                     this.props.authorized ?
@@ -146,18 +148,14 @@ class Search extends React.Component {
 
         return (
             <div className={"search-block" + (this.state.showForm ? ' opened' : '')}>
-                {
-                    this.state.showForm ?
-                        <form action="#" className="search-form">
-                            <input type="search" className="search-form__field" placeholder="Поиск"/>
-                            <button className="invisible">Найти</button>
-                            <div className="search-form__close" onClick={::this._closeForm}>Закрыть</div>
-                        </form>
-                        :
-                        <button type="button" className="search-block__trigger" onClick={::this._showForm}>
-                            <svg width="20" height="21" dangerouslySetInnerHTML={{__html: _search}}/>
-                        </button>
-                }
+                <button type="button" className="search-block__trigger" onClick={::this._showForm}>
+                    <svg width="20" height="21" dangerouslySetInnerHTML={{__html: _search}}/>
+                </button>
+                <form action="#" className="search-form">
+                    <input type="search" className="search-form__field" placeholder="Поиск"/>
+                    <button className="invisible">Найти</button>
+                    <div className="search-form__close" onClick={::this._closeForm}>Закрыть</div>
+                </form>
             </div>
         )
     }

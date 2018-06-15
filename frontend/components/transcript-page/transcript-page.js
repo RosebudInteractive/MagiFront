@@ -169,7 +169,7 @@ class Refs extends React.Component {
     _getList() {
         return this.props.refs.map((ref, index) => {
             return <li key={index}>
-                {ref.URL ? <Link to={ref.URL}>ref.Description</Link> : ref.Description}
+                {ref.URL ? <Link to={ref.URL}>{ref.Description}</Link> : ref.Description}
             </li>
         })
     }

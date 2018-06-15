@@ -4,19 +4,18 @@ import {bindActionCreators} from "redux";
 
 import DesktopHeaderRow from './desktop-header';
 import MobileHeaderRow from './mobile-header';
-import FilterRow from './desktop-filters';
-import MenuMobile from './menu-mobile';
+import MobileFilter from './desktop-filters';
 import TranscriptMenu from '../lesson-page/lesson-transcript-menu';
 
 import * as tools from '../../tools/page-tools';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import {pages} from "../../tools/page-tools";
+import $ from "jquery";
 
 class Header extends React.Component {
     constructor(props) {
         super(props);
-        this._isMobile = tools.isMobile.bind(this);
     }
 
     componentDidUpdate() {
@@ -27,7 +26,13 @@ class Header extends React.Component {
     }
 
     _onClickMenuTrigger() {
-        this.props.pageHeaderState.showMenu ? this.props.pageHeaderActions.hideMenu() : this.props.pageHeaderActions.showMenu();
+        if (this.props.pageHeaderState.showMenu) {
+            this.props.pageHeaderActions.hideMenu()
+            $('body').removeClass('overflow');
+        } else {
+            this.props.pageHeaderActions.showMenu()
+            $('body').addClass('overflow');
+        }
     }
 
     _onFilterClick() {
@@ -43,7 +48,7 @@ class Header extends React.Component {
         }
     }
 
-    _getLessonInfo(info){
+    _getLessonInfo(info) {
         if (info.object) {
             let _subLesson = info.object.Lessons;
             return !info.isSublesson ? info.object : (_subLesson[info.currentSubLesson])
@@ -60,21 +65,17 @@ class Header extends React.Component {
         return (
             this.props.pageHeaderState.visibility ?
                 <header className={_headerClass}>
-                    {this._isMobile() ?
-                        [
-                            <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger} currentPage={pageHeaderState.currentPage}/>,
-                            <MenuMobile/>
-                        ]
-                        :
-                        [
-                            <DesktopHeaderRow
-                                onFilterClick={::this._onFilterClick}
-                                onNavigateClick={::this._onNavigateClick}
-                                currentPage={pageHeaderState.currentPage}
-                                filterActive={pageHeaderState.showFiltersForm}/>,
-                            <FilterRow/>
-                        ]
-                    }
+                    <div className='page-header__row'>
+
+                        <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}
+                                         currentPage={pageHeaderState.currentPage}/>
+                        <DesktopHeaderRow
+                            onFilterClick={::this._onFilterClick}
+                            onNavigateClick={::this._onNavigateClick}
+                            currentPage={pageHeaderState.currentPage}
+                            filterActive={pageHeaderState.showFiltersForm}/>
+                    </div>
+                    <MobileFilter/>
                     {_showTranscriptMenu ?
                         <TranscriptMenu
                             courseUrl={this.props.courseUrl}
@@ -86,6 +87,7 @@ class Header extends React.Component {
                         />
                         :
                         null}
+
                 </header>
                 : null
         )
@@ -96,7 +98,6 @@ class Header extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         pageHeaderState: state.pageHeader,
-        size: state.app.size,
         courseUrl: state.pageHeader.courseUrl,
         lessonUrl: state.pageHeader.lessonUrl,
         lessonInfo: state.singleLesson,

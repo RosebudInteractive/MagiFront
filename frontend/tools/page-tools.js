@@ -12,7 +12,7 @@ export const Size = {
 export const getSize = (width) => {
 // export const getSize = () => {
     let _size = Object.keys(Size).find((item) => {
-        return width > Size[item].width
+        return width >= Size[item].width
     });
 
     // let _size = Size.xl;

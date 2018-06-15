@@ -6,7 +6,6 @@ import * as filtersActions from '../../actions/filters-actions';
 
 import * as svg from '../../tools/svg-paths';
 
-
 class FiltersRow extends React.Component {
 
     constructor(props) {
@@ -43,21 +42,6 @@ class FiltersRow extends React.Component {
     _clearFilter() {
         this.props.filtersActions.clear()
     }
-
-    // render() {
-    //     return (
-    //         <div className="page-header__row filters-row opened">
-    //             <div className="page-header__wrapper filters-row__wrapper">
-    //                 <div className="filters-row__inner">
-    //                     <p className="filters-row__label" onClick={::this._clearFilter}>Сбросить фильтры</p>
-    //                     <ul className="filters-list">
-    //                         {this._getFilters()}
-    //                     </ul>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     )
-    // }
 
     render() {
         return (

@@ -10,15 +10,59 @@ export default class Menu extends React.Component {
     constructor(props) {
         super(props);
 
-        this._isMobileWidth = !($(window).width() > 899);
+        this._isDesktopWidth = $(window).outerWidth() > 899;
         this._scrollMounted = false;
 
         this.state = {
             opened: false,
-            showToc: this._isMobileWidth,
+            showToc: !this._isDesktopWidth,
             showNavigationButtons: false,
         }
+
+        let that = this;
+        this._resizeHandler = () => {
+            let _newWidthIsDesktop = $(window).outerWidth() > 899;
+
+            if (that._isDesktopWidth !== _newWidthIsDesktop) {
+                that._isDesktopWidth = _newWidthIsDesktop;
+                that._handleSetNewWidth()
+            }
+        }
+
+        this._mouseupHandler = (e) => {
+            let _isButton = e.target.closest('#Content') ||
+                e.target.closest('.menu-nav-sublist__item') ||
+                e.target.closest('.lectures-menu-nav__trigger');
+
+            if (!_isButton) {
+                that.setState({
+                    showToc: !that._isDesktopWidth,
+                    showNavigationButtons: false,
+                })
+            }
+        }
     }
+
+    _handleSetNewWidth() {
+        if (this._isDesktopWidth) {
+            this._unmountCustomScroll();
+            if (this.state.showToc) {
+                this.setState({showToc: false})
+            }
+
+            $('.menu-nav-list').height('auto')
+            $('.menu-nav-list').show()
+        } else {
+            // this._mountCustomScroll()
+            $('.menu-nav-list').hide()
+            if (!this.state.showToc) {
+                this.setState({showToc: true})
+            }
+        }
+
+        this._setNavigationMenuWidth();
+    }
+
 
     static propTypes = {
         courseTitle: PropTypes.string,
@@ -30,18 +74,24 @@ export default class Menu extends React.Component {
     };
 
     componentDidMount() {
+        $(window).resize(this._resizeHandler)
+        $('.App').mouseup(this._mouseupHandler)
         // this._mountCustomScroll()
     }
 
     componentWillUnmount() {
         // this._unmountCustomScroll();
+        $(window).unbind('resize', this._resizeHandler)
+        $('.App').unbind('mouseup', this._mouseupHandler)
     }
 
     _mountCustomScroll() {
-        let _div = $('.lectures-menu-nav__list');
-        if (_div.length && _div[0].childElementCount) {
-            _div.mCustomScrollbar();
-            this._scrollMounted = true;
+        if (!this._isDesktopWidth) {
+            let _div = $('.lectures-menu-nav__list');
+            if (_div.length && _div[0].childElementCount) {
+                _div.mCustomScrollbar();
+                this._scrollMounted = true;
+            }
         }
     }
 
@@ -61,36 +111,43 @@ export default class Menu extends React.Component {
     }
 
     _switchToc() {
-        this.setState({showToc: !this.state.showToc || this._isMobileWidth})
+        this.setState({showToc: !this.state.showToc || !this._isDesktopWidth})
     }
 
     _switchNavigation() {
+        let _willBeOpen = !this.state.showNavigationButtons;
+
+        if (_willBeOpen && !this._isDesktopWidth) {
+            let _top = $('.menu-nav-list').offset().top - window.scrollY,
+                _bottom = $(window).innerHeight(),
+                _height = _bottom - _top;
+
+            $('.menu-nav-list').height(_height)
+            $('.menu-nav-list').show()
+        }
+
         this.setState({showNavigationButtons: !this.state.showNavigationButtons})
     }
-    //
+
 
     componentWillReceiveProps() {
-        let _newWidthIsDesktop = $(window).width() > 899;
 
-        if (this._isMobileWidth) {
-            if (_newWidthIsDesktop) {
-                this._isMobileWidth = false;
-                if (this.state.showToc) {
-                    this.setState({showToc: false})
-                }
-            }
-        } else {
-            if (!_newWidthIsDesktop) {
-                this._isMobileWidth = true;
-                if (!this.state.showToc) {
-                    this.setState({showToc: true})
-                }
-            }
-        }
     }
 
     componentDidUpdate() {
-        if (!this._isMobileWidth) {
+        this._setNavigationMenuWidth()
+    }
+
+    _hasToc() {
+        let {episodes} = this.props;
+
+        return episodes && episodes.some((episode) => {
+            return (episode.Toc && episode.Toc.length)
+        })
+    }
+
+    _setNavigationMenuWidth() {
+        if (this._isDesktopWidth) {
             $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
         } else {
             $('.js-lectures-menu-nav').css('width', '');
@@ -105,8 +162,8 @@ export default class Menu extends React.Component {
         return (
             <div className="page-header__row lectures-menu-row">
                 <div className={"lectures-menu" + (this.state.opened ? ' opened' : '')}>
-                    <div className="lectures-menu__section">
-                        <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
+                    <div className="lectures-menu__section transcript">
+                        <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back transcript">
                             <div className="icon">
                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _linkBack}}/>
                             </div>
@@ -124,19 +181,16 @@ export default class Menu extends React.Component {
                         <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
                         <div className={"lectures-menu-nav__list" + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">
-                                <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
-                                    onClick={::this._switchToc}>
-                                    {
-                                        (this.props.episodes && this.props.episodes.length > 0) ?
-                                            [
-                                                <div className="menu-nav-list__item-head">Оглавление</div>,
-                                                <TableOfContents episodes={this.props.episodes}/>
-                                            ]
-                                            :
-                                            null
-                                    }
-
-                                </li>
+                                {
+                                    this._hasToc() ?
+                                        <li className={"menu-nav-list__item" + (this.state.showToc ? ' expanded' : '')}
+                                            onClick={::this._switchToc}>
+                                            <div className="menu-nav-list__item-head" id='Content'>Оглавление</div>
+                                            <TableOfContents episodes={this.props.episodes}/>
+                                        </li>
+                                        :
+                                        null
+                                }
                                 <li className="menu-nav-list__item">
                                     <a href="#recommend"
                                        className="menu-nav-list__item-head js-scroll-link">Источники</a>
@@ -214,7 +268,7 @@ class TableOfContents extends React.Component {
 
     render() {
         return (
-            <ol className="menu-nav-sublist" style={{top: 44}}>
+            <ol className="menu-nav-sublist" style={{top: 43}}>
                 {this._getList()}
             </ol>
         )
