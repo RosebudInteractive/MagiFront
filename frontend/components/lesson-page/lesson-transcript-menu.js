@@ -82,7 +82,7 @@ export default class Menu extends React.Component {
         } else {
             if (!_newWidthIsDesktop) {
                 this._isMobileWidth = true;
-                if (this.state.showToc) {
+                if (!this.state.showToc) {
                     this.setState({showToc: true})
                 }
             }
