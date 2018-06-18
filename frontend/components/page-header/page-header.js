@@ -84,6 +84,7 @@ class Header extends React.Component {
                             current={_currentLesson.Number}
                             isNeedHideGallery={_currentLesson.IsAuthRequired && !authorized}
                             episodes={this.props.lessonText.episodes}
+                            isMobileApp={this.props.isMobileApp}
                         />
                         :
                         null}
@@ -104,6 +105,7 @@ function mapStateToProps(state, ownProps) {
         lessonText: state.lessonText,
         lessons: state.lessons,
         authorized: !!state.user.user,
+        isMobileApp: state.app.isMobileApp,
         ownProps,
     }
 }

@@ -605,3 +605,5 @@ export default class CWSResourceLoader {
     }
 
 }
+
+window.preinitAudio = CWSResourceLoader.preinitAudio

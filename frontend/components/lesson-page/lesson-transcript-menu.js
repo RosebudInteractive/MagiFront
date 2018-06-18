@@ -19,7 +19,35 @@ export default class Menu extends React.Component {
             showNavigationButtons: false,
         }
 
+        this._mediaQuery = window.matchMedia("(orientation: portrait)");
+
         let that = this;
+        this._mediaQueryHandler = (m) => {
+            let _newWidth = $(window).outerWidth()
+
+            if(m.matches) {
+                // Changed to portrait
+                let _chromeBug = $(window).outerHeight() < $(window).outerWidth()
+                if (_chromeBug) {
+                    _newWidth = $(window).outerHeight();
+                }
+            }
+            else {
+                // 'Changed to landscape'
+                let _chromeBug = $(window).outerHeight() > $(window).outerWidth()
+                if (_chromeBug) {
+                    _newWidth = $(window).outerHeight();
+                }
+            }
+
+            let _newWidthIsDesktop = _newWidth > 899;
+
+            if (that._isDesktopWidth !== _newWidthIsDesktop) {
+                that._isDesktopWidth = _newWidthIsDesktop;
+                that._handleSetNewWidth()
+            }
+        };
+
         this._resizeHandler = () => {
             let _newWidthIsDesktop = $(window).outerWidth() > 899;
 
@@ -41,9 +69,10 @@ export default class Menu extends React.Component {
                 })
             }
         }
+
     }
 
-    _handleSetNewWidth() {
+     _handleSetNewWidth() {
         if (this._isDesktopWidth) {
             this._unmountCustomScroll();
             if (this.state.showToc) {
@@ -74,15 +103,20 @@ export default class Menu extends React.Component {
     };
 
     componentDidMount() {
-        $(window).resize(this._resizeHandler)
+        if (this.props.isMobileApp) {
+            this._mediaQuery.addListener(this._mediaQueryHandler)
+        } else {
+            $(window).resize(this._resizeHandler)
+        }
+
         $('.App').mouseup(this._mouseupHandler)
-        // this._mountCustomScroll()
     }
 
     componentWillUnmount() {
         // this._unmountCustomScroll();
         $(window).unbind('resize', this._resizeHandler)
         $('.App').unbind('mouseup', this._mouseupHandler)
+        this._mediaQuery.removeListener(this._mediaQueryHandler)
     }
 
     _mountCustomScroll() {
