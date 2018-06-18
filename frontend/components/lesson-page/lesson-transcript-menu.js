@@ -25,7 +25,7 @@ export default class Menu extends React.Component {
         this._mediaQueryHandler = (m) => {
             let _newWidth = $(window).outerWidth()
 
-            if(m.matches) {
+            if (m.matches) {
                 // Changed to portrait
                 let _chromeBug = $(window).outerHeight() < $(window).outerWidth()
                 if (_chromeBug) {
@@ -72,11 +72,11 @@ export default class Menu extends React.Component {
 
     }
 
-     _handleSetNewWidth() {
+    _handleSetNewWidth() {
         if (this._isDesktopWidth) {
             this._unmountCustomScroll();
             if (this.state.showToc) {
-                this.setState({showToc: false})
+                this._switchToc()
             }
 
             $('.menu-nav-list').height('auto')
@@ -85,7 +85,7 @@ export default class Menu extends React.Component {
             // this._mountCustomScroll()
             $('.menu-nav-list').hide()
             if (!this.state.showToc) {
-                this.setState({showToc: true})
+                this._switchToc()
             }
         }
 
@@ -145,6 +145,22 @@ export default class Menu extends React.Component {
     }
 
     _switchToc() {
+        let _willBeOpen = !this.state.showToc || !this._isDesktopWidth;
+
+        if (_willBeOpen) {
+            if (this._isDesktopWidth) {
+                let _top = $('.menu-nav-sublist').offset().top - window.scrollY,
+                    _bottom = $(window).innerHeight(),
+                    _height = _bottom - _top;
+
+                $('.menu-nav-sublist').css('max-height', _height)
+                $('.menu-nav-sublist').show()
+            }
+        } else {
+            $('.menu-nav-sublist').css('max-height', '0')
+            $('.menu-nav-sublist').hide()
+        }
+
         this.setState({showToc: !this.state.showToc || !this._isDesktopWidth})
     }
 

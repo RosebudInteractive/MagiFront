@@ -6899,13 +6899,16 @@ body[data-page="fullpage-player"] .lectures-menu {
   visibility: hidden;
   -webkit-transition: opacity 0.3s ease-in;
   transition: opacity 0.3s ease-in;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;}
   ._dark .lectures-list-wrapper {
     min-height: -webkit-calc(100vh - 54px);
     min-height: calc(100vh - 54px);
     color: #fff;
     background-color: rgba(47, 47, 47, 0.9); }
   .lectures-list-wrapper._dark {
+    min-height: -webkit-calc(100vh - 54px);
+    min-height: calc(100vh - 54px);
     background-color: #2f2f2f; }
     .lectures-list-wrapper._dark .lectures-list__item-header {
       color: #fff; }
