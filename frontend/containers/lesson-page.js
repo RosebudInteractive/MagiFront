@@ -34,6 +34,8 @@ class LessonPage extends React.Component {
 
 
         this._resizeHandler = () => {
+            alert("YAHOO!!!")
+
             if ($('#fullpage-lesson').length) {
                 $.fn.fullpage.reBuild();
             }
