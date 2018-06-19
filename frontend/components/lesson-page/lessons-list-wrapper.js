@@ -41,14 +41,19 @@ class LessonsListWrapper extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
+            $(window).on('touchmove', stopScrolling);
+            $(document).on('touchmove', stopScrolling);
+
+
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
                 _elem.scrollIntoView()
             }
+        }
 
-            $('body').on('touchmove', function (e) {
-                if (!$('.lectures-list-wrapper').has($(e.target)).length) e.preventDefault();
-            });
+        if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
+            $(window).unbind('touchmove', stopScrolling);
+            $(document).unbind('touchmove', stopScrolling)
         }
     }
 
@@ -61,7 +66,10 @@ class LessonsListWrapper extends React.Component {
             </div>
         )
     }
+}
 
+function stopScrolling(e) {
+    e.preventDefault()
 }
 
 class ListItem extends React.Component {

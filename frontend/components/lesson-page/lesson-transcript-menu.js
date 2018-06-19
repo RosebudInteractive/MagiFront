@@ -4,8 +4,11 @@ import {Link} from 'react-router-dom';
 import $ from 'jquery'
 
 import LessonsListWrapper from '../lesson-page/lessons-list-wrapper';
+import {bindActionCreators} from "redux";
+import * as appActions from "../../actions/app-actions";
+import {connect} from "react-redux";
 
-export default class Menu extends React.Component {
+class Menu extends React.Component {
 
     static propTypes = {
         courseTitle: PropTypes.string,
@@ -20,7 +23,6 @@ export default class Menu extends React.Component {
         super(props);
 
         this._isDesktopWidth = $(window).outerWidth() > 899;
-        this._scrollMounted = false;
 
         this.state = {
             opened: false,
@@ -127,7 +129,17 @@ export default class Menu extends React.Component {
     }
 
     _switchMenu() {
-        this.setState({opened: !this.state.opened})
+        // this.setState({opened: !this.state.opened})
+        if (this.props.isLessonMenuOpened) {
+            this.props.appActions.hideLessonMenu()
+        } else {
+            this.props.appActions.showLessonMenu()
+        }
+
+        $(window).on('scroll', (e) => {
+            console.log(e.target.className)
+            // e.preventDefault()
+        })
     }
 
     _switchToc() {
@@ -199,7 +211,7 @@ export default class Menu extends React.Component {
 
         return (
             <div className="page-header__row lectures-menu-row">
-                <div className={"lectures-menu" + (this.state.opened ? ' opened' : '')}>
+                <div className={"lectures-menu" + (this.props.isLessonMenuOpened ? ' opened' : '')}>
                     <div className="lectures-menu__section transcript">
                         <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back transcript">
                             <div className="icon">
@@ -312,3 +324,17 @@ class TableOfContents extends React.Component {
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Menu);
