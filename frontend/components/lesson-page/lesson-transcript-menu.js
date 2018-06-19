@@ -59,12 +59,15 @@ export default class Menu extends React.Component {
 
         this._mouseupHandler = (e) => {
             let _isButton = e.target.closest('#Content') ||
-                e.target.closest('.menu-nav-sublist__item') ||
+                // e.target.closest('.menu-nav-sublist__item') ||
                 e.target.closest('.lectures-menu-nav__trigger');
 
             if (!_isButton) {
+                if (that.state.showToc) {
+                    that._switchToc()
+                }
+
                 that.setState({
-                    showToc: !that._isDesktopWidth,
                     showNavigationButtons: false,
                 })
             }
@@ -77,6 +80,10 @@ export default class Menu extends React.Component {
             this._unmountCustomScroll();
             if (this.state.showToc) {
                 this._switchToc()
+            }
+
+            if (this.state.showNavigationButtons) {
+                this.setState({showNavigationButtons: false})
             }
 
             $('.menu-nav-list').height('auto')
@@ -149,12 +156,12 @@ export default class Menu extends React.Component {
 
         if (_willBeOpen) {
             if (this._isDesktopWidth) {
+                $('.menu-nav-sublist').show()
                 let _top = $('.menu-nav-sublist').offset().top - window.scrollY,
                     _bottom = $(window).innerHeight(),
                     _height = _bottom - _top;
 
                 $('.menu-nav-sublist').css('max-height', _height)
-                $('.menu-nav-sublist').show()
             }
         } else {
             $('.menu-nav-sublist').css('max-height', '0')
@@ -168,12 +175,12 @@ export default class Menu extends React.Component {
         let _willBeOpen = !this.state.showNavigationButtons;
 
         if (_willBeOpen && !this._isDesktopWidth) {
+            $('.menu-nav-list').show()
             let _top = $('.menu-nav-list').offset().top - window.scrollY,
                 _bottom = $(window).innerHeight(),
                 _height = _bottom - _top;
 
             $('.menu-nav-list').height(_height)
-            $('.menu-nav-list').show()
         }
 
         this.setState({showNavigationButtons: !this.state.showNavigationButtons})
@@ -278,7 +285,7 @@ class TableOfContents extends React.Component {
                 _delta = 0;
 
             if (_currentPosition > targetOffset) {
-                _delta = 175
+                _delta = ($(window).outerWidth() > 899) ? 175 : 125
             } else {
                 _delta = 75
             }
@@ -291,7 +298,7 @@ class TableOfContents extends React.Component {
                 // trigger scroll
                 $('html, body').animate({
                     scrollTop: targetOffset
-                }, 300);
+                }, 400);
             }
         })
     }

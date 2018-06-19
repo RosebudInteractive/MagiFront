@@ -8588,7 +8588,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   .gallery-item:nth-child(4n + 4) {
     border-right: none; }
 
-@media (max-width: 1279px) {
+@media (max-width: 899px) {
   .gallery-label {
     position: absolute;
     top: 0;
@@ -8604,7 +8604,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   font-weight: 400;
   font-size: 30px;
   line-height: 32px; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-label h2 {
       margin: 0;
       padding: 25px 55px;
@@ -8623,7 +8623,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     line-height: 30px;
     color: rgba(47, 47, 47, 0.6);
     letter-spacing: 1.5px; }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .gallery-label h2 span {
         font-size: 15px; } }
     @media (max-width: 767px) {
@@ -8631,7 +8631,7 @@ body[data-page="fullpage-player"] .lectures-menu {
         font-size: 13px;
         top: -7px; } }
 
-@media (max-width: 1279px) {
+@media (max-width: 899px) {
   .gallery-item {
     border: 1px solid #fff; }
     .gallery-item:nth-child(4n + 2) {
@@ -8702,10 +8702,10 @@ body[data-page="fullpage-player"] .lectures-menu {
     background-image: -webkit-gradient(linear, left bottom, left top, from(#fff), to(rgba(255, 255, 255, 0)));
     background-image: -webkit-linear-gradient(bottom, #fff, rgba(255, 255, 255, 0));
     background-image: linear-gradient(to top, #fff, rgba(255, 255, 255, 0)); }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
       .gallery-item__preview._long-descr:after {
         display: none; } }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-item__preview {
       position: relative;
       padding: 0;
@@ -8736,7 +8736,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   background: no-repeat top;
   background-size: cover;
   overflow: hidden; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-item__image {
       position: absolute;
       top: 0;
@@ -8754,7 +8754,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       width: auto;
   max-height: 207px;
   max-width: 100%; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-item img {
       display: none;
       max-width: 1000px;
@@ -8768,7 +8768,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   color: rgba(47, 47, 47, 0.6);
   -webkit-transition: color 0.3s ease;
   transition: color 0.3s ease; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-item__caption {
       display: none; } }
 
@@ -8789,7 +8789,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   padding: 0;
   width: 100%;
   height: 100%; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .gallery-slide {
       -webkit-box-orient: vertical;
       -webkit-box-direction: normal;
@@ -8806,7 +8806,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     background: no-repeat center;
     background-size: contain;
     overflow: hidden; }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .gallery-slide__image {
         position: relative;
         margin-left: 41px;
@@ -8828,7 +8828,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     display: block;
     height: 100%;
     width: auto; }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .gallery-slide img {
         position: absolute;
         top: 0;
@@ -8873,7 +8873,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     font-size: 13px;
     line-height: 17px;
     color: rgba(47, 47, 47, 0.6); }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .gallery-slide__caption {
         display: -webkit-box;
         display: -webkit-flex;
@@ -8907,7 +8907,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     font-size: 13px;
     line-height: 17px;
     color: rgba(47, 47, 47, 0.6); }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .gallery-slide .number {
         top: 60px;
         left: 45px; } }

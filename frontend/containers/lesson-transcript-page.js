@@ -55,7 +55,7 @@ class TranscriptLessonPage extends React.Component {
     }
 
     static _handleScroll() {
-        let _link = $('.link-to-lecture');
+        let _link = $('.link-to-lecture, .social-block-vertical');
         const _recommend = $('#gallery');
 
         if ((_link.length) && (_recommend.length)) {
