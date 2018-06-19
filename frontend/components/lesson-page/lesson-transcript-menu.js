@@ -7,6 +7,15 @@ import LessonsListWrapper from '../lesson-page/lessons-list-wrapper';
 
 export default class Menu extends React.Component {
 
+    static propTypes = {
+        courseTitle: PropTypes.string,
+        courseUrl: PropTypes.string,
+        current: PropTypes.string,
+        total: PropTypes.number,
+        episodes: PropTypes.array,
+        isNeedHideGallery: PropTypes.bool,
+    };
+
     constructor(props) {
         super(props);
 
@@ -59,7 +68,7 @@ export default class Menu extends React.Component {
 
         this._mouseupHandler = (e) => {
             let _isButton = e.target.closest('#Content') ||
-                // e.target.closest('.menu-nav-sublist__item') ||
+                (e.target.closest('.menu-nav-sublist__item') && that._isDesktopWidth) ||
                 e.target.closest('.lectures-menu-nav__trigger');
 
             if (!_isButton) {
@@ -67,17 +76,20 @@ export default class Menu extends React.Component {
                     that._switchToc()
                 }
 
-                that.setState({
-                    showNavigationButtons: false,
-                })
+                if (!that._isDesktopWidth && that.state.showNavigationButtons) {
+                    that.setState({
+                        showNavigationButtons: false,
+                    })
+                }
             }
+
+            e.preventDefault();
         }
 
     }
 
     _handleSetNewWidth() {
         if (this._isDesktopWidth) {
-            this._unmountCustomScroll();
             if (this.state.showToc) {
                 this._switchToc()
             }
@@ -89,7 +101,6 @@ export default class Menu extends React.Component {
             $('.menu-nav-list').height('auto')
             $('.menu-nav-list').show()
         } else {
-            // this._mountCustomScroll()
             $('.menu-nav-list').hide()
             if (!this.state.showToc) {
                 this._switchToc()
@@ -98,16 +109,6 @@ export default class Menu extends React.Component {
 
         this._setNavigationMenuWidth();
     }
-
-
-    static propTypes = {
-        courseTitle: PropTypes.string,
-        courseUrl: PropTypes.string,
-        current: PropTypes.string,
-        total: PropTypes.number,
-        episodes: PropTypes.array,
-        isNeedHideGallery: PropTypes.bool,
-    };
 
     componentDidMount() {
         if (this.props.isMobileApp) {
@@ -120,32 +121,10 @@ export default class Menu extends React.Component {
     }
 
     componentWillUnmount() {
-        // this._unmountCustomScroll();
         $(window).unbind('resize', this._resizeHandler)
         $('.App').unbind('mouseup', this._mouseupHandler)
         this._mediaQuery.removeListener(this._mediaQueryHandler)
     }
-
-    _mountCustomScroll() {
-        if (!this._isDesktopWidth) {
-            let _div = $('.lectures-menu-nav__list');
-            if (_div.length && _div[0].childElementCount) {
-                _div.mCustomScrollbar();
-                this._scrollMounted = true;
-            }
-        }
-    }
-
-    _unmountCustomScroll() {
-        if (this._scrollMounted) {
-            let _div = $('.lectures-menu-nav__list');
-            if (_div.length) {
-                _div.mCustomScrollbar('destroy');
-                this._scrollMounted = false
-            }
-        }
-    }
-
 
     _switchMenu() {
         this.setState({opened: !this.state.opened})
@@ -155,13 +134,15 @@ export default class Menu extends React.Component {
         let _willBeOpen = !this.state.showToc || !this._isDesktopWidth;
 
         if (_willBeOpen) {
+            $('.menu-nav-sublist').show()
             if (this._isDesktopWidth) {
-                $('.menu-nav-sublist').show()
                 let _top = $('.menu-nav-sublist').offset().top - window.scrollY,
                     _bottom = $(window).innerHeight(),
                     _height = _bottom - _top;
 
                 $('.menu-nav-sublist').css('max-height', _height)
+            } else {
+                $('.menu-nav-sublist').css('max-height', 'auto')
             }
         } else {
             $('.menu-nav-sublist').css('max-height', '0')

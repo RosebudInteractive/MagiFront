@@ -9,6 +9,8 @@ import SubLessonPlayBlock from './subLesson-play-block'
 import * as lessonActions from '../../actions/lesson-actions';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
+import $ from 'jquery'
+
 class LessonsListWrapper extends React.Component {
     static propTypes = {
         isDark: PropTypes.bool,
@@ -43,6 +45,10 @@ class LessonsListWrapper extends React.Component {
             if (_elem) {
                 _elem.scrollIntoView()
             }
+
+            $('body').on('touchmove', function (e) {
+                if (!$('.lectures-list-wrapper').has($(e.target)).length) e.preventDefault();
+            });
         }
     }
 
