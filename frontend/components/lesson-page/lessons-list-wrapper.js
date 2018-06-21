@@ -69,7 +69,9 @@ class LessonsListWrapper extends React.Component {
 }
 
 function stopScrolling(e) {
-    e.preventDefault()
+    if (!e.target.closest('.lectures-list-wrapper')) {
+        e.preventDefault()
+    }
 }
 
 class ListItem extends React.Component {

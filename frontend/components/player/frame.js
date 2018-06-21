@@ -28,8 +28,8 @@ class Frame extends Component {
         this._timer = null;
 
         this.state = {
-            showContent: false,
-            showRate: false,
+            // showContent: false,
+            // showRate: false,
             fullScreen: false,
         }
 
@@ -65,13 +65,13 @@ class Frame extends Component {
                 this.props.playerStartActions.startPlay(this.props.lesson.Id)
             }
 
-            this._hideContentTooltip = this.state.showContent;
-            this._hideRateTooltip = this.state.showRate
+            this._hideContentTooltip = this.props.showContentTooltip;
+            this._hideRateTooltip = this.props.showSpeedTooltip;
             if (this._hideContentTooltip) {
-                this.setState({showContent: false})
+                this.props.playerActions.hideContentTooltip()
             }
             if (this._hideRateTooltip) {
-                this.setState({showRate: false})
+                this.props.playerActions.hideSpeedTooltip()
             }
         });
 
@@ -174,10 +174,11 @@ class Frame extends Component {
         if (!this._hideContentTooltip) {
             $('#fp-nav').addClass('hide');
             this._clearTimeOut()
-            this.setState({showContent: !this.state.showContent})
+            this.props.playerActions.showContentTooltip()
         } else {
             this._hideContentTooltip = false
             $('#fp-nav').removeClass('hide');
+            this.props.playerActions.hideContentTooltip()
         }
     }
 
@@ -185,10 +186,11 @@ class Frame extends Component {
         if (!this._hideRateTooltip) {
             $('#fp-nav').addClass('hide');
             this._clearTimeOut()
-            this.setState({showRate: !this.state.showRate})
+            this.props.playerActions.showSpeedTooltip()
         } else {
             this._hideRateTooltip = false
             $('#fp-nav').removeClass('hide');
+            this.props.playerActions.hideSpeedTooltip()
         }
     }
 
@@ -217,7 +219,9 @@ class Frame extends Component {
     }
 
     render() {
-        let _id = this.props.lesson ? this.props.lesson.Id : '';
+        let _id = this.props.lesson ? this.props.lesson.Id : '',
+            {showContentTooltip, showSpeedTooltip} = this.props;
+
 
         const
             _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
@@ -266,8 +270,8 @@ class Frame extends Component {
                                                      dangerouslySetInnerHTML={{__html: _screen}}/>
                                             </button>
                                         </div>
-                                        {this.state.showContent ? <ContentTooltip id={_id}/> : ''}
-                                        {this.state.showRate ? <RateTooltip/> : ''}
+                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                        {showSpeedTooltip ? <RateTooltip/> : ''}
                                     </div>
                                 </div>
                             </div>
@@ -291,6 +295,8 @@ function mapStateToProps(state) {
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
+        showContentTooltip: state.player.showContentTooltip,
+        showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }

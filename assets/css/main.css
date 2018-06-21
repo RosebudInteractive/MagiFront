@@ -10605,6 +10605,13 @@ ul.lectures-tab {
 .player-wrapper {
   /*background-color: #2f2f2f; */
 }
+
+  .player-wrapper .link-to-transcript._reduced{
+    display: none;
+  }
+  .fp-tableCell .player-wrapper .link-to-transcript._reduced {
+    display: block;
+  }
   @media (max-width: 600px) {
     .player-wrapper .lectures-menu {
       position: absolute;
@@ -10636,9 +10643,14 @@ ul.lectures-tab {
         width: 20px;
         height: 20px; }
     .player-wrapper .link-to-transcript._reduced {
+      display: block;
       bottom: auto;
       top: 4px;
-      z-index: 101;} }
+      z-index: 101;}
+    .fp-tableCell .player-wrapper .link-to-transcript._reduced{
+      display: none;
+    }}
+
 
 .social-trigger {
   position: relative;
@@ -10974,7 +10986,7 @@ ul.lectures-tab {
     color: #fff; }
     @media (max-width: 600px) {
       .player-block__info {
-        position: fixed;
+        /*position: fixed;*/
         /*left: -webkit-calc(100% - 125px);*/
         /*left: calc(100% - 125px);*/
         left: 0;
@@ -11001,6 +11013,8 @@ ul.lectures-tab {
   .player-block .sound-button,
   .player-block .speed-button,
   .player-block .content-button,
+  .player-wrapper .speed-button,
+  .player-wrapper .content-button,
   .player-block .fullscreen-button {
     padding: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -11030,6 +11044,8 @@ ul.lectures-tab {
     .player-block .sound-button:focus,
     .player-block .speed-button:focus,
     .player-block .content-button:focus,
+    .player-wrapper .speed-button:focus,
+    .player-wrapper .content-button:focus,
     .player-block .fullscreen-button:focus {
       outline: none; }
     .player-block .backwards:hover,
@@ -11037,6 +11053,8 @@ ul.lectures-tab {
     .player-block .sound-button:hover,
     .player-block .speed-button:hover,
     .player-block .content-button:hover,
+    .player-wrapper .speed-button:hover,
+    .player-wrapper .content-button:hover,
     .player-block .fullscreen-button:hover {
       opacity: 0.7; }
     .player-block .backwards svg,
@@ -11044,6 +11062,8 @@ ul.lectures-tab {
     .player-block .sound-button svg,
     .player-block .speed-button svg,
     .player-block .content-button svg,
+    .player-wrapper .speed-button svg,
+    .player-wrapper .content-button svg,
     .player-block .fullscreen-button svg {
       display: block;
       max-width: 20px; }
@@ -11057,9 +11077,15 @@ ul.lectures-tab {
     .player-block .speed-button:hover svg,
     .player-block .speed-button:active svg,
     .player-block .speed-button.active svg,
+    .player-wrapper .speed-button:hover svg,
+    .player-wrapper .speed-button:active svg,
+    .player-wrapper .speed-button.active svg,
     .player-block .content-button:hover svg,
     .player-block .content-button:active svg,
     .player-block .content-button.active svg,
+    .player-wrapper .content-button:hover svg,
+    .player-wrapper .content-button:active svg,
+    .player-wrapper .content-button.active svg,
     .player-block .fullscreen-button:hover svg,
     .player-block .fullscreen-button:active svg,
     .player-block .fullscreen-button.active svg {
@@ -11135,16 +11161,38 @@ ul.lectures-tab {
       display: none; }
   @media (max-width: 600px) {
     .player-block .speed-button {
+      /*position: absolute;*/
+      /*top: 12px;*/
+      /*right: 111px;*/
+      /*pointer-events: initial;*/
+      /*z-index: 101; */
+      display: none; } }
+  @media (max-width: 600px) {
+    .player-block .content-button {
+      /*position: absolute;*/
+      /*top: 12px;*/
+      /*right: 57px;*/
+      /*pointer-events: initial;*/
+      /*z-index: 101;*/
+      display: none; } }
+  .player-wrapper .speed-button,
+  .player-wrapper .content-button {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    .player-wrapper .speed-button {
+      display: block;
       position: absolute;
-      top: 12px;
+      top: 11px;
       right: 111px;
       pointer-events: initial;
       z-index: 101; } }
   @media (max-width: 600px) {
-    .player-block .content-button {
+    .player-wrapper .content-button {
+      display: block;
       position: absolute;
-      top: 12px;
-      right: 57px;
+      top: 11px;
+      right: 60px;
       pointer-events: initial;
       z-index: 101; } }
   @media (max-width: 600px) {
@@ -11609,6 +11657,7 @@ ul.lectures-tab {
     z-index: 100; }
     @media (max-width: 600px) {
       .contents-tooltip.opened {
+        top: 53px;
         z-index: 150; } }
   .contents-tooltip:before {
     content: "";
@@ -11725,6 +11774,7 @@ ul.lectures-tab {
     z-index: 100; }
     @media (max-width: 600px) {
       .speed-tooltip.opened {
+        top: 53px;
         z-index: 150; } }
     @media (max-width: 375px) {
       .speed-tooltip.opened,
