@@ -101,6 +101,7 @@ class ResourceForm extends React.Component {
                     view: "text",
                     labelPosition: "top",
                     name: "Name",
+                    id: 'Name',
                     label: "Название",
                     placeholder: "Введите название",
                     validate: window.webix.rules.isNotEmpty,
@@ -111,6 +112,7 @@ class ResourceForm extends React.Component {
                     labelPosition: "top",
                     height: 150,
                     name: "Description",
+                    id: "Description",
                     label: "Описание",
                     placeholder: "Введите описание"
                 },
@@ -161,8 +163,6 @@ class ResourceForm extends React.Component {
                                             window.$$('res-form-btnCancel').disable();
                                         },
                                         onUploadComplete: (response) => {
-                                            window.$$('file-name').setValue(response[0].file);
-
                                             let _type = response[0].info['mime-type'].toLowerCase();
                                             if (_type) {
                                                 let _metaType = _type.split('/')[0];
@@ -174,7 +174,13 @@ class ResourceForm extends React.Component {
                                                 }
                                             }
                                         },
-                                        onFileUpload: () => {
+                                        onFileUpload: (file, response) => {
+                                            let _name = response[0].info.name ? response[0].info.name : null,
+                                                _description = response[0].info.description ? response[0].info.description : null;
+
+                                            window.$$('file-name').setValue(response[0].file);
+                                            window.$$('Name').setValue(_name);
+                                            window.$$('Description').setValue(_description);
                                             window.$$('res-form-btnOk').enable();
                                             window.$$('res-form-btnCancel').enable();
                                         },
