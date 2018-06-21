@@ -11112,9 +11112,14 @@ ul.lectures-tab {
           max-width: 100px; } }
   @media (max-width: 600px) {
     .player-block .play-button {
-      margin: 0 50px;
       width: auto;
       height: auto; }
+    .player-block .play-button.paused {
+      margin: 0 50px;
+    }
+    .player-block .play-button {
+      margin: 0 38px;
+    }
       .player-block .play-button svg {
         max-width: 100px; }
         .player-block .play-button svg.pause {
@@ -11123,10 +11128,12 @@ ul.lectures-tab {
         .player-block .play-button svg.play {
           width: 48px;
           height: 30px; } }
-  @media (max-width: 600px) {
-    .player-block .play-button {
+  @media (max-width: 375px) {
+    .player-block .play-button.paused {
       margin: 0 30px;
-    }}
+    }
+    .player-block .play-button {
+       margin: 0 18px; }}
   .player-block .sound-button svg {
     fill: #fff; }
   .player-block .sound-button .off {
@@ -11201,6 +11208,13 @@ ul.lectures-tab {
       bottom: 15px;
       right: 18px;
       pointer-events: initial; } }
+  @media (max-width: 375px) {
+    .player-wrapper .speed-button {
+        right: 57px; } }
+  @media (max-width: 375px) {
+    .player-wrapper .content-button {
+        right: 25px; } }
+
 
 .sound-control {
   position: relative;

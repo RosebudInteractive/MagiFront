@@ -52,7 +52,7 @@ class Controls extends React.Component {
                         <svg className="play" width="19" height="19" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
                     :
-                    <button type="button" className="play-button" onClick={::this.props.playerStartActions.startPause}>
+                    <button type="button" className="play-button paused" onClick={::this.props.playerStartActions.startPause}>
                         <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: _pause}}/>
                     </button>
                 }
