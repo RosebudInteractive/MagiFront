@@ -53,7 +53,7 @@ class SubLessonEditor extends LessonEditor{
     }
 
     _clearObjectInStorage() {
-        this.props.parentLessonActions.clear();
+        // this.props.parentLessonActions.clear();
     }
 
     _getExtElements() {

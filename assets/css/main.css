@@ -3317,7 +3317,8 @@ li.fancybox-thumbs-loading {
   right: 34px; }
 
 #fp-nav ul li .fp-tooltip {
-  max-width: 330px;
+  max-width: calc(100vw - 100px);
+  max-width: -webkit-calc(100vw - 100px);
   text-overflow: ellipsis;
   font-family: "Fira Sans", Arial, sans-serif;
   font-size: 17px;
