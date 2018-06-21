@@ -217,7 +217,7 @@ export class LessonEditor extends ObjectEditor {
             array.push({
                 Id: resource.Id,
                 Description: resource.Description,
-                ResLanguageId: resource.ResLanguageId,
+                ResLanguageId: resource.ResLanguageId ? resource.ResLanguageId : null,
                 FileName: resource.FileName,
                 Name: resource.Name,
                 MetaData: resource.MetaData,
