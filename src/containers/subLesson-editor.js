@@ -56,6 +56,10 @@ class SubLessonEditor extends LessonEditor{
         // this.props.parentLessonActions.clear();
     }
 
+    componentWillUnmount() {
+        this.props.parentLessonActions.clear();
+    }
+
     _getExtElements() {
         let _result = super._getExtElements();
         _result.splice(1, 0, {
