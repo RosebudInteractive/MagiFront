@@ -41,9 +41,8 @@ class LessonsListWrapper extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
-            $(window).on('touchmove', stopScrolling);
-            $(document).on('touchmove', stopScrolling);
-
+            $('html').css('overflow', 'hidden');
+            $('body').css('overflow', 'hidden');
 
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
@@ -52,8 +51,8 @@ class LessonsListWrapper extends React.Component {
         }
 
         if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
-            $(window).unbind('touchmove', stopScrolling);
-            $(document).unbind('touchmove', stopScrolling)
+            $('html').css('overflow', '');
+            $('body').css('overflow', '');
         }
     }
 
@@ -65,12 +64,6 @@ class LessonsListWrapper extends React.Component {
                 </ol>
             </div>
         )
-    }
-}
-
-function stopScrolling(e) {
-    if (!e.target.closest('.lectures-list-wrapper')) {
-        e.preventDefault()
     }
 }
 
