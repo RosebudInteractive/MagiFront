@@ -7003,7 +7003,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     outline: none; }
   @media (max-width: 375px) {
     .lectures-list-trigger .caption {
-      /*display: none;*/
+      display: none;
     }
   }
 
