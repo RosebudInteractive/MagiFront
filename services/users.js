@@ -3,12 +3,96 @@ let { UsersService } = require('./../database/db-user');
 
 function setupUsers(app) {
 
-    app.get('/api/users', (req, res, next) => {
+    app.get('/api/users/bookmark', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getPublic(req.user)
+                .getShortBookmarks(req.user.Id)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.get('/api/users/bookmark-ext', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getExtBookmarks(req.user.Id)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.post('/api/users/bookmark/:course_url/:lesson_url', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .insBookmark(req.user.Id, req.params.course_url, req.params.lesson_url)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.post('/api/users/bookmark/:course_url', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .insBookmark(req.user.Id, req.params.course_url)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.delete('/api/users/bookmark/:course_url/:lesson_url', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .delBookmark(req.user.Id, req.params.course_url, req.params.lesson_url)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.delete('/api/users/bookmark/:course_url', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .delBookmark(req.user.Id, req.params.course_url)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.get('/api/users/bookmark', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getBookmark(req.user.Id)
                 .then(rows => {
                     res.send(rows);
                 })
@@ -23,6 +107,20 @@ function setupUsers(app) {
         else
             UsersService()
                 .getHistory(req.user.Id)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.get('/api/users', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getPublic(req.user)
                 .then(rows => {
                     res.send(rows);
                 })
