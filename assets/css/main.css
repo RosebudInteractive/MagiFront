@@ -5228,18 +5228,22 @@ ul.user-tooltip {
       .course-module__label {
         padding-left: 30px; } }
   .course-module .favourites {
-      position: absolute;
-      top: 4px;
-      left: -27px;
-      width: 14px;
-      height: 23px;
+    position: absolute;
+    top: 4px;
+    left: -27px;
+    width: 14px;
+    height: 23px;
     font-size: 0;
-      background-image: url("../images/svg/flag.svg");
+    background-image: url("../images/svg/flag.svg");
     background-repeat: no-repeat;
     -webkit-background-size: contain;
     background-size: contain;
     background-position: center;
-      opacity: 0.2; }
+    opacity: 0.2; }
+  .course-module .favourites.active {
+    background-image: url("../images/svg/flag-red.svg");
+    opacity: 1;
+  }
       @media (max-width: 1899px) {
       .course-module .favourites {
           top: 10px; } }
@@ -12519,6 +12523,7 @@ ul.lectures-tab {
           width: 284px; } }
 
 .favourites {
+  cursor: pointer;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;

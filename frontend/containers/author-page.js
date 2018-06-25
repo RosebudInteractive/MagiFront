@@ -12,7 +12,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 
-class Main extends React.Component {
+class AuthorPage extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -67,4 +67,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Main);
+export default connect(mapStateToProps, mapDispatchToProps)(AuthorPage);
