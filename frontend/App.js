@@ -20,6 +20,8 @@ import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
+import {getUserBookmarks} from "./ducks/profile";
+
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -92,8 +94,10 @@ class App extends Component {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
-        if (!(_recoveryRout || _errorRout))
+        if (!(_recoveryRout || _errorRout)){
             this.props.userActions.whoAmI()
+            this.props.getUserBookmarks()
+        }
     }
 
     componentDidMount() {
@@ -233,6 +237,7 @@ function mapDispatchToProps(dispatch) {
         userActions: bindActionCreators(userActions, dispatch),
         playerActions: bindActionCreators(playerActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
     }
 }
 

@@ -28,6 +28,22 @@ export const CHANGE_PASSWORD_START = `${prefix}/CHANGE_PASSWORD_START`
 export const CHANGE_PASSWORD_SUCCESS = `${prefix}/CHANGE_PASSWORD_SUCCESS`
 export const CHANGE_PASSWORD_ERROR = `${prefix}/CHANGE_PASSWORD_ERROR`
 
+export const GET_BOOKMARKS_START = `${prefix}/GET_BOOKMARKS_START`
+export const GET_BOOKMARKS_SUCCESS = `${prefix}/GET_BOOKMARKS_SUCCESS`
+export const GET_BOOKMARKS_ERROR = `${prefix}/GET_BOOKMARKS_ERROR`
+
+export const ADD_COURSE_TO_BOOKMARKS_START = `${prefix}/ADD_COURSE_TO_BOOKMARKS_START`
+export const ADD_COURSE_TO_BOOKMARKS_SUCCESS = `${prefix}/ADD_COURSE_TO_BOOKMARKS_SUCCESS`
+export const ADD_COURSE_TO_BOOKMARKS_ERROR = `${prefix}/ADD_COURSE_TO_BOOKMARKS_ERROR`
+
+export const REMOVE_COURSE_FROM_BOOKMARKS_START = `${prefix}/REMOVE_COURSE_FROM_BOOKMARKS_START`
+export const REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS = `${prefix}/REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS`
+export const REMOVE_COURSE_FROM_BOOKMARKS_ERROR = `${prefix}/REMOVE_COURSE_FROM_BOOKMARKS_ERROR`
+
+export const ADD_LESSON_TO_BOOKMARKS_START = `${prefix}/ADD_LESSON_TO_BOOKMARKS_START`
+export const ADD_LESSON_TO_BOOKMARKS_SUCCESS = `${prefix}/ADD_LESSON_TO_BOOKMARKS_SUCCESS`
+export const ADD_LESSON_TO_BOOKMARKS_ERROR = `${prefix}/ADD_LESSON_TO_BOOKMARKS_ERROR`
+
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 
 /**
@@ -36,6 +52,7 @@ export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 export const ReducerRecord = Record({
     user: null,
     history: [],
+    bookmarks: null,
     loading: false,
     error: null
 })
@@ -81,6 +98,20 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
 
+        case GET_BOOKMARKS_START:
+            return state
+                .set('error', null)
+                // .set('loading', true)
+                .set('bookmarks', null)
+
+        case GET_BOOKMARKS_SUCCESS:
+            return state
+                .set('bookmarks', payload)
+
+        case GET_BOOKMARKS_ERROR:
+            return state
+                .set('loading', false)
+                .set('error', payload.error.message)
 
         default:
             return state
@@ -94,6 +125,12 @@ export default function reducer(state = new ReducerRecord(), action) {
 export const stateSelector = state => state[moduleName]
 export const userSelector = createSelector(stateSelector, state => state.user)
 export const userHistorySelector = createSelector(stateSelector, state => state.history)
+export const userBookmarksSelector = createSelector(stateSelector, state => state.bookmarks)
+
+export const getCourseBookmarks = createSelector([userBookmarksSelector], (bookmarks) => {
+    return bookmarks ? bookmarks.Courses : [];
+})
+
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 
@@ -151,6 +188,104 @@ export function getUserHistory() {
                 });
             });
     }
+}
+
+export function getUserBookmarks() {
+    return (dispatch) => {
+        dispatch({
+            type: GET_BOOKMARKS_START,
+            payload: null
+        });
+
+        fetch("/api/users/bookmark-ext", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleHistoryData(data);
+                dispatch({
+                    type: GET_BOOKMARKS_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: GET_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export function addCourseToBookmarks(url) {
+    return (dispatch) => {
+        dispatch({
+            type: ADD_COURSE_TO_BOOKMARKS_START,
+            payload: null
+        });
+
+        fetch("/api/users/bookmark/" + url, {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleHistoryData(data);
+                dispatch({
+                    type: ADD_COURSE_TO_BOOKMARKS_SUCCESS,
+                    payload: data.Lessons
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: ADD_COURSE_TO_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export function addLessonToBookmark() {
+
+}
+
+export function removeCourseFromBookmarks(url) {
+    return (dispatch) => {
+        dispatch({
+            type: REMOVE_COURSE_FROM_BOOKMARKS_START,
+            payload: null
+        });
+
+        fetch("/api/users/bookmark/" + url, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleHistoryData(data);
+                dispatch({
+                    type: REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS,
+                    payload: data.Lessons
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: REMOVE_COURSE_FROM_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export function removeLessonFromBookmark() {
+
 }
 
 export const changePassword = (values) => {

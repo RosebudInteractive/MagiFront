@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import PlayBlock from './play-block'
-import {ImageSize, getImagePath} from '../../tools/page-tools'
 
 export default class Wrapper extends React.Component {
 

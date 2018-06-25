@@ -23,9 +23,23 @@ export class LessonFull extends React.Component {
         isAuthRequired: PropTypes.bool,
     };
 
+    _favoritesClick() {
+        if (this._isCourseInBookmarks()) {
+            this.props.removeCourseFromBookmarks(this.props.url)
+        } else {
+            this.props.addCourseToBookmarks(this.props.url)
+        }
+    }
+
+    _isCourseInBookmarks() {
+        return this.props.bookmarks.find((item) => {
+            return item.URL === this.props.url
+        })
+    }
+
     render() {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
 
         return (
             <li className="lecture-full">
