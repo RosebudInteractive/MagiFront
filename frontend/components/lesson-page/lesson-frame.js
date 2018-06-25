@@ -129,7 +129,9 @@ class SocialBlock extends React.Component {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
-            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>'
+            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
 
         return (
@@ -158,6 +160,9 @@ class SocialBlock extends React.Component {
                     </div>
                     <span className="social-btn__actions">4</span>
                 </a>
+                <span className="favorites">
+                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
+                </span>
             </div>
         )
     }

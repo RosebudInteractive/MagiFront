@@ -24,6 +24,9 @@ export class LessonFull extends React.Component {
     };
 
     render() {
+        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
+
         return (
             <li className="lecture-full">
                 <div className="lecture-full__wrapper">
@@ -36,6 +39,9 @@ export class LessonFull extends React.Component {
                         books={this.props.books}
                         url={this.props.url}
                     />
+                    <span className="favorites">
+                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
+                    </span>
                 </div>
             </li>
         )
