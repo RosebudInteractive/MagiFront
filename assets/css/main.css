@@ -7756,6 +7756,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     padding-top: 7px;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     height: 29px;
+    cursor: pointer;
   }
   .social-block--dark .social-btn {
     border: 1px solid rgba(47, 47, 74, 0.2); }
@@ -9310,6 +9311,10 @@ ul.lectures-tab {
     right: 56px;
     bottom: 52px;
     opacity: 0.2;
+    cursor: pointer;
+  }
+  .lecture-full__wrapper .favorites.active {
+    opacity: 1;
   }
   @media (max-width: 1399px) {
     .lecture-full__wrapper .favorites {

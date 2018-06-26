@@ -8,7 +8,6 @@ import {
     removeCourseFromBookmarks
 } from "../../ducks/profile";
 import React from "react";
-import * as storageActions from "../../actions/lesson-info-storage-actions";
 import PropTypes from "prop-types";
 
 class Header extends React.Component {
@@ -45,13 +44,9 @@ class Header extends React.Component {
     }
 }
 
-
-
-
 function mapStateToProps(state) {
     return {
         bookmarks: getCourseBookmarks(state),
-        // loading: loadingSelector(state),
     }
 }
 
@@ -60,7 +55,6 @@ function mapDispatchToProps(dispatch) {
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
-        storageActions: bindActionCreators(storageActions, dispatch),
     }
 }
 

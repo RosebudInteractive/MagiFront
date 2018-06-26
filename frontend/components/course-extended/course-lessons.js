@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import {LessonFull, LessonPreview} from "../common/lecture-full-wrapper";
+import LessonFull from "../common/lecture-full-wrapper";
+import LessonPreview from './lesson-preview';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class CourseLessons extends React.Component {

@@ -44,6 +44,10 @@ export const ADD_LESSON_TO_BOOKMARKS_START = `${prefix}/ADD_LESSON_TO_BOOKMARKS_
 export const ADD_LESSON_TO_BOOKMARKS_SUCCESS = `${prefix}/ADD_LESSON_TO_BOOKMARKS_SUCCESS`
 export const ADD_LESSON_TO_BOOKMARKS_ERROR = `${prefix}/ADD_LESSON_TO_BOOKMARKS_ERROR`
 
+export const REMOVE_LESSON_FROM_BOOKMARKS_START = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_START`
+export const REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS`
+export const REMOVE_LESSON_FROM_BOOKMARKS_ERROR = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_ERROR`
+
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 
 /**
@@ -131,6 +135,10 @@ export const getCourseBookmarks = createSelector([userBookmarksSelector], (bookm
     return bookmarks ? bookmarks.Courses : [];
 })
 
+export const getLessonBookmarks = createSelector([userBookmarksSelector], (bookmarks) => {
+    return bookmarks ? bookmarks.Lessons : [];
+})
+
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 
@@ -201,7 +209,6 @@ export function getUserBookmarks() {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleHistoryData(data);
                 dispatch({
                     type: GET_BOOKMARKS_SUCCESS,
                     payload: data
@@ -233,7 +240,6 @@ export function addCourseToBookmarks(url) {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleHistoryData(data);
                 dispatch({
                     type: ADD_COURSE_TO_BOOKMARKS_SUCCESS,
                     payload: data.Lessons
@@ -248,8 +254,35 @@ export function addCourseToBookmarks(url) {
     }
 }
 
-export function addLessonToBookmark() {
+export function addLessonToBookmarks(courseUrl, lessonUrl) {
+    return (dispatch) => {
+        dispatch({
+            type: ADD_LESSON_TO_BOOKMARKS_START,
+            payload: null
+        });
 
+        fetch("/api/users/bookmark/" + courseUrl + '/' + lessonUrl, {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: ADD_LESSON_TO_BOOKMARKS_SUCCESS,
+                    payload: data.Lessons
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: ADD_LESSON_TO_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
 }
 
 export function removeCourseFromBookmarks(url) {
@@ -269,7 +302,6 @@ export function removeCourseFromBookmarks(url) {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleHistoryData(data);
                 dispatch({
                     type: REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS,
                     payload: data.Lessons
@@ -284,8 +316,35 @@ export function removeCourseFromBookmarks(url) {
     }
 }
 
-export function removeLessonFromBookmark() {
+export function removeLessonFromBookmarks(courseUrl, lessonUrl) {
+    return (dispatch) => {
+        dispatch({
+            type: REMOVE_LESSON_FROM_BOOKMARKS_START,
+            payload: null
+        });
 
+        fetch("/api/users/bookmark/" + courseUrl + '/' + lessonUrl, {
+            method: 'DELETE',
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS,
+                    payload: data.Lessons
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: REMOVE_LESSON_FROM_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
 }
 
 export const changePassword = (values) => {
