@@ -2,7 +2,7 @@
 // import {eventChannel} from 'redux-saga'
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Record} from 'immutable'
+import {Record, Set} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {
@@ -56,7 +56,7 @@ export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 export const ReducerRecord = Record({
     user: null,
     history: [],
-    bookmarks: null,
+    bookmarks: new Set(),
     loading: false,
     error: null
 })
@@ -106,16 +106,26 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 // .set('loading', true)
-                .set('bookmarks', null)
+                .update('bookmarks', bookmarks => bookmarks.clear())
 
         case GET_BOOKMARKS_SUCCESS:
             return state
-                .set('bookmarks', payload)
+                .update('bookmarks', bookmarks => bookmarks.union(payload))
 
         case GET_BOOKMARKS_ERROR:
             return state
                 .set('loading', false)
                 .set('error', payload.error.message)
+
+        case ADD_COURSE_TO_BOOKMARKS_SUCCESS:
+        case ADD_LESSON_TO_BOOKMARKS_SUCCESS:
+            return state
+                .update('bookmarks', bookmarks => bookmarks.add(payload))
+
+        case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
+        case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
+            return state
+                .update('bookmarks', bookmarks => bookmarks.delete(payload))
 
         default:
             return state
@@ -205,7 +215,7 @@ export function getUserBookmarks() {
             payload: null
         });
 
-        fetch("/api/users/bookmark-ext", {credentials: 'include'})
+        fetch("/api/users/bookmark", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -239,10 +249,10 @@ export function addCourseToBookmarks(url) {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(data => {
+            .then(() => {
                 dispatch({
                     type: ADD_COURSE_TO_BOOKMARKS_SUCCESS,
-                    payload: data.Lessons
+                    payload: url
                 });
             })
             .catch((error) => {
@@ -270,10 +280,10 @@ export function addLessonToBookmarks(courseUrl, lessonUrl) {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(data => {
+            .then(() => {
                 dispatch({
                     type: ADD_LESSON_TO_BOOKMARKS_SUCCESS,
-                    payload: data.Lessons
+                    payload: courseUrl + '/' + lessonUrl
                 });
             })
             .catch((error) => {
@@ -301,10 +311,10 @@ export function removeCourseFromBookmarks(url) {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(data => {
+            .then(() => {
                 dispatch({
                     type: REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS,
-                    payload: data.Lessons
+                    payload: url
                 });
             })
             .catch((error) => {
@@ -332,10 +342,10 @@ export function removeLessonFromBookmarks(courseUrl, lessonUrl) {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(data => {
+            .then(() => {
                 dispatch({
                     type: REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS,
-                    payload: data.Lessons
+                    payload: courseUrl + '/' + lessonUrl
                 });
             })
             .catch((error) => {

@@ -12,6 +12,12 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import * as userActions from "../actions/user-actions";
 
+import {
+    addCourseToBookmarks,
+    userBookmarksSelector,
+    removeCourseFromBookmarks
+} from "../ducks/profile";
+
 import {pages} from '../tools/page-tools';
 
 class Main extends React.Component {
@@ -32,10 +38,25 @@ class Main extends React.Component {
         }
     }
 
+    _favoritesClick() {
+        if (this._isCourseInBookmarks()) {
+            this.props.removeCourseFromBookmarks(this.props.courseUrl)
+        } else {
+            this.props.addCourseToBookmarks(this.props.courseUrl)
+        }
+    }
+
+    _isCourseInBookmarks() {
+        return this.props.bookmarks.find((item) => {
+            return item === this.props.courseUrl
+        })
+    }
+
     render() {
         let {
             course,
-            fetching
+            fetching,
+            courseUrl
         } = this.props;
 
         return (
@@ -46,11 +67,11 @@ class Main extends React.Component {
                         :
                         course ?
                             <div className="courses">
-                                <CourseModuleExt title={course.Name}/>
+                                <CourseModuleExt title={course.Name} isFavorite={this._isCourseInBookmarks()} onFavoritesClick={::this._favoritesClick}/>
                                 <CourseTabs
                                     lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                     books={{total: course.Books.length}}
-                                    courseUrl={this.props.courseUrl}
+                                    courseUrl={courseUrl}
                                 />
                             </div> : null
                 }
@@ -63,7 +84,7 @@ class CourseModuleExt extends React.Component {
     render() {
         return (
             <div className="course-module course-module--extended">
-                <TitleWrapper title={this.props.title}/>
+                <TitleWrapper {...this.props}/>
                 <Inner/>
             </div>
         )
@@ -72,11 +93,13 @@ class CourseModuleExt extends React.Component {
 
 class TitleWrapper extends React.Component {
     render() {
+        let {isFavorite, onFavoritesClick, title} = this.props;
+
         return (
             <div className="course-module__title-wrapper">
                 <h1 className="course-module__title no_underline">
-                    <span className="favourites">В закладки</span>
-                    <p className="course-module__label">Курс:</p> <span>{' ' + this.props.title}</span>
+                    <span className={"favourites" + (isFavorite ? ' active' : '')} onClick={onFavoritesClick}>В закладки</span>
+                    <p className="course-module__label">Курс:</p> <span>{' ' + title}</span>
                 </h1>
             </div>
         )
@@ -194,6 +217,7 @@ function mapStateToProps(state, ownProps) {
         courseUrl: ownProps.match.params.url,
         fetching: state.singleCourse.fetching,
         course: state.singleCourse.object,
+        bookmarks: userBookmarksSelector(state),
     }
 }
 
@@ -203,6 +227,8 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
+        removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
     }
 }
 

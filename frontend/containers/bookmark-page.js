@@ -1,7 +1,7 @@
 import React from "react";
 import {pages} from "../tools/page-tools";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux/index";
+import {bindActionCreators} from "redux";
 import {authorSelector, getAuthor} from "../ducks/author";
 import * as pageHeaderActions from "../actions/page-header-actions";
 import * as userActions from "../actions/user-actions";

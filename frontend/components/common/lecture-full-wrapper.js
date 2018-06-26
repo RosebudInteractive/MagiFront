@@ -5,7 +5,7 @@ import PlayBlock from './play-block';
 import {Link} from 'react-router-dom';
 import {
     addLessonToBookmarks,
-    getLessonBookmarks,
+    userBookmarksSelector,
     getUserBookmarks,
     removeLessonFromBookmarks
 } from "../../ducks/profile";
@@ -42,8 +42,10 @@ export class LessonFull extends React.Component {
     }
 
     _isLessonInBookmarks() {
+        let {courseUrl, lessonUrl} = this.props;
+
         return this.props.bookmarks.find((item) => {
-            return item.URL === this.props.lessonUrl
+            return item === courseUrl + '/' + lessonUrl
         })
     }
 
@@ -117,7 +119,7 @@ class InfoBlock extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        bookmarks: getLessonBookmarks(state),
+        bookmarks: userBookmarksSelector(state),
     }
 }
 

@@ -3,7 +3,7 @@ import {bindActionCreators} from "redux";
 import {Link} from 'react-router-dom';
 import {
     addCourseToBookmarks,
-    getCourseBookmarks,
+    userBookmarksSelector,
     getUserBookmarks,
     removeCourseFromBookmarks
 } from "../../ducks/profile";
@@ -27,7 +27,7 @@ class Header extends React.Component {
 
     _isCourseInBookmarks() {
         return this.props.bookmarks.find((item) => {
-            return item.URL === this.props.url
+            return item === this.props.url
         })
     }
 
@@ -46,7 +46,7 @@ class Header extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        bookmarks: getCourseBookmarks(state),
+        bookmarks: userBookmarksSelector(state),
     }
 }
 
