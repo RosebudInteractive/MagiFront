@@ -48,6 +48,7 @@ export const pages = {
     lesson: {name: 'lesson', url: null},
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
+    bookmarks: {name: 'bookmarks', url: '/favorites'},
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile/'},
 }

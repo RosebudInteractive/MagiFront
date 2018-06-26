@@ -39,15 +39,19 @@ class Main extends React.Component {
     }
 
     _favoritesClick() {
-        if (this._isCourseInBookmarks()) {
-            this.props.removeCourseFromBookmarks(this.props.courseUrl)
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
         } else {
-            this.props.addCourseToBookmarks(this.props.courseUrl)
+            if (this._isCourseInBookmarks()) {
+                this.props.removeCourseFromBookmarks(this.props.courseUrl)
+            } else {
+                this.props.addCourseToBookmarks(this.props.courseUrl)
+            }
         }
     }
 
     _isCourseInBookmarks() {
-        return this.props.bookmarks.find((item) => {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === this.props.courseUrl
         })
     }
@@ -218,6 +222,7 @@ function mapStateToProps(state, ownProps) {
         fetching: state.singleCourse.fetching,
         course: state.singleCourse.object,
         bookmarks: userBookmarksSelector(state),
+        authorized: !!state.user.user,
     }
 }
 

@@ -88,17 +88,21 @@ class LessonFrame extends React.Component {
     _favoritesClick() {
         let {courseUrl, lessonUrl} = this.props;
 
-        if (this._isLessonInBookmarks()) {
-            this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
         } else {
-            this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            if (this._isLessonInBookmarks()) {
+                this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+            } else {
+                this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            }
         }
     }
 
     _isLessonInBookmarks() {
         let {courseUrl, lessonUrl} = this.props;
 
-        return this.props.bookmarks.find((item) => {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === courseUrl + '/' +  lessonUrl
         })
     }

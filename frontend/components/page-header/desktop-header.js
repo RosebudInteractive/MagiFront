@@ -63,12 +63,12 @@ class Navigator extends React.Component {
                     <li className={_isCoursesPage ? "current" : ''}>
                         <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
-                    <li>
-                        <a>Календарь</a>
-                    </li>
+                    {/*<li>*/}
+                        {/*<a>Календарь</a>*/}
+                    {/*</li>*/}
                     <li className={"filter" + (this.props.filterActive ? ' active' : '')}
                         onClick={this.props.onBookmarkClick}>
-                        <Link to={'/BookmarksPage'}>
+                        <Link to={'/favorites'}>
                             <span className="hidden">Закладки</span>
                             <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
                         </Link>

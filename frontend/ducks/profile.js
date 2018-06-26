@@ -2,7 +2,7 @@
 // import {eventChannel} from 'redux-saga'
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Record, Set} from 'immutable'
+import {Record, Set, List} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {
@@ -32,6 +32,10 @@ export const GET_BOOKMARKS_START = `${prefix}/GET_BOOKMARKS_START`
 export const GET_BOOKMARKS_SUCCESS = `${prefix}/GET_BOOKMARKS_SUCCESS`
 export const GET_BOOKMARKS_ERROR = `${prefix}/GET_BOOKMARKS_ERROR`
 
+export const GET_BOOKMARKS_EXT_START = `${prefix}/GET_BOOKMARKS_EXT_START`
+export const GET_BOOKMARKS_EXT_SUCCESS = `${prefix}/GET_BOOKMARKS_EXT_SUCCESS`
+export const GET_BOOKMARKS_EXT_ERROR = `${prefix}/GET_BOOKMARKS_EXT_ERROR`
+
 export const ADD_COURSE_TO_BOOKMARKS_START = `${prefix}/ADD_COURSE_TO_BOOKMARKS_START`
 export const ADD_COURSE_TO_BOOKMARKS_SUCCESS = `${prefix}/ADD_COURSE_TO_BOOKMARKS_SUCCESS`
 export const ADD_COURSE_TO_BOOKMARKS_ERROR = `${prefix}/ADD_COURSE_TO_BOOKMARKS_ERROR`
@@ -57,6 +61,8 @@ export const ReducerRecord = Record({
     user: null,
     history: [],
     bookmarks: new Set(),
+    courseBookmarks: new List(),
+    lessonBookmarks: new List(),
     loading: false,
     error: null
 })
@@ -108,6 +114,19 @@ export default function reducer(state = new ReducerRecord(), action) {
                 // .set('loading', true)
                 .update('bookmarks', bookmarks => bookmarks.clear())
 
+        case GET_BOOKMARKS_EXT_START:
+            return state
+                .set('error', null)
+                // .set('loading', true)
+                .clear('courseBookmarks')
+                .clear('lessonBookmarks')
+
+        case GET_BOOKMARKS_EXT_SUCCESS:
+            return state
+                .set('error', null)
+                .update('courseBookmarks', courseBookmarks => courseBookmarks.concat(payload.Courses))
+                .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.concat(payload.Lessons))
+
         case GET_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.union(payload))
@@ -123,9 +142,32 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .update('bookmarks', bookmarks => bookmarks.add(payload))
 
         case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
-        case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload))
+                .update('courseBookmarks', courseBookmarks => {
+                    let _index = courseBookmarks.findIndex((course) => {
+                        return course.URL === payload
+                    })
+
+                    return (_index >= 0) ?
+                        courseBookmarks.splice(_index, 1)
+                        :
+                        courseBookmarks
+                    })
+
+        case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
+            return state
+                .update('bookmarks', bookmarks => bookmarks.delete(payload.courseUrl + '/' + payload.lessonUrl))
+                .update('lessonBookmarks', lessonBookmarks => {
+                    let _index = lessonBookmarks.findIndex((lesson) => {
+                        return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
+                    })
+
+                    return (_index >= 0) ?
+                        lessonBookmarks.splice(_index, 1)
+                        :
+                        lessonBookmarks
+                })
 
         default:
             return state
@@ -141,13 +183,8 @@ export const userSelector = createSelector(stateSelector, state => state.user)
 export const userHistorySelector = createSelector(stateSelector, state => state.history)
 export const userBookmarksSelector = createSelector(stateSelector, state => state.bookmarks)
 
-export const getCourseBookmarks = createSelector([userBookmarksSelector], (bookmarks) => {
-    return bookmarks ? bookmarks.Courses : [];
-})
-
-export const getLessonBookmarks = createSelector([userBookmarksSelector], (bookmarks) => {
-    return bookmarks ? bookmarks.Lessons : [];
-})
+export const getCourseBookmarks = createSelector(stateSelector, state => state.courseBookmarks)
+export const getLessonBookmarks = createSelector(stateSelector, state => state.lessonBookmarks)
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
@@ -227,6 +264,33 @@ export function getUserBookmarks() {
             .catch((error) => {
                 dispatch({
                     type: GET_BOOKMARKS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export function getUserBookmarksFull() {
+    return (dispatch) => {
+        dispatch({
+            type: GET_BOOKMARKS_EXT_START,
+            payload: null
+        });
+
+        fetch("/api/users/bookmark-ext", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                handleBookmarksData(data);
+
+                dispatch({
+                    type: GET_BOOKMARKS_EXT_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: GET_BOOKMARKS_EXT_ERROR,
                     payload: {error}
                 });
             });
@@ -345,7 +409,7 @@ export function removeLessonFromBookmarks(courseUrl, lessonUrl) {
             .then(() => {
                 dispatch({
                     type: REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS,
-                    payload: courseUrl + '/' + lessonUrl
+                    payload: {courseUrl: courseUrl, lessonUrl: lessonUrl}
                 });
             })
             .catch((error) => {
@@ -482,6 +546,41 @@ const handleHistoryData = (data) => {
 
         data.Lessons.sort((a, b) => {
             return (b.lastVisitDate.getTime() - a.lastVisitDate.getTime());
+        })
+    }
+}
+
+const handleBookmarksData = (data) => {
+    if (data.Courses) {
+        data.Courses.forEach(course => {
+            handleCourse(course)
+            course.authors = [];
+
+            course.Authors.forEach((authorId) => {
+                course.authors.push(data.Authors[authorId])
+            })
+
+            course.categories = [];
+
+            course.Categories.forEach((categoryId) => {
+                course.categories.push(data.Categories[categoryId])
+            })
+        })
+    }
+
+    if (data.Lessons) {
+        data.Lessons.forEach((lesson) => {
+            handleLesson(lesson);
+
+            let _course = data.LessonCourses[lesson.CourseId];
+
+            lesson.courseUrl = _course ? _course.URL : null;
+            lesson.courseName = _course ? _course.Name : null;
+
+            let _author = data.Authors[lesson.AuthorId];
+
+            lesson.authorUrl = _author ? _author.URL : null;
+            lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
         })
     }
 }

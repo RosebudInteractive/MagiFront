@@ -11,6 +11,7 @@ import {
 } from "../../ducks/profile";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import * as userActions from "../../actions/user-actions";
 
 export class LessonFull extends React.Component {
 
@@ -34,17 +35,21 @@ export class LessonFull extends React.Component {
     _favoritesClick() {
         let {courseUrl, lessonUrl} = this.props;
 
-        if (this._isLessonInBookmarks()) {
-            this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
         } else {
-            this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            if (this._isLessonInBookmarks()) {
+                this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+            } else {
+                this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            }
         }
     }
 
     _isLessonInBookmarks() {
         let {courseUrl, lessonUrl} = this.props;
 
-        return this.props.bookmarks.find((item) => {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === courseUrl + '/' + lessonUrl
         })
     }
@@ -120,6 +125,7 @@ class InfoBlock extends React.Component {
 function mapStateToProps(state) {
     return {
         bookmarks: userBookmarksSelector(state),
+        authorized: !!state.user.user,
     }
 }
 
@@ -128,6 +134,7 @@ function mapDispatchToProps(dispatch) {
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
         removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

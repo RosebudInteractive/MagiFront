@@ -12973,7 +12973,12 @@ ul.lectures-tab {
     @media (max-width: 639px) {
       .profile-block__tab-control:first-child {
         margin-left: 24px; } }
-
+  .bookmarks-page .profile-block__tab-control:first-child  {
+    margin-left: 117px;
+  }
+  .bookmarks-page .profile-block__header-col:first-child  {
+    padding-left: 0;
+  }
 .profile-block .icon {
   position: absolute;
   left: -27px;
@@ -13005,6 +13010,10 @@ ul.lectures-tab {
     position: static;
     opacity: 1;
     z-index: initial; }
+
+  .bookmarks-page .profile-block {
+    margin-top: 48px;
+  }
 
 .history-list {
   display: -webkit-box;
@@ -13192,6 +13201,12 @@ ul.lectures-tab {
         -ms-flex-align: start;
         align-items: flex-start;
         margin-top: -6px; } }
+  .history-item__date-block .favorites {
+    right: 20px;
+    position: absolute;
+    top: 63px;
+    cursor: pointer;
+  }
   .history-item__play-block .play-block-small {
     position: absolute;
   }

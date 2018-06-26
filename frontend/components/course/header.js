@@ -9,6 +9,7 @@ import {
 } from "../../ducks/profile";
 import React from "react";
 import PropTypes from "prop-types";
+import * as userActions from "../../actions/user-actions"
 
 class Header extends React.Component {
 
@@ -18,15 +19,19 @@ class Header extends React.Component {
     };
 
     _favoritesClick() {
-        if (this._isCourseInBookmarks()) {
-            this.props.removeCourseFromBookmarks(this.props.url)
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
         } else {
-            this.props.addCourseToBookmarks(this.props.url)
+            if (this._isCourseInBookmarks()) {
+                this.props.removeCourseFromBookmarks(this.props.url)
+            } else {
+                this.props.addCourseToBookmarks(this.props.url)
+            }
         }
     }
 
     _isCourseInBookmarks() {
-        return this.props.bookmarks.find((item) => {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === this.props.url
         })
     }
@@ -47,6 +52,7 @@ class Header extends React.Component {
 function mapStateToProps(state) {
     return {
         bookmarks: userBookmarksSelector(state),
+        authorized: !!state.user.user,
     }
 }
 
@@ -55,6 +61,7 @@ function mapDispatchToProps(dispatch) {
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
