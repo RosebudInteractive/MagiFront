@@ -91,7 +91,7 @@ const GET_SHORT_BKM_MSSQL =
     "where b.[UserId] = <%= userId %>";
 
 const GET_LESSON_IDS_BKM_MSSQL =
-    "select c.[Id] from[Bookmark] b\n" +
+    "select l.[Id] from[Bookmark] b\n" +
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
@@ -153,7 +153,7 @@ const GET_SHORT_BKM_MYSQL =
     "where b.`UserId` = <%= userId %>";
 
 const GET_LESSON_IDS_BKM_MYSQL =
-    "select c.`Id` from`Bookmark` b\n" +
+    "select l.`Id` from`Bookmark` b\n" +
     "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
