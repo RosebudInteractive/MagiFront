@@ -28,8 +28,6 @@ class Frame extends Component {
         this._timer = null;
 
         this.state = {
-            // showContent: false,
-            // showRate: false,
             fullScreen: false,
         }
 
@@ -52,7 +50,7 @@ class Frame extends Component {
 
             if (_isPlayer) {
                 if (that.props.isMobileApp && that._firstTap) {
-                    this._firstTap = false;
+                    that._firstTap = false;
                     that._clearTimeOut();
                     that._initTimeOut();
                 } else {
@@ -62,16 +60,16 @@ class Frame extends Component {
             }
 
             if (_isPauseFrame) {
-                this.props.playerStartActions.startPlay(this.props.lesson.Id)
+                that.props.playerStartActions.startPlay(this.props.lesson.Id)
             }
 
-            this._hideContentTooltip = this.props.showContentTooltip;
-            this._hideRateTooltip = this.props.showSpeedTooltip;
-            if (this._hideContentTooltip) {
-                this.props.playerActions.hideContentTooltip()
+            that._hideContentTooltip = that.props.showContentTooltip;
+            that._hideRateTooltip = that.props.showSpeedTooltip;
+            if (that._hideContentTooltip) {
+                that.props.playerActions.hideContentTooltip()
             }
-            if (this._hideRateTooltip) {
-                this.props.playerActions.hideSpeedTooltip()
+            if (that._hideRateTooltip) {
+                that.props.playerActions.hideSpeedTooltip()
             }
         });
 

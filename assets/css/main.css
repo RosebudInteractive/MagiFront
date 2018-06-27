@@ -5814,6 +5814,7 @@ ul.user-tooltip {
         min-width: 47%; } }
 
 .lectures-wrapper {
+  -webkit-overflow-scrolling: touch;
   background-color: #fff; }
   @media (max-width: 899px) {
   .lectures-wrapper {
@@ -6766,7 +6767,7 @@ ul.user-tooltip {
         fill: #2f2f2f; }
         ._dark .lectures-menu__link-back .icon svg {
           fill: #fff; }
-    @media (max-width: 599px) {
+    @media (max-width: 600px) {
       .lectures-menu__link-back span {
         font-size: 0; } }
     @media (max-width: 1280px) {
@@ -14485,6 +14486,11 @@ ul.lectures-tab {
   width: 2px;
   -webkit-animation: equalize 2s infinite;
   animation: equalize 2s infinite; }
+
+.equalizer.paused div {
+  -webkit-animation: none;
+  animation: none;
+}
 
 .equalizer div:nth-child(1) {
   -webkit-animation-delay: -1.2s;
