@@ -258,6 +258,7 @@ class LessonPage extends React.Component {
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
 
         if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
+
             return <Wrapper key={key}
                             lesson={lesson}
                             courseUrl={this.props.courseUrl}
@@ -451,6 +452,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         playingLesson: state.player.playingLesson,
+        lessonEnded: state.player.ended,
         isMobileApp: state.app.isMobileApp,
         authorized: !!state.user.user,
     }

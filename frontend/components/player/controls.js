@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import $ from 'jquery'
 import {Link} from 'react-router-dom';
+import Platform from 'platform';
 
 import * as playerStartActions from '../../actions/player-start-actions'
 
@@ -40,7 +41,9 @@ class Controls extends React.Component {
             _sound = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sound"/>',
             _mute = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mute"/>';
 
-        let _id = this.props.lesson ? this.props.lesson.Id : '';
+        let _id = this.props.lesson ? this.props.lesson.Id : '',
+            _isIOS = Platform.os.family === "iOS",
+            _needHideSoundControl = (this.props.muted || _isIOS)
 
         return (
             <div className="player-block__controls">
@@ -52,11 +55,14 @@ class Controls extends React.Component {
                         <svg className="play" width="19" height="19" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
                     :
-                    <button type="button" className="play-button paused" onClick={::this.props.playerStartActions.startPause}>
+                    <button type="button" className="play-button paused"
+                            onClick={::this.props.playerStartActions.startPause}>
                         <svg className="pause" width="11" height="18" dangerouslySetInnerHTML={{__html: _pause}}/>
                     </button>
                 }
-                <button type="button" className="sound-button" onClick={::this.props.playerStartActions.toggleMute}>
+                <button type="button" className="sound-button"
+                        style={_isIOS ? {display: 'none'} : null}
+                        onClick={::this.props.playerStartActions.toggleMute}>
                     {
                         this.props.muted ?
                             <svg className="off" width="18" height="18" dangerouslySetInnerHTML={{__html: _mute}}/>
@@ -64,7 +70,8 @@ class Controls extends React.Component {
                             <svg className="on" width="18" height="18" dangerouslySetInnerHTML={{__html: _sound}}/>
                     }
                 </button>
-                <div className="sound-control" id={'sound-bar' + _id} style={this.props.muted ? {display: 'none'} : null}>
+                <div className="sound-control" id={'sound-bar' + _id}
+                     style={_needHideSoundControl ? {display: 'none'} : null}>
                     <div className="sound-control__bar">
                         <div className="sound-control__progress" style={{width: (this.props.volume * 100) + "%"}}/>
                     </div>
@@ -72,7 +79,8 @@ class Controls extends React.Component {
                             style={{left: (this.props.volume * 100) + "%"}}>Громкость
                     </button>
                 </div>
-                <Link to={this.props.lesson.URL + "/transcript"} className="link-to-transcript controls-row">Транскрипт <br/>и материалы</Link>
+                <Link to={this.props.lesson.URL + "/transcript"}
+                      className="link-to-transcript controls-row">Транскрипт <br/>и материалы</Link>
             </div>
         );
     }
