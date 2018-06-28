@@ -118,8 +118,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 // .set('loading', true)
-                .clear('courseBookmarks')
-                .clear('lessonBookmarks')
+                .update('courseBookmarks', courseBookmarks => courseBookmarks.clear())
+                .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.clear())
 
         case GET_BOOKMARKS_EXT_SUCCESS:
             return state
