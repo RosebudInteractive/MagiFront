@@ -1476,7 +1476,13 @@
             "title2": "Художник – Поль Гоген (фр. Paul Gauguin, 1848–1903). Художественная галерея Олбрайт-Нокс, Буффало",
             "track": 1,
             "duration": 74.4
-          }
+          },
+          "effects": [{
+            "type": "zoom",
+            "start": 1,
+            "duration": 25,
+            "acceleration": 3
+          }]
         },
         {
           "id": 8364,
