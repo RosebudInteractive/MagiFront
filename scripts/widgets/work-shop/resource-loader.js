@@ -206,7 +206,7 @@ export default class CWSResourceLoader {
             let beg = new Date();
             let result = this._getFromLoaded(ids);
             if (!result.success) {
-                console.warn("resource loader: begin to waiting for resource download " +  JSON.stringify(ids));
+                console.warn("resource loader: begin to waiting for resource download " + JSON.stringify(ids));
                 let int = setInterval(() => {
                     result = this._getFromLoaded(ids);
                     if (result.success) {
@@ -237,7 +237,7 @@ export default class CWSResourceLoader {
                     if (result.success) {
                         clearInterval(int);
                         resolve(result.audio);
-                        return ;
+                        return;
                     }
 
                     let now = new Date();
@@ -575,14 +575,19 @@ export default class CWSResourceLoader {
 
             if (!audio) {
                 audio = new Audio()
+                audio.preload = 'none'
                 _audioMap.set(url, audio)
             }
 
-            audio.src = url;
-            audio.load();
+
+            setTimeout(() => {
+                audio.src = url;
+                console.log('load : ', audio.src);
+                audio.load();
+            }, 500);
 
             audio.onerror = function () {
-                console.error("resource loader: " + JSON.stringify(audio.error) );
+                console.error("resource loader: " + JSON.stringify(audio.error));
             }
 
             this._state.loadedData.audios[id] = {
