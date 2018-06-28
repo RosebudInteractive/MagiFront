@@ -11219,19 +11219,9 @@ ul.lectures-tab {
       display: none; }
   @media (max-width: 600px) {
     .player-block .speed-button {
-      /*position: absolute;*/
-      /*top: 12px;*/
-      /*right: 111px;*/
-      /*pointer-events: initial;*/
-      /*z-index: 101; */
       display: none; } }
   @media (max-width: 600px) {
     .player-block .content-button {
-      /*position: absolute;*/
-      /*top: 12px;*/
-      /*right: 57px;*/
-      /*pointer-events: initial;*/
-      /*z-index: 101;*/
       display: none; } }
   .player-wrapper .speed-button,
   .player-wrapper .content-button {
@@ -11261,10 +11251,10 @@ ul.lectures-tab {
       pointer-events: initial; } }
   @media (max-width: 375px) {
     .player-wrapper .speed-button {
-        right: 57px; } }
+        right: 97px; } }
   @media (max-width: 375px) {
     .player-wrapper .content-button {
-        right: 25px; } }
+        right: 45px; } }
 
 
 .sound-control {

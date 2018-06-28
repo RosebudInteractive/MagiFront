@@ -65,7 +65,7 @@ class HistoryBlock extends React.Component {
                 <div className="history-list">
                     {this._getList()}
                     {
-                        (this._visibleCount !== history.length)
+                        ((this._visibleCount < history.length) && (history.length > 0))
                             ?
                             <button className="btn btn--white history-list__link"
                                     onClick={::this._getMoreHistory}>Больше лекций</button>

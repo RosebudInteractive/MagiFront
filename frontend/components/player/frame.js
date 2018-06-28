@@ -42,9 +42,10 @@ class Frame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),
-                _isPauseFrame = e.target.closest('.player-frame__screen');
+                _isPauseFrame = e.target.closest('.player-frame__screen'),
+                _isMenuButton = e.target.closest('.menu-button');
 
-            if (_isContent || _isRate) {
+            if (_isContent || _isRate || _isMenuButton) {
                 return
             }
 
@@ -245,13 +246,13 @@ class Frame extends Component {
                                         <Controls {...this.props}/>
                                         <div className="player-block__stats">
                                             <TimeInfo/>
-                                            <button type="button" className="speed-button js-speed-trigger"
+                                            <button type="button" className="speed-button js-speed-trigger player-button"
                                                     onClick={::this._openRate}>
                                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                             </button>
                                             {
                                                 this.props.contentArray.length > 0 ?
-                                                    <button type="button" className="content-button js-contents-trigger"
+                                                    <button type="button" className="content-button js-contents-trigger player-button"
                                                             onClick={::this._openContent}>
                                                         <svg width="18" height="12"
                                                              dangerouslySetInnerHTML={{__html: _contents}}/>

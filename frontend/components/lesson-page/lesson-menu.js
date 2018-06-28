@@ -15,12 +15,20 @@ class Menu extends React.Component {
 
     constructor(props) {
         super(props);
+    }
 
+    static propTypes = {
+        current: PropTypes.string.isRequired,
+        id: PropTypes.number.isRequired,
+    };
+
+    componentDidMount() {
         $(document).mouseup((e) => {
             let _isContent = e.target.closest('.js-contents'),
-                _isRate = e.target.closest('.js-speed');
+                _isRate = e.target.closest('.js-speed'),
+                _isPlayerButton = e.target.closest('.player-button');
 
-            if (_isContent || _isRate) {
+            if (_isContent || _isRate || _isPlayerButton) {
                 return
             }
 
@@ -34,12 +42,6 @@ class Menu extends React.Component {
             }
         });
     }
-
-
-    static propTypes = {
-        current: PropTypes.string.isRequired,
-        id: PropTypes.number.isRequired,
-    };
 
     componentWillUnmount() {
         this.props.appActions.hideLessonMenu()
@@ -127,13 +129,13 @@ class Menu extends React.Component {
                 {
                     this.props.isPlayer ?
                         [
-                            <button type="button" className="speed-button js-speed-trigger"
+                            <button type="button" className="speed-button js-speed-trigger menu-button"
                                     onClick={::this._openRate}>
                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                             </button>,
                             (
                                 this.props.contentArray.length > 0 ?
-                                    <button type="button" className="content-button js-contents-trigger"
+                                    <button type="button" className="content-button js-contents-trigger menu-button"
                                             onClick={::this._openContent}>
                                         <svg width="18" height="12"
                                              dangerouslySetInnerHTML={{__html: _contents}}/>
