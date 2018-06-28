@@ -11,6 +11,7 @@ import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
+import BookmarksPage from './containers/bookmark-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -20,6 +21,8 @@ import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
+import {getUserBookmarks} from "./ducks/profile";
+
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -92,8 +95,10 @@ class App extends Component {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
-        if (!(_recoveryRout || _errorRout))
+        if (!(_recoveryRout || _errorRout)){
             this.props.userActions.whoAmI()
+            this.props.getUserBookmarks()
+        }
     }
 
     componentDidMount() {
@@ -181,6 +186,7 @@ class App extends Component {
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>
                 <Route path={_homePath + 'history'} component={ProfilePage}/>
+                <Route path={_homePath + 'favorites'} component={BookmarksPage}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
@@ -233,6 +239,7 @@ function mapDispatchToProps(dispatch) {
         userActions: bindActionCreators(userActions, dispatch),
         playerActions: bindActionCreators(playerActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
     }
 }
 

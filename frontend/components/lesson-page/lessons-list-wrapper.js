@@ -22,6 +22,7 @@ class LessonsListWrapper extends React.Component {
 
     _getLessonsList() {
         const {object: lessons, authors} = this.props.lessons;
+        let _needShowAuthor = (authors && (authors.length > 1))
 
         return lessons.map((lesson, index) => {
             lesson.Author = authors.find((author) => {
@@ -34,16 +35,14 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson}
-                             key={index}/>
+            return <ListItem {...this.props} lesson={lesson} showAuthor={_needShowAuthor} key={index}/>
         });
     }
 
     componentWillReceiveProps(nextProps) {
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
-            $(window).on('touchmove', stopScrolling);
-            $(document).on('touchmove', stopScrolling);
-
+            $('html').css('overflow', 'hidden');
+            $('body').css('overflow', 'hidden');
 
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
@@ -52,8 +51,8 @@ class LessonsListWrapper extends React.Component {
         }
 
         if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
-            $(window).unbind('touchmove', stopScrolling);
-            $(document).unbind('touchmove', stopScrolling)
+            $('html').css('overflow', '');
+            $('body').css('overflow', '');
         }
     }
 
@@ -68,16 +67,13 @@ class LessonsListWrapper extends React.Component {
     }
 }
 
-function stopScrolling(e) {
-    e.preventDefault()
-}
-
 class ListItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
         // currentNumber: PropTypes.string.isRequired,
         active: PropTypes.string,
+        showAuthor: PropTypes.bool,
     };
 
     render() {
@@ -93,7 +89,7 @@ class ListItem extends React.Component {
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={this.props.lesson.Number}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
-                    <ListItemInfo title={lesson.Name} author={lesson.Author}/>
+                    <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
                     <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
                                courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
                                totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}/>
@@ -109,7 +105,12 @@ class ListItem extends React.Component {
                 <div className="lectures-list__item-header">
                     <div className="lectures-list__item-info">
                         <h3 className="lectures-list__item-title"><span>{lesson.Name}</span></h3>
-                        <p className="lectures-list__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                        {
+                            this.props.showAuthor ?
+                                <p className="lectures-list__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                                :
+                                null
+                        }
                     </div>
                     <div className="lectures-list__item-date">{lesson.readyMonth + ' ' + lesson.readyYear}</div>
                 </div>
@@ -120,15 +121,21 @@ class ListItem extends React.Component {
 
 class ListItemInfo extends React.Component {
     static propTypes = {
-        title: PropTypes.string.isRequired,
-        author: PropTypes.object.isRequired
+        title: PropTypes.string,
+        author: PropTypes.object,
+        showAuthor: PropTypes.bool,
     };
 
     render() {
         return (
             <div className="lectures-list__item-info">
                 <h3 className="lectures-list__item-title"><span>{this.props.title}</span></h3>
-                <p className="lectures-list__item-author">{this.props.author.FirstName + ' ' + this.props.author.LastName}</p>
+                {
+                    this.props.showAuthor ?
+                        <p className="lectures-list__item-author">{this.props.author.FirstName + ' ' + this.props.author.LastName}</p>
+                        :
+                        null
+                }
             </div>
         )
     }
@@ -143,7 +150,6 @@ class SubList extends React.Component {
     };
 
     _getItems() {
-        // const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>';
         const {active} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
@@ -154,7 +160,6 @@ class SubList extends React.Component {
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
-                    <p className="lectures-sublist__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                     <SubLessonPlayBlock duration={lesson.DurationFmt} lessonUrl={lesson.URL}
                                         courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
                                         totalDuration={lesson.Duration}/>

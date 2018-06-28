@@ -54,3 +54,7 @@ CREATE UNIQUE INDEX `u_Idx_SNetProvider_Name` ON `SNetProvider`(`Name`);
 GO
 CREATE UNIQUE INDEX `u_Idx_SNetProvider_URL` ON `SNetProvider`(`URL`);
 GO
+CREATE UNIQUE INDEX `u_Idx_Bookmark_UserId_CourseId` ON `Bookmark`(`UserId`, `CourseId`);
+GO
+CREATE UNIQUE INDEX `u_Idx_Bookmark_UserId_LessonCourseId` ON `Bookmark`(`UserId`, `LessonCourseId`);
+GO

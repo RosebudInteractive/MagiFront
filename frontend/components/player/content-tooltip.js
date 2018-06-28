@@ -17,14 +17,10 @@ class ContentTooltip extends Component {
     }
 
     static propTypes = {
-        content: PropTypes.array.isRequired,
-        visible: PropTypes.bool.isRequired,
-        onGoToContent: PropTypes.func
+        id: PropTypes.number,
     };
 
     static defaultProps = {
-        content: [],
-        visible: false,
     };
 
     componentDidMount() {
@@ -79,7 +75,7 @@ class ContentTooltip extends Component {
                 <div className='contents-tooltip_item'>{item.title}</div>
                 {
                     _isActive ?
-                        <div className="equalizer">
+                        <div className={"equalizer" + (that.props.paused ? " paused" : "")}>
                             <div/>
                             <div/>
                             <div/>
@@ -116,6 +112,7 @@ function mapStateToProps(state) {
     return {
         contentArray: state.player.contentArray,
         currentContent: state.player.currentContent,
+        paused: state.player.paused,
     }
 }
 

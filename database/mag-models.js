@@ -253,6 +253,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Duration", { type: "int", allowNull: false })
             .addField("Content", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("Bookmark", "c1b21a84-9a78-43aa-aee6-57cf1d7da19c", "RootBookmark", "d0c73f6d-04dd-486c-a6ae-4317663de11b")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: true })
+            .addField("LessonCourseId", { type: "dataRef", model: "LessonCourse", refAction: "parentRestrict", allowNull: true });
+
         metaDataMgr.checkSchema();
     }
 }

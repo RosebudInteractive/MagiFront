@@ -67,7 +67,7 @@ export default function lessonCommonRefs(state = initialState, action) {
             let _array = [...state.current, action.payload];
             tools.setObjectsRank(_array);
 
-            return {...state, current: _array, hasChanges: true};
+            return {...state, current: _array, selected: action.payload, hasChanges: true};
         }
 
         case UPDATE_COMMON_REFERENCE: {

@@ -15,6 +15,10 @@ import {
     PLAYER_SET_FULL_VIEWPORT,
     PLAYER_CLEAR_FULL_VIEWPORT,
     PLAYER_SET_BUFFERED_TIME,
+    SHOW_CONTENT_TOOLTIP,
+    HIDE_CONTENT_TOOLTIP,
+    SHOW_SPEED_TOOLTIP,
+    HIDE_SPEED_TOOLTIP,
 } from '../constants/player'
 
 export const startInit = () => {
@@ -126,5 +130,33 @@ export const setBufferedTime = (value) => {
     return {
         type: PLAYER_SET_BUFFERED_TIME,
         payload: value
+    }
+}
+
+export const showContentTooltip = () => {
+    return {
+        type: SHOW_CONTENT_TOOLTIP,
+        payload: null
+    }
+}
+
+export const hideContentTooltip = () => {
+    return {
+        type: HIDE_CONTENT_TOOLTIP,
+        payload: null
+    }
+}
+
+export const showSpeedTooltip = () => {
+    return {
+        type: SHOW_SPEED_TOOLTIP,
+        payload: null
+    }
+}
+
+export const hideSpeedTooltip = () => {
+    return {
+        type: HIDE_SPEED_TOOLTIP,
+        payload: null
     }
 }

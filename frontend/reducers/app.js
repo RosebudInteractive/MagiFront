@@ -21,6 +21,7 @@ const initialState = {
     isMobileApp: false,
     showSignInForm: false,
     showUserBlock: false,
+    showLessonBookmarks: false,
 };
 
 export default function app(state = initialState, action) {

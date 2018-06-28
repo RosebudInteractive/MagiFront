@@ -5,6 +5,12 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import {bindActionCreators} from 'redux';
 import $ from 'jquery'
 import * as userActions from "../../actions/user-actions";
+import {
+    addLessonToBookmarks,
+    userBookmarksSelector,
+    getUserBookmarks,
+    removeLessonFromBookmarks
+} from "../../ducks/profile";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -79,6 +85,28 @@ class LessonFrame extends React.Component {
         return _button;
     }
 
+    _favoritesClick() {
+        let {courseUrl, lessonUrl} = this.props;
+
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
+        } else {
+            if (this._isLessonInBookmarks()) {
+                this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+            } else {
+                this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            }
+        }
+    }
+
+    _isLessonInBookmarks() {
+        let {courseUrl, lessonUrl} = this.props;
+
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
+            return item === courseUrl + '/' +  lessonUrl
+        })
+    }
+
     render() {
         const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
 
@@ -114,7 +142,7 @@ class LessonFrame extends React.Component {
                             <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                         </div>
                     </div>
-                    <SocialBlock/>
+                    <SocialBlock inFavorites={this._isLessonInBookmarks()} onFavoritesClick={::this._favoritesClick}/>
                 </div>
                 <div className="progress-bar">
                     <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
@@ -125,12 +153,20 @@ class LessonFrame extends React.Component {
 }
 
 class SocialBlock extends React.Component {
+    static propTypes = {
+        inFavorites : PropTypes.bool,
+        onFavoritesClick: PropTypes.func,
+    }
+
     render() {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
-            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>'
+            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
+        let {inFavorites, onFavoritesClick} = this.props;
 
         return (
             <div className="social-block">
@@ -158,6 +194,9 @@ class SocialBlock extends React.Component {
                     </div>
                     <span className="social-btn__actions">4</span>
                 </a>
+                <span className={"favorites"  + (inFavorites ? ' active' : '')} onClick={onFavoritesClick}>
+                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: inFavorites ? _redFlag : _flag}}/>
+                </span>
             </div>
         )
     }
@@ -165,6 +204,7 @@ class SocialBlock extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        bookmarks: userBookmarksSelector(state),
         lessonInfoStorage: state.lessonInfoStorage,
         authorized: !!state.user.user,
     }
@@ -174,6 +214,9 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
+        addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
+        removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
     }
 }
 
