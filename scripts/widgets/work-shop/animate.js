@@ -5,6 +5,7 @@
 export function animate(options, playState) {
 
     let start = performance.now();
+    options.inProgress = true;
 
     requestAnimationFrame(function animate(time) {
         // timeFraction от 0 до 1
@@ -20,6 +21,11 @@ export function animate(options, playState) {
 
         if (timeFraction < 1 && !playState.stopped) {
             requestAnimationFrame(animate);
+        } else {
+            options.inProgress = false;
+            if (options.complete) {
+                options.complete();
+            }
         }
 
     });
@@ -31,7 +37,8 @@ export function imageTimingFunc(timeFraction) {
 }
 
 export function quad(progress) {
-    return Math.pow(progress, 2);
+    return progress;
+    //return Math.pow(progress, 2);
 }
 
 export function makeEaseInOut(timing) {
