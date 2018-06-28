@@ -1695,8 +1695,12 @@ export default class CWSTracks extends CWSBase {
             let element = elements[i];
             let oldStart = element.start;
 
-            if (currentPos > element.start) {
-                element.start = currentPos;
+            if (currentPos > element.start && (currentPos - element.start) > 0.01) {
+                if (altKey) {
+                    element.start = currentPos;
+                } else {
+                    return false;
+                }
             }
             // если зажат Alt, то пытаемся ужать следующий элемент
             if (altKey && oldStart != element.start) {
