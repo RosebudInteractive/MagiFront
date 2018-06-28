@@ -8,6 +8,7 @@ export default class Item extends React.Component {
 
     static propTypes = {
         item: PropTypes.object,
+        isFavorite: PropTypes.bool,
     }
 
     constructor(props) {
@@ -17,12 +18,12 @@ export default class Item extends React.Component {
 
     _favoritesClick() {
         if (this.props.onRemoveItem) {
-            this.props.onRemoveItem(this.props.item.URL)
+            this.props.onRemoveItem(this.props.item)
         }
     }
 
     render() {
-        let {item} = this.props,
+        let {item, isFavorite} = this.props,
             _coverPath = getCoverPath(item, ImageSize.medium),
             _cover = _coverPath ? '/data/' + _coverPath : null;
 
@@ -32,24 +33,22 @@ export default class Item extends React.Component {
 
         _authors = (_authors.length > 1) ? <div>{_authors[0]}, {_authors[1]}</div> : _authors
 
-        const _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
-
-
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  _cover + '" width="724" height="503"/>';
+        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
+            _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  _cover + '" width="724" height="503"/>';
 
         return (
             <div className="fav-card">
                 <div className="fav-card__header">
                     <h3 className="fav-card__title">
-                        <span className="fav" onClick={::this._favoritesClick}>
-                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _redFlag}}/>
+                        <span className={"fav" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
+                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
                         </span>
                         <Link to={'category/' + item.URL}>
-                            <span class="fav-card__title-text"><span
+                            <span className="fav-card__title-text"><span
                                 className="label">Курс:</span> {" " + item.Name}</span>
                         </Link>
                     </h3>
-                    <div class="fav-card__info">
+                    <div className="fav-card__info">
                         {_authors}
                         <Link to="#" className="fav-card__info-link _tag">История</Link>
                     </div>

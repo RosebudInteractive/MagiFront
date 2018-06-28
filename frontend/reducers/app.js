@@ -7,6 +7,8 @@ import {
     SET_APP_TYPE_MOBILE,
     SHOW_USER_BLOCK,
     HIDE_USER_BLOCK,
+    SHOW_LESSONS_BOOKMARKS,
+    SHOW_COURSES_BOOKMARKS,
 } from '../constants/app'
 
 import {
@@ -22,6 +24,7 @@ const initialState = {
     showSignInForm: false,
     showUserBlock: false,
     showLessonBookmarks: false,
+    showCourseBookmarks: true,
 };
 
 export default function app(state = initialState, action) {
@@ -77,6 +80,14 @@ export default function app(state = initialState, action) {
 
         case CLOSE_SIGN_IN_FORM: {
             return {...state, showSignInForm: false}
+        }
+
+        case SHOW_LESSONS_BOOKMARKS: {
+            return {...state, showLessonBookmarks: true, showCourseBookmarks: false}
+        }
+
+        case SHOW_COURSES_BOOKMARKS: {
+            return {...state, showLessonBookmarks: false, showCourseBookmarks: true}
         }
 
         default:
