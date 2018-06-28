@@ -37,8 +37,8 @@ export function imageTimingFunc(timeFraction) {
 }
 
 export function quad(progress) {
-    return progress;
-    //return Math.pow(progress, 2);
+    //return progress;
+    return Math.pow(progress, 2);
 }
 
 export function makeEaseInOut(timing) {
