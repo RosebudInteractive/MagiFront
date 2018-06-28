@@ -39,7 +39,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                     duration: ef.duration * 1000 / rate,
                     timing: makeEaseInOut(quad),
                     draw: (progress) => {
-                        if (currentProgress > progress) return;
+                        if (currentProgress > progress && progress - currentProgress <= 1) return;
                         currentProgress = progress;
                         img[0].style.width = (100 + progress) + "%";
                         img[0].style.height = (100 + progress) + "%";
