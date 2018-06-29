@@ -177,73 +177,73 @@ ul {
   font-style: normal; }
 
 ._mask01 image {
-  -webkit-clip-path: url("#clipping01");
+  /*-webkit-clip-path: url("#clipping01");*/
   clip-path: url("#clipping01");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask02 image {
-  -webkit-clip-path: url("#clipping02");
+  /*-webkit-clip-path: url("#clipping02");*/
   clip-path: url("#clipping02");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask03 image {
-  -webkit-clip-path: url("#clipping03");
+  /*-webkit-clip-path: url("#clipping03");*/
   clip-path: url("#clipping03");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask04 image {
-  -webkit-clip-path: url("#clipping04");
+  /*-webkit-clip-path: url("#clipping04");*/
   clip-path: url("#clipping04");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask05 image {
-  -webkit-clip-path: url("#clipping05");
+  /*-webkit-clip-path: url("#clipping05");*/
   clip-path: url("#clipping05");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask06 image {
-  -webkit-clip-path: url("#clipping06");
+  /*-webkit-clip-path: url("#clipping06");*/
   clip-path: url("#clipping06");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask07 image {
-  -webkit-clip-path: url("#clipping07");
+  /*-webkit-clip-path: url("#clipping07");*/
   clip-path: url("#clipping07");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask08 image {
-  -webkit-clip-path: url("#clipping08");
+  /*-webkit-clip-path: url("#clipping08");*/
   clip-path: url("#clipping08");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask09 image {
-  -webkit-clip-path: url("#clipping09");
+  /*-webkit-clip-path: url("#clipping09");*/
   clip-path: url("#clipping09");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask10 image {
-  -webkit-clip-path: url("#clipping10");
+  /*-webkit-clip-path: url("#clipping10");*/
   clip-path: url("#clipping10");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask11 image {
-  -webkit-clip-path: url("#clipping11");
+  /*-webkit-clip-path: url("#clipping11");*/
   clip-path: url("#clipping11");
   min-height: 100%;
   min-width: 100%; }
 
 ._mask12 image {
-  -webkit-clip-path: url("#clipping12");
+  /*-webkit-clip-path: url("#clipping12");*/
   clip-path: url("#clipping12");
   min-height: 100%;
   min-width: 100%; }
