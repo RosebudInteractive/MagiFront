@@ -48,7 +48,7 @@ class Menu extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this.props.isLessonMenuOpened) {
+        if (this.props.isLessonMenuOpened || this.props.showContentTooltip || this.props.showSpeedTooltip) {
             this._hideNavigationButtons()
         } else {
             this._showNavigationButtons()

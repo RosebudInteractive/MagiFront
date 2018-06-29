@@ -10,7 +10,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     }
 
     _playImage() {
-        if (that._playState.imageAnimation) {
+        if (this._playState.imageAnimation) {
             cancelAnimationFrame(that._playState.imageAnimation.frame);
         }
         let rate = this._playState.rate;
