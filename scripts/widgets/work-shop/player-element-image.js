@@ -10,6 +10,9 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     }
 
     _playImage() {
+        if (that._playState.imageAnimation) {
+            cancelAnimationFrame(that._playState.imageAnimation.frame);
+        }
         let rate = this._playState.rate;
 
         //assume now there can be only one effect
@@ -38,11 +41,15 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                     curTime: imgPlayPos * 1000 / rate,
                     duration: ef.duration * 1000 / rate,
                     timing: makeEaseInOut(quad),
+                    effectStart: ef.start,
+                    effectDuration: ef.duration,
                     draw: (progress) => {
-                        if (currentProgress > progress && progress - currentProgress <= 1) return;
+                        if (currentProgress > progress) return;
                         currentProgress = progress;
-                        img[0].style.width = (100 + progress) + "%";
-                        img[0].style.height = (100 + progress) + "%";
+                        let scale = (100 + progress)/100;
+                        img[0].style.transform = "scale(" + scale + ", " + scale + ")"
+                        //img[0].style.width = (100 + progress) + "%";
+                        //img[0].style.height = (100 + progress) + "%";
                         /*img.css({
                             width: (100 + progress) + "%",
                             height: (100 + progress) + "%"
@@ -107,6 +114,10 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     }
 
     renderPosition(position) {
+        if (this._playState.imageAnimation) {
+            cancelAnimationFrame(this._playState.imageAnimation.frame);
+        }
+
         super.renderPosition(position);
         let item = $("#" + this.Id);
 
@@ -139,12 +150,13 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                 offset = calcProgress / 2;
             }
             let img = item.find("img");
+            let scale = (100 + offset * 2)/100;
             img.css({
                 //left: (50) + "%",
                 //top: (50) + "%",
-                width: (100 + offset * 2) + "%",
-                height: (100 + offset * 2) + "%",
-                //transform: "translate(-50%, -50%)"
+                //width: (100 + offset * 2) + "%",
+                //height: (100 + offset * 2) + "%",
+                transform: "scale("  + scale + ", " + scale + ")"
             });
         }
     }

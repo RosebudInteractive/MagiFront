@@ -1479,9 +1479,9 @@
           },
           "effects": [{
             "type": "zoom",
-            "start": 1,
-            "duration": 25,
-            "acceleration": 3
+            "start": 3,
+            "duration": 10,
+            "acceleration": 20
           }]
         },
         {
