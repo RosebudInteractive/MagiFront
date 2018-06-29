@@ -838,8 +838,9 @@
                 nav.find('ul').append(li);
             }
 
-            //centering it vertically
-            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).innerHeight()/2) + 'px');
+            //centering it verticallyß
+            // $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).innerHeight()/2) + 'px');
+            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).outerHeight()/2) + 'px');
 
             //activating the current active section
             $(SECTION_NAV_SEL).find('li').eq($(SECTION_ACTIVE_SEL).index(SECTION_SEL)).find('a').addClass(ACTIVE);
