@@ -839,8 +839,7 @@
             }
 
             //centering it vertically
-            // $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).innerHeight()/2) + 'px');
-            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).outerHeight()/2) + 'px');
+            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).innerHeight()/2) + 'px');
 
             //activating the current active section
             $(SECTION_NAV_SEL).find('li').eq($(SECTION_ACTIVE_SEL).index(SECTION_SEL)).find('a').addClass(ACTIVE);
@@ -914,10 +913,8 @@
                 var currentScroll = $window.scrollTop();
                 var scrollDirection = getScrollDirection(currentScroll);
                 var visibleSectionIndex = 0;
-                // var screen_mid = currentScroll + ($window.innerHeight() / 2.0);
-                var screen_mid = currentScroll + ($window.outerHeight() / 2.0);
-                // var isAtBottom = $body.height() - $window.innerHeight() === currentScroll;
-                var isAtBottom = $body.height() - $window.outerHeight() === currentScroll;
+                var screen_mid = currentScroll + ($window.innerHeight() / 2.0);
+                var isAtBottom = $body.height() - $window.innerHeight() === currentScroll;
                 var sections =  document.querySelectorAll(SECTION_SEL);
 
                 //when using `auto-height` for a small last section it won't be centered in the viewport
@@ -1033,12 +1030,10 @@
          */
         function isCompletelyInViewPort(movement){
             var top = $(SECTION_ACTIVE_SEL).position().top;
-            // var bottom = top + $window.innerHeight();
-            var bottom = top + $window.outerHeight();
+            var bottom = top + $window.innerHeight();
 
             if(movement == 'up'){
-                // return bottom >= ($window.scrollTop() + $window.innerHeight());
-                return bottom >= ($window.scrollTop() + $window.outerHeight());
+                return bottom >= ($window.scrollTop() + $window.innerHeight());
             }
             return top <= $window.scrollTop();
         }
@@ -1149,8 +1144,7 @@
                 else if(options.autoScrolling && canScroll){
 
                     //is the movement greater than the minimum resistance to scroll?
-                    // if (Math.abs(touchStartY - touchEndY) > ($window.innerHeight() / 100 * options.touchSensitivity)) {
-                    if (Math.abs(touchStartY - touchEndY) > ($window.outerHeight() / 100 * options.touchSensitivity)) {
+                    if (Math.abs(touchStartY - touchEndY) > ($window.innerHeight() / 100 * options.touchSensitivity)) {
                         if (touchStartY > touchEndY) {
                             scrolling('down');
                         } else if (touchEndY > touchStartY) {
@@ -2144,8 +2138,7 @@
 
                 //if the keyboard is NOT visible
                 if (!activeElement.is('textarea') && !activeElement.is('input') && !activeElement.is('select')) {
-                    // var currentHeight = $window.innerHeight();
-                    var currentHeight = $window.outerHeight();
+                    var currentHeight = $window.innerHeight();
 
                     //making sure the change in the viewport size is enough to force a rebuild. (20 % of the window to avoid problems when hidding scroll bars)
                     if( Math.abs(currentHeight - previousHeight) > (20 * Math.max(previousHeight, currentHeight) / 100) ){
@@ -2174,8 +2167,7 @@
 
             //only calculating what we need. Remember its called on the resize event.
             var isBreakingPointWidth = widthLimit && $window.outerWidth() < widthLimit;
-            // var isBreakingPointHeight = heightLimit && $window.innerHeight() < heightLimit;
-            var isBreakingPointHeight = heightLimit && $window.outerHeight() < heightLimit;
+            var isBreakingPointHeight = heightLimit && $window.innerHeight() < heightLimit;
 
             if(widthLimit && heightLimit){
                 setResponsive(isBreakingPointWidth || isBreakingPointHeight);
