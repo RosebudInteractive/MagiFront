@@ -14582,8 +14582,24 @@ ul.lectures-tab {
   overflow: hidden;
   width: 14px; }
   .equalizer.paused div {
-    -webkit-animation-play-state: paused;
-    animation-play-state: paused; }
+    /*-webkit-animation-play-state: paused;*/
+    /*animation-play-state: paused;*/
+    -webkit-animation: none;
+    animation: none}
+  .equalizer.paused .eq-1 {
+    height: 7px;
+    margin-top: 7px; }
+  .equalizer.paused .eq-2 {
+    height: 14px }
+  .equalizer.paused .eq-3 {
+    height: 3px;
+    margin-top: 11px; }
+  .equalizer.paused .eq-4 {
+    height: 9px;
+    margin-top: 5px; }
+  .equalizer.paused .eq-5 {
+    height: 5px;
+    margin-top: 9px; }
 
 .equalizer div {
   background: #c8684c;

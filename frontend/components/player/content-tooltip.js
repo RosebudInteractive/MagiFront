@@ -76,11 +76,11 @@ class ContentTooltip extends Component {
                 {
                     _isActive ?
                         <div className={"equalizer" + (that.props.paused ? " paused" : "")}>
-                            <div/>
-                            <div/>
-                            <div/>
-                            <div/>
-                            <div/>
+                            <div className='eq-1'/>
+                            <div className='eq-2'/>
+                            <div className='eq-3'/>
+                            <div className='eq-4'/>
+                            <div className='eq-5'/>
                         </div>
                         :
                         null
