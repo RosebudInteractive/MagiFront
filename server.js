@@ -126,6 +126,10 @@ Promise.resolve()
             res.sendFile(__dirname + '/debug/FileUploadTest.html');
         });
 
+        app.get("/testimport", function (req, res) {
+            res.sendFile(__dirname + '/debug/EpisodeImportTest.html');
+        });
+
         app.get("/logintest", function (req, res) {
             res.sendFile(__dirname + '/debug/LoginTestPage.html');
         });
@@ -160,6 +164,9 @@ Promise.resolve()
         // });
 
         app.post('/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
+
+        const { ImportEpisode, ImportEpisodeParams } = require('./database/import');
+        app.post('/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 
         app.listen(port, address, function (error) {
             if (error) {

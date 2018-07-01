@@ -196,16 +196,36 @@ function getUploadDir(upload_dir) {
 }
 
 function parseFileName(fileName) {
-    const { name, ext } = path.parse(fileName);
-    let res = { file: fileName, info: { name: name } };
-    let comp = name.split('@');
-    if (comp.length > 1) {
-        res.info.name = comp[0];
-        res.info.description = comp[1];
-    }
+    const { name: fname, ext } = path.parse(fileName);
+    let res = { file: fileName, info: { name: fname } };
+    let name = null;
+    let description = null;
+    let id = null;
 
-    let transName = slugify(name, { lowercase: false });
-    if (name !== transName)
+    let comp = fname.split('@');
+    comp.forEach((part) => {
+        let match = part.match(/(id-)(.*)/i)
+        if ((!id) && match) {
+            if (match.length >= 3) {
+                id = match[2];
+                res.info.fileId = id;;
+            }
+        }
+        else {
+            if (!name) {
+                name = part;
+                res.info.name = name;;
+            }
+            else
+                if (!description) {
+                    description = part;
+                    res.info.description = description;;
+                }
+        }
+    });
+
+    let transName = slugify(fname, { lowercase: false });
+    if (fname !== transName)
         res.file = transName + ext;
     return res;
 }
@@ -264,7 +284,7 @@ function importImages(srcDir, dstDir) {
 
 exports.FileUpload = {
     importImages: importImages,
-    getFileUploadProc: (upload_dir) => {
+    getFileUploadProc: (upload_dir, postProcessor, parameters) => {
         const uploadDir = getUploadDir(upload_dir);
         const fileProcessors = {
             image: processImage,
@@ -304,9 +324,20 @@ exports.FileUpload = {
                     form.parse(req, (err, fields, files) => {
                         if (err)
                             return processErr(err);
+                        if (typeof (postProcessor) === "function") {
+                            let options = {};
+                            parameters.forEach((param) => {
+                                let val = fields[param];
+                                if (typeof (val) != "undefined")
+                                    options[param] = val;
+                            });
+                            result = result
+                                .then(() => postProcessor(uploadDir, res_files, options));
+                        }
                         result
-                            .then(() => {
-                                return res.status(HTTP_OK).json(res_files);
+                            .then((func_res) => {
+                                let result = func_res ? func_res : res_files;
+                                return res.status(HTTP_OK).json(result);
                             })
                             .catch((err) => {
                                 return processErr(err);
