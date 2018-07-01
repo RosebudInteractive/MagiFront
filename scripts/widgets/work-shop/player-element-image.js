@@ -10,8 +10,11 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     }
 
     _playImage() {
-        if (that._playState.imageAnimation) {
-            cancelAnimationFrame(that._playState.imageAnimation.frame);
+        if (this._playState.imageAnimation) {
+            cancelAnimationFrame(this._playState.imageAnimation.frame);
+        }
+        if (this._playState.imgDelayInterval) {
+            clearTimeout(this._playState.imgDelayInterval)
         }
         let rate = this._playState.rate;
 
@@ -116,6 +119,9 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     renderPosition(position) {
         if (this._playState.imageAnimation) {
             cancelAnimationFrame(this._playState.imageAnimation.frame);
+        }
+        if (this._playState.imgDelayInterval) {
+            clearTimeout(this._playState.imgDelayInterval)
         }
 
         super.renderPosition(position);
