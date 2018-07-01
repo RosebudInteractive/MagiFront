@@ -41,8 +41,9 @@ class NestedPlayer {
         this._currentTime = 0;
 
         // setTimeout(() => {
+        //     console.log('timeout play')
         //     this.play()
-        // }, 2000)
+        // }, 0)
     }
 
 
@@ -131,8 +132,9 @@ class NestedPlayer {
             this.applyViewPorts();
             this._applyData(data);
             // setTimeout(() => {
+            //     console.log('timeout play')
             //     this.play()
-            // }, 2000)
+            // }, 0)
         }
 
         this._hasStoppedOnSwitch = false;

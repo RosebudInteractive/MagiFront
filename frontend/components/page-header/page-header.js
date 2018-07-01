@@ -83,6 +83,7 @@ class Header extends React.Component {
                             total={this.props.lessons.object.length}
                             current={_currentLesson.Number}
                             isNeedHideGallery={_currentLesson.IsAuthRequired && !authorized}
+                            isNeedHideRefs={!(this.props.lessonText.refs && (this.props.lessonText.refs.length > 0))}
                             episodes={this.props.lessonText.episodes}
                             isMobileApp={this.props.isMobileApp}
                         />

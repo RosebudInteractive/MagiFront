@@ -1,7 +1,12 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {getLessonBookmarks, removeLessonFromBookmarks} from '../../ducks/profile'
+import {
+    getLessonBookmarks,
+    removeLessonFromBookmarks,
+    addLessonToBookmarks,
+    userBookmarksSelector
+} from '../../ducks/profile'
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../actions/lesson-info-storage-actions";
 import Item from "./lesson-item";
@@ -33,16 +38,29 @@ class LessonsBlock extends React.Component {
         }
     }
 
+    _favoritesClick(lesson) {
+        if (this._isLessonInBookmarks(lesson)) {
+            this.props.removeLessonFromBookmarks(lesson.courseUrl, lesson.URL)
+        } else {
+            this.props.addLessonToBookmarks(lesson.courseUrl, lesson.URL)
+        }
+    }
+
+    _isLessonInBookmarks(lesson) {
+        return this.props.userBookmarks && this.props.userBookmarks.find((item) => {
+            return item === lesson.courseUrl + '/' + lesson.URL
+        })
+    }
+
+
     _getList() {
         let {bookmarks} = this.props,
             _result = [];
 
-        if (this._visibleCount > this.props.bookmarks.size) {
-            this._visibleCount = this.props.bookmarks.size
-        }
-
         for (let i = 0; i < this._visibleCount; i++) {
-            _result.push(<Item item={bookmarks.get(i)} key={i} onRemoveItem={::this.props.removeLessonFromBookmarks}/>)
+            let _item = bookmarks.get(i);
+            _result.push(<Item item={_item} key={i} onRemoveItem={::this._favoritesClick}
+                               isFavorite={this._isLessonInBookmarks(_item)}/>)
         }
 
         return _result
@@ -63,12 +81,16 @@ class LessonsBlock extends React.Component {
     render() {
         let {bookmarks} = this.props;
 
+        if (this._visibleCount > this.props.bookmarks.size) {
+            this._visibleCount = this.props.bookmarks.size
+        }
+
         return (
             <div className={"profile-block__tab" + (this.props.active ? " active" : "")}>
                 <div className="history-list">
                     {this._getList()}
                     {
-                        (this._visibleCount !== bookmarks.length)
+                        ((bookmarks.size > 0) && (this._visibleCount < bookmarks.size))
                             ?
                             <button className="btn btn--white history-list__link"
                                     onClick={::this._getMoreBookmarks}>Больше лекций</button>
@@ -84,12 +106,14 @@ class LessonsBlock extends React.Component {
 function mapStateToProps(state) {
     return {
         bookmarks: getLessonBookmarks(state),
+        userBookmarks: userBookmarksSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
+        addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
     }
 }

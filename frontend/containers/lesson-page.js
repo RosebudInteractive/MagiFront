@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 
 import $ from 'jquery'
-import 'fullpage.js'
+// import 'fullpage.js'
+import 'script-lib/jquery.fullpage'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as playerStartActions from '../actions/player-start-actions';

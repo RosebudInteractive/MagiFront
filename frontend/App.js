@@ -187,6 +187,8 @@ class App extends Component {
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>
                 <Route path={_homePath + 'history'} component={ProfilePage}/>
                 <Route path={_homePath + 'favorites'} component={BookmarksPage}/>
+                <Route path={_homePath + 'favorites/courses'} component={BookmarksPage}/>
+                <Route path={_homePath + 'favorites/lessons'} component={BookmarksPage}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>

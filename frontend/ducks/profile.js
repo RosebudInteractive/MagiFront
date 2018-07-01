@@ -144,30 +144,30 @@ export default function reducer(state = new ReducerRecord(), action) {
         case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload))
-                .update('courseBookmarks', courseBookmarks => {
-                    let _index = courseBookmarks.findIndex((course) => {
-                        return course.URL === payload
-                    })
-
-                    return (_index >= 0) ?
-                        courseBookmarks.splice(_index, 1)
-                        :
-                        courseBookmarks
-                    })
+                // .update('courseBookmarks', courseBookmarks => {
+                //     let _index = courseBookmarks.findIndex((course) => {
+                //         return course.URL === payload
+                //     })
+                //
+                //     return (_index >= 0) ?
+                //         courseBookmarks.splice(_index, 1)
+                //         :
+                //         courseBookmarks
+                //     })
 
         case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload.courseUrl + '/' + payload.lessonUrl))
-                .update('lessonBookmarks', lessonBookmarks => {
-                    let _index = lessonBookmarks.findIndex((lesson) => {
-                        return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
-                    })
-
-                    return (_index >= 0) ?
-                        lessonBookmarks.splice(_index, 1)
-                        :
-                        lessonBookmarks
-                })
+                // .update('lessonBookmarks', lessonBookmarks => {
+                //     let _index = lessonBookmarks.findIndex((lesson) => {
+                //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
+                //     })
+                //
+                //     return (_index >= 0) ?
+                //         lessonBookmarks.splice(_index, 1)
+                //         :
+                //         lessonBookmarks
+                // })
 
         default:
             return state

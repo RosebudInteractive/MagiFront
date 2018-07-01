@@ -178,7 +178,7 @@ export default class LessonInfoStorage {
         if (_playingLessonId) {
             let _value = object.get(_playingLessonId);
 
-            let _pos = Math.round(_value.currentTime * 100) / 100,
+            let _pos = _value ? (Math.round(_value.currentTime  * 100) / 100) : 0,
                 _lessonsMap = _state.lessonInfoStorage.lessons,
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
@@ -189,7 +189,7 @@ export default class LessonInfoStorage {
 
             let _obj = {pos: _pos, dt: _dt}
 
-            if (_value.isFinished !== undefined) {
+            if (_value && (_value.isFinished !== undefined)) {
                 _obj.isFinished = _value.isFinished
             }
 

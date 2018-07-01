@@ -7,25 +7,27 @@ export default class Item extends React.Component {
 
     static propTypes = {
         item: PropTypes.object,
+        isFavorite: PropTypes.bool,
     }
 
     _favoritesClick() {
         if (this.props.onRemoveItem) {
-            this.props.onRemoveItem(this.props.item.courseUrl, this.props.item.URL)
+            this.props.onRemoveItem(this.props.item)
         }
     }
 
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>';
 
-        let {item} = this.props;
+        let {item, isFavorite} = this.props;
 
         return (
             <div className="history-item">
                 <div className="history-item__date-block">
                     <span className="favorites active" onClick={::this._favoritesClick}>
-                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _redFlag}}/>
+                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ? _redFlag : _flag}}/>
                     </span>
                     {
                         item.isSubLesson ?
