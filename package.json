@@ -48,7 +48,6 @@
     "express-logger": "0.0.3",
     "express-session": "^1.15.6",
     "formidable": "^1.1.1",
-    "fullpage.js": "^2.9.7",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
     "jquery": "^3.3.1",

@@ -16,6 +16,7 @@ class DesktopHeaderRow extends React.Component {
         filterActive: PropTypes.bool.isRequired,
         currentPage: PropTypes.object.isRequired,
         onFilterClick: PropTypes.func.isRequired,
+        onBookmarkClick: PropTypes.func.isRequired,
     }
 
     render() {
@@ -53,6 +54,7 @@ class Navigator extends React.Component {
 
     render() {
         const _filter = '<use xlink:href="#filter"/>',
+            _flagFull = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>',
             _isCoursesPage = this.props.currentPage.name === tools.pages.courses.name;
 
         return (
@@ -61,8 +63,15 @@ class Navigator extends React.Component {
                     <li className={_isCoursesPage ? "current" : ''}>
                         <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
-                    <li>
-                        <a>Календарь</a>
+                    {/*<li>*/}
+                        {/*<a>Календарь</a>*/}
+                    {/*</li>*/}
+                    <li className={"filter" + (this.props.filterActive ? ' active' : '')}
+                        onClick={this.props.onBookmarkClick}>
+                        <Link to={'/favorites'}>
+                            <span className="hidden">Закладки</span>
+                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                        </Link>
                     </li>
                     {
                         _isCoursesPage

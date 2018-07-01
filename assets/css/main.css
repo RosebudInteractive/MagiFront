@@ -3359,26 +3359,42 @@ li.fancybox-thumbs-loading {
 .fancybox-slide > * {
   padding: 0 42px 30px 42px; }
 
-.fancybox-navigation button {
-  padding: 0;
-  width: 48px;
-  height: 48px;
-  background-color: rgba(47, 47, 47, 0.6);
-  border-radius: 50%;
-  overflow: hidden;
-  display: none; }
-  .fancybox-navigation button:before {
-    display: none; }
-  .fancybox-navigation button svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    display: block;
-    width: 40px;
-    height: 40px; }
+.fancybox-navigation {
+  display: block; }
+  .fancybox-navigation button {
+    padding: 0;
+    margin-top: 0;
+    width: 28% !important;
+    height: 100%;
+    top: 0;
+    overflow: hidden; }
+    .fancybox-navigation button.fancybox-button--arrow_right {
+      right: auto;
+      left: 71.875%;
+      margin-top: -48px; }
+    .fancybox-navigation button:after {
+      content: '';
+      width: 48px;
+      height: 48px;
+      background-color: rgba(47, 47, 47, 0.9);
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      margin-top: -24px;
+      margin-left: -24px; }
+    .fancybox-navigation button:before {
+      display: none; }
+    .fancybox-navigation button svg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      display: block;
+      width: 40px;
+      height: 40px;
+      z-index: 2; }
 
 .fancybox-infobar {
   display: none; }
@@ -3468,6 +3484,10 @@ li.fancybox-thumbs-loading {
       right: 18px;
       height: 1px;
       background-color: rgba(47, 47, 47, 0.2); } }
+@media (max-width: 375px) {
+  .page-header__menu-mobile:after {
+    left: 0;
+    right: 0;} }
   @media (max-width: 899px) {
     .page-header.opened .page-header__menu-mobile {
       background-color: #2f2f2f; }
@@ -5737,7 +5757,10 @@ ul.user-tooltip {
       @media (max-width: 639px) {
         .course-module--main .course-module__info-block {
           padding-top: 5px;
-          padding-left: 20px; } }
+          padding-left: 20px;
+          padding-right: 20px;
+          width: 100%;
+          min-width: 100%; } }
     @media (max-width: 639px) {
       .course-module--main .course-module__label {
         padding-left: 24px; } }
@@ -5747,65 +5770,102 @@ ul.user-tooltip {
       display: -moz-box;
       display: -ms-flexbox;
       display: flex;
-      min-width: 44%;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      padding-left: 40px;
+      padding-top: 68px;
+      padding-bottom: 58px;
+      width: 50%;
+      min-width: 50%;
       position: relative;
-      top: 40px; }
+      top: 0; }
+      @media (max-width: 1279px) {
+        .course-module--main .course-module__image-block {
+          padding-top: 16px;
+          padding-bottom: 42px; } }
       @media (max-width: 899px) {
         .course-module--main .course-module__image-block {
-          top: 14px; } }
-      @media (max-width: 768px) {
+          padding-top: 32px;
+          padding-left: 53px;
+          padding-bottom: 33px; } }
+      @media (max-width: 767px) {
         .course-module--main .course-module__image-block {
-          top: 0; } }
-      @media (max-width: 640px) {
-        .course-module--main .course-module__image-block {
-          padding-top: 0; } }
+          padding-top: 16px;
+          padding-bottom: 11px; } }
       @media (max-width: 639px) {
         .course-module--main .course-module__image-block {
-          padding-left: 0; } }
+          padding-top: 0;
+          padding-left: 0;
+          padding-bottom: 9px;
+          -webkit-box-sizing: border-box;
+          -moz-box-sizing: border-box;
+          box-sizing: border-box;
+          width: 100%;
+          min-width: 100%; } }
       .course-module--main .course-module__image-block svg {
         max-width: 1000px;
         max-height: 1000px;
-        min-width: 547px;
-        min-height: 503px; }
+        min-width: 665px;
+        min-height: 575px; }
+        @media (max-width: 1399px) {
+          .course-module--main .course-module__image-block svg {
+            min-width: 612px;
+            min-height: 500px; } }
+        @media (max-width: 1279px) {
+          .course-module--main .course-module__image-block svg {
+            min-width: 500px;
+            min-height: 503px; } }
         @media (max-width: 899px) {
           .course-module--main .course-module__image-block svg {
             max-width: 370px;
             max-height: 300px;
-            min-width: 239px;
-            min-height: 316px; } }
-        @media (max-width: 640px) {
+            min-width: 331px;
+            min-height: 287px; } }
+        @media (max-width: 767px) {
           .course-module--main .course-module__image-block svg {
-            min-height: 304px;
-            max-width: 278px;
-            min-width: 278px; } }
+            max-height: 270px;
+            min-width: 276px;
+            min-height: 270px; } }
         @media (max-width: 639px) {
           .course-module--main .course-module__image-block svg {
             min-width: 320px;
             min-height: 304px;
-            max-height: 370px; } }
+            max-width: 320px;
+            min-width: 320px;
+            max-height: 350px; } }
     .course-module--main .course-module__label:before {
       display: none; }
       @media (max-width: 899px) {
         .course-module--main .course-module__label:before {
           display: block; } }
     .course-module--main .course-module__header {
-      padding-bottom: 100px; }
+      padding-bottom: 0; }
       @media (max-width: 899px) {
         .course-module--main .course-module__header {
           min-height: 0;
-          padding-bottom: 0; } }
-      @media (max-width: 768px) {
+          padding-bottom: 0;
+          padding-top: 40px; } }
+      @media (max-width: 767px) {
         .course-module--main .course-module__header {
-          padding-bottom: 9px; } }
+          padding-bottom: 0;
+          padding-top: 42px; } }
       @media (max-width: 639px) {
         .course-module--main .course-module__header {
           padding-right: 0; } }
+    @media (max-width: 1279px) {
+      .course-module--main .course-module__title {
+        margin-bottom: 42px;
+        width: 100%; } }
     @media (max-width: 899px) {
       .course-module--main .course-module__title {
         margin-bottom: 20px; } }
     @media (max-width: 639px) {
       .course-module--main .course-module__title {
         padding-right: 40px; } }
+    @media (max-width: 1279px) {
+      .course-module--main .course-module__info {
+        margin-bottom: 42px; } }
     @media (max-width: 899px) {
       .course-module--main .course-module__info-col {
         min-width: 45%; } }
@@ -5814,22 +5874,23 @@ ul.user-tooltip {
         min-width: 47%; } }
 
 .lectures-wrapper {
+  -webkit-overflow-scrolling: touch;
   background-color: #fff; }
   @media (max-width: 899px) {
-  .lectures-wrapper {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    margin-left: -33px;
-    padding-left: 33px;
-    padding-bottom: 20px;
-    min-width: 100%;
-    overflow: auto; } }
+    .lectures-wrapper {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: flex;
+      margin-left: -33px;
+      padding-left: 33px;
+      padding-bottom: 20px;
+      min-width: 100%;
+      overflow: auto; } }
   @media (max-width: 639px) {
-  .lectures-wrapper {
-    padding-bottom: 17px; } }
+    .lectures-wrapper {
+      padding-bottom: 17px; } }
 
 .lectures-counter {
   margin: 0;
@@ -6652,9 +6713,9 @@ ul.user-tooltip {
   padding-right: 20px;
   -webkit-transition: background-color 0.3s ease, opacity 0.3s ease;
   transition: background-color 0.3s ease, opacity 0.3s ease; }
-  /*@media (max-width: 899px) {*/
-    /*.lectures-menu {*/
-      /*padding-right: 0; } }*/
+  @media (max-width: 899px) {
+    .lectures-menu {
+      padding-right: 0; } }
   .lectures-menu:after {
     content: "";
     position: absolute;
@@ -6714,6 +6775,10 @@ ul.user-tooltip {
         .lectures-menu__section.transcript:first-child {
           width: 50%;
           min-width: 50%; } }
+      @media (max-width: 375px) {
+        .lectures-menu__section.transcript:first-child {
+          width: 55px;
+          min-width: 55px; } }
       @media (max-width: 767px) {
         .lectures-menu__section:first-child {
           padding-left: 8px; } }
@@ -6744,8 +6809,12 @@ ul.user-tooltip {
         width: 100% }
       .lectures-menu__link-back.transcript {
         max-width: 100%;
-        max-width: 100%;
         width: 100% } }
+    @media (max-width: 375px) {
+      .lectures-menu__link-back.transcript {
+        margin-left: 11px;
+        max-width: 55px;
+        width: 55px } }
     @media (max-width: 599px) {
       .lectures-menu__link-back {
         -webkit-box-flex: 1;
@@ -6766,7 +6835,7 @@ ul.user-tooltip {
         fill: #2f2f2f; }
         ._dark .lectures-menu__link-back .icon svg {
           fill: #fff; }
-    @media (max-width: 599px) {
+    @media (max-width: 600px) {
       .lectures-menu__link-back span {
         font-size: 0; } }
     @media (max-width: 1280px) {
@@ -7828,6 +7897,11 @@ body[data-page="fullpage-player"] .lectures-menu {
         left: 0;
         height: 32px;
         border-left: 1px solid rgba(47, 47, 74, 0.2); } }
+  @media (max-width: 375px) {
+    .lectures-menu-nav {
+      width: 55px; }
+    .lectures-menu-nav:after {
+      height: 54px; } }
   .lectures-menu-nav__trigger {
     position: absolute;
     display: none;
@@ -11218,19 +11292,9 @@ ul.lectures-tab {
       display: none; }
   @media (max-width: 600px) {
     .player-block .speed-button {
-      /*position: absolute;*/
-      /*top: 12px;*/
-      /*right: 111px;*/
-      /*pointer-events: initial;*/
-      /*z-index: 101; */
       display: none; } }
   @media (max-width: 600px) {
     .player-block .content-button {
-      /*position: absolute;*/
-      /*top: 12px;*/
-      /*right: 57px;*/
-      /*pointer-events: initial;*/
-      /*z-index: 101;*/
       display: none; } }
   .player-wrapper .speed-button,
   .player-wrapper .content-button {
@@ -11260,10 +11324,13 @@ ul.lectures-tab {
       pointer-events: initial; } }
   @media (max-width: 375px) {
     .player-wrapper .speed-button {
-        right: 57px; } }
+      top: 0px;
+      padding: 17px 33px 36px 20px; } }
   @media (max-width: 375px) {
     .player-wrapper .content-button {
-        right: 25px; } }
+      top: 0px;
+      padding: 20px 33px 33px 20px;
+      right: 54px; } }
 
 
 .sound-control {
@@ -12668,13 +12735,12 @@ ul.lectures-tab {
     .fav-card__title:hover .fav svg {
       fill: #c8684c; }
   .fav-card__title-text {
-    padding-left: 30px;
     font-weight: 400;
     letter-spacing: -0.5px; }
   .fav-card .fav {
     position: absolute;
-    top: 9px;
-    left: 0;
+    top: 4px;
+    right: 0;
     display: block;
     width: 14px;
     height: 23px; }
@@ -12682,6 +12748,8 @@ ul.lectures-tab {
       fill: #bababa;
       -webkit-transition: fill 0.3s ease;
       transition: fill 0.3s ease; }
+  .fav-card .fav.active svg {
+      fill: #c8684c; }
     @media (max-width: 899px) {
       .fav-card .fav {
         top: 1px; } }
@@ -12963,6 +13031,17 @@ ul.lectures-tab {
       padding-bottom: 6px;
       font-size: 20px;
       line-height: 20px; } }
+  .profile-block__tab-control .qty {
+    position: absolute;
+    left: -webkit-calc(100% + 4px);
+    left: calc(100% + 4px);
+    top: 14px;
+    font-size: 18px; }
+    @media (max-width: 899px) {
+      .profile-block__tab-control .qty {
+        top: 16px;
+        font-size: 13px;
+        line-height: 13px; } }
   .profile-block__tab-control.active {
     color: #2f2f2f; }
   .profile-block__tab-control:first-child {
@@ -12973,7 +13052,23 @@ ul.lectures-tab {
     @media (max-width: 639px) {
       .profile-block__tab-control:first-child {
         margin-left: 24px; } }
-
+  .bookmarks-page .profile-block__tab-control:first-child {
+    margin-left: 117px; }
+  @media (max-width: 899px){
+    .bookmarks-page .profile-block__tab-control:first-child {
+      margin-left: 75px; } }
+  @media (max-width: 767px){
+    .bookmarks-page .profile-block__tab-control:first-child {
+      margin-left: 37px; } }
+  @media (max-width: 480px){
+    .bookmarks-page .profile-block__tab-control:first-child {
+      margin-left: 20px; }
+    .bookmarks-page .profile-block__tab-controls ul {
+      padding-left: 0;
+      padding-right: 0;
+    }}
+  .bookmarks-page .profile-block__header-col:first-child {
+    padding-left: 0; }
 .profile-block .icon {
   position: absolute;
   left: -27px;
@@ -13005,6 +13100,16 @@ ul.lectures-tab {
     position: static;
     opacity: 1;
     z-index: initial; }
+
+  .bookmarks-page .profile-block {
+    margin-top: 48px;
+  }
+  @media (max-width: 899px) {
+    .bookmarks-page .profile-block {
+      margin-top: 28px; } }
+@media (max-width: 639px) {
+  .bookmarks-page .profile-block {
+    margin-top: 68px; } }
 
 .history-list {
   display: -webkit-box;
@@ -13192,6 +13297,19 @@ ul.lectures-tab {
         -ms-flex-align: start;
         align-items: flex-start;
         margin-top: -6px; } }
+  .history-item__date-block .favorites {
+    right: 20px;
+    position: absolute;
+    top: 63px;
+    cursor: pointer; }
+  @media (max-width: 899px) {
+    .history-item__date-block .favorites {
+      top: 39px; } }
+  @media (max-width: 639px) {
+    .bookmarks-page .history-item__info-block {
+      padding-left: 30px; }
+    .history-item__date-block .favorites {
+      right: auto; } }
   .history-item__play-block .play-block-small {
     position: absolute;
   }
@@ -14463,6 +14581,25 @@ ul.lectures-tab {
   justify-content: space-between;
   overflow: hidden;
   width: 14px; }
+  .equalizer.paused div {
+    /*-webkit-animation-play-state: paused;*/
+    /*animation-play-state: paused;*/
+    -webkit-animation: none;
+    animation: none}
+  .equalizer.paused .eq-1 {
+    height: 7px;
+    margin-top: 7px; }
+  .equalizer.paused .eq-2 {
+    height: 14px }
+  .equalizer.paused .eq-3 {
+    height: 3px;
+    margin-top: 11px; }
+  .equalizer.paused .eq-4 {
+    height: 9px;
+    margin-top: 5px; }
+  .equalizer.paused .eq-5 {
+    height: 5px;
+    margin-top: 9px; }
 
 .equalizer div {
   background: #c8684c;

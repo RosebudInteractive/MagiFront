@@ -295,7 +295,8 @@ export default class CWSPlayer extends CWSBase {
     _setAudioEvents(audio) {
         let that = this;
         audio
-            .on("canplay", () => {
+            .on("canplay", function() {
+                // console.log('canplay : ', this.src)
                 that._addDevInfo('canplay')
 
                 if (that._audioState.savedCurrenttime !== undefined) {
@@ -306,10 +307,11 @@ export default class CWSPlayer extends CWSBase {
                 that._broadcastCanPlay(that);
             })
             .on("loadeddata", function () {
+                // console.log('loadeddata : ', this.src)
                 that._onAudioLoadedHandler(this);
             })
             .on("timeupdate", function () {
-
+                // console.log('timeupdate : ', this.src)
                 that._audioState.currentTime = (that._audioState.currentTime < this.currentTime) ? this.currentTime : that._audioState.currentTime;
                 that._audioState.globalTime = that._audioState.baseTime + that._audioState.currentTime;
 
@@ -327,7 +329,7 @@ export default class CWSPlayer extends CWSBase {
                 that._audioState.muted = this.muted;
             })
             .on("ended", function () {
-                console.log('canplay ended')
+                // console.log('canplay ended : ', this.src)
                 that._addDevInfo('canplay ended')
                 let data = that._options.loader.getData();
                 if (that._audioState.currentEpisode + 1 < data.episodes.length) {
@@ -369,21 +371,24 @@ export default class CWSPlayer extends CWSBase {
 
             })
             .on("play", function () {
+                // console.log('play : ', this.src)
                 that._addDevInfo('play event')
                 that._audioState.stopped = false;
                 that._audioState.requestAnimationFrameID = requestAnimationFrame(::that._proccessAnimationFrame);
                 that._broadcastStarted();
             })
             .on("error", function (e) {
-                console.log('canplay error')
+                // console.log('canplay error')
                 that._addDevInfo('canplay error')
                 that.pause();
                 that._broadcastError(e);
             })
             .on("progress", function() {
+                // console.log('progress : ', this.src)
                 that._calcBuffered(this)
             })
             .on("loadedmetadata", function() {
+                // console.log('loadedmetadata : ', this.src)
                 that._calcBuffered(this)
             })
     }

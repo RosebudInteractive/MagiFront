@@ -28,8 +28,6 @@ class Frame extends Component {
         this._timer = null;
 
         this.state = {
-            // showContent: false,
-            // showRate: false,
             fullScreen: false,
         }
 
@@ -44,15 +42,16 @@ class Frame extends Component {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),
-                _isPauseFrame = e.target.closest('.player-frame__screen');
+                _isPauseFrame = e.target.closest('.player-frame__screen'),
+                _isMenuButton = e.target.closest('.menu-button');
 
-            if (_isContent || _isRate) {
+            if (_isContent || _isRate || _isMenuButton) {
                 return
             }
 
             if (_isPlayer) {
                 if (that.props.isMobileApp && that._firstTap) {
-                    this._firstTap = false;
+                    that._firstTap = false;
                     that._clearTimeOut();
                     that._initTimeOut();
                 } else {
@@ -62,16 +61,16 @@ class Frame extends Component {
             }
 
             if (_isPauseFrame) {
-                this.props.playerStartActions.startPlay(this.props.lesson.Id)
+                that.props.playerStartActions.startPlay(this.props.lesson.Id)
             }
 
-            this._hideContentTooltip = this.props.showContentTooltip;
-            this._hideRateTooltip = this.props.showSpeedTooltip;
-            if (this._hideContentTooltip) {
-                this.props.playerActions.hideContentTooltip()
+            that._hideContentTooltip = that.props.showContentTooltip;
+            that._hideRateTooltip = that.props.showSpeedTooltip;
+            if (that._hideContentTooltip) {
+                that.props.playerActions.hideContentTooltip()
             }
-            if (this._hideRateTooltip) {
-                this.props.playerActions.hideSpeedTooltip()
+            if (that._hideRateTooltip) {
+                that.props.playerActions.hideSpeedTooltip()
             }
         });
 
@@ -247,13 +246,13 @@ class Frame extends Component {
                                         <Controls {...this.props}/>
                                         <div className="player-block__stats">
                                             <TimeInfo/>
-                                            <button type="button" className="speed-button js-speed-trigger"
+                                            <button type="button" className="speed-button js-speed-trigger player-button"
                                                     onClick={::this._openRate}>
                                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                             </button>
                                             {
                                                 this.props.contentArray.length > 0 ?
-                                                    <button type="button" className="content-button js-contents-trigger"
+                                                    <button type="button" className="content-button js-contents-trigger player-button"
                                                             onClick={::this._openContent}>
                                                         <svg width="18" height="12"
                                                              dangerouslySetInnerHTML={{__html: _contents}}/>

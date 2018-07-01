@@ -17,6 +17,7 @@ class Menu extends React.Component {
         total: PropTypes.number,
         episodes: PropTypes.array,
         isNeedHideGallery: PropTypes.bool,
+        isNeedHideRefs: PropTypes.bool,
     };
 
     constructor(props) {
@@ -205,7 +206,7 @@ class Menu extends React.Component {
     }
 
     render() {
-        let {isNeedHideGallery} = this.props;
+        let {isNeedHideGallery, isNeedHideRefs} = this.props;
 
         const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>'
 
@@ -222,7 +223,7 @@ class Menu extends React.Component {
                     </div>
                     <div className="lectures-menu__section lectures-list-block">
                         <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
-                                onClick={::this._switchMenu}><span className='caption'>Лекция </span>
+                                onClick={::this._switchMenu}><span>Лекция </span>
                             <span className="num"><span
                                 className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
@@ -241,10 +242,15 @@ class Menu extends React.Component {
                                         :
                                         null
                                 }
-                                <li className="menu-nav-list__item">
-                                    <a href="#recommend"
-                                       className="menu-nav-list__item-head js-scroll-link">Источники</a>
-                                </li>
+                                {
+                                    !isNeedHideRefs ?
+                                        <li className="menu-nav-list__item">
+                                            <a href="#recommend"
+                                               className="menu-nav-list__item-head js-scroll-link">Источники</a>
+                                        </li>
+                                        :
+                                        null
+                                }
                                 {
                                     !isNeedHideGallery ?
                                         <li className="menu-nav-list__item">

@@ -7,7 +7,7 @@ import $ from 'jquery'
 import * as userActions from "../../actions/user-actions";
 import {
     addLessonToBookmarks,
-    getLessonBookmarks,
+    userBookmarksSelector,
     getUserBookmarks,
     removeLessonFromBookmarks
 } from "../../ducks/profile";
@@ -88,16 +88,22 @@ class LessonFrame extends React.Component {
     _favoritesClick() {
         let {courseUrl, lessonUrl} = this.props;
 
-        if (this._isLessonInBookmarks()) {
-            this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
         } else {
-            this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            if (this._isLessonInBookmarks()) {
+                this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+            } else {
+                this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            }
         }
     }
 
     _isLessonInBookmarks() {
-        return this.props.bookmarks.find((item) => {
-            return item.URL === this.props.lessonUrl
+        let {courseUrl, lessonUrl} = this.props;
+
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
+            return item === courseUrl + '/' +  lessonUrl
         })
     }
 
@@ -157,7 +163,7 @@ class SocialBlock extends React.Component {
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
         let {inFavorites, onFavoritesClick} = this.props;
@@ -198,7 +204,7 @@ class SocialBlock extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        bookmarks: getLessonBookmarks(state),
+        bookmarks: userBookmarksSelector(state),
         lessonInfoStorage: state.lessonInfoStorage,
         authorized: !!state.user.user,
     }

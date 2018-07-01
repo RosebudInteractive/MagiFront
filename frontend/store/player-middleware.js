@@ -68,9 +68,6 @@ const playerMiddleware = store => next => action => {
         }
 
         case PLAYER_START_REPLAY: {
-
-
-
             if (Player.getInstance()) {
                 Player.getInstance().replay()
             }
