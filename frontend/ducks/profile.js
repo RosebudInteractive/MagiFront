@@ -85,7 +85,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case LOGOUT_SUCCESS:
             return state
-                .set('user', null)
+                .clear()
 
         case GET_USER_INFO_ERROR:
         case GET_HISTORY_ERROR:
@@ -581,6 +581,16 @@ const handleBookmarksData = (data) => {
 
             lesson.authorUrl = _author ? _author.URL : null;
             lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
+        })
+
+        data.Lessons.sort((a, b) => {
+            let _result = b.CourseId - a.CourseId;
+
+            if (_result === 0) {
+                _result = a.Number - b.Number
+            }
+
+            return _result
         })
     }
 }

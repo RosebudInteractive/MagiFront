@@ -51,7 +51,7 @@ export default class Item extends React.Component {
                             <span className="text">{' ' + item.Name}</span>
                         </Link>
                     </h4>
-                    <Link to={'autor/' + item.authorUrl}>
+                    <Link to={'/autor/' + item.authorUrl}>
                         <p className="history-item__author">{item.authorName}</p>
                     </Link>
                 </div>

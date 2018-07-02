@@ -97,7 +97,7 @@ class App extends Component {
 
         if (!(_recoveryRout || _errorRout)){
             this.props.userActions.whoAmI()
-            this.props.getUserBookmarks()
+            // this.props.getUserBookmarks()
         }
     }
 

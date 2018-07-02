@@ -5,9 +5,9 @@ import {Link} from 'react-router-dom';
 
 import {authorSelector} from '../../ducks/author'
 import {ImageSize, getCoverPath, getRandomInt} from '../../tools/page-tools'
-import {LessonFull} from "../common/lecture-full-wrapper";
+import LessonFull from "../common/lecture-full-wrapper";
 
-class CouresesBlock extends React.Component {
+class CoursesBlock extends React.Component {
 
     constructor(props) {
         super(props);
@@ -135,4 +135,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(CouresesBlock);
+export default connect(mapStateToProps)(CoursesBlock);

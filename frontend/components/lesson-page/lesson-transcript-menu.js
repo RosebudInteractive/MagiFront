@@ -155,7 +155,7 @@ class Menu extends React.Component {
 
                 $('.menu-nav-sublist').css('max-height', _height)
             } else {
-                $('.menu-nav-sublist').css('max-height', 'auto')
+                $('.menu-nav-sublist').css('max-height', 'none')
             }
         } else {
             $('.menu-nav-sublist').css('max-height', '0')
@@ -205,10 +205,35 @@ class Menu extends React.Component {
         }
     }
 
+    _scrollToTop() {
+        let $target = $("#text"),
+            targetOffset = $target.offset().top;
+
+        let _currentPosition = $(window).scrollTop(),
+            _delta = 0;
+
+        if (_currentPosition > targetOffset) {
+            _delta = ($(window).outerWidth() > 899) ? 175 : 125
+        } else {
+            _delta = 75
+        }
+
+        targetOffset -= _delta;
+
+        if ($target.length) {
+
+            // trigger scroll
+            $('html, body').animate({
+                scrollTop: targetOffset
+            }, 400);
+        }
+    }
+
     render() {
         let {isNeedHideGallery, isNeedHideRefs} = this.props;
 
-        const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>'
+        const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>',
+            _style = {"white-space": 'nowrap'};
 
         return (
             <div className="page-header__row lectures-menu-row">
@@ -229,7 +254,7 @@ class Menu extends React.Component {
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
                     <section className={"lectures-menu__section lectures-menu-nav js-lectures-menu-nav"}>
-                        <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
+                        <button className={"lectures-menu-nav__trigger" + (this.state.showNavigationButtons ? ' opened' : '')} onClick={::this._switchNavigation}>Меню</button>
                         <div className={"lectures-menu-nav__list" + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">
                                 {
@@ -240,7 +265,9 @@ class Menu extends React.Component {
                                             <TableOfContents episodes={this.props.episodes}/>
                                         </li>
                                         :
-                                        null
+                                        <li className={"menu-nav-list__item"} style={_style}>
+                                            <div className="menu-nav-list__item-head"  onClick={::this._scrollToTop}>В начало</div>
+                                        </li>
                                 }
                                 {
                                     !isNeedHideRefs ?
