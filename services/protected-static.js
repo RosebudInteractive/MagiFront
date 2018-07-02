@@ -9,6 +9,16 @@ let dataUrl = config.get('dataUrl');
 
 exports.setupProtectedStatic = (app) => {
     app.use(dataUrl, (req, res, next) => {
+        let { name, ext } = path.parse(decodeURIComponent(req.url))
+        if (ext === ".mp3") {
+            console.log("=== DATA REQUEST ===");
+            console.log("  OriginalUrl: " + req.originalUrl);
+            console.log("  Ip: " + req.ip);
+            console.log("=== START HEADERS ===");
+            for (let h in req.headers)
+                console.log(`    ${h}: "${req.headers[h]}"`);
+            console.log("===  END HEADERS  ===");
+        };
         AccessRights.canAccessFile(req.user, req.url)
             .then((canAccess) => {
                 if (canAccess) {
