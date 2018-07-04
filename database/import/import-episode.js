@@ -6,6 +6,9 @@ const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
+const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
+const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { ParserWordXML } = require('./parser-word-xml');
 const { EpisodesService } = require("../db-episode");
 
@@ -38,8 +41,27 @@ const GET_EPISODE_DURATION_MYSQL =
     "  join`EpisodeLng` el on el.`EpisodeId` = e.`Id`\n" +
     "where e.`Id` = <%= idEpisode %>";
 
+const RESOURCE_EXP = {
+    expr: {
+        model: {
+            name: "Resource",
+            childs: [
+                {
+                    dataObject: {
+                        name: "ResourceLng"
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const { Import } = require('../../const/common');
+
 exports.ImportEpisode = class ImportEpisode {
-    constructor() { }
+    constructor() {
+        this._db = $memDataBase;
+    }
 
     importEpisode(fileName, options) {
         let opts = _.defaultsDeep(options, IMPOPT_OPTIONS_DFLT);
@@ -47,7 +69,10 @@ exports.ImportEpisode = class ImportEpisode {
         opts.importWarnings = [];
         let idLesson;
         let idEpisode;
-        
+        let self = this;
+        let edtOptions = { dbRoots: [] };
+        let root_obj = null;
+
         return new Promise((resolve) => {
             idLesson = parseInt(opts.idLesson);
             idEpisode = parseInt(opts.idEpisode);
@@ -86,55 +111,97 @@ exports.ImportEpisode = class ImportEpisode {
                             if (!(result && result.detail && (result.detail.length === 1)))
                                 throw new Error(`Episode (Id=${idEpisode}) doesn't exist.`);
                             duration = result.detail[0].Duration;
-                            return $data.execSql({
-                                dialect: {
-                                    mysql: _.template(GET_LESSON_PIC_MYSQL)({ idLesson: idLesson }),
-                                    mssql: _.template(GET_LESSON_PIC_MSSQL)({ idLesson: idLesson })
-                                }
-                            }, {});
-                        })
-                        .then((result) => {
-                            let picts = {};
-                            if (result && result.detail && (result.detail.length > 0)) {
-                                result.detail.forEach((elem) => {
-                                    try {
-                                        if (elem.MetaData) {
-                                            let meta = JSON.parse(elem.MetaData);
-                                            if (meta.fileId)
-                                                picts[meta.fileId] = { id: elem.Id, meta: meta };
-                                        }
-                                    } catch (err) { }
-                                })
-                            }
-                            let content = episode.Content = [];
-                            data.picts[data.picts.length - 1].duration = duration * 1000 - data.picts[data.picts.length - 1].ts;
-                            data.picts.forEach((elem) => {
-                                elem.files.forEach((file) => {
-                                    let item = { CompType: "PIC" };
-                                    let pict = picts[file.id];
-                                    if (pict) {
-                                        item.ResourceId = pict.id;
-                                        item.StartTime = elem.ts;
-                                        item.Duration = elem.duration;
-                                        item.Content = { track: file.track, duration: elem.duration / 1000 };
-                                        let title = file.title ? file.title : (pict.meta.name ? pict.meta.name : null);
-                                        let title2 = file.title2 ? file.title2 : (pict.meta.description ? pict.meta.description : null);
-                                        if (title)
-                                            item.Content.title = title;    
-                                        if (title2)
-                                            item.Content.title2 = title2;
-                                        item.Content = JSON.stringify(item.Content);
-                                        content.push(item);
-                                    }
-                                    else
-                                        opts.importErrors.push(`File id = ${file.id} ("${file.title}") doesn't exist in lesson.`);
-                                })
-                            });
 
-                            if (opts.importErrors.length > 0)
-                                throw new Error(`There are errors.`);
-                            
-                            return episode;
+                            return Utils.editDataWrapper(() => {
+                                return new MemDbPromise(self._db, (resolve, reject) => {
+                                    var predicate = new Predicate(self._db, {});
+                                    predicate
+                                        .addCondition({ field: "ResType", op: "=", value: "P" })
+                                        .addCondition({ field: "LessonId", op: "=", value: idLesson });
+
+                                    let exp_filtered = Object.assign({}, RESOURCE_EXP);
+                                    exp_filtered.expr.predicate = predicate.serialize(true);
+                                    self._db._deleteRoot(predicate.getRoot());
+
+                                    resolve(self._db.getData(Utils.guid(), null, null, exp_filtered, {}));
+                                })
+                                    .then((result) => {
+                                        if (result && result.guids && (result.guids.length === 1)) {
+                                            root_obj = self._db.getObj(result.guids[0]);
+                                            if (!root_obj)
+                                                throw new Error("ImportEpisode::importEpisode: Object doesn't exist: " + result.guids[0]);
+                                        }
+                                        else
+                                            throw new Error("ImportEpisode::importEpisode: Invalid result of \"getData\": " + JSON.stringify(result));
+
+                                        edtOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                        return root_obj.edit();
+                                    })
+                                    .then(() => {
+                                        let picts = {};
+                                        let collection = root_obj.getCol("DataElements");
+                                        for (let i = 0; i < collection.count(); i++) {
+                                            let resObj = collection.get(i);
+                                            let lngCollection = resObj.getDataRoot("ResourceLng").getCol("DataElements");
+                                            if (lngCollection && (lngCollection.count() === 1)) {
+                                                let elem = lngCollection.get(0);
+                                                try {
+                                                    if (elem.metaData()) {
+                                                        let meta = JSON.parse(elem.metaData());
+                                                        if (meta.fileId)
+                                                            picts[meta.fileId] = { id: resObj.id(), obj: elem, meta: meta, isUpdated: false };
+                                                    }
+                                                } catch (err) { };
+                                            }
+                                        }
+                                        let content = episode.Content = [];
+                                        data.picts[data.picts.length - 1].duration = duration * 1000 - data.picts[data.picts.length - 1].ts;
+                                        data.picts.forEach((elem) => {
+                                            elem.files.forEach((file) => {
+                                                let item = { CompType: "PIC" };
+                                                let pictData= picts[file.id];
+                                                if (pictData) {
+                                                    let meta = pictData.meta;
+                                                    let pict = pictData.obj;
+                                                    item.ResourceId = pictData.id;
+                                                    item.StartTime = elem.ts;
+                                                    item.Duration = elem.duration;
+                                                    item.Content = { track: file.track, duration: elem.duration / 1000 };
+                                                    if (!pict.isUpdated) {
+                                                        if (file.title) {
+                                                            pict.name(file.title);
+                                                            meta.name = file.title;
+                                                        }
+                                                        if (file.title2) {
+                                                            pict.description(file.title2);
+                                                            meta.description = file.title2;
+                                                        }
+                                                        pict.isUpdated = true;
+                                                        pict.metaData(JSON.stringify(meta));
+                                                    }
+                                                    let title = pict.name() ? pict.name() : null;
+                                                    let title2 = pict.description() ? pict.description() : null;
+                                                    if (title)
+                                                        item.Content.title = title;
+                                                    if (title2)
+                                                        item.Content.title2 = title2;
+                                                    item.Content = JSON.stringify(item.Content);
+                                                    content.push(item);
+                                                }
+                                                else
+                                                    opts.importErrors.push(`File id = ${file.id} ("${file.title}") doesn't exist in lesson.`);
+                                            })
+                                        });
+
+                                        if (opts.importErrors.length > 0)
+                                            throw new Error(`There are errors.`);
+
+                                        return root_obj.save();
+                                    })
+                                    .then(() => {
+                                        return episode;
+                                    });
+                            }, edtOptions);
                         });
                 }
                 return result;
@@ -167,16 +234,16 @@ exports.ImportEpisode = class ImportEpisode {
             let fileList = getCellText(cell);
             let files = null;
             if (fileList.length > 0) {
-                let filesArr = fileList.split(";");
+                let filesArr = fileList.split(Import.FILE_LIST_SEPARATOR);
                 let tracks = [];
                 filesArr.forEach((file) => {
-                    let { name } = path.parse(file);
-                    let partArr = name.split("@");
+                    let { name } = path.parse(file.trim());
+                    let partArr = name.split(Import.FILE_FIELD_SEPARATOR);
                     let title = null;
                     let title2 = null;
                     let id = null;
                     partArr.forEach((part) => {
-                        let match = part.match(/(id-)(.*)/i)
+                        let match = part.trim().match(/(id-)(.*)/i)
                         if (match) {
                             if (match.length >= 3)
                                 id = match[2];
