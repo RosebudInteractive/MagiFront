@@ -65,10 +65,14 @@ class Menu extends React.Component {
 
     _hideNavigationButtons() {
         $('#fp-nav').addClass('hide');
+        $('.total-time').addClass('hide');
+        $('.played-time').addClass('hide');
     }
 
     _showNavigationButtons() {
         $('#fp-nav').removeClass('hide');
+        $('.total-time').removeClass('hide');
+        $('.played-time').removeClass('hide');
     }
 
     _openRate() {
