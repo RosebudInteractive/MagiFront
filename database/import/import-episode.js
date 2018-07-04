@@ -225,6 +225,7 @@ exports.ImportEpisode = class ImportEpisode {
         let toc = [];
         let picts = [];
         let lastHeader = null;
+        let isInParagraph = false;
 
         function getCellText(cell) {
             return cell.content.text.trim();
@@ -305,6 +306,10 @@ exports.ImportEpisode = class ImportEpisode {
             content.paragraphs.forEach((prg) => {
                 if (prg.props.numList) {
                     if (!listType) {
+                        if (isInParagraph) {
+                            html += `</p>`;
+                            isInParagraph = false;
+                        }
                         listType = prg.props.numList.numFmt;
                         html += listType === "bullet" ? `<ul>` : `<ol>`;;
                     }
@@ -316,12 +321,22 @@ exports.ImportEpisode = class ImportEpisode {
                         listType = null;
                     }
                     if ((typeof (checkHeader) === "function") && checkHeader()) {
+                        if (isInParagraph) {
+                            html += `</p>`;
+                            isInParagraph = false;
+                        }
                         html += `<h2>${prg.html}</h2>`;
                         lastHeader = { text: prg.text, ts: 0 };
                         toc.push(lastHeader);
                     }
                     else
-                        html += `<p>${prg.html}</p>`;
+                        if (!prg.props.notParagraph) {
+                            if (isInParagraph)
+                                html += `</p>`;
+                            html += `<p>${prg.html}`
+                        }
+                        else
+                            html += prg.html;
                 }
             });
             return { textItem: content.text, htmlItem: html };
@@ -349,9 +364,13 @@ exports.ImportEpisode = class ImportEpisode {
                         lastHeader.ts = timeMS;
                         lastHeader = null;
                     }
-                    if (options.transcriptTimeMarks)
-                        htmlItem = `<p><b><u>ts:{${timeStr}}</u></b></p>${htmlItem}`;
-                    textItem = `/r/nts:{${timeStr}}${textItem}`;
+                    if (options.transcriptTimeMarks) {
+                        if (htmlItem.match(/(<\/ol>|<\/ul>){0,1}<p>.*/))
+                            htmlItem = htmlItem.replace(`<p>`, `<p><b><u>ts:{${timeStr}}</u></b>`)
+                        else
+                            htmlItem = `<b><u>ts:{${timeStr}}</u></b>${htmlItem}`;
+                        textItem = `/r/nts:{${timeStr}}${textItem}`;
+                    }
                 }
                 html += htmlItem;
                 text += textItem;
@@ -359,8 +378,14 @@ exports.ImportEpisode = class ImportEpisode {
             isFirstRow = false;
             rowNum++;
         })
-        html += listType === "bullet" ? `</ul>` : `</ol>`;
-        listType = null;
+        if (isInParagraph) {
+            html += `</p>`;
+            isInParagraph = false;
+        }
+        if (listType) {
+            html += listType === "bullet" ? `</ul>` : `</ol>`;
+            listType = null;
+        }
 
         // Foot notes processing
         //
@@ -373,7 +398,14 @@ exports.ImportEpisode = class ImportEpisode {
                 html += htmlItem;
                 text += textItem;
             })
-            html += listType === "bullet" ? `</ul>` : `</ol>`;
+            if (isInParagraph) {
+                html += `</p>`;
+                isInParagraph = false;
+            }
+            if (listType) {
+                html += listType === "bullet" ? `</ul>` : `</ol>`;
+                listType = null;
+            }
         }
         return { text: text, html: html, toc: toc, picts: picts };
     }

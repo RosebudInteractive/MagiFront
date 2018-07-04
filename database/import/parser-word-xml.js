@@ -8,6 +8,8 @@ const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 
+const { Import } = require('../../const/common');
+
 exports.ParserWordXML = class ParserWordXML {
     constructor() { }
 
@@ -349,6 +351,11 @@ exports.ParserWordXML = class ParserWordXML {
                                 options.errors.push(`(${options.rowNum},${options.cellNum}) _parseParagraph: Unhandled element "${elem.name}".`);
                     }
                 }
+            }
+            if (result.text[0] === Import.PARAGRAPH_MERGE_SYMBOL) {
+                result.props.notParagraph = true;
+                result.text = result.text.replace(Import.PARAGRAPH_MERGE_SYMBOL, "");
+                result.html = result.html.replace(Import.PARAGRAPH_MERGE_SYMBOL, "");
             }
         }
         return result;
