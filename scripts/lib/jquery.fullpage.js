@@ -242,8 +242,8 @@
             if(options.autoScrolling && !options.scrollBar){
                 $htmlBody.css({
                     'overflow' : 'hidden',
-                    'height' : '100vh'
-                    // 'height' : 'auto'
+                    // 'height' : '100vh'
+                    'height' : 'auto'
                 });
 
                 setRecordHistory(originals.recordHistory, 'internal');
@@ -638,7 +638,7 @@
          */
         function prepareDom(){
             container.css({
-                'height': '100vh',
+                'height': 'auto',
                 'position': 'relative'
             });
 
