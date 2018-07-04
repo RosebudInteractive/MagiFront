@@ -183,9 +183,8 @@ class NestedPlayer {
     }
 
     replay() {
-        if (this._initState) {
-            this._initState.currentTime = 0;
-        }
+        if (!this._initState) { this._initState = {} }
+        this._initState.currentTime = 0;
 
         this.play()
     }
@@ -201,7 +200,7 @@ class NestedPlayer {
                     let _state = Object.assign({}, this._initState);
                     this._initState = null;
                     let _audioState = this.player._audioState;
-                    if (_state.currentTime) {
+                    if (_state.currentTime !== undefined) {
                         this.setPosition(_state.currentTime)
                     }
 

@@ -222,22 +222,24 @@ class Frame extends Component {
             {showContentTooltip, showSpeedTooltip} = this.props;
 
 
-        const
-            _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
+        const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
             _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen"/>',
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
+        let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false
+
         return (
             <div style={this.props.visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
+                <div className="player-frame__poster" style={_isFinished ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {
                     this.props.visible ?
                         <div>
-                            <PauseScreen {...this.props}/>
+                            <PauseScreen {...this.props} isFinished={_isFinished}/>
                             <div className="player-frame">
                                 <Titles/>
                                 <div className="player-block">
@@ -297,6 +299,7 @@ function mapStateToProps(state) {
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
+        lessonInfoStorage: state.lessonInfoStorage,
     }
 }
 

@@ -7694,7 +7694,10 @@ body[data-page="fullpage-player"] .lectures-menu {
     @media (max-width: 899px) {
       .lecture-frame__play-btn {
         left: 2px;
-        top: 34px; } }
+        top: 34px; }
+      .lecture-frame__play-btn svg {
+        width: 47px;
+        height: 41px; } }
     @media (max-width: 599px) {
       .lecture-frame__play-btn.pause-screen {
         display: none } }
@@ -11553,6 +11556,8 @@ ul.lectures-tab {
   .player-frame__screen.hide{
     opacity: 0;
     visibility: hidden;}
+  .player-frame__screen.finished{
+    background: none}
   .player-frame__play-screen {
     position: absolute;
     top: 97px;

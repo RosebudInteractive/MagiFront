@@ -24,6 +24,7 @@ import {
     SWITCH_TO_FULL_PLAYER,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
+import * as storageActions from "../actions/lesson-info-storage-actions";
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {
@@ -59,6 +60,12 @@ const playerMiddleware = store => next => action => {
 
             if ((_id === action.payload) && Player.getInstance()) {
                 if (_isFinished) {
+                    // store.dispatch(storageActions.setCurrentTimeForLesson({
+                    //     id: action.payload,
+                    //     currentTime: 0,
+                    //     isFinished: false
+                    // }));
+
                     Player.getInstance().replay()
                 } else {
                     Player.getInstance().play()
