@@ -1,6 +1,7 @@
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const formidable = require('formidable');
 const { DbUtils } = require('./db-utils');
+const { Import } = require('../const/common');
 
 const path = require('path');
 const config = require('config');
@@ -202,7 +203,7 @@ function parseFileName(fileName) {
     let description = null;
     let id = null;
 
-    let comp = fname.split('@');
+    let comp = fname.split(Import.FILE_FIELD_SEPARATOR);
     comp.forEach((part) => {
         let match = part.match(/(id-)(.*)/i)
         if ((!id) && match) {
