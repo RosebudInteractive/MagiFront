@@ -638,7 +638,7 @@
          */
         function prepareDom(){
             container.css({
-                'height': 'auto',
+                'height': '100vh',
                 'position': 'relative'
             });
 
