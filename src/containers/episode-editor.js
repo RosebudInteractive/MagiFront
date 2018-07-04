@@ -290,6 +290,12 @@ class EpisodeEditor extends ObjectEditor {
         }
     }
 
+    _uploadPackage(files) {
+        let {lessonId, episodeId} = this.props;
+
+        this.props.episodeActions.uploadPackage({idLesson : lessonId, idEpisode: episodeId, file: files[0]})
+    }
+
     _getExtElements() {
         let that = this;
 
@@ -450,6 +456,34 @@ class EpisodeEditor extends ObjectEditor {
                 width: 500,
                 name: "Transcript",
                 labelWidth: labelWidth,
+            },
+            {
+                cols: [
+                    {
+                        view: 'template',
+                        // hidden: true,
+                        id: 'file-dialog',
+                        borderless: true,
+                        height: 0,
+                        template: () => {
+                            return '<input style="display: none" type="file" id="file-dialog" accept=".xml"/>'
+                        },
+                    },
+                    {
+                        view: "button",
+                        value: "Загрузить пакет",
+                        name: 'btnUploadPackage',
+                        id: 'btnUploadPackage',
+                        disabled: !that.props.episodeId,
+                        click: function () {
+                            $('#file-dialog').unbind("change");
+                            $('#file-dialog').bind("change", function(){
+                                that._uploadPackage(this.files)
+                            });
+                            $("#file-dialog").trigger('click');
+                        }
+                    },
+                ]
             }
         ];
     }

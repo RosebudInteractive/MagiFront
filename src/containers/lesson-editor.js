@@ -440,8 +440,6 @@ export class LessonEditor extends ObjectEditor {
         }
     }
 
-
-
     _getWebixForm() {
         const {
             mainEpisodes,

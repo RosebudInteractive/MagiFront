@@ -13,7 +13,6 @@ import {
 
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
-
 } from '../../constants/lesson/singleLesson'
 
 import {

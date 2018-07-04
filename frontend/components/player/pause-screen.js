@@ -21,14 +21,17 @@ class PauseScreen extends React.Component {
     }
 
     render() {
-        let {lesson} = this.props;
+        let {lesson, isFinished} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
         let _toc = this.props.currentContent ? this.props.currentContent.title : '';
 
-        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
+        const _style = {cursor: 'pointer'};
+
+        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>',
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lecture-replay"/>';
 
         return (
-            <div className={"player-frame__screen" + (this.props.paused ? "" : " hide")}>
+            <div className={"player-frame__screen" + (isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}>
                 <div className="lecture-frame">
                     <div className="lecture-frame__header">
                         <div className='lecture-frame__play-link'>
@@ -45,9 +48,19 @@ class PauseScreen extends React.Component {
                             }
                             <h2 className="lecture-frame__title">
                                 <span className="lecture-frame__duration pause-screen">{lesson.DurationFmt}</span>
-                                <span className="play-btn-big lecture-frame__play-btn pause-screen" style={{cursor: 'pointer'}}
-                                      onClick={::this._startPlay}>Воспроизвести
+                                {
+                                    isFinished ?
+                                        <div style={_style} onClick={::this._startPlay}>
+                                            <span className="play-btn-big lecture-frame__play-btn lock">
+                                                <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _replay}}/>
+                                            </span>
+                                        </div>
+                                        :
+                                        <span className="play-btn-big lecture-frame__play-btn pause-screen" style={_style}
+                                              onClick={::this._startPlay}>Воспроизвести
                                 </span>
+                                }
+
                                 <p className="title-paragraph pause-screen">
                                     <span className="title-text">
                                         <span className="number">{_number}</span>
