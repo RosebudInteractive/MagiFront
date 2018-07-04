@@ -28,7 +28,7 @@ class Frame extends Component {
         this._timer = null;
 
         this.state = {
-            fullScreen: false,
+            fullScreen: document.fullscreen,
         }
 
         this._firstTap = true;

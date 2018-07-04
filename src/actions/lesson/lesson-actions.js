@@ -12,8 +12,7 @@ import {
     GET_LESSON_RESOURCES_FAIL,
 
     SAVE_LESSON_SUCCESS,
-    CLEAR_LESSON, IMPORT_LESSON_SUCCESS,
-
+    CLEAR_LESSON,
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -171,38 +170,6 @@ export const clear = () => {
         });
     }
 };
-
-export const uploadPackage = (object) => {
-    return (dispatch) => {
-        fetch('/import',
-            {
-                method: 'POST',
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(object),
-                credentials: 'include'
-            })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(() => {
-                dispatch({
-                    type: IMPORT_LESSON_SUCCESS,
-                    payload: null
-                })
-            })
-            .catch((err) => {
-                handleJsonError(err)
-                    .then((message) => {
-                        dispatch({
-                            type: SHOW_ERROR_DIALOG,
-                            payload: message
-                        })
-                    });
-            });
-
-    }
-}
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {

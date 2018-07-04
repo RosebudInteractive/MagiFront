@@ -440,12 +440,6 @@ export class LessonEditor extends ObjectEditor {
         }
     }
 
-    _uploadPackage(files) {
-        let {lessonId, courseId} = this.props;
-
-        this.props.lessonActions.uploadPackage({idLesson : lessonId, idCourse: courseId, file: files[0]})
-    }
-
     _getWebixForm() {
         const {
             mainEpisodes,
@@ -825,25 +819,6 @@ export class LessonEditor extends ObjectEditor {
                         },
                     },
                 ]
-            },
-            {
-                view: "button", value: "Загрузить пакет", name: 'btnUploadPackage', id: 'btnUploadPackage',
-                click: function () {
-                    $('#file-dialog').bind("change", function(){
-                        that._uploadPackage(this.files)
-                    });
-                    $("#file-dialog").trigger('click');
-                }
-            },
-            {
-                view: 'template',
-                // hidden: true,
-                id: 'file-dialog',
-                borderless: true,
-                height: 0,
-                template: () => {
-                    return '<input style="display: none" type="file" id="file-dialog" accept=".xml"/>'
-                },
             },
         ];
     }
