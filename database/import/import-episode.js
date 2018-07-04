@@ -243,8 +243,9 @@ exports.ImportEpisode = class ImportEpisode {
                     let title = null;
                     let title2 = null;
                     let id = null;
-                    partArr.forEach((part) => {
-                        let match = part.trim().match(/(id-)(.*)/i)
+                    partArr.forEach((field) => {
+                        let part = field.trim();
+                        let match = part.match(/(id-)(.*)/i)
                         if (match) {
                             if (match.length >= 3)
                                 id = match[2];
