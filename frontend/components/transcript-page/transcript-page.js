@@ -37,7 +37,7 @@ class TextBlock extends React.Component {
 
     _parseTranscript(episode) {
         let _div = [];
-        const _re = /^<h2>(.+)<\/h2>+$/gim;
+        const _re = /<h2>(.*?)<\/h2>/gim;
         let _matches;
 
         let _text = episode.Transcript,
