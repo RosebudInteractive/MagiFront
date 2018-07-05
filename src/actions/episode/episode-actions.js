@@ -7,7 +7,7 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
-    IMPORT_EPISODE_SUCCESS,
+    IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_START, IMPORT_EPISODE_FAIL,
 } from '../../constants/episode/singleEpisode'
 
 import {
@@ -102,6 +102,10 @@ export const save = (values, mode) => {
 export const uploadPackage = (object) => {
     return (dispatch) => {
 
+        dispatch({
+            type: IMPORT_EPISODE_START,
+            payload: null
+        })
 
         let data = new FormData()
         data.append('file', object.file)
@@ -125,10 +129,17 @@ export const uploadPackage = (object) => {
                         type: IMPORT_EPISODE_SUCCESS,
                         payload: null
                     })
+
+                    dispatch(get(object.idEpisode, object.idLesson))
                 } else if (data.result === 'WARN') {
                     dispatch({
                         type: SHOW_ERROR_DIALOG,
                         payload: data.warnings.join('\n')
+                    })
+
+                    dispatch({
+                        type: IMPORT_EPISODE_FAIL,
+                        payload: null
                     })
                 } else {
                     let _message = (data.errors.length > 0) ? data.errors.join('\n') : data.message;
@@ -137,8 +148,13 @@ export const uploadPackage = (object) => {
                         type: SHOW_ERROR_DIALOG,
                         payload: _message
                     })
+
+                    dispatch({
+                        type: IMPORT_EPISODE_FAIL,
+                        payload: null
+                    })
                 }
-                ß            })
+            })
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {

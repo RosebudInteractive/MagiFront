@@ -278,6 +278,9 @@ class ResourceForm extends React.Component {
                         //return false to block operation
                         return true;
                     });
+                },
+                onChange: function() {
+                    this.clearValidation();
                 }
             }
         }

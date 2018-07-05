@@ -125,7 +125,7 @@ class EpisodeEditor extends ObjectEditor {
 
         let _obj = {
             id: value.id,
-            LessonId: this.props.lessonId,
+            LessonId: this.props.subLessonId ? this.props.subLessonId : this.props.lessonId,
             Number: value.Number,
             Id: value.id,
             Name: value.Name,
@@ -288,12 +288,26 @@ class EpisodeEditor extends ObjectEditor {
         } else {
             window.$$('btn-work-shop').enable()
         }
+
+        if ((!this.props.episodeId) || this.props.packageUploadProcess) {
+            window.$$('btn-upload-package').disable()
+        } else {
+            window.$$('btn-upload-package').enable()
+        }
+
+        if (this.props.packageUploadProcess) {
+            window.$$('btn-upload-package').$setValue("Идет импорт эпизода")
+        } else {
+            window.$$('btn-upload-package').$setValue("Импорт эпизода из Word XML")
+        }
+
+
     }
 
     _uploadPackage(files) {
         let {lessonId, episodeId} = this.props;
 
-        this.props.episodeActions.uploadPackage({idLesson : lessonId, idEpisode: episodeId, file: files[0]})
+        this.props.episodeActions.uploadPackage({idLesson: lessonId, idEpisode: episodeId, file: files[0]})
     }
 
     _getExtElements() {
@@ -471,17 +485,17 @@ class EpisodeEditor extends ObjectEditor {
                     },
                     {
                         view: "button",
-                        value: "Загрузить пакет",
+                        value: that.props.packageUploadProcess ? "Идет импорт эпизода" : "Импорт эпизода из Word XML",
                         name: 'btnUploadPackage',
-                        id: 'btnUploadPackage',
-                        disabled: !that.props.episodeId,
+                        id: 'btn-upload-package',
+                        // disabled: (!that.props.episodeId) || that.props.packageUploadProcess,
                         click: function () {
                             $('#file-dialog').unbind("change");
-                            $('#file-dialog').bind("change", function(){
+                            $('#file-dialog').bind("change", function () {
                                 that._uploadPackage(this.files)
                             });
                             $("#file-dialog").trigger('click');
-                        }
+                        },
                     },
                 ]
             }
@@ -497,6 +511,7 @@ function mapStateToProps(state, ownProps) {
     return {
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
+        packageUploadProcess: state.singleEpisode.packageUploadProcess,
 
         episodeToc: state.episodeToc.current,
         selectedToc: state.episodeToc.selected,
