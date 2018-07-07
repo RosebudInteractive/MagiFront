@@ -63,6 +63,18 @@ class EpisodeEditor extends ObjectEditor {
         }
     }
 
+    componentDidMount() {
+        if (this.props.isWorkshop) {
+            this._openWorkshop()
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.isWorkshop && !prevProps.isWorkshop) {
+            this._openWorkshop()
+        }
+    }
+
     getObject() {
         return this.props.episode
     }
@@ -207,6 +219,19 @@ class EpisodeEditor extends ObjectEditor {
         this.props.contentActions.clear();
     }
 
+    _openWorkshop() {
+        let {lessonId, episodeId} = this.props;
+
+        if (lessonId && episodeId) {
+            let _object = {
+                lessonId: lessonId,
+                episodeId: episodeId
+            }
+
+            this.props.workShopActions.loadData(_object)
+        }
+    }
+
     _getWebixForm() {
         let {
             tocActions,
@@ -296,12 +321,12 @@ class EpisodeEditor extends ObjectEditor {
         }
 
         if (this.props.packageUploadProcess) {
-            window.$$('btn-upload-package').$setValue("Идет импорт эпизода")
+            window.$$('btn-upload-package').define("value", "Идет импорт эпизода");
+            window.$$('btn-upload-package').refresh();
         } else {
-            window.$$('btn-upload-package').$setValue("Импорт эпизода из Word XML")
+            window.$$('btn-upload-package').define("value", "Импорт эпизода из Word XML");
+            window.$$('btn-upload-package').refresh();
         }
-
-
     }
 
     _uploadPackage(files) {
@@ -318,15 +343,8 @@ class EpisodeEditor extends ObjectEditor {
                 view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
-                    let {lessonId, episodeId} = that.props;
-
-                    if (lessonId && episodeId) {
-                        let _object = {
-                            lessonId: lessonId,
-                            episodeId: episodeId
-                        }
-
-                        that.props.workShopActions.loadData(_object)
+                    if (!that.props.isWorkshop) {
+                        that.props.history.push(that.props.location.pathname + '?workshop')
                     }
                 },
             },
@@ -485,7 +503,7 @@ class EpisodeEditor extends ObjectEditor {
                     },
                     {
                         view: "button",
-                        value: that.props.packageUploadProcess ? "Идет импорт эпизода" : "Импорт эпизода из Word XML",
+                        value: "Импорт эпизода из Word XML",
                         name: 'btnUploadPackage',
                         id: 'btn-upload-package',
                         // disabled: (!that.props.episodeId) || that.props.packageUploadProcess,
@@ -538,6 +556,7 @@ function mapStateToProps(state, ownProps) {
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching,
 
+        isWorkshop: ownProps.location.search === "?workshop",
         ownProps: ownProps,
     }
 }

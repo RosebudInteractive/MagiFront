@@ -27,6 +27,7 @@ import {EDIT_MODE_INSERT, EDIT_MODE_EDIT} from '../constants/Common'
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import ResourceForm from "../components/resource-form";
+import MultiResourceForm from "../components/multi-resource-form";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -404,6 +405,10 @@ export class LessonEditor extends ObjectEditor {
         this.props.resourcesActions.create()
     }
 
+    _multiUpload() {
+        this.props.resourcesActions.multiUpload()
+    }
+
     _editResource(id) {
         let _resource = this.props.resources.find((item) => {
             return item.id === parseInt(id)
@@ -421,6 +426,15 @@ export class LessonEditor extends ObjectEditor {
 
     _cancelEditResource() {
         this.props.resourcesActions.clear();
+    }
+
+    _cancelUploadResources() {
+        this.props.resourcesActions.cancelUpload();
+    }
+
+    _finishUploadResource(resources) {
+        this.props.lessonResourcesActions.multipleInsert(resources);
+        this.props.resourcesActions.finishUpload();
     }
 
     _getAdditionalTab() {
@@ -535,6 +549,7 @@ export class LessonEditor extends ObjectEditor {
                                          createAction={::this._createResource}
                                          editAction={::this._editResource}
                                          removeAction={lessonResourcesActions.remove}
+                                         multiUploadAction={::this._multiUpload}
                                          editMode={this.editMode}
                                          selected={selectedResource}
                                          data={resources}
@@ -560,6 +575,13 @@ export class LessonEditor extends ObjectEditor {
                 cancel={::this._cancelEditResource}
                 save={::this._saveResource}
                 data={this.props.resource}
+            />)
+        }
+
+        if (this.props.showMultiUploadResourcesEditor) {
+            _dialogs.push(<MultiResourceForm
+                cancel={::this._cancelUploadResources}
+                finish={::this._finishUploadResource}
             />)
         }
 
@@ -848,6 +870,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleCourse.current,
 
         showResourceEditor: state.resources.showEditor,
+        showMultiUploadResourcesEditor: state.resources.showMultiUploadEditor,
         resource: state.resources.object,
         resourceEditMode: state.resources.editMode,
 

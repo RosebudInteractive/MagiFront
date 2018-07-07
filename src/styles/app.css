@@ -159,6 +159,10 @@
     background: url(./../icons/arrow_left.svg);
 }
 
+.upload {
+    background: #96c8ff url(./../icons/upload.svg);
+}
+
 button:disabled,
 button[disabled] {
     border: 1px solid #999999;

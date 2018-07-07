@@ -2,7 +2,10 @@ import {
     CREATE_RESOURCE,
     EDIT_RESOURCE,
     CLEAR_RESOURCE,
-} from '../constants/resources'
+    MULTI_UPLOAD_RESOURCES_START,
+    MULTI_UPLOAD_RESOURCES_CANCEL,
+    MULTI_UPLOAD_RESOURCES_FINISH,
+} from '../constants/lesson/lessonResources';
 
 import {
     EDIT_MODE_INSERT,
@@ -13,6 +16,7 @@ const initialState = {
     object: null,
     hasChanges: false,
     showEditor: false,
+    showMultiUploadEditor: false,
     internalId: -1,
     editMode: EDIT_MODE_INSERT,
 };
@@ -35,6 +39,26 @@ export default function resources(state = initialState, action) {
             };
         }
 
+        case MULTI_UPLOAD_RESOURCES_START:{
+            return {
+                ...state,
+                showMultiUploadEditor: true,
+            };
+        }
+
+        case MULTI_UPLOAD_RESOURCES_CANCEL:{
+            return {
+                ...state,
+                showMultiUploadEditor: false,
+            };
+        }
+
+        case MULTI_UPLOAD_RESOURCES_FINISH:{
+            return {
+                ...state,
+                showMultiUploadEditor: false,
+            };
+        }
 
         case EDIT_RESOURCE:
             return {

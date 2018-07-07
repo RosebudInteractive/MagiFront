@@ -5,6 +5,7 @@ import {
     REMOVE_RESOURCE,
     MOVE_RESOURCE_UP,
     MOVE_RESOURCE_DOWN,
+    MULTIPLE_INSERT_RESOURCE,
 } from '../../constants/lesson/lessonResources';
 
 export const insert = (value) => {
@@ -13,6 +14,13 @@ export const insert = (value) => {
             type: INSERT_RESOURCE,
             payload: value
         });
+    }
+};
+
+export const multipleInsert = (values) => {
+    return {
+        type: MULTIPLE_INSERT_RESOURCE,
+        payload: values
     }
 };
 
