@@ -95,12 +95,14 @@ const GET_LESSON_IDS_BKM_MSSQL =
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "where b.[UserId] = <%= userId %>";
+    "where b.[UserId] = <%= userId %>\n" +
+    "order by b.[Id] desc";
 
 const GET_COURSE_IDS_BKM_MSSQL =
     "select c.[Id] from [Bookmark] b\n" +
     "  join[Course] c on c.[Id] = b.[CourseId]\n" +
-    "where b.[UserId] = <%= userId %>";
+    "where b.[UserId] = <%= userId %>\n" +
+    "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
     "select c.[Id], c.[Cover], c.[CoverMeta], c.[URL], cl.[Name] from [Course] c\n" +
@@ -157,12 +159,14 @@ const GET_LESSON_IDS_BKM_MYSQL =
     "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "where b.`UserId` = <%= userId %>";
+    "where b.`UserId` = <%= userId %>\n" +
+    "order by b.`Id` desc";
 
 const GET_COURSE_IDS_BKM_MYSQL =
     "select c.`Id` from `Bookmark` b\n" +
     "  join`Course` c on c.`Id` = b.`CourseId`\n" +
-    "where b.`UserId` = <%= userId %>";
+    "where b.`UserId` = <%= userId %>\n" +
+    "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
     "select c.`Id`, c.`Cover`, c.`CoverMeta`, c.`URL`, cl.`Name` from `Course` c\n" +
@@ -338,7 +342,9 @@ const DbUser = class DbUser extends DbObject {
         let bookmarks = { Authors: {}, Categories: {}, LessonCourses: {}, Courses: [], Lessons: [] };
         let opts = {};
         let arrayOfIds = [];
-
+        let lessonBoookmarkOrder = {};
+        let courseBoookmarkOrder = {};
+        
         function getLessonIdsByBookmarks() {
             return new Promise((resolve, reject) => {
                 resolve($data.execSql({
@@ -351,8 +357,10 @@ const DbUser = class DbUser extends DbObject {
                 .then((result) => {
                     let res = [];
                     if (result && result.detail && (result.detail.length > 0)) {
+                        let i = 0;
                         result.detail.forEach((elem) => {
                             res.push(elem.Id);
+                            lessonBoookmarkOrder[elem.Id] = ++i;
                         })
                     }
                     return res;
@@ -379,6 +387,9 @@ const DbUser = class DbUser extends DbObject {
                 bookmarks.Authors = result.Authors;
                 bookmarks.LessonCourses = result.Courses;
                 bookmarks.Lessons = result.Lessons;
+                bookmarks.Lessons.forEach((elem) => {
+                    elem.Order = lessonBoookmarkOrder[elem.Id];
+                })
                 return $data.execSql({
                     dialect: {
                         mysql: _.template(GET_COURSE_IDS_BKM_MYSQL)({ userId: userId }),
@@ -387,8 +398,10 @@ const DbUser = class DbUser extends DbObject {
                 }, {})
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            let i = 0;
                             result.detail.forEach((elem) => {
                                 courseIds.push(elem.Id);
+                                courseBoookmarkOrder[elem.Id] = ++i;
                             })
                         }
                     });
@@ -412,6 +425,7 @@ const DbUser = class DbUser extends DbObject {
                                             URL: elem.URL,
                                             Cover: elem.Cover,
                                             CoverMeta: elem.CoverMeta,
+                                            Order: courseBoookmarkOrder[elem.Id],
                                             Authors: [],
                                             Categories: []
                                         };
