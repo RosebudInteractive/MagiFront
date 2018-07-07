@@ -164,11 +164,15 @@ export class LessonEditor extends ObjectEditor {
             Episodes: [],
             References: [],
             Resources: [],
+            Childs: (this.props.subLessons.length > 0) ? [] : null,
         };
 
         this._fillEpisodes(_obj.Episodes);
         this._fillReferences(_obj.References);
         this._fillResources(_obj.Resources);
+        if (this.props.subLessons.length > 0) {
+            this._fillChilds(_obj.Childs);
+        }
 
         super._save(_obj)
     }
@@ -225,6 +229,10 @@ export class LessonEditor extends ObjectEditor {
                 ResType: resource.ResType,
             })
         });
+    }
+
+    _fillChilds(array) {
+        this.props.subLessons.map(child => array.push(child));
     }
 
     hideAddAuthorDialog() {

@@ -31,7 +31,7 @@ let _data = null;
 class AdmWorkShop {
     static loadData(data) {
         _instance = new AdmWorkShop(data);
-        store.dispatch(workShopActions.show())
+        store.dispatch(workShopActions.show(data.callingRoute))
     }
 
     static close() {

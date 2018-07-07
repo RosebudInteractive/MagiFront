@@ -12,10 +12,10 @@ import {
 
 import {handleJsonError} from '../tools/fetch-tools';
 
-export const show = () => {
+export const show = (callingRoute) => {
     return {
         type: WORK_SHOP_SHOW,
-        payload: null
+        payload: callingRoute
     }
 };
 
@@ -32,6 +32,7 @@ export const loadData = (object) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                data.callingRoute = object.callingRoute
                 dispatch({
                     type: WORK_SHOP_GET_DATA_SUCCESS,
                     payload: data

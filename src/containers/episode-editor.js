@@ -220,12 +220,13 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _openWorkshop() {
-        let {lessonId, episodeId} = this.props;
+        let {lessonId, episodeId, location} = this.props;
 
         if (lessonId && episodeId) {
             let _object = {
                 lessonId: lessonId,
-                episodeId: episodeId
+                episodeId: episodeId,
+                callingRoute: location.pathname,
             }
 
             this.props.workShopActions.loadData(_object)
