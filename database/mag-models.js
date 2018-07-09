@@ -116,6 +116,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("CoverMeta", { type: "string", allowNull: true })
             .addField("RawCoverMeta", { type: "string", allowNull: true })
+            .addField("Mask", { type: "string", length: 20, allowNull: true })
             .addField("Color", { type: "int", allowNull: true })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("OneLesson", { type: "boolean", allowNull: false })

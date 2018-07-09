@@ -71,12 +71,12 @@ const COURSE_UPD_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
+    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
+    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -194,7 +194,7 @@ const COURSE_LESSONS_MYSQL =
     "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
@@ -222,7 +222,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "order by cc.[CourseId]";
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
@@ -250,7 +250,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "order by cc.`CourseId`";
 
 const COURSE_MSSQL_PUBLIC_REQ =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -288,7 +288,7 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
     "order by l.[Id]";
     
 const COURSE_MYSQL_PUBLIC_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -378,6 +378,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             Id: elem.Id,
                                             Cover: elem.Cover,
                                             CoverMeta: elem.CoverMeta,
+                                            Mask: elem.Mask,
                                             Color: elem.Color,
                                             Name: elem.Name,
                                             URL: elem.URL,
@@ -513,6 +514,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         LanguageId: elem.LanguageId,
                                         Cover: elem.Cover,
                                         CoverMeta: elem.CoverMeta,
+                                        Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
@@ -964,6 +966,8 @@ const DbCourse = class DbCourse extends DbObject {
 
                         if (typeof (inpFields["Color"]) !== "undefined")
                             crs_obj.color(inpFields["Color"]);
+                        if (typeof (inpFields["Mask"]) !== "undefined")
+                            crs_obj.mask(inpFields["Mask"]);
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             crs_obj.cover(inpFields["Cover"]);
                         if (typeof (inpFields["CoverMeta"]) !== "undefined")
@@ -1139,6 +1143,8 @@ const DbCourse = class DbCourse extends DbObject {
                         let fields = { AccountId: ACCOUNT_ID };
                         if (typeof (inpFields["Color"]) !== "undefined")
                             fields["Color"] = inpFields["Color"];
+                        if (typeof (inpFields["Mask"]) !== "undefined")
+                            fields["Mask"] = inpFields["Mask"];
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             fields["Cover"] = inpFields["Cover"];
                         if (typeof (inpFields["CoverMeta"]) !== "undefined")

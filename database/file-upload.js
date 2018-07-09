@@ -244,8 +244,8 @@ function importImages(srcDir, dstDir) {
                 .then((dir_suffix) => {
                     return Utils.seqExec(impSettings.courses, (val, key) => {
                         return new Promise((resolve, reject) => {
-                            let inFileFn = path.join(srcDir, path.sep, "images", path.sep, val);
-                            let fileData = parseFileName(val);
+                            let inFileFn = path.join(srcDir, path.sep, "images", path.sep, val.file);
+                            let fileData = parseFileName(val.file);
                             let outFileFn = path.join(uploadDir, path.sep, dir_suffix, path.sep, fileData.file);
                             let inStream = fs.createReadStream(inFileFn);
                             let outStream = fs.createWriteStream(outFileFn);
@@ -259,6 +259,7 @@ function importImages(srcDir, dstDir) {
                                         .then(() => {
                                             let desc = files[files.length - 1];
                                             desc.url = key;
+                                            desc.mask = val.mask;
                                         })
                                     );
                                 } catch (e) {
@@ -277,7 +278,8 @@ function importImages(srcDir, dstDir) {
             return Utils.seqExec(files, (file) => {
                 return CoursesService().update(0, {
                     Cover: file.file,
-                    CoverMeta: JSON.stringify(file.info)
+                    CoverMeta: JSON.stringify(file.info),
+                    Mask: file.mask
                 }, { byUrl: file.url });
             });
         });
