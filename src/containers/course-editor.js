@@ -49,6 +49,7 @@ class CourseEditor extends ObjectEditor {
 
         this.cover = course ? course.Cover : null;
         this.coverMeta = course ? course.CoverMeta : null;
+        this.mask = course ? course.Mask : null;
     }
 
     getObject() {
@@ -110,7 +111,8 @@ class CourseEditor extends ObjectEditor {
     _getCoverInfo() {
         let _meta = this.coverMeta;
         return {
-            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.cover)) : null,
+            // path: _meta ? ('/data/' + (_meta.content.m ? (_meta.path +  _meta.content.m) : this.cover)) : null,
+            path: _meta ? '/data/' + this.cover : null,
             heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
         };
     }
@@ -335,6 +337,16 @@ class CourseEditor extends ObjectEditor {
         ]
     }
 
+    _getMasks() {
+        let _masks = [];
+        for (let i=1; i <= 12; i++) {
+            _masks.push({id: '_mask' + i.toString().padStart(2, '0'), value: 'Маска ' + i})
+        }
+
+        return _masks;
+    }
+
+
     _getExtDialogs() {
         let _dialogs = [];
         if (this.props.showAddAuthorDialog) {
@@ -477,7 +489,11 @@ class CourseEditor extends ObjectEditor {
                                 datatype: 'image',
                                 id: 'cover_template',
                                 template: (obj) => {
-                                    return '<img class="cover" src="' + obj.src + '" />'
+                                    return '<div class="cover ' + obj.mask + '" width="'+ obj.width +'px"' + ' height="'+ obj.height +'px">' +
+                                        '<svg viewBox="0 0 574 503" width="574" height="503">' +
+                                        '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + obj.src + '" width="724" height="503"/>' +
+                                        '</svg>' +
+                                        '</div>'
                                 },
                                 width: 360,
                                 borderless: true,
@@ -485,8 +501,14 @@ class CourseEditor extends ObjectEditor {
                                     onBeforeRender: (object) => {
                                         let _coverInfo = that._getCoverInfo();
                                         object.src = _coverInfo.path;
-                                        let _width = window.$$('cover_template').config.width;
-                                        window.$$('cover_template').config.height = _width * _coverInfo.heightRatio;
+                                        object.mask = that.mask;
+                                        let _width = window.$$('cover_template').config.width,
+                                            _height = 334;
+                                            // _height = _width * _coverInfo.heightRatio;
+
+                                        object.width = _width;
+                                        object.height = _height;
+                                        window.$$('cover_template').config.height = _height;
                                         window.$$('cover_template').resize()
                                     },
                                     validate: function (value) {
@@ -545,6 +567,23 @@ class CourseEditor extends ObjectEditor {
                         }
                     },
                 ]
+            },
+            {
+                view: "combo",
+                name: "Mask",
+                label: "Маска обложки",
+                placeholder: "Выберите маску обложки",
+                options: that._getMasks(),
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                        that.mask = this.getValue();
+                        window.$$('cover_template').refresh()
+                    },
+                },
             },
             {
                 view: "richtext",
