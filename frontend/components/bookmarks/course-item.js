@@ -13,7 +13,7 @@ export default class Item extends React.Component {
 
     constructor(props) {
         super(props)
-        this._maskNumber = svg.getRandomInt(1, 12).toString().padStart(2, '0')
+        // this._maskNumber = svg.getRandomInt(1, 12).toString().padStart(2, '0')
     }
 
     _favoritesClick() {
@@ -59,7 +59,7 @@ export default class Item extends React.Component {
                             курсе</Link>
                     </div>
                     <div className="fav-card__col">
-                        <div className={"fav-card__image-block _mask" + this._maskNumber}>
+                        <div className={"fav-card__image-block " + item.Mask}>
                             <svg viewBox="0 0 563 514" width="563" height="514" dangerouslySetInnerHTML={{__html: _image}}/>
                         </div>
                     </div>

@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
-import Gallery from './gallery';
-import GallerySlides from './gallery-slides';
+// import Gallery from './gallery';
+// import GallerySlides from './gallery-slides';
 import $ from 'jquery'
 
 export default class TranscriptPage extends React.Component {
@@ -17,14 +17,14 @@ export default class TranscriptPage extends React.Component {
     };
 
     render() {
-        let {isNeedHideGallery} = this.props;
+        // let {isNeedHideGallery} = this.props;
 
         return (
             <div>
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
-                {isNeedHideGallery ? null : <Gallery {...this.props}/>}
-                {isNeedHideGallery ? null : <GallerySlides {...this.props}/>}
+                {/*{isNeedHideGallery ? null : <Gallery {...this.props}/>}*/}
+                {/*{isNeedHideGallery ? null : <GallerySlides {...this.props}/>}*/}
             </div>
         )
     }
@@ -61,7 +61,8 @@ class TextBlock extends React.Component {
 
             _content = _content.trim();
 
-            let _array = _content.split('\r\n\r\n');
+            let _array = _content.split(/<p>(.*?)<\/p>/gim);
+            let _isToc = true;
 
             _array.forEach((item, index) => {
                 let _paragraph = item;
@@ -71,9 +72,11 @@ class TextBlock extends React.Component {
                     return
                 }
 
+                _paragraph = _paragraph.replace(/<b><u>ts(.*?)<\/u><\/b>/gim, '');
+
                 if (_isFirstParagraph) {
                     let _firstLetter = _paragraph.slice(0, 1);
-                    _paragraph = _content.slice(1);
+                    _paragraph = _paragraph.slice(1);
 
                     _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                         <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
@@ -85,9 +88,10 @@ class TextBlock extends React.Component {
 
                     _isFirstParagraph = false;
                 } else {
-                    if (index > 0) {
+                    if (!_isToc) {
                         _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
                     } else {
+                        _isToc = false;
                         _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                             <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
                             <p>

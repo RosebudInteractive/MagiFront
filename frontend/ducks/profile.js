@@ -144,30 +144,30 @@ export default function reducer(state = new ReducerRecord(), action) {
         case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload))
-                // .update('courseBookmarks', courseBookmarks => {
-                //     let _index = courseBookmarks.findIndex((course) => {
-                //         return course.URL === payload
-                //     })
-                //
-                //     return (_index >= 0) ?
-                //         courseBookmarks.splice(_index, 1)
-                //         :
-                //         courseBookmarks
-                //     })
+        // .update('courseBookmarks', courseBookmarks => {
+        //     let _index = courseBookmarks.findIndex((course) => {
+        //         return course.URL === payload
+        //     })
+        //
+        //     return (_index >= 0) ?
+        //         courseBookmarks.splice(_index, 1)
+        //         :
+        //         courseBookmarks
+        //     })
 
         case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload.courseUrl + '/' + payload.lessonUrl))
-                // .update('lessonBookmarks', lessonBookmarks => {
-                //     let _index = lessonBookmarks.findIndex((lesson) => {
-                //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
-                //     })
-                //
-                //     return (_index >= 0) ?
-                //         lessonBookmarks.splice(_index, 1)
-                //         :
-                //         lessonBookmarks
-                // })
+        // .update('lessonBookmarks', lessonBookmarks => {
+        //     let _index = lessonBookmarks.findIndex((lesson) => {
+        //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
+        //     })
+        //
+        //     return (_index >= 0) ?
+        //         lessonBookmarks.splice(_index, 1)
+        //         :
+        //         lessonBookmarks
+        // })
 
         default:
             return state
@@ -566,6 +566,10 @@ const handleBookmarksData = (data) => {
                 course.categories.push(data.Categories[categoryId])
             })
         })
+
+        data.Courses.sort((a, b) => {
+            return a.Order - b.Order
+        })
     }
 
     if (data.Lessons) {
@@ -573,6 +577,12 @@ const handleBookmarksData = (data) => {
             handleLesson(lesson);
 
             let _course = data.LessonCourses[lesson.CourseId];
+
+            _course.minOrder = _course.minOrder
+                ?
+                (_course.minOrder < lesson.Order) ? _course.minOrder : lesson.Order
+                :
+                lesson.Order;
 
             lesson.courseUrl = _course ? _course.URL : null;
             lesson.courseName = _course ? _course.Name : null;
@@ -584,10 +594,14 @@ const handleBookmarksData = (data) => {
         })
 
         data.Lessons.sort((a, b) => {
-            let _result = b.CourseId - a.CourseId;
+            let _courseA = data.LessonCourses[a.CourseId];
+            let _courseB = data.LessonCourses[b.CourseId];
+
+            let _result = _courseA.minOrder - _courseB.minOrder;
 
             if (_result === 0) {
                 _result = a.Number - b.Number
+                // _result = a.Order - b.Order
             }
 
             return _result

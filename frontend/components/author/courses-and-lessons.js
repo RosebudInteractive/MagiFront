@@ -106,7 +106,7 @@ class Course extends React.Component {
         return (
             <div className="course-announce">
                 <div className="course-announce__col">
-                    <div className={'course-announce__image _mask' + this.maskNumber}>
+                    <div className={'course-announce__image ' + course.Mask}>
                         <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                     </div>
                 </div>
