@@ -11,6 +11,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
+import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
@@ -104,38 +105,50 @@ class TranscriptLessonPage extends React.Component {
             authorized
         } = this.props;
 
-        return (
-            <div>
-                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
-                      className="link-to-lecture"
-                      id='link-to-lecture'
-                      style={{
-                          position: 'fixed',
-                          top: '50%',
-                          marginTop: 0
-                      }}
-                >Смотреть <br/>лекцию</Link>
-                <SocialBlock/>
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        (lesson && lessonText.loaded) ?
-                            <div>
-                                <div className="transcript-page">
-                                    <TranscriptPage episodes={lessonText.episodes}
-                                                    refs={lessonText.refs}
-                                                    gallery={lessonText.gallery}
-                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
-                                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
-                                                    lesson={lesson}/>
-                                </div>
-                            </div>
-                            :
-                            null
-                }
-            </div>
-        )
+        const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0},
+            _gallery = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#gallery"/>',
+            _prev = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-prev"/>',
+            _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
+
+
+        return [
+            <div className="sticky-block js-sticky-block" style={_linkStyle}>
+                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="link-to-lecture" id='link-to-lecture'>
+                    Смотреть <br/>лекцию
+                </Link>
+            </div>,
+            <div className="js-gallery-controls gallery-controls hide">
+                <button className="gallery-trigger js-gallery-trigger" type="button">
+                    <span className="visually-hidden">Галерея</span>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
+                </button>
+                <button className="swiper-button-prev swiper-button-disabled" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>
+                </button>
+                <button className="swiper-button-next" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
+                </button>
+            </div>,
+            <SocialBlock/>,
+            lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
+            fetching ?
+                <p>Загрузка...</p>
+                :
+                (lesson && lessonText.loaded) ?
+                    <div>
+                        <div className="transcript-page">
+                            <TranscriptPage episodes={lessonText.episodes}
+                                            refs={lessonText.refs}
+                                            gallery={lessonText.gallery}
+                                            isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                            isNeedHideRefs={!(lessonText.refs.length > 0)}
+                                            lesson={lesson}/>
+                        </div>
+                    </div>
+                    :
+                    null
+
+        ]
     }
 }
 

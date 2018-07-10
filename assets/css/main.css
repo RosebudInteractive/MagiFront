@@ -4754,8 +4754,8 @@ ul.user-tooltip {
       display: none; } }
   .filters-row.opened {
     transform: translateY(96px);
-    max-height: 96px;
-    border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
+    max-height: 96px; }
+    /*border-bottom: 1px solid rgba(47, 47, 47, 0.15); }*/
   .filters-row__wrapper {
     padding-top: 30px;
     padding-left: 0;
@@ -8013,7 +8013,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   margin: 0;
   padding: 0;
   list-style: none; }
-  @media (max-width: 1279px) {
+  @media (max-width: 899px) {
     .menu-nav-list {
       overflow-y: auto;
       -webkit-box-orient: vertical;
@@ -8040,7 +8040,7 @@ body[data-page="fullpage-player"] .lectures-menu {
         display: none; }
       .menu-nav-list .menu-nav-list__item:last-child a {
         border-top: none; } }
-  @media (max-width: 1165px) {
+  @media (max-width: 785px) {
     .menu-nav-list .menu-nav-list__item:last-child a {
       border-top: 1px solid rgba(47, 47, 74, 0.2); }
     .menu-nav-list .menu-nav-list__item:nth-child(2) {
@@ -8064,7 +8064,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     pointer-events: none;
     max-width: 0;
     overflow: hidden; }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .menu-nav-list._shadow {
         position: static;
         opacity: 1;
@@ -8096,10 +8096,10 @@ body[data-page="fullpage-player"] .lectures-menu {
         .menu-nav-list._shadow .menu-nav-list__item:nth-child(2) {
           display: inline-block;
           vertical-align: top; } }
-    @media (max-width: 1165px) {
+    @media (max-width: 785px) {
       .menu-nav-list._shadow .menu-nav-list__item:nth-child(2) {
         display: none; } }
-    @media (max-width: 900px) {
+    @media (max-width: 899px) {
       .menu-nav-list._shadow {
         display: none; } }
     .menu-nav-list._shadow .menu-nav-list__item {
@@ -8123,7 +8123,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       @media (max-width: 599px) {
         .menu-nav-list__item a {
           color: rgba(255, 255, 255, 0.6); } }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .menu-nav-list__item {
         width: 100%;
         text-align: left;
