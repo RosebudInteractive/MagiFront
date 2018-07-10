@@ -62,6 +62,7 @@ class ResourceForm extends React.Component {
 
             _file.uploaded = true;
             _file.Name = response[0].info.name ? response[0].info.name : null;
+            _file.MetaData = JSON.stringify(response[0].info);
             _file.FileName = response[0].file;
             _file.Description = response[0].info.description ? response[0].info.description : null;
             _file.Language = '';
