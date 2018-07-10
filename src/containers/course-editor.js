@@ -84,6 +84,7 @@ class CourseEditor extends ObjectEditor {
             LanguageId: value.LanguageId,
             URL: value.URL,
             Description: value.Description,
+            Mask: value.Mask,
             Authors: [],
             Categories: [],
             Lessons: [],
