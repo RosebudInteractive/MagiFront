@@ -35,7 +35,7 @@ const AUTHOR_MSSQL_PUB_REQ =
     "where a.[URL] = '<%= authorUrl %>'";
 
 const AUTHOR_MSSQL_CL_PUB_REQ =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
@@ -76,7 +76,7 @@ const AUTHOR_MYSQL_PUB_REQ =
     "where a.`URL` = '<%= authorUrl %>'";
 
 const AUTHOR_MYSQL_CL_PUB_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
@@ -161,6 +161,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         LanguageId: elem.LanguageId,
                                         Cover: elem.Cover,
                                         CoverMeta: elem.CoverMeta,
+                                        Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
