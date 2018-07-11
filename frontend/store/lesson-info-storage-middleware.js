@@ -3,14 +3,20 @@ import {
     PLAYER_SET_VOLUME,
     PLAYER_SET_MUTE_STATE,
     PLAYER_START_INIT,
-    PLAYER_SET_RATE, PLAYER_PAUSED, PLAYER_STOPPED, PLAYER_ENDED,
+    PLAYER_SET_RATE,
+    PLAYER_PAUSED,
+    PLAYER_STOPPED,
+    PLAYER_ENDED,
 } from '../constants/player'
 
 import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS} from "../constants/user";
 
 import {
-    LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS, LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
-    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS
+    LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS,
+    LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
+    LESSON_INFO_STORAGE_RESTORE_LESSON,
+    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
 } from "../constants/lesson-info-storage";
 
 import LessonInfoStorage from '../tools/player/lesson-info-storage'
@@ -44,7 +50,22 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     _totalDuration = _state.player.totalDuration,
                     _lessonsMap = _state.lessonInfoStorage.lessons,
                     _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
-                    _newPosition = action.payload;
+                    _newPosition = action.payload,
+                    _isFinished = Math.round(_newPosition) === _totalDuration;
+
+                store.dispatch(storageActions.setCurrentTimeForLesson({
+                    id: _state.player.playingLesson.lessonId,
+                    currentTime: _newPosition,
+                    isFinished: _isFinished
+                }))
+
+                if (_isFinished) {
+                    store.dispatch(storageActions.setLessonEnded({
+                        id: _state.player.playingLesson.lessonId,
+                        currentTime: _newPosition,
+                        isFinished: _isFinished
+                    }))
+                }
 
                 if (Math.abs(_newPosition - _currentPosition) > 1) {
                     LessonInfoStorage.saveChanges()
@@ -53,12 +74,6 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     LessonInfoStorage.setDeltaStart(_currentPosition)
                     LessonInfoStorage.hasChangedPosition();
                 }
-
-                store.dispatch(storageActions.setCurrentTimeForLesson({
-                    id: _state.player.playingLesson.lessonId,
-                    currentTime: _newPosition,
-                    isFinished: Math.round(_newPosition) === _totalDuration
-                }))
             }
 
             return next(action)
@@ -100,6 +115,13 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS: {
             LessonInfoStorage.applyLoadedPosition(action.payload)
             return next(action)
+        }
+
+        case LESSON_INFO_STORAGE_RESTORE_LESSON:
+        case LESSON_INFO_STORAGE_SET_LESSON_ENDED: {
+            let result = next(action)
+            LessonInfoStorage.saveChanges()
+            return result
         }
 
         default:

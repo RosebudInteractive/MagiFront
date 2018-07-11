@@ -13,6 +13,8 @@ import CWSPlayerElementText from "work-shop/player-element-text";
 //     function (CWSBase, CPlayerElement, Loader, tpl) {
 const ratioX = 16, ratioY = 9;
 
+var _counter = 0;
+
 export default class CWSPlayer extends CWSBase {
     constructor(container, options, audioOptions) {
         super(container, tpl);
@@ -31,7 +33,8 @@ export default class CWSPlayer extends CWSBase {
             requestAnimationFrameID: null,
             videoOff: false,
             source: null,
-            currentTitles: []
+            currentTitles: [],
+            id : ++_counter,
         };
         this._elements = {
             array: [],

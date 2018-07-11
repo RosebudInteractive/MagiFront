@@ -13,7 +13,8 @@ import {
     LESSON_INFO_STORAGE_REFRESH_DB_START,
     LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
     LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
-    LESSON_INFO_STORAGE_CLEAR_INIT_STATE
+    LESSON_INFO_STORAGE_CLEAR_INIT_STATE,
+    LESSON_INFO_STORAGE_RESTORE_LESSON,
 } from '../constants/lesson-info-storage'
 
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
@@ -29,6 +30,13 @@ export const clearInitialState = () => {
     return {
         type: LESSON_INFO_STORAGE_CLEAR_INIT_STATE,
         payload: null
+    }
+}
+
+export const restoreLesson = (lessonId) => {
+    return {
+        type: LESSON_INFO_STORAGE_RESTORE_LESSON,
+        payload: lessonId
     }
 }
 
