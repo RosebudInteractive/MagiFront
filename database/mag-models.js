@@ -1,3 +1,5 @@
+const { Data } = require('../const/common');
+
 exports.getSchemaGenFunc = function (uccelloDir) {
     return function (metaDataMgr) {
         const coreModels = require(uccelloDir + '/dataman/core-models');
@@ -41,6 +43,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Phone", { type: "string", length: 50, allowNull: true })
             .addField("RegDate", { type: "datetime", allowNull: true })
             .addField("ExpDate", { type: "datetime", allowNull: true })
+            .addField("SubsExpDate", { type: "datetime", allowNull: true })
             .addField("ActivationKey", { type: "string", length: 50, allowNull: true })
             .addField("Status", { type: "int", allowNull: true })
             .addField("IsOld", { type: "boolean", allowNull: true })
@@ -153,6 +156,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("CoverMeta", { type: "string", allowNull: true })
             .addField("RawCoverMeta", { type: "string", allowNull: true })
             .addField("IsAuthRequired", { type: "boolean", allowNull: false })
+            .addField("IsSubsRequired", { type: "boolean", allowNull: false })
+            .addField("FreeExpDate", { type: "datetime", allowNull: true })
             .addField("URL", { type: "string", length: 255, allowNull: false });
 
         metaDataMgr.addModel("LessonLng", "7012a967-e186-43d8-b39c-1409b7f198b1", "RootLessonLng", "4dde1122-7556-4929-a81c-5c7679a5bbee")
@@ -258,6 +263,10 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: true })
             .addField("LessonCourseId", { type: "dataRef", model: "LessonCourse", refAction: "parentRestrict", allowNull: true });
+
+        metaDataMgr.addModel("PushSubscription", "", "RootPushSubscription", "")
+            .addField("EndPoint", { type: "string", length: Data.ENDPOINT_FIELD_LENGTH, allowNull: false })
+            .addField("Data", { type: "string", allowNull: false });
 
         metaDataMgr.checkSchema();
     }

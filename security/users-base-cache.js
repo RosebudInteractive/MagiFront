@@ -16,7 +16,7 @@ const LOGIN_FIELD = "Email";
 const STATUS_ACTIVE = 1;
 const STATUS_PENDING = 2;
 
-const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData"];
+const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate"];
 const CONV_USER_DATA_FN = (rawUser) => {
     if (typeof (rawUser.PData) === "string") {
         try {
@@ -61,6 +61,7 @@ exports.UsersBaseCache = class UsersBaseCache {
             Id: user.Id,
             Name: user.Name,
             DisplayName: user.DisplayName,
+            SubsExpDate: user.SubsExpDate,
             PData: user.PData
         };
     }

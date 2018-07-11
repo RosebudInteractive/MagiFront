@@ -1,6 +1,7 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
+const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -113,7 +114,7 @@ const LESSON_UPD_TREE = {
 };
 
 const LESSON_MSSQL_ID_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -129,7 +130,7 @@ const LESSON_MSSQL_ID_REQ =
     "where l.[Id] = <%= id %> and lc.[CourseId] = <%= courseId %>";
 
 const LESSON_MSSQL_CHLD_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -144,7 +145,7 @@ const LESSON_MSSQL_CHLD_REQ =
     "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>";
 
 const LESSON_MYSQL_ID_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
@@ -160,7 +161,7 @@ const LESSON_MYSQL_ID_REQ =
     "where l.`Id` = <%= id %> and lc.`CourseId` = <%= courseId %>";
 
 const LESSON_MYSQL_CHLD_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
@@ -248,11 +249,12 @@ const LESSON_MSSQL_ASSETS_ALL_REQ =
 
 const LESSON_MSSQL_REQ =
     "select lc.[CourseId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
-    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
     "  lch.[Id] as[IdCh], llch.[Name] as[NameCh], llch.[ShortDescription] as[ShortDescriptionCh],\n" +
     "  lcch.[State] as[StateCh], lcch.[ReadyDate] as[ReadyDateCh], lch.[Cover] as[CoverCh], lch.[CoverMeta] as[CoverMetaCh],\n" +
     "  llch.[Duration] as[DurationCh], lcch.[Number] as[NumberCh],\n" +
-    "  llch.[DurationFmt] as[DurationFmtCh], lch.[IsAuthRequired] as[IsAuthRequiredCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh]\n" +
+    "  llch.[DurationFmt] as[DurationFmtCh], lch.[IsAuthRequired] as[IsAuthRequiredCh], lch.[IsSubsRequired] as[IsSubsRequiredCh],\n" +
+    "  lch.[FreeExpDate] as[FreeExpDateCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
@@ -357,11 +359,12 @@ const LESSON_MYSQL_ASSETS_ALL_REQ =
 
 const LESSON_MYSQL_REQ =
     "select lc.`CourseId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
-    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
     "  lch.`Id` as`IdCh`, llch.`Name` as`NameCh`, llch.`ShortDescription` as`ShortDescriptionCh`,\n" +
     "  lcch.`State` as`StateCh`, lcch.`ReadyDate` as`ReadyDateCh`, lch.`Cover` as`CoverCh`, lch.`CoverMeta` as`CoverMetaCh`,\n" +
     "  llch.`Duration` as`DurationCh`, lcch.`Number` as`NumberCh`,\n" +
-    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`IsAuthRequired` as`IsAuthRequiredCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh`\n" +
+    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`IsAuthRequired` as`IsAuthRequiredCh`, lch.`IsSubsRequired` as`IsSubsRequiredCh`,\n" +
+    "  lch.`FreeExpDate` as`FreeExpDateCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
@@ -451,7 +454,7 @@ const GET_LESSON_DURATION_MYSQL =
 const LESSONS_ALL_MSSQL_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
     "  lc.[Number], lc.[ReadyDate],\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], ell.Audio, el.[Number] Eln from [Course] c\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -466,7 +469,7 @@ const LESSONS_ALL_MSSQL_REQ =
 const LESSONS_ALL_MYSQL_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
     "  lc.`Number`, lc.`ReadyDate`,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, ell.Audio, el.`Number` Eln from `Course` c\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -502,6 +505,7 @@ const DbLesson = class DbLesson extends DbObject {
     get(id, course_id) {
         let lesson = {};
         let isNotFound = true;
+        let now = new Date();
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -514,6 +518,9 @@ const DbLesson = class DbLesson extends DbObject {
                         if (result && result.detail && (result.detail.length === 1)) {
                             lesson = result.detail[0];
                             lesson.IsAuthRequired = lesson.IsAuthRequired ? true : false;
+                            lesson.IsSubsRequired = lesson.IsSubsRequired ? true : false;
+                            if (!(lesson.IsSubsRequired && lesson.FreeExpDate && ((now - lesson.FreeExpDate) > Intervals.MIN_FREE_LESSON)))
+                                delete lesson.FreeExpDate;
                             isNotFound = false;
                         }
                         if (!isNotFound)
@@ -568,6 +575,9 @@ const DbLesson = class DbLesson extends DbObject {
                             if (result && result.detail && (result.detail.length > 0)) {
                                 result.detail.forEach((elem) => {
                                     elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                                    elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
+                                    if (!(elem.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON)))
+                                        delete elem.FreeExpDate;
                                 });
                                 childs = result.detail;
                             }
@@ -638,6 +648,7 @@ const DbLesson = class DbLesson extends DbObject {
                             let isFirst = true;
                             let authors_list = {};
                             let lesson_list = {};
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 let lsn = lesson_list[elem.LessonId];
                                 if (!lsn) {
@@ -651,6 +662,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
                                         Duration: elem.Duration,
                                         DurationFmt: elem.DurationFmt,
@@ -658,6 +670,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         Lessons: [],
                                         Audios: []
                                     };
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     let isCurrent = lesson_url === elem.LURL;
                                     if (!elem.ParentId) {
@@ -726,6 +740,7 @@ const DbLesson = class DbLesson extends DbObject {
         let course = null;
         let curLesson = null;
         let parentUrl = lesson_url;
+        let now = new Date();
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -769,18 +784,22 @@ const DbLesson = class DbLesson extends DbObject {
                                         DurationFmt: elem.DurationFmt,
                                         URL: elem.URL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         AuthorId: elem.AuthorId,
                                         Number: elem.Number,
                                         ShortDescription: elem.ShortDescription,
                                         Lessons: []
                                     };
+                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                        lesson.FreeExpDate = elem.FreeExpDate;
                                     isFirst = false;
                                     authors_list[elem.AuthorId] = true;
                                 }
                                 if (elem.IdCh) {
                                     if (elem.URLCh === lesson_url)
                                         curLesson = lesson.Lessons.length;
-                                    lesson.Lessons.push({
+                                    let lsn;
+                                    lesson.Lessons.push(lsn = {
                                         Id: elem.IdCh,
                                         Name: elem.NameCh,
                                         Cover: elem.CoverCh,
@@ -791,10 +810,13 @@ const DbLesson = class DbLesson extends DbObject {
                                         DurationFmt: elem.DurationFmtCh,
                                         URL: elem.URLCh,
                                         IsAuthRequired: elem.IsAuthRequiredCh ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequiredCh ? true : false,
                                         AuthorId: elem.AuthorIdCh,
                                         Number: elem.NumberCh,
                                         ShortDescription: elem.ShortDescriptionCh
                                     });
+                                    if (lsn.IsSubsRequired && elem.FreeExpDateCh && ((now - elem.FreeExpDateCh) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDateCh;
                                     authors_list[elem.AuthorIdCh] = true;
                                 }
                             });
@@ -1532,7 +1554,12 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_obj.uRL(inpFields["URL"]);
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             lsn_obj.isAuthRequired(inpFields["IsAuthRequired"]);
-
+                        if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
+                            lsn_obj.isSubsRequired(inpFields["IsSubsRequired"]);
+                        if (typeof (inpFields["FreeExpDate"]) !== "undefined")
+                            lsn_obj.freeExpDate(inpFields["FreeExpDate"]);
+                        if (lsn_obj.isSubsRequired())
+                            lsn_obj.isAuthRequired(true);    
                         if (typeof (inpFields["State"]) !== "undefined")
                             lsn_lng_obj.state(inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1772,6 +1799,13 @@ const DbLesson = class DbLesson extends DbObject {
                         fields["IsAuthRequired"] = false;
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             fields["IsAuthRequired"] = inpFields["IsAuthRequired"];
+                        fields["IsSubsRequired"] = false;
+                        if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
+                            fields["IsSubsRequired"] = inpFields["IsSubsRequired"];
+                        if (typeof (inpFields["FreeExpDate"]) !== "undefined")
+                            fields["FreeExpDate"] = inpFields["FreeExpDate"];
+                        if (fields["IsSubsRequired"])
+                            fields["IsAuthRequired"] = true;    
                         return root_obj.newObject({
                             fields: fields
                         }, opts);

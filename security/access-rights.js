@@ -5,13 +5,13 @@ const { ACCOUNT_ID } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const LESSON_FILE_MSSQL_REQ =
-    "select l.[Id], l.[IsAuthRequired] from[EpisodeLng] el\n" +
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired] from[FreeExpDate] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
     "where el.[Audio] = '<%= file %>'";
     
 const LESSON_FILE_MYSQL_REQ =
-    "select l.`Id`, l.`IsAuthRequired` from`EpisodeLng` el\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate` from`EpisodeLng` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `Lesson` l on l.`Id` = e.`LessonId`\n" +
     "where el.`Audio` = '<%= file %>'";
@@ -32,8 +32,17 @@ exports.AccessRights = class {
                         res = result.detail[0].IsAuthRequired ? true : false;
                     if (!res)
                         res = true
-                    else
-                        res = user ? true : false;    
+                    else {
+                        res = user ? true : false;
+                        if (res) {
+                            let rec = result.detail[0];
+                            let now = new Date();
+                            if ((!rec.FreeExpDate)||(now > rec.FreeExpDate)) {
+                                if (rec.IsSubsRequired && ((!user.SubsExpDate) || (now > rec.SubsExpDate)))
+                                    res = false;    
+                            }
+                        }
+                    }
                     return res;
                 });
             resolve(canAccess);
