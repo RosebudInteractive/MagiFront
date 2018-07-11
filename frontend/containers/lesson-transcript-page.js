@@ -80,20 +80,80 @@ class TranscriptLessonPage extends React.Component {
         }
     }
 
+    // static _handleScroll() {
+    //     let //_controls = $('.js-gallery-controls'),
+    //         _link = $('.link-to-lecture, .social-block-vertical'),
+    //         // _windowHeight = $(window).height(),
+    //         _scrollTop = $(window).scrollTop();
+    //
+    //     // Для новой галереи
+    //     // const _recommend = $('#recommend');
+    //     const _recommend = $('#gallery');
+    //
+    //     if ((_link.length) && (_recommend.length)) {
+    //         let coordTop = _recommend.offset().top;
+    //
+    //         if ((_scrollTop + 550) >= coordTop) {
+    //             _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
+    //         } else {
+    //             _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
+    //         }
+    //
+    //         // Это из новой галереи
+    //         // if ((_scrollTop + _windowHeight / 2 + 120) >= coordTop) {
+    //         //     _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
+    //         // } else {
+    //         //     _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
+    //         // }
+    //
+    //
+    //         if ($(window).width() < 768) {
+    //
+    //             // Это из новой галереи
+    //             // if ((_scrollTop + _windowHeight) >= coordTop) {
+    //             //     $('.js-sticky-block').css('position', 'absolute').css('top', coordTop).css('bottom', 'auto').css('margin-top', '-100px');
+    //             // } else {
+    //             //     $('.js-sticky-block').css('position', 'fixed').css('top', 'auto').css('bottom', '30px').css('margin-top', '0');
+    //             // }
+    //
+    //             if ((_scrollTop + 650) >= coordTop) {
+    //                 _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
+    //             } else {
+    //                 _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
+    //             }
+    //         }
+    //     }
+    //
+    //     //Для новой галереи
+    //     // if (_controls.length && _recommend.length) {
+    //     //     let coordTop = $('#recommend').offset().top;
+    //     //
+    //     //     if ($(window).width() < 768 ) {
+    //     //         if ((_scrollTop + _windowHeight) >= coordTop) {
+    //     //             _controls.css('position', 'absolute').css('bottom', 'auto').css('top', coordTop - 55);
+    //     //             if (_controls.hasClass('show')) {
+    //     //                 // closeGallerySlider();
+    //     //             }
+    //     //         } else {
+    //     //             _controls.css('position', 'fixed').css('top', 'auto').css('bottom', '10px').css('margin-top', '0');
+    //     //         }
+    //     //     } else {
+    //     //         if ((_scrollTop + _windowHeight) >= coordTop) {
+    //     //             _controls.css('position', 'absolute').css('top', coordTop).css('transform', 'none').css('bottom', 'auto');
+    //     //             if (_controls.hasClass('show')) {
+    //     //             //     closeGallerySlider();
+    //     //             }
+    //     //         } else {
+    //     //             _controls.css('position', 'fixed').css('bottom', '20px').css('top', 'auto').css('margin-top', '-60px');
+    //     //         }
+    //     //     }
+    //     // }
+    // }
+
     componentWillReceiveProps(nextProps) {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
-        }
-
-        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
-            $('.transcript-page').on('touchmove', stopScrolling);
-            $(document).on('touchmove', stopScrolling);
-        }
-
-        if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
-            $('.transcript-page').unbind('touchmove', stopScrolling);
-            $(document).unbind('touchmove', stopScrolling)
         }
     }
 
@@ -105,11 +165,7 @@ class TranscriptLessonPage extends React.Component {
             authorized
         } = this.props;
 
-        const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0},
-            _gallery = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#gallery"/>',
-            _prev = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-prev"/>',
-            _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
-
+        const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
 
         return [
             <div className="sticky-block js-sticky-block" style={_linkStyle}>
@@ -117,20 +173,9 @@ class TranscriptLessonPage extends React.Component {
                     Смотреть <br/>лекцию
                 </Link>
             </div>,
-            <div className="js-gallery-controls gallery-controls hide">
-                <button className="gallery-trigger js-gallery-trigger" type="button">
-                    <span className="visually-hidden">Галерея</span>
-                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
-                </button>
-                <button className="swiper-button-prev swiper-button-disabled" type="button">
-                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>
-                </button>
-                <button className="swiper-button-next" type="button">
-                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
-                </button>
-            </div>,
+            //<GalleryButtons/>,
             <SocialBlock/>,
-            lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
+            // lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
             fetching ?
                 <p>Загрузка...</p>
                 :
@@ -152,15 +197,30 @@ class TranscriptLessonPage extends React.Component {
     }
 }
 
+class GalleryButtons extends React.Component {
 
-function stopScrolling(e) {
+    render() {
+        const _gallery = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#gallery"/>',
+            _prev = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-prev"/>',
+            _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
 
-    console.log(e, e.target)
-    if (!e.target.closest('.lectures-list-wrapper')) {
-        e.preventDefault();
-        e.stopPropagation()
+        return (
+            <div className="js-gallery-controls gallery-controls hide">
+                <button className="gallery-trigger js-gallery-trigger" type="button">
+                    <span className="visually-hidden">Галерея</span>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
+                </button>
+                <button className="swiper-button-prev swiper-button-disabled" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>
+                </button>
+                <button className="swiper-button-next" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
+                </button>
+            </div>
+        )
     }
 }
+
 
 class SocialBlock extends React.Component {
 

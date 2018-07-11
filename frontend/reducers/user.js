@@ -34,6 +34,9 @@ import {
     RECOVERY_PASSWORD_START,
     RECOVERY_PASSWORD_SUCCESS,
     RECOVERY_PASSWORD_FAIL, CLOSE_SIGN_IN_FORM,
+    WHO_AM_I_START,
+    WHO_AM_I_SUCCESS,
+    WHO_AM_I_FAIL,
 } from '../constants/user'
 
 const initialState = {
@@ -59,6 +62,7 @@ export default function app(state = initialState, action) {
         }
 
         case SIGN_IN_START:
+        case WHO_AM_I_START:
         case ACTIVATION_START:
         case LOGOUT_START:
         case SEND_NEW_PASSWORD_START:
@@ -70,6 +74,7 @@ export default function app(state = initialState, action) {
             return {...state, error: null, loading: true, email: payload.login};
 
         case SIGN_IN_SUCCESS:
+        case WHO_AM_I_SUCCESS:
         case SIGN_UP_SUCCESS:
         case SIGN_OUT_SUCCESS:
         case ACTIVATION_SUCCESS:
@@ -139,6 +144,7 @@ export default function app(state = initialState, action) {
             }
 
         case SIGN_IN_FAIL:
+        case WHO_AM_I_FAIL:
         case SIGN_UP_FAIL:
         case ACTIVATION_FAIL:
         case RECOVERY_PASSWORD_FAIL:

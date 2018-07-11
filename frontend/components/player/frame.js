@@ -24,6 +24,7 @@ class Frame extends Component {
 
     constructor(props) {
         super(props)
+        this._lessonId = this.props.lesson.Id;
 
         this._timer = null;
 
@@ -220,6 +221,10 @@ class Frame extends Component {
     render() {
         let _id = this.props.lesson ? this.props.lesson.Id : '',
             {showContentTooltip, showSpeedTooltip} = this.props;
+
+        if (this._lessonId !== _id) {
+            return null
+        }
 
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',

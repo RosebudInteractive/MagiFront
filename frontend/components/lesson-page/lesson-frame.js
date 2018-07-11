@@ -60,7 +60,6 @@ class LessonFrame extends React.Component {
 
     _getButton(isFinished) {
         const _playLock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-lock"/>',
-            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lecture-replay"/>';
 
         const _style = {cursor: 'pointer'};
@@ -73,7 +72,6 @@ class LessonFrame extends React.Component {
                 <div style={_style} onClick={::this._unlock}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
                         <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _playLock}}/>
-                        <svg className='icon-lock' width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
                     </span>
                 </div>
             )

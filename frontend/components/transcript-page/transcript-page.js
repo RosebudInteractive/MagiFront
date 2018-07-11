@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
-// import Gallery from './gallery';
-// import GallerySlides from './gallery-slides';
+import Gallery from './gallery';
+import GallerySlides from './gallery-slides';
 import $ from 'jquery'
 
 export default class TranscriptPage extends React.Component {
@@ -17,14 +17,14 @@ export default class TranscriptPage extends React.Component {
     };
 
     render() {
-        // let {isNeedHideGallery} = this.props;
+        let {isNeedHideGallery} = this.props;
 
         return (
             <div>
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
-                {/*{isNeedHideGallery ? null : <Gallery {...this.props}/>}*/}
-                {/*{isNeedHideGallery ? null : <GallerySlides {...this.props}/>}*/}
+                {isNeedHideGallery ? null : <Gallery {...this.props}/>}
+                {isNeedHideGallery ? null : <GallerySlides {...this.props}/>}
             </div>
         )
     }

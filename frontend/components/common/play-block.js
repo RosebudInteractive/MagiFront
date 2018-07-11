@@ -6,6 +6,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from '../../actions/user-actions'
+import * as storageActions from '../../actions/lesson-info-storage-actions'
 
 class PlayBlock extends React.Component {
 
@@ -119,6 +120,7 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        storageActions: bindActionCreators(storageActions, dispatch),
     }
 }
 
