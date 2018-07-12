@@ -445,14 +445,19 @@
 
             isResizing = true;
 
-            // windowsHeight = $window.innerHeight();  //updating global var
-            windowsHeight = $window.outerHeight();  //updating global var
+            windowsHeight = ($(window).innerHeight() > $window.outerHeight()) ? $(window).innerHeight() : $window.outerHeight();  //updating global var
+            // windowsHeight = $window.outerHeight();  //updating global var
 
             $(SECTION_SEL).each(function(){
                 var slidesWrap = $(this).find(SLIDES_WRAPPER_SEL);
                 var slides = $(this).find(SLIDE_SEL);
 
                 //adjusting the height of the table-cell for IE and Firefox
+                // _addDevInfo('reBuild windowsHeight : ' + windowsHeight);
+                // _addDevInfo('reBuild outerHeight : ' + $(window).outerHeight());
+                // _addDevInfo('reBuild innerHeight : ' + $(window).innerHeight());
+                // _addDevInfo('reBuild outerWidth : ' + $(window).outerWidth());
+
                 if(options.verticalCentered){
                     $(this).find(TABLE_CELL_SEL).css('height', getTableHeight($(this)) + 'px');
                 }
@@ -2926,3 +2931,13 @@
 
     }; //end of $.fn.fullpage
 });
+
+
+function _addDevInfo(text) {
+    let _dev = $('#dev'),
+        isVisible = _dev.is(':visible');
+
+    if (isVisible === true) {
+        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
+    }
+}
