@@ -34,6 +34,11 @@ module.exports = {
         storage: 'local',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:'
     },
+    debug: {
+        routes: {
+            "set-user-subscription": true
+        }
+    },
     authentication: {
         enabled: true,
         useJWT: true,
