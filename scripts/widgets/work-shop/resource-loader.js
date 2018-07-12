@@ -9,8 +9,8 @@ let _audioMap = new Map();
 
 const _isIOS = Platform.os.family === "iOS",
     _isAndroid = Platform.os.family === "Android",
-    _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari");
-const _usePreinit = (_isIOS || _isAndroid || _isSafariOnMac)
+    _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari"),
+    _usePreinit = (_isIOS || _isAndroid || _isSafariOnMac);
 
 export default class CWSResourceLoader {
 
