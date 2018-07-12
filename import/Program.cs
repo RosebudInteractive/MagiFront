@@ -414,8 +414,14 @@ namespace MagImport
             public string CoverMeta { get; set; }
             public string RawCoverMeta { get; set; }
             public bool IsAuthRequired { get; set; }
+            public bool IsSubsRequired { get; set; }
+            public DateTime? FreeExpDate { get; set; }
             public string URL { get; set; }
-            public LessonFields() { IsAuthRequired = false; }
+            public LessonFields()
+            {
+                IsAuthRequired = false;
+                IsSubsRequired = false;
+            }
         };
 
         public class Lesson : DataObjTyped<LessonFields, LessonRoot>
@@ -857,6 +863,7 @@ namespace MagImport
             public string Phone { get; set; }
             public DateTime? RegDate { get; set; }
             public DateTime? ExpDate { get; set; }
+            public DateTime? SubsExpDate { get; set; }
             public string ActivationKey { get; set; }
             public int? Status { get; set; }
             public bool? IsOld { get; set; }

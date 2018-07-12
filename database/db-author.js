@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { DbObject } = require('./db-object');
 const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
+const { Intervals } = require('../const/common');
 
 const AUTHOR_REQ_TREE = {
     expr: {
@@ -37,7 +38,7 @@ const AUTHOR_MSSQL_PUB_REQ =
 const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
     "from[Lesson] l\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
@@ -78,7 +79,7 @@ const AUTHOR_MYSQL_PUB_REQ =
 const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
     "from`Lesson` l\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
@@ -153,6 +154,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                             let authors_list = {};
                             let courseId = -1;
                             let course = null;
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 if (courseId !== elem.Id) {
                                     courseId = elem.Id;
@@ -184,6 +186,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -194,6 +197,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         NBooks: 0,
                                         Audios: []
                                     };
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     if (!elem.ParentId) {
                                         author.Lessons.push(lsn);
