@@ -21,6 +21,16 @@ export default class TranscriptPage extends React.Component {
 
         return (
             <div>
+                <div style={{
+                    width:'100vw',
+                    height:'100vh',
+                    backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
+                    backgroundRepeat: "no-repeat",
+                    backgroundSize: "cover",
+                    backgroundPosition: "top center",
+                }}>
+
+                </div>
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
                 {/*{isNeedHideGallery ? null : <Gallery {...this.props}/>}*/}

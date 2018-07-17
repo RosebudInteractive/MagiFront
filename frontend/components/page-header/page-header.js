@@ -59,7 +59,8 @@ class Header extends React.Component {
         let {authorized, lessonInfo, pageHeaderState, visible} = this.props,
             _menuOpened = pageHeaderState.showMenu,
             _headerClass = 'page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!visible ? ' _animate' : '')),
-            _showTranscriptMenu = (pageHeaderState.currentPage === pages.transcript) && lessonInfo.loaded,
+            // _showTranscriptMenu = (pageHeaderState.currentPage === pages.transcript) && lessonInfo.loaded,
+            _showTranscriptMenu = false,
             _currentLesson = this._getLessonInfo(lessonInfo)
 
         return (

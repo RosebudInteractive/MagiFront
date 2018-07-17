@@ -8,7 +8,7 @@ import {BrowserRouter} from 'react-router-dom';
 
 ReactDOM.render(
     <div>
-        <Provider store={store}>
+        <Provider onUpdate={() => window.scrollTo(0, 0)} store={store}>
             <BrowserRouter>
                 <App/>
             </BrowserRouter>
