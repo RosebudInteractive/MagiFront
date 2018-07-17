@@ -4939,16 +4939,19 @@ ul.user-tooltip {
   border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
   @media (max-width: 1899px) {
     .course-module {
-      min-height: 685px; } }
+      min-height: 635px; } }
   @media (max-width: 1279px) {
     .course-module {
-      min-height: 733px; } }
+      /*min-height: 733px; */
+      min-height: 685px; } }
   @media (max-width: 1023px) {
     .course-module {
-      min-height: 747px; } }
+      /*min-height: 747px;*/
+      min-height: 685px; } }
   @media (max-width: 899px) {
     .course-module {
-      min-height: 700px; } }
+      /*min-height: 700px;*/
+      min-height: 685px; } }
   @media (max-width: 639px) {
     .course-module {
       -webkit-box-orient: vertical;
