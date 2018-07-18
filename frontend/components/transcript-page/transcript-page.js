@@ -19,9 +19,10 @@ export default class TranscriptPage extends React.Component {
     constructor(props) {
         super(props);
 
+
+
         this._resizeHandler = () => {
-            $('#cover-test').height(window.innerHeight);
-            $('#cover-test').width(window.innerWidth);
+            $('#cover-test').css('height', $(window).height());
         }
 
         // let that = this;
@@ -33,13 +34,18 @@ export default class TranscriptPage extends React.Component {
                 $(window).on('resize', this._resizeHandler)
             }, 250));
         }
+
+
     }
 
     componentDidMount() {
-        // $(window).on('resize', this._resizeHandler)
+        this._mediaQuery = window.matchMedia("(orientation: portrait)");
+        this._mediaQuery.addListener(this._resizeHandler);
+
+        // window.addEventListener("orientationchange", this._resizeHandler)
         // $(window).on('scroll', this._scrollHandler)
         //
-        // this._resizeHandler();
+        this._resizeHandler();
     }
 
     render() {
@@ -49,14 +55,12 @@ export default class TranscriptPage extends React.Component {
             <div>
                 <div id='cover-test' style={{
                     width:'100vw',
-                    height: '100vh',
+                    // height: '100vh',
                     backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
                     backgroundPosition: "top center",
-                }}>
-
-                </div>
+                }}/>
                 <TextBlock {...this.props} />
                 {/*<ReadingBlock {...this.props}/>*/}
                 {/*{isNeedHideGallery ? null : <Gallery {...this.props}/>}*/}
