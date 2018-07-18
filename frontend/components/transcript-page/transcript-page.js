@@ -42,10 +42,10 @@ export default class TranscriptPage extends React.Component {
         // this._mediaQuery = window.matchMedia("(orientation: portrait)");
         // this._mediaQuery.addListener(this._resizeHandler);
 
-        window.addEventListener("orientationchange", this._resizeHandler)
+        // window.addEventListener("orientationchange", this._resizeHandler)
         // $(window).on('scroll', this._scrollHandler)
         //
-        this._resizeHandler();
+        // this._resizeHandler();
     }
 
     render() {
@@ -55,7 +55,7 @@ export default class TranscriptPage extends React.Component {
             <div>
                 <div id='cover-test' style={{
                     width:'100vw',
-                    // height: '100vh',
+                    height: '56vw',
                     backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
