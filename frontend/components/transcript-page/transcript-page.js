@@ -16,14 +16,40 @@ export default class TranscriptPage extends React.Component {
         lesson: PropTypes.object,
     };
 
+    constructor(props) {
+        super(props);
+
+        this._resizeHandler = () => {
+            $('#cover-test').height(window.innerHeight);
+            $('#cover-test').width(window.innerWidth);
+        }
+
+        // let that = this;
+        this._scrollHandler = () => {
+            $(window).unbind('resize', this._resizeHandler)
+            clearTimeout($.data(this, 'scrollTimer'));
+            $.data(this, 'scrollTimer', setTimeout(() => {
+                // do something
+                $(window).on('resize', this._resizeHandler)
+            }, 250));
+        }
+    }
+
+    componentDidMount() {
+        // $(window).on('resize', this._resizeHandler)
+        // $(window).on('scroll', this._scrollHandler)
+        //
+        // this._resizeHandler();
+    }
+
     render() {
         // let {isNeedHideGallery} = this.props;
 
         return (
             <div>
-                <div style={{
+                <div id='cover-test' style={{
                     width:'100vw',
-                    height:'100vh',
+                    height: '100vh',
                     backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
                     backgroundRepeat: "no-repeat",
                     backgroundSize: "cover",
