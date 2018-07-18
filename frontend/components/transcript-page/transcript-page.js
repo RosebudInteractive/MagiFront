@@ -22,7 +22,7 @@ export default class TranscriptPage extends React.Component {
 
 
         this._resizeHandler = () => {
-            $('#cover-test').css('height', $(window).height());
+            $('#cover-test').css('height', window.screen.availHeight);
         }
 
         // let that = this;
@@ -39,10 +39,10 @@ export default class TranscriptPage extends React.Component {
     }
 
     componentDidMount() {
-        this._mediaQuery = window.matchMedia("(orientation: portrait)");
-        this._mediaQuery.addListener(this._resizeHandler);
+        // this._mediaQuery = window.matchMedia("(orientation: portrait)");
+        // this._mediaQuery.addListener(this._resizeHandler);
 
-        // window.addEventListener("orientationchange", this._resizeHandler)
+        window.addEventListener("orientationchange", this._resizeHandler)
         // $(window).on('scroll', this._scrollHandler)
         //
         this._resizeHandler();
