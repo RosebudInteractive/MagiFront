@@ -3973,17 +3973,21 @@ li.fancybox-thumbs-loading {
       opacity: 1; }
 
 .transcript-page {
-  margin-top: 149px;
-  padding-top: 86px; }
+  /*margin-top: 149px;*/
+  /*padding-top: 86px; */
+}
   @media (max-width: 1023px) {
     .transcript-page {
-      padding-top: 61px; } }
+      /*padding-top: 61px; */
+    } }
   @media (max-width: 899px) {
     .transcript-page {
-      margin-top: 118px; } }
+      /*margin-top: 118px; */
+    } }
   @media (max-width: 599px) {
     .transcript-page {
-      padding-top: 42px; } }
+      /*padding-top: 42px; */
+    } }
 
   .transcript-page .title-text {
       text-indent: -1.3em;
@@ -4939,16 +4943,19 @@ ul.user-tooltip {
   border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
   @media (max-width: 1899px) {
     .course-module {
-      min-height: 685px; } }
+      min-height: 635px; } }
   @media (max-width: 1279px) {
     .course-module {
-      min-height: 733px; } }
+      /*min-height: 733px; */
+      min-height: 685px; } }
   @media (max-width: 1023px) {
     .course-module {
-      min-height: 747px; } }
+      /*min-height: 747px;*/
+      min-height: 685px; } }
   @media (max-width: 899px) {
     .course-module {
-      min-height: 700px; } }
+      /*min-height: 700px;*/
+      min-height: 685px; } }
   @media (max-width: 639px) {
     .course-module {
       -webkit-box-orient: vertical;
@@ -6948,7 +6955,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   flex-grow: 1; }
   @media (max-width: 1279px) {
     .lectures-list-block {
-      width: auto;
+      /*width: auto;*/
       min-width: 200px;
       -webkit-box-flex: 0;
       -webkit-flex-grow: 0;

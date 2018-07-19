@@ -3,8 +3,14 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import InfoBlock from './info-block';
-import {ImageSize, getCoverPath, getRandomInt} from '../../tools/page-tools'
+import {ImageSize, getCoverPath} from '../../tools/page-tools';
+import { lazyload } from 'react-lazyload';
 
+@lazyload({
+    height: 200,
+    once: true,
+    offset: 100
+})
 export default class CourseModule extends React.Component {
 
     render() {

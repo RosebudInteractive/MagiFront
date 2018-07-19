@@ -35,9 +35,9 @@ class LessonPage extends React.Component {
 
 
         this._resizeHandler = () => {
-            if ($('#fullpage-lesson').length) {
-                $.fn.fullpage.reBuild();
-            }
+            // if ($('#fullpage-lesson').length) {
+            //     $.fn.fullpage.reBuild();
+            // }
         }
 
         this._keydownHandler = (e) => {

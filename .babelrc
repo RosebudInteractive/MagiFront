@@ -2,6 +2,7 @@
   "presets": ["es2015", "stage-0", "react"], //поддержка ES2015, ES7 и JSX
   "plugins": [
     "transform-object-assign",
-    "es6-promise"
+    "es6-promise",
+    "transform-decorators-legacy"
   ]
 }
