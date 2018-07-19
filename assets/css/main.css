@@ -6336,13 +6336,18 @@ ul.user-tooltip {
     min-height: 0 !important; }
 
   .lesson-wrapper {
-    width: 100vw;
-    height: 100vh;
+    /*height: 100vh;*/
+    position: relative;
+    touch-action: none;
+    transform: translate3d(0px, 0px, 0px);
   }
 
+  .lecture-wrapper {
+    height: 100%;
+  }
 .lecture-wrapper, .player-wrapper {
-  height: 100%;
-  width: 100%;
+  /*height: 100%;*/
+  /*width: 100%;*/
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   background-size: cover;
@@ -6705,7 +6710,10 @@ ul.user-tooltip {
       top: 64px } }
 
 .lectures-menu {
-  position: relative;
+  /*position: relative;*/
+  position: absolute;
+  width: 100%;
+  z-index: 100;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -7610,9 +7618,27 @@ body[data-page="fullpage-player"] .lectures-menu {
     width: 18px;
   }
 
+  .lesson-sub-wrapper{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -moz-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    height: 100%;
+  }
 .lecture-frame {
-  width: 100%;
-  height: 100%;
   margin-top: auto;
   padding: 0 18px 10px 18px;
   color: #fff;
@@ -7958,7 +7984,6 @@ body[data-page="fullpage-player"] .lectures-menu {
           outline: none; }
         .lectures-menu-nav__trigger:after {
           content: "";
-          position: absolute;
           position: absolute;
           left: 50%;
           -webkit-transform: translateX(-50%);
@@ -10896,13 +10921,15 @@ ul.lectures-tab {
   .fp-tableCell .player-wrapper .link-to-transcript._reduced {
     display: block;
   }
+
   @media (max-width: 600px) {
     .player-wrapper .lectures-menu {
-      position: absolute;
+      /*position: absolute;*/
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100; }
+      /*z-index: 100; */
+    }
       .player-wrapper .lectures-menu:after {
         display: none; }
     .player-wrapper .lectures-menu__link-back {
