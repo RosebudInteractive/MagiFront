@@ -41,14 +41,16 @@ class BookmarksPage extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
-            this.props.appActions.showCoursesBookmarks();
-            this.props.history.replace('/favorites/courses')
-        }
+        if (nextProps.isBookmarksPage) {
+            if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
+                this.props.appActions.showCoursesBookmarks();
+                this.props.history.replace('/favorites/courses')
+            }
 
-        if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
-            this.props.appActions.showLessonsBookmarks();
-            this.props.history.replace('/favorites/lessons')
+            if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
+                this.props.appActions.showLessonsBookmarks();
+                this.props.history.replace('/favorites/lessons')
+            }
         }
     }
 
@@ -109,6 +111,7 @@ function mapStateToProps(state, ownProps) {
         showLessonBookmarks: state.app.showLessonBookmarks,
         showCourseBookmarks: state.app.showCourseBookmarks,
         page: ownProps.location.pathname,
+        isBookmarksPage: ownProps.match.path === "/favorites",
     }
 }
 

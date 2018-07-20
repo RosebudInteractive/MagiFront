@@ -11,7 +11,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
-import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
+// import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {

@@ -107,6 +107,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                         </div>
                         :
                         <div className="form register-form">
+                            <Field name="login" component={LoginEdit} hidden={true}/>
                             <Field name="username" component={UserNameEdit}/>
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>

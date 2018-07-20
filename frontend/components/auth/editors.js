@@ -14,12 +14,12 @@ class Editor extends React.Component {
         const _checkGreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#check-green"/>',
             _failure = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#failure"/>';
 
-        const {input, meta: {error, touched}, id, type, label, placeholder, disabled} = this.props;
+        const {input, meta: {error, touched}, id, type, label, placeholder, disabled, hidden} = this.props;
         const _errorText = touched && error &&
             <p className="form__error-message js-error-message" style={{display: "block"}}>{error}</p>
 
         return (
-            <div className="form__field-wrapper register-form__field-wrapper">
+            <div className="form__field-wrapper register-form__field-wrapper" style={hidden ? {display : 'none'} : null}>
                 <label htmlFor={id} className="form__field-label register-form__field-label">{label}</label>
                 {disabled ?
                     <input {...input} id={id} type={type} className="form__field register-form__field" placeholder={placeholder} disabled/>
