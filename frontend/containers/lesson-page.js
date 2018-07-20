@@ -94,10 +94,11 @@ class LessonPage extends React.Component {
 
             if (!_isRedirectFromThisPage) {
                 this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+                this.props.appActions.hideLessonMenu()
             }
         }
 
-        this.props.appActions.hideLessonMenu()
+
 
         let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
         if (!_lesson) {

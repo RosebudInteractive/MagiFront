@@ -29,6 +29,7 @@ export default class Wrapper extends React.Component {
 
         this._resizeHandler = () => {
             $('.lesson-wrapper').css('height', window.innerHeight)
+            console.log('locationbar : %s, menubar : %s', window.locationbar.visible, window.menubar.visible)
         }
 
         $(window).on('resize', this._resizeHandler)
