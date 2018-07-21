@@ -6725,6 +6725,7 @@ ul.user-tooltip {
   /*position: relative;*/
   position: absolute;
   width: 100%;
+  z-index: 10;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
