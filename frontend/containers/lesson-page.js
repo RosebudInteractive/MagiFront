@@ -25,11 +25,8 @@ class LessonPage extends React.Component {
 
         this.state = {
             total: 0,
-            currentActive: 0,
             redirectToPlayer: false,
         }
-
-        this._internalRedirect = false;
     }
 
     componentWillMount() {
@@ -70,8 +67,7 @@ class LessonPage extends React.Component {
 
         let _isRedirectFromThisPage = (nextState.redirectToPlayer) &&
             (this.props.courseUrl === nextProps.courseUrl) &&
-            (this.props.lessonUrl !== nextProps.lessonUrl) &&
-            !this._internalRedirect;
+            (this.props.lessonUrl !== nextProps.lessonUrl);
 
         let _needSkipRedirect = _linkToSelfLessonFromPlayer || _isRedirectFromThisPage
 
@@ -88,14 +84,8 @@ class LessonPage extends React.Component {
         let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
-
-            let _isRedirectFromThisPage = (courseUrl === prevProps.courseUrl) &&
-                (lessonUrl !== prevProps.lessonUrl);
-
-            if (!_isRedirectFromThisPage) {
-                this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-                this.props.appActions.hideLessonMenu()
-            }
+            this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+            this.props.appActions.hideLessonMenu()
         }
 
 
@@ -186,7 +176,7 @@ class LessonPage extends React.Component {
                         lesson={lesson}
                         courseUrl={this.props.courseUrl}
                         lessonUrl={lesson.URL}
-                        active={this.state.currentActive}
+                        active={lesson.Number}
                         isPlayer={_playingLessonUrl || _lessonInPlayer}
                         audios={_audios}
                         history={this.props.history}

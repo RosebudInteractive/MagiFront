@@ -281,7 +281,7 @@ class Menu extends React.Component {
                                 {
                                     !isNeedHideGallery ?
                                         <li className="menu-nav-list__item">
-                                            <a href="#gallery"
+                                            <a href="#pictures"
                                                className="menu-nav-list__item-head js-scroll-link">Галерея</a>
                                         </li>
                                         :

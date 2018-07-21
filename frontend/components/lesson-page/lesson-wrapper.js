@@ -8,6 +8,14 @@ import LessonFrame from './lesson-frame';
 
 import $ from 'jquery'
 
+function _addDevInfo(text) {
+    let _dev = $('#dev'),
+        isVisible = _dev.is(':visible');
+
+    if (isVisible === true) {
+        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
+    }
+}
 
 export default class Wrapper extends React.Component {
 
@@ -27,28 +35,39 @@ export default class Wrapper extends React.Component {
     constructor(props) {
         super(props)
 
-        this._resizeHandler = () => {
-            $('.lesson-wrapper').css('height', window.innerHeight)
-            console.log('locationbar : %s, menubar : %s', window.locationbar.visible, window.menubar.visible)
-        }
 
-        $(window).on('resize', this._resizeHandler)
+        this._resizeHandler = () => {
+            this._height = $(window).innerHeight();
+            $('.lesson-wrapper').css('height', this._height)
+
+        }
     }
 
     componentDidMount() {
+        $(window).on('resize', this._resizeHandler)
         this._resizeHandler()
+    }
+
+    componentDidUpdate() {
+        if (this._height !== $(window).innerHeight()) {
+            this._resizeHandler()
+        }
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
         let {isPlayer} = this.props;
+        const _coverStyle = {
+            backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
+        }
 
         return (
-            <div className={'lecture-wrapper' + (isPlayer ? ' player-wrapper' : '')}
+            <div className='lecture-wrapper'
                  id={this.props.isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                 style={{
-                     backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
-                     // backgroundImage: "-webkit-radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")"
-                 }}>
+                 style={_coverStyle}>
                 <Menu {...this.props} current={this.props.lesson.Number} id={'lesson-menu-' + this.props.lesson.Id}/>
                 <div className={'lesson-sub-wrapper'}>
                     {
