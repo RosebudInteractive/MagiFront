@@ -7,14 +7,12 @@ import PlayerFrame from '../player/frame'
 import LessonFrame from './lesson-frame';
 
 import $ from 'jquery'
+import Platform from 'platform';
 
-function _addDevInfo(text) {
-    let _dev = $('#dev'),
-        isVisible = _dev.is(':visible');
+const _isSafariOnIOS = (Platform.os.family === "iOS") && (Platform.name === "Safari");
 
-    if (isVisible === true) {
-        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
-    }
+function _getHeight() {
+    return _isSafariOnIOS ? $(window).outerHeight() : $(window).innerHeight();
 }
 
 export default class Wrapper extends React.Component {
@@ -37,13 +35,12 @@ export default class Wrapper extends React.Component {
 
 
         this._resizeHandler = () => {
-            this._height = $(window).innerHeight();
-            let _outerHeight = $(window).outerHeight();
+            this._height = _getHeight();
             $('.lesson-wrapper').css('height', this._height);
-            _addDevInfo('inner : ' + this._height + 'px / outer : ' + _outerHeight + 'px');
-
         }
     }
+
+
 
     componentDidMount() {
         $(window).on('resize', this._resizeHandler)
@@ -51,7 +48,7 @@ export default class Wrapper extends React.Component {
     }
 
     componentDidUpdate() {
-        if (this._height !== $(window).innerHeight()) {
+        if (this._height !== _getHeight()) {
             this._resizeHandler()
         }
     }
