@@ -43,9 +43,11 @@ export default class Item extends React.Component {
                         <span className={"fav" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
                             <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
                         </span>
-                        <Link to={'category/' + item.URL}>
-                            <span className="fav-card__title-text"><span
-                                className="label">Курс:</span> {" " + item.Name}</span>
+                        <Link to={'/category/' + item.URL}>
+                            <span className="fav-card__title-text">
+                                <span className="label">Курс:</span>
+                                <span className='title'>{" " + item.Name}</span>
+                            </span>
                         </Link>
                     </h3>
                     <div className="fav-card__info">
