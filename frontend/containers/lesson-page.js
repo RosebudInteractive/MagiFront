@@ -205,7 +205,7 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='lesson-wrapper' id='fullpage-lesson'>
+                    <div className='lesson-wrapper'>
                         {this._getLessonsBundles()}
                     </div>
                     :

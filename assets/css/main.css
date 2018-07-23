@@ -6349,7 +6349,7 @@ ul.user-tooltip {
 
   .lesson-wrapper {
     height: 100vh;
-    position: relative;
+    position: fixed;
     touch-action: none;
     transform: translate3d(0px, 0px, 0px);
   }
