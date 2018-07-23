@@ -8,6 +8,15 @@ import LessonFrame from './lesson-frame';
 
 import $ from 'jquery'
 
+function _addDevInfo(text) {
+    let _dev = $('#dev'),
+        isVisible = _dev.is(':visible');
+
+    if (isVisible === true) {
+        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
+    }
+}
+
 export default class Wrapper extends React.Component {
 
     static propTypes = {
@@ -29,7 +38,9 @@ export default class Wrapper extends React.Component {
 
         this._resizeHandler = () => {
             this._height = $(window).innerHeight();
-            $('.lesson-wrapper').css('height', this._height)
+            let _outerHeight = $(window).outerHeight();
+            $('.lesson-wrapper').css('height', this._height);
+            _addDevInfo('inner : ' + this._height + 'px / outer : ' + _outerHeight + 'px');
 
         }
     }
