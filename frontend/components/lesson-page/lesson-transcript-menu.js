@@ -198,11 +198,11 @@ class Menu extends React.Component {
     }
 
     _setNavigationMenuWidth() {
-        // if (this._isDesktopWidth) {
-        //     $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
-        // } else {
-        //     $('.js-lectures-menu-nav').css('width', '');
-        // }
+        if (this._isDesktopWidth) {
+            $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+        } else {
+            $('.js-lectures-menu-nav').css('width', '');
+        }
     }
 
     _scrollToTop() {
