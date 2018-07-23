@@ -384,6 +384,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             Color: elem.Color,
                                             Name: elem.Name,
                                             URL: elem.URL,
+                                            IsSubsRequired: false,
                                             Authors: [],
                                             Categories: [],
                                             Lessons: []
@@ -411,6 +412,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         AuthorId: elem.AuthorId,
                                         Audios: []
                                     };
+                                    curr_course.IsSubsRequired = curr_course.IsSubsRequired || lesson.IsSubsRequired;
                                     if (lesson.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
                                         lesson.FreeExpDate = elem.FreeExpDate;
                                     curr_course.Lessons.push(lesson);
@@ -526,6 +528,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: elem.URL,
+                                        IsSubsRequired: false,
                                         Authors: [],
                                         Categories: [],
                                         Lessons: [],
@@ -555,6 +558,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Lessons: [],
                                         Audios: []
                                     };
+                                    course.IsSubsRequired = course.IsSubsRequired || lsn.IsSubsRequired;
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;

@@ -6212,7 +6212,7 @@ ul.user-tooltip {
     color: #c8684c; }
   .lecture:hover .lecture__play-block svg {
     fill-opacity: 1; }
-  .lecture:hover .lecture__image-wrapper:after {
+  .lecture__play-block:hover .lecture__image-wrapper:after {
     content: "";
     position: absolute;
     top: 0;
@@ -12855,17 +12855,18 @@ ul.lectures-tab {
         margin-bottom: 5px;
         padding-right: 20px; } }
     .fav-card__title a {
-      color: #2f2f2f;
-      border-bottom: 1px solid rgba(255, 255, 255, 0);
-      -webkit-transition: border-color 0.3s ease;
-      transition: border-color 0.3s ease; }
-    .fav-card__title:hover a {
-      border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
+      color: #2f2f2f; }
     .fav-card__title:hover .fav svg {
       fill: #c8684c; }
   .fav-card__title-text {
     font-weight: 400;
     letter-spacing: -0.5px; }
+  .fav-card__title-text .title {
+    border-bottom: 1px solid rgba(47, 47, 74, 0);
+    -webkit-transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease; }
+  .fav-card__title-text:hover .title {
+    border-bottom: 1px solid rgba(47, 47, 74, 0.2) }
   .fav-card .fav {
     position: absolute;
     top: 4px;
