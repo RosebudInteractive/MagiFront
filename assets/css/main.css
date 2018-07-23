@@ -7975,7 +7975,6 @@ body[data-page="fullpage-player"] .lectures-menu {
         .lectures-menu-nav__trigger:after {
           content: "";
           position: absolute;
-          position: absolute;
           left: 50%;
           -webkit-transform: translateX(-50%);
           -ms-transform: translateX(-50%);
@@ -7987,15 +7986,15 @@ body[data-page="fullpage-player"] .lectures-menu {
           border-radius: 50%;
           -webkit-box-shadow: 0 7px 0 0 #2f2f2f, 0 14px 0 0 #2f2f2f;
           box-shadow: 0 7px 0 0 #2f2f2f, 0 14px 0 0 #2f2f2f; } }
-    @media (max-width: 375px) {
+    @media (max-width: 599px) {
       .lectures-menu-nav__trigger.opened:after, .lectures-menu-nav__trigger.opened:before {
         box-shadow: none;
         -webkit-box-shadow: none;
         border-radius: inherit;
         content: "";
         position: absolute;
-        top: 13px;
-        left: 28px;
+        top: 15px;
+        left: 20px;
         width: 1px;
         height: 24px;
         background-color: #2f2f2f;
@@ -8006,6 +8005,12 @@ body[data-page="fullpage-player"] .lectures-menu {
         -webkit-transform: rotate(-45deg);
         -ms-transform: rotate(-45deg);
         transform: rotate(-45deg); } }
+    @media (max-width: 375px) {
+      .lectures-menu-nav__trigger.opened:after, .lectures-menu-nav__trigger.opened:before {
+        top: 13px;
+        left: 28px;
+        width: 1px;
+        height: 24px; } }
   @media (max-width: 899px) {
     .lectures-menu-nav__list {
       position: absolute;
