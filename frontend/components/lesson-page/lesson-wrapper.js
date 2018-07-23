@@ -9,6 +9,15 @@ import LessonFrame from './lesson-frame';
 import $ from 'jquery'
 import Platform from 'platform';
 
+function _addDevInfo(text) {
+    let _dev = $('#dev'),
+        isVisible = _dev.is(':visible');
+
+    if (isVisible === true) {
+        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
+    }
+}
+
 const _isSafariOnIOS = (Platform.os.family === "iOS") && (Platform.name === "Safari");
 
 function _getHeight() {
@@ -37,6 +46,7 @@ export default class Wrapper extends React.Component {
         this._resizeHandler = () => {
             this._height = _getHeight();
             $('.lesson-wrapper').css('height', this._height);
+            _addDevInfo('inner : ' + $(window).innerHeight() + 'px / ' + 'outer : ' + $(window).outerHeight() + 'px')
         }
     }
 
