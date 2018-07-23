@@ -195,7 +195,6 @@ class LessonPage extends React.Component {
         } = this.props;
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
-            // this.setState({redirectToPlayer: false})
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
@@ -204,12 +203,9 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    [
-                        <div className='lesson-wrapper'>
-                            {this._getLessonsBundles()}
-                        </div>,
-                        <div style={{height: 50, backgroundColor: "#2f2f2f"}}/>
-                    ]
+                    <div className='lesson-wrapper'>
+                        {this._getLessonsBundles()}
+                    </div>
                     :
                     null
         )

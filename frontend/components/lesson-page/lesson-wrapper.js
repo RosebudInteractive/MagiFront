@@ -53,7 +53,7 @@ export default class Wrapper extends React.Component {
 
 
     componentDidMount() {
-        // $('#root').css('position', 'fixed');
+        $('body').css('position', 'fixed');
         $(window).on('resize', this._resizeHandler)
         this._resizeHandler()
     }
@@ -66,7 +66,7 @@ export default class Wrapper extends React.Component {
 
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler)
-        // $('#root').css('position', '');
+        $('body').css('position', '');
     }
 
     render() {

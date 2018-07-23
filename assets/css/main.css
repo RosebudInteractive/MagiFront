@@ -10843,7 +10843,7 @@ ul.lectures-tab {
   .player-wrapper .link-to-transcript._reduced{
     display: none;
   }
-  .fp-tableCell .player-wrapper .link-to-transcript._reduced {
+  .lesson-sub-wrapper .player-wrapper .link-to-transcript._reduced {
     display: block;
   }
 
@@ -10888,7 +10888,7 @@ ul.lectures-tab {
       bottom: auto;
       top: 4px;
       z-index: 101;}
-    .fp-tableCell .player-wrapper .link-to-transcript._reduced{
+    .lesson-sub-wrapper .player-wrapper .link-to-transcript._reduced{
       display: none;
     }}
 
