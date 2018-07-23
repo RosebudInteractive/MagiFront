@@ -89,7 +89,6 @@ class LessonPage extends React.Component {
         }
 
 
-
         let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
         if (!_lesson) {
             return
@@ -205,9 +204,12 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='lesson-wrapper'>
-                        {this._getLessonsBundles()}
-                    </div>
+                    [
+                        <div className='lesson-wrapper'>
+                            {this._getLessonsBundles()}
+                        </div>,
+                        <div style={{height: 50, backgroundColor: "#2f2f2f"}}/>
+                    ]
                     :
                     null
         )

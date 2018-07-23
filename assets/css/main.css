@@ -6349,7 +6349,8 @@ ul.user-tooltip {
 
   .lesson-wrapper {
     height: 100vh;
-    position: fixed;
+    /*position: fixed;*/
+    position: relative;
     touch-action: none;
     transform: translate3d(0px, 0px, 0px);
   }
@@ -6358,8 +6359,6 @@ ul.user-tooltip {
     height: 100%;
   }
 .lecture-wrapper, .player-wrapper {
-  /*height: 100%;*/
-  /*width: 100%;*/
   background-repeat: no-repeat;
   -webkit-background-size: cover;
   background-size: cover;
