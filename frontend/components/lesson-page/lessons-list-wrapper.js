@@ -44,7 +44,7 @@ class LessonsListWrapper extends React.Component {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
-                // _elem.scrollIntoView()
+                _elem.scrollIntoView()
             }
         }
     }

@@ -18,10 +18,11 @@ function _addDevInfo(text) {
     }
 }
 
-const _isSafariOnIOS = (Platform.os.family === "iOS") && (Platform.name === "Safari");
+const _isSafariOnIOS = (Platform.os.family === "iOS") && (Platform.name === "Safari"),
+    _isAndroid = Platform.os.family === "Android";
 
 function _getHeight() {
-    return _isSafariOnIOS ? $(window).outerHeight() : $(window).innerHeight();
+    return (_isSafariOnIOS || _isAndroid) ? $(window).outerHeight() : $(window).innerHeight();
 }
 
 export default class Wrapper extends React.Component {
