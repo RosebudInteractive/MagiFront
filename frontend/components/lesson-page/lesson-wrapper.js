@@ -18,11 +18,17 @@ function _addDevInfo(text) {
     }
 }
 
-const _isSafariOnIOS = (Platform.os.family === "iOS") && (Platform.name === "Safari"),
+const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
     _isAndroid = Platform.os.family === "Android";
 
+console.log(Platform)
+
 function _getHeight() {
-    return (_isSafariOnIOS || _isAndroid) ? $(window).outerHeight() : $(window).innerHeight();
+    return (_isSafariOnIPad || _isAndroid) ? $(window).outerHeight() : $(window).innerHeight();
+}
+
+function _getWidth() {
+    return (_isSafariOnIPad || _isAndroid) ? $(window).outerWidth() : $(window).innerWidth();
 }
 
 export default class Wrapper extends React.Component {
@@ -46,8 +52,10 @@ export default class Wrapper extends React.Component {
 
         this._resizeHandler = () => {
             this._height = _getHeight();
-            $('.lesson-wrapper').css('height', this._height);
-            _addDevInfo('inner : ' + $(window).innerHeight() + 'px / ' + 'outer : ' + $(window).outerHeight() + 'px')
+            this._width = _getWidth();
+            $('.lesson-wrapper').css('height', this._height).css('width', this._width);
+            _addDevInfo('width: inner : ' + $(window).innerWidth() + 'px / ' + 'outer : ' + $(window).outerWidth() + 'px')
+            _addDevInfo('height: inner : ' + $(window).innerHeight() + 'px / ' + 'outer : ' + $(window).outerHeight() + 'px')
         }
     }
 
