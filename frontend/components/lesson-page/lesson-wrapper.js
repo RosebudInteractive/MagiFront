@@ -9,15 +9,6 @@ import LessonFrame from './lesson-frame';
 import $ from 'jquery'
 import Platform from 'platform';
 
-function _addDevInfo(text) {
-    let _dev = $('#dev'),
-        isVisible = _dev.is(':visible');
-
-    if (isVisible === true) {
-        _dev.append($( "<div style='position:  relative'>" + text + "</div>" ))
-    }
-}
-
 const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
     _isAndroid = Platform.os.family === "Android";
 
@@ -28,7 +19,7 @@ function _getHeight() {
 }
 
 function _getWidth() {
-    return (_isSafariOnIPad || _isAndroid) ? $(window).outerWidth() : $(window).innerWidth();
+    return $(window).innerWidth();
 }
 
 export default class Wrapper extends React.Component {
@@ -54,8 +45,6 @@ export default class Wrapper extends React.Component {
             this._height = _getHeight();
             this._width = _getWidth();
             $('.lesson-wrapper').css('height', this._height).css('width', this._width);
-            _addDevInfo('width: inner : ' + $(window).innerWidth() + 'px / ' + 'outer : ' + $(window).outerWidth() + 'px')
-            _addDevInfo('height: inner : ' + $(window).innerHeight() + 'px / ' + 'outer : ' + $(window).outerHeight() + 'px')
         }
     }
 

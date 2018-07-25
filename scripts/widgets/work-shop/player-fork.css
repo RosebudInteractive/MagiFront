@@ -13,7 +13,7 @@
   margin: auto;
   top: 50%;
   transform: translateY(-50%);
-  position: absolute;
+  position: relative;
 }
 .ws-player-content {
   width: 100%;
