@@ -30,7 +30,7 @@ class BookmarksPage extends React.Component {
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getUserBookmarksFull();
-        this.props.pageHeaderActions.setCurrentPage(pages.author);
+        this.props.pageHeaderActions.setCurrentPage(pages.bookmarks);
         if ((this.props.page === '/favorites/lessons') && (!this.props.showLessonBookmarks)) {
             this.props.appActions.showLessonsBookmarks();
         }

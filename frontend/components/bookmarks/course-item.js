@@ -13,7 +13,6 @@ export default class Item extends React.Component {
 
     constructor(props) {
         super(props)
-        // this._maskNumber = svg.getRandomInt(1, 12).toString().padStart(2, '0')
     }
 
     _favoritesClick() {
@@ -30,8 +29,12 @@ export default class Item extends React.Component {
         let _authors = item.authors.map((author) => {
             return (<Link to={'/autor/' + author.URL} className="fav-card__info-link _author">{author.FirstName + ' ' + author.LastName}</Link>);
         });
+        _authors = <div>{_authors}</div>
 
-        _authors = (_authors.length > 1) ? <div>{_authors[0]}, {_authors[1]}</div> : _authors
+        let _categories = item.categories.map((category) => {
+            return (<Link to={'#'} className="fav-card__info-link _tag">{category.Name}</Link>);
+        });
+        _categories = <div>{_categories}</div>
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
             _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  _cover + '" width="724" height="503"/>';
@@ -52,7 +55,7 @@ export default class Item extends React.Component {
                     </h3>
                     <div className="fav-card__info">
                         {_authors}
-                        <Link to="#" className="fav-card__info-link _tag">История</Link>
+                        {_categories}
                     </div>
                 </div>
                 <div className="fav-card__body">
