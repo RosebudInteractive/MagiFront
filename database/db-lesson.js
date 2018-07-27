@@ -519,8 +519,6 @@ const DbLesson = class DbLesson extends DbObject {
                             lesson = result.detail[0];
                             lesson.IsAuthRequired = lesson.IsAuthRequired ? true : false;
                             lesson.IsSubsRequired = lesson.IsSubsRequired ? true : false;
-                            if (!(lesson.IsSubsRequired && lesson.FreeExpDate && ((now - lesson.FreeExpDate) > Intervals.MIN_FREE_LESSON)))
-                                delete lesson.FreeExpDate;
                             isNotFound = false;
                         }
                         if (!isNotFound)
@@ -576,8 +574,6 @@ const DbLesson = class DbLesson extends DbObject {
                                 result.detail.forEach((elem) => {
                                     elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
                                     elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
-                                    if (!(elem.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON)))
-                                        delete elem.FreeExpDate;
                                 });
                                 childs = result.detail;
                             }
@@ -670,7 +666,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         Lessons: [],
                                         Audios: []
                                     };
-                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     let isCurrent = lesson_url === elem.LURL;
@@ -790,7 +786,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         ShortDescription: elem.ShortDescription,
                                         Lessons: []
                                     };
-                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lesson.FreeExpDate = elem.FreeExpDate;
                                     isFirst = false;
                                     authors_list[elem.AuthorId] = true;
@@ -815,7 +811,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         Number: elem.NumberCh,
                                         ShortDescription: elem.ShortDescriptionCh
                                     });
-                                    if (lsn.IsSubsRequired && elem.FreeExpDateCh && ((now - elem.FreeExpDateCh) > Intervals.MIN_FREE_LESSON))
+                                    if (lsn.IsSubsRequired && elem.FreeExpDateCh && ((elem.FreeExpDateCh - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDateCh;
                                     authors_list[elem.AuthorIdCh] = true;
                                 }

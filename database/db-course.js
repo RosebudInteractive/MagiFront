@@ -413,7 +413,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Audios: []
                                     };
                                     curr_course.IsSubsRequired = curr_course.IsSubsRequired || lesson.IsSubsRequired;
-                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lesson.FreeExpDate = elem.FreeExpDate;
                                     curr_course.Lessons.push(lesson);
                                     lessons_list[elem.LessonId] = lesson;
@@ -559,7 +559,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Audios: []
                                     };
                                     course.IsSubsRequired = course.IsSubsRequired || lsn.IsSubsRequired;
-                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     if (!elem.ParentId) {
@@ -759,8 +759,6 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
                                 elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
-                                if (!(elem.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON)))
-                                    delete elem.FreeExpDate;
                             });
                             course.Lessons = result.detail;
                         return course;
