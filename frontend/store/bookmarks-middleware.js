@@ -1,4 +1,4 @@
-import {SIGN_IN_SUCCESS} from "../constants/user";
+import {SIGN_IN_SUCCESS, WHO_AM_I_SUCCESS} from "../constants/user";
 
 import {getUserBookmarks} from "../ducks/profile";
 import {store} from './configureStore';
@@ -8,6 +8,12 @@ const BookmarksMiddleware = store => next => action => {
     switch (action.type) {
 
         case SIGN_IN_SUCCESS: {
+            let result = next(action)
+            Bookmarks.getInstance().loadBookmarks();
+            return result
+        }
+
+        case WHO_AM_I_SUCCESS: {
             let result = next(action)
             Bookmarks.getInstance().loadBookmarks();
             return result
@@ -36,3 +42,4 @@ class Bookmarks {
 }
 
 export default BookmarksMiddleware;
+

@@ -161,6 +161,8 @@ export class LessonEditor extends ObjectEditor {
             FullDescription: value.FullDescription,
             ParentId: value.CurrParentId,
             IsAuthRequired: value.IsAuthRequired,
+            IsSubsRequired: value.IsSubsRequired,
+            FreeExpDate: value.IsSubsRequired ? value.FreeExpDate : null,
             Episodes: [],
             References: [],
             Resources: [],
@@ -219,6 +221,12 @@ export class LessonEditor extends ObjectEditor {
 
     _fillResources(array) {
         this.props.resources.map((resource) => {
+            if (resource.FileId) {
+                let _meta = JSON.parse(resource.MetaData);
+                _meta.fileId = resource.FileId;
+                resource.MetaData = JSON.stringify(_meta)
+            }
+
             array.push({
                 Id: resource.Id,
                 Description: resource.Description,
@@ -459,6 +467,12 @@ export class LessonEditor extends ObjectEditor {
         let _authors = this._getCourseAuthorsArray();
         if (_authors.length === 1) {
             window.$$('author').setValue(_authors[0].id);
+        }
+
+        if (this.props.lesson.IsSubsRequired) {
+            window.$$('free-expr-date').enable()
+        } else {
+            window.$$('free-expr-date').disable()
         }
     }
 
@@ -829,6 +843,22 @@ export class LessonEditor extends ObjectEditor {
                 view: "checkbox",
                 label: "Требуется авторизация",
                 name: 'IsAuthRequired',
+                labelWidth: labelWidth,
+            },
+            {
+                view: "checkbox",
+                label: "Требуется подписка на лекцию",
+                name: 'IsSubsRequired',
+                labelWidth: labelWidth,
+            },
+            {
+                view: "datepicker",
+                label: "Дата окончания бесплатного периода",
+                name: 'FreeExpDate',
+                id: 'free-expr-date',
+                width: 500,
+                stringResult: true,
+                format: this._formatDate,
                 labelWidth: labelWidth,
             },
             {

@@ -28,12 +28,13 @@ class LessonFrame extends React.Component {
 
         $(document).mouseup((e) => {
             let _isLessonScreen = e.target.closest('#lesson-' + that.props.lesson.Id),
+                _isMenu = e.target.closest('.lectures-menu'),
                 _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
                 _isSocialBlock = e.target.closest('.social-block'),
                 _isTranscriptLink = e.target.closest('.link-to-transcript'),
                 _isPlayerBlock = e.target.closest('.player-frame');
 
-            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink) {
+            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu) {
                 that._play()
             }
         })

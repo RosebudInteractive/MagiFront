@@ -39,30 +39,27 @@ class LessonsListWrapper extends React.Component {
         });
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
-            $('html').css('overflow', 'hidden');
-            $('body').css('overflow', 'hidden');
-
+    componentDidUpdate(prevProps) {
+    // componentWillReceiveProps(nextProps) {
+        if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
                 _elem.scrollIntoView()
             }
         }
-
-        if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
-            $('html').css('overflow', '');
-            $('body').css('overflow', '');
-        }
     }
 
     render() {
-        return this.props.fetching ? null : (
-            <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
-                <ol className="lectures-list">
-                    {this._getLessonsList()}
-                </ol>
-            </div>
+        return (
+            (this.props.fetching) ?
+                null
+                : (
+                    <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
+                        <ol className="lectures-list">
+                            {this._getLessonsList()}
+                        </ol>
+                    </div>
+                )
         )
     }
 }

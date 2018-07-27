@@ -7,7 +7,7 @@ import {Link} from 'react-router-dom';
 import UserBlock from './user-block';
 import FiltersRow from './mobile-filters';
 
-import * as tools from '../../tools/page-tools';
+import {pages} from "../../tools/page-tools";
 import * as userActions from '../../actions/user-actions'
 
 class DesktopHeaderRow extends React.Component {
@@ -55,24 +55,26 @@ class Navigator extends React.Component {
     render() {
         const _filter = '<use xlink:href="#filter"/>',
             _flagFull = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>',
-            _isCoursesPage = this.props.currentPage.name === tools.pages.courses.name;
+            _isCoursesPage = this.props.currentPage.name === pages.courses.name;
 
         return (
             <nav className="navigation">
                 <ul>
                     <li className={_isCoursesPage ? "current" : ''}>
-                        <Link to={tools.pages.courses.url}>Курсы</Link>
+                        <Link to={pages.courses.url}>Курсы</Link>
                     </li>
-                    {/*<li>*/}
-                        {/*<a>Календарь</a>*/}
-                    {/*</li>*/}
-                    <li className={"filter" + (this.props.filterActive ? ' active' : '')}
-                        onClick={this.props.onBookmarkClick}>
-                        <Link to={'/favorites'}>
-                            <span className="hidden">Закладки</span>
-                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
-                        </Link>
-                    </li>
+                    {
+                        this.props.authorized ?
+                            <li className={"favorites" + (this.props.currentPage === pages.bookmarks ? ' active' : '')}
+                                onClick={this.props.onBookmarkClick}>
+                                <Link to={'/favorites'}>
+                                    <span className="hidden">Закладки</span>
+                                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                                </Link>
+                            </li>
+                            :
+                            null
+                    }
                     {
                         _isCoursesPage
                             ?

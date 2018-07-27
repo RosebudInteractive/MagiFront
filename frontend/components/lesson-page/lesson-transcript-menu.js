@@ -198,11 +198,11 @@ class Menu extends React.Component {
     }
 
     _setNavigationMenuWidth() {
-        // if (this._isDesktopWidth) {
-        //     $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
-        // } else {
-        //     $('.js-lectures-menu-nav').css('width', '');
-        // }
+        if (this._isDesktopWidth) {
+            $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+        } else {
+            $('.js-lectures-menu-nav').css('width', '');
+        }
     }
 
     _scrollToTop() {
@@ -281,7 +281,7 @@ class Menu extends React.Component {
                                 {
                                     !isNeedHideGallery ?
                                         <li className="menu-nav-list__item">
-                                            <a href="#gallery"
+                                            <a href="#pictures"
                                                className="menu-nav-list__item-head js-scroll-link">Галерея</a>
                                         </li>
                                         :
