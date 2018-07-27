@@ -118,6 +118,16 @@ class ResourceForm extends React.Component {
                     placeholder: "Введите описание"
                 },
                 {
+                    view: "text",
+                    labelPosition: "top",
+                    name: "FileId",
+                    id: 'file-id',
+                    label: "ID файла",
+                    placeholder: "",
+                    // validate: window.webix.rules.isNotEmpty,
+                    // invalidMessage: "Значение не может быть пустым",
+                },
+                {
                     view: "checkbox",
                     label: "Отображать в галереи",
                     name: 'ShowInGalery',
@@ -183,11 +193,13 @@ class ResourceForm extends React.Component {
                                         },
                                         onFileUpload: (file, response) => {
                                             let _name = response[0].info.name ? response[0].info.name : null,
-                                                _description = response[0].info.description ? response[0].info.description : null;
+                                                _description = response[0].info.description ? response[0].info.description : null,
+                                                _fileId = response[0].info.fileId ? response[0].info.fileId : null
 
                                             window.$$('file-name').setValue(response[0].file);
                                             window.$$('Name').setValue(_name);
                                             window.$$('Description').setValue(_description);
+                                            window.$$('file-id').setValue(_fileId);
                                             window.$$('res-form-btnOk').enable();
                                             window.$$('res-form-btnCancel').enable();
                                         },

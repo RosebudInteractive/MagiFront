@@ -26,7 +26,7 @@ class CourseLessons extends React.Component {
                     cover={_cover}
                     duration={lesson.DurationFmt}
                     totalDuration={lesson.Duration}
-                    subLessons={lesson.NSub}
+                    subLessons={lesson.Lessons}
                     refs={lesson.NRefBooks}
                     books={lesson.NBooks}
                     audios={lesson.Audios}

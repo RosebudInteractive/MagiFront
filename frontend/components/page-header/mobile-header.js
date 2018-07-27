@@ -30,7 +30,7 @@ export default class MobileHeader extends React.Component {
                             <Link to={tools.pages.courses.url}>Курсы</Link>
                         </li>
                         <li>
-                            <a href="#">Календарь</a>
+                            {/*<a href="#">Календарь</a>*/}
                         </li>
                     </ul>
                 </nav>

@@ -25,7 +25,7 @@ export class LessonFull extends React.Component {
         cover: PropTypes.string,
         duration: PropTypes.string,
         totalDuration: PropTypes.number,
-        subLessons: PropTypes.number,
+        subLessons: PropTypes.array,
         refs: PropTypes.number,
         books: PropTypes.number,
         audios: PropTypes.array,
@@ -81,41 +81,11 @@ export class LessonFull extends React.Component {
 
 class InfoBlock extends React.Component {
     render() {
-        const _eps = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#eps"/>',
-            _lit = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lit"/>',
-            _books = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#books"/>';
-
         return (
             <div className="lecture-full__info-block">
                 <div className="lecture-full__text-block">
                     <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title}</Link></h3>
                     <p className="lecture-full__descr">{' ' + this.props.descr + ' '}</p>
-                </div>
-                <div className="lecture-full__info-table">
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _eps}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Доп. эпизоды</p>
-                        <p className="lecture-full__info-table-value">{this.props.subLessons}</p>
-                    </div>
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _lit}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Источники</p>
-                        <p className="lecture-full__info-table-value">{this.props.refs}</p>
-                    </div>
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _books}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Книги</p>
-                        <p className="lecture-full__info-table-value">{this.props.books}</p>
-                    </div>
                 </div>
             </div>
         )
