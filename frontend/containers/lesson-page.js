@@ -136,7 +136,7 @@ class LessonPage extends React.Component {
             })
     }
 
-    _createBundle(lesson, key) {
+    _createBundle(lesson) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
@@ -171,8 +171,7 @@ class LessonPage extends React.Component {
 
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
 
-        return <Wrapper key={key}
-                        lesson={lesson}
+        return <Wrapper lesson={lesson}
                         courseUrl={this.props.courseUrl}
                         lessonUrl={lesson.URL}
                         active={lesson.Number}
@@ -183,9 +182,18 @@ class LessonPage extends React.Component {
     }
 
     _getLessonsBundles() {
-        let {object: lesson} = this.props.lessonInfo;
+        let lesson = this._getLesson();
 
-        return lesson ? this._createBundle(lesson, 'lesson0') : null;
+        return lesson ? this._createBundle(lesson) : null;
+    }
+
+    _getLesson() {
+        let {lessonUrl, lessonInfo} = this.props,
+            lesson = lessonInfo.object;
+
+        return (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
+            return subLesson.URL === lessonUrl
+        })
     }
 
     render() {

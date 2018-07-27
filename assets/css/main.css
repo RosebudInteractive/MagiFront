@@ -9640,6 +9640,8 @@ ul.lectures-tab {
       font-style: italic;
       color: #c8684c; }
   .lecture-full__text-block {
+    position: relative;
+    padding-right: 50px;
     font-size: 20px;
     line-height: 26px; }
     @media (max-width: 1399px) {
@@ -9650,6 +9652,33 @@ ul.lectures-tab {
       .lecture-full__text-block {
         font-size: 15px;
         line-height: 19px; } }
+  .lecture-full__fav {
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    position: absolute;
+    top: 10px;
+    left: -webkit-calc(100% + 2vw);
+    left: calc(100% + 2vw);
+    width: 14px;
+    height: 23px; }
+    .lecture-full__fav:focus {
+      outline: none; }
+    .lecture-full__fav:hover {
+      opacity: 0.7; }
+    .lecture-full__fav svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      fill: rgba(47, 47, 74, 0.2); }
+    @media (max-width: 899px) {
+      .lecture-full__fav {
+        left: auto;
+        right: 0;
+        top: 8px; } }
   .lecture-full__descr {
     margin: 0;
     display: inline; }
@@ -9669,54 +9698,28 @@ ul.lectures-tab {
       border-bottom: 1px solid #c8684c; }
     .lecture-full__title a {
       color: #2f2f2f; }
-  .lecture-full__info-table {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    margin-top: 25px; }
-    @media (max-width: 899px) {
-      .lecture-full__info-table {
-        margin-top: 5px; } }
-    @media (max-width: 767px) {
-      .lecture-full__info-table {
-        margin-bottom: 5px; } }
-  .lecture-full__info-table-col {
-    width: 109px; }
-    @media (max-width: 899px) {
-      .lecture-full__info-table-col {
-        display: -webkit-box;
-        display: -webkit-flex;
-        display: -moz-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-align: center;
-        -webkit-align-items: center;
-        -moz-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-        width: auto;
-        min-width: 59px; } }
-  .lecture-full__info-table-label {
+  .lecture-full__author {
+    display: inline;
     margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
-    line-height: 18px;
+    line-height: 28px;
     color: rgba(47, 47, 47, 0.6); }
+  .lecture-full__extras {
+    margin-bottom: -10px;
+    margin-top: 20px; }
     @media (max-width: 899px) {
-      .lecture-full__info-table-label {
-        display: none; } }
-  .lecture-full__info-table-value {
-    margin: 5px 0 2px 0;
+      .lecture-full__extras {
+        margin-top: 6px; } }
+  .lecture-full__extras-label {
+    margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 17px;
-    line-height: 21px; }
+    line-height: 34px;
+    color: rgba(47, 47, 47, 0.6); }
     @media (max-width: 899px) {
-      .lecture-full__info-table-value {
-        font-size: 15px;
-        line-height: 18px;
-        margin-bottom: 4px; } }
+      .lecture-full__extras-label {
+        font-size: 15px; } }
   .lecture-full__archive-title {
     margin: 0;
     padding-left: 117px;
@@ -14822,6 +14825,135 @@ ul.lectures-tab {
   90% {
     -webkit-clip-path: inset(39% 0 0 0);
     clip-path: inset(39% 0 0 0); } }
+
+.extras-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: li;
+  font-family: "Fira Sans", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 16px;
+  border-top: 1px solid rgba(47, 47, 74, 0.2); }
+@media (max-width: 899px) {
+  .extras-list {
+    font-size: 15px;
+    line-height: 18px; } }
+.extras-list li {
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
+@media (max-width: 899px) {
+  .extras-list li {
+    min-height: 66px; } }
+.extras-list li:last-child {
+  border-bottom: none; }
+.extras-list li .counter,
+.extras-list li .inner-counter {
+  display: inline;
+  margin-right: 4px;
+  color: #c8684c; }
+.extras-list li .duration {
+  margin-left: 4px;
+  font-size: 13px;
+  color: rgba(47, 47, 47, 0.6); }
+.extras-list__item {
+  display: inline;
+  color: #2f2f2f; }
+.extras-list__play-btn {
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
+  outline: none;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: relative;
+  margin-left: auto;
+  -webkit-box-flex: 0;
+  -webkit-flex: none;
+  -moz-box-flex: 0;
+  -ms-flex: none;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #c8684c;
+  border-radius: 50%; }
+.extras-list__play-btn:focus {
+  outline: none; }
+.extras-list__play-btn:hover {
+  opacity: 0.7; }
+.extras-list__play-btn svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  display: block;
+  margin-left: 2px;
+  opacity: 0;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease; }
+.extras-list__play-btn svg.play {
+  opacity: 1; }
+.extras-list__play-btn.playing .play {
+  opacity: 0; }
+.extras-list__play-btn.playing .pause {
+  margin-left: 0;
+  opacity: 1; }
+@media (max-width: 899px) {
+  .extras-list__play-btn {
+    margin-left: 20px;
+    width: 30px;
+    height: 30px;
+    border-width: 2px; } }
+.extras-list__fav {
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
+  outline: none;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;
+  position: absolute;
+  top: 17px;
+  left: -webkit-calc(100% + 2vw);
+  left: calc(100% + 2vw);
+  width: 14px;
+  height: 23px; }
+.extras-list__fav:focus {
+  outline: none; }
+.extras-list__fav:hover {
+  opacity: 0.7; }
+@media (max-width: 899px) {
+  .extras-list__fav {
+    position: relative;
+    -webkit-box-flex: 0;
+    -webkit-flex: none;
+    -moz-box-flex: 0;
+    -ms-flex: none;
+    flex: none;
+    top: auto;
+    left: auto;
+    right: 0;
+    margin-left: 20px; } }
+.extras-list__fav svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: rgba(47, 47, 74, 0.2); }
 
 /*# sourceMappingURL=main.css.map */
 

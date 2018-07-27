@@ -31,6 +31,7 @@ class CourseLessons extends React.Component {
                     books={lesson.NBooks}
                     audios={lesson.Audios}
                     isAuthRequired={lesson.IsAuthRequired}
+                    lesson={lesson}
                     key={index}/>
                 :
                 <LessonPreview
