@@ -42,3 +42,4 @@ class Bookmarks {
 }
 
 export default BookmarksMiddleware;
+

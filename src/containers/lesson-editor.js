@@ -832,6 +832,12 @@ export class LessonEditor extends ObjectEditor {
                 labelWidth: labelWidth,
             },
             {
+                view: "checkbox",
+                label: "Требуется подписка на лекцию",
+                name: 'IsSubsRequired',
+                labelWidth: labelWidth,
+            },
+            {
                 view: "accordion",
                 multi: true,
 

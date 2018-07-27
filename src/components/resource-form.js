@@ -7,6 +7,7 @@ import ErrorDialog from './ErrorDialog';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as appActions from "../actions/app-actions";
+import {labelWidth} from "../containers/object-editor";
 
 class ResourceForm extends React.Component {
 
@@ -115,6 +116,12 @@ class ResourceForm extends React.Component {
                     id: "Description",
                     label: "Описание",
                     placeholder: "Введите описание"
+                },
+                {
+                    view: "checkbox",
+                    label: "Отображать в галереи",
+                    name: 'ShowInGalery',
+                    labelWidth: 347,
                 },
                 {
                     cols: [
