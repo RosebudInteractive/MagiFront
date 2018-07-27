@@ -70,6 +70,8 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps)
+
         if (this.props.isWorkshop && !prevProps.isWorkshop) {
             this._openWorkshop()
         }

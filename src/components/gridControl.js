@@ -90,8 +90,6 @@ export default class GridControl extends Component {
         }
     }
 
-
-
     _configButtons() {
         let {
             createAction,
