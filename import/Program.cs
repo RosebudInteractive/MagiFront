@@ -1239,6 +1239,12 @@ namespace MagImport
             provider.Fields.URL = "https://www.yandex.ru";
             providers.Add(provider.Fields.Code, provider);
 
+            provider = new SNetProvider();
+            provider.Fields.Code = "odnoklassniki";
+            provider.Fields.Name = "Odnoklassniki";
+            provider.Fields.URL = "https://www.ok.ru";
+            providers.Add(provider.Fields.Code, provider);
+
             Dictionary<string, Role> roles = new Dictionary<string, Role>();
             Role.AllData = allData;
             Role role = new Role();

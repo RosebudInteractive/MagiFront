@@ -18,10 +18,30 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Share Counters Update",
+            module: "./sn-counters",
+            type: "scheduled-task",
+            disabled: false,
+            // schedule: "0/30 * * * * *", // run every 30 sec
+            schedule: "0 20 14 * * *", // run at 10:00
+            options: {
+                baseUrl: "https://magisteria.ru",
+                snets: ["facebook", "vkontakte", "odnoklassniki"],
+                urlDelay: 30 * 1000,
+                maxUrls: 1000,
+                snPrefs: {
+                    facebook: {
+                        usageLimitPerc: 90,
+                        repairTime: 90 * 60 * 1000
+                    }
+                }
+            }
+        },
+        {
             name: "RSS Generation",
             module: "./rss",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "5,15,25,35,45,55 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),

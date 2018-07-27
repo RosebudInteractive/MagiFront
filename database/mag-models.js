@@ -132,6 +132,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("Description", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("CrsShareCounter", "d54482f1-94fa-463d-9efd-7ab7711d9a15", "RootCrsShareCounter", "0a239450-47e0-406c-b4e4-e7c303c8ea1c")
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
+            .addField("SNetProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
+            .addField("Counter", { type: "int", allowNull: false });
+
         metaDataMgr.addModel("Category", "fa44e670-4ee6-4227-ab4d-083924a92d8a", "RootCategory", "6479905e-bdc3-45a8-8690-568ce3e698b9")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
             .addField("ParentId", { type: "dataRef", model: "Category", refAction: "parentRestrict", allowNull: true })
@@ -177,6 +182,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });
+
+        metaDataMgr.addModel("LsnShareCounter", "484a1f53-0e76-4d13-8cd0-ca8f1ef88dec", "RootLsnShareCounter", "fd4c7303-1699-439e-9555-b64994bfd72d")
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
+            .addField("SNetProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
+            .addField("Counter", { type: "int", allowNull: false });
 
         metaDataMgr.addModel("Reference", "b919a12f-5202-43b5-b1fc-481f75623659", "RootReference", "8d5fd37d-e686-4eec-a8e8-b7df91160a92")
             .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
