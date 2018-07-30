@@ -4,6 +4,48 @@ const defer = require('config/defer').deferConfig;
 module.exports = {
     tasks: [
         {
+            name: "5 TOP Share Counters Update",
+            module: "./sn-counters",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 37 * * * *", // run every hour
+            options: {
+                baseUrl: "https://magisteria.ru",
+                snets: ["facebook", "vkontakte", "odnoklassniki"],
+                urlDelay: 0,
+                offset: 0,
+                maxUrls: 5,
+                snPrefs: {
+                    facebook: {
+                        usageLimitPerc: 90,
+                        repairTime: 65 * 60 * 1000,
+                        minDelay: 1 * 1000
+                    }
+                }
+            }
+        },
+        {
+            name: "500 LAST Share Counters Update",
+            module: "./sn-counters",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 33 19 * * *", // run at 19:33
+            options: {
+                baseUrl: "https://magisteria.ru",
+                snets: ["facebook", "vkontakte", "odnoklassniki"],
+                urlDelay: 0,
+                offset: 5,
+                maxUrls: 500,
+                snPrefs: {
+                    facebook: {
+                        usageLimitPerc: 90,
+                        repairTime: 65 * 60 * 1000,
+                        minDelay: 30 * 1000
+                    }
+                }
+            }
+        },
+        {
             name: "RSS Generation",
             module: "./rss",
             type: "scheduled-task",
