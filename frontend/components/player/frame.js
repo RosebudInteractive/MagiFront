@@ -39,7 +39,7 @@ class Frame extends Component {
     componentDidMount() {
         let that = this
 
-        $(document).mouseup((e) => {
+        document.body.addEventListener('touchend', (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),

@@ -57,7 +57,7 @@ class TranscriptLessonPage extends React.Component {
 
     static _handleScroll() {
         let _link = $('.link-to-lecture, .social-block-vertical');
-        const _recommend = $('#gallery');
+        const _recommend = $('#pictures');
 
         if ((_link.length) && (_recommend.length)) {
             let coordTop = _recommend.offset().top;
@@ -70,85 +70,16 @@ class TranscriptLessonPage extends React.Component {
                 _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
             }
 
-            if ($(window).width() < 768) {
+            if (window.innerWidth < 600) {
                 if ((_scrollTop + 650) >= coordTop) {
                     _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
                 } else {
+                    // _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
                     _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
                 }
             }
         }
     }
-
-    // static _handleScroll() {
-    //     let //_controls = $('.js-gallery-controls'),
-    //         _link = $('.link-to-lecture, .social-block-vertical'),
-    //         // _windowHeight = $(window).height(),
-    //         _scrollTop = $(window).scrollTop();
-    //
-    //     // Для новой галереи
-    //     // const _recommend = $('#recommend');
-    //     const _recommend = $('#gallery');
-    //
-    //     if ((_link.length) && (_recommend.length)) {
-    //         let coordTop = _recommend.offset().top;
-    //
-    //         if ((_scrollTop + 550) >= coordTop) {
-    //             _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-    //         } else {
-    //             _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
-    //         }
-    //
-    //         // Это из новой галереи
-    //         // if ((_scrollTop + _windowHeight / 2 + 120) >= coordTop) {
-    //         //     _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-    //         // } else {
-    //         //     _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
-    //         // }
-    //
-    //
-    //         if ($(window).width() < 768) {
-    //
-    //             // Это из новой галереи
-    //             // if ((_scrollTop + _windowHeight) >= coordTop) {
-    //             //     $('.js-sticky-block').css('position', 'absolute').css('top', coordTop).css('bottom', 'auto').css('margin-top', '-100px');
-    //             // } else {
-    //             //     $('.js-sticky-block').css('position', 'fixed').css('top', 'auto').css('bottom', '30px').css('margin-top', '0');
-    //             // }
-    //
-    //             if ((_scrollTop + 650) >= coordTop) {
-    //                 _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-    //             } else {
-    //                 _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
-    //             }
-    //         }
-    //     }
-    //
-    //     //Для новой галереи
-    //     // if (_controls.length && _recommend.length) {
-    //     //     let coordTop = $('#recommend').offset().top;
-    //     //
-    //     //     if ($(window).width() < 768 ) {
-    //     //         if ((_scrollTop + _windowHeight) >= coordTop) {
-    //     //             _controls.css('position', 'absolute').css('bottom', 'auto').css('top', coordTop - 55);
-    //     //             if (_controls.hasClass('show')) {
-    //     //                 // closeGallerySlider();
-    //     //             }
-    //     //         } else {
-    //     //             _controls.css('position', 'fixed').css('top', 'auto').css('bottom', '10px').css('margin-top', '0');
-    //     //         }
-    //     //     } else {
-    //     //         if ((_scrollTop + _windowHeight) >= coordTop) {
-    //     //             _controls.css('position', 'absolute').css('top', coordTop).css('transform', 'none').css('bottom', 'auto');
-    //     //             if (_controls.hasClass('show')) {
-    //     //             //     closeGallerySlider();
-    //     //             }
-    //     //         } else {
-    //     //             _controls.css('position', 'fixed').css('bottom', '20px').css('top', 'auto').css('margin-top', '-60px');
-    //     //         }
-    //     //     }
-    //     // }
-    // }
 
     componentWillReceiveProps(nextProps) {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
@@ -167,33 +98,36 @@ class TranscriptLessonPage extends React.Component {
 
         const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
 
-        return [
-            <div className="sticky-block js-sticky-block" style={_linkStyle}>
-                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl} className="link-to-lecture" id='link-to-lecture'>
-                    Смотреть <br/>лекцию
-                </Link>
-            </div>,
-            //<GalleryButtons/>,
-            <SocialBlock/>,
-            // lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
-            fetching ?
-                <p>Загрузка...</p>
-                :
-                (lesson && lessonText.loaded) ?
-                    <div>
-                        <div className="transcript-page">
-                            <TranscriptPage episodes={lessonText.episodes}
-                                            refs={lessonText.refs}
-                                            gallery={lessonText.gallery}
-                                            isNeedHideGallery={lesson.IsAuthRequired && !authorized}
-                                            isNeedHideRefs={!(lessonText.refs.length > 0)}
-                                            lesson={lesson}/>
-                        </div>
-                    </div>
-                    :
-                    null
-
-        ]
+        return (
+            <div>
+                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
+                      className="link-to-lecture"
+                      id='link-to-lecture'
+                      style={_linkStyle}
+                >Смотреть <br/>лекцию</Link>
+                {/*//<GalleryButtons/>*/}
+                <SocialBlock/>
+                {/*// lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,*/}
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
+                        :
+                        (lesson && lessonText.loaded) ?
+                            <div>
+                                <div className="transcript-page">
+                                    <TranscriptPage episodes={lessonText.episodes}
+                                                    refs={lessonText.refs}
+                                                    gallery={lessonText.gallery}
+                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
+                                                    lesson={lesson}/>
+                                </div>
+                            </div>
+                            :
+                            null
+                }
+            </div>
+        )
     }
 }
 

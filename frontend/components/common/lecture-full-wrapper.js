@@ -12,6 +12,7 @@ import {
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as userActions from "../../actions/user-actions";
+import LessonPlayBlockSmall from './small-play-block'
 
 export class LessonFull extends React.Component {
 
@@ -25,20 +26,20 @@ export class LessonFull extends React.Component {
         cover: PropTypes.string,
         duration: PropTypes.string,
         totalDuration: PropTypes.number,
-        subLessons: PropTypes.number,
+        subLessons: PropTypes.array,
         refs: PropTypes.number,
         books: PropTypes.number,
         audios: PropTypes.array,
         isAuthRequired: PropTypes.bool,
     };
 
-    _favoritesClick() {
-        let {courseUrl, lessonUrl} = this.props;
+    _switchFavorites(lessonUrl) {
+        let {courseUrl} = this.props;
 
         if (!this.props.authorized) {
             this.props.userActions.showSignInForm();
         } else {
-            if (this._isLessonInBookmarks()) {
+            if (this._isLessonInBookmarks(lessonUrl)) {
                 this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
             } else {
                 this.props.addLessonToBookmarks(courseUrl, lessonUrl)
@@ -46,8 +47,12 @@ export class LessonFull extends React.Component {
         }
     }
 
-    _isLessonInBookmarks() {
-        let {courseUrl, lessonUrl} = this.props;
+    _favoritesClick() {
+        this._switchFavorites(this.props.lessonUrl)
+    }
+
+    _isLessonInBookmarks(lessonUrl) {
+        let {courseUrl} = this.props;
 
         return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === courseUrl + '/' + lessonUrl
@@ -55,6 +60,8 @@ export class LessonFull extends React.Component {
     }
 
     render() {
+        let { lesson, lessonUrl } = this.props;
+
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
 
@@ -62,63 +69,64 @@ export class LessonFull extends React.Component {
             <li className="lecture-full">
                 <div className="lecture-full__wrapper">
                     <PlayBlock {...this.props}/>
-                    <InfoBlock
-                        title={this.props.title}
-                        descr={this.props.descr}
-                        subLessons={this.props.subLessons}
-                        refs={this.props.refs}
-                        books={this.props.books}
-                        url={this.props.url}
-                    />
-                    <span className={"favorites" + (this._isLessonInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>
-                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks() ? _redFlag : _flag }}/>
-                    </span>
+                    <div className="lecture-full__info-block">
+                        <div className="lecture-full__text-block">
+                            <button type="button" class="lecture-full__fav" onClick={::this._favoritesClick}>
+                                <svg width="14" height="23"
+                                     dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks(lessonUrl) ? _redFlag : _flag}}/>
+                            </button>
+                            <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title}</Link></h3>
+                            <p className="lecture-full__descr">{' ' + this.props.descr + ' '}</p>
+                        </div>
+                        <Extras subLessons={lesson.Lessons}
+                                parentNumber={lesson.Number}
+                                isLessonInBookmarks={::this._isLessonInBookmarks}
+                                onSwitchFavorites={::this._switchFavorites}
+                                courseUrl = {this.props.courseUrl}/>
+                    </div>
                 </div>
             </li>
         )
     }
 }
 
-class InfoBlock extends React.Component {
-    render() {
-        const _eps = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#eps"/>',
-            _lit = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lit"/>',
-            _books = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#books"/>';
+class Extras extends React.Component {
 
-        return (
-            <div className="lecture-full__info-block">
-                <div className="lecture-full__text-block">
-                    <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title}</Link></h3>
-                    <p className="lecture-full__descr">{' ' + this.props.descr + ' '}</p>
-                </div>
-                <div className="lecture-full__info-table">
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _eps}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Доп. эпизоды</p>
-                        <p className="lecture-full__info-table-value">{this.props.subLessons}</p>
-                    </div>
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _lit}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Источники</p>
-                        <p className="lecture-full__info-table-value">{this.props.refs}</p>
-                    </div>
-                    <div className="lecture-full__info-table-col">
-                                                <span className="icon">
-                                                    <svg width="18" height="18"
-                                                         dangerouslySetInnerHTML={{__html: _books}}/>
-                                                </span>
-                        <p className="lecture-full__info-table-label">Книги</p>
-                        <p className="lecture-full__info-table-value">{this.props.books}</p>
-                    </div>
-                </div>
+    _getList() {
+        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
+
+        return this.props.subLessons.map((lesson) => {
+            let url = '/' + this.props.courseUrl + '/' + lesson.URL
+
+            return <li>
+                <Link to={url} className="extras-list__item">
+                    <span className="counter">{this.props.parentNumber + '.'}</span>
+                    <span className="inner-counter">{lesson.Number}</span>
+                        {lesson.Name + ' '}
+                    <span className="duration">{lesson.DurationFmt}</span>
+                </Link>
+                <LessonPlayBlockSmall lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}
+                                      audios={lesson.Audios} id={lesson.Id}
+                                      totalDuration={lesson.Duration}/>
+                <button className="extras-list__fav" type="button" onClick={() => { this.props.onSwitchFavorites(lesson.URL)}}>
+                    <svg width="14" height="23"
+                         dangerouslySetInnerHTML={{__html: this.props.isLessonInBookmarks(lesson.URL) ? _redFlag : _flag}}/>
+                </button>
+            </li>
+        })
+    }
+
+    render() {
+        return (this.props.subLessons && (this.props.subLessons.length > 0)) ?
+            <div className="lecture-full__extras">
+                <p className="lecture-full__extras-label">Дополнительные эпизоды</p>
+                <ol className="lecture-full__extras-extras-list extras-list">
+                    {this._getList()}
+                </ol>
             </div>
-        )
+            :
+            null
     }
 }
 

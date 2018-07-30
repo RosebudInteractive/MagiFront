@@ -116,6 +116,7 @@ const handleData = (data) => {
 const handleCourse = (data) => {
     if (data.CoverMeta) {
         data.CoverMeta = JSON.parse(data.CoverMeta)
+        data.Mask = data.Mask ? data.Mask : '_mask01';
     }
 };
 

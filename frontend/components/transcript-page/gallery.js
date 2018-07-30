@@ -40,7 +40,7 @@ export default class Gallery extends React.Component {
 
     render() {
         return (
-            <section className="gallery-block" id="gallery">
+            <section className="gallery-block" id="pictures">
                 <div className="gallery">
                     <div className="gallery-label">
                         <h2>Галерея <span className="qty">{this.props.gallery.length}</span></h2>

@@ -64,6 +64,8 @@ export const ReducerRecord = Record({
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
     loading: false,
+    loadingBookmarks: false,
+    loadingUserBookmarks: false,
     error: null
 })
 
@@ -111,29 +113,36 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_BOOKMARKS_START:
             return state
                 .set('error', null)
-                // .set('loading', true)
+                .set('loadingUserBookmarks', true)
                 .update('bookmarks', bookmarks => bookmarks.clear())
 
         case GET_BOOKMARKS_EXT_START:
             return state
                 .set('error', null)
-                // .set('loading', true)
+                .set('loadingBookmarks', true)
                 .update('courseBookmarks', courseBookmarks => courseBookmarks.clear())
                 .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.clear())
 
         case GET_BOOKMARKS_EXT_SUCCESS:
             return state
                 .set('error', null)
+                .set('loadingBookmarks', false)
                 .update('courseBookmarks', courseBookmarks => courseBookmarks.concat(payload.Courses))
                 .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.concat(payload.Lessons))
 
         case GET_BOOKMARKS_SUCCESS:
             return state
+                .set('loadingUserBookmarks', false)
                 .update('bookmarks', bookmarks => bookmarks.union(payload))
 
         case GET_BOOKMARKS_ERROR:
             return state
-                .set('loading', false)
+                .set('loadingUserBookmarks', false)
+                .set('error', payload.error.message)
+
+        case GET_BOOKMARKS_EXT_ERROR:
+            return state
+                .set('loadingBookmarks', false)
                 .set('error', payload.error.message)
 
         case ADD_COURSE_TO_BOOKMARKS_SUCCESS:
@@ -188,6 +197,8 @@ export const getLessonBookmarks = createSelector(stateSelector, state => state.l
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const loadingBookmarksSelector = createSelector(stateSelector, state => state.loadingBookmarks)
+export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
 
 /**
  * Action Creators
