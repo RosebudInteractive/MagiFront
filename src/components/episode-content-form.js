@@ -18,7 +18,15 @@ class EpisodeResourceForm extends React.Component {
 
     _save(value) {
         value.Id = this.props.data.Id;
-        value.Content = JSON.stringify({title : value.Name, title2: value.Description});
+
+        let _contentObj = {};
+        if ((!!value.Content) && (value.Content !== '')) {
+            _contentObj = JSON.parse(value.Content)
+        }
+        
+        _contentObj.title = value.Name;
+        _contentObj.title2 = value.Description;
+        value.Content = JSON.stringify(_contentObj);
         this.props.save(value)
     }
 

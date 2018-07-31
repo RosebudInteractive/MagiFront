@@ -28,6 +28,7 @@ import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import ResourceForm from "../components/resource-form";
 import MultiResourceForm from "../components/multi-resource-form";
+import $ from 'jquery';
 
 export class LessonEditor extends ObjectEditor {
 
@@ -91,6 +92,35 @@ export class LessonEditor extends ObjectEditor {
         this.editMode = EDIT_MODE_INSERT;
     }
 
+    componentDidMount() {
+        let _editor = $('.webix_view .webix_layout_line');
+
+        _editor.on('paste', (e) => {
+            // Prevent the default pasting event and stop bubbling
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Get the clipboard data
+            let paste = (e.clipboardData || window.clipboardData).getData('text');
+
+            // Do something with paste like remove non-UTF-8 characters
+            paste = paste.replace(/[^\x20-\xFF]/gi, '');
+
+            // Find the cursor location or highlighted area
+            const selection = window.getSelection();
+
+            // Cancel the paste operation if the cursor or highlighted area isn't found
+            if (!selection.rangeCount) return false;
+
+            // Paste the modified clipboard content where it was intended to go
+            selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+        });
+
+        window.$$('descrition').$view.addEventListener("onPaste", function (text) {
+            window.webix.message("Custom paste behavior: " + text);
+        });
+    }
+
     componentWillReceiveProps(next) {
         const {
             lesson,
@@ -139,8 +169,8 @@ export class LessonEditor extends ObjectEditor {
     _getCoverInfo() {
         let _meta = this.coverMeta;
         return {
-            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.cover)) : null,
-            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path + _meta.content.s) : this.cover)) : null,
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width) : 0
         };
     }
 
@@ -874,9 +904,12 @@ export class LessonEditor extends ObjectEditor {
                     {
                         view: "accordionitem",
                         headerHeight: 40,
+                        borderless: true,
                         header: "Краткое описание",
                         body: {
-                            view: "richtext",
+                            view: "textarea",
+                            borderless: true,
+                            id: 'descrition',
                             labelWidth: 0,
                             height: 100,
                             width: 0,

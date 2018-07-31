@@ -7,7 +7,6 @@ import ErrorDialog from './ErrorDialog';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as appActions from "../actions/app-actions";
-import {labelWidth} from "../containers/object-editor";
 
 class ResourceForm extends React.Component {
 
@@ -83,13 +82,6 @@ class ResourceForm extends React.Component {
         return _lang ? _lang.Language : '';
     }
 
-    _handleFiles() {
-        let fileList = this.files; /* теперь вы можете работь со списком файлов */
-        fileList.forEach((file) => {
-            console.log(file)
-        })
-    }
-
     getUI(save, cancel) {
         let that = this;
 
@@ -105,8 +97,6 @@ class ResourceForm extends React.Component {
                     id: 'Name',
                     label: "Название",
                     placeholder: "Введите название",
-                    validate: window.webix.rules.isNotEmpty,
-                    invalidMessage: "Значение не может быть пустым",
                 },
                 {
                     view: "textarea",
@@ -124,8 +114,13 @@ class ResourceForm extends React.Component {
                     id: 'file-id',
                     label: "ID файла",
                     placeholder: "",
-                    // validate: window.webix.rules.isNotEmpty,
-                    // invalidMessage: "Значение не может быть пустым",
+                },
+                {
+                    view: "text",
+                    label: "Alt",
+                    labelPosition: "top",
+                    name: 'AltAttribute',
+                    placeholder: "",
                 },
                 {
                     view: "checkbox",
