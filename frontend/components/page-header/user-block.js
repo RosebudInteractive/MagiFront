@@ -7,23 +7,23 @@ import {Link} from 'react-router-dom';
 
 class UserBlock extends React.Component {
 
-    static
-    propTypes = {};
-
-    static
-    defaultProps = {};
-
     constructor(props) {
         super(props);
     }
 
     _onClick() {
-        if (this.props.showUserBlock) {
+        if (this.props.showUserBlock && (!(window.innerWidth < 900))) {
             this.props.appActions.hideUserBlock()
         } else {
             this.props.appActions.showUserBlock()
         }
     }
+
+    // componentDidUpdate() {
+    //     if ((window.innerWidth < 900) && !this.props.showUserBlock) {
+    //         this.props.appActions.showUserBlock()
+    //     }
+    // }
 
     render() {
         const _logout = '<use xlink:href="#logout"/>'

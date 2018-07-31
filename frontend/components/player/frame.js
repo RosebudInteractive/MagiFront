@@ -33,13 +33,19 @@ class Frame extends Component {
         }
 
         this._firstTap = true;
-    }
 
+        this._onDocumentReady = () => {
+            this._applyViewPort()
+        }
+
+        $(document).ready(this._onDocumentReady)
+        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+    }
 
     componentDidMount() {
         let that = this
 
-        document.body.addEventListener('touchend', (e) => {
+        document.body.addEventListener(this._touchEventName, (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),
@@ -87,16 +93,10 @@ class Frame extends Component {
             }
         })
 
-        // let that = this;
-        //
         $(document).on('mousemove', () => {
             this._clearTimeOut();
             this._initTimeOut();
         });
-
-        if (this.props.visible) {
-            this._applyViewPort()
-        }
     }
 
     _clearTimeOut() {
@@ -165,9 +165,10 @@ class Frame extends Component {
     }
 
     _removeListeners() {
-        $(document).off('mouseup');
+        $(document).off(this._touchEventName);
         $(document).off('keydown');
         $(document).off('mousemove');
+        $(document).unbind('ready', this._onDocumentReady);
     }
 
     _openContent() {

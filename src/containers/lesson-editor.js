@@ -471,8 +471,12 @@ export class LessonEditor extends ObjectEditor {
 
         if (this.props.lesson.IsSubsRequired) {
             window.$$('free-expr-date').enable()
+            window.$$('is-auth-required').setValue(true)
+            window.$$('is-auth-required').disable()
+
         } else {
             window.$$('free-expr-date').disable()
+            window.$$('is-auth-required').enable()
         }
     }
 
@@ -841,6 +845,7 @@ export class LessonEditor extends ObjectEditor {
             },
             {
                 view: "checkbox",
+                id: 'is-auth-required',
                 label: "Требуется авторизация",
                 name: 'IsAuthRequired',
                 labelWidth: labelWidth,
