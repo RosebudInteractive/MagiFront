@@ -187,7 +187,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "where l.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[AltAttribute], l.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
@@ -297,7 +297,7 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "where l.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`AltAttribute`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
@@ -1452,6 +1452,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     data.res.ShowInGalery = elem.ShowInGalery;
                                 if (typeof (elem.Description) !== "undefined")
                                     data.lng.Description = elem.Description;
+                                if (typeof (elem.AltAttribute) !== "undefined")
+                                    data.lng.AltAttribute = elem.AltAttribute;
                                 if (typeof (elem.MetaData) !== "undefined")
                                     data.lng.MetaData = elem.MetaData;
                                 if (typeof (elem.Id) === "number") {
@@ -1899,6 +1901,8 @@ const DbLesson = class DbLesson extends DbObject {
                                             fields["Name"] = elem["Name"];
                                         if (typeof (elem["Description"]) !== "undefined")
                                             fields["Description"] = elem["Description"];
+                                        if (typeof (elem["AltAttribute"]) !== "undefined")
+                                            fields["AltAttribute"] = elem["AltAttribute"];
                                         if (typeof (elem["MetaData"]) !== "undefined")
                                             fields["MetaData"] = elem["MetaData"];
                                         return root_res_lng.newObject({
