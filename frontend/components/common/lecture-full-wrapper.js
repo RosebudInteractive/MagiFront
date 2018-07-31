@@ -118,9 +118,11 @@ class Extras extends React.Component {
     }
 
     render() {
+        const _label = (this.props.subLessons.length > 1) ? 'Дополнительные эпизоды' : 'Дополнительный эпизод'
+
         return (this.props.subLessons && (this.props.subLessons.length > 0)) ?
             <div className="lecture-full__extras">
-                <p className="lecture-full__extras-label">Дополнительные эпизоды</p>
+                <p className="lecture-full__extras-label">{_label}</p>
                 <ol className="lecture-full__extras-extras-list extras-list">
                     {this._getList()}
                 </ol>

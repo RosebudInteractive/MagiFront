@@ -85,10 +85,7 @@ class Menu extends React.Component {
                     })
                 }
             }
-
-            e.preventDefault();
         }
-
     }
 
     _handleSetNewWidth() {
@@ -130,7 +127,6 @@ class Menu extends React.Component {
     }
 
     _switchMenu() {
-        // this.setState({opened: !this.state.opened})
         if (this.props.isLessonMenuOpened) {
             this.props.appActions.hideLessonMenu()
         } else {
@@ -139,7 +135,6 @@ class Menu extends React.Component {
 
         $(window).on('scroll', (e) => {
             console.log(e.target.className)
-            // e.preventDefault()
         })
     }
 
@@ -200,6 +195,11 @@ class Menu extends React.Component {
     _setNavigationMenuWidth() {
         if (this._isDesktopWidth) {
             $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+            let _items = $('.menu-nav-list__item');
+            if (_items.length > 0) {
+                let _width = 100 / _items.length;
+                _items.css('width', _width + '%');
+            }
         } else {
             $('.js-lectures-menu-nav').css('width', '');
         }
@@ -300,7 +300,7 @@ class Menu extends React.Component {
 
 class TableOfContents extends React.Component {
 
-    componentDidUpdate() {
+    _mountScroll() {
         let _links = $('.js-scroll-link');
         _links.prop('onclick', null).off('click');
 
@@ -308,14 +308,16 @@ class TableOfContents extends React.Component {
             let $target = $($(this).attr('href')),
                 targetOffset = $target.offset().top;
 
-            let _currentPosition = $(window).scrollTop(),
-                _delta = 0;
+            // let _currentPosition = $(window).scrollTop(),
+            //     _delta = 0;
 
-            if (_currentPosition > targetOffset) {
-                _delta = ($(window).outerWidth() > 899) ? 175 : 125
-            } else {
-                _delta = 75
-            }
+            // if (_currentPosition > targetOffset) {
+            //     _delta = ($(window).outerWidth() > 899) ? 240 : 190
+            // } else {
+            //     _delta = 75
+            // }
+
+            let _delta = ($(window).outerWidth() > 899) ? 160 : 125
 
             targetOffset -= _delta;
 
@@ -330,6 +332,14 @@ class TableOfContents extends React.Component {
                 // }, 0);
             }
         })
+    }
+
+    componentDidMount() {
+        this._mountScroll()
+    }
+
+    componentDidUpdate() {
+        this._mountScroll()
     }
 
     componentWillUnmount() {

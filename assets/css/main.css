@@ -7932,10 +7932,12 @@ body[data-page="fullpage-player"] .lectures-menu {
     color: #fff; }
 
 .lectures-menu-nav {
+  min-width: 325px;
   position: relative;
   border-left: none; }
   @media (max-width: 899px) {
     .lectures-menu-nav {
+      min-width: auto;
       width: 40px; }
       .lectures-menu-nav:after {
         content: "";
@@ -8013,8 +8015,12 @@ body[data-page="fullpage-player"] .lectures-menu {
         left: 28px;
         width: 1px;
         height: 24px; } }
+  .lectures-menu-nav__list {
+    width: 100%
+  }
   @media (max-width: 899px) {
     .lectures-menu-nav__list {
+      width: auto;
       position: absolute;
       top: 100%;
       right: 0;
