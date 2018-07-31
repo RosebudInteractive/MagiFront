@@ -2,6 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
+const mime = require('mime');
 const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
@@ -237,9 +238,24 @@ exports.ImportEpisode = class ImportEpisode {
             if (fileList.length > 0) {
                 let filesArr = fileList.split(Import.FILE_LIST_SEPARATOR);
                 let tracks = [];
-                filesArr.forEach((file) => {
-                    let { name } = path.parse(file.trim());
+                filesArr.forEach((fileRaw) => {
+                    let file = fileRaw;
+                    let idx = file.indexOf("[");
+                    if (idx >= 0) {
+                        // Hyperlink
+                        if (idx === 0) file = ""
+                        else
+                            file = file.slice(0, idx - 1);
+                    }
+                    let name = file.trim();
+                    let mimeType = mime.getType(name);
+                    if (mimeType) {
+                        let { name: fn } = path.parse(name);
+                        name = fn;
+                    }
                     let partArr = name.split(Import.FILE_FIELD_SEPARATOR);
+                    if (partArr[0].length === 0)
+                        partArr.splice(0, 1);
                     let title = null;
                     let title2 = null;
                     let id = null;

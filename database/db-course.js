@@ -287,6 +287,10 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
     "  join [Reference] r on r.[LessonLngId] = ll.[Id] and r.[Recommended] = 1\n" +
     "where c.[Id] = <%= courseId %> and(l.[ParentId] is NULL)\n" +
     "order by l.[Id]";
+const COURSE_SHARE_COUNTERS_MSSQL_REQ =
+    "select sp.[Code], cs.[Counter] from [CrsShareCounter] cs\n" +
+    "  join[SNetProvider] sp on sp.[Id] = cs.[SNetProviderId]\n" +
+    "where[CourseId] = <%= courseId %>";
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
@@ -319,6 +323,10 @@ const COURSE_REC_MYSQL_PUBLIC_REQ =
     "  join `Reference` r on r.`LessonLngId` = ll.`Id` and r.`Recommended` = 1\n" +
     "where c.`Id` = <%= courseId %> and(l.`ParentId` is NULL)\n" +
     "order by l.`Id`";
+const COURSE_SHARE_COUNTERS_MYSQL_REQ =
+    "select sp.`Code`, cs.`Counter` from `CrsShareCounter` cs\n" +
+    "  join`SNetProvider` sp on sp.`Id` = cs.`SNetProviderId`\n" +
+    "where`CourseId` = <%= courseId %>";
 
 const DbCourse = class DbCourse extends DbObject {
 
@@ -532,7 +540,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Authors: [],
                                         Categories: [],
                                         Lessons: [],
-                                        Books: []
+                                        Books: [],
+                                        ShareCounters: {}
                                     };
                                 };
                                 let lsn = lsn_list[elem.LessonId];
@@ -674,6 +683,20 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     Description: elem.Description
                                 });
+                            })
+                        }
+                        if (course)
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(COURSE_SHARE_COUNTERS_MYSQL_REQ)({ courseId: courseId }),
+                                    mssql: _.template(COURSE_SHARE_COUNTERS_MSSQL_REQ)({ courseId: courseId })
+                                }
+                            }, {});
+                    })
+                    .then((result) => {
+                        if (course && result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                course.ShareCounters[elem.Code] = elem.Counter;
                             })
                         }
                         return course;

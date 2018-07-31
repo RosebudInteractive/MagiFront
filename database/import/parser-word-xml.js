@@ -258,12 +258,17 @@ exports.ParserWordXML = class ParserWordXML {
 
     _parseHyperLink(hlink, options) {
         let result = { props: {}, text: "", html: "", link: null };
-        if (hlink && hlink.attributes && options && options.Refs) {
-            let olink = options.Refs["External"];
-            if (olink)
-                olink = olink[hlink.attributes["r:id"]];
-            if (olink && olink.link.Target)
-                result.link = olink.link.Target;
+        if (hlink && hlink.attributes) {
+            if (options && options.Refs) {
+                let olink = options.Refs["External"];
+                if (olink)
+                    olink = olink[hlink.attributes["r:id"]];
+                if (olink && olink.link.Target)
+                    result.link = olink.link.Target;
+            }
+            else
+                if (hlink.attributes["w:dest"])
+                    result.link = hlink.attributes["w:dest"];
         }
         if (hlink && hlink.elements && (hlink.elements.length > 0)) {
             for (let i = 0; i < hlink.elements.length; i++) {
@@ -272,20 +277,18 @@ exports.ParserWordXML = class ParserWordXML {
                     switch (elem.name) {
                         case "w:r":
                             let { text, html } = this._parseText(elem, options);
-                            if (result.link) {
-                                result.text += text + " [" + result.link + "]";
-                                result.html += `<a href="${escape(result.link)}">${html}</a>`;
-                            }
-                            else {
-                                result.text += text;
-                                result.html += html;
-                            }
+                            result.text += text;
+                            result.html += html;
                             break;
                         default:
                             if (options && options.errors)
                                 options.errors.push(`(${options.rowNum},${options.cellNum}) _parseHyperLink: Unhandled element "${elem.name}".`);
                     }
                 }
+            }
+            if (result.link) {
+                result.text = result.text + " [" + result.link + "]";
+                result.html = `<a href="${escape(result.link)}">${result.html}</a>`;
             }
         }
         return result;
@@ -309,6 +312,11 @@ exports.ParserWordXML = class ParserWordXML {
                             let { text: textLink, html: htmlLink, link } = this._parseHyperLink(elem, options);
                             result.text += textLink;
                             result.html += htmlLink;
+                            break;
+                        case "w:hlink":
+                            let { text: textHlink, html: htmlHlink, link: linkHlink } = this._parseHyperLink(elem);
+                            result.text += textHlink;
+                            result.html += htmlHlink;
                             break;
                         case "w:r":
                             let { props, text, html } = this._parseText(elem, options);
