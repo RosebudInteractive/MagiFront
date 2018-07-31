@@ -11,13 +11,14 @@ const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_LESSONS_MSSQL =
-    "select top <%= nrec %> lc.[ReadyDate], c.[Id] as [CID], l.[Id], c.[URL], l.[URL] as [LURL]\n" +
+    "select lc.[ReadyDate], c.[Id] as [CID], l.[Id], c.[URL], l.[URL] as [LURL]\n" +
     "from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "where lc.[State] = 'R' and c.[State] = 'P'\n" +
-    "order by lc.[ReadyDate] desc";
+    "order by lc.[ReadyDate] desc\n" +
+    "offset <%= offset %> rows fetch next <%= nrec %> rows only";
 
 const GET_SNLIST_MSSQL =
     "select [Id], [Code] from [SNetProvider]";
@@ -30,7 +31,7 @@ const GET_LESSONS_MYSQL =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where lc.`State` = 'R' and c.`State` = 'P'\n" +
     "order by lc.`ReadyDate` desc\n" +
-    "limit <%= nrec %>";
+    "limit <%= offset %>,<%= nrec %>";
 
 const GET_SNLIST_MYSQL =
     "select `Id`, `Code` from `SNetProvider`";
@@ -38,14 +39,20 @@ const GET_SNLIST_MYSQL =
 const MAX_URLS = 1000;
 const URL_DELAY = 1000;
 
+const MIN_FB_DELAY = 30 * 1000;
+const FB_REPAIR_TIME = 65 * 60 * 1000;
+const FB_USAGE_LIMIT_PERC = 90;
+
 let dfltSettings = {
     snets: ["facebook", "vkontakte", "odnoklassniki"],
     urlDelay: URL_DELAY,
+    offset: 0,
     maxUrls: MAX_URLS,
     snPrefs: {
         facebook: {
-            usageLimitPerc: 90,
-            repairTime: 75 * 60 * 1000
+            usageLimitPerc: FB_USAGE_LIMIT_PERC,
+            repairTime: FB_REPAIR_TIME,
+            minDelay: MIN_FB_DELAY
         }
     }
 };
@@ -94,8 +101,8 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             .then(() => {
                 return $data.execSql({
                     dialect: {
-                        mysql: _.template(GET_LESSONS_MYSQL)({ nrec: self._settings.maxUrls }),
-                        mssql: _.template(GET_LESSONS_MSSQL)({ nrec: self._settings.maxUrls })
+                        mysql: _.template(GET_LESSONS_MYSQL)({ offset: self._settings.offset, nrec: self._settings.maxUrls }),
+                        mssql: _.template(GET_LESSONS_MSSQL)({ offset: self._settings.offset, nrec: self._settings.maxUrls })
                     }
                 }, {});
             })
@@ -116,62 +123,85 @@ exports.SnCounterTask = class SnCounterTask extends Task {
         // response.headers["x-app-usage"] = "{"call_count":724,"total_cputime":0,"total_time":24}"
         // response.statusCode === ERR_FORBIDDEN, body = "{"error":{"message":"(#4) Application request limit reached","type":"OAuthException","is_transient":true,"code":4,"fbtrace_id":"GoyjxuQpQMG"}}"
         //
-        return new Promise((resolve, reject) => {
-            let counter = 0;
-
-            if (options.lock && options.lockTime) {
-                let now = new Date();
-                if ((now - options.lockTime) > options.repairTime) {
-                    options.lock = false;
-                    delete options.lockTime;
-                }
+        let self = this;
+        let counter = 0;
+    
+        return getCounter(url)
+            .then((cnt) => {
+                counter = cnt;
+                return getCounter(url + "/");
+            })
+            .then((cnt) => {
+                return cnt > counter ? cnt : counter;
+            });
+    
+        function getCounter(_url) {
+            let rc = Promise.resolve();
+            if (options.lastReq) {
+                let delay = options.minDelay - ((new Date()) - options.lastReq);
+                if (delay > 0)
+                    rc = self._delay(delay);
             }
-            if (!options.lock) {
-                let reqUrl = new URL("https://graph.facebook.com/v3.0");
-                reqUrl.searchParams.append('id', url);
-                reqUrl.searchParams.append('fields', 'engagement');
-                reqUrl.searchParams.append('access_token', config.snets.facebook.appId + '|' + config.snets.facebook.appSecret);
-                request(reqUrl.href, (error, response, body) => {
-                    if (error)
-                        reject(error)
-                    else {
-                        if (response.statusCode === HttpCode.OK) {
-                            let usageStat = response.headers["x-app-usage"];
-                            if (usageStat) {
-                                try {
-                                    usageStat = JSON.parse(usageStat);
-                                    if ((usageStat.call_count > options.usageLimitPerc)
-                                        || (usageStat.total_cputime > options.usageLimitPerc)
-                                        || (usageStat.total_time > options.usageLimitPerc)) {
+            return rc.then(() => {
+                return new Promise((resolve, reject) => {
+                    let counter = 0;
 
-                                        options.lock = true;
-                                        options.lockTime = new Date();
-                                        console.error(`SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
-                                            `${JSON.stringify(usageStat)}`);
-                                    }
-                                } catch (err) { };
-                            }
-                            try {
-                                let counters = JSON.parse(body);
-                                if (counters.engagement)
-                                    for (let key in counters.engagement)
-                                        counter += counters.engagement[key];
-                            }
-                            catch (err) { };
+                    if (options.lock && options.lockTime) {
+                        let now = new Date();
+                        if ((now - options.lockTime) > options.repairTime) {
+                            options.lock = false;
+                            delete options.lockTime;
                         }
-                        else {
-                            if (response.statusCode === HttpCode.ERR_FORBIDDEN) {
-                                options.lock = true;
-                                console.error(`SnCounterTask: FB access error: ${body}`);
-                            }
-                        }
-                        resolve(counter);
                     }
+                    if (!options.lock) {
+                        let reqUrl = new URL("https://graph.facebook.com/v3.0");
+                        reqUrl.searchParams.append('id', _url);
+                        reqUrl.searchParams.append('fields', 'engagement');
+                        reqUrl.searchParams.append('access_token', config.snets.facebook.appId + '|' + config.snets.facebook.appSecret);
+                        options.lastReq = new Date();
+                        request(reqUrl.href, (error, response, body) => {
+                            if (error)
+                                reject(error)
+                            else {
+                                if (response.statusCode === HttpCode.OK) {
+                                    let usageStat = response.headers["x-app-usage"];
+                                    if (usageStat) {
+                                        try {
+                                            usageStat = JSON.parse(usageStat);
+                                            if ((usageStat.call_count > options.usageLimitPerc)
+                                                || (usageStat.total_cputime > options.usageLimitPerc)
+                                                || (usageStat.total_time > options.usageLimitPerc)) {
+
+                                                options.lock = true;
+                                                options.lockTime = new Date();
+                                                console.error(`SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
+                                                    `${JSON.stringify(usageStat)}`);
+                                            }
+                                        } catch (err) { };
+                                    }
+                                    try {
+                                        let counters = JSON.parse(body);
+                                        if (counters.engagement)
+                                            for (let key in counters.engagement)
+                                                counter += counters.engagement[key];
+                                    }
+                                    catch (err) { };
+                                }
+                                else {
+                                    if (response.statusCode === HttpCode.ERR_FORBIDDEN) {
+                                        options.lock = true;
+                                        console.error(`SnCounterTask: FB access error: ${body}`);
+                                    }
+                                }
+                                resolve(counter);
+                            }
+                        });
+                    }
+                    else
+                        resolve(counter);
                 });
-            }
-            else
-                resolve(counter);
-        });
+            });
+        };
     }
 
     /*
@@ -179,24 +209,37 @@ exports.SnCounterTask = class SnCounterTask extends Task {
         VK: https://vk.com/share.php?act=count&url=https%3A%2F%2Fmagisteria.ru%2Fquattrocento%2Fbrunelleschi%2F
     */
     _getVKCount(url, options) {
-        return new Promise((resolve, reject) => {
-            let reqUrl = new URL("https://vk.com/share.php");
-            reqUrl.searchParams.append('act', 'count');
-            reqUrl.searchParams.append('url', url);
-            request(reqUrl.href, (error, response, body) => {
-                if (error)
-                    reject(error)
-                else {
-                    let counter = 0;
-                    if (response.statusCode === HttpCode.OK)
-                        try {
-                            counter = body.match(/^VK\.Share\.count\(\d, (\d+)\);$/)[1] / 1;
-                        }
-                        catch (err) { };
-                    resolve(counter);
-                }
+        let counter = 0;
+
+        return getCounter(url)
+            .then((cnt) => {
+                counter = cnt;
+                return getCounter(url + "/");
+            })
+            .then((cnt) => {
+                return cnt + counter;
             });
-        });
+
+        function getCounter(_url) {
+            return new Promise((resolve, reject) => {
+                let reqUrl = new URL("https://vk.com/share.php");
+                reqUrl.searchParams.append('act', 'count');
+                reqUrl.searchParams.append('url', _url);
+                request(reqUrl.href, (error, response, body) => {
+                    if (error)
+                        reject(error)
+                    else {
+                        let counter = 0;
+                        if (response.statusCode === HttpCode.OK)
+                            try {
+                                counter = body.match(/^VK\.Share\.count\(\d, (\d+)\);$/)[1] / 1;
+                            }
+                            catch (err) { };
+                        resolve(counter);
+                    }
+                });
+            });
+        };
     }
 
     /*
@@ -204,25 +247,38 @@ exports.SnCounterTask = class SnCounterTask extends Task {
         OK: https://connect.ok.ru/dk?st.cmd=extLike&uid=odklcnt0&ref=https%3A%2F%2Fmagisteria.ru%2Fquattrocento%2Fbrunelleschi%2F
     */
     _getOKCount(url, options) {
-        return new Promise((resolve, reject) => {
-            let reqUrl = new URL("https://connect.ok.ru/dk");
-            reqUrl.searchParams.append('st.cmd', 'extLike');
-            reqUrl.searchParams.append('uid', 'odklcnt0');
-            reqUrl.searchParams.append('ref', url);
-            request(reqUrl.href, (error, response, body) => {
-                if (error)
-                    reject(error)
-                else {
-                    let counter = 0;
-                    if (response.statusCode === HttpCode.OK)
-                        try {
-                            counter = body.match(/^ODKL\.updateCount\(\'odklcnt0\',\'(\d+)\'\);$/)[1] / 1;
-                        }
-                        catch (err) { };
-                    resolve(counter);
-                }
+        let counter = 0;
+
+        return getCounter(url)
+            .then((cnt) => {
+                counter = cnt;
+                return getCounter(url + "/");
+            })
+            .then((cnt) => {
+                return cnt + counter;
             });
-        });
+
+        function getCounter(_url) {
+            return new Promise((resolve, reject) => {
+                let reqUrl = new URL("https://connect.ok.ru/dk");
+                reqUrl.searchParams.append('st.cmd', 'extLike');
+                reqUrl.searchParams.append('uid', 'odklcnt0');
+                reqUrl.searchParams.append('ref', _url);
+                request(reqUrl.href, (error, response, body) => {
+                    if (error)
+                        reject(error)
+                    else {
+                        let counter = 0;
+                        if (response.statusCode === HttpCode.OK)
+                            try {
+                                counter = body.match(/^ODKL\.updateCount\(\'odklcnt0\',\'(\d+)\'\);$/)[1] / 1;
+                            }
+                            catch (err) { };
+                        resolve(counter);
+                    }
+                });
+            });
+        };
     }
 
     _processItem(item, url, modelName, filterFieldName, itemFieldName) {
@@ -315,7 +371,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
     }
 
     _delay(dt) {
-        let delay = dt ? dt : this._settings.urlDelay;
+        let delay = dt ? (dt > 0 ? dt : 0) : this._settings.urlDelay;
         let rc = Promise.resolve();
         if (delay) {
             rc = rc.then(() => {
@@ -335,7 +391,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                     let rc = self._delay();
                     if (!self._courses[lesson.CID]) {
                         rc = rc.then(() => {
-                            let url = self._settings.baseUrl + '/category/' + lesson.URL + '/';
+                            let url = self._settings.baseUrl + '/category/' + lesson.URL;
                             return self._processItem(lesson, url, "CrsShareCounter", "CourseId", "CID");
                         })
                             .then(() => {
@@ -344,7 +400,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                             });
                     }
                     return rc.then(() => {
-                        let url = self._settings.baseUrl + '/' + lesson.URL + '/' + lesson.LURL + '/';
+                        let url = self._settings.baseUrl + '/' + lesson.URL + '/' + lesson.LURL;
                         return self._processItem(lesson, url, "LsnShareCounter", "LessonId", "Id");
                     })
                 });

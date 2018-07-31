@@ -23,17 +23,18 @@ let options = {
             type: "scheduled-task",
             disabled: false,
             // schedule: "0/30 * * * * *", // run every 30 sec
-            schedule: "0 20 14 * * *", // run at 10:00
+            schedule: "0 37 14 * * *", // run at 10:00
             options: {
                 baseUrl: "https://magisteria.ru",
                 snets: ["facebook", "vkontakte", "odnoklassniki"],
-                urlDelay: 30 * 1000,
+                urlDelay: 0,
+                offset: 0,
                 maxUrls: 1000,
                 snPrefs: {
                     facebook: {
                         usageLimitPerc: 90,
-                        repairTime: 90 * 60 * 1000
-                    }
+                        repairTime: 65 * 60 * 1000,
+                        minDelay: 30 * 1000                    }
                 }
             }
         },
