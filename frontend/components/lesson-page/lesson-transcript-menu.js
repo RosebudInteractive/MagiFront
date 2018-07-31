@@ -220,13 +220,13 @@ class Menu extends React.Component {
 
         targetOffset -= _delta;
 
-        if ($target.length) {
-
-            // trigger scroll
-            $('html, body').animate({
-                scrollTop: targetOffset
-            }, 400);
-        }
+        // if ($target.length) {
+        //
+        //     // trigger scroll
+        //     $('html, body').animate({
+        //         scrollTop: targetOffset
+        //     }, 0);
+        // }
     }
 
     render() {
@@ -319,12 +319,14 @@ class TableOfContents extends React.Component {
             targetOffset -= _delta;
 
             if ($target.length) {
-                e.preventDefault();
+                $('html, body').scrollTop(targetOffset)
+
+                // e.preventDefault();
 
                 // trigger scroll
-                $('html, body').animate({
-                    scrollTop: targetOffset
-                }, 400);
+                // $('html, body').animate({
+                //     scrollTop: targetOffset
+                // }, 0);
             }
         })
     }

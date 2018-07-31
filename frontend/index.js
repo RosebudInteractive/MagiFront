@@ -5,12 +5,16 @@ import {Provider} from 'react-redux';
 import App from './App';
 import {store} from './store/configureStore';
 import {BrowserRouter} from 'react-router-dom';
+import ScrollMemory from 'react-router-scroll-memory';
 
 ReactDOM.render(
     <div>
-        <Provider onUpdate={() => window.scrollTo(0, 0)} store={store}>
+        <Provider store={store}>
             <BrowserRouter>
-                <App/>
+                <div>
+                    <ScrollMemory/>
+                    <App/>
+                </div>
             </BrowserRouter>
         </Provider>
     </div>,

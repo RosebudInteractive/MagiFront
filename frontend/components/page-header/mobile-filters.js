@@ -10,15 +10,17 @@ class FiltersRow extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.state = {
-            showForm: false
-        }
     }
 
-    _switchFilterForm() {
-        let _newState = !this.state.showForm;
-        this.setState({showForm: _newState})
+    _switchFilterForm(e) {
+        let _isFilterItem = e.target.closest('.filters-list');
+
+        if (!_isFilterItem) {
+            this.props.showFiltersForm ?
+                this.props.pageHeaderActions.hideFiltersForm()
+                :
+                this.props.pageHeaderActions.showFiltersForm()
+        }
     }
 
     _getFilters() {
@@ -45,7 +47,7 @@ class FiltersRow extends React.Component {
 
     render() {
         return (
-            <div className={'filters-mobile' + (this.state.showForm ? ' opened' : '')}
+            <div className={'filters-mobile' + (this.props.showFiltersForm ? ' opened' : '')}
                  onClick={::this._switchFilterForm}>
                 <div className="filters-mobile__trigger">
                     <svg className="filters-mobile__icon" width="22" height="21">
@@ -54,7 +56,7 @@ class FiltersRow extends React.Component {
                     <span className="filters-mobile__label">Фильтры</span>
                 </div>
                 {
-                    this.state.showForm ?
+                    this.props.showFiltersForm ?
                         <ul className="filters-list">
                             {this._getFilters()}
                         </ul>
@@ -70,7 +72,8 @@ class FiltersRow extends React.Component {
 function mapStateToProps(state) {
     return {
         showSearchForm: state.pageHeader.showSearchForm,
-        pageHeader: state.pageHeader,
+        showFiltersForm: state.pageHeader.showFiltersForm,
+        // pageHeader: state.pageHeader,
         filters: state.filters.items,
     }
 }

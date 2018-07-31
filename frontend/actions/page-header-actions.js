@@ -18,29 +18,23 @@ export const showSearchForm = () => {
 };
 
 export const hideSearchForm = () => {
-    return (dispatch) => {
-        dispatch({
-            type: HIDE_SEARCH_FORM,
-            payload: null
-        });
+    return {
+        type: HIDE_SEARCH_FORM,
+        payload: null
     }
 };
 
 export const showFiltersForm = () => {
-    return (dispatch) => {
-        dispatch({
-            type: SHOW_FILTERS_FORM,
-            payload: null
-        });
+    return {
+        type: SHOW_FILTERS_FORM,
+        payload: null
     }
 };
 
 export const hideFiltersForm = () => {
-    return (dispatch) => {
-        dispatch({
-            type: HIDE_FILTER_FORM,
-            payload: null
-        });
+    return {
+        type: HIDE_FILTER_FORM,
+        payload: null
     }
 };
 
@@ -66,7 +60,7 @@ export const setCurrentPage = (page, courseUrl, lessonUrl) => {
     return (dispatch) => {
         dispatch({
             type: SET_CURRENT_PAGE,
-            payload: {page : page, courseUrl: courseUrl, lessonUrl: lessonUrl}
+            payload: {page: page, courseUrl: courseUrl, lessonUrl: lessonUrl}
         });
     }
 }
