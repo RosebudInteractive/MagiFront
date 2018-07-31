@@ -219,6 +219,7 @@ class Menu extends React.Component {
         }
 
         targetOffset -= _delta;
+        $('html, body').scrollTop(targetOffset)
 
         // if ($target.length) {
         //
