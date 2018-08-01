@@ -173,19 +173,25 @@ exports.ImportEpisode = class ImportEpisode {
                                                             pict.name(file.title);
                                                             meta.name = file.title;
                                                         }
+                                                        else {
+                                                            pict.name("");
+                                                            meta.name = "";
+                                                        }
                                                         if (file.title2) {
                                                             pict.description(file.title2);
                                                             meta.description = file.title2;
                                                         }
+                                                        else {
+                                                            pict.description(null);
+                                                            delete meta.description;
+                                                        }
                                                         pict.isUpdated = true;
                                                         pict.metaData(JSON.stringify(meta));
                                                     }
-                                                    let title = pict.name() ? pict.name() : null;
-                                                    let title2 = pict.description() ? pict.description() : null;
-                                                    if (title)
-                                                        item.Content.title = title;
-                                                    if (title2)
-                                                        item.Content.title2 = title2;
+                                                    if (file.title)
+                                                        item.Content.title = file.title;
+                                                    if (file.title2)
+                                                        item.Content.title2 = file.title2;
                                                     item.Content = JSON.stringify(item.Content);
                                                     content.push(item);
                                                 }
