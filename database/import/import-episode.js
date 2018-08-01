@@ -89,10 +89,10 @@ exports.ImportEpisode = class ImportEpisode {
         })
             .then((docData) => this._compileTable(docData, opts))
             .then((data) => {
-                let episode = { Transcript: data.html };
+                let episode = { Transcript: data.html, Toc: [], Content: [] };
                 let result = episode;
                 if (data.toc.length > 0) {
-                    let toc = episode.Toc = [];
+                    let toc = episode.Toc;
                     data.toc.forEach((elem) => {
                         toc.push({
                             Topic: elem.text,
@@ -155,7 +155,7 @@ exports.ImportEpisode = class ImportEpisode {
                                                 } catch (err) { };
                                             }
                                         }
-                                        let content = episode.Content = [];
+                                        let content = episode.Content;
                                         data.picts[data.picts.length - 1].duration = duration * 1000 - data.picts[data.picts.length - 1].ts;
                                         data.picts.forEach((elem) => {
                                             elem.files.forEach((file) => {
