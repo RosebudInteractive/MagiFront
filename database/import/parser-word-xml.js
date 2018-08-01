@@ -198,6 +198,10 @@ exports.ParserWordXML = class ParserWordXML {
                                 result.text += text;
                                 result.html += html;
                             }
+                            else { // Interpret an empty "w:t" as single space. Not sure if it's correct !!!
+                                result.text += " ";
+                                result.html += " ";
+                            }
                             break;
                         default:
                             if (options && options.errors)
