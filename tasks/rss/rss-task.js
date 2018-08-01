@@ -255,12 +255,14 @@ exports.RssTask = class RssTask extends FileTask {
                                 height: elem.imgMeta.size.height,
                                 caption: elem.imgMeta.name
                             });
-                        content += elem.transcript.replace(/<a\s.*>.*<\/a>/g, ''); // remove links (tags <a>) from transcript
+                        let filtered = elem.transcript.replace(/<a\s.*?>.*?<\/a>/gim, ''); // remove links (tags <a>) from transcript
+                        filtered = filtered.replace(/<b><u>ts:\{.*?\}<\/u><\/b>/gim, ''); // remove time labels
+                        content += filtered;
                         item.custom_elements.push({ 'content:encoded': { _cdata: content } });
                         feed.item(item);
                     });
                     rssXml = { content: feed.xml({ indent: true }) };
-                    rssXml.csContent = rssXml.content.replace(/\s*<lastBuildDate>.*<\/lastBuildDate>/g, ''); // remove <lastBuildDate> tag
+                    rssXml.csContent = rssXml.content.replace(/\s*<lastBuildDate>.*?<\/lastBuildDate>/g, ''); // remove <lastBuildDate> tag
                 }
                 return rssXml;
             });
@@ -381,7 +383,7 @@ exports.RssTask = class RssTask extends FileTask {
                         feed.item(item);
                     });
                     rssXml = { content: feed.xml({ indent: true }) };
-                    rssXml.csContent = rssXml.content.replace(/\s*<lastBuildDate>.*<\/lastBuildDate>/g, ''); // remove <lastBuildDate> tag
+                    rssXml.csContent = rssXml.content.replace(/\s*<lastBuildDate>.*?<\/lastBuildDate>/g, ''); // remove <lastBuildDate> tag
                 }
                 return rssXml;
             });
