@@ -75,7 +75,12 @@ class EpisodeResourceForm extends React.Component {
 
     _getResourceArray() {
         return this.props.resources.map((item) => {
-            return {id: item.id, value: item.Name ? item.Name : item.FileName}
+            let _fileId= item.FileId ? item.FileId : '',
+                _name = item.Name ? item.Name : item.FileName,
+                _separator = ((_fileId !== '') && (_name !== '')) ? ' : ' : '',
+                _title = _fileId + _separator + _name;
+
+            return {id: item.id, value: _title}
         })
     }
 
