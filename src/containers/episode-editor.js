@@ -77,12 +77,12 @@ class EpisodeEditor extends ObjectEditor {
         }
 
         if (!this.props.fetching && prevProps.fetching) {
-            // this.props.lessonActions.getResources(this.props.lesson.id);
             this._fillFileId()
         }
 
-        if (this.props.isResourcesLoaded && !prevProps.isResourcesLoaded) {
-          // this._fillFileId()
+        if (!this.props.isResourcesLoaded && prevProps.isResourcesLoaded) {
+            this.props.lessonActions.getResources(this.props.lesson.id);
+            this._fillFileId()
         }
     }
 
