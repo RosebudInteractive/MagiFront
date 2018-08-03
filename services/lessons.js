@@ -3,9 +3,9 @@ let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
 
-    app.get('/api/adm/lessons/:id/:courseId', (req, res, next) => {
+    app.get('/api/adm/lessons/resources/:id', (req, res, next) => {
         LessonsService()
-            .get(parseInt(req.params.id), parseInt(req.params.courseId))
+            .getResources(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -14,9 +14,9 @@ function setupLessons(app) {
             });
     });
 
-    app.get('/api/adm/lessons/resources/:id', (req, res, next) => {
+    app.get('/api/adm/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
-            .getResources(parseInt(req.params.id))
+            .get(parseInt(req.params.id), parseInt(req.params.courseId))
             .then(rows => {
                 res.send(rows);
             })
