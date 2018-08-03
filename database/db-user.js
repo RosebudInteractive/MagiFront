@@ -592,7 +592,7 @@ const DbUser = class DbUser extends DbObject {
                             else
                                 if (res.message) {
                                     let message = res.message;
-                                    let parsed = res.message.match(/.*duplicate.*u_Idx_Bookmark_UserId_.*/ig);
+                                    let parsed = res.message.match(/.*?duplicate.*?u_Idx_Bookmark_UserId_.*/ig);
                                     if (parsed) {
                                         message = `Duplicate course "/${courseUrl}" bookmark has been ignored.`;
                                         if (isLessonBookmark)
