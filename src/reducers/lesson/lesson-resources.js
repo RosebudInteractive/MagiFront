@@ -20,6 +20,8 @@ import {
     GET_LESSON_RESOURCES_SUCCESS,
 } from '../../constants/lesson/singleLesson';
 
+import {IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_FAIL} from "../../constants/episode/singleEpisode";
+
 import * as tools from '../tools';
 
 const initialState = {
@@ -85,7 +87,6 @@ export default function lessonResources(state = initialState, action) {
                     fetching: false,
                 }
             }
-
         }
 
         case GET_LESSON_RESOURCES_SUCCESS: {
@@ -204,6 +205,14 @@ export default function lessonResources(state = initialState, action) {
                 ...state,
                 initial: [...state.current],
                 hasChanges: false,
+            }
+        }
+
+        case IMPORT_EPISODE_SUCCESS:
+        case IMPORT_EPISODE_FAIL: {
+            return {
+                ...state,
+                loaded: false,
             }
         }
 
