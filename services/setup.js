@@ -30,8 +30,8 @@ const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
 
 function errorHandler(err, req, res, next) {
-    console.error("setup::errorHandler ==> " + err.toString());
-    res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
+    console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
+    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message ? err.message : err.toString() });
 }
 
 function setupAPI(express, app) {
