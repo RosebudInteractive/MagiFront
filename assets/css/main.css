@@ -4706,7 +4706,7 @@ li.fancybox-thumbs-loading {
 ul.user-tooltip {
   position: absolute;
   right: 0;
-  top: 100%;
+  top: calc(100% + 6px);
   display: block;
   margin: 0;
   -webkit-box-sizing: border-box;

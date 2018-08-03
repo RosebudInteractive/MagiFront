@@ -30,7 +30,6 @@ class ProfilePage extends React.Component {
     componentWillMount() {
         this.props.getUserProfile();
         this.props.pageHeaderActions.setCurrentPage(pages.profile);
-
     }
 
     componentWillReceiveProps(nextProps) {
@@ -55,7 +54,6 @@ class ProfilePage extends React.Component {
 
     componentDidUpdate() {
         document.title = 'Магистерия: Личный кабинет';
-        this.props.appActions.hideUserBlock();
     }
 
     _openHistory() {
@@ -120,6 +118,7 @@ function mapStateToProps(state, ownProps) {
         loading: loadingSelector(state),
         error: errorSelector(state),
         user: state.user.user,
+        pageHeaderState: state.pageHeader,
         page: ownProps.match.path,
     }
 }

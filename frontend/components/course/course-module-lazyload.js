@@ -1,10 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import InfoBlock from './info-block';
 import {ImageSize, getCoverPath} from '../../tools/page-tools';
+import { lazyload } from 'react-lazyload';
 
-export default class CourseModule extends React.Component {
+@lazyload({
+    height: 200,
+    once: true,
+    offset: 100,
+    unmountIfInvisible: true,
+})
+export default class CourseModuleLazyload extends React.Component {
 
     render() {
         let {course, isMobile} = this.props,
@@ -25,6 +33,11 @@ export default class CourseModule extends React.Component {
         );
     }
 }
+
+CourseModuleLazyload.propTypes = {
+    course: PropTypes.object,
+    isMobile: PropTypes.bool,
+};
 
 
 class ImageBlock extends React.Component {

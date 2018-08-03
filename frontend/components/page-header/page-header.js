@@ -9,12 +9,14 @@ import TranscriptMenu from '../lesson-page/lesson-transcript-menu';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import * as appActions from "../../actions/app-actions";
-import {pages} from "../../tools/page-tools";
+import {pages, widthLessThan900} from "../../tools/page-tools";
 import $ from "jquery";
 
 class Header extends React.Component {
     constructor(props) {
         super(props);
+
+        this._width = window.innerWidth;
     }
 
     componentDidUpdate() {
@@ -23,9 +25,15 @@ class Header extends React.Component {
             this.props.pageHeaderActions.hideFiltersForm()
         }
 
-        if ((window.innerWidth < 900) && !this.props.showUserBlock) {
+        if (widthLessThan900() && !this.props.showUserBlock) {
             this.props.appActions.showUserBlock()
         }
+
+        if ((this._width < 900) && !widthLessThan900()) {
+            this.props.appActions.hideUserBlock()
+        }
+
+        this._width = window.innerWidth;
     }
 
     _onClickMenuTrigger() {
@@ -110,6 +118,7 @@ function mapStateToProps(state, ownProps) {
         lessons: state.lessons,
         authorized: !!state.user.user,
         isMobileApp: state.app.isMobileApp,
+        showUserBlock: state.app.showUserBlock,
         ownProps,
     }
 }

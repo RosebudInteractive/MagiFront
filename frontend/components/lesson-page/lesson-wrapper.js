@@ -12,8 +12,6 @@ import Platform from 'platform';
 const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
     _isAndroid = Platform.os.family === "Android";
 
-console.log(Platform)
-
 function _getHeight() {
     return (_isSafariOnIPad || _isAndroid) ? $(window).outerHeight() : $(window).innerHeight();
 }
@@ -47,8 +45,6 @@ export default class Wrapper extends React.Component {
             $('.lesson-wrapper').css('height', this._height).css('width', this._width);
         }
     }
-
-
 
     componentDidMount() {
         $('body').css('position', 'fixed');

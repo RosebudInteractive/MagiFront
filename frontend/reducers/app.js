@@ -35,7 +35,7 @@ export default function app(state = initialState, action) {
             return {...state, showUserBlock: true};
 
         case HIDE_USER_BLOCK:
-                    return {...state, showUserBlock: false};
+            return {...state, showUserBlock: false};
 
 
         case SWITCH_SIZE_TO:
