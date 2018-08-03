@@ -38,7 +38,7 @@ class LessonPlayBlockSmall extends React.Component {
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _playedPart = (totalDuration && !_isFinished) ? ((_currentTime) / totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
