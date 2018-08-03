@@ -115,9 +115,6 @@ export const uploadPackage = (object) => {
         fetch('/import',
             {
                 method: 'POST',
-                // headers: {
-                //     "Content-type": "application/json"
-                // },
                 body: data,
                 credentials: 'include'
             })

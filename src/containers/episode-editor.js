@@ -75,6 +75,27 @@ class EpisodeEditor extends ObjectEditor {
         if (this.props.isWorkshop && !prevProps.isWorkshop) {
             this._openWorkshop()
         }
+
+        if (!this.props.fetching && prevProps.fetching) {
+            // this.props.lessonActions.getResources(this.props.lesson.id);
+            this._fillFileId()
+        }
+
+        if (this.props.isResourcesLoaded && !prevProps.isResourcesLoaded) {
+          // this._fillFileId()
+        }
+    }
+
+    _fillFileId() {
+        let {content, resources} = this.props;
+
+        content.forEach((item) => {
+            let _resource = resources.find((resource) => {
+                return resource.Id === item.ResourceId
+            })
+
+            item.FileId = _resource ? _resource.FileId : null;
+        })
     }
 
     getObject() {
@@ -539,6 +560,7 @@ function mapStateToProps(state, ownProps) {
         showTocEditor: state.toc.showEditor,
         toc: state.toc.object,
         tocEditMode: state.toc.editMode,
+        isResourcesLoaded : state.lessonResources.loaded,
 
         showResourceEditor: state.content.showEditor,
         contentItem: state.content.object,
@@ -546,6 +568,7 @@ function mapStateToProps(state, ownProps) {
 
         content: state.episodeContent.current,
         selectedContent: state.episodeContent.selected,
+        resources: state.lessonResources.current,
 
         hasChanges: state.singleEpisode.hasChanges || state.episodeToc.hasChanges || state.episodeContent.hasChanges,
 

@@ -49,12 +49,13 @@ class TextBlock extends React.Component {
             });
 
             _text = _text.slice(_re.lastIndex);
-            let _index = _text.search(/^<h2>/gim);
+            let _index = _text.search(/<h2>/gim);
             let _content = '';
 
             if (_index > -1) {
                 // _content = _text.substr(0, _index)
                 _content = _text.slice(0, _index)
+                _text = _text.slice(_index)
             } else {
                 _content = _text
             }

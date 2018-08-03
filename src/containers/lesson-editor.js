@@ -265,6 +265,7 @@ export class LessonEditor extends ObjectEditor {
                 Name: resource.Name,
                 MetaData: resource.MetaData,
                 ResType: resource.ResType,
+                AltAttribute: resource.AltAttribute,
             })
         });
     }
