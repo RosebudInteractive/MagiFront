@@ -9493,9 +9493,6 @@ ul.lectures-tab {
     display: flex;
     margin: 0 auto;
     padding: 0 8.333333%; }
-    @media (max-width: 1399px) {
-      .lecture-full__wrapper {
-        padding: 0 52px; } }
     @media (max-width: 899px) {
       .lecture-full__wrapper {
         padding: 0 36px; } }
