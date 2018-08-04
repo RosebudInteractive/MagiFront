@@ -10,6 +10,7 @@ import {
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../actions/lesson-info-storage-actions";
 import Item from "./lesson-item";
+import Message from "./favourites-message";
 
 const _pagingSize = 10;
 
@@ -63,7 +64,7 @@ class LessonsBlock extends React.Component {
                                isFavorite={this._isLessonInBookmarks(_item)}/>)
         }
 
-        return _result
+        return (_result.length > 0) ? _result : <Message/>
     }
 
     _getMoreBookmarks() {
