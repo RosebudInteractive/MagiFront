@@ -7,9 +7,9 @@ export default class Message extends React.Component {
         return (
             <div className="favourites__message">
                 <b>Тут пока пусто</b>
-                <p>Вы можете отмечать курсы или лекции <i>символом закладки</i>;
+                <p>Вы можете отмечать курсы или лекции <i>символом закладки</i>&nbsp;
                     <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _redFlag}}/>
-                    {/*<br>и они всегда будут доступны из этого раздела.</br>*/}
+                    <br/>и&nbsp;они всегда будут доступны из&nbsp;этого раздела.
                 </p>
             </div>
         )

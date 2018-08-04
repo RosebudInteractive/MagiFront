@@ -19,15 +19,16 @@ export default class Item extends React.Component {
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>';
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>';
 
         let {item, isFavorite} = this.props;
 
         return (
             <div className="history-item">
                 <div className="history-item__date-block">
-                    <span className="favorites active" onClick={::this._favoritesClick}>
-                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ? _redFlag : _flag}}/>
+                    <span className={"favorites" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
+                    {/*<span className={"fav" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>*/}
+                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ?_redFlag : _flag}}/>
                     </span>
                     {
                         item.isSubLesson ?

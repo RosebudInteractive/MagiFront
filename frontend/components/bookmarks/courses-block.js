@@ -11,6 +11,7 @@ import {
 } from '../../ducks/profile'
 import {bindActionCreators} from "redux";
 import Item from "./course-item";
+import Message from "./favourites-message";
 
 class LessonsBlock extends React.Component {
 
@@ -44,7 +45,7 @@ class LessonsBlock extends React.Component {
                 return <Item item={item} key={index} onRemoveItem={::this._favoritesClick}
                              isFavorite={this._isCourseInBookmarks(item)}/>
             }) :
-            null
+            <Message/>
     }
 
     render() {

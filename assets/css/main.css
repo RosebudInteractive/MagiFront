@@ -12815,6 +12815,23 @@ ul.lectures-tab {
     .favourites {
       background-image: none;
       border-bottom: none; } }
+  .favourites__message {
+    margin: 98px auto;
+    max-width: 280px;
+    text-align: center; }
+    .favourites__message b {
+      margin: 0;
+      font-family: "Fira Sans", Arial, sans-serif;
+      font-weight: 600;
+      font-size: 17px;
+      line-height: 23px; }
+    .favourites__message p {
+      margin: 0;
+      font-size: 17px;
+      line-height: 23px; }
+    .favourites__message svg {
+      display: inline-block;
+      vertical-align: middle; }
 
 .fav-card {
   -webkit-box-flex: 0;
@@ -13455,8 +13472,12 @@ ul.lectures-tab {
   .history-item__date-block .favorites {
     right: 20px;
     position: absolute;
+    opacity: 0.2;
     top: 63px;
     cursor: pointer; }
+  .history-item__date-block .favorites.active {
+    opacity: 1;
+  }
   @media (max-width: 899px) {
     .history-item__date-block .favorites {
       top: 39px; } }
