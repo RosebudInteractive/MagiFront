@@ -172,8 +172,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("ShortDescription", { type: "string", allowNull: false })
             .addField("FullDescription", { type: "string", allowNull: true })
+            .addField("SnPost", { type: "string", allowNull: true })
+            .addField("SnName", { type: "string", allowNull: true })
+            .addField("SnDescription", { type: "string", allowNull: true })
             .addField("Duration", { type: "int", allowNull: true })
             .addField("DurationFmt", { type: "string", length: 15, allowNull: true });
+
+        metaDataMgr.addModel("LessonMetaImage", "0eba67e3-ff9f-4c81-87f4-72e95816bc05", "LessonRootMetaImage", "84ba5f1d-29d6-49f7-9884-03171320957d")
+            .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
+            .addField("Type", { type: "string", length: 50, allowNull: false })
+            .addField("ResourceId", { type: "dataRef", model: "Resource", refAction: "parentRestrict", allowNull: false });
         
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })

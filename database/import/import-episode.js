@@ -42,14 +42,38 @@ const GET_EPISODE_DURATION_MYSQL =
     "  join`EpisodeLng` el on el.`EpisodeId` = e.`Id`\n" +
     "where e.`Id` = <%= idEpisode %>";
 
-const RESOURCE_EXP = {
+const LESSON_REQ_TREE = {
     expr: {
         model: {
-            name: "Resource",
+            name: "Lesson",
             childs: [
                 {
                     dataObject: {
-                        name: "ResourceLng"
+                        name: "LessonLng",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "Reference"
+                                }
+                            },
+                            {
+                                dataObject: {
+                                    name: "LessonMetaImage"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    dataObject: {
+                        name: "Resource",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "ResourceLng"
+                                }
+                            }
+                        ]
                     }
                 }
             ]
@@ -58,6 +82,21 @@ const RESOURCE_EXP = {
 };
 
 const { Import } = require('../../const/common');
+
+const GEN_TABLE_TITLE = /описание\s*на\s*сайте/gi;
+const CONTENT_TABLE_TITLE = /главы/gi;
+const REF_TABLE_TITLE = /материалы/gi;
+
+const SN_POST_TITLE = /текст\s*для\s*постинга/gi;
+const SN_NAME_TITLE = /заголовок\s*для\s*сс/gi;
+const SN_DESC_TITLE = /описание\s*для\s*сс/gi;
+
+const FB_IMG_ID = "fb";
+const TW_IMG_ID = "tw";
+
+function getCellText(cell) {
+    return cell.content.text.trim();
+}
 
 exports.ImportEpisode = class ImportEpisode {
     constructor() {
@@ -73,6 +112,10 @@ exports.ImportEpisode = class ImportEpisode {
         let self = this;
         let edtOptions = { dbRoots: [] };
         let root_obj = null;
+        let lesson_obj = null;
+        let image_root = null;
+        let references = null;
+        let refs_root = null;
 
         return new Promise((resolve) => {
             idLesson = parseInt(opts.idLesson);
@@ -87,8 +130,10 @@ exports.ImportEpisode = class ImportEpisode {
             let parser = new ParserWordXML();
             resolve(parser.parseDocXMLFile(fileName));
         })
-            .then((docData) => this._compileTable(docData, opts))
-            .then((data) => {
+            .then((docData) => this._compileTables(docData, opts))
+            .then((resData) => {
+                let data = resData.Content;
+                references = resData.References;
                 let episode = { Transcript: data.html, Toc: [], Content: [] };
                 let result = episode;
                 if (data.toc.length > 0) {
@@ -100,7 +145,7 @@ exports.ImportEpisode = class ImportEpisode {
                         });
                     })
                 }
-                if (data.picts.length > 0) {
+                if (resData.General || (data.picts.length > 0)) {
                     let duration;
                     result = $data.execSql({
                         dialect: {
@@ -117,10 +162,9 @@ exports.ImportEpisode = class ImportEpisode {
                                 return new MemDbPromise(self._db, (resolve, reject) => {
                                     var predicate = new Predicate(self._db, {});
                                     predicate
-                                        .addCondition({ field: "ResType", op: "=", value: "P" })
-                                        .addCondition({ field: "LessonId", op: "=", value: idLesson });
+                                        .addCondition({ field: "Id", op: "=", value: idLesson });
 
-                                    let exp_filtered = Object.assign({}, RESOURCE_EXP);
+                                    let exp_filtered = Object.assign({}, LESSON_REQ_TREE);
                                     exp_filtered.expr.predicate = predicate.serialize(true);
                                     self._db._deleteRoot(predicate.getRoot());
 
@@ -136,27 +180,35 @@ exports.ImportEpisode = class ImportEpisode {
                                             throw new Error("ImportEpisode::importEpisode: Invalid result of \"getData\": " + JSON.stringify(result));
 
                                         edtOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                        let col = root_obj.getCol("DataElements");
+                                        if (col.count() !== 1)
+                                            throw new Error(`Lesson (Id = ${idLesson}) doesn't exist.`);
+                                        lesson_obj = col.get(0);
                                         return root_obj.edit();
                                     })
                                     .then(() => {
                                         let picts = {};
-                                        let collection = root_obj.getCol("DataElements");
+                                        let images = [];
+                                        let collection = lesson_obj.getDataRoot("Resource").getCol("DataElements");
                                         for (let i = 0; i < collection.count(); i++) {
                                             let resObj = collection.get(i);
-                                            let lngCollection = resObj.getDataRoot("ResourceLng").getCol("DataElements");
-                                            if (lngCollection && (lngCollection.count() === 1)) {
-                                                let elem = lngCollection.get(0);
-                                                try {
-                                                    if (elem.metaData()) {
-                                                        let meta = JSON.parse(elem.metaData());
-                                                        if (meta.fileId)
-                                                            picts[meta.fileId] = { id: resObj.id(), obj: elem, meta: meta, isUpdated: false };
-                                                    }
-                                                } catch (err) { };
+                                            if (resObj.resType() === "P") {
+                                                let lngCollection = resObj.getDataRoot("ResourceLng").getCol("DataElements");
+                                                if (lngCollection && (lngCollection.count() === 1)) {
+                                                    let elem = lngCollection.get(0);
+                                                    try {
+                                                        if (elem.metaData()) {
+                                                            let meta = JSON.parse(elem.metaData());
+                                                            if (meta.fileId)
+                                                                picts[meta.fileId] = { id: resObj.id(), obj: elem, meta: meta, isUpdated: false };
+                                                        }
+                                                    } catch (err) { };
+                                                }
                                             }
                                         }
                                         let content = episode.Content;
-                                        data.picts[data.picts.length - 1].duration = duration * 1000 - data.picts[data.picts.length - 1].ts;
+                                        if (data.picts.length > 0)
+                                            data.picts[data.picts.length - 1].duration = duration * 1000 - data.picts[data.picts.length - 1].ts;
                                         data.picts.forEach((elem) => {
                                             elem.files.forEach((file) => {
                                                 let item = { CompType: "PIC" };
@@ -200,9 +252,68 @@ exports.ImportEpisode = class ImportEpisode {
                                             })
                                         });
 
+                                        let col = lesson_obj.getDataRoot("LessonLng").getCol("DataElements");
+                                        if (col.count() !== 1)
+                                            throw new Error(`Inconsistent "LessonLng" part of lesson (Id = ${idLesson}).`);
+                                        let lessonLng = col.get(0);
+
+                                        if (references) {
+                                            refs_root = lessonLng.getDataRoot("Reference");
+                                            col = refs_root.getCol("DataElements");
+                                            while (col.count() > 0)
+                                                col._del(col.get(0));
+                                        }
+
+                                        if (resData.General) {
+                                            lessonLng.shortDescription(resData.General.shortDescription);
+                                            lessonLng.snPost(resData.General.snPost);
+                                            lessonLng.snName(resData.General.snName);
+                                            lessonLng.snDescription(resData.General.snDescription);
+
+                                            image_root = lessonLng.getDataRoot("LessonMetaImage");
+                                            col = image_root.getCol("DataElements");
+                                            while (col.count() > 0)
+                                                col._del(col.get(0));
+
+                                            [{ id: FB_IMG_ID, tp: "og" }, { id: TW_IMG_ID, tp: "twitter" }].forEach((elem) => {
+                                                let img = picts[elem.id];
+                                                if (img) {
+                                                    images.push({ Type: elem.tp, ResourceId: img.id });
+                                                }
+                                            });
+                                        }
+
                                         if (opts.importErrors.length > 0)
                                             throw new Error(`There are errors.`);
 
+                                        return images;
+                                    })
+                                    .then((images) => {
+                                        if (images.length > 0) {
+                                            return Utils.seqExec(images, (elem) => {
+                                                return image_root.newObject({
+                                                    fields: elem
+                                                }, {})                                            })
+                                        }
+                                    })
+                                    .then(() => {
+                                        if (references && (references.length > 0)) {
+                                            let num = 0;
+                                            return Utils.seqExec(references, (elem) => {
+                                                let fields = {
+                                                    Number: ++num,
+                                                    Description: elem.text,
+                                                    Recommended: false
+                                                }
+                                                if (elem.url)
+                                                    fields.URL = elem.url;
+                                                return refs_root.newObject({
+                                                    fields: fields
+                                                }, {})
+                                            })
+                                        }
+                                    })
+                                    .then(() => {
                                         return root_obj.save();
                                     })
                                     .then(() => {
@@ -224,7 +335,75 @@ exports.ImportEpisode = class ImportEpisode {
             });
     }
 
-    _compileTable(docData, options) {
+    _compileTables(docData, options) {
+        let rc = { General: null, Content: null, References: null };
+        docData.Tables.forEach((tbl) => {
+            if ((tbl.rows.length > 1) && (tbl.rows[0].cells.length > 0)) {
+                let title = getCellText(tbl.rows[0].cells[0]);
+                docData.Rows = tbl.rows;
+                if (title.match(GEN_TABLE_TITLE)) {
+                    rc.General = this._compileGeneralTable(docData, options);
+                }
+                else
+                    if (title.match(CONTENT_TABLE_TITLE)) {
+                        rc.Content = this._compileContentTable(docData, options);
+                    }
+                    else
+                        if (title.match(REF_TABLE_TITLE)) {
+                            rc.References = this._compileRefTable(docData, options);
+                        }
+            }
+        })
+        if (!rc.Content)
+            throw new Error("Missing episode content table in the import file.")
+        return rc;
+    }
+
+    _compileRefTable(docData, options) {
+        let rc = [];
+        let isFirst = true;
+        docData.Rows.forEach((row) => {
+            if ((!isFirst) && (row.cells.length > 0)) {
+                let item = getCellText(row.cells[0]);
+                let match = item.match(/(.*?)\[(.*?)\]/i);
+                if (match && (match.length === 3))
+                    item = { text: match[1].trim(), url: match[2].trim() }
+                else
+                    item = { text: item };
+                rc.push(item);
+            }
+            isFirst = false;
+        })
+        return rc;
+    }
+
+    _compileGeneralTable(docData, options) {
+        let rc = {
+            shortDescription: null,
+            snPost: null,
+            snName: null,
+            snDescription: null
+        };
+        docData.Rows.forEach((row) => {
+            if (row.cells.length > 1) {
+                let title = getCellText(row.cells[0]);
+                if (title.match(GEN_TABLE_TITLE))
+                    rc.shortDescription = getCellText(row.cells[1])
+                else
+                    if (title.match(SN_POST_TITLE))
+                        rc.snPost = getCellText(row.cells[1])
+                    else
+                        if (title.match(SN_NAME_TITLE))
+                            rc.snName = getCellText(row.cells[1])
+                        else
+                            if (title.match(SN_DESC_TITLE))
+                                rc.snDescription = getCellText(row.cells[1])
+            }            
+        })
+        return rc;
+    }
+
+    _compileContentTable(docData, options) {
         let text = "";
         let html = "";
         let listType = null;
@@ -233,10 +412,6 @@ exports.ImportEpisode = class ImportEpisode {
         let picts = [];
         let lastHeader = null;
         let isInParagraph = false;
-
-        function getCellText(cell) {
-            return cell.content.text.trim();
-        }
 
         function parseFiles(cell, rowNum, colNum) {
             let fileList = getCellText(cell);

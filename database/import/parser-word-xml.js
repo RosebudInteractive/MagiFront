@@ -25,8 +25,14 @@ exports.ParserWordXML = class ParserWordXML {
             opts.Numbering = this._parseNumbering(this._findFirst("w:numbering", json), opts);
             opts.Refs = this._parseRefs(json, opts);
             opts.FootNotes = this._parseFootNotes(this._findFirst("w:footnotes", json), opts);
-            let tbl = this._parseTable(this._findFirst("w:tbl", json), opts);
-            resolve({ Rows: tbl.rows, Numbering: opts.Numbering, Refs: opts.Refs, FootNotes: opts.FootNotes});
+            let tblNodes = [];
+            this._findAll("w:tbl", json, tblNodes, true);
+            let tables = [];
+            tblNodes.forEach((node)=>{
+                let tbl = this._parseTable(node, opts);
+                tables.push(tbl);
+            })
+            resolve({ Tables: tables, Numbering: opts.Numbering, Refs: opts.Refs, FootNotes: opts.FootNotes});
         });
     }
 
