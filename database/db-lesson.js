@@ -33,6 +33,11 @@ const LESSON_REQ_TREE = {
                                 dataObject: {
                                     name: "Reference"
                                 }
+                            },
+                            {
+                                dataObject: {
+                                    name: "LessonMetaImage"
+                                }
                             }
                         ]
                     }
@@ -76,6 +81,11 @@ const LESSON_UPD_TREE = {
                             {
                                 dataObject: {
                                     name: "Reference"
+                                }
+                            },
+                            {
+                                dataObject: {
+                                    name: "LessonMetaImage"
                                 }
                             }
                         ]
@@ -192,6 +202,11 @@ const LESSON_MSSQL_RESOURCE_REQ =
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
 
+const LESSON_MSSQL_IMG_REQ =
+    "select i.[Id], i.[Type], i.[ResourceId] from [LessonMetaImage] i\n" +
+    "  join [LessonLng] l on l.[Id] = i.[LessonLngId]\n" +
+    "where l.[LessonId] = <%= id %>";
+
 const LESSON_MSSQL_TOC_REQ =
     "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
     "  join[EpisodeTocLng] l on l.[EpisodeTocId] = t.[Id]\n" +
@@ -301,6 +316,11 @@ const LESSON_MYSQL_RESOURCE_REQ =
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
+
+const LESSON_MYSQL_IMG_REQ =
+    "select i.`Id`, i.`Type`, i.`ResourceId` from `LessonMetaImage` i\n" +
+    "  join `LessonLng` l on l.`Id` = i.`LessonLngId`\n" +
+    "where l.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_TOC_REQ =
     "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
@@ -596,6 +616,21 @@ const DbLesson = class DbLesson extends DbObject {
                                 });
                             }
                             lesson.Resources = resources;
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(LESSON_MYSQL_IMG_REQ)({ id: id }),
+                                    mssql: _.template(LESSON_MSSQL_IMG_REQ)({ id: id })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (!isNotFound) {
+                            let images = [];
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                images = result.detail;
+                            }
+                            lesson.Images = images;
                         }
                         return lesson;
                     })
@@ -1316,17 +1351,20 @@ const DbLesson = class DbLesson extends DbObject {
             let root_ch;
             let root_res;
             let root_ref;
+            let root_img;
             let root_epi;
             let ch_collection;
             let ch_own_collection;
             let res_collection;
             let ref_collection;
+            let img_collection;
             let epi_collection;
             let epi_own_collection;
             let languageId;
             let ch_list = {};
             let res_list = {};
             let ref_list = {};
+            let img_list = {};
             let epi_list = {};
             let opts = {};
             let inpFields = data || {};
@@ -1334,6 +1372,7 @@ const DbLesson = class DbLesson extends DbObject {
             let ch_new = [];
             let res_new = [];
             let ref_new = [];
+            let img_new = [];
             let epi_new = [];
 
             let needToDeleteOwn = false;
@@ -1386,6 +1425,8 @@ const DbLesson = class DbLesson extends DbObject {
                         res_collection = root_res.getCol("DataElements");
                         root_ref = lsn_lng_obj.getDataRoot("Reference");
                         ref_collection = root_ref.getCol("DataElements");
+                        root_img = lsn_lng_obj.getDataRoot("LessonMetaImage");
+                        img_collection = root_img.getCol("DataElements");
                         root_epi = lsn_obj.getDataRoot("EpisodeLesson");
                         epi_collection = root_epi.getCol("DataElements");
                         epi_own_collection = lsn_obj.getDataRoot("Episode").getCol("DataElements");
@@ -1505,6 +1546,33 @@ const DbLesson = class DbLesson extends DbObject {
                             })
                         }
 
+                        if (inpFields.Images && (typeof (inpFields.Images.length) === "number")) {
+                            for (let i = 0; i < img_collection.count(); i++) {
+                                let obj = img_collection.get(i);
+                                img_list[obj.id()] = { deleted: true, obj: obj };
+                            }
+
+                            inpFields.Images.forEach((elem) => {
+                                let data = {
+                                    Type: elem.Type,
+                                    ResourceId: elem.ResourceId
+                                };
+                                if (typeof (elem.Id) === "number") {
+                                    if (img_list[elem.Id]) {
+                                        img_list[elem.Id].deleted = false;
+                                        img_list[elem.Id].data = data;
+                                    }
+                                    else {
+                                        //throw new Error("Unknown reference item (Id = " + elem.Id + ").");
+                                        delete elem.Id;
+                                        img_new.push(data);
+                                    }
+                                }
+                                else
+                                    img_new.push(data);
+                            })
+                        }
+
                         if (inpFields.Episodes && (typeof (inpFields.Episodes.length) === "number")) {
                             for (let i = 0; i < epi_collection.count(); i++) {
                                 let obj = epi_collection.get(i);
@@ -1566,6 +1634,12 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_lng_obj.shortDescription(inpFields["ShortDescription"]);
                         if (typeof (inpFields["FullDescription"]) !== "undefined")
                             lsn_lng_obj.fullDescription(inpFields["FullDescription"]);
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            lsn_lng_obj.snPost(inpFields["SnPost"]);
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            lsn_lng_obj.snName(inpFields["SnName"]);
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            lsn_lng_obj.snDescription(inpFields["SnDescription"]);
 
                         if (typeof (inpFields["State"]) !== "undefined") {
                             ls_course_obj.state(inpFields["State"]);
@@ -1604,6 +1678,14 @@ const DbLesson = class DbLesson extends DbObject {
                                     ref_list[key].obj[self._genGetterName(field)](ref_list[key].data[field]);    
                             }
                         
+                        for (let key in img_list)
+                            if (img_list[key].deleted)
+                                img_collection._del(img_list[key].obj)
+                            else {
+                                for (let field in img_list[key].data)
+                                    img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
+                            }
+
                         for (let key in epi_list)
                             if (epi_list[key].deleted) {
                                 if (epi_list[key].isOwner)
@@ -1645,6 +1727,15 @@ const DbLesson = class DbLesson extends DbObject {
                         if (ref_new && (ref_new.length > 0)) {
                             return Utils.seqExec(ref_new, (elem) => {
                                 return root_ref.newObject({
+                                    fields: elem
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        if (img_new && (img_new.length > 0)) {
+                            return Utils.seqExec(img_new, (elem) => {
+                                return root_img.newObject({
                                     fields: elem
                                 }, opts);
                             });
@@ -1749,7 +1840,6 @@ const DbLesson = class DbLesson extends DbObject {
             let inpFields = data || {};
             let transactionId = null;
             let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
-            let isDurationChanged = false;
             let languageId;
 
             resolve(
@@ -1813,7 +1903,7 @@ const DbLesson = class DbLesson extends DbObject {
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("LessonLng");
 
-                        let fields = { LanguageId: languageId };
+                        let fields = { LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1822,6 +1912,12 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["ShortDescription"] = inpFields["ShortDescription"];
                         if (typeof (inpFields["FullDescription"]) !== "undefined")
                             fields["FullDescription"] = inpFields["FullDescription"];
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            fields["SnPost"] = inpFields["SnPost"];
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            fields["SnName"] = inpFields["SnName"];
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            fields["SnDescription"] = inpFields["SnDescription"];
 
                         return root_lng.newObject({
                             fields: fields
@@ -1877,9 +1973,23 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
-                        let root_res = new_lng_obj.getDataRoot("Resource");
+                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
+                        if (inpFields.Images && (inpFields.Images.length > 0)) {
+                            return Utils.seqExec(inpFields.Images, (elem) => {
+                                let fields = {};
+                                if (typeof (elem["Type"]) !== "undefined")
+                                    fields["Type"] = elem["Type"];
+                                if (typeof (elem["ResourceId"]) !== "undefined")
+                                    fields["ResourceId"] = elem["ResourceId"];
+                                return root_img.newObject({
+                                    fields: fields
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        let root_res = new_obj.getDataRoot("Resource");
                         if (inpFields.Resources && (inpFields.Resources.length > 0)) {
-                            isDurationChanged = true;
                             return Utils.seqExec(inpFields.Resources, (elem) => {
                                 let fields = { ResType: "P" };
                                 if (typeof (elem["ResType"]) !== "undefined")
@@ -1894,7 +2004,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     fields: fields
                                 }, opts)
                                     .then((result) => {
-                                        new_res_obj = this._db.getObj(result.newObject);
+                                        let new_res_obj = this._db.getObj(result.newObject);
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
                                         let fields = { Name: "", LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
@@ -1962,10 +2072,6 @@ const DbLesson = class DbLesson extends DbObject {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
                                 return root_obj.save(opts);
-                            })
-                            .then(() => {
-                                if (isDurationChanged)
-                                    this._updateLessonDuration(newId, opts);
                             })
                             .then(() => {
                                 return course_obj.save(opts);
