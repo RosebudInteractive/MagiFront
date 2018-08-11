@@ -57,6 +57,10 @@ export default class CWorkShop extends CWSBase {
         this._tracksWidget = new CWSTracks(this._tracksContainer, this._getTracksOptions());
         this._playerWidget = new CWSPlayer(this._playerContainer, this._getPlayerOptions());
 
+        this._titles = $(CWorkShop.template("sub-titles"));
+        this._playerContainer.parent().append(this._titles);
+        this._titles.hide();
+
         this._setEvents();
 
         this._readData();
@@ -415,13 +419,36 @@ export default class CWorkShop extends CWSBase {
                 if (that._options.tracks.onAddElement)
                     that._options.tracks.onAddElement(e);
                 that._tracksWidget.render();
+            },
+            onChangeTitles: function (e) {
+                that._renderTitles(e);
             }
         };
     }
 
+    _renderTitles(titles) {
+        let _title = '',
+            _subTitle = '';
+
+        titles.forEach((item) => {
+            if (item.title) {
+                if (_title !== "") _title += "\n";
+                _title += item.title ? item.title : '';
+
+                if (_subTitle !== "") _subTitle += "\n";
+                _subTitle += item.title2 ? item.title2 : '';
+            }
+        });
+
+        this._titles.find(".ws-player-title").text(_title);
+        this._titles.find(".ws-player-subtitle").text(_subTitle);
+
+        if (_title !== "" || _subTitle !== "") this._titles.show();
+        else this._titles.hide();
+    }
+
     _renderPropEditor(elId) {
         let data = this._tracksWidget.getElementData(elId);
-        // console.log(data);
 
         if (this._propeditorWidget) {
             this._propeditorWidget.destroy();

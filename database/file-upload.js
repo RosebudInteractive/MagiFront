@@ -6,6 +6,8 @@ const path = require('path');
 const config = require('config');
 const fs = require('fs');
 const mime = require('mime');
+const _ = require('lodash');
+const { slugify } = require('transliteration');
 
 const sharp = require('sharp');
 //const sizeOf = require('image-size');
@@ -25,10 +27,10 @@ const icon_sz = 150;
 const HTTP_OK = 200;
 const HTTP_SERVER_ERR = 500;
 
-function processOther(file_name, mime_type, size, dir, dir_suffix, files, all_files) {
+function processOther(file_name, mime_type, size, dir, dir_suffix, files, all_files, extInfo) {
 
     return new Promise((resolve, reject) => {
-        let file_info = { "mime-type": mime_type };
+        let file_info = Object.assign({ "mime-type": mime_type }, extInfo);
         let file_desc = { file: dir_suffix + file_name, info: file_info };
         let full_dir = path.join(dir, dir_suffix);
         let full_name = path.join(full_dir, file_name);
@@ -38,10 +40,10 @@ function processOther(file_name, mime_type, size, dir, dir_suffix, files, all_fi
     });
 }
 
-function processAudio(file_name, mime_type, size, dir, dir_suffix, files, all_files) {
+function processAudio(file_name, mime_type, size, dir, dir_suffix, files, all_files, extInfo) {
 
     return new Promise((resolve, reject) => {
-        let file_info = { "mime-type": mime_type, filesize: size };
+        let file_info = Object.assign({ "mime-type": mime_type, filesize: size }, extInfo);
         let file_desc = { file: dir_suffix + file_name, info: file_info };
         let full_dir = path.join(dir, dir_suffix);
         let full_name = path.join(full_dir, file_name);
@@ -59,26 +61,21 @@ function processAudio(file_name, mime_type, size, dir, dir_suffix, files, all_fi
     });
 }
 
-function processImage(file_name, mime_type, size, dir, dir_suffix, files, all_files) {
+function processImage(file_name, mime_type, size, dir, dir_suffix, files, all_files, extInfo) {
 
     let file_info;
     let file_desc;
     let full_dir;
     let full_name;
-    let name;
-    let ext;
+    let { name, ext } = path.parse(file_name);
 
     return new Promise((resolve, reject) => {
 
-        file_info = { "mime-type": mime_type, path: dir_suffix, content: {} };
+        file_info = Object.assign({ "mime-type": mime_type, path: dir_suffix, content: {} }, extInfo);
         file_desc = { file: dir_suffix + file_name, info: file_info };
         full_dir = path.join(dir, dir_suffix);
         full_name = path.join(full_dir, file_name);
         all_files.push(full_name);
-
-        let fobj = path.parse(file_name);
-        name = fobj.name;
-        ext = fobj.ext;
 
         resolve(
             sharp(full_name).metadata()
@@ -198,6 +195,21 @@ function getUploadDir(upload_dir) {
     return upload_dir ? path.join(upload_dir, path.sep) : config.get('uploadPath');
 }
 
+function parseFileName(fileName) {
+    const { name, ext } = path.parse(fileName);
+    let res = { file: fileName, info: { name: name } };
+    let comp = name.split('@');
+    if (comp.length > 1) {
+        res.info.name = comp[0];
+        res.info.description = comp[1];
+    }
+
+    let transName = slugify(name, { lowercase: false });
+    if (name !== transName)
+        res.file = transName + ext;
+    return res;
+}
+
 function importImages(srcDir, dstDir) {
     let files = [];
     let all_files = [];
@@ -212,7 +224,8 @@ function importImages(srcDir, dstDir) {
                     return Utils.seqExec(impSettings.courses, (val, key) => {
                         return new Promise((resolve, reject) => {
                             let inFileFn = path.join(srcDir, path.sep, "images", path.sep, val);
-                            let outFileFn = path.join(uploadDir, path.sep, dir_suffix, path.sep, val);
+                            let fileData = parseFileName(val);
+                            let outFileFn = path.join(uploadDir, path.sep, dir_suffix, path.sep, fileData.file);
                             let inStream = fs.createReadStream(inFileFn);
                             let outStream = fs.createWriteStream(outFileFn);
                             inStream.on("error", (err) => { reject(err); });
@@ -221,7 +234,7 @@ function importImages(srcDir, dstDir) {
                                 try {
                                     let mimeType = mime.getType(inFileFn);
                                     resolve(
-                                        processImage(val, mimeType, 0, uploadDir, dir_suffix, files, all_files)
+                                        processImage(fileData.file, mimeType, 0, uploadDir, dir_suffix, files, all_files, fileData.info)
                                         .then(() => {
                                             let desc = files[files.length - 1];
                                             desc.url = key;
@@ -301,8 +314,10 @@ exports.FileUpload = {
                     });
 
                     form.on("fileBegin", (fname, file) => {
-                        const { name, ext } = path.parse(file.name);
-                        file.path = path.join(uploadDir, dir_suffix, `${name}${ext}`);
+                        let fileData = parseFileName(file.name);
+                        file.info = fileData.info;
+                        file.realName = fileData.file;
+                        file.path = path.join(uploadDir, dir_suffix, fileData.file);
                     });
 
                     form.on("file", (fname, file) => {
@@ -310,7 +325,8 @@ exports.FileUpload = {
                         if (types && (types.length > 0)) {
                             let fileProcessFn = fileProcessors[types[0]] ? fileProcessors[types[0]] : processOther;
                             result = result.then(() => {
-                                return fileProcessFn(file.name, file.type, file.size, form.uploadDir, dir_suffix, res_files, all_files);
+                                return fileProcessFn(file.realName ? file.realName : file.name,
+                                    file.type, file.size, form.uploadDir, dir_suffix, res_files, all_files, file.info);
                             });
                             console.info("### Uploaded File: " + JSON.stringify(file.toJSON()));
                         }

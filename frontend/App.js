@@ -11,6 +11,7 @@ import LessonPage from './containers/lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
+import BookmarksPage from './containers/bookmark-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -20,6 +21,8 @@ import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
+import {getUserBookmarks} from "./ducks/profile";
+
 
 import * as Polifyll from './tools/polyfill';
 import {pages} from "./tools/page-tools";
@@ -36,7 +39,7 @@ import Platform from 'platform';
 Polifyll.registry();
 
 let _homePath = '/';
-const _scrollDelta = 80;
+const _globalScrollDelta = 80;
 
 class App extends Component {
 
@@ -92,8 +95,10 @@ class App extends Component {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
-        if (!(_recoveryRout || _errorRout))
+        if (!(_recoveryRout || _errorRout)){
             this.props.userActions.whoAmI()
+            this.props.getUserBookmarks()
+        }
     }
 
     componentDidMount() {
@@ -130,21 +135,33 @@ class App extends Component {
     }
 
     _handleScroll(event) {
-        this._addDevWarn('last : ' + this.state.lastScrollPos + ' top : ' + event.target.scrollingElement.scrollTop)
-
         if (!event.target.scrollingElement) {
             return
         }
 
-        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop)
+        let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
+
+        let _scrollDelta = _bellowScreen ? _globalScrollDelta / 2 : _globalScrollDelta;
+
+        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop);
         if (_delta < _scrollDelta) {
             return
         }
 
-        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
-            this.setState({showHeader : true})
-
+        let _header = $('.page-header._fixed');
+        if (_header && _header.length > 0) {
+            if (_bellowScreen) {
+                _header.css("-webkit-transition", "-webkit-transform 0.2s ease").css("transition", "-webkit-transform 0.2s ease")
+            } else {
+                _header.css("-webkit-transition", "-webkit-transform 0.4s ease").css("transition", "-webkit-transform 0.4s ease")
+            }
         }
+
+        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
+            this.setState({showHeader: true})
+        }
+
+
 
         if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
             this.setState({
@@ -169,6 +186,9 @@ class App extends Component {
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>
                 <Route path={_homePath + 'history'} component={ProfilePage}/>
+                <Route path={_homePath + 'favorites'} component={BookmarksPage}/>
+                <Route path={_homePath + 'favorites/courses'} component={BookmarksPage}/>
+                <Route path={_homePath + 'favorites/lessons'} component={BookmarksPage}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
@@ -221,6 +241,7 @@ function mapDispatchToProps(dispatch) {
         userActions: bindActionCreators(userActions, dispatch),
         playerActions: bindActionCreators(playerActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
     }
 }
 

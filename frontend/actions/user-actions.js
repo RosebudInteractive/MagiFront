@@ -35,7 +35,7 @@ import {
 
 import 'whatwg-fetch';
 
-import {readResponseBody} from '../tools/fetch-tools'
+import {reset} from 'redux-form';
 
 export const showSignInForm = () => {
     return {
@@ -152,6 +152,8 @@ export const login = (values) => {
                     type: SIGN_IN_SUCCESS,
                     payload: data
                 });
+
+                dispatch(reset('SignInForm'));
 
                 dispatch({
                     type: CLOSE_SIGN_IN_FORM,

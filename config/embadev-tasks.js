@@ -18,10 +18,28 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "RSS Generation",
+            module: "./rss",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "5,15,25,35,45,55 * * * * *", // run every 10 sec
+            options: {
+                path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                channels: {
+                    'yandex-zen': {
+                        enabled: true
+                    },
+                    'rss': {
+                        enabled: true
+                    }
+                }
+            }
+        },
+        {
             name: "Sitemap Generation",
             module: "./site-map",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
@@ -38,7 +56,7 @@ let options = {
         }
     ],
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
+    uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
     dataUrl: '/data',
     proxyServer: proxyServer,
     server: {

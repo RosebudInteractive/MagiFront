@@ -32,6 +32,10 @@ export default class LessonInfoStorage {
         this.getInstance()._init().loadLessonsPositions()
     }
 
+    static clear() {
+        store.dispatch(storageActions.clearInitialState());
+    }
+
     static applyLoadedPosition(data) {
         let _map = convertToStorageFormat(data);
 
@@ -72,7 +76,7 @@ export default class LessonInfoStorage {
             }
         } else {
             let _userId = store.getState().user.user.Id;
-            let _jsonObj = localStorage.getItem(_userId);
+            let _jsonObj = localStorage.getItem(_userId.toString());
             let _ts = 0;
 
             if (_jsonObj) {
@@ -87,6 +91,8 @@ export default class LessonInfoStorage {
                 if (_volume !== undefined) {
                     store.dispatch(storageActions.setVolume(_volume))
                 }
+            } else {
+                store.dispatch(storageActions.setInitialState());
             }
 
             store.dispatch(storageActions.loadInitialStateFromDB(_ts))
@@ -172,7 +178,7 @@ export default class LessonInfoStorage {
         if (_playingLessonId) {
             let _value = object.get(_playingLessonId);
 
-            let _pos = Math.round(_value.currentTime * 100) / 100,
+            let _pos = _value ? (Math.round(_value.currentTime  * 100) / 100) : 0,
                 _lessonsMap = _state.lessonInfoStorage.lessons,
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
@@ -183,7 +189,7 @@ export default class LessonInfoStorage {
 
             let _obj = {pos: _pos, dt: _dt}
 
-            if (_value.isFinished !== undefined) {
+            if (_value && (_value.isFinished !== undefined)) {
                 _obj.isFinished = _value.isFinished
             }
 

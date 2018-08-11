@@ -55,7 +55,7 @@ class TranscriptLessonPage extends React.Component {
     }
 
     static _handleScroll() {
-        let _link = $('.link-to-lecture');
+        let _link = $('.link-to-lecture, .social-block-vertical');
         const _recommend = $('#gallery');
 
         if ((_link.length) && (_recommend.length)) {
@@ -83,6 +83,16 @@ class TranscriptLessonPage extends React.Component {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
+        }
+
+        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
+            $('.transcript-page').on('touchmove', stopScrolling);
+            $(document).on('touchmove', stopScrolling);
+        }
+
+        if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
+            $('.transcript-page').unbind('touchmove', stopScrolling);
+            $(document).unbind('touchmove', stopScrolling)
         }
     }
 
@@ -117,6 +127,7 @@ class TranscriptLessonPage extends React.Component {
                                                     refs={lessonText.refs}
                                                     gallery={lessonText.gallery}
                                                     isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
                                                     lesson={lesson}/>
                                 </div>
                             </div>
@@ -125,6 +136,16 @@ class TranscriptLessonPage extends React.Component {
                 }
             </div>
         )
+    }
+}
+
+
+function stopScrolling(e) {
+
+    console.log(e, e.target)
+    if (!e.target.closest('.lectures-list-wrapper')) {
+        e.preventDefault();
+        e.stopPropagation()
     }
 }
 
@@ -178,6 +199,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         authorized: !!state.user.user,
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }
 

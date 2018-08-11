@@ -47,6 +47,8 @@ window.Utils = Utils;
 
         var pl = pl1;
 
+        window.player = pl;
+
         $.ajax({
             url: "/genData",
             type: "GET",

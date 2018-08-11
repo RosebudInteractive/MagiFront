@@ -17,14 +17,10 @@ class ContentTooltip extends Component {
     }
 
     static propTypes = {
-        content: PropTypes.array.isRequired,
-        visible: PropTypes.bool.isRequired,
-        onGoToContent: PropTypes.func
+        id: PropTypes.number,
     };
 
     static defaultProps = {
-        content: [],
-        visible: false,
     };
 
     componentDidMount() {
@@ -71,11 +67,25 @@ class ContentTooltip extends Component {
         let that = this;
 
         return this.props.contentArray.map((item, index) => {
-            let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0;
+            let _currContentId = this.props.currentContent ? this.props.currentContent.id : 0,
+                _isActive = _currContentId === item.id;
 
-            return <li className={(_currContentId === item.id) ? 'active' : ''} key={index}
+            return <li className={_isActive ? 'active' : ''} key={index}
                        onClick={() => {that._goToContent(item.begin)}}>
                 <div className='contents-tooltip_item'>{item.title}</div>
+                {
+                    _isActive ?
+                        <div className={"equalizer" + (that.props.paused ? " paused" : "")}>
+                            <div className='eq-1'/>
+                            <div className='eq-2'/>
+                            <div className='eq-3'/>
+                            <div className='eq-4'/>
+                            <div className='eq-5'/>
+                        </div>
+                        :
+                        null
+                }
+
             </li>
         }, this)
     }
@@ -102,6 +112,7 @@ function mapStateToProps(state) {
     return {
         contentArray: state.player.contentArray,
         currentContent: state.player.currentContent,
+        paused: state.player.paused,
     }
 }
 

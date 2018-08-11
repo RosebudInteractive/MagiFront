@@ -39,7 +39,8 @@ export function imageTimingFunc(timeFraction) {
 }
 
 export function quad(progress) {
-    return Math.pow(progress, 2);
+    //return progress;
+    return Math.pow(progress, 3);
 }
 
 export function makeEaseInOut(timing) {
@@ -50,3 +51,15 @@ export function makeEaseInOut(timing) {
             return (2 - timing(2 * (1 - timeFraction))) / 2;
     }
 }
+
+
+/*
+background-size: contain;
+    position: absolute;
+    width: 947px;
+    height: 771px;
+    background-image: url(https://magisteria.ru/wp-content/uploads/2017/04/Sidyashhij-Budda.-Tailand-XVII-v.-Metropoliten-muzej-Nyu-Jork.jpg);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    transform: scale(1.33941, 1.33941);
+ */

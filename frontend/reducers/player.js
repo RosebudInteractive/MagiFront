@@ -11,6 +11,10 @@ import {
     PLAYER_SET_CONTENT_ARRAY,
     PLAYER_ENDED,
     PLAYER_SET_BUFFERED_TIME,
+    SHOW_CONTENT_TOOLTIP,
+    HIDE_CONTENT_TOOLTIP,
+    SHOW_SPEED_TOOLTIP,
+    HIDE_SPEED_TOOLTIP,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -36,6 +40,8 @@ const initialState = {
     contentArray: [],
     playingLesson: null,
     stopped: false,
+    showContentTooltip: false,
+    showSpeedTooltip: false,
 };
 
 export default function player(state = initialState, action) {
@@ -123,6 +129,22 @@ export default function player(state = initialState, action) {
             } else {
                 return state
             }
+        }
+
+        case SHOW_CONTENT_TOOLTIP: {
+            return {...state, showContentTooltip: true}
+        }
+
+        case HIDE_CONTENT_TOOLTIP: {
+            return {...state, showContentTooltip: false}
+        }
+
+        case SHOW_SPEED_TOOLTIP: {
+            return {...state, showSpeedTooltip: true}
+        }
+
+        case HIDE_SPEED_TOOLTIP: {
+            return {...state, showSpeedTooltip: false}
         }
 
         default:

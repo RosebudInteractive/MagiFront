@@ -5,6 +5,7 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
+import FiltersRow from './mobile-filters';
 
 import * as tools from '../../tools/page-tools';
 import * as userActions from '../../actions/user-actions'
@@ -15,14 +16,16 @@ class DesktopHeaderRow extends React.Component {
         filterActive: PropTypes.bool.isRequired,
         currentPage: PropTypes.object.isRequired,
         onFilterClick: PropTypes.func.isRequired,
+        onBookmarkClick: PropTypes.func.isRequired,
     }
 
     render() {
         return (
-            <div className="page-header__wrapper menu-mobile row">
+            <div className="page-header__wrapper menu-mobile">
                 <Logo/>
                 <Navigator {...this.props}/>
                 <Languages/>
+                <FiltersRow/>
                 <Search/>
                 {
                     this.props.authorized ?
@@ -51,6 +54,7 @@ class Navigator extends React.Component {
 
     render() {
         const _filter = '<use xlink:href="#filter"/>',
+            _flagFull = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>',
             _isCoursesPage = this.props.currentPage.name === tools.pages.courses.name;
 
         return (
@@ -59,8 +63,15 @@ class Navigator extends React.Component {
                     <li className={_isCoursesPage ? "current" : ''}>
                         <Link to={tools.pages.courses.url}>Курсы</Link>
                     </li>
-                    <li>
-                        <a>Календарь</a>
+                    {/*<li>*/}
+                        {/*<a>Календарь</a>*/}
+                    {/*</li>*/}
+                    <li className={"filter" + (this.props.filterActive ? ' active' : '')}
+                        onClick={this.props.onBookmarkClick}>
+                        <Link to={'/favorites'}>
+                            <span className="hidden">Закладки</span>
+                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                        </Link>
                     </li>
                     {
                         _isCoursesPage
@@ -146,18 +157,14 @@ class Search extends React.Component {
 
         return (
             <div className={"search-block" + (this.state.showForm ? ' opened' : '')}>
-                {
-                    this.state.showForm ?
-                        <form action="#" className="search-form">
-                            <input type="search" className="search-form__field" placeholder="Поиск"/>
-                            <button className="invisible">Найти</button>
-                            <div className="search-form__close" onClick={::this._closeForm}>Закрыть</div>
-                        </form>
-                        :
-                        <button type="button" className="search-block__trigger" onClick={::this._showForm}>
-                            <svg width="20" height="21" dangerouslySetInnerHTML={{__html: _search}}/>
-                        </button>
-                }
+                <button type="button" className="search-block__trigger" onClick={::this._showForm}>
+                    <svg width="20" height="21" dangerouslySetInnerHTML={{__html: _search}}/>
+                </button>
+                <form action="#" className="search-form">
+                    <input type="search" className="search-form__field" placeholder="Поиск"/>
+                    <button className="invisible">Найти</button>
+                    <div className="search-form__close" onClick={::this._closeForm}>Закрыть</div>
+                </form>
             </div>
         )
     }

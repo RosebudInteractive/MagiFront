@@ -3,12 +3,21 @@ import PropTypes from 'prop-types';
 import {reduxForm, Field} from 'redux-form';
 import Captcha from './../auth/captcha'
 import {PasswordEdit, SignUpButton} from './../auth/editors'
+import PasswordValidator from 'password-validator';
+
+let schema = new PasswordValidator();
+schema
+    .is().min(6)
+    .is().max(100)
+    .has().not().spaces()
 
 const validate = values => {
     const errors = {}
 
     if (!values.password1) {
         errors.password1 = 'Required'
+    } else if (!schema.validate(values.password1)) {
+        errors.password1 = 'Пароль недостаточно надежен'
     }
     if (!values.password2) {
         errors.password2 = 'Required'

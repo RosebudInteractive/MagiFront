@@ -12,6 +12,7 @@ export default class TranscriptPage extends React.Component {
         refs: PropTypes.array,
         gallery: PropTypes.array,
         isNeedHideGallery: PropTypes.bool,
+        isNeedHideRefs: PropTypes.bool,
         lesson: PropTypes.object,
     };
 
@@ -150,14 +151,14 @@ class TextBlock extends React.Component {
     }
 
     render() {
-        let {lesson} = this.props;
+        let {lesson, isNeedHideRefs} = this.props;
 
         return (
             <section className={'text-block'} id='text'>
                 <div className={'text-block__wrapper'}>
                     <div className='title-text'><span className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
                     {this._getText()}
-                    <Refs {...this.props}/>
+                    {isNeedHideRefs ? null : <Refs {...this.props}/>}
                 </div>
             </section>
         )
@@ -169,7 +170,7 @@ class Refs extends React.Component {
     _getList() {
         return this.props.refs.map((ref, index) => {
             return <li key={index}>
-                {ref.URL ? <Link to={ref.URL}>ref.Description</Link> : ref.Description}
+                {ref.URL ? <Link to={ref.URL}>{ref.Description}</Link> : ref.Description}
             </li>
         })
     }

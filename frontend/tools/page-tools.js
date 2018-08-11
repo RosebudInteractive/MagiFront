@@ -12,7 +12,7 @@ export const Size = {
 export const getSize = (width) => {
 // export const getSize = () => {
     let _size = Object.keys(Size).find((item) => {
-        return width > Size[item].width
+        return width >= Size[item].width
     });
 
     // let _size = Size.xl;
@@ -48,6 +48,7 @@ export const pages = {
     lesson: {name: 'lesson', url: null},
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
+    bookmarks: {name: 'bookmarks', url: '/favorites'},
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile/'},
 }

@@ -53,6 +53,10 @@ class SubLessonEditor extends LessonEditor{
     }
 
     _clearObjectInStorage() {
+        // this.props.parentLessonActions.clear();
+    }
+
+    componentWillUnmount() {
         this.props.parentLessonActions.clear();
     }
 

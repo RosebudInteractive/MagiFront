@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 
 import $ from 'jquery'
-import 'fullpage.js'
+// import 'fullpage.js'
+import 'script-lib/jquery.fullpage'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as playerStartActions from '../actions/player-start-actions';
@@ -32,19 +33,11 @@ class LessonPage extends React.Component {
         this._internalRedirect = false;
         this._mountPlayerGuard = true;
 
-        this._resizeHandler = (e) => {
-            let text = window.screen.availHeight + ' : ' + window.screen.availWidth
-            alert(text)
-            alert(e.handleObj.type + ' innerHeight: ' + window.innerHeight);
 
-            let _height = $('.fp-tableCell').css('height');
-            alert(e.handleObj.type + ' current css height: ' + _height);
-
-            $('.fp-tableCell').css('height', window.innerHeight);
-            $('.fullpage-section').css('height', window.innerHeight);
-
-            _height = $('.fp-tableCell').css('height');
-            alert(e.handleObj.type + ' new css height: ' + _height)
+        this._resizeHandler = () => {
+            if ($('#fullpage-lesson').length) {
+                $.fn.fullpage.reBuild();
+            }
         }
 
         this._keydownHandler = (e) => {
@@ -184,7 +177,6 @@ class LessonPage extends React.Component {
         }
     }
 
-
     componentWillUnmount() {
         this._unmountFullpage();
         $('body').removeAttr('data-page');
@@ -227,6 +219,7 @@ class LessonPage extends React.Component {
 
     _mountKeydownHandler() {
         $(window).keydown(this._keydownHandler)
+        $(window).resize(this._resizeHandler)
     }
 
     _createBundle(lesson, key, isMain) {
@@ -246,13 +239,17 @@ class LessonPage extends React.Component {
         this.props.lessons.object.some((item) => {
             let _founded = item.Id === lesson.Id
 
-            if (!_founded && (item.Lessons.length > 0)) {
-                return item.Lessons.some((subItem) => {
-                    if (subItem.Id === lesson.Id) {
-                        _lessonAudios = subItem;
-                    }
-                    return subItem.Id === lesson.Id
-                })
+            if (!_founded) {
+                if (item.Lessons.length > 0) {
+                    return item.Lessons.some((subItem) => {
+                        if (subItem.Id === lesson.Id) {
+                            _lessonAudios = subItem;
+                        }
+                        return subItem.Id === lesson.Id
+                    })
+                } else {
+                    return false
+                }
             } else {
                 _lessonAudios = item;
                 return true
@@ -262,6 +259,7 @@ class LessonPage extends React.Component {
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
 
         if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
+
             return <Wrapper key={key}
                             lesson={lesson}
                             courseUrl={this.props.courseUrl}
@@ -338,7 +336,6 @@ class LessonPage extends React.Component {
         let that = this;
         let _anchors = this._getAnchors();
 
-
         return {
             normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
             fixedElements: '.js-lesson-menu',
@@ -354,6 +351,7 @@ class LessonPage extends React.Component {
             lockAnchors: true,
             keyboardScrolling: true,
             animateAnchor: true,
+            // responsiveSlides: true,
             sectionSelector: '.fullpage-section',
             slideSelector: '.fullpage-slide',
             lazyLoading: true,
@@ -434,11 +432,8 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div>
-                        <div className='fullpage-wrapper' id='fullpage-lesson'>
-                            {this._getLessonsBundles()}
-                        </div>
-
+                    <div className='fullpage-wrapper' id='fullpage-lesson'>
+                        {this._getLessonsBundles()}
                     </div>
                     :
                     null
@@ -458,6 +453,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         playingLesson: state.player.playingLesson,
+        lessonEnded: state.player.ended,
         isMobileApp: state.app.isMobileApp,
         authorized: !!state.user.user,
     }
