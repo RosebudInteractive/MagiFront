@@ -27,10 +27,9 @@ export function animate(options, playState) {
     });
 
     playObj.cancel = function () {
-       cancelAnimationFrame(this.frame);
+        cancelAnimationFrame(this.frame);
         this.frame = null;
     };
-
     return playObj;
 }
 

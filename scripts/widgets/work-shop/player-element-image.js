@@ -122,7 +122,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
 
     renderPosition(position) {
         if (this._playState.imageAnimation) {
-            cancelAnimationFrame(this._playState.imageAnimation.frame);
+            this._playState.imageAnimation.cancel();
         }
         if (this._playState.imgDelayInterval) {
             clearTimeout(this._playState.imgDelayInterval)
