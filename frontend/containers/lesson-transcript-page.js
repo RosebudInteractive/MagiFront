@@ -11,6 +11,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
+// import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
@@ -56,7 +57,7 @@ class TranscriptLessonPage extends React.Component {
 
     static _handleScroll() {
         let _link = $('.link-to-lecture, .social-block-vertical');
-        const _recommend = $('#gallery');
+        const _recommend = $('#pictures');
 
         if ((_link.length) && (_recommend.length)) {
             let coordTop = _recommend.offset().top;
@@ -69,10 +70,11 @@ class TranscriptLessonPage extends React.Component {
                 _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
             }
 
-            if ($(window).width() < 768) {
+            if (window.innerWidth < 600) {
                 if ((_scrollTop + 650) >= coordTop) {
                     _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
                 } else {
+                    // _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
                     _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
                 }
             }
@@ -84,16 +86,6 @@ class TranscriptLessonPage extends React.Component {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
         }
-
-        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
-            $('.transcript-page').on('touchmove', stopScrolling);
-            $(document).on('touchmove', stopScrolling);
-        }
-
-        if ((this.props.isLessonMenuOpened) && (!nextProps.isLessonMenuOpened)) {
-            $('.transcript-page').unbind('touchmove', stopScrolling);
-            $(document).unbind('touchmove', stopScrolling)
-        }
     }
 
     render() {
@@ -104,18 +96,18 @@ class TranscriptLessonPage extends React.Component {
             authorized
         } = this.props;
 
+        const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
+
         return (
             <div>
                 <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
                       className="link-to-lecture"
                       id='link-to-lecture'
-                      style={{
-                          position: 'fixed',
-                          top: '50%',
-                          marginTop: 0
-                      }}
+                      style={_linkStyle}
                 >Смотреть <br/>лекцию</Link>
+                {/*//<GalleryButtons/>*/}
                 <SocialBlock/>
+                {/*// lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,*/}
                 {
                     fetching ?
                         <p>Загрузка...</p>
@@ -139,15 +131,30 @@ class TranscriptLessonPage extends React.Component {
     }
 }
 
+class GalleryButtons extends React.Component {
 
-function stopScrolling(e) {
+    render() {
+        const _gallery = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#gallery"/>',
+            _prev = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-prev"/>',
+            _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
 
-    console.log(e, e.target)
-    if (!e.target.closest('.lectures-list-wrapper')) {
-        e.preventDefault();
-        e.stopPropagation()
+        return (
+            <div className="js-gallery-controls gallery-controls hide">
+                <button className="gallery-trigger js-gallery-trigger" type="button">
+                    <span className="visually-hidden">Галерея</span>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
+                </button>
+                <button className="swiper-button-prev swiper-button-disabled" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>
+                </button>
+                <button className="swiper-button-next" type="button">
+                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
+                </button>
+            </div>
+        )
     }
 }
+
 
 class SocialBlock extends React.Component {
 

@@ -40,7 +40,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                 let currentProgress = 0;
                 that._playState.imageAnimation = animate({
                     from: 0,
-                    to: ef.acceleration * ef.duration,
+                    to: Math.abs(ef.acceleration) * ef.duration,
                     curTime: imgPlayPos * 1000 / rate,
                     duration: ef.duration * 1000 / rate,
                     timing: makeEaseInOut(quad),
@@ -49,14 +49,12 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                     draw: (progress) => {
                         if (currentProgress > progress) return;
                         currentProgress = progress;
-                        let scale = (100 + progress)/100;
-                        img[0].style.transform = "scale(" + scale + ", " + scale + ")"
-                        //img[0].style.width = (100 + progress) + "%";
-                        //img[0].style.height = (100 + progress) + "%";
-                        /*img.css({
-                            width: (100 + progress) + "%",
-                            height: (100 + progress) + "%"
-                        });*/
+                        let scale = Math.sign(ef.acceleration) * progress/100;
+                        let startScale = 1;
+                        if (ef.acceleration < 0) {
+                            startScale = 1 + Math.abs(ef.acceleration * ef.duration)/100;
+                        }
+                        img[0].style.transform = "scale("  + (startScale + scale) + ", " + (startScale + scale) + ")"
                     }
                 }, that._playState);
             }, imgDelay);
@@ -130,50 +128,15 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
 
         super.renderPosition(position);
         let item = $("#" + this.Id);
-        let that = this;
+        let img = item.find("img");
 
         // масштаб изображения
         let effects = this.Data.effects;
         if (!effects) effects = [];
         if (effects.length != 0) {
             let effect = effects[0];
-            let imgPlayPos = this._playState.position - effect.start;
-            let offset = 0;
-            if (imgPlayPos > 0
-                && effect.duration > 0
-                && imgPlayPos < this._playState.position - effect.start + effect.duration) {
-                if (!this._playState.stopped) {
-                    this.pause();
-                    setTimeout(function () {
-                        that.play();
-                    }, 500);
-                }
-
-                let timeFraction = imgPlayPos / effect.duration;
-                if (timeFraction > 1) timeFraction = 1;
-                let animationFunc = makeEaseInOut(quad);
-                // текущее состояние анимации от 0 до 1
-                let progress = animationFunc(timeFraction);
-                // Текущее состояние в заказанных единицах
-                let calcProgress = effect.acceleration * effect.duration * progress;
-
-                offset = calcProgress / 2;
-            } else if (imgPlayPos > 0
-                && effect.duration > 0
-                && imgPlayPos >= this._playState.position - effect.start + effect.duration) {
-                let animationFunc = makeEaseInOut(quad);
-                let progress = animationFunc(1);
-                let calcProgress = effect.acceleration * effect.duration * progress;
-
-                offset = calcProgress / 2;
-            }
-            let img = item.find("img");
-            let scale = (100 + offset * 2)/100;
+            let scale = this._getImageScale(effect);
             img.css({
-                //left: (50) + "%",
-                //top: (50) + "%",
-                //width: (100 + offset * 2) + "%",
-                //height: (100 + offset * 2) + "%",
                 transform: "scale("  + scale + ", " + scale + ")"
             });
         }
@@ -195,6 +158,16 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                     this._setEvents(item);
                     item.fadeIn("fast");
 
+                    let effects = this.Data.effects;
+                    if (!effects) effects = [];
+                    if (effects.length != 0) {
+                        let effect = effects[0];
+                        let scale = this._getImageScale(effect);
+                        imgDiv.css({
+                            transform: "scale("  + scale + ", " + scale + ")"
+                        });
+                    }
+
                 })
                 .catch((err) => {
                     console.error(err);
@@ -206,6 +179,41 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
             this._setEvents(item);
             item.fadeIn("fast");
         }
+    }
+
+    _getImageScale(effect) {
+        let that = this;
+        let calcProgress = 0;
+        let imgPlayPos = this._playState.position - effect.start;
+        if (imgPlayPos > 0
+            && effect.duration > 0
+            && imgPlayPos < this._playState.position - effect.start + effect.duration) {
+            if (!this._playState.stopped) {
+                this.pause();
+                setTimeout(function () {
+                    that.play();
+                }, 50);
+            }
+            let timeFraction = imgPlayPos / effect.duration;
+            if (timeFraction > 1) timeFraction = 1;
+            let animationFunc = makeEaseInOut(quad);
+            // текущее состояние анимации от 0 до 1
+            let progress = animationFunc(timeFraction);
+            // Текущее состояние в заказанных единицах
+            calcProgress = effect.acceleration * effect.duration * progress;
+        } else if (imgPlayPos > 0
+            && effect.duration > 0
+            && imgPlayPos >= this._playState.position - effect.start + effect.duration) {
+            let animationFunc = makeEaseInOut(quad);
+            let progress = animationFunc(1);
+            calcProgress = effect.acceleration * effect.duration * progress;
+        }
+        let scale = calcProgress/100;
+        let startScale = 1;
+        if (effect.acceleration < 0) {
+            startScale = 1 + Math.abs(effect.acceleration * effect.duration)/100;
+        }
+        return startScale + scale
     }
 
     _reinitItem(item) {

@@ -82,13 +82,6 @@ class ResourceForm extends React.Component {
         return _lang ? _lang.Language : '';
     }
 
-    _handleFiles() {
-        let fileList = this.files; /* теперь вы можете работь со списком файлов */
-        fileList.forEach((file) => {
-            console.log(file)
-        })
-    }
-
     getUI(save, cancel) {
         let that = this;
 
@@ -104,8 +97,6 @@ class ResourceForm extends React.Component {
                     id: 'Name',
                     label: "Название",
                     placeholder: "Введите название",
-                    validate: window.webix.rules.isNotEmpty,
-                    invalidMessage: "Значение не может быть пустым",
                 },
                 {
                     view: "textarea",
@@ -115,6 +106,27 @@ class ResourceForm extends React.Component {
                     id: "Description",
                     label: "Описание",
                     placeholder: "Введите описание"
+                },
+                {
+                    view: "text",
+                    labelPosition: "top",
+                    name: "FileId",
+                    id: 'file-id',
+                    label: "ID файла",
+                    placeholder: "",
+                },
+                {
+                    view: "text",
+                    label: "Alt",
+                    labelPosition: "top",
+                    name: 'AltAttribute',
+                    placeholder: "",
+                },
+                {
+                    view: "checkbox",
+                    label: "Отображать в галереи",
+                    name: 'ShowInGalery',
+                    labelWidth: 347,
                 },
                 {
                     cols: [
@@ -176,11 +188,13 @@ class ResourceForm extends React.Component {
                                         },
                                         onFileUpload: (file, response) => {
                                             let _name = response[0].info.name ? response[0].info.name : null,
-                                                _description = response[0].info.description ? response[0].info.description : null;
+                                                _description = response[0].info.description ? response[0].info.description : null,
+                                                _fileId = response[0].info.fileId ? response[0].info.fileId : null
 
                                             window.$$('file-name').setValue(response[0].file);
                                             window.$$('Name').setValue(_name);
                                             window.$$('Description').setValue(_description);
+                                            window.$$('file-id').setValue(_fileId);
                                             window.$$('res-form-btnOk').enable();
                                             window.$$('res-form-btnCancel').enable();
                                         },
@@ -278,6 +292,9 @@ class ResourceForm extends React.Component {
                         //return false to block operation
                         return true;
                     });
+                },
+                onChange: function() {
+                    this.clearValidation();
                 }
             }
         }

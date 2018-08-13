@@ -5,9 +5,9 @@ import {Link} from 'react-router-dom';
 
 import {authorSelector} from '../../ducks/author'
 import {ImageSize, getCoverPath, getRandomInt} from '../../tools/page-tools'
-import {LessonFull} from "../common/lecture-full-wrapper";
+import LessonFull from "../common/lecture-full-wrapper";
 
-class CouresesBlock extends React.Component {
+class CoursesBlock extends React.Component {
 
     constructor(props) {
         super(props);
@@ -41,11 +41,12 @@ class CouresesBlock extends React.Component {
                     cover={_cover}
                     duration={lesson.DurationFmt}
                     totalDuration={lesson.Duration}
-                    subLessons={lesson.NSub}
+                    subLessons={lesson.Lessons}
                     refs={lesson.NRefBooks}
                     books={lesson.NBooks}
                     audios={lesson.Audios}
                     isAuthRequired={lesson.IsAuthRequired}
+                    lesson={lesson}
                     key={index}/>
             })
         ) : null
@@ -106,7 +107,7 @@ class Course extends React.Component {
         return (
             <div className="course-announce">
                 <div className="course-announce__col">
-                    <div className={'course-announce__image _mask' + this.maskNumber}>
+                    <div className={'course-announce__image ' + course.Mask}>
                         <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                     </div>
                 </div>
@@ -135,4 +136,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(CouresesBlock);
+export default connect(mapStateToProps)(CoursesBlock);

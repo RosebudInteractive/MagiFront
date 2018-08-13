@@ -1,5 +1,6 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
+const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const {
     ACCOUNT_ID,
@@ -71,12 +72,12 @@ const COURSE_UPD_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
+    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
+    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -91,7 +92,7 @@ const COURSE_MSSQL_AUTHOR_REQ =
 const COURSE_MSSQL_CATEGORY_REQ =
     "select [CategoryId] as [Id] from [CourseCategory] where [CourseId] = <%= id %>";
 const COURSE_MSSQL_LESSON_REQ =
-    "select ls.[Id], ls.[IsAuthRequired], lsl.[Name], lsl.[ShortDescription], lsl.[FullDescription], lc.[Number], lc.[ReadyDate], lc.[State], l.[Language] as [LanguageName] from [Lesson] ls\n" +
+    "select ls.[Id], ls.[IsAuthRequired], ls.[IsSubsRequired], ls.[FreeExpDate], lsl.[Name], lsl.[ShortDescription], lsl.[FullDescription], lc.[Number], lc.[ReadyDate], lc.[State], l.[Language] as [LanguageName] from [Lesson] ls\n" +
     "  join [LessonLng] lsl on ls.[Id] = lsl.[LessonId]\n" +
     "  join [Language] l on lsl.[LanguageId] = l.[Id]\n" +
     "  join [LessonCourse] lc on lc.[LessonId] = ls.[Id]\n" +
@@ -106,7 +107,7 @@ const COURSE_MYSQL_AUTHOR_REQ =
 const COURSE_MYSQL_CATEGORY_REQ =
     "select `CategoryId` as `Id` from `CourseCategory` where `CourseId` = <%= id %>";
 const COURSE_MYSQL_LESSON_REQ =
-    "select ls.`Id`, ls.`IsAuthRequired`, lc.`CourseId`, lsl.`Name`, lsl.`ShortDescription`, lsl.`FullDescription`, lc.`Number`, lc.`ReadyDate`, lc.`State`, l.`Language` as `LanguageName` from `Lesson` ls\n" +
+    "select ls.`Id`, ls.`IsAuthRequired`, ls.`IsSubsRequired`, ls.`FreeExpDate`, lc.`CourseId`, lsl.`Name`, lsl.`ShortDescription`, lsl.`FullDescription`, lc.`Number`, lc.`ReadyDate`, lc.`State`, l.`Language` as `LanguageName` from `Lesson` ls\n" +
     "  join `LessonLng` lsl on ls.`Id` = lsl.`LessonId`\n" +
     "  join `Language` l on lsl.`LanguageId` = l.`Id`\n" +
     "  join `LessonCourse` lc on lc.`LessonId` = ls.`Id`\n" +
@@ -194,8 +195,8 @@ const COURSE_LESSONS_MYSQL =
     "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
+    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -222,8 +223,8 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "order by cc.[CourseId]";
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
+    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -250,9 +251,9 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "order by cc.`CourseId`";
 
 const COURSE_MSSQL_PUBLIC_REQ =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -286,11 +287,15 @@ const COURSE_REC_MSSQL_PUBLIC_REQ =
     "  join [Reference] r on r.[LessonLngId] = ll.[Id] and r.[Recommended] = 1\n" +
     "where c.[Id] = <%= courseId %> and(l.[ParentId] is NULL)\n" +
     "order by l.[Id]";
+const COURSE_SHARE_COUNTERS_MSSQL_REQ =
+    "select sp.[Code], cs.[Counter] from [CrsShareCounter] cs\n" +
+    "  join[SNetProvider] sp on sp.[Id] = cs.[SNetProviderId]\n" +
+    "where[CourseId] = <%= courseId %>";
     
 const COURSE_MYSQL_PUBLIC_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -318,6 +323,10 @@ const COURSE_REC_MYSQL_PUBLIC_REQ =
     "  join `Reference` r on r.`LessonLngId` = ll.`Id` and r.`Recommended` = 1\n" +
     "where c.`Id` = <%= courseId %> and(l.`ParentId` is NULL)\n" +
     "order by l.`Id`";
+const COURSE_SHARE_COUNTERS_MYSQL_REQ =
+    "select sp.`Code`, cs.`Counter` from `CrsShareCounter` cs\n" +
+    "  join`SNetProvider` sp on sp.`Id` = cs.`SNetProviderId`\n" +
+    "where`CourseId` = <%= courseId %>";
 
 const DbCourse = class DbCourse extends DbObject {
 
@@ -369,6 +378,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let crs_id = -1;
                             let curr_course;
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 if (elem.Id !== crs_id) {
                                     crs_id = elem.Id;
@@ -378,9 +388,11 @@ const DbCourse = class DbCourse extends DbObject {
                                             Id: elem.Id,
                                             Cover: elem.Cover,
                                             CoverMeta: elem.CoverMeta,
+                                            Mask: elem.Mask,
                                             Color: elem.Color,
                                             Name: elem.Name,
                                             URL: elem.URL,
+                                            IsSubsRequired: false,
                                             Authors: [],
                                             Categories: [],
                                             Lessons: []
@@ -391,7 +403,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 };
                                 let lesson = lessons_list[elem.LessonId];
                                 if (!lesson) {
-                                    curr_course.Lessons.push(lesson = {
+                                    lesson = {
                                         Id: elem.LessonId,
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
@@ -400,13 +412,18 @@ const DbCourse = class DbCourse extends DbObject {
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
                                         DurationFmt: elem.DurationFmt,
                                         AuthorId: elem.AuthorId,
                                         Audios: []
-                                    });
+                                    };
+                                    curr_course.IsSubsRequired = curr_course.IsSubsRequired || lesson.IsSubsRequired;
+                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                        lesson.FreeExpDate = elem.FreeExpDate;
+                                    curr_course.Lessons.push(lesson);
                                     lessons_list[elem.LessonId] = lesson;
                                 }
                                 lesson.Audios.push(elem.Audio);
@@ -503,6 +520,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let isFirst = true;
                             let authors_list = {};
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
                                     isFirst = false;
@@ -513,14 +531,17 @@ const DbCourse = class DbCourse extends DbObject {
                                         LanguageId: elem.LanguageId,
                                         Cover: elem.Cover,
                                         CoverMeta: elem.CoverMeta,
+                                        Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: elem.URL,
+                                        IsSubsRequired: false,
                                         Authors: [],
                                         Categories: [],
                                         Lessons: [],
-                                        Books: []
+                                        Books: [],
+                                        ShareCounters: {}
                                     };
                                 };
                                 let lsn = lsn_list[elem.LessonId];
@@ -534,6 +555,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -545,6 +567,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         Lessons: [],
                                         Audios: []
                                     };
+                                    course.IsSubsRequired = course.IsSubsRequired || lsn.IsSubsRequired;
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     if (!elem.ParentId) {
                                         course.Lessons.push(lsn);
@@ -660,6 +685,20 @@ const DbCourse = class DbCourse extends DbObject {
                                 });
                             })
                         }
+                        if (course)
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(COURSE_SHARE_COUNTERS_MYSQL_REQ)({ courseId: courseId }),
+                                    mssql: _.template(COURSE_SHARE_COUNTERS_MSSQL_REQ)({ courseId: courseId })
+                                }
+                            }, {});
+                    })
+                    .then((result) => {
+                        if (course && result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                course.ShareCounters[elem.Code] = elem.Counter;
+                            })
+                        }
                         return course;
                     })
             );
@@ -738,9 +777,11 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then((result) => {
                         course.Lessons = [];
+                        let now = new Date();
                         if (result && result.detail && (result.detail.length > 0))
                             result.detail.forEach((elem) => {
                                 elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                                elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
                             });
                             course.Lessons = result.detail;
                         return course;
@@ -964,6 +1005,8 @@ const DbCourse = class DbCourse extends DbObject {
 
                         if (typeof (inpFields["Color"]) !== "undefined")
                             crs_obj.color(inpFields["Color"]);
+                        if (typeof (inpFields["Mask"]) !== "undefined")
+                            crs_obj.mask(inpFields["Mask"]);
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             crs_obj.cover(inpFields["Cover"]);
                         if (typeof (inpFields["CoverMeta"]) !== "undefined")
@@ -1139,6 +1182,8 @@ const DbCourse = class DbCourse extends DbObject {
                         let fields = { AccountId: ACCOUNT_ID };
                         if (typeof (inpFields["Color"]) !== "undefined")
                             fields["Color"] = inpFields["Color"];
+                        if (typeof (inpFields["Mask"]) !== "undefined")
+                            fields["Mask"] = inpFields["Mask"];
                         if (typeof (inpFields["Cover"]) !== "undefined")
                             fields["Cover"] = inpFields["Cover"];
                         if (typeof (inpFields["CoverMeta"]) !== "undefined")

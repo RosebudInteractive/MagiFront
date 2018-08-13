@@ -4,6 +4,21 @@ import PropTypes from 'prop-types';
 import {EDIT_MODE_EDIT} from '../constants/Common'
 
 export default class GridControl extends Component {
+
+    static propTypes = {
+        selectAction: PropTypes.func.isRequired,
+        createAction: PropTypes.func,
+        addAction: PropTypes.func,
+        editAction: PropTypes.func,
+        removeAction: PropTypes.func.isRequired,
+        moveUpAction: PropTypes.func,
+        moveDownAction: PropTypes.func,
+        multiUploadAction: PropTypes.func,
+        editMode: PropTypes.string,
+        selected: PropTypes.number,
+        data: PropTypes.any.isRequired,
+    }
+
     constructor(props) {
         super(props);
 
@@ -69,6 +84,12 @@ export default class GridControl extends Component {
         }
     }
 
+    _upload() {
+        if (this.props.multiUploadAction) {
+            this.props.multiUploadAction()
+        }
+    }
+
     _configButtons() {
         let {
             createAction,
@@ -76,6 +97,7 @@ export default class GridControl extends Component {
             editAction,
             moveUpAction,
             moveDownAction,
+            multiUploadAction,
             editMode,
         } = this.props;
 
@@ -103,6 +125,10 @@ export default class GridControl extends Component {
             let _disabled = ((!this._selected) || (this._isLastSelected));
             _buttons.push(<button key='btnDown' className='tool-btn down' disabled={_disabled}
                                   onClick={::this._moveDown}/>)
+        }
+
+        if (multiUploadAction) {
+            _buttons.push(<button key='btnUpload' className='tool-btn upload' onClick={::this._upload}/>)
         }
 
         return _buttons;
@@ -176,17 +202,3 @@ export default class GridControl extends Component {
         return data ? fn(new Date(data)) : '';
     }
 }
-
-GridControl.propTypes = {
-    // message: PropTypes.string,
-    selectAction: PropTypes.func.isRequired,
-    createAction: PropTypes.func,
-    addAction: PropTypes.func,
-    editAction: PropTypes.func,
-    removeAction: PropTypes.func.isRequired,
-    moveUpAction: PropTypes.func,
-    moveDownAction: PropTypes.func,
-    editMode: PropTypes.string,
-    selected: PropTypes.number,
-    data: PropTypes.any.isRequired,
-};

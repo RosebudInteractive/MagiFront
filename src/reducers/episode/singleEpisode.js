@@ -7,6 +7,9 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
+    IMPORT_EPISODE_START,
+    IMPORT_EPISODE_SUCCESS,
+    IMPORT_EPISODE_FAIL,
 } from '../../constants/episode/singleEpisode'
 
 const initialState = {
@@ -14,6 +17,7 @@ const initialState = {
     current: null,
     fetching: false,
     hasChanges: false,
+    packageUploadProcess: false,
 };
 
 export default function singleEpisode(state = initialState, action) {
@@ -100,6 +104,21 @@ export default function singleEpisode(state = initialState, action) {
                 current: null,
                 fetching: true,
                 hasChanges: false,
+            }
+        }
+
+        case IMPORT_EPISODE_START: {
+            return {
+                ...state,
+                packageUploadProcess : true
+            }
+        }
+
+        case IMPORT_EPISODE_SUCCESS:
+        case IMPORT_EPISODE_FAIL:{
+            return {
+                ...state,
+                packageUploadProcess : false
             }
         }
 

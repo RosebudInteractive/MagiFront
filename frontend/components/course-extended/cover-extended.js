@@ -16,7 +16,8 @@ class Cover extends React.Component {
             _authors = course.Authors ? course.Authors : [],
             _categories = course.Categories ? course.Categories : [],
             _coverPath = getCoverPath(course, ImageSize.medium),
-            _cover = _coverPath ? '/data/' + _coverPath : null;
+            _cover = _coverPath ? '/data/' + _coverPath : null,
+            _mask = course.Mask;
 
         return (
             <div className="course-module__info-block">
@@ -24,7 +25,7 @@ class Cover extends React.Component {
                     authors={_authors}
                     categories={_categories}
                 />
-                <Body cover={_cover}/>
+                <Body cover={_cover} mask={_mask}/>
             </div>
         );
     }
@@ -50,11 +51,13 @@ class Body extends React.Component {
     }
 
     render() {
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  this.props.cover + '" width="724" height="503"/>';
+        let {cover, mask} = this.props;
+
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  cover + '" width="724" height="503"/>';
 
         return (
             <div className="course-module__body">
-                <div className={"course-module__image-block _mask" + this.state.maskNumber}>
+                <div className={"course-module__image-block " + mask}>
                     <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </div>

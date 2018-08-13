@@ -24,21 +24,28 @@ class Frame extends Component {
 
     constructor(props) {
         super(props)
+        this._lessonId = this.props.lesson.Id;
 
         this._timer = null;
 
         this.state = {
-            fullScreen: false,
+            fullScreen: document.fullscreen,
         }
 
         this._firstTap = true;
-    }
 
+        this._onDocumentReady = () => {
+            this._applyViewPort()
+        }
+
+        $(document).ready(this._onDocumentReady)
+        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+    }
 
     componentDidMount() {
         let that = this
 
-        $(document).mouseup((e) => {
+        document.body.addEventListener(this._touchEventName, (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),
@@ -86,16 +93,10 @@ class Frame extends Component {
             }
         })
 
-        // let that = this;
-        //
         $(document).on('mousemove', () => {
             this._clearTimeOut();
             this._initTimeOut();
         });
-
-        if (this.props.visible) {
-            this._applyViewPort()
-        }
     }
 
     _clearTimeOut() {
@@ -164,9 +165,10 @@ class Frame extends Component {
     }
 
     _removeListeners() {
-        $(document).off('mouseup');
+        $(document).off(this._touchEventName);
         $(document).off('keydown');
         $(document).off('mousemove');
+        $(document).unbind('ready', this._onDocumentReady);
     }
 
     _openContent() {
@@ -221,23 +223,29 @@ class Frame extends Component {
         let _id = this.props.lesson ? this.props.lesson.Id : '',
             {showContentTooltip, showSpeedTooltip} = this.props;
 
+        if (this._lessonId !== _id) {
+            return null
+        }
 
-        const
-            _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
+
+        const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
             _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen"/>',
             _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
+        let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false
+
         return (
             <div style={this.props.visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={this.props.showCover ? {display: 'none'} : null}>
+                <div className="player-frame__poster" style={_isFinished ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {
                     this.props.visible ?
                         <div>
-                            <PauseScreen {...this.props}/>
+                            <PauseScreen {...this.props} isFinished={_isFinished}/>
                             <div className="player-frame">
                                 <Titles/>
                                 <div className="player-block">
@@ -297,6 +305,7 @@ function mapStateToProps(state) {
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
+        lessonInfoStorage: state.lessonInfoStorage,
     }
 }
 

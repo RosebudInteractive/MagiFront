@@ -63,6 +63,41 @@ class EpisodeEditor extends ObjectEditor {
         }
     }
 
+    componentDidMount() {
+        if (this.props.isWorkshop) {
+            this._openWorkshop()
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps)
+
+        if (this.props.isWorkshop && !prevProps.isWorkshop) {
+            this._openWorkshop()
+        }
+
+        if (!this.props.fetching && prevProps.fetching) {
+            this._fillFileId()
+        }
+
+        if (this.props.isResourcesLoaded && !prevProps.isResourcesLoaded) {
+            // this.props.lessonActions.getResources(this.props.lesson.id);
+            this._fillFileId()
+        }
+    }
+
+    _fillFileId() {
+        let {content, resources} = this.props;
+
+        content.forEach((item) => {
+            let _resource = resources.find((resource) => {
+                return resource.Id === item.ResourceId
+            })
+
+            item.FileId = _resource ? _resource.FileId : null;
+        })
+    }
+
     getObject() {
         return this.props.episode
     }
@@ -125,7 +160,7 @@ class EpisodeEditor extends ObjectEditor {
 
         let _obj = {
             id: value.id,
-            LessonId: this.props.lessonId,
+            LessonId: this.props.subLessonId ? this.props.subLessonId : this.props.lessonId,
             Number: value.Number,
             Id: value.id,
             Name: value.Name,
@@ -205,6 +240,20 @@ class EpisodeEditor extends ObjectEditor {
 
     _cancelEditContentItem() {
         this.props.contentActions.clear();
+    }
+
+    _openWorkshop() {
+        let {lessonId, episodeId, location} = this.props;
+
+        if (lessonId && episodeId) {
+            let _object = {
+                lessonId: lessonId,
+                episodeId: episodeId,
+                callingRoute: location.pathname,
+            }
+
+            this.props.workShopActions.loadData(_object)
+        }
     }
 
     _getWebixForm() {
@@ -288,6 +337,26 @@ class EpisodeEditor extends ObjectEditor {
         } else {
             window.$$('btn-work-shop').enable()
         }
+
+        if ((!this.props.episodeId) || this.props.packageUploadProcess) {
+            window.$$('btn-upload-package').disable()
+        } else {
+            window.$$('btn-upload-package').enable()
+        }
+
+        if (this.props.packageUploadProcess) {
+            window.$$('btn-upload-package').define("value", "Идет импорт эпизода");
+            window.$$('btn-upload-package').refresh();
+        } else {
+            window.$$('btn-upload-package').define("value", "Импорт эпизода из Word XML");
+            window.$$('btn-upload-package').refresh();
+        }
+    }
+
+    _uploadPackage(files) {
+        let {lessonId, episodeId} = this.props;
+
+        this.props.episodeActions.uploadPackage({idLesson: lessonId, idEpisode: episodeId, file: files[0]})
     }
 
     _getExtElements() {
@@ -298,15 +367,8 @@ class EpisodeEditor extends ObjectEditor {
                 view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
-                    let {lessonId, episodeId} = that.props;
-
-                    if (lessonId && episodeId) {
-                        let _object = {
-                            lessonId: lessonId,
-                            episodeId: episodeId
-                        }
-
-                        that.props.workShopActions.loadData(_object)
+                    if (!that.props.isWorkshop) {
+                        that.props.history.push(that.props.location.pathname + '?workshop')
                     }
                 },
             },
@@ -450,6 +512,34 @@ class EpisodeEditor extends ObjectEditor {
                 width: 500,
                 name: "Transcript",
                 labelWidth: labelWidth,
+            },
+            {
+                cols: [
+                    {
+                        view: 'template',
+                        // hidden: true,
+                        id: 'file-dialog',
+                        borderless: true,
+                        height: 0,
+                        template: () => {
+                            return '<input style="display: none" type="file" id="file-dialog" accept=".xml"/>'
+                        },
+                    },
+                    {
+                        view: "button",
+                        value: "Импорт эпизода из Word XML",
+                        name: 'btnUploadPackage',
+                        id: 'btn-upload-package',
+                        // disabled: (!that.props.episodeId) || that.props.packageUploadProcess,
+                        click: function () {
+                            $('#file-dialog').unbind("change");
+                            $('#file-dialog').bind("change", function () {
+                                that._uploadPackage(this.files)
+                            });
+                            $("#file-dialog").trigger('click');
+                        },
+                    },
+                ]
             }
         ];
     }
@@ -463,12 +553,14 @@ function mapStateToProps(state, ownProps) {
     return {
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
+        packageUploadProcess: state.singleEpisode.packageUploadProcess,
 
         episodeToc: state.episodeToc.current,
         selectedToc: state.episodeToc.selected,
         showTocEditor: state.toc.showEditor,
         toc: state.toc.object,
         tocEditMode: state.toc.editMode,
+        isResourcesLoaded : state.lessonResources.loaded,
 
         showResourceEditor: state.content.showEditor,
         contentItem: state.content.object,
@@ -476,6 +568,7 @@ function mapStateToProps(state, ownProps) {
 
         content: state.episodeContent.current,
         selectedContent: state.episodeContent.selected,
+        resources: state.lessonResources.current,
 
         hasChanges: state.singleEpisode.hasChanges || state.episodeToc.hasChanges || state.episodeContent.hasChanges,
 
@@ -489,6 +582,7 @@ function mapStateToProps(state, ownProps) {
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching,
 
+        isWorkshop: ownProps.location.search === "?workshop",
         ownProps: ownProps,
     }
 }

@@ -13,7 +13,6 @@ import {
 
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
-
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -192,6 +191,7 @@ const handleLesson = (lesson) => {
     lesson.suppEpisodes = [];
 
     lesson.DT_ReadyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null;
+    lesson.FreeExpDate = lesson.FreeExpDate ? new Date(lesson.FreeExpDate) : null;
 
     if (lesson.Episodes) {
         lesson.Episodes.forEach((episode) => {
@@ -237,6 +237,9 @@ const handleLesson = (lesson) => {
     if (lesson.Resources) {
         lesson.Resources.forEach((resource) => {
             resource.id = resource.Id
+
+            let _meta = JSON.parse(resource.MetaData);
+            resource.FileId = _meta.fileId;
         })
     }
 

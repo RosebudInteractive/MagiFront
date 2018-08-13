@@ -4,6 +4,7 @@ import { createLogger } from 'redux-logger'
 import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
 import workShopMiddleware from '../middlewares/work-shop-middleware'
+import history from '../history'
 
 export const store = configureStore();
 

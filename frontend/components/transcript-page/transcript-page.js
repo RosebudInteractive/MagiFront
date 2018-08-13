@@ -37,7 +37,7 @@ class TextBlock extends React.Component {
 
     _parseTranscript(episode) {
         let _div = [];
-        const _re = /^<h2>(.+)<\/h2>/gim;
+        const _re = /<h2>(.*?)<\/h2>/gim;
         let _matches;
 
         let _text = episode.Transcript,
@@ -49,19 +49,21 @@ class TextBlock extends React.Component {
             });
 
             _text = _text.slice(_re.lastIndex);
-            let _index = _text.search(/^<h2>/gim);
+            let _index = _text.search(/<h2>/gim);
             let _content = '';
 
             if (_index > -1) {
                 // _content = _text.substr(0, _index)
                 _content = _text.slice(0, _index)
+                _text = _text.slice(_index)
             } else {
                 _content = _text
             }
 
             _content = _content.trim();
 
-            let _array = _content.split('\r\n\r\n');
+            let _array = _content.split(/<p>(.*?)<\/p>/gim);
+            let _isToc = true;
 
             _array.forEach((item, index) => {
                 let _paragraph = item;
@@ -71,9 +73,11 @@ class TextBlock extends React.Component {
                     return
                 }
 
+                _paragraph = _paragraph.replace(/<b><u>ts(.*?)<\/u><\/b>/gim, '');
+
                 if (_isFirstParagraph) {
                     let _firstLetter = _paragraph.slice(0, 1);
-                    _paragraph = _content.slice(1);
+                    _paragraph = _paragraph.slice(1);
 
                     _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                         <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
@@ -85,9 +89,10 @@ class TextBlock extends React.Component {
 
                     _isFirstParagraph = false;
                 } else {
-                    if (index > 0) {
+                    if (!_isToc) {
                         _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
                     } else {
+                        _isToc = false;
                         _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                             <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
                             <p>

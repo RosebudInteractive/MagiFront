@@ -4,7 +4,7 @@ import {
     UPDATE_RESOURCE,
     REMOVE_RESOURCE,
     MOVE_RESOURCE_UP,
-    MOVE_RESOURCE_DOWN,
+    MOVE_RESOURCE_DOWN, MULTIPLE_INSERT_RESOURCE,
 } from '../../constants/lesson/lessonResources';
 
 import {
@@ -19,6 +19,8 @@ import {
     GET_LESSON_RESOURCES_FAIL,
     GET_LESSON_RESOURCES_SUCCESS,
 } from '../../constants/lesson/singleLesson';
+
+import {IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_FAIL} from "../../constants/episode/singleEpisode";
 
 import * as tools from '../tools';
 
@@ -85,7 +87,6 @@ export default function lessonResources(state = initialState, action) {
                     fetching: false,
                 }
             }
-
         }
 
         case GET_LESSON_RESOURCES_SUCCESS: {
@@ -133,6 +134,13 @@ export default function lessonResources(state = initialState, action) {
 
         case INSERT_RESOURCE: {
             let _array = [...state.current, action.payload];
+            tools.setObjectsRank(_array);
+
+            return {...state, current: _array, hasChanges: true, selected: action.payload};
+        }
+
+        case MULTIPLE_INSERT_RESOURCE: {
+            let _array = state.current.concat(action.payload);
             tools.setObjectsRank(_array);
 
             return {...state, current: _array, hasChanges: true, selected: action.payload};
@@ -197,6 +205,14 @@ export default function lessonResources(state = initialState, action) {
                 ...state,
                 initial: [...state.current],
                 hasChanges: false,
+            }
+        }
+
+        case IMPORT_EPISODE_SUCCESS:
+        case IMPORT_EPISODE_FAIL: {
+            return {
+                ...state,
+                loaded: false,
             }
         }
 

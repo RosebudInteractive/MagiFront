@@ -27,6 +27,8 @@ import {EDIT_MODE_INSERT, EDIT_MODE_EDIT} from '../constants/Common'
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import ResourceForm from "../components/resource-form";
+import MultiResourceForm from "../components/multi-resource-form";
+import $ from 'jquery';
 
 export class LessonEditor extends ObjectEditor {
 
@@ -90,6 +92,35 @@ export class LessonEditor extends ObjectEditor {
         this.editMode = EDIT_MODE_INSERT;
     }
 
+    componentDidMount() {
+        let _editor = $('.webix_view .webix_layout_line');
+
+        _editor.on('paste', (e) => {
+            // Prevent the default pasting event and stop bubbling
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Get the clipboard data
+            let paste = (e.clipboardData || window.clipboardData).getData('text');
+
+            // Do something with paste like remove non-UTF-8 characters
+            paste = paste.replace(/[^\x20-\xFF]/gi, '');
+
+            // Find the cursor location or highlighted area
+            const selection = window.getSelection();
+
+            // Cancel the paste operation if the cursor or highlighted area isn't found
+            if (!selection.rangeCount) return false;
+
+            // Paste the modified clipboard content where it was intended to go
+            selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+        });
+
+        window.$$('descrition').$view.addEventListener("onPaste", function (text) {
+            window.webix.message("Custom paste behavior: " + text);
+        });
+    }
+
     componentWillReceiveProps(next) {
         const {
             lesson,
@@ -138,8 +169,8 @@ export class LessonEditor extends ObjectEditor {
     _getCoverInfo() {
         let _meta = this.coverMeta;
         return {
-            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path +  _meta.content.s) : this.cover)) : null,
-            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+            path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path + _meta.content.s) : this.cover)) : null,
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width) : 0
         };
     }
 
@@ -160,14 +191,20 @@ export class LessonEditor extends ObjectEditor {
             FullDescription: value.FullDescription,
             ParentId: value.CurrParentId,
             IsAuthRequired: value.IsAuthRequired,
+            IsSubsRequired: value.IsSubsRequired,
+            FreeExpDate: value.IsSubsRequired ? value.FreeExpDate : null,
             Episodes: [],
             References: [],
             Resources: [],
+            Childs: (this.props.subLessons.length > 0) ? [] : null,
         };
 
         this._fillEpisodes(_obj.Episodes);
         this._fillReferences(_obj.References);
         this._fillResources(_obj.Resources);
+        if (this.props.subLessons.length > 0) {
+            this._fillChilds(_obj.Childs);
+        }
 
         super._save(_obj)
     }
@@ -214,6 +251,12 @@ export class LessonEditor extends ObjectEditor {
 
     _fillResources(array) {
         this.props.resources.map((resource) => {
+            if (resource.FileId) {
+                let _meta = JSON.parse(resource.MetaData);
+                _meta.fileId = resource.FileId;
+                resource.MetaData = JSON.stringify(_meta)
+            }
+
             array.push({
                 Id: resource.Id,
                 Description: resource.Description,
@@ -222,8 +265,13 @@ export class LessonEditor extends ObjectEditor {
                 Name: resource.Name,
                 MetaData: resource.MetaData,
                 ResType: resource.ResType,
+                AltAttribute: resource.AltAttribute,
             })
         });
+    }
+
+    _fillChilds(array) {
+        this.props.subLessons.map(child => array.push(child));
     }
 
     hideAddAuthorDialog() {
@@ -404,6 +452,10 @@ export class LessonEditor extends ObjectEditor {
         this.props.resourcesActions.create()
     }
 
+    _multiUpload() {
+        this.props.resourcesActions.multiUpload()
+    }
+
     _editResource(id) {
         let _resource = this.props.resources.find((item) => {
             return item.id === parseInt(id)
@@ -423,6 +475,15 @@ export class LessonEditor extends ObjectEditor {
         this.props.resourcesActions.clear();
     }
 
+    _cancelUploadResources() {
+        this.props.resourcesActions.cancelUpload();
+    }
+
+    _finishUploadResource(resources) {
+        this.props.lessonResourcesActions.multipleInsert(resources);
+        this.props.resourcesActions.finishUpload();
+    }
+
     _getAdditionalTab() {
         return <TabLink to="tab2">Дополнительные лекции</TabLink>
     }
@@ -438,9 +499,17 @@ export class LessonEditor extends ObjectEditor {
         if (_authors.length === 1) {
             window.$$('author').setValue(_authors[0].id);
         }
+
+        if (this.props.lesson.IsSubsRequired) {
+            window.$$('free-expr-date').enable()
+            window.$$('is-auth-required').setValue(true)
+            window.$$('is-auth-required').disable()
+
+        } else {
+            window.$$('free-expr-date').disable()
+            window.$$('is-auth-required').enable()
+        }
     }
-
-
 
     _getWebixForm() {
         const {
@@ -537,6 +606,7 @@ export class LessonEditor extends ObjectEditor {
                                          createAction={::this._createResource}
                                          editAction={::this._editResource}
                                          removeAction={lessonResourcesActions.remove}
+                                         multiUploadAction={::this._multiUpload}
                                          editMode={this.editMode}
                                          selected={selectedResource}
                                          data={resources}
@@ -562,6 +632,13 @@ export class LessonEditor extends ObjectEditor {
                 cancel={::this._cancelEditResource}
                 save={::this._saveResource}
                 data={this.props.resource}
+            />)
+        }
+
+        if (this.props.showMultiUploadResourcesEditor) {
+            _dialogs.push(<MultiResourceForm
+                cancel={::this._cancelUploadResources}
+                finish={::this._finishUploadResource}
             />)
         }
 
@@ -799,8 +876,25 @@ export class LessonEditor extends ObjectEditor {
             },
             {
                 view: "checkbox",
+                id: 'is-auth-required',
                 label: "Требуется авторизация",
                 name: 'IsAuthRequired',
+                labelWidth: labelWidth,
+            },
+            {
+                view: "checkbox",
+                label: "Требуется подписка на лекцию",
+                name: 'IsSubsRequired',
+                labelWidth: labelWidth,
+            },
+            {
+                view: "datepicker",
+                label: "Дата окончания бесплатного периода",
+                name: 'FreeExpDate',
+                id: 'free-expr-date',
+                width: 500,
+                stringResult: true,
+                format: this._formatDate,
                 labelWidth: labelWidth,
             },
             {
@@ -811,9 +905,12 @@ export class LessonEditor extends ObjectEditor {
                     {
                         view: "accordionitem",
                         headerHeight: 40,
+                        borderless: true,
                         header: "Краткое описание",
                         body: {
-                            view: "richtext",
+                            view: "textarea",
+                            borderless: true,
+                            id: 'descrition',
                             labelWidth: 0,
                             height: 100,
                             width: 0,
@@ -850,6 +947,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleCourse.current,
 
         showResourceEditor: state.resources.showEditor,
+        showMultiUploadResourcesEditor: state.resources.showMultiUploadEditor,
         resource: state.resources.object,
         resourceEditMode: state.resources.editMode,
 

@@ -7,6 +7,11 @@ const FAIL_AUDIO_TIME = 120;
 
 let _audioMap = new Map();
 
+const _isIOS = Platform.os.family === "iOS",
+    _isAndroid = Platform.os.family === "Android",
+    _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari"),
+    _usePreinit = (_isIOS || _isAndroid || _isSafariOnMac);
+
 export default class CWSResourceLoader {
 
     static clearAudios() {
@@ -18,11 +23,7 @@ export default class CWSResourceLoader {
     }
 
     static preinitAudio(sources) {
-        const _isIOS = Platform.os.family === "iOS",
-            _isAndroid = Platform.os.family === "Android",
-            _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari");
-
-        if (_isIOS || _isAndroid || _isSafariOnMac) {
+        if (_usePreinit) {
             let _mapKeys = _audioMap.keys();
             let _sourceNotEqual = (_audioMap.size !== sources.length) || sources.some((src) => {
                 let _source = '/data/' + src,
@@ -571,14 +572,23 @@ export default class CWSResourceLoader {
 
         if (id && !this._alreadyLoadedAudio(id)) {
             let url = "/data/" + id;
-            let audio = _audioMap.get(url)
 
-            if (!audio) {
+            let audio = null;
+
+            if (_usePreinit) {
+                audio = _audioMap.get(url)
+
+                if (!audio) {
+                    audio = new Audio()
+                    audio.preload = 'none'
+                    _audioMap.set(url, audio)
+                } else {
+                    audio.currentTime = 0;
+                }
+            } else {
                 audio = new Audio()
                 audio.preload = 'none'
-                _audioMap.set(url, audio)
             }
-
 
             setTimeout(() => {
                 audio.src = url;

@@ -834,12 +834,12 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 return root_obj.save(opts);
                             })
                             .then(() => {
+                                return lesson_obj.save(opts);
+                            })
+                            .then(() => {
                                 if (duration !== 0)
                                     return this._updateLessonDuration(newId, duration, opts);
-                            })    
-                            .then(() => {
-                                return lesson_obj.save(opts);
-                            });
+                            });    
                     })
                     .then(() => {
                         console.log("Episode added: Id=" + newId + ".");

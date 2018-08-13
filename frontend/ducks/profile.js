@@ -64,6 +64,8 @@ export const ReducerRecord = Record({
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
     loading: false,
+    loadingBookmarks: false,
+    loadingUserBookmarks: false,
     error: null
 })
 
@@ -85,7 +87,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case LOGOUT_SUCCESS:
             return state
-                .set('user', null)
+                .clear()
 
         case GET_USER_INFO_ERROR:
         case GET_HISTORY_ERROR:
@@ -111,29 +113,36 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_BOOKMARKS_START:
             return state
                 .set('error', null)
-                // .set('loading', true)
+                .set('loadingUserBookmarks', true)
                 .update('bookmarks', bookmarks => bookmarks.clear())
 
         case GET_BOOKMARKS_EXT_START:
             return state
                 .set('error', null)
-                // .set('loading', true)
+                .set('loadingBookmarks', true)
                 .update('courseBookmarks', courseBookmarks => courseBookmarks.clear())
                 .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.clear())
 
         case GET_BOOKMARKS_EXT_SUCCESS:
             return state
                 .set('error', null)
+                .set('loadingBookmarks', false)
                 .update('courseBookmarks', courseBookmarks => courseBookmarks.concat(payload.Courses))
                 .update('lessonBookmarks', lessonBookmarks => lessonBookmarks.concat(payload.Lessons))
 
         case GET_BOOKMARKS_SUCCESS:
             return state
+                .set('loadingUserBookmarks', false)
                 .update('bookmarks', bookmarks => bookmarks.union(payload))
 
         case GET_BOOKMARKS_ERROR:
             return state
-                .set('loading', false)
+                .set('loadingUserBookmarks', false)
+                .set('error', payload.error.message)
+
+        case GET_BOOKMARKS_EXT_ERROR:
+            return state
+                .set('loadingBookmarks', false)
                 .set('error', payload.error.message)
 
         case ADD_COURSE_TO_BOOKMARKS_SUCCESS:
@@ -144,30 +153,30 @@ export default function reducer(state = new ReducerRecord(), action) {
         case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload))
-                // .update('courseBookmarks', courseBookmarks => {
-                //     let _index = courseBookmarks.findIndex((course) => {
-                //         return course.URL === payload
-                //     })
-                //
-                //     return (_index >= 0) ?
-                //         courseBookmarks.splice(_index, 1)
-                //         :
-                //         courseBookmarks
-                //     })
+        // .update('courseBookmarks', courseBookmarks => {
+        //     let _index = courseBookmarks.findIndex((course) => {
+        //         return course.URL === payload
+        //     })
+        //
+        //     return (_index >= 0) ?
+        //         courseBookmarks.splice(_index, 1)
+        //         :
+        //         courseBookmarks
+        //     })
 
         case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload.courseUrl + '/' + payload.lessonUrl))
-                // .update('lessonBookmarks', lessonBookmarks => {
-                //     let _index = lessonBookmarks.findIndex((lesson) => {
-                //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
-                //     })
-                //
-                //     return (_index >= 0) ?
-                //         lessonBookmarks.splice(_index, 1)
-                //         :
-                //         lessonBookmarks
-                // })
+        // .update('lessonBookmarks', lessonBookmarks => {
+        //     let _index = lessonBookmarks.findIndex((lesson) => {
+        //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
+        //     })
+        //
+        //     return (_index >= 0) ?
+        //         lessonBookmarks.splice(_index, 1)
+        //         :
+        //         lessonBookmarks
+        // })
 
         default:
             return state
@@ -188,6 +197,8 @@ export const getLessonBookmarks = createSelector(stateSelector, state => state.l
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const loadingBookmarksSelector = createSelector(stateSelector, state => state.loadingBookmarks)
+export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
 
 /**
  * Action Creators
@@ -489,7 +500,8 @@ const handleData = (data) => {
 
 const handleCourse = (data) => {
     if (data.CoverMeta) {
-        data.CoverMeta = JSON.parse(data.CoverMeta)
+        data.CoverMeta = JSON.parse(data.CoverMeta);
+        data.Mask = data.Mask ? data.Mask : '_mask01';
     }
 };
 
@@ -566,6 +578,10 @@ const handleBookmarksData = (data) => {
                 course.categories.push(data.Categories[categoryId])
             })
         })
+
+        data.Courses.sort((a, b) => {
+            return a.Order - b.Order
+        })
     }
 
     if (data.Lessons) {
@@ -574,6 +590,12 @@ const handleBookmarksData = (data) => {
 
             let _course = data.LessonCourses[lesson.CourseId];
 
+            _course.minOrder = _course.minOrder
+                ?
+                (_course.minOrder < lesson.Order) ? _course.minOrder : lesson.Order
+                :
+                lesson.Order;
+
             lesson.courseUrl = _course ? _course.URL : null;
             lesson.courseName = _course ? _course.Name : null;
 
@@ -581,6 +603,20 @@ const handleBookmarksData = (data) => {
 
             lesson.authorUrl = _author ? _author.URL : null;
             lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
+        })
+
+        data.Lessons.sort((a, b) => {
+            let _courseA = data.LessonCourses[a.CourseId];
+            let _courseB = data.LessonCourses[b.CourseId];
+
+            let _result = _courseA.minOrder - _courseB.minOrder;
+
+            if (_result === 0) {
+                _result = a.Number - b.Number
+                // _result = a.Order - b.Order
+            }
+
+            return _result
         })
     }
 }

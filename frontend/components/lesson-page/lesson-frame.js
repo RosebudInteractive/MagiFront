@@ -28,12 +28,13 @@ class LessonFrame extends React.Component {
 
         $(document).mouseup((e) => {
             let _isLessonScreen = e.target.closest('#lesson-' + that.props.lesson.Id),
+                _isMenu = e.target.closest('.lectures-menu'),
                 _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
                 _isSocialBlock = e.target.closest('.social-block'),
                 _isTranscriptLink = e.target.closest('.link-to-transcript'),
                 _isPlayerBlock = e.target.closest('.player-frame');
 
-            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink) {
+            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu) {
                 that._play()
             }
         })
@@ -58,27 +59,40 @@ class LessonFrame extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
-    _getButton() {
+    _getButton(isFinished) {
         const _playLock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-lock"/>',
-            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lecture-replay"/>';
+
+        const _style = {cursor: 'pointer'};
 
         let {lesson, authorized} = this.props,
             _button = null;
 
         if (lesson.IsAuthRequired && !authorized) {
             _button = (
-                <div style={{cursor: 'pointer'}} onClick={::this._unlock}>
+                <div style={_style} onClick={::this._unlock}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
                         <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _playLock}}/>
-                        <svg className='icon-lock' width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
                     </span>
                 </div>
             )
         } else {
             _button = (
-                <div style={{cursor: 'pointer'}} onClick={::this._play}>
-                    <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
-                </div>
+                isFinished ?
+                    (
+                        <div style={_style} onClick={::this._play}>
+                            <span className="play-btn-big lecture-frame__play-btn lock">
+                                <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _replay}}/>
+                            </span>
+                        </div>
+                    )
+                    :
+                    (
+                        <div style={_style} onClick={::this._play}>
+                            <span className="play-btn-big lecture-frame__play-btn">Воспроизвести</span>
+                        </div>
+                    )
+
             )
         }
 
@@ -103,7 +117,7 @@ class LessonFrame extends React.Component {
         let {courseUrl, lessonUrl} = this.props;
 
         return this.props.bookmarks && this.props.bookmarks.find((item) => {
-            return item === courseUrl + '/' +  lessonUrl
+            return item === courseUrl + '/' + lessonUrl
         })
     }
 
@@ -114,6 +128,7 @@ class LessonFrame extends React.Component {
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
 
         return (
@@ -129,7 +144,7 @@ class LessonFrame extends React.Component {
                             </button>}
                         <h2 className="lecture-frame__title">
                             <span className="lecture-frame__duration">{lesson.DurationFmt}</span>
-                            {this._getButton()}
+                            {this._getButton(_isFinished)}
                             <p className="title-paragraph">
                                 <span className="title-text">
                                     <span className="number">{_number}</span>
@@ -154,7 +169,7 @@ class LessonFrame extends React.Component {
 
 class SocialBlock extends React.Component {
     static propTypes = {
-        inFavorites : PropTypes.bool,
+        inFavorites: PropTypes.bool,
         onFavoritesClick: PropTypes.func,
     }
 
@@ -194,7 +209,7 @@ class SocialBlock extends React.Component {
                     </div>
                     <span className="social-btn__actions">4</span>
                 </a>
-                <span className={"favorites"  + (inFavorites ? ' active' : '')} onClick={onFavoritesClick}>
+                <span className={"favorites" + (inFavorites ? ' active' : '')} onClick={onFavoritesClick}>
                     <svg width="14" height="23" dangerouslySetInnerHTML={{__html: inFavorites ? _redFlag : _flag}}/>
                 </span>
             </div>

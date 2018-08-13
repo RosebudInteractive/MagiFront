@@ -209,7 +209,16 @@ const convertToStorageFormat = (object) => {
         _result = new Map();
 
     for (let key in lsn) {
-        _result.set(parseInt(key), {currentTime: lsn[key].pos})
+        let _obj = {};
+        if (lsn[key].pos !== undefined) {
+            _obj.currentTime = lsn[key].pos;
+        }
+
+        if (lsn[key].isFinished !== undefined) {
+            _obj.isFinished = lsn[key].isFinished;
+        }
+
+        _result.set(parseInt(key), _obj)
     }
 
     return _result

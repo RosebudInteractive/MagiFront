@@ -85,10 +85,7 @@ class Menu extends React.Component {
                     })
                 }
             }
-
-            e.preventDefault();
         }
-
     }
 
     _handleSetNewWidth() {
@@ -130,7 +127,6 @@ class Menu extends React.Component {
     }
 
     _switchMenu() {
-        // this.setState({opened: !this.state.opened})
         if (this.props.isLessonMenuOpened) {
             this.props.appActions.hideLessonMenu()
         } else {
@@ -139,7 +135,6 @@ class Menu extends React.Component {
 
         $(window).on('scroll', (e) => {
             console.log(e.target.className)
-            // e.preventDefault()
         })
     }
 
@@ -155,7 +150,7 @@ class Menu extends React.Component {
 
                 $('.menu-nav-sublist').css('max-height', _height)
             } else {
-                $('.menu-nav-sublist').css('max-height', 'auto')
+                $('.menu-nav-sublist').css('max-height', 'none')
             }
         } else {
             $('.menu-nav-sublist').css('max-height', '0')
@@ -200,15 +195,46 @@ class Menu extends React.Component {
     _setNavigationMenuWidth() {
         if (this._isDesktopWidth) {
             $('.js-lectures-menu-nav').css('width', $('.lectures-menu-nav__list').width());
+            let _items = $('.menu-nav-list__item');
+            if (_items.length > 0) {
+                let _width = 100 / _items.length;
+                _items.css('width', _width + '%');
+            }
         } else {
             $('.js-lectures-menu-nav').css('width', '');
         }
     }
 
+    _scrollToTop() {
+        let $target = $("#text"),
+            targetOffset = $target.offset().top;
+
+        let _currentPosition = $(window).scrollTop(),
+            _delta = 0;
+
+        if (_currentPosition > targetOffset) {
+            _delta = ($(window).outerWidth() > 899) ? 175 : 125
+        } else {
+            _delta = 75
+        }
+
+        targetOffset -= _delta;
+        $('html, body').scrollTop(targetOffset)
+
+        // if ($target.length) {
+        //
+        //     // trigger scroll
+        //     $('html, body').animate({
+        //         scrollTop: targetOffset
+        //     }, 0);
+        // }
+    }
+
     render() {
         let {isNeedHideGallery, isNeedHideRefs} = this.props;
 
-        const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>'
+        const _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"></use>',
+            _style = {"white-space": 'nowrap'};
 
         return (
             <div className="page-header__row lectures-menu-row">
@@ -229,7 +255,7 @@ class Menu extends React.Component {
                         <LessonsListWrapper {...this.props} isDark={true} active={this.props.current}/>
                     </div>
                     <section className={"lectures-menu__section lectures-menu-nav js-lectures-menu-nav"}>
-                        <button className="lectures-menu-nav__trigger" onClick={::this._switchNavigation}>Меню</button>
+                        <button className={"lectures-menu-nav__trigger" + (this.state.showNavigationButtons ? ' opened' : '')} onClick={::this._switchNavigation}>Меню</button>
                         <div className={"lectures-menu-nav__list" + (this.state.showNavigationButtons ? ' show' : '')}>
                             <ul className="menu-nav-list">
                                 {
@@ -240,7 +266,9 @@ class Menu extends React.Component {
                                             <TableOfContents episodes={this.props.episodes}/>
                                         </li>
                                         :
-                                        null
+                                        <li className={"menu-nav-list__item"} style={_style}>
+                                            <div className="menu-nav-list__item-head"  onClick={::this._scrollToTop}>В начало</div>
+                                        </li>
                                 }
                                 {
                                     !isNeedHideRefs ?
@@ -254,7 +282,7 @@ class Menu extends React.Component {
                                 {
                                     !isNeedHideGallery ?
                                         <li className="menu-nav-list__item">
-                                            <a href="#gallery"
+                                            <a href="#pictures"
                                                className="menu-nav-list__item-head js-scroll-link">Галерея</a>
                                         </li>
                                         :
@@ -272,7 +300,7 @@ class Menu extends React.Component {
 
 class TableOfContents extends React.Component {
 
-    componentDidUpdate() {
+    _mountScroll() {
         let _links = $('.js-scroll-link');
         _links.prop('onclick', null).off('click');
 
@@ -280,26 +308,38 @@ class TableOfContents extends React.Component {
             let $target = $($(this).attr('href')),
                 targetOffset = $target.offset().top;
 
-            let _currentPosition = $(window).scrollTop(),
-                _delta = 0;
+            // let _currentPosition = $(window).scrollTop(),
+            //     _delta = 0;
 
-            if (_currentPosition > targetOffset) {
-                _delta = ($(window).outerWidth() > 899) ? 175 : 125
-            } else {
-                _delta = 75
-            }
+            // if (_currentPosition > targetOffset) {
+            //     _delta = ($(window).outerWidth() > 899) ? 240 : 190
+            // } else {
+            //     _delta = 75
+            // }
+
+            let _delta = ($(window).outerWidth() > 899) ? 160 : 125
 
             targetOffset -= _delta;
 
             if ($target.length) {
-                e.preventDefault();
+                $('html, body').scrollTop(targetOffset)
+
+                // e.preventDefault();
 
                 // trigger scroll
-                $('html, body').animate({
-                    scrollTop: targetOffset
-                }, 400);
+                // $('html, body').animate({
+                //     scrollTop: targetOffset
+                // }, 0);
             }
         })
+    }
+
+    componentDidMount() {
+        this._mountScroll()
+    }
+
+    componentDidUpdate() {
+        this._mountScroll()
     }
 
     componentWillUnmount() {

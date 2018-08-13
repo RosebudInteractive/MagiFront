@@ -1,9 +1,17 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {getCourseBookmarks, removeCourseFromBookmarks, addCourseToBookmarks, userBookmarksSelector} from '../../ducks/profile'
+import {
+    getCourseBookmarks,
+    removeCourseFromBookmarks,
+    addCourseToBookmarks,
+    userBookmarksSelector,
+    loadingBookmarksSelector,
+    loadingUserBookmarksSelector,
+} from '../../ducks/profile'
 import {bindActionCreators} from "redux";
 import Item from "./course-item";
+import Message from "./favourites-message";
 
 class LessonsBlock extends React.Component {
 
@@ -37,16 +45,21 @@ class LessonsBlock extends React.Component {
                 return <Item item={item} key={index} onRemoveItem={::this._favoritesClick}
                              isFavorite={this._isCourseInBookmarks(item)}/>
             }) :
-            null
+            <Message/>
     }
 
     render() {
+        let {loading} = this.props;
+
         return (
-            <div className={"profile-block__tab" + (this.props.active ? " active" : "")}>
-                <div className="favourites">
-                    {this._getList()}
+            !loading ?
+                <div className={"profile-block__tab" + (this.props.active ? " active" : "")}>
+                    <div className="favourites">
+                        {this._getList()}
+                    </div>
                 </div>
-            </div>
+                :
+                null
         )
     }
 }
@@ -55,6 +68,7 @@ function mapStateToProps(state) {
     return {
         bookmarks: getCourseBookmarks(state),
         userBookmarks: userBookmarksSelector(state),
+        loading: loadingBookmarksSelector(state) || loadingUserBookmarksSelector(state)
     }
 }
 

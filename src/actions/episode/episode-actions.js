@@ -7,10 +7,10 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
+    IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_START, IMPORT_EPISODE_FAIL,
 } from '../../constants/episode/singleEpisode'
 
 import {
-    // HIDE_DELETE_DLG,
     SHOW_ERROR_DIALOG,
     EDIT_MODE_INSERT,
     EDIT_MODE_EDIT,
@@ -18,6 +18,7 @@ import {
 
 
 import 'whatwg-fetch';
+import {handleJsonError} from "../../tools/fetch-tools";
 
 export const get = (id, lessonId) => {
     return (dispatch) => {
@@ -97,6 +98,72 @@ export const save = (values, mode) => {
 
     }
 };
+
+export const uploadPackage = (object) => {
+    return (dispatch) => {
+
+        dispatch({
+            type: IMPORT_EPISODE_START,
+            payload: null
+        })
+
+        let data = new FormData()
+        data.append('file', object.file)
+        data.append('idEpisode', object.idEpisode)
+        data.append('idLesson', object.idLesson)
+
+        fetch('/import',
+            {
+                method: 'POST',
+                body: data,
+                credentials: 'include'
+            })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then((data) => {
+                if (data.result === 'OK') {
+                    dispatch({
+                        type: IMPORT_EPISODE_SUCCESS,
+                        payload: null
+                    })
+
+                    dispatch(get(object.idEpisode, object.idLesson))
+                } else if (data.result === 'WARN') {
+                    dispatch({
+                        type: SHOW_ERROR_DIALOG,
+                        payload: data.warnings.join('\n')
+                    })
+
+                    dispatch({
+                        type: IMPORT_EPISODE_FAIL,
+                        payload: null
+                    })
+                } else {
+                    let _message = (data.errors.length > 0) ? data.errors.join('\n') : data.message;
+
+                    dispatch({
+                        type: SHOW_ERROR_DIALOG,
+                        payload: _message
+                    })
+
+                    dispatch({
+                        type: IMPORT_EPISODE_FAIL,
+                        payload: null
+                    })
+                }
+            })
+            .catch((err) => {
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            });
+
+    }
+}
 
 export const changeData = (object) => {
     return (dispatch) => {

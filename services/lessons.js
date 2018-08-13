@@ -3,17 +3,6 @@ let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
 
-    app.get('/api/adm/lessons/:id/:courseId', (req, res, next) => {
-        LessonsService()
-            .get(parseInt(req.params.id), parseInt(req.params.courseId))
-            .then(rows => {
-                res.send(rows);
-            })
-            .catch(err => {
-                next(err);
-            });
-    });
-
     app.get('/api/adm/lessons/resources/:id', (req, res, next) => {
         LessonsService()
             .getResources(parseInt(req.params.id))
@@ -25,9 +14,31 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/adm/lessons/:id/:courseId', (req, res, next) => {
+        LessonsService()
+            .get(parseInt(req.params.id), parseInt(req.params.courseId))
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/lessons/play/:id', (req, res, next) => {
         LessonsService()
             .getPlayerData(parseInt(req.params.id))
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/lessons/v2/:course_url/:lesson_url', (req, res, next) => {
+        LessonsService()
+            .getLessonV2(req.params.course_url, req.params.lesson_url)
             .then(rows => {
                 res.send(rows);
             })

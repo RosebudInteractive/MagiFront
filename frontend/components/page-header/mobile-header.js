@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import * as tools from '../../tools/page-tools';
+import {pages} from "../../tools/page-tools";
 
-export default class MobileHeader extends React.Component {
+class MobileHeader extends React.Component {
 
     static propTypes = {
         onClickMenuTrigger: PropTypes.func.isRequired,
@@ -13,9 +14,9 @@ export default class MobileHeader extends React.Component {
 
     static defaultProps = {};
 
-
     render() {
-        const _logo = '<use xlink:href="#logo-mob"/>'
+        const _logo = '<use xlink:href="#logo-mob"/>',
+            _flagFull = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>'
 
         return (
             <div className="page-header__menu-mobile">
@@ -26,15 +27,32 @@ export default class MobileHeader extends React.Component {
                 </Link>
                 <nav className="navigation navigation-mobile">
                     <ul>
-                        <li className={this.props.currentPage.name === tools.pages.courses.name ? "current" : ''}>
-                            <Link to={tools.pages.courses.url}>Курсы</Link>
+                        <li className={this.props.currentPage.name === pages.courses.name ? "current" : ''}>
+                            <Link to={pages.courses.url}>Курсы</Link>
                         </li>
-                        <li>
-                            <a href="#">Календарь</a>
-                        </li>
+                        {
+                            this.props.authorized ?
+                                <li className={"favorites" + (this.props.currentPage === pages.bookmarks ? ' active' : '')}
+                                    onClick={this.props.onBookmarkClick}>
+                                    <Link to={'/favorites'}>
+                                        <span className="hidden">Закладки</span>
+                                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                                    </Link>
+                                </li>
+                                :
+                                null
+                        }
                     </ul>
                 </nav>
             </div>
         )
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        authorized: !!state.user.user,
+    }
+}
+
+export default connect(mapStateToProps)(MobileHeader);

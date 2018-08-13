@@ -22,18 +22,18 @@ export const startPlayLesson = (lesson) => {
 };
 
 export const startPlay = (lessonId) => {
-    return {
-        type: PLAYER_START_PLAY,
-        payload: lessonId
+    return (dispatch) => {
+        dispatch({
+            type: PLAYER_START_PLAY,
+            payload: lessonId
+        });
     };
 };
 
-export const startReplay = () => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_START_REPLAY,
-            payload: null
-        });
+export const startReplay = (lessonId) => {
+    return {
+        type: PLAYER_START_REPLAY,
+        payload: lessonId
     }
 };
 

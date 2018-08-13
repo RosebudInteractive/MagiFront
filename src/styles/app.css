@@ -1,4 +1,76 @@
 /*https://www.iconfinder.com/iconsets/evil-icons-user-interface*/
+._mask01 image {
+    /*-webkit-clip-path: url("#clipping01");*/
+    clip-path: url("#clipping01");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask02 image {
+    /*-webkit-clip-path: url("#clipping02");*/
+    clip-path: url("#clipping02");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask03 image {
+    /*-webkit-clip-path: url("#clipping03");*/
+    clip-path: url("#clipping03");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask04 image {
+    /*-webkit-clip-path: url("#clipping04");*/
+    clip-path: url("#clipping04");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask05 image {
+    /*-webkit-clip-path: url("#clipping05");*/
+    clip-path: url("#clipping05");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask06 image {
+    /*-webkit-clip-path: url("#clipping06");*/
+    clip-path: url("#clipping06");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask07 image {
+    /*-webkit-clip-path: url("#clipping07");*/
+    clip-path: url("#clipping07");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask08 image {
+    /*-webkit-clip-path: url("#clipping08");*/
+    clip-path: url("#clipping08");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask09 image {
+    /*-webkit-clip-path: url("#clipping09");*/
+    clip-path: url("#clipping09");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask10 image {
+    /*-webkit-clip-path: url("#clipping10");*/
+    clip-path: url("#clipping10");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask11 image {
+    /*-webkit-clip-path: url("#clipping11");*/
+    clip-path: url("#clipping11");
+    min-height: 100%;
+    min-width: 100%; }
+
+._mask12 image {
+    /*-webkit-clip-path: url("#clipping12");*/
+    clip-path: url("#clipping12");
+    min-height: 100%;
+    min-width: 100%; }
+
 #confirm .holder {
     font: 12px sans-serif;
     position: absolute;
@@ -50,10 +122,18 @@
 
 .cover {
     width: 360px;
-    height: auto;
+    /*height: auto;*/
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
     /*border-radius: 100%; !* Радиус скругления *!*/
     /*box-shadow: 0 0 0 3px green, 0 0 13px #333; !* Параметры теней *!*/
     /*display: none;*/
+}
+
+.cover svg {
+    max-width: 360px;
+    max-height: 334px;
 }
 
 .tabs-1 .tab-links {
@@ -157,6 +237,10 @@
 
 .back {
     background: url(./../icons/arrow_left.svg);
+}
+
+.upload {
+    background: #96c8ff url(./../icons/upload.svg);
 }
 
 button:disabled,

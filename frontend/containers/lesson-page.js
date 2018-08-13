@@ -5,7 +5,7 @@ import {Redirect} from 'react-router';
 
 import $ from 'jquery'
 // import 'fullpage.js'
-import 'script-lib/jquery.fullpage'
+// import 'script-lib/jquery.fullpage'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as playerStartActions from '../actions/player-start-actions';
@@ -22,29 +22,10 @@ class LessonPage extends React.Component {
 
     constructor(props) {
         super(props);
-        this._mountFullPageGuard = false;
 
         this.state = {
             total: 0,
-            currentActive: 0,
             redirectToPlayer: false,
-        }
-
-        this._internalRedirect = false;
-        this._mountPlayerGuard = true;
-
-
-        this._resizeHandler = () => {
-            if ($('#fullpage-lesson').length) {
-                $.fn.fullpage.reBuild();
-            }
-        }
-
-        this._keydownHandler = (e) => {
-            if (e.which === 32) {
-                this._handleWhitespace = true;
-                e.preventDefault();
-            }
         }
     }
 
@@ -57,14 +38,6 @@ class LessonPage extends React.Component {
         this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.lesson);
         this._needStartPlayer = this.props.params === '?play'
-    }
-
-    componentDidMount() {
-        $(document).ready(() => {
-            this._mountFullpage();
-        });
-
-        this._mountKeydownHandler();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -92,18 +65,9 @@ class LessonPage extends React.Component {
             (this.props.params === '?play')
 
 
-        let _anchors = this._getAnchors();
-
-        let _index = _anchors.findIndex((item) => {
-            return item.url === nextProps.lessonUrl
-        });
-
-        let _anchor = (_index >= 0) ? _anchors[_index] : null
-
         let _isRedirectFromThisPage = (nextState.redirectToPlayer) &&
             (this.props.courseUrl === nextProps.courseUrl) &&
-            (this.props.lessonUrl !== nextProps.lessonUrl) &&
-            (_anchor) && !this._internalRedirect;
+            (this.props.lessonUrl !== nextProps.lessonUrl);
 
         let _needSkipRedirect = _linkToSelfLessonFromPlayer || _isRedirectFromThisPage
 
@@ -111,9 +75,6 @@ class LessonPage extends React.Component {
             let _newUrl = '/' + nextProps.courseUrl + '/' + nextProps.lessonUrl + '?play';
             this.props.history.replace(_newUrl)
             this.props.appActions.hideLessonMenu()
-            if (_isRedirectFromThisPage) {
-                $.fn.fullpage.moveTo(_anchor.name, _index + 1)
-            }
         }
 
         return !_needSkipRedirect
@@ -121,32 +82,12 @@ class LessonPage extends React.Component {
 
     componentDidUpdate(prevProps) {
         let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
-        this._mountFullpage();
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
-            let _anchors = this._getAnchors();
-
-            let _index = _anchors.findIndex((item) => {
-                return item.url === lessonUrl
-            })
-
-            let _anchor = (_index >= 0) ? _anchors[_index] : null
-
-            let _isRedirectFromThisPage = (courseUrl === prevProps.courseUrl) &&
-                (lessonUrl !== prevProps.lessonUrl) &&
-                (_anchor);
-
-            if (!_isRedirectFromThisPage) {
-                this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-                this._unmountFullpage();
-            } else {
-                if (!this._internalRedirect) {
-                    $.fn.fullpage.moveTo(_anchor.name, _index + 1)
-                }
-            }
+            this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+            this.props.appActions.hideLessonMenu()
         }
 
-        this.props.appActions.hideLessonMenu()
 
         let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
         if (!_lesson) {
@@ -178,11 +119,8 @@ class LessonPage extends React.Component {
     }
 
     componentWillUnmount() {
-        this._unmountFullpage();
         $('body').removeAttr('data-page');
         this.props.lessonActions.clearLesson();
-        $(window).unbind('resize', this._resizeHandler)
-        $(window).unbind('keydown', this._keydownHandler)
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
@@ -198,31 +136,7 @@ class LessonPage extends React.Component {
             })
     }
 
-    _mountFullpage() {
-        let _container = $('#fullpage-lesson');
-        if ((!this._mountFullPageGuard) && (_container.length > 0)) {
-            $('body').attr('data-page', 'fullpage-lesson');
-            const _options = this._getFullpageOptions();
-            _container.fullpage(_options)
-            this._mountFullPageGuard = true;
-        }
-    }
-
-    _unmountFullpage() {
-        if (this._mountFullPageGuard) {
-            $.fn.fullpage.destroy(true)
-            this._mountFullPageGuard = false
-            let _menu = $('.js-lesson-menu');
-            _menu.remove();
-        }
-    }
-
-    _mountKeydownHandler() {
-        $(window).keydown(this._keydownHandler)
-        $(window).resize(this._resizeHandler)
-    }
-
-    _createBundle(lesson, key, isMain) {
+    _createBundle(lesson) {
         let {authors} = this.props.lessonInfo;
 
         lesson.Author = authors.find((author) => {
@@ -231,7 +145,6 @@ class LessonPage extends React.Component {
 
 
         let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
-            _isManyLessonsOnPage = this._getAnchors().length > 0,
             _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
 
         let _lessonAudios = null;
@@ -258,162 +171,29 @@ class LessonPage extends React.Component {
 
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
 
-        if (_playingLessonUrl || (_lessonInPlayer && _isManyLessonsOnPage)) {
-
-            return <Wrapper key={key}
-                            lesson={lesson}
-                            courseUrl={this.props.courseUrl}
-                            lessonUrl={lesson.URL}
-                            isMain={isMain}
-                            active={this.state.currentActive}
-                            isPlayer={true}
-                            audios={_audios}
-                            history={this.props.history}
-            />
-        } else {
-            return <Wrapper key={key}
-                            lesson={lesson}
-                            lessonUrl={this.props.lessonUrl}
-                            courseUrl={this.props.courseUrl}
-                            isMain={isMain}
-                            active={this.state.currentActive}
-                            isPlayer={false}
-                            audios={_audios}
-                            history={this.props.history}
-            />
-        }
+        return <Wrapper lesson={lesson}
+                        courseUrl={this.props.courseUrl}
+                        lessonUrl={lesson.URL}
+                        active={lesson.Number}
+                        isPlayer={_playingLessonUrl || _lessonInPlayer}
+                        audios={_audios}
+                        history={this.props.history}
+        />
     }
 
     _getLessonsBundles() {
-        let {object: lesson} = this.props.lessonInfo;
-        let _bundles = [];
+        let lesson = this._getLesson();
 
-        if (!lesson) return _bundles;
-
-        _bundles.push(this._createBundle(lesson, 'lesson0', true));
-
-        if (lesson.Lessons) {
-            lesson.Lessons.forEach((lesson, index) => {
-                _bundles.push(this._createBundle(lesson, 'lesson' + (index + 1), false))
-            });
-        }
-
-        return _bundles.map((bundle) => {
-            return bundle
-        });
+        return lesson ? this._createBundle(lesson) : null;
     }
 
-    _getAnchors() {
-        let {object: lesson} = this.props.lessonInfo;
+    _getLesson() {
+        let {lessonUrl, lessonInfo} = this.props,
+            lesson = lessonInfo.object;
 
-        if (!lesson) {
-            return []
-        }
-
-        let _anchors = [];
-        _anchors.push({
-            name: 'lesson0',
-            title: lesson.Name,
-            id: lesson.Id,
-            number: lesson.Number,
-            url: lesson.URL,
-        });
-
-        lesson.Lessons.forEach((lesson, index) => {
-            _anchors.push({
-                name: 'lesson' + (index + 1),
-                title: lesson.Name,
-                id: lesson.Id,
-                number: lesson.Number,
-                url: lesson.URL,
-            })
-        });
-
-        return _anchors
-    }
-
-    _getFullpageOptions() {
-        let that = this;
-        let _anchors = this._getAnchors();
-
-        return {
-            normalScrollElements: '.lectures-list-wrapper, .contents-tooltip',
-            fixedElements: '.js-lesson-menu',
-            anchors: _anchors.map((anchor) => {
-                return anchor.name
-            }),
-            navigation: (_anchors.length > 1),
-            navigationTooltips: _anchors.map((anchor) => {
-                return anchor.title
-            }),
-            css3: true,
-            autoScrolling: true,
-            lockAnchors: true,
-            keyboardScrolling: true,
-            animateAnchor: true,
-            // responsiveSlides: true,
-            sectionSelector: '.fullpage-section',
-            slideSelector: '.fullpage-slide',
-            lazyLoading: true,
-            onLeave: (index, nextIndex,) => {
-                if (that._handleWhitespace) {
-                    that._handleWhitespace = false;
-                    return false
-                }
-
-                if (index === nextIndex) {
-                    return
-                }
-
-                let _menu = $('.js-lesson-menu');
-                if (_menu.length) {
-                    _menu.hide();
-                }
-
-                let {id} = _anchors[nextIndex - 1];
-                let _activeMenu = $('#lesson-menu-' + id);
-                if (_activeMenu.length > 0) {
-                    _activeMenu.show()
-                }
-                that._activeLessonId = id;
-
-                if (that.props.lessonUrl !== _anchors[nextIndex - 1].url) {
-                    let _newUrl = '/' + that.props.courseUrl + '/' + _anchors[nextIndex - 1].url;
-                    if (that.props.playInfo && (that.props.playInfo.id === id)) {
-                        _newUrl += '?play';
-                    }
-                    that._internalRedirect = true;
-                    that.props.history.replace(_newUrl)
-                }
-            },
-            afterLoad: (anchorLink, index) => {
-                that._internalRedirect = false;
-
-                if (!index) {
-                    return
-                }
-
-                let {id, number} = _anchors[index - 1];
-                let _activeMenu = $('#lesson-menu-' + id);
-                if (_activeMenu.length > 0) {
-                    _activeMenu.show()
-                }
-
-                that._activeLessonId = id;
-                that.setState({currentActive: number})
-            },
-            afterRender: () => {
-                let _url = this.props.lessonUrl;
-                let _anchor = _anchors.find((anchor) => {
-                    return anchor.url === _url
-                })
-
-                if ((_anchors.length > 1) && _anchor) {
-                    that._silentMove = true;
-                    $.fn.fullpage.silentMoveTo(_anchor.name);
-                }
-            }
-        }
+        return (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
+            return subLesson.URL === lessonUrl
+        })
     }
 
     render() {
@@ -423,7 +203,6 @@ class LessonPage extends React.Component {
         } = this.props;
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
-            // this.setState({redirectToPlayer: false})
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
@@ -432,7 +211,7 @@ class LessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 lessonInfo.object ?
-                    <div className='fullpage-wrapper' id='fullpage-lesson'>
+                    <div className='lesson-wrapper'>
                         {this._getLessonsBundles()}
                     </div>
                     :

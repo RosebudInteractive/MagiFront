@@ -127,6 +127,7 @@ const handleCourses = (data) => {
             });
 
             item.ColorHex = '#' + item.Color.toString(16);
+            item.Mask = item.Mask ? item.Mask : '_mask01';
 
             let _readyLessonCount = 0;
 
@@ -157,6 +158,8 @@ const handleCourse = (data) => {
         if (data.CoverMeta) {
             data.CoverMeta = JSON.parse(data.CoverMeta)
         }
+
+        data.Mask = data.Mask ? data.Mask : '_mask01';
 
         data.Authors.forEach((author) => {
             if (author.PortraitMeta) {

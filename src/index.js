@@ -6,8 +6,9 @@ import App from './containers/App'
 import './styles/app.css'
 import "./styles/font-awesome.min.css"
 import { store } from './store/configureStore'
-import { BrowserRouter } from 'react-router-dom'
+import { Router} from 'react-router-dom'
 import UserConfirmation from "./components/userConfirmation";
+import history from './history'
 
 const getConfirmation = (message, callback) => {
     render((
@@ -17,9 +18,9 @@ const getConfirmation = (message, callback) => {
 
 render(
     <Provider store={store}>
-        <BrowserRouter getUserConfirmation={getConfirmation}>
+        <Router getUserConfirmation={getConfirmation} history={history}>
             <App />
-        </BrowserRouter>
+        </Router>
     </Provider>,
     document.getElementById('root')
 );

@@ -5,6 +5,7 @@ import {
 
 const initialState = {
     visible: false,
+    callingRoute: '',
 };
 
 export default function workShop(state = initialState, action) {
@@ -12,7 +13,7 @@ export default function workShop(state = initialState, action) {
     switch (action.type) {
         case WORK_SHOP_SHOW: {
             if (!state.visible) {
-                return {...state, visible: true};
+                return {...state, visible: true, callingRoute: action.payload};
             } else {
                 return state
             }
@@ -20,7 +21,7 @@ export default function workShop(state = initialState, action) {
 
         case WORK_SHOP_HIDE: {
             if (state.visible) {
-                return {...state, visible: false};
+                return {...state, visible: false, callingRoute: ''};
             } else {
                 return state
             }

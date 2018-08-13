@@ -3,11 +3,9 @@ import {pages} from "../tools/page-tools";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
-    // addCourseToBookmarks,
     getCourseBookmarks,
     getLessonBookmarks,
-    getUserBookmarksFull
-    // removeCourseFromBookmarks
+    getUserBookmarksFull, loadingSelector
 } from "../ducks/profile";
 import * as pageHeaderActions from "../actions/page-header-actions";
 import * as userActions from "../actions/user-actions";
@@ -15,10 +13,13 @@ import * as appActions from "../actions/app-actions";
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import LessonsBlock from '../components/bookmarks/lessons-block'
 import CoursesBlock from '../components/bookmarks/courses-block'
+import {Redirect} from 'react-router';
 
 class BookmarksPage extends React.Component {
     constructor(props) {
         super(props);
+
+        this._redirect = false;
 
         this.state = {
             courses: true,
@@ -30,7 +31,7 @@ class BookmarksPage extends React.Component {
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getUserBookmarksFull();
-        this.props.pageHeaderActions.setCurrentPage(pages.author);
+        this.props.pageHeaderActions.setCurrentPage(pages.bookmarks);
         if ((this.props.page === '/favorites/lessons') && (!this.props.showLessonBookmarks)) {
             this.props.appActions.showLessonsBookmarks();
         }
@@ -41,14 +42,24 @@ class BookmarksPage extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
-            this.props.appActions.showCoursesBookmarks();
-            this.props.history.replace('/favorites/courses')
+        if ((this.props.loading) && (!nextProps.loading)) {
+            if (!nextProps.authorized) {
+                this._redirect = true;
+                this.forceUpdate();
+                this.props.userActions.showSignInForm();
+            }
         }
 
-        if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
-            this.props.appActions.showLessonsBookmarks();
-            this.props.history.replace('/favorites/lessons')
+        if (nextProps.isBookmarksPage) {
+            if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
+                this.props.appActions.showCoursesBookmarks();
+                this.props.history.replace('/favorites/courses')
+            }
+
+            if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
+                this.props.appActions.showLessonsBookmarks();
+                this.props.history.replace('/favorites/lessons')
+            }
         }
     }
 
@@ -67,6 +78,10 @@ class BookmarksPage extends React.Component {
             _lessonsCount = lessonsBookmarks ? lessonsBookmarks.size : 0,
             _coursesCount = coursesBookmarks ? coursesBookmarks.size : 0;
 
+        if (this._redirect) {
+            this._redirect = false;
+            return <Redirect push to={'/'}/>;
+        }
 
         return (
             <div className="bookmarks-page">
@@ -106,9 +121,12 @@ function mapStateToProps(state, ownProps) {
     return {
         lessonsBookmarks: getLessonBookmarks(state),
         coursesBookmarks: getCourseBookmarks(state),
+        authorized: !!state.user.user,
+        loading: state.user.loading,
         showLessonBookmarks: state.app.showLessonBookmarks,
         showCourseBookmarks: state.app.showCourseBookmarks,
         page: ownProps.location.pathname,
+        isBookmarksPage: ownProps.match.path === "/favorites",
     }
 }
 

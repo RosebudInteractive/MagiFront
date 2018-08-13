@@ -27,10 +27,11 @@ const { setupLessons } = require('./lessons');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
+const { SetupRoute: setupDebugRoutes } = require('./debug');
 
 function errorHandler(err, req, res, next) {
-    console.error("setup::errorHandler ==> " + err.toString());
-    res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
+    console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
+    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message ? err.message : err.toString() });
 }
 
 function setupAPI(express, app) {
@@ -89,6 +90,7 @@ function setupAPI(express, app) {
 
     setupProtectedStatic(app);
     setupLessonPositions(app);
+    setupDebugRoutes(app);
     setupEpisodes(app);
     setupUsers(app);
     setupAuthors(app);

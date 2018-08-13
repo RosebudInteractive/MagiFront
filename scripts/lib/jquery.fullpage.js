@@ -188,8 +188,7 @@
         var isTouchDevice = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|playbook|silk|BlackBerry|BB10|Windows Phone|Tizen|Bada|webOS|IEMobile|Opera Mini)/);
         var isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0) || (navigator.maxTouchPoints));
         var container = $(this);
-        // var windowsHeight = $window.innerHeight();
-        var windowsHeight = $window.outerHeight();
+        var windowsHeight = $window.height();
         var isResizing = false;
         var isWindowFocused = true;
         var lastScrolledDestiny;
@@ -242,8 +241,7 @@
             if(options.autoScrolling && !options.scrollBar){
                 $htmlBody.css({
                     'overflow' : 'hidden',
-                    // 'height' : '100%'
-                    'height' : 'auto'
+                    'height' : '100%'
                 });
 
                 setRecordHistory(originals.recordHistory, 'internal');
@@ -445,8 +443,7 @@
 
             isResizing = true;
 
-            // windowsHeight = $window.innerHeight();  //updating global var
-            windowsHeight = $window.outerHeight();  //updating global var
+            windowsHeight = $window.height();  //updating global var
 
             $(SECTION_SEL).each(function(){
                 var slidesWrap = $(this).find(SLIDES_WRAPPER_SEL);
@@ -647,8 +644,7 @@
             $('html').addClass(ENABLED);
 
             //due to https://github.com/alvarotrigo/fullPage.js/issues/1502
-            // windowsHeight = $window.innerHeight();
-            windowsHeight = $window.outerHeight();
+            windowsHeight = $window.height();
 
             container.removeClass(DESTROYED); //in case it was destroyed before initializing it again
 
@@ -838,9 +834,8 @@
                 nav.find('ul').append(li);
             }
 
-            //centering it verticallyß
-            // $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).innerHeight()/2) + 'px');
-            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).outerHeight()/2) + 'px');
+            //centering it vertically
+            $(SECTION_NAV_SEL).css('margin-top', '-' + ($(SECTION_NAV_SEL).height()/2) + 'px');
 
             //activating the current active section
             $(SECTION_NAV_SEL).find('li').eq($(SECTION_ACTIVE_SEL).index(SECTION_SEL)).find('a').addClass(ACTIVE);
@@ -914,8 +909,8 @@
                 var currentScroll = $window.scrollTop();
                 var scrollDirection = getScrollDirection(currentScroll);
                 var visibleSectionIndex = 0;
-                var screen_mid = currentScroll + ($window.innerHeight() / 2.0);
-                var isAtBottom = $body.height() - $window.innerHeight() === currentScroll;
+                var screen_mid = currentScroll + ($window.height() / 2.0);
+                var isAtBottom = $body.height() - $window.height() === currentScroll;
                 var sections =  document.querySelectorAll(SECTION_SEL);
 
                 //when using `auto-height` for a small last section it won't be centered in the viewport
@@ -1031,10 +1026,10 @@
          */
         function isCompletelyInViewPort(movement){
             var top = $(SECTION_ACTIVE_SEL).position().top;
-            var bottom = top + $window.innerHeight();
+            var bottom = top + $window.height();
 
             if(movement == 'up'){
-                return bottom >= ($window.scrollTop() + $window.innerHeight());
+                return bottom >= ($window.scrollTop() + $window.height());
             }
             return top <= $window.scrollTop();
         }
@@ -1145,7 +1140,7 @@
                 else if(options.autoScrolling && canScroll){
 
                     //is the movement greater than the minimum resistance to scroll?
-                    if (Math.abs(touchStartY - touchEndY) > ($window.innerHeight() / 100 * options.touchSensitivity)) {
+                    if (Math.abs(touchStartY - touchEndY) > ($window.height() / 100 * options.touchSensitivity)) {
                         if (touchStartY > touchEndY) {
                             scrolling('down');
                         } else if (touchEndY > touchStartY) {
@@ -2139,7 +2134,7 @@
 
                 //if the keyboard is NOT visible
                 if (!activeElement.is('textarea') && !activeElement.is('input') && !activeElement.is('select')) {
-                    var currentHeight = $window.innerHeight();
+                    var currentHeight = $window.height();
 
                     //making sure the change in the viewport size is enough to force a rebuild. (20 % of the window to avoid problems when hidding scroll bars)
                     if( Math.abs(currentHeight - previousHeight) > (20 * Math.max(previousHeight, currentHeight) / 100) ){
@@ -2168,7 +2163,7 @@
 
             //only calculating what we need. Remember its called on the resize event.
             var isBreakingPointWidth = widthLimit && $window.outerWidth() < widthLimit;
-            var isBreakingPointHeight = heightLimit && $window.innerHeight() < heightLimit;
+            var isBreakingPointHeight = heightLimit && $window.height() < heightLimit;
 
             if(widthLimit && heightLimit){
                 setResponsive(isBreakingPointWidth || isBreakingPointHeight);

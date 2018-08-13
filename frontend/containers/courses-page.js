@@ -1,14 +1,16 @@
-import React  from 'react';
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import React from 'react';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 
-import CourseModule from '../components/course/course-module'
+import CourseModuleLazyload from '../components/course/course-module-lazyload'
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 
 import * as tools from '../tools/page-tools';
+import {forceCheck} from 'react-lazyload';
+import CourseModule from "../components/course/course-module";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -28,6 +30,12 @@ class CoursesPage extends React.Component {
         document.title = 'Магистерия'
     }
 
+    componentWillReceiveProps(newProps) {
+        if (!this.props.pageHeaderState.showFiltersForm && newProps.pageHeaderState.showFiltersForm) {
+            forceCheck();
+        }
+    }
+
     _getCoursesBundles() {
 
         let {filters} = this.props;
@@ -43,6 +51,7 @@ class CoursesPage extends React.Component {
             if (_cleanFilter) {
                 _inFilter = true
             } else {
+
                 _inFilter = course.Categories.some((categoryId) => {
                     let _filter = filters.find((item) => {
                         return item.id === categoryId
@@ -52,7 +61,17 @@ class CoursesPage extends React.Component {
                 });
             }
 
-            return (_inFilter ? <CourseModule course={course} key={index} isMobile={this._isMobile()}/> : null)
+            return (
+                _inFilter
+                    ?
+                    _cleanFilter
+                        ?
+                        <CourseModuleLazyload course={course} key={index} isMobile={this._isMobile()}/>
+                        :
+                        <CourseModule course={course} key={index} isMobile={this._isMobile()}/>
+                    :
+                    null
+            )
         })
     }
 
@@ -77,6 +96,7 @@ function mapStateToProps(state, ownProps) {
         courses: state.courses,
         filters: state.filters.items,
         size: state.app.size,
+        pageHeaderState: state.pageHeader,
         ownProps,
     }
 }

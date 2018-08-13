@@ -24,6 +24,7 @@ import {
     SWITCH_TO_FULL_PLAYER,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
+import * as storageActions from "../actions/lesson-info-storage-actions";
 
 const playerMiddleware = store => next => action => {
     switch (action.type) {
@@ -47,14 +48,17 @@ const playerMiddleware = store => next => action => {
         case PLAYER_START_PLAY: {
             let _state = store.getState(),
                 _isFinished = false,
-                _id = null;
+                _id = null,
+                _lessonsMap = _state.lessonInfoStorage.lessons;
+
+            _isFinished = _lessonsMap.has(action.payload) ? _lessonsMap.get(action.payload).isFinished : false;
+            if (_isFinished) {
+                store.dispatch(storageActions.restoreLesson(action.payload));
+            }
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
                 _id = _state.player.playingLesson.lessonId;
-                let _lessonsMap = _state.lessonInfoStorage.lessons;
-
-                _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false;
             }
 
             if ((_id === action.payload) && Player.getInstance()) {

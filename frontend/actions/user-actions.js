@@ -31,6 +31,9 @@ import {
     RECOVERY_PASSWORD_START,
     RECOVERY_PASSWORD_SUCCESS,
     RECOVERY_PASSWORD_FAIL,
+    WHO_AM_I_START,
+    WHO_AM_I_SUCCESS,
+    WHO_AM_I_FAIL,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -107,7 +110,7 @@ export const whoAmI = () => {
     return (dispatch) => {
 
         dispatch({
-            type: SIGN_IN_START,
+            type: WHO_AM_I_START,
             payload: null
         });
 
@@ -116,13 +119,13 @@ export const whoAmI = () => {
             .then(parseJSON)
             .then(data => {
                 dispatch({
-                    type: SIGN_IN_SUCCESS,
+                    type: WHO_AM_I_SUCCESS,
                     payload: data
                 });
             })
             .catch((error) => {
                 dispatch({
-                    type: SIGN_IN_FAIL,
+                    type: WHO_AM_I_FAIL,
                     payload: {error}
                 });
             });

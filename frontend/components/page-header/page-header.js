@@ -7,22 +7,33 @@ import MobileHeaderRow from './mobile-header';
 import MobileFilter from './desktop-filters';
 import TranscriptMenu from '../lesson-page/lesson-transcript-menu';
 
-import * as tools from '../../tools/page-tools';
-
 import * as pageHeaderActions from "../../actions/page-header-actions";
-import {pages} from "../../tools/page-tools";
+import * as appActions from "../../actions/app-actions";
+import {pages, widthLessThan900} from "../../tools/page-tools";
 import $ from "jquery";
 
 class Header extends React.Component {
     constructor(props) {
         super(props);
+
+        this._width = window.innerWidth;
     }
 
     componentDidUpdate() {
-        let _isCoursesPage = this.props.pageHeaderState.currentPage.name === tools.pages.courses.name;
+        let _isCoursesPage = this.props.pageHeaderState.currentPage.name === pages.courses.name;
         if (!_isCoursesPage && this.props.pageHeaderState.showFiltersForm) {
             this.props.pageHeaderActions.hideFiltersForm()
         }
+
+        if (widthLessThan900() && !this.props.showUserBlock) {
+            this.props.appActions.showUserBlock()
+        }
+
+        if ((this._width < 900) && !widthLessThan900()) {
+            this.props.appActions.hideUserBlock()
+        }
+
+        this._width = window.innerWidth;
     }
 
     _onClickMenuTrigger() {
@@ -107,6 +118,7 @@ function mapStateToProps(state, ownProps) {
         lessons: state.lessons,
         authorized: !!state.user.user,
         isMobileApp: state.app.isMobileApp,
+        showUserBlock: state.app.showUserBlock,
         ownProps,
     }
 }
@@ -114,6 +126,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 

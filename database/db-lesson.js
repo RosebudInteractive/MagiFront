@@ -1,6 +1,7 @@
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
+const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const _ = require('lodash');
 
@@ -31,6 +32,11 @@ const LESSON_REQ_TREE = {
                             {
                                 dataObject: {
                                     name: "Reference"
+                                }
+                            },
+                            {
+                                dataObject: {
+                                    name: "LessonMetaImage"
                                 }
                             }
                         ]
@@ -76,6 +82,11 @@ const LESSON_UPD_TREE = {
                                 dataObject: {
                                     name: "Reference"
                                 }
+                            },
+                            {
+                                dataObject: {
+                                    name: "LessonMetaImage"
+                                }
                             }
                         ]
                     }
@@ -113,7 +124,7 @@ const LESSON_UPD_TREE = {
 };
 
 const LESSON_MSSQL_ID_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -129,7 +140,7 @@ const LESSON_MSSQL_ID_REQ =
     "where l.[Id] = <%= id %> and lc.[CourseId] = <%= courseId %>";
 
 const LESSON_MSSQL_CHLD_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -144,7 +155,7 @@ const LESSON_MSSQL_CHLD_REQ =
     "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>";
 
 const LESSON_MYSQL_ID_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
@@ -160,7 +171,7 @@ const LESSON_MYSQL_ID_REQ =
     "where l.`Id` = <%= id %> and lc.`CourseId` = <%= courseId %>";
 
 const LESSON_MYSQL_CHLD_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
@@ -186,10 +197,15 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "where l.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[AltAttribute], l.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
+
+const LESSON_MSSQL_IMG_REQ =
+    "select i.[Id], i.[Type], i.[ResourceId] from [LessonMetaImage] i\n" +
+    "  join [LessonLng] l on l.[Id] = i.[LessonLngId]\n" +
+    "where l.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_TOC_REQ =
     "select lls.[Name], e.[Id] Episode, t.[Id], t.[Number], l.[Topic], l.[StartTime] from[EpisodeToc] t\n" +
@@ -248,11 +264,12 @@ const LESSON_MSSQL_ASSETS_ALL_REQ =
 
 const LESSON_MSSQL_REQ =
     "select lc.[CourseId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
-    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
     "  lch.[Id] as[IdCh], llch.[Name] as[NameCh], llch.[ShortDescription] as[ShortDescriptionCh],\n" +
     "  lcch.[State] as[StateCh], lcch.[ReadyDate] as[ReadyDateCh], lch.[Cover] as[CoverCh], lch.[CoverMeta] as[CoverMetaCh],\n" +
     "  llch.[Duration] as[DurationCh], lcch.[Number] as[NumberCh],\n" +
-    "  llch.[DurationFmt] as[DurationFmtCh], lch.[IsAuthRequired] as[IsAuthRequiredCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh]\n" +
+    "  llch.[DurationFmt] as[DurationFmtCh], lch.[IsAuthRequired] as[IsAuthRequiredCh], lch.[IsSubsRequired] as[IsSubsRequiredCh],\n" +
+    "  lch.[FreeExpDate] as[FreeExpDateCh], lch.[URL] as[URLCh], lch.[AuthorId] as[AuthorIdCh]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
@@ -264,15 +281,55 @@ const LESSON_MSSQL_REQ =
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'\n" +
     "order by lcch.[Number]";
 
+const LESSON_MSSQL_REQ_V2 =
+    "select lc.[Id] as [ParentId], lc.[CourseId], c.[URL] as [CURL], cl.[LanguageId], cl.[Name] as [CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  ll.[SnPost], ll.[SnName], ll.[SnDescription],\n" +
+    "  al.[FirstName], al.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] as [AURL]\n" +
+    "from[LessonCourse] lc\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[CourseLng] cl on c.[Id] = cl.[CourseId]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
+    "  join[AuthorLng] al on al.[AuthorId] = a.[Id]\n" +
+    "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
+
+const LESSON_MSSQL_CHILDS_REQ =
+    "select l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired],\n" +
+    "  l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  ell.[Audio]\n" +
+    "from[LessonCourse] lc\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
+    "where lc.[ParentId] = <%= id %>\n" +
+    "order by l.[Id], el.[Number]";
+
+const LESSON_SHARE_COUNTERS_MSSQL_REQ =
+    "select sp.[Code], cs.[Counter] from [LsnShareCounter] cs\n" +
+    "  join[SNetProvider] sp on sp.[Id] = cs.[SNetProviderId]\n" +
+    "where[LessonId] = <%= id %>";
+
+const LESSON_IMG_META_MSSQL_REQ =
+    "select i.[Type], r.[FileName], rl.[MetaData] from [LessonMetaImage] i\n" +
+    "  join[Resource] r on r.[Id] = i.[ResourceId]\n" +
+    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
+    "where r.[LessonId] = <%= id %>";
+
 const PARENT_MSSQL_REQ =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
-    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName]\n" +
+    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
+    "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const LESSON_MSSQL_TRANSCRIPT_REQ =
@@ -295,10 +352,15 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "where l.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`AltAttribute`, l.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
+
+const LESSON_MYSQL_IMG_REQ =
+    "select i.`Id`, i.`Type`, i.`ResourceId` from `LessonMetaImage` i\n" +
+    "  join `LessonLng` l on l.`Id` = i.`LessonLngId`\n" +
+    "where l.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_TOC_REQ =
     "select lls.`Name`, e.`Id` Episode, t.`Id`, t.`Number`, l.`Topic`, l.`StartTime` from`EpisodeToc` t\n" +
@@ -357,11 +419,12 @@ const LESSON_MYSQL_ASSETS_ALL_REQ =
 
 const LESSON_MYSQL_REQ =
     "select lc.`CourseId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
-    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
     "  lch.`Id` as`IdCh`, llch.`Name` as`NameCh`, llch.`ShortDescription` as`ShortDescriptionCh`,\n" +
     "  lcch.`State` as`StateCh`, lcch.`ReadyDate` as`ReadyDateCh`, lch.`Cover` as`CoverCh`, lch.`CoverMeta` as`CoverMetaCh`,\n" +
     "  llch.`Duration` as`DurationCh`, lcch.`Number` as`NumberCh`,\n" +
-    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`IsAuthRequired` as`IsAuthRequiredCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh`\n" +
+    "  llch.`DurationFmt` as`DurationFmtCh`, lch.`IsAuthRequired` as`IsAuthRequiredCh`, lch.`IsSubsRequired` as`IsSubsRequiredCh`,\n" +
+    "  lch.`FreeExpDate` as`FreeExpDateCh`, lch.`URL` as`URLCh`, lch.`AuthorId` as`AuthorIdCh`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
@@ -373,15 +436,55 @@ const LESSON_MYSQL_REQ =
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'\n" +
     "order by lcch.`Number`";
 
+const LESSON_MYSQL_REQ_V2 =
+    "select lc.`Id` as `ParentId`, lc.`CourseId`, c.`URL` as `CURL`, cl.`LanguageId`, cl.`Name` as `CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`,\n" +
+    "  al.`FirstName`, al.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` as `AURL`\n" +
+    "from`LessonCourse` lc\n" +
+    "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`CourseLng` cl on c.`Id` = cl.`CourseId`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
+    "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
+    "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
+
+const LESSON_MYSQL_CHILDS_REQ =
+    "select l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`,\n" +
+    "  l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  ell.`Audio`\n" +
+    "from`LessonCourse` lc\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
+    "where lc.`ParentId` = <%= id %>\n" +
+    "order by l.`Id`, el.`Number`";
+
+const LESSON_SHARE_COUNTERS_MYSQL_REQ =
+    "select sp.`Code`, cs.`Counter` from `LsnShareCounter` cs\n" +
+    "  join`SNetProvider` sp on sp.`Id` = cs.`SNetProviderId`\n" +
+    "where`LessonId` = <%= id %>";
+
+const LESSON_IMG_META_MYSQL_REQ =
+    "select i.`Type`, r.`FileName`, rl.`MetaData` from `LessonMetaImage` i\n" +
+    "  join`Resource` r on r.`Id` = i.`ResourceId`\n" +
+    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
+    "where r.`LessonId` = <%= id %>";
+
 const PARENT_MYSQL_REQ =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
-    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`\n" +
+    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
+    "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const LESSON_MYSQL_TRANSCRIPT_REQ =
@@ -451,7 +554,7 @@ const GET_LESSON_DURATION_MYSQL =
 const LESSONS_ALL_MSSQL_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
     "  lc.[Number], lc.[ReadyDate],\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], ell.Audio, el.[Number] Eln from [Course] c\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -466,7 +569,7 @@ const LESSONS_ALL_MSSQL_REQ =
 const LESSONS_ALL_MYSQL_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
     "  lc.`Number`, lc.`ReadyDate`,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, ell.Audio, el.`Number` Eln from `Course` c\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -502,6 +605,7 @@ const DbLesson = class DbLesson extends DbObject {
     get(id, course_id) {
         let lesson = {};
         let isNotFound = true;
+        let now = new Date();
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -514,6 +618,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (result && result.detail && (result.detail.length === 1)) {
                             lesson = result.detail[0];
                             lesson.IsAuthRequired = lesson.IsAuthRequired ? true : false;
+                            lesson.IsSubsRequired = lesson.IsSubsRequired ? true : false;
                             isNotFound = false;
                         }
                         if (!isNotFound)
@@ -568,6 +673,7 @@ const DbLesson = class DbLesson extends DbObject {
                             if (result && result.detail && (result.detail.length > 0)) {
                                 result.detail.forEach((elem) => {
                                     elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                                    elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
                                 });
                                 childs = result.detail;
                             }
@@ -590,6 +696,21 @@ const DbLesson = class DbLesson extends DbObject {
                                 });
                             }
                             lesson.Resources = resources;
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(LESSON_MYSQL_IMG_REQ)({ id: id }),
+                                    mssql: _.template(LESSON_MSSQL_IMG_REQ)({ id: id })
+                                }
+                            }, {});
+                        }
+                    })
+                    .then((result) => {
+                        if (!isNotFound) {
+                            let images = [];
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                images = result.detail;
+                            }
+                            lesson.Images = images;
                         }
                         return lesson;
                     })
@@ -638,6 +759,7 @@ const DbLesson = class DbLesson extends DbObject {
                             let isFirst = true;
                             let authors_list = {};
                             let lesson_list = {};
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 let lsn = lesson_list[elem.LessonId];
                                 if (!lsn) {
@@ -651,6 +773,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
                                         Duration: elem.Duration,
                                         DurationFmt: elem.DurationFmt,
@@ -658,6 +781,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         Lessons: [],
                                         Audios: []
                                     };
+                                    if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDate;
                                     authors_list[elem.AuthorId] = true;
                                     let isCurrent = lesson_url === elem.LURL;
                                     if (!elem.ParentId) {
@@ -726,6 +851,7 @@ const DbLesson = class DbLesson extends DbObject {
         let course = null;
         let curLesson = null;
         let parentUrl = lesson_url;
+        let now = new Date();
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -769,18 +895,22 @@ const DbLesson = class DbLesson extends DbObject {
                                         DurationFmt: elem.DurationFmt,
                                         URL: elem.URL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         AuthorId: elem.AuthorId,
                                         Number: elem.Number,
                                         ShortDescription: elem.ShortDescription,
                                         Lessons: []
                                     };
+                                    if (lesson.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                        lesson.FreeExpDate = elem.FreeExpDate;
                                     isFirst = false;
                                     authors_list[elem.AuthorId] = true;
                                 }
                                 if (elem.IdCh) {
                                     if (elem.URLCh === lesson_url)
                                         curLesson = lesson.Lessons.length;
-                                    lesson.Lessons.push({
+                                    let lsn;
+                                    lesson.Lessons.push(lsn = {
                                         Id: elem.IdCh,
                                         Name: elem.NameCh,
                                         Cover: elem.CoverCh,
@@ -791,10 +921,13 @@ const DbLesson = class DbLesson extends DbObject {
                                         DurationFmt: elem.DurationFmtCh,
                                         URL: elem.URLCh,
                                         IsAuthRequired: elem.IsAuthRequiredCh ? true : false,
+                                        IsSubsRequired: elem.IsSubsRequiredCh ? true : false,
                                         AuthorId: elem.AuthorIdCh,
                                         Number: elem.NumberCh,
                                         ShortDescription: elem.ShortDescriptionCh
                                     });
+                                    if (lsn.IsSubsRequired && elem.FreeExpDateCh && ((elem.FreeExpDateCh - now) > Intervals.MIN_FREE_LESSON))
+                                        lsn.FreeExpDate = elem.FreeExpDateCh;
                                     authors_list[elem.AuthorIdCh] = true;
                                 }
                             });
@@ -876,6 +1009,248 @@ const DbLesson = class DbLesson extends DbObject {
                         else
                             throw new Error("Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
 
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_ASSETS_REQ)({ id: id })
+                            }
+                        }, {})
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (!assets_list[elem.Id]) {
+                                    let asset = {
+                                        Id: elem.Id,
+                                        FileName: elem.FileName,
+                                        MetaData: elem.MetaData
+                                    };
+                                    if (elem.Name)
+                                        asset.Name = elem.Name;
+                                    if (elem.Description)
+                                        asset.Description = elem.Description;
+                                    assets_list[elem.Id] = asset;
+                                    if (elem.ShowInGalery)
+                                        data.Galery.push(asset);
+                                }
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TRANSCRIPT_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_TRANSCRIPT_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let curr_episode = {
+                                    Id: elem.Id,
+                                    Number: elem.Number,
+                                    Name: elem.Name,
+                                    Transcript: elem.Transcript,
+                                    Toc: []
+                                };
+                                data.Episodes.push(curr_episode);
+                                data.Audios.push(elem.Audio);
+                                epi_list[elem.Id] = curr_episode;
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_TOC_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_TOC_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                if (curr_id !== elem.Episode) {
+                                    curr_episode = epi_list[elem.Episode];
+                                    if (!curr_episode)
+                                        throw new Error("Unknown episode (Id=" + elem.Episode + ") in lesson (Id=" + id + ").");
+                                }
+                                curr_episode.Toc.push({
+                                    Id: elem.Id,
+                                    Topic: elem.Topic,
+                                    StartTime: elem.StartTime
+                                });
+                            });
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_REFERENCE_REQ)({ id: id }),
+                                mssql: _.template(LESSON_MSSQL_REFERENCE_REQ)({ id: id })
+                            }
+                        }, {});
+                    })
+                    .then((result) => {
+                        let curr_id = -1;
+                        let curr_episode = null;;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let item = { Number: elem.Number, Description: elem.Description, URL: elem.URL };
+                                if (elem.Recommended)
+                                    data.Books.push(item)
+                                else
+                                    data.Refs.push(item);
+                            });
+                        }
+                        return data;
+                    })
+            );
+        })
+    }
+
+    getLessonV2(course_url, lesson_url) {
+        let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
+        let epi_list = {};
+        let assets_list = {};
+        let id;
+
+        return new Promise((resolve, reject) => {
+            resolve(
+
+                $data.execSql({
+                    dialect: {
+                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
+                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length == 1)) {
+                            let elem = result.detail[0];
+                            if (elem.URL) {
+                                data.Parent = {
+                                    URL: elem.URL,
+                                    Name: elem.Name,
+                                    Number: elem.Number
+                                }
+                            }
+                            id = elem.Id;
+                            data.Course = {
+                                Id: elem.CId,
+                                LanguageId: elem.LanguageId,
+                                Name: elem.CName,
+                                URL: elem.CURL
+                            };
+                        }
+                        else
+                            throw new Error("Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
+
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_REQ_V2)({ course_url: course_url, lesson_url: lesson_url }),
+                                mssql: _.template(LESSON_MSSQL_REQ_V2)({ course_url: course_url, lesson_url: lesson_url })
+                            }
+                        }, {})
+                    })
+                    .then((result) => {
+                        let parentId;
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let elem = result.detail[0];
+                            parentId = elem.ParentId;
+                            data.Id= elem.Id;
+                            data.Name = elem.Name;
+                            data.Cover = elem.Cover;
+                            data.CoverMeta = elem.CoverMeta;
+                            data.State = elem.State;
+                            data.ReadyDate = elem.ReadyDate;
+                            data.Duration = elem.Duration;
+                            data.DurationFmt = elem.DurationFmt;
+                            data.URL = elem.URL;
+                            data.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                            data.IsSubsRequired = elem.IsSubsRequired ? true : false;
+                            if (elem.SnName)
+                                data.PageMeta.Name = elem.SnName;
+                            if (elem.SnDescription)
+                                data.PageMeta.Description = elem.SnDescription;
+                            if (elem.SnPost)
+                                data.PageMeta.Post = elem.SnPost;
+                            data.Author = {
+                                Id: elem.AuthorId,
+                                FirstName: elem.FirstName,
+                                LastName: elem.LastName,
+                                Portrait: elem.Portrait,
+                                PortraitMeta: elem.PortraitMeta,
+                                URL: elem.AURL,
+                            };
+                            data.Number = elem.Number;
+                            data.ShortDescription = elem.ShortDescription;
+                            if (data.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                data.FreeExpDate = elem.FreeExpDate;
+                        }
+                        if (!data.Parent)
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(LESSON_MYSQL_CHILDS_REQ)({ id: parentId }),
+                                    mssql: _.template(LESSON_MSSQL_CHILDS_REQ)({ id: parentId })
+                                }
+                            }, {});
+                    })
+                    .then((result)=>{
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let childs = {};
+                            result.detail.forEach((elem) => {
+                                let child = childs[elem.Id];
+                                if (!child) {
+                                    child = childs[elem.Id] = {};
+                                    child.Id = elem.Id;
+                                    child.Name = elem.Name;
+                                    child.Cover = elem.Cover;
+                                    child.CoverMeta = elem.CoverMeta;
+                                    child.State = elem.State;
+                                    child.ReadyDate = elem.ReadyDate;
+                                    child.Duration = elem.Duration;
+                                    child.DurationFmt = elem.DurationFmt;
+                                    child.URL = elem.URL;
+                                    child.IsAuthRequired = elem.IsAuthRequired ? true : false;
+                                    child.IsSubsRequired = elem.IsSubsRequired ? true : false;
+                                    child.Number = elem.Number;
+                                    child.ShortDescription = elem.ShortDescription;
+                                    if (child.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
+                                        child.FreeExpDate = elem.FreeExpDate;
+                                    child.Audios = [];
+                                    data.Childs.push(child);
+                                }
+                                if (elem.Audio)
+                                    child.Audios.push(elem.Audio);
+                            })
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_SHARE_COUNTERS_MYSQL_REQ)({ id: id }),
+                                mssql: _.template(LESSON_SHARE_COUNTERS_MSSQL_REQ)({ id: id })
+                            }
+                        }, {})
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                data.ShareCounters[elem.Code] = elem.Counter;
+                            })
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_IMG_META_MYSQL_REQ)({ id: id }),
+                                mssql: _.template(LESSON_IMG_META_MSSQL_REQ)({ id: id })
+                            }
+                        }, {})
+                    })
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            data.PageMeta.Images = {};
+                            result.detail.forEach((elem) => {
+                                data.PageMeta.Images[elem.Type] = {
+                                    FileName: elem.FileName,
+                                    MetaData: elem.MetaData
+                                };
+                            })
+                        }
                         return $data.execSql({
                             dialect: {
                                 mysql: _.template(LESSON_MYSQL_ASSETS_REQ)({ id: id }),
@@ -1298,17 +1673,20 @@ const DbLesson = class DbLesson extends DbObject {
             let root_ch;
             let root_res;
             let root_ref;
+            let root_img;
             let root_epi;
             let ch_collection;
             let ch_own_collection;
             let res_collection;
             let ref_collection;
+            let img_collection;
             let epi_collection;
             let epi_own_collection;
             let languageId;
             let ch_list = {};
             let res_list = {};
             let ref_list = {};
+            let img_list = {};
             let epi_list = {};
             let opts = {};
             let inpFields = data || {};
@@ -1316,6 +1694,7 @@ const DbLesson = class DbLesson extends DbObject {
             let ch_new = [];
             let res_new = [];
             let ref_new = [];
+            let img_new = [];
             let epi_new = [];
 
             let needToDeleteOwn = false;
@@ -1368,6 +1747,8 @@ const DbLesson = class DbLesson extends DbObject {
                         res_collection = root_res.getCol("DataElements");
                         root_ref = lsn_lng_obj.getDataRoot("Reference");
                         ref_collection = root_ref.getCol("DataElements");
+                        root_img = lsn_lng_obj.getDataRoot("LessonMetaImage");
+                        img_collection = root_img.getCol("DataElements");
                         root_epi = lsn_obj.getDataRoot("EpisodeLesson");
                         epi_collection = root_epi.getCol("DataElements");
                         epi_own_collection = lsn_obj.getDataRoot("Episode").getCol("DataElements");
@@ -1434,6 +1815,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     data.res.ShowInGalery = elem.ShowInGalery;
                                 if (typeof (elem.Description) !== "undefined")
                                     data.lng.Description = elem.Description;
+                                if (typeof (elem.AltAttribute) !== "undefined")
+                                    data.lng.AltAttribute = elem.AltAttribute;
                                 if (typeof (elem.MetaData) !== "undefined")
                                     data.lng.MetaData = elem.MetaData;
                                 if (typeof (elem.Id) === "number") {
@@ -1485,6 +1868,33 @@ const DbLesson = class DbLesson extends DbObject {
                             })
                         }
 
+                        if (inpFields.Images && (typeof (inpFields.Images.length) === "number")) {
+                            for (let i = 0; i < img_collection.count(); i++) {
+                                let obj = img_collection.get(i);
+                                img_list[obj.id()] = { deleted: true, obj: obj };
+                            }
+
+                            inpFields.Images.forEach((elem) => {
+                                let data = {
+                                    Type: elem.Type,
+                                    ResourceId: elem.ResourceId
+                                };
+                                if (typeof (elem.Id) === "number") {
+                                    if (img_list[elem.Id]) {
+                                        img_list[elem.Id].deleted = false;
+                                        img_list[elem.Id].data = data;
+                                    }
+                                    else {
+                                        //throw new Error("Unknown reference item (Id = " + elem.Id + ").");
+                                        delete elem.Id;
+                                        img_new.push(data);
+                                    }
+                                }
+                                else
+                                    img_new.push(data);
+                            })
+                        }
+
                         if (inpFields.Episodes && (typeof (inpFields.Episodes.length) === "number")) {
                             for (let i = 0; i < epi_collection.count(); i++) {
                                 let obj = epi_collection.get(i);
@@ -1532,7 +1942,12 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_obj.uRL(inpFields["URL"]);
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             lsn_obj.isAuthRequired(inpFields["IsAuthRequired"]);
-
+                        if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
+                            lsn_obj.isSubsRequired(inpFields["IsSubsRequired"]);
+                        if (typeof (inpFields["FreeExpDate"]) !== "undefined")
+                            lsn_obj.freeExpDate(inpFields["FreeExpDate"]);
+                        if (lsn_obj.isSubsRequired())
+                            lsn_obj.isAuthRequired(true);    
                         if (typeof (inpFields["State"]) !== "undefined")
                             lsn_lng_obj.state(inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1541,6 +1956,12 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_lng_obj.shortDescription(inpFields["ShortDescription"]);
                         if (typeof (inpFields["FullDescription"]) !== "undefined")
                             lsn_lng_obj.fullDescription(inpFields["FullDescription"]);
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            lsn_lng_obj.snPost(inpFields["SnPost"]);
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            lsn_lng_obj.snName(inpFields["SnName"]);
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            lsn_lng_obj.snDescription(inpFields["SnDescription"]);
 
                         if (typeof (inpFields["State"]) !== "undefined") {
                             ls_course_obj.state(inpFields["State"]);
@@ -1579,6 +2000,14 @@ const DbLesson = class DbLesson extends DbObject {
                                     ref_list[key].obj[self._genGetterName(field)](ref_list[key].data[field]);    
                             }
                         
+                        for (let key in img_list)
+                            if (img_list[key].deleted)
+                                img_collection._del(img_list[key].obj)
+                            else {
+                                for (let field in img_list[key].data)
+                                    img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
+                            }
+
                         for (let key in epi_list)
                             if (epi_list[key].deleted) {
                                 if (epi_list[key].isOwner)
@@ -1620,6 +2049,15 @@ const DbLesson = class DbLesson extends DbObject {
                         if (ref_new && (ref_new.length > 0)) {
                             return Utils.seqExec(ref_new, (elem) => {
                                 return root_ref.newObject({
+                                    fields: elem
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        if (img_new && (img_new.length > 0)) {
+                            return Utils.seqExec(img_new, (elem) => {
+                                return root_img.newObject({
                                     fields: elem
                                 }, opts);
                             });
@@ -1724,7 +2162,6 @@ const DbLesson = class DbLesson extends DbObject {
             let inpFields = data || {};
             let transactionId = null;
             let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
-            let isDurationChanged = false;
             let languageId;
 
             resolve(
@@ -1772,6 +2209,13 @@ const DbLesson = class DbLesson extends DbObject {
                         fields["IsAuthRequired"] = false;
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             fields["IsAuthRequired"] = inpFields["IsAuthRequired"];
+                        fields["IsSubsRequired"] = false;
+                        if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
+                            fields["IsSubsRequired"] = inpFields["IsSubsRequired"];
+                        if (typeof (inpFields["FreeExpDate"]) !== "undefined")
+                            fields["FreeExpDate"] = inpFields["FreeExpDate"];
+                        if (fields["IsSubsRequired"])
+                            fields["IsAuthRequired"] = true;    
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
@@ -1781,7 +2225,7 @@ const DbLesson = class DbLesson extends DbObject {
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("LessonLng");
 
-                        let fields = { LanguageId: languageId };
+                        let fields = { LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1790,6 +2234,12 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["ShortDescription"] = inpFields["ShortDescription"];
                         if (typeof (inpFields["FullDescription"]) !== "undefined")
                             fields["FullDescription"] = inpFields["FullDescription"];
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            fields["SnPost"] = inpFields["SnPost"];
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            fields["SnName"] = inpFields["SnName"];
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            fields["SnDescription"] = inpFields["SnDescription"];
 
                         return root_lng.newObject({
                             fields: fields
@@ -1845,9 +2295,23 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
-                        let root_res = new_lng_obj.getDataRoot("Resource");
+                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
+                        if (inpFields.Images && (inpFields.Images.length > 0)) {
+                            return Utils.seqExec(inpFields.Images, (elem) => {
+                                let fields = {};
+                                if (typeof (elem["Type"]) !== "undefined")
+                                    fields["Type"] = elem["Type"];
+                                if (typeof (elem["ResourceId"]) !== "undefined")
+                                    fields["ResourceId"] = elem["ResourceId"];
+                                return root_img.newObject({
+                                    fields: fields
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        let root_res = new_obj.getDataRoot("Resource");
                         if (inpFields.Resources && (inpFields.Resources.length > 0)) {
-                            isDurationChanged = true;
                             return Utils.seqExec(inpFields.Resources, (elem) => {
                                 let fields = { ResType: "P" };
                                 if (typeof (elem["ResType"]) !== "undefined")
@@ -1862,13 +2326,15 @@ const DbLesson = class DbLesson extends DbObject {
                                     fields: fields
                                 }, opts)
                                     .then((result) => {
-                                        new_res_obj = this._db.getObj(result.newObject);
+                                        let new_res_obj = this._db.getObj(result.newObject);
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
                                         let fields = { Name: "", LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
                                             fields["Name"] = elem["Name"];
                                         if (typeof (elem["Description"]) !== "undefined")
                                             fields["Description"] = elem["Description"];
+                                        if (typeof (elem["AltAttribute"]) !== "undefined")
+                                            fields["AltAttribute"] = elem["AltAttribute"];
                                         if (typeof (elem["MetaData"]) !== "undefined")
                                             fields["MetaData"] = elem["MetaData"];
                                         return root_res_lng.newObject({
@@ -1928,10 +2394,6 @@ const DbLesson = class DbLesson extends DbObject {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
                                 return root_obj.save(opts);
-                            })
-                            .then(() => {
-                                if (isDurationChanged)
-                                    this._updateLessonDuration(newId, opts);
                             })
                             .then(() => {
                                 return course_obj.save(opts);

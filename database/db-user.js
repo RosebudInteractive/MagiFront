@@ -5,11 +5,12 @@ const { DbObject } = require('./db-object');
 const { UsersMemCache } = require("../security/users-mem-cache");
 const { UsersRedisCache } = require("../security/users-redis-cache");
 const { PositionsService } = require('../services/lesson-positions');
+const { Intervals } = require('../const/common');
 
 const GET_HISTORY_MSSQL =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[URL] as[LURL],\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
     "from[Lesson] l\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
@@ -33,9 +34,9 @@ const GET_HISTORY_MSSQL =
     "order by c.[Id], lc.[ParentId], lc.[Number], el.[Number]";
 
 const GET_HISTORY_MYSQL =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`URL` as`LURL`,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
     "from`Lesson` l\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
@@ -95,15 +96,17 @@ const GET_LESSON_IDS_BKM_MSSQL =
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
-    "where b.[UserId] = <%= userId %>";
+    "where b.[UserId] = <%= userId %>\n" +
+    "order by b.[Id] desc";
 
 const GET_COURSE_IDS_BKM_MSSQL =
     "select c.[Id] from [Bookmark] b\n" +
     "  join[Course] c on c.[Id] = b.[CourseId]\n" +
-    "where b.[UserId] = <%= userId %>";
+    "where b.[UserId] = <%= userId %>\n" +
+    "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
-    "select c.[Id], c.[Cover], c.[CoverMeta], c.[URL], cl.[Name] from [Course] c\n" +
+    "select c.[Id], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
@@ -157,15 +160,17 @@ const GET_LESSON_IDS_BKM_MYSQL =
     "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
-    "where b.`UserId` = <%= userId %>";
+    "where b.`UserId` = <%= userId %>\n" +
+    "order by b.`Id` desc";
 
 const GET_COURSE_IDS_BKM_MYSQL =
     "select c.`Id` from `Bookmark` b\n" +
     "  join`Course` c on c.`Id` = b.`CourseId`\n" +
-    "where b.`UserId` = <%= userId %>";
+    "where b.`UserId` = <%= userId %>\n" +
+    "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
-    "select c.`Id`, c.`Cover`, c.`CoverMeta`, c.`URL`, cl.`Name` from `Course` c\n" +
+    "select c.`Id`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
@@ -250,6 +255,7 @@ const DbUser = class DbUser extends DbObject {
                                     let lc_list = {};
                                     let lsn_list = {};
                                     let course = null;
+                                    let now = new Date();
                                     result.detail.forEach((elem) => {
                                         course = history.Courses[elem.Id];
                                         if (!course) {
@@ -258,6 +264,7 @@ const DbUser = class DbUser extends DbObject {
                                                 LanguageId: elem.LanguageId,
                                                 Cover: elem.Cover,
                                                 CoverMeta: elem.CoverMeta,
+                                                Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
                                                 URL: elem.URL,
@@ -277,12 +284,15 @@ const DbUser = class DbUser extends DbObject {
                                                 CoverMeta: elem.LCoverMeta,
                                                 URL: elem.LURL,
                                                 IsAuthRequired: elem.IsAuthRequired ? true : false,
+                                                IsSubsRequired: elem.IsSubsRequired ? true : false,
                                                 Name: elem.LName,
                                                 Duration: elem.Duration,
                                                 DurationFmt: elem.DurationFmt,
                                                 AuthorId: elem.AuthorId,
                                                 Audios: []
                                             };
+                                            if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
+                                                lsn.FreeExpDate = elem.FreeExpDate;
                                             let author = history.Authors[elem.AuthorId];
                                             if (!author) {
                                                 author = {
@@ -338,7 +348,9 @@ const DbUser = class DbUser extends DbObject {
         let bookmarks = { Authors: {}, Categories: {}, LessonCourses: {}, Courses: [], Lessons: [] };
         let opts = {};
         let arrayOfIds = [];
-
+        let lessonBoookmarkOrder = {};
+        let courseBoookmarkOrder = {};
+        
         function getLessonIdsByBookmarks() {
             return new Promise((resolve, reject) => {
                 resolve($data.execSql({
@@ -351,8 +363,10 @@ const DbUser = class DbUser extends DbObject {
                 .then((result) => {
                     let res = [];
                     if (result && result.detail && (result.detail.length > 0)) {
+                        let i = 0;
                         result.detail.forEach((elem) => {
                             res.push(elem.Id);
+                            lessonBoookmarkOrder[elem.Id] = ++i;
                         })
                     }
                     return res;
@@ -379,6 +393,9 @@ const DbUser = class DbUser extends DbObject {
                 bookmarks.Authors = result.Authors;
                 bookmarks.LessonCourses = result.Courses;
                 bookmarks.Lessons = result.Lessons;
+                bookmarks.Lessons.forEach((elem) => {
+                    elem.Order = lessonBoookmarkOrder[elem.Id];
+                })
                 return $data.execSql({
                     dialect: {
                         mysql: _.template(GET_COURSE_IDS_BKM_MYSQL)({ userId: userId }),
@@ -387,8 +404,10 @@ const DbUser = class DbUser extends DbObject {
                 }, {})
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            let i = 0;
                             result.detail.forEach((elem) => {
                                 courseIds.push(elem.Id);
+                                courseBoookmarkOrder[elem.Id] = ++i;
                             })
                         }
                     });
@@ -412,6 +431,8 @@ const DbUser = class DbUser extends DbObject {
                                             URL: elem.URL,
                                             Cover: elem.Cover,
                                             CoverMeta: elem.CoverMeta,
+                                            Mask: elem.Mask,
+                                            Order: courseBoookmarkOrder[elem.Id],
                                             Authors: [],
                                             Categories: []
                                         };
@@ -571,7 +592,7 @@ const DbUser = class DbUser extends DbObject {
                             else
                                 if (res.message) {
                                     let message = res.message;
-                                    let parsed = res.message.match(/.*duplicate.*u_Idx_Bookmark_UserId_.*/ig);
+                                    let parsed = res.message.match(/.*?duplicate.*?u_Idx_Bookmark_UserId_.*/ig);
                                     if (parsed) {
                                         message = `Duplicate course "/${courseUrl}" bookmark has been ignored.`;
                                         if (isLessonBookmark)

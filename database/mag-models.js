@@ -1,3 +1,5 @@
+const { Data } = require('../const/common');
+
 exports.getSchemaGenFunc = function (uccelloDir) {
     return function (metaDataMgr) {
         const coreModels = require(uccelloDir + '/dataman/core-models');
@@ -41,6 +43,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Phone", { type: "string", length: 50, allowNull: true })
             .addField("RegDate", { type: "datetime", allowNull: true })
             .addField("ExpDate", { type: "datetime", allowNull: true })
+            .addField("SubsExpDate", { type: "datetime", allowNull: true })
             .addField("ActivationKey", { type: "string", length: 50, allowNull: true })
             .addField("Status", { type: "int", allowNull: true })
             .addField("IsOld", { type: "boolean", allowNull: true })
@@ -116,6 +119,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Cover", { type: "string", length: 255, allowNull: true })
             .addField("CoverMeta", { type: "string", allowNull: true })
             .addField("RawCoverMeta", { type: "string", allowNull: true })
+            .addField("Mask", { type: "string", length: 20, allowNull: true })
             .addField("Color", { type: "int", allowNull: true })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("OneLesson", { type: "boolean", allowNull: false })
@@ -127,6 +131,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false })
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("CrsShareCounter", "d54482f1-94fa-463d-9efd-7ab7711d9a15", "RootCrsShareCounter", "0a239450-47e0-406c-b4e4-e7c303c8ea1c")
+            .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
+            .addField("SNetProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
+            .addField("Counter", { type: "int", allowNull: false });
 
         metaDataMgr.addModel("Category", "fa44e670-4ee6-4227-ab4d-083924a92d8a", "RootCategory", "6479905e-bdc3-45a8-8690-568ce3e698b9")
             .addField("AccountId", { type: "dataRef", model: "Account", refAction: "parentRestrict", allowNull: false })
@@ -152,6 +161,8 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("CoverMeta", { type: "string", allowNull: true })
             .addField("RawCoverMeta", { type: "string", allowNull: true })
             .addField("IsAuthRequired", { type: "boolean", allowNull: false })
+            .addField("IsSubsRequired", { type: "boolean", allowNull: false })
+            .addField("FreeExpDate", { type: "datetime", allowNull: true })
             .addField("URL", { type: "string", length: 255, allowNull: false });
 
         metaDataMgr.addModel("LessonLng", "7012a967-e186-43d8-b39c-1409b7f198b1", "RootLessonLng", "4dde1122-7556-4929-a81c-5c7679a5bbee")
@@ -161,8 +172,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("ShortDescription", { type: "string", allowNull: false })
             .addField("FullDescription", { type: "string", allowNull: true })
+            .addField("SnPost", { type: "string", allowNull: true })
+            .addField("SnName", { type: "string", allowNull: true })
+            .addField("SnDescription", { type: "string", allowNull: true })
             .addField("Duration", { type: "int", allowNull: true })
             .addField("DurationFmt", { type: "string", length: 15, allowNull: true });
+
+        metaDataMgr.addModel("LessonMetaImage", "0eba67e3-ff9f-4c81-87f4-72e95816bc05", "LessonRootMetaImage", "84ba5f1d-29d6-49f7-9884-03171320957d")
+            .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
+            .addField("Type", { type: "string", length: 50, allowNull: false })
+            .addField("ResourceId", { type: "dataRef", model: "Resource", refAction: "parentRestrict", allowNull: false });
         
         metaDataMgr.addModel("LessonCourse", "c93aa70c-6d24-4587-a723-79dbc9e65f99", "RootLessonCourse", "45616f57-8260-497d-9179-25eedce0ba68")
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentCascade", allowNull: false })
@@ -171,6 +190,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Number", { type: "int", allowNull: false })
             .addField("ReadyDate", { type: "datetime", allowNull: true })
             .addField("State", { type: "enum", values: ["D", "R", "A"], allowNull: false });
+
+        metaDataMgr.addModel("LsnShareCounter", "484a1f53-0e76-4d13-8cd0-ca8f1ef88dec", "RootLsnShareCounter", "fd4c7303-1699-439e-9555-b64994bfd72d")
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
+            .addField("SNetProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
+            .addField("Counter", { type: "int", allowNull: false });
 
         metaDataMgr.addModel("Reference", "b919a12f-5202-43b5-b1fc-481f75623659", "RootReference", "8d5fd37d-e686-4eec-a8e8-b7df91160a92")
             .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
@@ -257,6 +281,10 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
             .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: true })
             .addField("LessonCourseId", { type: "dataRef", model: "LessonCourse", refAction: "parentRestrict", allowNull: true });
+
+        metaDataMgr.addModel("PushSubscription", "", "RootPushSubscription", "")
+            .addField("EndPoint", { type: "string", length: Data.ENDPOINT_FIELD_LENGTH, allowNull: false })
+            .addField("Data", { type: "string", allowNull: false });
 
         metaDataMgr.checkSchema();
     }
