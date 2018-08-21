@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-import $ from 'jquery'
+// import $ from 'jquery'
 
 import * as appActions from '../../actions/app-actions';
 import * as playerActions from "../../actions/player-actions";
@@ -13,8 +13,6 @@ import LessonsListWrapper from './lessons-list-wrapper';
 
 
 class Menu extends React.Component {
-
-
 
     render() {
         const _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>',
@@ -74,6 +72,10 @@ class ListBlock extends React.Component {
         total: PropTypes.number,
     };
 
+    _switchMenu() {
+
+    }
+
     render() {
         return (
             <div className="lectures-menu__section lectures-list-block">
@@ -90,41 +92,41 @@ class ListBlock extends React.Component {
 class Navigation extends React.Component {
 
     render() {
+        const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
+
         return(
-            <section class="lectures-menu__section section-nav js-section-nav">
-                <button class="section-nav__trigger js-section-nav-trigger">
-                    <span class="visually-hidden">Меню</span>
-                    <svg width="4" height="18">
-                        <use xlink:href="#dots"></use>
-                    </svg>
+            <section className="lectures-menu__section section-nav js-section-nav">
+                <button className="section-nav__trigger js-section-nav-trigger">
+                    <span className="visually-hidden">Меню</span>
+                    <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
                 </button>
-                <div class="section-nav__list">
-                    <ul class="section-nav-list">
-                        <li class="section-nav-list__item js-section-menu-control">
-                            <a href="#transcript" class="section-nav-list__item-head js-scroll-link">Транскрипт</a>
-                            <ol class="section-nav-sublist">
-                                <li class="section-nav-sublist__item current">
-                                    <a href="#" class="section-nav-sublist__link">«К чему эти смехотворные чудовища?»</a>
+                <div className="section-nav__list">
+                    <ul className="section-nav-list">
+                        <li className="section-nav-list__item js-section-menu-control">
+                            <a href="#transcript" className="section-nav-list__item-head js-scroll-link">Транскрипт</a>
+                            <ol className="section-nav-sublist">
+                                <li className="section-nav-sublist__item current">
+                                    <a href="#" className="section-nav-sublist__link">«К чему эти смехотворные чудовища?»</a>
                                 </li>
-                                <li class="section-nav-sublist__item">
-                                    <a href="#" class="section-nav-sublist__link">Строгие формы аббатства Фонтене</a>
+                                <li className="section-nav-sublist__item">
+                                    <a href="#" className="section-nav-sublist__link">Строгие формы аббатства Фонтене</a>
                                 </li>
-                                <li class="section-nav-sublist__item">
-                                    <a href="#" class="section-nav-sublist__link">Танцующие и плачущие святые</a>
+                                <li className="section-nav-sublist__item">
+                                    <a href="#" className="section-nav-sublist__link">Танцующие и плачущие святые</a>
                                 </li>
-                                <li class="section-nav-sublist__item">
-                                    <a href="#" class="section-nav-sublist__link">«Эпоха образа до эпохи искусства»</a>
+                                <li className="section-nav-sublist__item">
+                                    <a href="#" className="section-nav-sublist__link">«Эпоха образа до эпохи искусства»</a>
                                 </li>
-                                <li class="section-nav-sublist__item">
-                                    <a href="#" class="section-nav-sublist__link">Категория стиля</a>
+                                <li className="section-nav-sublist__item">
+                                    <a href="#" className="section-nav-sublist__link">Категория стиля</a>
                                 </li>
-                                <li class="section-nav-sublist__item">
-                                    <a href="#" class="section-nav-sublist__link">Стиль и политика</a>
+                                <li className="section-nav-sublist__item">
+                                    <a href="#" className="section-nav-sublist__link">Стиль и политика</a>
                                 </li>
                             </ol>
                         </li>
-                        <li class="section-nav-list__item">
-                            <a href="#recommend" class="section-nav-list__item-head js-scroll-link">Литература</a>
+                        <li className="section-nav-list__item">
+                            <a href="#recommend" className="section-nav-list__item-head js-scroll-link">Литература</a>
                         </li>
                     </ul>
                 </div>

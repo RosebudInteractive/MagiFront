@@ -3,7 +3,11 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
-import TranscriptPage from '../components/transcript-page/transcript-page';
+import Menu from '../components/combined-lesson-page/menu'
+import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
+import LessonWrapper from '../components/lesson-page/lesson-wrapper';
+import LessonInfo from '../components/combined-lesson-page/lesson-info';
+import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -11,7 +15,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
-// import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
+import * as storageActions from "../actions/lesson-info-storage-actions";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
@@ -21,7 +25,8 @@ class TranscriptLessonPage extends React.Component {
     componentWillMount() {
         let {courseUrl, lessonUrl} = this.props;
 
-        this.props.userActions.whoAmI()
+        this.props.userActions.whoAmI();
+        this.props.storageActions.refreshState();
 
         if (!this._lessonLoaded(courseUrl, lessonUrl)) {
             this.props.lessonActions.getLesson(courseUrl, lessonUrl);
@@ -32,7 +37,7 @@ class TranscriptLessonPage extends React.Component {
         }
 
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
-        this.props.pageHeaderActions.setCurrentPage(pages.transcript, courseUrl, lessonUrl);
+        this.props.pageHeaderActions.setCurrentPage(pages.lesson, courseUrl, lessonUrl);
     }
 
     componentDidMount() {
@@ -88,6 +93,52 @@ class TranscriptLessonPage extends React.Component {
         }
     }
 
+    _createBundle(lesson) {
+        let {authors, lessons} = this.props;
+
+        lesson.Author = authors.find((author) => {
+            return author.Id === lesson.AuthorId
+        });
+
+
+        // let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
+        //     _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
+
+        let _lessonAudios = null;
+
+        lessons.object.some((item) => {
+            let _founded = item.Id === lesson.Id
+
+            if (!_founded) {
+                if (item.Lessons.length > 0) {
+                    return item.Lessons.some((subItem) => {
+                        if (subItem.Id === lesson.Id) {
+                            _lessonAudios = subItem;
+                        }
+                        return subItem.Id === lesson.Id
+                    })
+                } else {
+                    return false
+                }
+            } else {
+                _lessonAudios = item;
+                return true
+            }
+        })
+
+        let _audios = _lessonAudios ? _lessonAudios.Audios : null;
+
+        return <LessonWrapper lesson={lesson}
+                        courseUrl={this.props.courseUrl}
+                        lessonUrl={lesson.URL}
+                        active={lesson.Number}
+                        // isPlayer={_playingLessonUrl || _lessonInPlayer}
+                        audios={_audios}
+                        history={this.props.history}
+        />
+    }
+
+
     render() {
         let {
             lesson,
@@ -96,39 +147,67 @@ class TranscriptLessonPage extends React.Component {
             authorized
         } = this.props;
 
-        const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
-
         return (
-            <div>
-                <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
-                      className="link-to-lecture"
-                      id='link-to-lecture'
-                      style={_linkStyle}
-                >Смотреть <br/>лекцию</Link>
-                {/*//<GalleryButtons/>*/}
-                <SocialBlock/>
-                {/*// lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,*/}
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        (lesson && lessonText.loaded) ?
-                            <div>
-                                <div className="transcript-page">
-                                    <TranscriptPage episodes={lessonText.episodes}
-                                                    refs={lessonText.refs}
-                                                    gallery={lessonText.gallery}
-                                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
-                                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
-                                                    lesson={lesson}/>
-                                </div>
-                            </div>
-                            :
-                            null
-                }
-            </div>
+            fetching || !(lesson && lessonText.loaded) ?
+                <p>Загрузка...</p>
+                :
+
+                [
+                    <Menu/>,
+                    <GalleryWrapper/>,
+                    this._createBundle(lesson),
+                    <LessonInfo/>,
+                    <TranscriptPage episodes={lessonText.episodes}
+                                    refs={lessonText.refs}
+                                    gallery={lessonText.gallery}
+                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
+                                    lesson={lesson}/>
+                ]
         )
     }
+
+    // render() {
+    //     let {
+    //         lesson,
+    //         lessonText,
+    //         fetching,
+    //         authorized
+    //     } = this.props;
+    //
+    //     const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
+    //
+    //     return (
+    //         <div>
+    //             <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
+    //                   className="link-to-lecture"
+    //                   id='link-to-lecture'
+    //                   style={_linkStyle}
+    //             >Смотреть <br/>лекцию</Link>
+    //             {/*//<GalleryButtons/>*/}
+    //             <SocialBlock/>
+    //             {/*// lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,*/}
+    //             {
+    //                 fetching ?
+    //                     <p>Загрузка...</p>
+    //                     :
+    //                     (lesson && lessonText.loaded) ?
+    //                         <div>
+    //                             <div className="transcript-page">
+    //                                 <TranscriptPage episodes={lessonText.episodes}
+    //                                                 refs={lessonText.refs}
+    //                                                 gallery={lessonText.gallery}
+    //                                                 isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+    //                                                 isNeedHideRefs={!(lessonText.refs.length > 0)}
+    //                                                 lesson={lesson}/>
+    //                             </div>
+    //                         </div>
+    //                         :
+    //                         null
+    //             }
+    //         </div>
+    //     )
+    // }
 }
 
 class GalleryButtons extends React.Component {
@@ -155,53 +234,13 @@ class GalleryButtons extends React.Component {
     }
 }
 
-
-class SocialBlock extends React.Component {
-
-
-    render() {
-        const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
-            _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
-            _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
-            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>'
-
-        return (
-            <div className="social-block-vertical">
-                <a href="#" className="social-btn-dark">
-                    <div className="social-btn-dark__icon">
-                        <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">19</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">64</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">91</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
-                    </div>
-                    <span className="social-btn-dark__actions"/>
-                </a>
-            </div>
-        )
-    }
-}
-
 function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.courseUrl,
         lessonUrl: ownProps.match.params.lessonUrl,
         fetching: state.singleLesson.fetching || state.lessonText.fetching,
         lesson: state.singleLesson.object,
+        authors: state.singleLesson.authors,
         lessonText: state.lessonText,
         course: state.singleLesson.course,
         lessons: state.lessons,
@@ -215,6 +254,7 @@ function mapDispatchToProps(dispatch) {
         lessonActions: bindActionCreators(lessonActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        storageActions: bindActionCreators(storageActions, dispatch),
     }
 }
 
