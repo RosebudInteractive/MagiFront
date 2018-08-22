@@ -52,7 +52,7 @@ class LessonInfo extends React.Component {
             _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>';
 
         return (
-            lesson && lesson.Lessons && (lesson.Lessons.length > 0)
+            lesson
                 ?
                 <section className="lecture-info">
                     <div className="lecture-info__wrapper">
@@ -61,7 +61,8 @@ class LessonInfo extends React.Component {
                                 <span className="number">{lesson.Number + '. '}</span>{lesson.Name}
                             </h2>
                             <p className="lecture-info__descr">{lesson.ShortDescription + ' '}
-                                <span className="lecture-info__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</span>
+                                <span
+                                    className="lecture-info__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</span>
                             </p>
                         </div>
                         <div className="social-block social-block--dark _mobile">
@@ -92,14 +93,21 @@ class LessonInfo extends React.Component {
                                 </a>
                             </div>
                         </div>
-                        <div className="lecture-info__extras">
-                            <p className="lecture-info__extras-label">Доп<span
-                                className="mobile">олнительные</span><span
-                                className="desktop">.</span> эпизоды</p>
-                            <ol className="lecture-info__extras-list extras-list _full" data-number="10">
-                                {this._getSublessonList()}
-                            </ol>
-                        </div>
+                        {
+                            lesson.Lessons && (lesson.Lessons.length > 0)
+                                ?
+                                <div className="lecture-info__extras">
+                                    <p className="lecture-info__extras-label">Доп<span
+                                        className="mobile">олнительные</span><span
+                                        className="desktop">.</span> эпизоды</p>
+                                    <ol className="lecture-info__extras-list extras-list _full" data-number="10">
+                                        {this._getSublessonList()}
+                                    </ol>
+                                </div>
+                                :
+                                null
+                        }
+
                     </div>
                 </section>
                 :

@@ -146,8 +146,24 @@ class TranscriptLessonPage extends React.Component {
         }
     }
 
+    _getLessonsBundles() {
+        let lesson = this._getLesson();
+
+        return lesson ? this._createBundle(lesson) : null;
+    }
+
+    _getLesson() {
+        let {lessonUrl, lessonInfo} = this.props,
+            lesson = lessonInfo.object;
+
+        return (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
+            return subLesson.URL === lessonUrl
+        })
+    }
+
     _createBundle(lesson) {
-        let {authors, lessons} = this.props;
+        let {authors} = this.props.lessonInfo;
+        let {lessons} = this.props;
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
@@ -206,16 +222,16 @@ class TranscriptLessonPage extends React.Component {
                 :
 
                 [
-                    <Menu lesson={lesson}/>,
+                    <Menu lesson={this._getLesson()}/>,
                     <GalleryWrapper/>,
-                    this._createBundle(lesson),
-                    <LessonInfo lesson={lesson}/>,
+                    this._getLessonsBundles(),
+                    <LessonInfo lesson={this._getLesson()}/>,
                     <TranscriptPage episodes={lessonText.episodes}
                                     refs={lessonText.refs}
                                     gallery={lessonText.gallery}
-                                    isNeedHideGallery={lesson.IsAuthRequired && !authorized}
+                                    isNeedHideGallery={this._getLesson().IsAuthRequired && !authorized}
                                     isNeedHideRefs={!(lessonText.refs.length > 0)}
-                                    lesson={lesson}/>
+                                    lesson={this._getLesson()}/>
                 ]
         )
     }
