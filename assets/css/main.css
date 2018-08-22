@@ -6384,7 +6384,8 @@ ul.user-tooltip {
   }
 
   .lecture-wrapper {
-    height: 100%;
+    /*height: 100%;*/
+    height: 56.25vw;
   }
 .lecture-wrapper, .player-wrapper {
   background-repeat: no-repeat;

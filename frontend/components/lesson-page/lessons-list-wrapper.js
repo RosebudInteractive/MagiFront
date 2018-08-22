@@ -9,8 +9,6 @@ import SubLessonPlayBlock from './subLesson-play-block'
 import * as lessonActions from '../../actions/lesson-actions';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
-import $ from 'jquery'
-
 class LessonsListWrapper extends React.Component {
     static propTypes = {
         isDark: PropTypes.bool,

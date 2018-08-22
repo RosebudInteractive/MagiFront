@@ -15,9 +15,7 @@ import LessonsListWrapper from './lessons-list-wrapper';
 class Menu extends React.Component {
 
     render() {
-        const _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>',
-            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>';
-
+        const _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
 
         let {course, lessons} = this.props,
             _courseTitle = course ? course.Name : '',
@@ -25,10 +23,11 @@ class Menu extends React.Component {
             _total = lessons.object.length;
 
         return (
-            <div className="lectures-menu _plain-menu js-lectures-menu js-plain-menu _dark">
+            <div className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu _dark" + (this.props.isLessonMenuOpened ? ' opened' : '')}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
-                <ListBlock total={_total} {...this.props}/>
-
+                <ListBlock total={_total}
+                           courseUrl={_courseUrl}
+                           {...this.props}/>
                 <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button">
                     <svg width="60" height="53" dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                 </button>
@@ -72,8 +71,16 @@ class ListBlock extends React.Component {
         total: PropTypes.number,
     };
 
-    _switchMenu() {
+    componentWillUnmount() {
+        this.props.appActions.hideLessonMenu()
+    }
 
+    _switchMenu() {
+        if (this.props.isLessonMenuOpened) {
+            this.props.appActions.hideLessonMenu()
+        } else {
+            this.props.appActions.showLessonMenu()
+        }
     }
 
     render() {
@@ -82,7 +89,7 @@ class ListBlock extends React.Component {
                 <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
                         onClick={::this._switchMenu}><span className='caption'>Лекция </span>
                     <span className="num"><span
-                        className="current">{this.props.current}</span>{'/' + this.props.total}</span></button>
+                        className="current">{this.props.lesson.Number}</span>{'/' + this.props.total}</span></button>
                 <LessonsListWrapper {...this.props}/>
             </div>
         )

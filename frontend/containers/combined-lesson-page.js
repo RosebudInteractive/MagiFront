@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
-import LessonWrapper from '../components/lesson-page/lesson-wrapper';
+import LessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 
@@ -16,6 +16,8 @@ import * as userActions from "../actions/user-actions";
 import {pages} from '../tools/page-tools';
 import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
+import * as appActions from "../actions/app-actions";
+import * as playerStartActions from "../actions/player-start-actions";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
@@ -28,15 +30,10 @@ class TranscriptLessonPage extends React.Component {
         this.props.userActions.whoAmI();
         this.props.storageActions.refreshState();
 
-        if (!this._lessonLoaded(courseUrl, lessonUrl)) {
-            this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-        }
-
-        if (!this.props.lessons.loaded) {
-            this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
-        }
-
+        this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
+
         this.props.pageHeaderActions.setCurrentPage(pages.lesson, courseUrl, lessonUrl);
     }
 
@@ -46,23 +43,64 @@ class TranscriptLessonPage extends React.Component {
 
     componentWillUnmount() {
         window.removeEventListener('scroll', TranscriptLessonPage._handleScroll);
+        this.props.lessonActions.clearLesson();
     }
 
-    componentDidUpdate() {
-        TranscriptLessonPage._handleScroll()
+    componentDidUpdate(prevProps) {
+        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
 
-        if (this.props.lesson) {
-            document.title = 'Транскрипт: ' + this.props.lesson.Name + ' - Магистерия'
+        if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
+            this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+            this.props.appActions.hideLessonMenu()
+        }
+
+
+        let _lesson = this._getLessonInfoByUrl(lessonInfo, courseUrl, lessonUrl);
+        if (!_lesson) {
+            return
+        }
+
+        let _needStartPlay = (this.props.params === '?play')
+
+        if (this._needStartPlayer || _needStartPlay) {
+            this._needStartPlayer = false;
+
+            let _isPlayingLesson = playInfo ? (playInfo.id === _lesson.Id) : false;
+
+            if (_isPlayingLesson) {
+                this.props.appActions.switchToFullPlayer()
+            } else {
+                if (_lesson.IsAuthRequired && !authorized) {
+                    let _newUrl = '/' + courseUrl + '/' + lessonUrl;
+                    this.props.history.replace(_newUrl)
+                } else {
+                    this.props.playerStartActions.startPlayLesson(_lesson)
+                }
+            }
+        }
+
+        if (_lesson) {
+            document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
         }
     }
 
-    _lessonLoaded() {
-        return false
+    _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
+        if (!info.object) {
+            return null
+        }
+
+        return ((info.object.courseUrl === courseUrl) && (info.object.URL === lessonUrl)) ?
+            info.object
+            :
+            info.object.Lessons.find((lesson) => {
+                return ((lesson.courseUrl === courseUrl) && (lesson.URL === lessonUrl))
+            })
     }
 
     static _handleScroll() {
         let _link = $('.link-to-lecture, .social-block-vertical');
         const _recommend = $('#pictures');
+        let st = $(this).scrollTop();
 
         if ((_link.length) && (_recommend.length)) {
             let coordTop = _recommend.offset().top;
@@ -84,6 +122,21 @@ class TranscriptLessonPage extends React.Component {
                 }
             }
         }
+
+
+        if ($('.js-player').length) {
+            if (st > ($('.js-player').outerHeight() - 53)) {
+                $('.js-lectures-menu').removeClass('_dark');
+                $('.js-lectures-menu').addClass('_fixed');
+            } else {
+                $('.js-lectures-menu').addClass('_dark');
+                $('.js-lectures-menu').removeClass('_fixed');
+            }
+
+            if (st < $('.js-player').outerHeight()) {
+                // closeGallerySlider();
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -101,8 +154,8 @@ class TranscriptLessonPage extends React.Component {
         });
 
 
-        // let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
-        //     _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
+        let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
+            _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
 
         let _lessonAudios = null;
 
@@ -129,12 +182,12 @@ class TranscriptLessonPage extends React.Component {
         let _audios = _lessonAudios ? _lessonAudios.Audios : null;
 
         return <LessonWrapper lesson={lesson}
-                        courseUrl={this.props.courseUrl}
-                        lessonUrl={lesson.URL}
-                        active={lesson.Number}
-                        // isPlayer={_playingLessonUrl || _lessonInPlayer}
-                        audios={_audios}
-                        history={this.props.history}
+                              courseUrl={this.props.courseUrl}
+                              lessonUrl={lesson.URL}
+                              active={lesson.Number}
+                              isPlayer={_playingLessonUrl || _lessonInPlayer}
+                              audios={_audios}
+                              history={this.props.history}
         />
     }
 
@@ -153,10 +206,10 @@ class TranscriptLessonPage extends React.Component {
                 :
 
                 [
-                    <Menu/>,
+                    <Menu lesson={lesson}/>,
                     <GalleryWrapper/>,
                     this._createBundle(lesson),
-                    <LessonInfo/>,
+                    <LessonInfo lesson={lesson}/>,
                     <TranscriptPage episodes={lessonText.episodes}
                                     refs={lessonText.refs}
                                     gallery={lessonText.gallery}
@@ -166,48 +219,6 @@ class TranscriptLessonPage extends React.Component {
                 ]
         )
     }
-
-    // render() {
-    //     let {
-    //         lesson,
-    //         lessonText,
-    //         fetching,
-    //         authorized
-    //     } = this.props;
-    //
-    //     const _linkStyle = {position: 'fixed', top: '50%', marginTop: 0};
-    //
-    //     return (
-    //         <div>
-    //             <Link to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}
-    //                   className="link-to-lecture"
-    //                   id='link-to-lecture'
-    //                   style={_linkStyle}
-    //             >Смотреть <br/>лекцию</Link>
-    //             {/*//<GalleryButtons/>*/}
-    //             <SocialBlock/>
-    //             {/*// lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,*/}
-    //             {
-    //                 fetching ?
-    //                     <p>Загрузка...</p>
-    //                     :
-    //                     (lesson && lessonText.loaded) ?
-    //                         <div>
-    //                             <div className="transcript-page">
-    //                                 <TranscriptPage episodes={lessonText.episodes}
-    //                                                 refs={lessonText.refs}
-    //                                                 gallery={lessonText.gallery}
-    //                                                 isNeedHideGallery={lesson.IsAuthRequired && !authorized}
-    //                                                 isNeedHideRefs={!(lessonText.refs.length > 0)}
-    //                                                 lesson={lesson}/>
-    //                             </div>
-    //                         </div>
-    //                         :
-    //                         null
-    //             }
-    //         </div>
-    //     )
-    // }
 }
 
 class GalleryButtons extends React.Component {
@@ -238,6 +249,9 @@ function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.courseUrl,
         lessonUrl: ownProps.match.params.lessonUrl,
+        params: ownProps.location.search,
+
+        lessonInfo: state.singleLesson,
         fetching: state.singleLesson.fetching || state.lessonText.fetching,
         lesson: state.singleLesson.object,
         authors: state.singleLesson.authors,
@@ -255,6 +269,8 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
     }
 }
 

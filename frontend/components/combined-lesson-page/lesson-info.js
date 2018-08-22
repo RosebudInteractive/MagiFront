@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 // import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
+import {getCoverPath, ImageSize} from "../../tools/page-tools";
 
 
 class LessonInfo extends React.Component {
@@ -13,27 +14,29 @@ class LessonInfo extends React.Component {
 
     _getSublessonList() {
         const _playNofill = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-nofill"/>',
-            _pauseAlt = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-alt"/>';
+            _pauseAlt = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-alt"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>';
 
         let {lesson} = this.props;
 
         return lesson.Lessons.map((item) => {
+            let _cover = getCoverPath(item, ImageSize.icon)
             return (
                 <li>
-                    <Link to="#" className="extras-list__item">
-                        <span className="counter">10.</span>
+                    <Link to={"/" + item.courseUrl + '/' + item.URL} className="extras-list__item">
+                        {/*<span className="counter">10.</span>*/}
                         <span className="inner-counter">{item.Number}</span>
                         {item.Name + ' '}
                         <span className="duration">{item.DurationFmt}</span>
                     </Link>
                     <button className="extras-list__play-btn" type="button"
-                            style="background-image: url('assets/images/play-big03.png')">
+                            style={{backgroundImage: "url('/data/" + _cover + "')"}}>
                         <span className="duration">5:18</span>
                         <svg className="play" width="12" height="11" dangerouslySetInnerHTML={{__html: _playNofill}}/>
                         <svg className="pause" width="8" height="14" dangerouslySetInnerHTML={{__html: _pauseAlt}}/>
                     </button>
                     <button className="extras-list__fav" type="button">
-                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _pauseAlt}}/>
+                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
                     </button>
                 </li>
             )
@@ -57,8 +60,8 @@ class LessonInfo extends React.Component {
                             <h2 className="lecture-info__title">
                                 <span className="number">{lesson.Number + '. '}</span>{lesson.Name}
                             </h2>
-                            <p className="lecture-info__descr">{lesson.Description + ' '}
-                                <span className="lecture-info__author">Олег Лекманов</span>
+                            <p className="lecture-info__descr">{lesson.ShortDescription + ' '}
+                                <span className="lecture-info__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</span>
                             </p>
                         </div>
                         <div className="social-block social-block--dark _mobile">

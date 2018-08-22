@@ -20,12 +20,7 @@ export default class TranscriptPage extends React.Component {
         let {isNeedHideGallery} = this.props;
 
         return (
-            <div>
-                <TextBlock {...this.props} />
-                {/*<ReadingBlock {...this.props}/>*/}
-                {/*{isNeedHideGallery ? null : <Gallery {...this.props}/>}*/}
-                {/*{isNeedHideGallery ? null : <GallerySlides {...this.props}/>}*/}
-            </div>
+            <TextBlock {...this.props} />
         )
     }
 }
@@ -134,23 +129,23 @@ class TextBlock extends React.Component {
         return _div;
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this._setIndent()
     }
 
-    componentDidUpdate(){
+    componentDidUpdate() {
         this._setIndent()
     }
 
     _setIndent() {
-        let _number = $('.title-text .number')
+        let _number = $('.text-block__headline .number')
 
         if (_number.length > 0) {
             if (window.outerWidth > 899) {
                 let _width = _number[0].offsetWidth;
-                $('.title-text').css('text-indent', -_width);
+                $('.text-block__headline').css('text-indent', -_width);
             } else {
-                $('.title-text').css('text-indent', 0);
+                $('.text-block__headline').css('text-indent', 0);
             }
         }
     }
@@ -159,13 +154,71 @@ class TextBlock extends React.Component {
         let {lesson, isNeedHideRefs} = this.props;
 
         return (
-            <section className={'text-block'} id='text'>
-                <div className={'text-block__wrapper'}>
-                    <div className='title-text'><span className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
-                    {this._getText()}
-                    {isNeedHideRefs ? null : <Refs {...this.props}/>}
-                </div>
-            </section>
+            <div className="transcript-page _nested" id="transcript">
+
+
+                <section className="text-block js-social-start">
+                    <SocialBlock/>
+                    {/*<button className="play-btn js-play" type="button"*/}
+                    {/*style="background-image: url(&quot;assets/images/lecture01.png&quot;); bottom: auto; top: 10px;">*/}
+                    {/*<span className="duration">35:18</span>*/}
+                    {/*<svg width="41" height="36">*/}
+                    {/*/!*<use xlink:href="#play-nofill"></use>*!/*/}
+                    {/*</svg>*/}
+                    {/*</button>*/}
+                    <p className="text-block__label">Транскрипт</p>
+                    {/*<section className={'text-block'} id='text'>*/}
+                    <div className={'text-block__wrapper'}>
+                        <div className='text-block__headline'><span
+                            className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
+                        {this._getText()}
+                        {isNeedHideRefs ? null : <Refs {...this.props}/>}
+                    </div>
+                    {/*</section>*/}
+                </section>
+            </div>
+        )
+    }
+}
+
+class SocialBlock extends React.Component {
+
+
+    render() {
+        const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
+            _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
+            _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
+            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
+
+        const _style = {top: 0, bottom: 'auto'}
+
+        return (
+            <div className="social-block-vertical _left js-social" style={_style}>
+                <a href="#" className="social-btn-dark">
+                    <div className="social-btn-dark__icon">
+                        <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
+                    </div>
+                    <span className="social-btn-dark__actions">19</span>
+                </a>
+                <a href="#" className="social-btn-dark _active">
+                    <div className="social-btn-dark__icon">
+                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
+                    </div>
+                    <span className="social-btn-dark__actions">64</span>
+                </a>
+                <a href="#" className="social-btn-dark _active">
+                    <div className="social-btn-dark__icon">
+                        <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
+                    </div>
+                    <span className="social-btn-dark__actions">91</span>
+                </a>
+                <a href="#" className="social-btn-dark _active">
+                    <div className="social-btn-dark__icon">
+                        <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
+                    </div>
+                    <span className="social-btn-dark__actions"/>
+                </a>
+            </div>
         )
     }
 }
