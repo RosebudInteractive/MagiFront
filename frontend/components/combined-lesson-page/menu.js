@@ -121,6 +121,7 @@ class Navigation extends React.Component {
 
         this.state = {
             expanded: false,
+            showToc: false,
         }
     }
 
@@ -149,9 +150,12 @@ class Navigation extends React.Component {
         })
     }
 
-    _switchToc() {
-        if (this.state.expanded) {
-            this.setState({expanded: false})
+    _switchToc(e) {
+        if (this.state.showToc) {
+            let _isToc = e.target.closest('.section-nav-sublist');
+            if (!_isToc) {
+                this.setState({showToc: false})
+            }
         } else {
             if (!this.props.episodes || !this.props.episodes.length) {
                 let scrollTarget = $('#transcript').offset().top;
@@ -160,7 +164,7 @@ class Navigation extends React.Component {
                     scrollTop: scrollTarget
                 }, 600);
             } else {
-                this.setState({expanded: true})
+                this.setState({showToc: true})
             }
         }
     }
@@ -192,9 +196,9 @@ class Navigation extends React.Component {
                 </button>
                 <div className="section-nav__list">
                     <ul className="section-nav-list">
-                        <li className="section-nav-list__item js-section-menu-control" onClick={::this._switchToc}>
+                        <li className={"section-nav-list__item js-section-menu-control" + (this.state.showToc ? ' expanded' : '')}onClick={::this._switchToc}>
                             <a href="#transcript" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Транскрипт</a>
-                            <ol className={"section-nav-sublist" + (this.state.expanded ? ' show' : '')}>
+                            <ol className={"section-nav-sublist" + (this.state.showToc ? ' show' : '')}>
                                 {this._getList()}
                             </ol>
                         </li>

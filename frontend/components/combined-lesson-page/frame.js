@@ -11,6 +11,7 @@ import Titles from "../player/titles";
 import TimeInfo from '../player/time-info';
 import ContentTooltip from "../player/content-tooltip";
 import RateTooltip from '../player/rate-tooltip';
+import SoundButton from '../player-controls/sound-button'
 
 import * as playerActions from '../../actions/player-actions'
 import * as playerStartActions from '../../actions/player-start-actions'
@@ -62,7 +63,6 @@ class Frame extends Component {
                 } else {
                     that.props.playerStartActions.startPause()
                 }
-
             }
 
             if (_isPauseFrame) {
@@ -185,9 +185,7 @@ class Frame extends Component {
 
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
-            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
-            _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen"/>',
-            _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
+            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>'
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false
@@ -200,20 +198,21 @@ class Frame extends Component {
                 </div>
                 {
                     this.props.visible ?
-                        <div className="lecture-frame">
+                        <div>
                             <PauseScreen {...this.props} isFinished={_isFinished}/>
                             <div>
+                                <div className='lecture-frame__header'>
+                                    <Controls {...this.props}/>
+                                </div>
                                 <Titles/>
                                 <div className="player-block">
                                     <Progress id={_id}/>
                                     <div className="player-block__row">
-                                        <Controls {...this.props}/>
-                                        <div className="player-block__stats">
+                                        <div className="player-block__controls">
                                             <TimeInfo/>
-                                            <button type="button" className="speed-button js-speed-trigger player-button"
-                                                    onClick={::this._openRate}>
-                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                            </button>
+                                        </div>
+                                        <div className="player-block__stats">
+                                            <SoundButton/>
                                             {
                                                 this.props.contentArray.length > 0 ?
                                                     <button type="button" className="content-button js-contents-trigger player-button"
@@ -224,13 +223,9 @@ class Frame extends Component {
                                                     :
                                                     null
                                             }
-                                            <button type="button"
-                                                    className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')}
-                                                    onClick={::this._toggleFullscreen}>
-                                                <svg className="full" width="20" height="18"
-                                                     dangerouslySetInnerHTML={{__html: _fullscreen}}/>
-                                                <svg className="normal" width="20" height="18"
-                                                     dangerouslySetInnerHTML={{__html: _screen}}/>
+                                            <button type="button" className="speed-button js-speed-trigger player-button"
+                                                    onClick={::this._openRate}>
+                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                             </button>
                                         </div>
                                         {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
