@@ -8,6 +8,7 @@ import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper
 import LessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
+import GallerySlides from '../components/transcript-page/gallery-slides';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -18,6 +19,8 @@ import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";
 import * as playerStartActions from "../actions/player-start-actions";
+
+import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
@@ -39,11 +42,14 @@ class TranscriptLessonPage extends React.Component {
 
     componentDidMount() {
         window.addEventListener('scroll', TranscriptLessonPage._handleScroll);
+        $('body').toggleClass('_player');
+        $('[data-fancybox]').fancybox();
     }
 
     componentWillUnmount() {
         window.removeEventListener('scroll', TranscriptLessonPage._handleScroll);
         this.props.lessonActions.clearLesson();
+        $('body').removeClass('_player');
     }
 
     componentDidUpdate(prevProps) {
@@ -98,28 +104,99 @@ class TranscriptLessonPage extends React.Component {
     }
 
     static _handleScroll() {
-        let _link = $('.link-to-lecture, .social-block-vertical');
-        const _recommend = $('#pictures');
+        // const _recommend = $('#pictures');
+        let _controls = $('.js-gallery-controls');
+        // var windowHeight = $(window).height();
+
+        if (_controls.length) {
+            // var coordTop = $('#recommend').offset().top;
+            //
+            // if ($(window).width() < 768 ) {
+            //     if ($(window).scrollTop() + windowHeight >= coordTop) {
+            //         _controls.css('position', 'absolute').css('bottom', 'auto').css('top', coordTop - 55);
+            //         if (_controls.hasClass('show')) {
+            //             closeGallerySlider();
+            //         }
+            //     } else {
+            //         $('.js-gallery-controls').css('position', 'fixed').css('top', 'auto').css('bottom', '10px').css('margin-top', '0');
+            //     }
+            // } else {
+            //     if ($(window).scrollTop() + windowHeight >= coordTop) {
+            //         _controls.css('position', 'absolute').css('top', coordTop).css('transform', 'none').css('bottom', 'auto');
+            //         if (_controls.hasClass('show')) {
+            //             closeGallerySlider();
+            //         }
+            //     } else {
+            //         $('.js-gallery-controls').css('position', 'fixed').css('bottom', '20px').css('top', 'auto').css('margin-top', '-60px');
+            //     }
+            // }
+
+            if ($('.js-player').length) {
+                if ($(window).scrollTop() < $('.js-player').outerHeight()) {
+                    _controls.removeClass('visible');
+                    _controls.fadeOut();
+                } else {
+                    _controls.addClass('visible');
+                    _controls.fadeIn();
+                }
+            }
+        }
+
         let st = $(this).scrollTop();
 
-        if ((_link.length) && (_recommend.length)) {
-            let coordTop = _recommend.offset().top;
+        // if ((_link.length) && (_recommend.length)) {
+        //     let coordTop = _recommend.offset().top;
+        //
+        //     let _scrollTop = $(window).scrollTop();
+        //
+        //     if ((_scrollTop + 550) >= coordTop) {
+        //         _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
+        //     } else {
+        //         _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
+        //     }
+        //
+        //     if (window.innerWidth < 600) {
+        //         if ((_scrollTop + 650) >= coordTop) {
+        //             _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
+        //         } else {
+        //             // _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
+        //             _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
+        //         }
+        //     }
+        // }
 
-            let _scrollTop = $(window).scrollTop();
+        if ($('.js-social-start').length) {
 
-            if ((_scrollTop + 550) >= coordTop) {
-                _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-            } else {
-                _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
+            let _socialStart = $('.js-social-start');
+
+            if (st < _socialStart.offset().top + 147) {
+                $('.js-social').removeClass('_fixed');
+                $('.js-social').css('top', '0').css('bottom', 'auto');
             }
 
-            if (window.innerWidth < 600) {
-                if ((_scrollTop + 650) >= coordTop) {
-                    _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-                } else {
-                    // _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
-                    _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
-                }
+            if (st > _socialStart.offset().top + 147) {
+                $('.js-social').addClass('_fixed');
+                $('.js-social').css('bottom', 'auto').css('top', '0');
+            }
+
+            if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
+                $('.js-social').removeClass('_fixed');
+                $('.js-social').css('top', 'auto').css('bottom', '0');
+            }
+
+            if (st < _socialStart.offset().top - 63) {
+                $('.js-play').removeClass('_fixed');
+                $('.js-play').css('bottom', 'auto').css('top', '10px');
+            }
+
+            if (st > _socialStart.offset().top - 63) {
+                $('.js-play').addClass('_fixed');
+                $('.js-play').css('bottom', 'auto').css('top', '10px');
+            }
+
+            if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 98)) {
+                $('.js-play').removeClass('_fixed');
+                $('.js-play').css('bottom', '0').css('top', 'auto');
             }
         }
 
@@ -134,7 +211,7 @@ class TranscriptLessonPage extends React.Component {
             }
 
             if (st < $('.js-player').outerHeight()) {
-                // closeGallerySlider();
+                closeGallerySlider();
             }
         }
     }
@@ -207,7 +284,6 @@ class TranscriptLessonPage extends React.Component {
         />
     }
 
-
     render() {
         let {
             lesson,
@@ -223,7 +299,9 @@ class TranscriptLessonPage extends React.Component {
 
                 [
                     <Menu lesson={this._getLesson()}/>,
-                    <GalleryWrapper/>,
+                    <GalleryButtons/>,
+                    //<GallerySlides {...this.props}/>,
+                    lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
                     <LessonInfo lesson={this._getLesson()}/>,
                     <TranscriptPage episodes={lessonText.episodes}
@@ -235,6 +313,26 @@ class TranscriptLessonPage extends React.Component {
                 ]
         )
     }
+}
+
+// function openGallerySlider() {
+//     var controls = $('.js-gallery-controls'),
+//         wrap = $('.js-gallery-slider-wrapper'),
+//         stickyBlock = $('.js-sticky-block');
+//
+//     controls.removeClass('hide').addClass('show');
+//     wrap.addClass('show');
+//     stickyBlock.addClass('slider-opened');
+// }
+
+function closeGallerySlider() {
+    let controls = $('.js-gallery-controls'),
+        wrap = $('.js-gallery-slider-wrapper'),
+        stickyBlock = $('.js-sticky-block');
+
+    controls.addClass('hide').removeClass('show');
+    wrap.removeClass('show');
+    stickyBlock.removeClass('slider-opened');
 }
 
 class GalleryButtons extends React.Component {

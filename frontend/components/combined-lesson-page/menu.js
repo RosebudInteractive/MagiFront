@@ -4,15 +4,29 @@ import {connect} from 'react-redux';
 
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-// import $ from 'jquery'
 
 import * as appActions from '../../actions/app-actions';
 import * as playerActions from "../../actions/player-actions";
 
 import LessonsListWrapper from './lessons-list-wrapper';
+import $ from "jquery";
 
 
 class Menu extends React.Component {
+
+    _getMenuType() {
+        let _scrollTop = $(window).scrollTop();
+
+        let _type = (_scrollTop > ($('.js-player').outerHeight() - 53)) ? '_fixed' : '_dark';
+        return _type;
+    }
+
+    _onFullScreenClick() {
+        let scrollTarget = $('.js-player').outerHeight() - $(window).height();
+        $('html, body').animate({
+            scrollTop: scrollTarget
+        }, 600);
+    }
 
     render() {
         const _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
@@ -22,13 +36,17 @@ class Menu extends React.Component {
             _courseUrl = course ? course.URL : '',
             _total = lessons.object.length;
 
+        let _type = this._getMenuType();
+
         return (
-            <div className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu _dark" + (this.props.isLessonMenuOpened ? ' opened' : '')}>
+            <div
+                className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type + (this.props.isLessonMenuOpened ? ' opened' : '')}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
                 <ListBlock total={_total}
                            courseUrl={_courseUrl}
                            {...this.props}/>
-                <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button">
+                <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
+                        onClick={::this._onFullScreenClick}>
                     <svg width="60" height="53" dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                 </button>
                 <Navigation/>
@@ -49,7 +67,7 @@ class LogoAndTitle extends React.Component {
         const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
             _linkBack = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#link-back"/>';
 
-        return(
+        return (
             <div className="lectures-menu__section">
                 <Link to={'/'} className="logo-min">
                     <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>
@@ -98,12 +116,37 @@ class ListBlock extends React.Component {
 
 class Navigation extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            expanded: false,
+        }
+    }
+
+    _onTriggerClick() {
+        this.setState({expanded: !this.state.expanded})
+    }
+
+    _onRecommendedClick() {
+        let scrollTarget = $('#recommend').offset().top;
+
+        $("body, html").animate({
+            scrollTop: scrollTarget
+        }, 600);
+    }
+
+    _onLinkMockClick(e) {
+        e.preventDefault()
+    }
+
     render() {
         const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
 
-        return(
-            <section className="lectures-menu__section section-nav js-section-nav">
-                <button className="section-nav__trigger js-section-nav-trigger">
+        return (
+            <section
+                className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
+                <button className="section-nav__trigger js-section-nav-trigger" onClick={::this._onTriggerClick}>
                     <span className="visually-hidden">Меню</span>
                     <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
                 </button>
@@ -113,16 +156,19 @@ class Navigation extends React.Component {
                             <a href="#transcript" className="section-nav-list__item-head js-scroll-link">Транскрипт</a>
                             <ol className="section-nav-sublist">
                                 <li className="section-nav-sublist__item current">
-                                    <a href="#" className="section-nav-sublist__link">«К чему эти смехотворные чудовища?»</a>
+                                    <a href="#" className="section-nav-sublist__link">«К чему эти смехотворные
+                                        чудовища?»</a>
                                 </li>
                                 <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">Строгие формы аббатства Фонтене</a>
+                                    <a href="#" className="section-nav-sublist__link">Строгие формы аббатства
+                                        Фонтене</a>
                                 </li>
                                 <li className="section-nav-sublist__item">
                                     <a href="#" className="section-nav-sublist__link">Танцующие и плачущие святые</a>
                                 </li>
                                 <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">«Эпоха образа до эпохи искусства»</a>
+                                    <a href="#" className="section-nav-sublist__link">«Эпоха образа до эпохи
+                                        искусства»</a>
                                 </li>
                                 <li className="section-nav-sublist__item">
                                     <a href="#" className="section-nav-sublist__link">Категория стиля</a>
@@ -132,8 +178,8 @@ class Navigation extends React.Component {
                                 </li>
                             </ol>
                         </li>
-                        <li className="section-nav-list__item">
-                            <a href="#recommend" className="section-nav-list__item-head js-scroll-link">Литература</a>
+                        <li className="section-nav-list__item" onClick={::this._onRecommendedClick}>
+                            <a href="#recommend" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Литература</a>
                         </li>
                     </ul>
                 </div>

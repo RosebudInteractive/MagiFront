@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
-import PlayerFrame from '../player/frame'
+import PlayerFrame from './frame'
 import LessonFrame from './lesson-frame';
 
 import $ from 'jquery'
@@ -70,7 +70,7 @@ export default class Wrapper extends React.Component {
 
         return (
 
-            <section className='lecture-wrapper js-player'
+            <section className='lecture-wrapper lesson-player js-player'
                  id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                  style={_coverStyle}>
                 <div className={'lesson-sub-wrapper'}>

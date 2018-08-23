@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
+import PlayBlock from './play-block'
 
 // import Gallery from './gallery';
-// import GallerySlides from './gallery-slides';
+import GallerySlides from '../transcript-page/gallery-slides';
 import $ from 'jquery'
+import {getCoverPath, ImageSize} from "../../tools/page-tools";
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -19,9 +21,10 @@ export default class TranscriptPage extends React.Component {
     render() {
         let {isNeedHideGallery} = this.props;
 
-        return (
-            <TextBlock {...this.props} />
-        )
+        return [
+            <TextBlock {...this.props} />,
+            <GallerySlides {...this.props}/>
+        ]
     }
 }
 
@@ -141,7 +144,7 @@ class TextBlock extends React.Component {
         let _number = $('.text-block__headline .number')
 
         if (_number.length > 0) {
-            if (window.outerWidth > 899) {
+            if (window.innerWidth < 899) {
                 let _width = _number[0].offsetWidth;
                 $('.text-block__headline').css('text-indent', -_width);
             } else {
@@ -151,31 +154,27 @@ class TextBlock extends React.Component {
     }
 
     render() {
-        let {lesson, isNeedHideRefs} = this.props;
+        let {lesson, isNeedHideRefs} = this.props,
+            _cover = getCoverPath(lesson, ImageSize.icon);
 
         return (
             <div className="transcript-page _nested" id="transcript">
-
-
                 <section className="text-block js-social-start">
                     <SocialBlock/>
-                    {/*<button className="play-btn js-play" type="button"*/}
-                    {/*style="background-image: url(&quot;assets/images/lecture01.png&quot;); bottom: auto; top: 10px;">*/}
-                    {/*<span className="duration">35:18</span>*/}
-                    {/*<svg width="41" height="36">*/}
-                    {/*/!*<use xlink:href="#play-nofill"></use>*!/*/}
-                    {/*</svg>*/}
-                    {/*</button>*/}
+                    <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
+                               courseUrl={lesson.courseUrl} audios={lesson.Audios} id={lesson.Id}
+                               totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}
+                               extClass={'play-btn js-play'}/>
+
                     <p className="text-block__label">Транскрипт</p>
-                    {/*<section className={'text-block'} id='text'>*/}
                     <div className={'text-block__wrapper'}>
                         <div className='text-block__headline'><span
                             className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
                         {this._getText()}
                         {isNeedHideRefs ? null : <Refs {...this.props}/>}
                     </div>
-                    {/*</section>*/}
                 </section>
+
             </div>
         )
     }

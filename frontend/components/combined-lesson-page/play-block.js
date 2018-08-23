@@ -15,6 +15,7 @@ class PlayBlock extends React.Component {
         lessonUrl: PropTypes.string,
         audios: PropTypes.array,
         isAuthRequired: PropTypes.bool,
+        extClass: PropTypes.string,
     };
 
     constructor(props) {
@@ -87,7 +88,7 @@ class PlayBlock extends React.Component {
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
-        let {id, totalDuration, playingLesson, paused} = this.props,
+        let {id, totalDuration, playingLesson, paused, extClass} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
@@ -108,7 +109,7 @@ class PlayBlock extends React.Component {
 
         return (
             <div>
-                <div className="play-block">
+                <div className={"play-block" + (extClass ? ' ' + extClass : '')}>
                     <div className="play-block__image-wrapper"
                          style={{backgroundImage: "url(" + '/data/' + this.props.cover + ")"}}/>
                     <div className="play-block__loader">

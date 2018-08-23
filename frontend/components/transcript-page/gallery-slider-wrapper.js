@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Swiper from 'swiper';
 import $ from 'jquery'
+import {getImagePath, ImageSize} from "../../tools/page-tools";
+import {Link} from 'react-router-dom';
 
 export default class GalleryWrapper extends React.Component {
 
@@ -33,7 +35,7 @@ export default class GalleryWrapper extends React.Component {
 
         let that = this;
 
-        $('.js-gallery-trigger').on('click', function() {
+        $('.js-gallery-trigger').on('click', function () {
             if ($(this).closest('.js-gallery-controls').hasClass('hide')) {
                 let _isRecommendedExists = $('#recommend').length > 0,
                     _isRecommendedVisible = _isRecommendedExists ? $(window).scrollTop() >= ($('#recommend').offset().top - $(window).height()) : false;
@@ -75,14 +77,19 @@ export default class GalleryWrapper extends React.Component {
 
     _getList() {
         return this.props.gallery.map((item, index) => {
-            let _number = index + 1;
+            let _number = index + 1,
+                _numberWithLeadZero = _number.toString().padStart(2, '0');
 
-            return <div className="gallery-slide swiper-slide">
+            let _fileName = getImagePath(item, ImageSize.medium)
+
+            return <Link to={"gallery" + _numberWithLeadZero} data-src={"#gallery" + _numberWithLeadZero}
+                         data-fancybox="gallery-group" className="gallery-slide swiper-slide" key={index}>
                 <div className="gallery-slide__image">
-                    <img src={'/data/' + item.FileName}/>
+                    <img src={'/data/' + _fileName}/>
                 </div>
-                <p className="gallery-slide__caption"><span className="number">{_number + '.'}</span>{item.Name}<br/>{item.Description}</p>
-            </div>
+                <p className="gallery-slide__caption"><span
+                    className="number">{_number + '.'}</span>{item.Name}<br/>{item.Description}</p>
+            </Link>
         })
     }
 

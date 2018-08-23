@@ -32,9 +32,10 @@ class LessonFrame extends React.Component {
                 _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
                 _isSocialBlock = e.target.closest('.social-block'),
                 _isTranscriptLink = e.target.closest('.link-to-transcript'),
-                _isPlayerBlock = e.target.closest('.player-frame');
+                _isPlayerBlock = e.target.closest('.player-frame'),
+                _isFavoritesButton = e.target.closest('.lecture-frame__fav');
 
-            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu) {
+            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu && !_isFavoritesButton) {
                 that._play()
             }
         })
@@ -122,14 +123,17 @@ class LessonFrame extends React.Component {
     }
 
     render() {
-        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>'
+        const _plus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#plus"/>',
+            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
         let {lesson} = this.props;
         let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0
+            _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0,
+            _inFavorites = this._isLessonInBookmarks();
 
         return (
             <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
@@ -157,11 +161,14 @@ class LessonFrame extends React.Component {
                             <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                         </div>
                     </div>
-                    <SocialBlock inFavorites={this._isLessonInBookmarks()} onFavoritesClick={::this._favoritesClick}/>
+                    <SocialBlock/>
                 </div>
                 <div className="progress-bar">
                     <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
                 </div>
+                <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
+                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
+                </button>
             </div>
         )
     }
@@ -177,11 +184,7 @@ class SocialBlock extends React.Component {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
-            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
-
-        let {inFavorites, onFavoritesClick} = this.props;
+            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
 
         return (
             <div className="social-block">
@@ -209,9 +212,6 @@ class SocialBlock extends React.Component {
                     </div>
                     <span className="social-btn__actions">4</span>
                 </a>
-                <span className={"favorites" + (inFavorites ? ' active' : '')} onClick={onFavoritesClick}>
-                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: inFavorites ? _redFlag : _flag}}/>
-                </span>
             </div>
         )
     }

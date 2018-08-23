@@ -8,6 +8,7 @@ import SubLessonPlayBlock from './subLesson-play-block'
 
 import * as lessonActions from '../../actions/lesson-actions';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
+import $ from 'jquery'
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -40,10 +41,15 @@ class LessonsListWrapper extends React.Component {
     componentDidUpdate(prevProps) {
     // componentWillReceiveProps(nextProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
+            $('body').toggleClass('overflow');
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
                 _elem.scrollIntoView()
             }
+        }
+
+        if ((prevProps.isLessonMenuOpened) && (!this.props.isLessonMenuOpened)) {
+            $('body').removeClass('overflow');
         }
     }
 
