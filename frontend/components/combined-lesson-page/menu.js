@@ -49,7 +49,7 @@ class Menu extends React.Component {
                         onClick={::this._onFullScreenClick}>
                     <svg width="60" height="53" dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                 </button>
-                <Navigation/>
+                <Navigation isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes}/>
             </div>
         )
     }
@@ -124,6 +124,47 @@ class Navigation extends React.Component {
         }
     }
 
+    _getList() {
+        if (!this.props.episodes) {
+            return
+        }
+
+        return this.props.episodes.map((episode) => {
+            return episode.Toc.map((item) => {
+                const _id = 'toc' + item.Id;
+
+                return <li className="menu-nav-sublist__item current" key={_id}>
+                    <a href={"#" + _id} className="section-nav-sublist__link"
+                       onClick={(e) => {
+                           e.preventDefault();
+
+                           let position = $("#" + _id).offset().top - 75;
+
+                           $("body, html").animate({
+                               scrollTop: position
+                           }, 600);
+                       }}>{item.Topic}</a>
+                </li>
+            })
+        })
+    }
+
+    _switchToc() {
+        if (this.state.expanded) {
+            this.setState({expanded: false})
+        } else {
+            if (!this.props.episodes || !this.props.episodes.length) {
+                let scrollTarget = $('#transcript').offset().top;
+
+                $("body, html").animate({
+                    scrollTop: scrollTarget
+                }, 600);
+            } else {
+                this.setState({expanded: true})
+            }
+        }
+    }
+
     _onTriggerClick() {
         this.setState({expanded: !this.state.expanded})
     }
@@ -144,43 +185,30 @@ class Navigation extends React.Component {
         const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
 
         return (
-            <section
-                className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
+            <section className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
                 <button className="section-nav__trigger js-section-nav-trigger" onClick={::this._onTriggerClick}>
                     <span className="visually-hidden">Меню</span>
                     <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
                 </button>
                 <div className="section-nav__list">
                     <ul className="section-nav-list">
-                        <li className="section-nav-list__item js-section-menu-control">
-                            <a href="#transcript" className="section-nav-list__item-head js-scroll-link">Транскрипт</a>
-                            <ol className="section-nav-sublist">
-                                <li className="section-nav-sublist__item current">
-                                    <a href="#" className="section-nav-sublist__link">«К чему эти смехотворные
-                                        чудовища?»</a>
-                                </li>
-                                <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">Строгие формы аббатства
-                                        Фонтене</a>
-                                </li>
-                                <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">Танцующие и плачущие святые</a>
-                                </li>
-                                <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">«Эпоха образа до эпохи
-                                        искусства»</a>
-                                </li>
-                                <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">Категория стиля</a>
-                                </li>
-                                <li className="section-nav-sublist__item">
-                                    <a href="#" className="section-nav-sublist__link">Стиль и политика</a>
-                                </li>
+                        <li className="section-nav-list__item js-section-menu-control" onClick={::this._switchToc}>
+                            <a href="#transcript" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Транскрипт</a>
+                            <ol className={"section-nav-sublist" + (this.state.expanded ? ' show' : '')}>
+                                {this._getList()}
                             </ol>
                         </li>
-                        <li className="section-nav-list__item" onClick={::this._onRecommendedClick}>
-                            <a href="#recommend" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Литература</a>
-                        </li>
+                        {
+                            this.props.isNeedHideRefs
+                                ?
+                                null
+                                :
+                                <li className="section-nav-list__item" onClick={::this._onRecommendedClick}>
+                                    <a href="#recommend" className="section-nav-list__item-head js-scroll-link"
+                                       onClick={::this._onLinkMockClick}>Литература</a>
+                                </li>
+                        }
+
                     </ul>
                 </div>
             </section>

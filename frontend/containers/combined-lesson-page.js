@@ -292,23 +292,28 @@ class TranscriptLessonPage extends React.Component {
             authorized
         } = this.props;
 
+        let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
+            _lesson = lesson ? this._getLesson() : null,
+            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized);
+
         return (
             fetching || !(lesson && lessonText.loaded) ?
                 <p>Загрузка...</p>
                 :
 
                 [
-                    <Menu lesson={this._getLesson()}/>,
-                    <GalleryButtons/>,
-                    //<GallerySlides {...this.props}/>,
+                    <Menu lesson={this._getLesson()}
+                          isNeedHideRefs={_isNeedHideRefs}
+                          episodes={lessonText.episodes}/>,
+                    _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
                     <LessonInfo lesson={this._getLesson()}/>,
                     <TranscriptPage episodes={lessonText.episodes}
                                     refs={lessonText.refs}
                                     gallery={lessonText.gallery}
-                                    isNeedHideGallery={this._getLesson().IsAuthRequired && !authorized}
-                                    isNeedHideRefs={!(lessonText.refs.length > 0)}
+                                    isNeedHideGallery={_isNeedHideGallery}
+                                    isNeedHideRefs={_isNeedHideRefs}
                                     lesson={this._getLesson()}/>
                 ]
         )

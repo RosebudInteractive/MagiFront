@@ -6,6 +6,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions";
+import $ from "jquery";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -32,7 +33,12 @@ class PlayBlock extends React.Component {
     }
 
     _startPlay() {
-        this.props.playerStartActions.startPlay(this.props.id)
+        this.props.playerStartActions.startPlay(this.props.id);
+        
+        let scrollTarget = $('.js-player').outerHeight() - $(window).height();
+        $('html, body').animate({
+            scrollTop: scrollTarget
+        }, 600);
     }
 
     _unlock() {

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import PlayBlock from './play-block'
 
-// import Gallery from './gallery';
 import GallerySlides from '../transcript-page/gallery-slides';
 import $ from 'jquery'
 import {getCoverPath, ImageSize} from "../../tools/page-tools";
@@ -23,7 +22,7 @@ export default class TranscriptPage extends React.Component {
 
         return [
             <TextBlock {...this.props} />,
-            <GallerySlides {...this.props}/>
+            isNeedHideGallery ? null : <GallerySlides {...this.props}/>
         ]
     }
 }
@@ -63,7 +62,7 @@ class TextBlock extends React.Component {
             let _array = _content.split(/<p>(.*?)<\/p>/gim);
             let _isToc = true;
 
-            _array.forEach((item, index) => {
+            _array.forEach((item) => {
                 let _paragraph = item;
 
                 _paragraph.trim();
@@ -174,14 +173,12 @@ class TextBlock extends React.Component {
                         {isNeedHideRefs ? null : <Refs {...this.props}/>}
                     </div>
                 </section>
-
             </div>
         )
     }
 }
 
 class SocialBlock extends React.Component {
-
 
     render() {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
