@@ -8363,10 +8363,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       content: counter(li) ".";
       counter-increment: li;
       position: absolute;
-      width: 30px;
-      text-align: right;
       top: 0;
-      left: -20px;
+      left: 0;
       font-family: "Fira Sans", Arial, sans-serif;
       font-size: 14px;
       line-height: 20px;

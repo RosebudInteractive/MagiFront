@@ -133,7 +133,7 @@ class Navigation extends React.Component {
             return episode.Toc.map((item) => {
                 const _id = 'toc' + item.Id;
 
-                return <li className="menu-nav-sublist__item current" key={_id}>
+                return <li className="section-nav-sublist__item current" key={_id}>
                     <a href={"#" + _id} className="section-nav-sublist__link"
                        onClick={(e) => {
                            e.preventDefault();
