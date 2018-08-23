@@ -9264,6 +9264,8 @@ body[data-page="fullpage-player"] .lectures-menu {
     height: 100%;
     width: 75%;
     border-right: 1px solid #d5d6db;
+    background: no-repeat center;
+    background-size: contain;
     overflow: hidden; }
     @media (max-width: 1279px) {
       .gallery-slide__image {

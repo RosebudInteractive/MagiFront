@@ -34,7 +34,7 @@ class PlayBlock extends React.Component {
 
     _startPlay() {
         this.props.playerStartActions.startPlay(this.props.id);
-        
+
         let scrollTarget = $('.js-player').outerHeight() - $(window).height();
         $('html, body').animate({
             scrollTop: scrollTarget
