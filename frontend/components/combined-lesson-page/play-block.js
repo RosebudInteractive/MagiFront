@@ -17,7 +17,7 @@ class PlayBlock extends React.Component {
         // courseUrl: PropTypes.string,
         // lessonUrl: PropTypes.string,
         // audios: PropTypes.array,
-        isAuthRequired: PropTypes.bool,
+        // isAuthRequired: PropTypes.bool,
         extClass: PropTypes.string,
     };
 
@@ -27,7 +27,9 @@ class PlayBlock extends React.Component {
         this._redirect = false
     }
 
-    _play() {
+    _play(e) {
+        e.preventDefault()
+
         let {lesson, courseUrl, lessonUrl} = this.props;
 
         this.props.playerStartActions.preinitAudios(lesson.audios);
@@ -36,7 +38,7 @@ class PlayBlock extends React.Component {
             history.replace('/' + courseUrl + '/' + lesson.URL + '?play')
             this.forceUpdate()
         } else {
-            let _url = '/' + courseUrl + '/' + lesson.URL + '?play';
+            let _url = '/' + courseUrl + '/' + lesson.URL;
 
             history.push({
                 pathname: _url,
@@ -45,16 +47,16 @@ class PlayBlock extends React.Component {
             // history.push(_url)
         }
 
-        this.props.playerStartActions.startPlay(this.props.id)
+        this.props.playerStartActions.startPlay(lesson.Id)
     }
 
     _startPlay() {
-        this.props.playerStartActions.startPlay(this.props.id);
-
         let scrollTarget = $('.js-player').outerHeight() - $(window).height();
         $('html, body').animate({
             scrollTop: scrollTarget
-        }, 600);
+        }, 600, () => {
+            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+        });
     }
 
     _unlock() {

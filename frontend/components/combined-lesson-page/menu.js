@@ -22,7 +22,7 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        let scrollTarget = $('.js-player').outerHeight() - $(window).height();
+        let scrollTarget = $('.js-player').outerHeight() - $(window).height() + 53;
         $('html, body').animate({
             scrollTop: scrollTarget
         }, 600);

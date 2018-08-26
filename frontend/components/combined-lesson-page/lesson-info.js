@@ -9,7 +9,12 @@ import PlayBlockSmall from './sublesson/play-block-small'
 
 import {getCoverPath, ImageSize} from "../../tools/page-tools";
 import * as userActions from "../../actions/user-actions";
-
+import {
+    addLessonToBookmarks,
+    getUserBookmarks,
+    removeLessonFromBookmarks,
+    userBookmarksSelector
+} from "../../ducks/profile";
 
 class LessonInfo extends React.Component {
 
@@ -143,6 +148,8 @@ class LessonInfo extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        bookmarks: userBookmarksSelector(state),
+        authorized: !!state.user.user,
         // lessons: state.lessons,
         // course: state.singleLesson.course,
         // isLessonMenuOpened: state.app.isLessonMenuOpened,
@@ -156,8 +163,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         userActions: bindActionCreators(userActions, dispatch),
-        // playerActions: bindActionCreators(playerActions, dispatch),
-        // appActions: bindActionCreators(appActions, dispatch),
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
+        addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
+        removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
     }
 }
 

@@ -25,7 +25,6 @@ export default class Wrapper extends React.Component {
         lesson: PropTypes.object,
         courseUrl: PropTypes.string,
         isMain: PropTypes.bool,
-        active: PropTypes.string,
         isPlayer: PropTypes.bool,
     };
 

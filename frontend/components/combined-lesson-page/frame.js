@@ -6,12 +6,12 @@ import Progress from "../player/progress";
 import Controls from "./controls";
 
 import $ from 'jquery'
-import PauseScreen from "../player/pause-screen";
 import Titles from "../player/titles";
 import TimeInfo from '../player/time-info';
 import ContentTooltip from "../player/content-tooltip";
 import RateTooltip from '../player/rate-tooltip';
 import SoundButton from '../player-controls/sound-button'
+import SoundBar from '../player-controls/sound-bar'
 
 import * as playerActions from '../../actions/player-actions'
 import * as playerStartActions from '../../actions/player-start-actions'
@@ -229,7 +229,7 @@ class Frame extends Component {
         let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen,
             cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
 
-        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
             requestFullScreen.call(docEl);
         }
         else {
@@ -260,40 +260,40 @@ class Frame extends Component {
                 </div>
                 {
                     this.props.visible ?
-                        <div>
-                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>
-                            <Controls {...this.props}/>
-                            <div>
-                                <Titles/>
-                                <div className="player-block">
-                                    <Progress id={_id}/>
-                                    <div className="player-block__row">
-                                        <div className="player-block__controls">
-                                            <TimeInfo/>
-                                        </div>
-                                        <div className="player-block__stats">
-                                            <SoundButton/>
-                                            {
-                                                this.props.contentArray.length > 0 ?
-                                                    <button type="button" className="content-button js-contents-trigger player-button"
-                                                            onClick={::this._openContent}>
-                                                        <svg width="18" height="12"
-                                                             dangerouslySetInnerHTML={{__html: _contents}}/>
-                                                    </button>
-                                                    :
-                                                    null
-                                            }
-                                            <button type="button" className="speed-button js-speed-trigger player-button"
-                                                    onClick={::this._openRate}>
-                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                            </button>
-                                        </div>
-                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                        {showSpeedTooltip ? <RateTooltip/> : ''}
+                        [
+                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
+                            <Controls {...this.props}/>,
+                            <Titles/>,
+                            <div className="player-block">
+                                <Progress id={_id}/>
+                                <div className="player-block__row">
+                                    <div className="player-block__controls">
+                                        <TimeInfo/>
                                     </div>
+                                    <div className="player-block__stats">
+                                        <SoundButton/>
+                                        <SoundBar/>
+                                        {
+                                            this.props.contentArray.length > 0 ?
+                                                <button type="button"
+                                                        className="content-button js-contents-trigger player-button"
+                                                        onClick={::this._openContent}>
+                                                    <svg width="18" height="12"
+                                                         dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                </button>
+                                                :
+                                                null
+                                        }
+                                        <button type="button" className="speed-button js-speed-trigger player-button"
+                                                onClick={::this._openRate}>
+                                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
+                                        </button>
+                                    </div>
+                                    {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                    {showSpeedTooltip ? <RateTooltip/> : ''}
                                 </div>
                             </div>
-                        </div>
+                        ]
                         :
                         null
                 }
@@ -301,7 +301,6 @@ class Frame extends Component {
         )
     }
 }
-
 
 
 function mapStateToProps(state) {

@@ -286,7 +286,6 @@ class TranscriptLessonPage extends React.Component {
         return <LessonWrapper lesson={lesson}
                               courseUrl={this.props.courseUrl}
                               lessonUrl={lesson.URL}
-                              active={lesson.Number}
                               isPlayer={_playingLessonUrl || _lessonInPlayer}
                               audios={_audios}
                               history={this.props.history}
@@ -318,6 +317,7 @@ class TranscriptLessonPage extends React.Component {
                     <Menu lesson={_lesson}
                           isNeedHideRefs={_isNeedHideRefs}
                           episodes={lessonText.episodes}
+                          active={_lesson.Id}
                           history={this.props.history}/>,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,

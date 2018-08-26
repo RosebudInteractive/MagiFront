@@ -44,10 +44,20 @@ class LessonsListWrapper extends React.Component {
             if (!$('body').hasClass('overflow')) {
                 $('body').toggleClass('overflow');
             }
-            let _elem = document.getElementById(this.props.active);
-            if (_elem) {
-                _elem.scrollIntoView()
+
+            let _control = $("#lesson-" + this.props.active);
+            if (_control.length > 0) {
+                let _list = $(".lectures-list-wrapper"),
+                    _listCurrentScrollPosition = _list.scrollTop(),
+                    _listOffsetPosition = _list.offset().top,
+                    _itemOffsetPosition = _control.offset().top - _listOffsetPosition,
+                    _itemCurrentScrollPosition = _control.scrollTop();
+
+                if (_itemCurrentScrollPosition - _itemOffsetPosition !== 0) {
+                    _list.scrollTop(_listCurrentScrollPosition + _itemOffsetPosition)
+                }
             }
+
         }
 
         if ((prevProps.isLessonMenuOpened) && (!this.props.isLessonMenuOpened)) {
@@ -90,11 +100,11 @@ class ListItem extends React.Component {
     }
 
     _getReadyLesson(lesson) {
-        let _isActive = this.props.active === this.props.lesson.Number,
+        let _isActive = this.props.active === this.props.lesson.Id,
             _cover = getCoverPath(lesson, ImageSize.icon);
 
         return (
-            <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={this.props.lesson.Number}>
+            <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={'lesson-' + lesson.Id}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover}/>
@@ -158,9 +168,9 @@ class SubList extends React.Component {
         const {active} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
-            let _isActive = lesson.Number === active;
+            let _isActive = lesson.Id === active;
 
-            return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}>
+            return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index} id={'lesson-' + lesson.Id}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-sublist__title">
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
