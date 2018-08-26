@@ -143,7 +143,7 @@ class TextBlock extends React.Component {
         let _number = $('.text-block__headline .number')
 
         if (_number.length > 0) {
-            if (window.innerWidth < 899) {
+            if ((window.innerWidth < 899) && (window.innerWidth > 599)){
                 let _width = _number[0].offsetWidth;
                 $('.text-block__headline').css('text-indent', -_width);
             } else {
@@ -160,11 +160,7 @@ class TextBlock extends React.Component {
             <div className="transcript-page _nested" id="transcript">
                 <section className="text-block js-social-start">
                     <SocialBlock/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
-                               courseUrl={lesson.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                               totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}
-                               extClass={'play-btn js-play'}/>
-
+                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
                         <div className='text-block__headline'><span

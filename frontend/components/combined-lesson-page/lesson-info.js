@@ -1,9 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import {bindActionCreators} from 'redux';
+import {bindActionCreators} from "redux";
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
+
+import PlayBlock from './sublesson/play-block'
+import PlayBlockSmall from './sublesson/play-block-small'
+
 import {getCoverPath, ImageSize} from "../../tools/page-tools";
+import * as userActions from "../../actions/user-actions";
 
 
 class LessonInfo extends React.Component {
@@ -12,31 +17,51 @@ class LessonInfo extends React.Component {
         lesson: PropTypes.object,
     }
 
+    _favoritesClick(courseUrl, lessonUrl) {
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
+        } else {
+            if (this._isLessonInBookmarks()) {
+                this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
+            } else {
+                this.props.addLessonToBookmarks(courseUrl, lessonUrl)
+            }
+        }
+    }
+
+    _isLessonInBookmarks(courseUrl, lessonUrl) {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
+            return item === courseUrl + '/' + lessonUrl
+        })
+    }
+
     _getSublessonList() {
-        const _playNofill = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-nofill"/>',
-            _pauseAlt = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-alt"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>';
+        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
         let {lesson} = this.props;
 
+
         return lesson.Lessons.map((item) => {
-            let _cover = getCoverPath(item, ImageSize.icon)
+            let _cover = getCoverPath(item, ImageSize.icon),
+                _inFavorites = this._isLessonInBookmarks(item.courseUrl, item.URL)
+
+
             return (
                 <li>
                     <Link to={"/" + item.courseUrl + '/' + item.URL} className="extras-list__item">
-                        {/*<span className="counter">10.</span>*/}
                         <span className="inner-counter">{item.Number}</span>
                         {item.Name + ' '}
                         <span className="duration">{item.DurationFmt}</span>
                     </Link>
-                    <button className="extras-list__play-btn" type="button"
-                            style={{backgroundImage: "url('/data/" + _cover + "')"}}>
-                        <span className="duration">5:18</span>
-                        <svg className="play" width="12" height="11" dangerouslySetInnerHTML={{__html: _playNofill}}/>
-                        <svg className="pause" width="8" height="14" dangerouslySetInnerHTML={{__html: _pauseAlt}}/>
-                    </button>
-                    <button className="extras-list__fav" type="button">
-                        <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
+                    <PlayBlockSmall lesson={item} cover={_cover}/>
+                    <PlayBlock lesson={item} cover={_cover}/>
+                    <button className="extras-list__fav" type="button"
+                            onClick={() => {
+                                this._favoritesClick(item.courseUrl, item.URL)
+                            }}>
+                        <svg width="14" height="23"
+                             dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
                     </button>
                 </li>
             )
@@ -130,6 +155,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        userActions: bindActionCreators(userActions, dispatch),
         // playerActions: bindActionCreators(playerActions, dispatch),
         // appActions: bindActionCreators(appActions, dispatch),
     }

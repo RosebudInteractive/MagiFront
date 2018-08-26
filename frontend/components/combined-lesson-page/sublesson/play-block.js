@@ -4,21 +4,14 @@ import {Redirect} from 'react-router';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import * as playerStartActions from '../../actions/player-start-actions'
-import * as userActions from "../../actions/user-actions";
+import * as playerStartActions from '../../../actions/player-start-actions'
+import * as userActions from "../../../actions/user-actions";
 import $ from "jquery";
-import history from '../../history';
 
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
         lesson: PropTypes.object,
-        // duration: PropTypes.string,
-        // courseUrl: PropTypes.string,
-        // lessonUrl: PropTypes.string,
-        // audios: PropTypes.array,
-        isAuthRequired: PropTypes.bool,
-        extClass: PropTypes.string,
     };
 
     constructor(props) {
@@ -28,23 +21,9 @@ class PlayBlock extends React.Component {
     }
 
     _play() {
-        let {lesson, courseUrl, lessonUrl} = this.props;
-
-        this.props.playerStartActions.preinitAudios(lesson.audios);
-
-        if ((lesson.courseUrl === courseUrl) && (lesson.URL === lessonUrl)) {
-            history.replace('/' + courseUrl + '/' + lesson.URL + '?play')
-            this.forceUpdate()
-        } else {
-            let _url = '/' + courseUrl + '/' + lesson.URL + '?play';
-
-            history.push({
-                pathname: _url,
-                search: '?play',
-            })
-            // history.push(_url)
-        }
-
+        this.props.playerStartActions.preinitAudios(this.props.lesson.audios);
+        this._redirect = true;
+        this.forceUpdate()
         this.props.playerStartActions.startPlay(this.props.id)
     }
 
@@ -66,11 +45,11 @@ class PlayBlock extends React.Component {
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
-        let {lesson, authorized} = this.props,
-            {isAuthRequired} = lesson,
+        let {authorized, lesson} = this.props,
+            _isAuthRequired = lesson.IsAuthRequired,
             _button = null;
 
-        if (isAuthRequired && !authorized) {
+        if (_isAuthRequired && !authorized) {
             _button = <button className="lecture__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
@@ -93,29 +72,16 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
-    _getTooltip(isThisLessonPlaying, isFinished) {
-        let {lesson, authorized, paused} = this.props,
-            {isAuthRequired} = lesson,
-            _tooltip = null;
-
-        if (isAuthRequired && !authorized) {
-            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
-        } else {
-            _tooltip = isThisLessonPlaying ? (paused ? (isFinished ? "С начала" : "Смотреть") : 'Пауза') : (isFinished ? "С начала" : "Смотреть");
-        }
-
-        return _tooltip;
-    }
-
     render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
-            _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
+        const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
-        let {playingLesson, paused, lesson, extClass} = this.props,
+        let {playingLesson, paused, lesson} = this.props,
             _id = lesson.Id,
             _totalDuration = lesson.Duration,
             _duration = lesson.DurationFmt,
+            _lessonUrl = lesson.URL,
+            _courseUrl= lesson.courseUrl,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
@@ -127,17 +93,14 @@ class PlayBlock extends React.Component {
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === _id;
 
-        let _tooltipText = this._getTooltip(_isThisLessonPlaying, _isFinished);
+        if (this._redirect) {
+            this._redirect = false;
+            return <Redirect push to={'/' + _courseUrl + '/' + _lessonUrl + '?play'}/>;
+        }
 
-        // if (this._redirect) {
-        //     this._redirect = false;
-        //     return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
-        // }
-
-        return [
-            <div className={"play-block" + (extClass ? ' ' + extClass : '')}>
-                <div className="play-block__image-wrapper"
-                     style={{backgroundImage: "url(" + '/data/' + this.props.cover + ")"}}/>
+        return (
+            <button className="extras-list__play-btn" type="button"
+                    style={{backgroundImage: "url('/data/" + this.props.cover + "')"}}>
                 <div className="play-block__loader">
                     <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
                          version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -160,38 +123,9 @@ class PlayBlock extends React.Component {
                         :
                         this._getButton(_isThisLessonPlaying, _isFinished)
                 }
-                <div className="play-block__tooltip">{_tooltipText}</div>
-                <div className="play-block__duration">{_duration}</div>
-            </div>,
-
-            <div className="play-block-mobile">
-                <div className="play-block-mobile__play-block">
-                    {
-                        (_isThisLessonPlaying)
-                            ?
-                            (paused)
-                                ?
-                                <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPlay}>
-                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                    <span>Воспроизвести</span>
-                                </button>
-                                :
-                                <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPause}>
-                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>
-                                    <span>Воспроизвести</span>
-                                </button>
-                            :
-                            <button type="button" className="play-btn-small" onClick={::this._play}>
-                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                <span>Воспроизвести</span>
-                            </button>
-                    }
-                    <span className="play-block-mobile__duration">{_duration}</span>
-                </div>
-            </div>
-        ]
+                <div className="duration">{_duration}</div>
+            </button>
+        )
     }
 }
 

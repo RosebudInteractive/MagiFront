@@ -41,7 +41,9 @@ class LessonsListWrapper extends React.Component {
     componentDidUpdate(prevProps) {
     // componentWillReceiveProps(nextProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
-            $('body').toggleClass('overflow');
+            if (!$('body').hasClass('overflow')) {
+                $('body').toggleClass('overflow');
+            }
             let _elem = document.getElementById(this.props.active);
             if (_elem) {
                 _elem.scrollIntoView()
@@ -51,6 +53,10 @@ class LessonsListWrapper extends React.Component {
         if ((prevProps.isLessonMenuOpened) && (!this.props.isLessonMenuOpened)) {
             $('body').removeClass('overflow');
         }
+    }
+
+    componentWillUnmount() {
+        $('body').removeClass('overflow');
     }
 
     render() {
@@ -91,9 +97,7 @@ class ListItem extends React.Component {
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={this.props.lesson.Number}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
-                    <PlayBlock duration={lesson.DurationFmt} cover={_cover} lessonUrl={lesson.URL}
-                               courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                               totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}/>
+                    <PlayBlock {...this.props} lesson={lesson} cover={_cover}/>
                 </Link>
                 <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
             </li>

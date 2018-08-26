@@ -135,7 +135,10 @@ class LessonFrame extends React.Component {
             _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0,
             _inFavorites = this._isLessonInBookmarks();
 
-        return (
+        return [
+            <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
+                <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
+            </button>,
             <div className="lecture-frame" style={this.props.visible ? null : {display: 'none'}}>
                 <div className="lecture-frame__header">
                     <div className="lecture-frame__play-link">
@@ -166,11 +169,8 @@ class LessonFrame extends React.Component {
                 <div className="progress-bar">
                     <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
                 </div>
-                <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
-                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
-                </button>
             </div>
-        )
+        ]
     }
 }
 

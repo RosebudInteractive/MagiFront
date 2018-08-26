@@ -72,7 +72,7 @@ export default class Wrapper extends React.Component {
 
             <section className='lecture-wrapper lesson-player js-player'
                  id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                 style={_coverStyle}>
+                 style={isPlayer ? null : _coverStyle}>
                 <div className={'lesson-sub-wrapper'}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>

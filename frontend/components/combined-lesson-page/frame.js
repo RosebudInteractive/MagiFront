@@ -39,7 +39,26 @@ class Frame extends Component {
             this._applyViewPort()
         }
 
+        this._resizeHandler = () => {
+            let _width = $(window).innerWidth(),
+                _height = $(window).innerHeight(),
+                _control = $('.lesson-player');
+
+            const _rate = 0.75
+
+            if (_control.length > 0) {
+                if ((_width * _rate) < _height) {
+                    if (!_control.hasClass('added')) {
+                        _control.toggleClass('added')
+                    }
+                } else {
+                    _control.removeClass('added')
+                }
+            }
+        }
+
         $(document).ready(this._onDocumentReady)
+        $(window).resize(this._resizeHandler)
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
     }
 
@@ -60,6 +79,8 @@ class Frame extends Component {
             if (_isPlayer) {
                 if (that.props.isMobileApp && that._firstTap) {
                     that._firstTap = false;
+                    that._clearTimeOut();
+                    that._initTimeOut();
                 } else {
                     that.props.playerStartActions.startPause()
                 }
@@ -90,6 +111,35 @@ class Frame extends Component {
                 e.preventDefault();
             }
         })
+
+        $(document).on('mousemove', () => {
+            this._clearTimeOut();
+            this._initTimeOut();
+        });
+
+        this._resizeHandler();
+    }
+
+    _clearTimeOut() {
+        $('.lecture-frame__play-block-wrapper').removeClass('fade');
+        // $('.player-block__controls').addClass('show')
+        if (this._timer) {
+            clearTimeout(this._timer);
+        }
+    }
+
+    _initTimeOut() {
+        if (!this.props.paused) {
+            this._timer = setTimeout(() => {
+                if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
+                    this._firstTap = true;
+                    $('.lecture-frame__play-block-wrapper').addClass('fade');
+                    // $('.player-block__controls').removeClass('show')
+                }
+            }, 7000);
+        } else {
+            this._timer = null
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -98,6 +148,14 @@ class Frame extends Component {
         } else {
             if (prevProps.visible && !this.props.visible) {
                 this._viewPortApplied = false;
+            }
+        }
+
+        if (!prevProps.paused && this.props.paused) {
+            this._clearTimeOut()
+        } else {
+            if (prevProps.paused && !this.props.paused) {
+                this._initTimeOut();
             }
         }
     }
@@ -109,6 +167,7 @@ class Frame extends Component {
 
         this._removeListeners();
         this._clearViewPort();
+        this._clearTimeOut();
     }
 
     _applyViewPort() {
@@ -131,10 +190,12 @@ class Frame extends Component {
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
+        $(window).unbind('resize', this._resizeHandler);
     }
 
     _openContent() {
         if (!this._hideContentTooltip) {
+            this._clearTimeOut()
             this.props.playerActions.showContentTooltip()
         } else {
             this._hideContentTooltip = false
@@ -144,6 +205,7 @@ class Frame extends Component {
 
     _openRate() {
         if (!this._hideRateTooltip) {
+            this._clearTimeOut()
             this.props.playerActions.showSpeedTooltip()
         } else {
             this._hideRateTooltip = false
@@ -199,11 +261,9 @@ class Frame extends Component {
                 {
                     this.props.visible ?
                         <div>
-                            <PauseScreen {...this.props} isFinished={_isFinished}/>
+                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>
+                            <Controls {...this.props}/>
                             <div>
-                                <div className='lecture-frame__header'>
-                                    <Controls {...this.props}/>
-                                </div>
                                 <Titles/>
                                 <div className="player-block">
                                     <Progress id={_id}/>

@@ -1,14 +1,13 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
+import {Redirect} from 'react-router';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 import LessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
-import GallerySlides from '../components/transcript-page/gallery-slides';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -25,6 +24,79 @@ import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
+
+        this.state = {
+            redirectToPlayer: false,
+        }
+
+        this._handleScroll = () => {
+            let _controls = $('.js-gallery-controls');
+
+            if (_controls.length) {
+                if ($('.js-player').length) {
+                    if ($(window).scrollTop() < $('.js-player').outerHeight()) {
+                        _controls.removeClass('visible');
+                        _controls.fadeOut();
+                    } else {
+                        _controls.addClass('visible');
+                        _controls.fadeIn();
+                    }
+                }
+            }
+
+            let st = $(window).scrollTop();
+
+            if ($('.js-social-start').length) {
+
+                let _socialStart = $('.js-social-start');
+
+                if (st < _socialStart.offset().top + 147) {
+                    $('.js-social').removeClass('_fixed');
+                    $('.js-social').css('top', '0').css('bottom', 'auto');
+                }
+
+                if (st > _socialStart.offset().top + 147) {
+                    $('.js-social').addClass('_fixed');
+                    $('.js-social').css('bottom', 'auto').css('top', '0');
+                }
+
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
+                    $('.js-social').removeClass('_fixed');
+                    $('.js-social').css('top', 'auto').css('bottom', '0');
+                }
+
+                if (st < _socialStart.offset().top - 63) {
+                    $('.js-play').removeClass('_fixed');
+                    $('.js-play').css('bottom', 'auto').css('top', '10px');
+                }
+
+                if (st > _socialStart.offset().top - 63) {
+                    $('.js-play').addClass('_fixed');
+                    $('.js-play').css('bottom', 'auto').css('top', '10px');
+                }
+
+                if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 98)) {
+                    $('.js-play').removeClass('_fixed');
+                    $('.js-play').css('bottom', '0').css('top', 'auto');
+                }
+            }
+
+
+            if ($('.js-player').length) {
+                if (st > ($('.js-player').outerHeight() - 53)) {
+                    $('.js-lectures-menu').removeClass('_dark');
+                    $('.js-lectures-menu').addClass('_fixed');
+                    this.props.playerStartActions.startPause()
+                } else {
+                    $('.js-lectures-menu').addClass('_dark');
+                    $('.js-lectures-menu').removeClass('_fixed');
+                }
+
+                if (st < $('.js-player').outerHeight()) {
+                    closeGallerySlider();
+                }
+            }
+        }
     }
 
     componentWillMount() {
@@ -38,16 +110,18 @@ class TranscriptLessonPage extends React.Component {
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
 
         this.props.pageHeaderActions.setCurrentPage(pages.lesson, courseUrl, lessonUrl);
+
+        this._needStartPlayer = this.props.params === '?play'
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', TranscriptLessonPage._handleScroll);
+        window.addEventListener('scroll', this._handleScroll);
         $('body').toggleClass('_player');
         $('[data-fancybox]').fancybox();
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', TranscriptLessonPage._handleScroll);
+        window.removeEventListener('scroll', this._handleScroll);
         this.props.lessonActions.clearLesson();
         $('body').removeClass('_player');
     }
@@ -103,124 +177,48 @@ class TranscriptLessonPage extends React.Component {
             })
     }
 
-    static _handleScroll() {
-        // const _recommend = $('#pictures');
-        let _controls = $('.js-gallery-controls');
-        // var windowHeight = $(window).height();
-
-        if (_controls.length) {
-            // var coordTop = $('#recommend').offset().top;
-            //
-            // if ($(window).width() < 768 ) {
-            //     if ($(window).scrollTop() + windowHeight >= coordTop) {
-            //         _controls.css('position', 'absolute').css('bottom', 'auto').css('top', coordTop - 55);
-            //         if (_controls.hasClass('show')) {
-            //             closeGallerySlider();
-            //         }
-            //     } else {
-            //         $('.js-gallery-controls').css('position', 'fixed').css('top', 'auto').css('bottom', '10px').css('margin-top', '0');
-            //     }
-            // } else {
-            //     if ($(window).scrollTop() + windowHeight >= coordTop) {
-            //         _controls.css('position', 'absolute').css('top', coordTop).css('transform', 'none').css('bottom', 'auto');
-            //         if (_controls.hasClass('show')) {
-            //             closeGallerySlider();
-            //         }
-            //     } else {
-            //         $('.js-gallery-controls').css('position', 'fixed').css('bottom', '20px').css('top', 'auto').css('margin-top', '-60px');
-            //     }
-            // }
-
-            if ($('.js-player').length) {
-                if ($(window).scrollTop() < $('.js-player').outerHeight()) {
-                    _controls.removeClass('visible');
-                    _controls.fadeOut();
-                } else {
-                    _controls.addClass('visible');
-                    _controls.fadeIn();
-                }
-            }
-        }
-
-        let st = $(this).scrollTop();
-
-        // if ((_link.length) && (_recommend.length)) {
-        //     let coordTop = _recommend.offset().top;
-        //
-        //     let _scrollTop = $(window).scrollTop();
-        //
-        //     if ((_scrollTop + 550) >= coordTop) {
-        //         _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-        //     } else {
-        //         _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
-        //     }
-        //
-        //     if (window.innerWidth < 600) {
-        //         if ((_scrollTop + 650) >= coordTop) {
-        //             _link.css('position', 'absolute').css('top', coordTop).css('margin-top', '-100px');
-        //         } else {
-        //             // _link.css('position', 'fixed').css('top', '50%').css('margin-top', '0');
-        //             _link.css('position', 'fixed').css('top', 'auto').css('margin-top', '0');
-        //         }
-        //     }
-        // }
-
-        if ($('.js-social-start').length) {
-
-            let _socialStart = $('.js-social-start');
-
-            if (st < _socialStart.offset().top + 147) {
-                $('.js-social').removeClass('_fixed');
-                $('.js-social').css('top', '0').css('bottom', 'auto');
-            }
-
-            if (st > _socialStart.offset().top + 147) {
-                $('.js-social').addClass('_fixed');
-                $('.js-social').css('bottom', 'auto').css('top', '0');
-            }
-
-            if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-social').outerHeight())) {
-                $('.js-social').removeClass('_fixed');
-                $('.js-social').css('top', 'auto').css('bottom', '0');
-            }
-
-            if (st < _socialStart.offset().top - 63) {
-                $('.js-play').removeClass('_fixed');
-                $('.js-play').css('bottom', 'auto').css('top', '10px');
-            }
-
-            if (st > _socialStart.offset().top - 63) {
-                $('.js-play').addClass('_fixed');
-                $('.js-play').css('bottom', 'auto').css('top', '10px');
-            }
-
-            if (st > (_socialStart.offset().top + _socialStart.outerHeight() - $('.js-play').outerHeight() - 98)) {
-                $('.js-play').removeClass('_fixed');
-                $('.js-play').css('bottom', '0').css('top', 'auto');
-            }
-        }
-
-
-        if ($('.js-player').length) {
-            if (st > ($('.js-player').outerHeight() - 53)) {
-                $('.js-lectures-menu').removeClass('_dark');
-                $('.js-lectures-menu').addClass('_fixed');
-            } else {
-                $('.js-lectures-menu').addClass('_dark');
-                $('.js-lectures-menu').removeClass('_fixed');
-            }
-
-            if (st < $('.js-player').outerHeight()) {
-                closeGallerySlider();
-            }
-        }
-    }
-
     componentWillReceiveProps(nextProps) {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
         }
+
+        if (this.state.redirectToPlayer) {
+            this.setState({redirectToPlayer: false})
+        }
+
+        let _needRedirect = (this.props.playInfo) &&
+            (this.props.playInfo.lessonUrl === nextProps.lessonUrl) &&
+            (this.props.playInfo.courseUrl === nextProps.courseUrl) &&
+            (nextProps.params !== '?play')
+
+        if (_needRedirect) {
+            this.setState({
+                redirectToPlayer: true
+            })
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        let _linkToSelfLessonFromPlayer = (nextState.redirectToPlayer) &&
+            (this.props.courseUrl === nextProps.courseUrl) &&
+            (this.props.lessonUrl === nextProps.lessonUrl) &&
+            (this.props.params === '?play')
+
+
+        let _isRedirectFromThisPage = (nextState.redirectToPlayer) &&
+            (this.props.courseUrl === nextProps.courseUrl) &&
+            (this.props.lessonUrl !== nextProps.lessonUrl);
+
+        let _needSkipRedirect = _linkToSelfLessonFromPlayer || _isRedirectFromThisPage
+
+        if (_needSkipRedirect) {
+            let _newUrl = '/' + nextProps.courseUrl + '/' + nextProps.lessonUrl + '?play';
+            this.props.history.replace(_newUrl)
+            this.props.appActions.hideLessonMenu()
+        }
+
+        return !_needSkipRedirect
     }
 
     _getLessonsBundles() {
@@ -233,24 +231,21 @@ class TranscriptLessonPage extends React.Component {
         let {lessonUrl, lessonInfo} = this.props,
             lesson = lessonInfo.object;
 
-        return (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
+        let _lesson = (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
             return subLesson.URL === lessonUrl
         })
+
+        if (_lesson) {
+            let _audios = this._getAudios(_lesson)
+            _lesson.Audios = Object.assign({} , _audios)
+        }
+
+        return _lesson
     }
 
-    _createBundle(lesson) {
-        let {authors} = this.props.lessonInfo;
-        let {lessons} = this.props;
-
-        lesson.Author = authors.find((author) => {
-            return author.Id === lesson.AuthorId
-        });
-
-
-        let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
-            _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
-
-        let _lessonAudios = null;
+    _getAudios(lesson) {
+        let {lessons} = this.props,
+            _lessonAudios = null;
 
         lessons.object.some((item) => {
             let _founded = item.Id === lesson.Id
@@ -272,7 +267,21 @@ class TranscriptLessonPage extends React.Component {
             }
         })
 
-        let _audios = _lessonAudios ? _lessonAudios.Audios : null;
+        return _lessonAudios ? _lessonAudios.Audios : null;
+    }
+
+    _createBundle(lesson) {
+        let {authors} = this.props.lessonInfo;
+
+        lesson.Author = authors.find((author) => {
+            return author.Id === lesson.AuthorId
+        });
+
+
+        let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
+            _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
+
+        let _audios = this._getAudios(lesson);
 
         return <LessonWrapper lesson={lesson}
                               courseUrl={this.props.courseUrl}
@@ -296,39 +305,37 @@ class TranscriptLessonPage extends React.Component {
             _lesson = lesson ? this._getLesson() : null,
             _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized);
 
+        if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+        }
+
         return (
-            fetching || !(lesson && lessonText.loaded) ?
+            fetching || !(lesson && _lesson && lessonText.loaded) ?
                 <p>Загрузка...</p>
                 :
 
                 [
-                    <Menu lesson={this._getLesson()}
+                    <Menu lesson={_lesson}
                           isNeedHideRefs={_isNeedHideRefs}
-                          episodes={lessonText.episodes}/>,
+                          episodes={lessonText.episodes}
+                          history={this.props.history}/>,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
-                    <LessonInfo lesson={this._getLesson()}/>,
+                    <LessonInfo lesson={_lesson}/>,
                     <TranscriptPage episodes={lessonText.episodes}
                                     refs={lessonText.refs}
                                     gallery={lessonText.gallery}
                                     isNeedHideGallery={_isNeedHideGallery}
                                     isNeedHideRefs={_isNeedHideRefs}
-                                    lesson={this._getLesson()}/>
+                                    lesson={_lesson}
+                                    history={this.props.history}
+                                    courseUrl={this.props.courseUrl}
+                                    lessonUrl={this.props.lessonUrl}/>
                 ]
         )
     }
 }
-
-// function openGallerySlider() {
-//     var controls = $('.js-gallery-controls'),
-//         wrap = $('.js-gallery-slider-wrapper'),
-//         stickyBlock = $('.js-sticky-block');
-//
-//     controls.removeClass('hide').addClass('show');
-//     wrap.addClass('show');
-//     stickyBlock.addClass('slider-opened');
-// }
 
 function closeGallerySlider() {
     let controls = $('.js-gallery-controls'),
@@ -378,7 +385,9 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         authorized: !!state.user.user,
-        isLessonMenuOpened: state.app.isLessonMenuOpened,
+
+        playInfo: state.lessonPlayInfo.playInfo,
+        playingLesson: state.player.playingLesson,
     }
 }
 
