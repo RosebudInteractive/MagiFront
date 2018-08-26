@@ -4021,8 +4021,10 @@ li.fancybox-thumbs-loading {
           line-height: 30px;
           font-size: 30px;
           margin-bottom: 37px;}}
+  @media (max-width: 899px) {
       .transcript-page._nested {
         padding-top: 5px; } }
+
 
   .transcript-page .title-text .number{
     font-family: Fira Sans;
