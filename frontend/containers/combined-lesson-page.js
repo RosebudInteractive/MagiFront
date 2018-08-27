@@ -238,6 +238,14 @@ class TranscriptLessonPage extends React.Component {
         if (_lesson) {
             let _audios = this._getAudios(_lesson)
             _lesson.Audios = Object.assign({} , _audios)
+
+            let _hasSubLessons = _lesson.Lessons && (_lesson.Lessons.length > 0)
+            if (_hasSubLessons) {
+                _lesson.Lessons.forEach( sublesson => {
+                    let _audios = this._getAudios(sublesson)
+                    sublesson.Audios = Object.assign({} , _audios)
+                })
+            }
         }
 
         return _lesson
