@@ -99,6 +99,10 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
         if (this._playState.stopped) return;
 
         super.pause();
+        if (this._playState.imageAnimation) {
+            this._playState.imageAnimation.cancel();
+        }
+
         if (this._playState.imgDelayInterval) {
             clearTimeout(this._playState.imgDelayInterval);
             this._playState.imgDelayInterval = 0;
@@ -116,7 +120,7 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
 
     renderPosition(position) {
         if (this._playState.imageAnimation) {
-            cancelAnimationFrame(this._playState.imageAnimation.frame);
+            this._playState.imageAnimation.cancel();
         }
         if (this._playState.imgDelayInterval) {
             clearTimeout(this._playState.imgDelayInterval)
@@ -178,11 +182,18 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     }
 
     _getImageScale(effect) {
+        let that = this;
         let calcProgress = 0;
         let imgPlayPos = this._playState.position - effect.start;
         if (imgPlayPos > 0
             && effect.duration > 0
             && imgPlayPos < this._playState.position - effect.start + effect.duration) {
+            if (!this._playState.stopped) {
+                this.pause();
+                setTimeout(function () {
+                    that.play();
+                }, 50);
+            }
             let timeFraction = imgPlayPos / effect.duration;
             if (timeFraction > 1) timeFraction = 1;
             let animationFunc = makeEaseInOut(quad);

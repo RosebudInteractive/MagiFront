@@ -51,7 +51,7 @@ class NestedPlayer {
         let _isSmallActive = (this.player) && (this._smallPlayer) && (this.player === this._smallPlayer);
 
 
-        let _isSameViewPort = (this._fullDiv && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
+        let _isSameViewPort = (this._fullDiv && this._fullDiv.length && fullViewPort) ? this._fullDiv[0].isEqualNode(fullViewPort[0]) : false;
         if (fullViewPort && (!_isSameViewPort || !this._fullPlayer)) {
             this._fullDiv = fullViewPort;
             if (!this._fullPlayer) {

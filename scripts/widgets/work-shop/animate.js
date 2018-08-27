@@ -5,9 +5,10 @@
 export function animate(options, playState) {
 
     let start = performance.now();
-    let request = {frame: 0};
 
-    request.frame = requestAnimationFrame(function animate(time) {
+    let playObj = {};
+
+    playObj.frame = requestAnimationFrame(function animate(time) {
         // timeFraction от 0 до 1
         let timeFraction = (time - start + options.curTime) / options.duration;
         if (timeFraction > 1) timeFraction = 1;
@@ -19,21 +20,17 @@ export function animate(options, playState) {
         let calcProgress = options.from + options.to * progress;
         options.draw(calcProgress);
 
-        if (timeFraction < 1 && !playState.stopped //&&
-            //playState.position >= options.effectStart && playState.position <= options.effectDuration
-        ) {
-            request.frame = requestAnimationFrame(animate);
-        } else {
-            cancelAnimationFrame(request.frame);
-            if (options.complete) {
-                options.complete();
-            }
+        if (timeFraction < 1 && !playState.stopped && playObj.frame) {
+            playObj.frame = requestAnimationFrame(animate);
         }
 
     });
 
-    return request;
-
+    playObj.cancel = function () {
+        cancelAnimationFrame(this.frame);
+        this.frame = null;
+    };
+    return playObj;
 }
 
 export function imageTimingFunc(timeFraction) {
