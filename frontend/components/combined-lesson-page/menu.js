@@ -22,9 +22,16 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        let scrollTarget = $('.js-player').outerHeight() - $(window).height() + 53;
+        let _wrapper = $(".global-wrapper"),
+            _player = $('.js-player'),
+
+            _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
+            _wrapperOffsetPosition = _wrapper.offset().top,
+            _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
+            _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
+
         $('html, body').animate({
-            scrollTop: scrollTarget
+            scrollTop: _scroll
         }, 600);
     }
 
@@ -125,6 +132,14 @@ class Navigation extends React.Component {
         }
     }
 
+    _hasToc() {
+        let {episodes} = this.props;
+
+        return episodes && episodes.some((episode) => {
+            return (episode.Toc && episode.Toc.length)
+        })
+    }
+
     _getList() {
         if (!this.props.episodes) {
             return
@@ -157,7 +172,7 @@ class Navigation extends React.Component {
                 this.setState({showToc: false})
             }
         } else {
-            if (!this.props.episodes || !this.props.episodes.length) {
+            if (!this._hasToc()) {
                 let scrollTarget = $('#transcript').offset().top;
 
                 $("body, html").animate({
@@ -186,7 +201,10 @@ class Navigation extends React.Component {
     }
 
     render() {
-        const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
+        let {isNeedHideRefs} = this.props;
+
+        const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>',
+            _style = isNeedHideRefs && ($(window).innerWidth() > 899) ? {width : '100%'} : null;
 
         return (
             <section className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
@@ -194,8 +212,8 @@ class Navigation extends React.Component {
                     <span className="visually-hidden">Меню</span>
                     <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
                 </button>
-                <div className="section-nav__list">
-                    <ul className="section-nav-list">
+                <div className={"section-nav__list" + (this.props.isNeedHideRefs ? ' single' : '')}>
+                    <ul className={"section-nav-list" + (this.props.isNeedHideRefs ? ' single' : '')}>
                         <li className={"section-nav-list__item js-section-menu-control" + (this.state.showToc ? ' expanded' : '')}onClick={::this._switchToc}>
                             <a href="#transcript" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Транскрипт</a>
                             <ol className={"section-nav-sublist" + (this.state.showToc ? ' show' : '')}>

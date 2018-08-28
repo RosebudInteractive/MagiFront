@@ -170,6 +170,13 @@ ul {
   font-style: normal; }
 
 @font-face {
+  font-family: 'Fira Mono';
+  src: url("../fonts/FiraMono-Regular.eot");
+  src: url("../fonts/FiraMono-Regular.eot") format("embedded-opentype"), url("../fonts/FiraMono-Regular.woff2") format("woff2"), url("../fonts/FiraMono-Regular.woff") format("woff");
+  /*font-weight: 400;*/
+  font-style: normal; }
+
+@font-face {
   font-family: 'Fira Sans';
   src: url("../fonts/FiraSans-Bold.eot");
   src: url("../fonts/FiraSans-Bold.eot") format("embedded-opentype"), url("../fonts/FiraSans-Bold.woff2") format("woff2"), url("../fonts/FiraSans-Bold.woff") format("woff");
@@ -6961,7 +6968,9 @@ body[data-page="fullpage-player"] .lectures-menu {
     -ms-flex-align: center;
     align-items: center; }
   .play-block-mobile__duration {
-    margin-left: 10px;
+    margin-left: 2px;
+    min-width: 42px;
+    text-align: right;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
     line-height: 20px;
@@ -6972,7 +6981,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       color: rgba(47, 47, 47, 0.6); }
   @media (max-width: 599px) {
     .play-block-mobile {
-      display: block; } }
+      display: block;
+      width: auto; } }
 
 @media (max-width: 599px) {
   .player .lectures-list-trigger .label {
@@ -11227,7 +11237,6 @@ ul.lectures-tab {
     .lesson-sub-wrapper .player-wrapper .link-to-transcript._reduced{
       display: none;
     }}
-
 
 .social-trigger {
   position: relative;
@@ -15987,9 +15996,10 @@ ul.lectures-tab {
           right: 0;
           bottom: 15px; } }
     .lesson-player .player-block__info {
+      font-family: 'Fira Mono';
       margin-left: auto;
       margin-right: 0;
-      font-size: 15px;
+      font-size: 14px;
       line-height: 18px; }
       @media (max-width: 767px) {
         .lesson-player .player-block__info {
@@ -16413,11 +16423,34 @@ ul.lectures-tab {
     padding-right: 45px; }
     @media (max-width: 599px) {
       .lectures-menu._plain-menu .lectures-list-trigger {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: -moz-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: center;
+        -webkit-justify-content: center;
+        -moz-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -webkit-align-items: center;
+        -moz-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
         padding-left: 0;
-        padding-right: 0; } }
+        padding-right: 0;
+        width: 100%; } }
   .lectures-menu._plain-menu .lectures-list-wrapper {
     min-height: -webkit-calc(100vh - 53px);
     min-height: calc(100vh - 53px); }
+  @media (max-width: 767px) {
+    .lectures-menu._plain-menu .lectures-list-block {
+      -webkit-box-flex: 1;
+      -webkit-flex-grow: 1;
+      -moz-box-flex: 1;
+      -ms-flex-positive: 1;
+      flex-grow: 1; } }
   .lectures-menu._plain-menu._dark {
     background-color: #2f2f2f;
     border-color: rgba(255, 255, 255, 0); }
@@ -16808,7 +16841,10 @@ ul.lectures-tab {
   -webkit-align-items: flex-start;
   -moz-box-align: start;
   -ms-flex-align: start;
-  align-items: flex-start; }
+  align-items: flex-start;
+  background-color: #fff; }
+  ._dark .section-nav-list {
+    background-color: #2f2f2f; }
   @media (max-width: 899px) {
     .section-nav-list {
       -webkit-box-orient: vertical;
@@ -16819,7 +16855,13 @@ ul.lectures-tab {
       -ms-flex-direction: column;
       flex-direction: column;
       padding: 0 20px;
-      background-color: #2f2f2f; } }
+      background-color: #fff;
+      border: 1px solid rgba(47, 47, 74, 0.2);
+      border-top: none;
+      border-right: none; }
+      ._dark .section-nav-list {
+        background-color: #2f2f2f;
+        border-color: rgba(255, 255, 255, 0); } }
   .section-nav-list__item {
     padding: 15px 18px;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -16830,7 +16872,9 @@ ul.lectures-tab {
       .section-nav-list__item {
         padding: 15px 0;
         border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
+        ._dark .section-nav-list__item {
+          border-color: rgba(255, 255, 255, 0.2); }
         .section-nav-list__item:last-child {
           border-bottom: none; } }
     ._dark .section-nav-list__item {
@@ -16841,6 +16885,8 @@ ul.lectures-tab {
       color: #2f2f2f; }
       @media (max-width: 899px) {
         .section-nav-list__item-head {
+          color: #2f2f2f; }
+          ._dark .section-nav-list__item-head {
           color: rgba(255, 255, 255, 0.6); } }
       ._dark .section-nav-list__item-head {
         color: #fff; }
@@ -16856,8 +16902,11 @@ ul.lectures-tab {
         .section-nav-list__item.expanded .section-nav-list__item-head {
           display: block;
           padding-bottom: 15px;
+          color: #2f2f2f;
+          border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
+          ._dark .section-nav-list__item.expanded .section-nav-list__item-head {
           color: rgba(255, 255, 255, 0.6);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.2); } }
+            border-color: rgba(255, 255, 255, 0.2); } }
 
 .section-nav-sublist {
   margin: 0;
@@ -16877,6 +16926,21 @@ ul.lectures-tab {
   pointer-events: none;
   -webkit-transition: opacity 0.3s ease;
   transition: opacity 0.3s ease; }
+  .section-nav__list.single{
+    width: 100%;
+  }
+  .section-nav__list.single .section-nav-sublist{
+    width: 320px;
+  }
+  ._plain-menu._fixed .section-nav-sublist {
+    background-color: #fff;
+  }
+  @media (max-width: 899px) {
+    .section-nav__list.single {
+      width: 320px;
+    }
+    .section-nav__list.single .section-nav-sublist{
+      width: auto; } }
   @media (max-width: 899px) {
     .section-nav-sublist {
       position: static;
@@ -16902,6 +16966,12 @@ ul.lectures-tab {
       color: rgba(255, 255, 255, 0.6); }
   .section-nav-sublist__link {
     color: #fff; }
+  ._plain-menu._fixed .section-nav-sublist__item:before {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  ._plain-menu._fixed .section-nav-sublist__link{
+    color: #2f2f2f
+  }
 
 /*# sourceMappingURL=main.css.map */
 
