@@ -4,7 +4,7 @@ const config = require('config');
 const { RedisConnections, ConnectionWrapper } = require('../database/providers/redis/redis-connections');
 
 const KEY_PREFIX = "pg:";
-const DFLT_EXPIRATION = 90 * 24 * 60 * 60; // 90 days in sec
+const DFLT_EXPIRATION = 0;
 
 let PrerenderCache = class {
     constructor(options) {
