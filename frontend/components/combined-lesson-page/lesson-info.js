@@ -150,13 +150,6 @@ function mapStateToProps(state) {
     return {
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
-        // lessons: state.lessons,
-        // course: state.singleLesson.course,
-        // isLessonMenuOpened: state.app.isLessonMenuOpened,
-        // contentArray: state.player.contentArray,
-        // menuId: state.app.menuId,
-        // showContentTooltip: state.player.showContentTooltip,
-        // showSpeedTooltip: state.player.showSpeedTooltip,
     }
 }
 

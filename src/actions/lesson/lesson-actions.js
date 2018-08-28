@@ -258,6 +258,9 @@ const handleLessonResources = (resources) => {
     if (resources) {
         resources.forEach((resource) => {
             resource.id = resource.Id
+
+            let _meta = JSON.parse(resource.MetaData);
+            resource.FileId = _meta.fileId;
         })
     }
 }

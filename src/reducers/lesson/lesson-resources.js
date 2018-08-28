@@ -136,14 +136,14 @@ export default function lessonResources(state = initialState, action) {
             let _array = [...state.current, action.payload];
             tools.setObjectsRank(_array);
 
-            return {...state, current: _array, hasChanges: true, selected: action.payload};
+            return {...state, current: _array, hasChanges: true, selected: action.payload, loaded: false,};
         }
 
         case MULTIPLE_INSERT_RESOURCE: {
             let _array = state.current.concat(action.payload);
             tools.setObjectsRank(_array);
 
-            return {...state, current: _array, hasChanges: true, selected: action.payload};
+            return {...state, current: _array, hasChanges: true, selected: action.payload, loaded: false,};
         }
 
         case UPDATE_RESOURCE: {

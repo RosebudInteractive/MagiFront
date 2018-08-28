@@ -21,7 +21,9 @@ class PlayBlock extends React.Component {
     }
 
     _play() {
-        this.props.playerStartActions.preinitAudios(this.props.lesson.audios);
+        let _audios = Object.values(this.props.lesson.Audios);
+
+        this.props.playerStartActions.preinitAudios(_audios);
         this._redirect = true;
         this.forceUpdate()
         this.props.playerStartActions.startPlay(this.props.id)

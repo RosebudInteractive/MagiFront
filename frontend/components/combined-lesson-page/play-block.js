@@ -9,15 +9,11 @@ import * as userActions from "../../actions/user-actions";
 import $ from "jquery";
 import history from '../../history';
 
+
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
         lesson: PropTypes.object,
-        // duration: PropTypes.string,
-        // courseUrl: PropTypes.string,
-        // lessonUrl: PropTypes.string,
-        // audios: PropTypes.array,
-        // isAuthRequired: PropTypes.bool,
         extClass: PropTypes.string,
     };
 
@@ -30,9 +26,10 @@ class PlayBlock extends React.Component {
     _play(e) {
         e.preventDefault()
 
-        let {lesson, courseUrl, lessonUrl} = this.props;
+        let {lesson, courseUrl, lessonUrl} = this.props,
+            _audios = Object.values(lesson.Audios);
 
-        this.props.playerStartActions.preinitAudios(lesson.audios);
+        this.props.playerStartActions.preinitAudios(_audios);
 
         if ((lesson.courseUrl === courseUrl) && (lesson.URL === lessonUrl)) {
             history.replace('/' + courseUrl + '/' + lesson.URL + '?play')
