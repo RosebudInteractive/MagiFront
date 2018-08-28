@@ -6,6 +6,11 @@ exports.Import = {
     PARAGRAPH_MERGE_SYMBOL: "§"
 };
 
+exports.SEO = {
+    FORCE_RENDER_USER_AGENT: "magisteria-internal",
+    BOT_USER_AGENT: "magisteria-bot"
+};
+
 exports.Data = {
     ENDPOINT_FIELD_LENGTH: 255
 };
