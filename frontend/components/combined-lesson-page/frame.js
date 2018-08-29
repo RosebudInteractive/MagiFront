@@ -40,21 +40,21 @@ class Frame extends Component {
         }
 
         this._resizeHandler = () => {
-            let _width = $(window).innerWidth(),
-                _height = $(window).innerHeight(),
-                _control = $('.lesson-player');
-
-            const _rate = 0.75
-
-            if (_control.length > 0) {
-                if ((_width * _rate) < _height) {
-                    if (!_control.hasClass('added')) {
-                        _control.toggleClass('added')
-                    }
-                } else {
-                    _control.removeClass('added')
-                }
-            }
+            // let _width = $(window).innerWidth(),
+            //     _height = $(window).innerHeight(),
+            //     _control = $('.lesson-player');
+            //
+            // const _rate = 0.75
+            //
+            // if (_control.length > 0) {
+            //     if ((_width * _rate) < _height) {
+            //         if (!_control.hasClass('added')) {
+            //             _control.toggleClass('added')
+            //         }
+            //     } else {
+            //         _control.removeClass('added')
+            //     }
+            // }
         }
 
         $(document).ready(this._onDocumentReady)
