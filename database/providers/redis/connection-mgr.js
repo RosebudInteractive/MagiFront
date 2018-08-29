@@ -55,7 +55,7 @@ class RedisConnection {
         this.pexpireAsync = promisify(this._client.pexpire).bind(this._client);
         this.mgetAsync = promisify(this._client.mget).bind(this._client);
         this.renameAsync = promisify(this._client.rename).bind(this._client);
-        this.unlinkAsync = promisify(this._client.unlink).bind(this._client);
+        this.unlinkAsync = promisify(this._client.unlink).bind(this._client); // Available since Redis 4.0
         this.hgetAll = promisify(this._client.hgetall).bind(this._client);
         this.hset = promisify(this._client.hset).bind(this._client);
         this.hget = promisify(this._client.hget).bind(this._client);

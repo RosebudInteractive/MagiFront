@@ -89,7 +89,8 @@ let PrerenderCache = class {
             let id = this._prepareKey(key);
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
-                    return connection.unlinkAsync(id);
+                    return connection.delAsync(id);
+                    // return connection.unlinkAsync(id);// Available since Redis 4.0
                 });
             }
             else
