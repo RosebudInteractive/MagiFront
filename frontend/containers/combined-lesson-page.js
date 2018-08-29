@@ -5,7 +5,8 @@ import {Redirect} from 'react-router';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
-import LessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
+import MobileLessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
+import LessonWrapper from '../components/lesson-page/lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 
@@ -20,10 +21,12 @@ import * as appActions from "../actions/app-actions";
 import * as playerStartActions from "../actions/player-start-actions";
 
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
+import Platform from "platform";
 
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
+        this._isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone")
 
         this.state = {
             redirectToPlayer: false,
@@ -237,13 +240,13 @@ class TranscriptLessonPage extends React.Component {
 
         if (_lesson) {
             let _audios = this._getAudios(_lesson)
-            _lesson.Audios = Object.assign({} , _audios)
+            _lesson.Audios = Object.assign({}, _audios)
 
             let _hasSubLessons = _lesson.Lessons && (_lesson.Lessons.length > 0)
             if (_hasSubLessons) {
-                _lesson.Lessons.forEach( sublesson => {
+                _lesson.Lessons.forEach(sublesson => {
                     let _audios = this._getAudios(sublesson)
-                    sublesson.Audios = Object.assign({} , _audios)
+                    sublesson.Audios = Object.assign({}, _audios)
                 })
             }
         }
@@ -291,13 +294,21 @@ class TranscriptLessonPage extends React.Component {
 
         let _audios = this._getAudios(lesson);
 
-        return <LessonWrapper lesson={lesson}
-                              courseUrl={this.props.courseUrl}
-                              lessonUrl={lesson.URL}
-                              isPlayer={_playingLessonUrl || _lessonInPlayer}
-                              audios={_audios}
-                              history={this.props.history}
-        />
+        return this._isMobile ?
+            <MobileLessonWrapper lesson={lesson}
+                                 courseUrl={this.props.courseUrl}
+                                 lessonUrl={lesson.URL}
+                                 isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                 audios={_audios}
+                                 history={this.props.history}
+            /> :
+            <LessonWrapper lesson={lesson}
+                           courseUrl={this.props.courseUrl}
+                           lessonUrl={lesson.URL}
+                           isPlayer={_playingLessonUrl || _lessonInPlayer}
+                           audios={_audios}
+                           history={this.props.history}
+            />
     }
 
     render() {
@@ -322,11 +333,14 @@ class TranscriptLessonPage extends React.Component {
                 :
 
                 [
-                    <Menu lesson={_lesson}
-                          isNeedHideRefs={_isNeedHideRefs}
-                          episodes={lessonText.episodes}
-                          active={_lesson.Id}
-                          history={this.props.history}/>,
+                    this._isMobile ?
+                        <Menu lesson={_lesson}
+                              isNeedHideRefs={_isNeedHideRefs}
+                              episodes={lessonText.episodes}
+                              active={_lesson.Id}
+                              history={this.props.history}/>
+                        :
+                        null,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
