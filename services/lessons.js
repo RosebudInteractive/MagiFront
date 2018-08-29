@@ -14,6 +14,23 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/adm/lessons/prerender/:id', (req, res, next) => {
+        new Promise((resolve, reject) => {
+            let id = (req.query && req.query.url) ? req.query.url : parseInt(req.params.id);
+            if ((typeof (id) === "number") && isNaN(id))
+                throw new Error(`Invalid parameter: ${req.params.id}`);
+            let rc = LessonsService()
+                .prerender(id);
+            resolve(rc);
+        })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/lessons/:id/:courseId', (req, res, next) => {
         LessonsService()
             .get(parseInt(req.params.id), parseInt(req.params.courseId))

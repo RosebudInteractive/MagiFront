@@ -26,9 +26,26 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/adm/courses', (req, res, next) => {
+    app.get('/api/adm/courses/prerender/:id', (req, res, next) => {
+        new Promise((resolve, reject) => {
+            let id = (req.query && req.query.url) ? req.query.url : parseInt(req.params.id);
+            if ((typeof (id) === "number") && isNaN(id))
+                throw new Error(`Invalid parameter: ${req.params.id}`);
+            let rc = CoursesService()
+                .prerender(id);
+            resolve(rc);
+        })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/adm/courses/:id/authors', (req, res, next) => {
         CoursesService()
-            .getAll()
+            .getAuthors(parseInt(req.params.id))
             .then(rows => {
                 res.send(rows);
             })
@@ -48,9 +65,9 @@ function setupCourses(app) {
             });
     });
 
-    app.get('/api/adm/courses/:id/authors', (req, res, next) => {
+    app.get('/api/adm/courses', (req, res, next) => {
         CoursesService()
-            .getAuthors(parseInt(req.params.id))
+            .getAll()
             .then(rows => {
                 res.send(rows);
             })
