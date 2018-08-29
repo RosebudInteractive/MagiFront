@@ -58,7 +58,7 @@ class Frame extends Component {
         }
 
         $(document).ready(this._onDocumentReady)
-        $(window).resize(this._resizeHandler)
+        // $(window).resize(this._resizeHandler)
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
     }
 

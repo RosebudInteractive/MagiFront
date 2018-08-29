@@ -7061,7 +7061,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     min-height: -webkit-calc(100vh - 54px);
     min-height: calc(100vh - 54px);
     color: #fff;
-    background-color: rgba(47, 47, 47, 0.9); }
+    background-color: rgba(47, 47, 47, 0.98); }
   .lectures-list-wrapper._dark {
     min-height: -webkit-calc(100vh - 54px);
     min-height: calc(100vh - 54px);
@@ -15996,7 +15996,7 @@ ul.lectures-tab {
           right: 0;
           bottom: 15px; } }
     .lesson-player .player-block__info {
-      font-family: 'Fira Mono';
+      font-family: 'Open Sans';
       margin-left: auto;
       margin-right: 0;
       font-size: 14px;
