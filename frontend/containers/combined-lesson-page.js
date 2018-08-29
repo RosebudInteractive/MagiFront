@@ -5,8 +5,8 @@ import {Redirect} from 'react-router';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
-import MobileLessonWrapper from '../components/combined-lesson-page/lesson-wrapper';
-import LessonWrapper from '../components/lesson-page/lesson-wrapper';
+import MobileLessonWrapper from '../components/combined-lesson-page/mobile-lesson-wrapper';
+import DesktopLessonWrapper from '../components/combined-lesson-page/desktop-lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 
@@ -119,14 +119,18 @@ class TranscriptLessonPage extends React.Component {
 
     componentDidMount() {
         window.addEventListener('scroll', this._handleScroll);
-        $('body').toggleClass('_player');
+        // if (this._isMobile) {
+            $('body').toggleClass('_player');
+        // }
         $('[data-fancybox]').fancybox();
     }
 
     componentWillUnmount() {
         window.removeEventListener('scroll', this._handleScroll);
         this.props.lessonActions.clearLesson();
-        $('body').removeClass('_player');
+        // if (this._isMobile) {
+            $('body').removeClass('_player');
+        // }
     }
 
     componentDidUpdate(prevProps) {
@@ -302,12 +306,12 @@ class TranscriptLessonPage extends React.Component {
                                  audios={_audios}
                                  history={this.props.history}
             /> :
-            <LessonWrapper lesson={lesson}
-                           courseUrl={this.props.courseUrl}
-                           lessonUrl={lesson.URL}
-                           isPlayer={_playingLessonUrl || _lessonInPlayer}
-                           audios={_audios}
-                           history={this.props.history}
+            <DesktopLessonWrapper lesson={lesson}
+                                  courseUrl={this.props.courseUrl}
+                                  lessonUrl={lesson.URL}
+                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                  audios={_audios}
+                                  history={this.props.history}
             />
     }
 

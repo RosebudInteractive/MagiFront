@@ -64,43 +64,27 @@ export default class Wrapper extends React.Component {
     }
 
     render() {
-        let {isPlayer} = this.props;
         const _coverStyle = {
             backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
         }
 
         return (
-            <div className='lecture-wrapper'
-                 id={this.props.isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                 style={_coverStyle}>
-                <Menu {...this.props} current={this.props.lesson.Number} id={'lesson-menu-' + this.props.lesson.Id}/>
-                <div className={'lesson-sub-wrapper'}>
-                    {
-                        (isPlayer && !this.props.paused) ?
-                            <div className='player-wrapper'>
-                                <Link to={this.props.lesson.URL + "/transcript"}
-                                      className={"link-to-transcript _reduced"}>
-                                    Транскрипт <br/>и
-                                    материалы
-                                </Link>
-                            </div>
-                            :
-                            <div>
-                                <Link to={this.props.lesson.URL + "/transcript"}
-                                      className={"link-to-transcript"}>
-                                    Транскрипт <br/>и
-                                    материалы
-                                </Link>
-                            </div>
-                    }
-                    <PlayerFrame {...this.props}
-                                 visible={this.props.isPlayer}/>
-                    <LessonFrame {...this.props}
-                                 lesson={this.props.lesson}
-                                 isMain={this.props.isMain}
-                                 courseUrl={this.props.courseUrl}
-                                 visible={!this.props.isPlayer}
-                    />
+            <div className='lesson-wrapper'>
+                <div className='lecture-wrapper'
+                     id={this.props.isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
+                     style={_coverStyle}>
+                    <Menu {...this.props} current={this.props.lesson.Number}
+                          id={'lesson-menu-' + this.props.lesson.Id}/>
+                    <div className={'lesson-sub-wrapper'}>
+                        <PlayerFrame {...this.props}
+                                     visible={this.props.isPlayer}/>
+                        <LessonFrame {...this.props}
+                                     lesson={this.props.lesson}
+                                     isMain={this.props.isMain}
+                                     courseUrl={this.props.courseUrl}
+                                     visible={!this.props.isPlayer}
+                        />
+                    </div>
                 </div>
             </div>
         )
