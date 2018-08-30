@@ -44,10 +44,6 @@ class Header extends React.Component {
 class Body extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            maskNumber : svg.getRandomInt(1, 12).toString().padStart(2, '0')
-        }
     }
 
     render() {

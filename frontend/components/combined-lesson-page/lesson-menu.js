@@ -110,7 +110,7 @@ class Menu extends React.Component {
 
         return (
             <div
-                className={"lectures-menu js-lesson-menu _dark" + (this.props.isPlayer ? ' player-wrapper' : '') + (this.props.isLessonMenuOpened ? ' opened' : '')}
+                className={"lectures-menu js-lectures-menu _dark" + (this.props.isPlayer ? ' player-wrapper' : '') + (this.props.isLessonMenuOpened ? ' opened' : '')}
                 id={this.props.id} style={this.props.isMain ? null : {display: 'none'}}>
                 <div className="lectures-menu__section">
                     <Link to={'/'} className="logo-min">
@@ -130,33 +130,6 @@ class Menu extends React.Component {
                             className="current">{this.props.current}</span>{'/' + _total}</span></button>
                     <LessonsListWrapper {...this.props}/>
                 </div>
-                {
-                    this.props.isPlayer ?
-                        [
-                            <button type="button" className="speed-button js-speed-trigger menu-button"
-                                    onClick={::this._openRate}>
-                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                            </button>,
-                            (
-                                this.props.contentArray.length > 0 ?
-                                    <button type="button" className="content-button js-contents-trigger menu-button"
-                                            onClick={::this._openContent}>
-                                        <svg width="18" height="12"
-                                             dangerouslySetInnerHTML={{__html: _contents}}/>
-                                    </button>
-                                    :
-                                    null
-                            ),
-                            <Link to={this.props.lesson.URL + "/transcript"}
-                                  className={"link-to-transcript _reduced"}>
-                                Транскрипт <br/>и
-                                материалы
-                            </Link>
-                        ]
-                        :
-                        null
-                }
-
             </div>
         )
     }

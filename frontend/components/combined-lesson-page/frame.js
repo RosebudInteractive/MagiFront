@@ -48,9 +48,7 @@ class Frame extends Component {
 
             if (_control.length > 0) {
                 if ((_width * _rate) < _height) {
-                    if (!_control.hasClass('added')) {
-                        _control.toggleClass('added')
-                    }
+                    _control.addClass('added')
                 } else {
                     _control.removeClass('added')
                 }
@@ -261,7 +259,8 @@ class Frame extends Component {
                 {
                     this.props.visible ?
                         [
-                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
+                            <div
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
                             <Controls {...this.props}/>,
                             <Titles/>,
                             <div className="player-block">

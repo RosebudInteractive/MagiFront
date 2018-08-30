@@ -6,7 +6,7 @@ import {Redirect} from 'react-router';
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 import MobileLessonWrapper from '../components/combined-lesson-page/mobile-lesson-wrapper';
-import DesktopLessonWrapper from '../components/combined-lesson-page/desktop-lesson-wrapper';
+import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 
@@ -23,6 +23,15 @@ import * as playerStartActions from "../actions/player-start-actions";
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Platform from "platform";
 
+const _rate = 1;
+
+function _isLandscape() {
+    let _width = $(window).innerWidth(),
+        _height = $(window).innerHeight();
+
+    return (_width * _rate) > _height
+}
+
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
@@ -30,6 +39,7 @@ class TranscriptLessonPage extends React.Component {
 
         this.state = {
             redirectToPlayer: false,
+
         }
 
         this._handleScroll = () => {
@@ -86,10 +96,10 @@ class TranscriptLessonPage extends React.Component {
 
 
             if ($('.js-player').length) {
-                if (st > ($('.js-player').outerHeight() - 53)) {
+                if (st > ($('.js-player').outerHeight())) {
                     $('.js-lectures-menu').removeClass('_dark');
                     $('.js-lectures-menu').addClass('_fixed');
-                    this.props.playerStartActions.startPause()
+                    // this.props.playerStartActions.startPause()
                 } else {
                     $('.js-lectures-menu').addClass('_dark');
                     $('.js-lectures-menu').removeClass('_fixed');
@@ -100,6 +110,31 @@ class TranscriptLessonPage extends React.Component {
                 }
             }
         }
+
+        this._resizeHandler = () => {
+            let _control = $('.js-player');
+
+            if (_control.length > 0) {
+                if (!_isLandscape()) {
+                    _control.addClass('added')
+                } else {
+                    _control.removeClass('added')
+                }
+            }
+        }
+
+        this._addEventListeners();
+    }
+
+    _addEventListeners() {
+        window.addEventListener('scroll', this._handleScroll);
+        $(window).resize(this._resizeHandler)
+
+    }
+
+    _removeEventListeners() {
+        window.removeEventListener('scroll', this._handleScroll);
+        $('body').removeClass('_player');
     }
 
     componentWillMount() {
@@ -118,22 +153,18 @@ class TranscriptLessonPage extends React.Component {
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', this._handleScroll);
-        // if (this._isMobile) {
-            $('body').toggleClass('_player');
-        // }
+        $('body').addClass('_player');
         $('[data-fancybox]').fancybox();
+        this._handleScroll();
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', this._handleScroll);
+        this._removeEventListeners();
         this.props.lessonActions.clearLesson();
-        // if (this._isMobile) {
-            $('body').removeClass('_player');
-        // }
     }
 
     componentDidUpdate(prevProps) {
+        this._resizeHandler()
         let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
@@ -298,20 +329,21 @@ class TranscriptLessonPage extends React.Component {
 
         let _audios = this._getAudios(lesson);
 
-        return this._isMobile ?
-            <MobileLessonWrapper lesson={lesson}
-                                 courseUrl={this.props.courseUrl}
-                                 lessonUrl={lesson.URL}
-                                 isPlayer={_playingLessonUrl || _lessonInPlayer}
-                                 audios={_audios}
-                                 history={this.props.history}
-            /> :
+        return (!this._isMobile && _isLandscape()) ?
             <DesktopLessonWrapper lesson={lesson}
                                   courseUrl={this.props.courseUrl}
                                   lessonUrl={lesson.URL}
                                   isPlayer={_playingLessonUrl || _lessonInPlayer}
                                   audios={_audios}
                                   history={this.props.history}
+            />
+            :
+            <MobileLessonWrapper lesson={lesson}
+                                 courseUrl={this.props.courseUrl}
+                                 lessonUrl={lesson.URL}
+                                 isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                 audios={_audios}
+                                 history={this.props.history}
             />
     }
 
@@ -331,20 +363,20 @@ class TranscriptLessonPage extends React.Component {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
+        let _isNeedHideFixedMenu = _isLandscape() && !this._isMobile;
+
         return (
             fetching || !(lesson && _lesson && lessonText.loaded) ?
                 <p>Загрузка...</p>
                 :
 
                 [
-                    this._isMobile ?
-                        <Menu lesson={_lesson}
-                              isNeedHideRefs={_isNeedHideRefs}
-                              episodes={lessonText.episodes}
-                              active={_lesson.Id}
-                              history={this.props.history}/>
-                        :
-                        null,
+                    <Menu lesson={_lesson}
+                          isNeedHideRefs={_isNeedHideRefs}
+                          episodes={lessonText.episodes}
+                          active={_lesson.Id}
+                          history={this.props.history}
+                          extClass={_isNeedHideFixedMenu ? 'desktop landscape' : ''}/>,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),

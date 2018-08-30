@@ -34,30 +34,15 @@ export default class Wrapper extends React.Component {
 
     constructor(props) {
         super(props)
-
-
-        this._resizeHandler = () => {
-            this._height = _getHeight();
-            this._width = _getWidth();
-            $('.lesson-wrapper').css('height', this._height).css('width', this._width);
-        }
     }
 
     componentDidMount() {
-        // $('body').css('position', 'fixed');
-        // $(window).on('resize', this._resizeHandler)
-        // this._resizeHandler()
     }
 
     componentDidUpdate() {
-        // if (this._height !== _getHeight()) {
-        //     this._resizeHandler()
-        // }
     }
 
     componentWillUnmount() {
-        // $(window).unbind('resize', this._resizeHandler)
-        // $('body').css('position', '');
     }
 
     render() {
@@ -67,7 +52,7 @@ export default class Wrapper extends React.Component {
         }
 
         return (
-            <section className='lecture-wrapper lesson-player js-player added'
+            <section className='lecture-wrapper lesson-player js-player mobile'
                  id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                  style={isPlayer ? null : _coverStyle}>
                 <div className={'lesson-sub-wrapper'}>

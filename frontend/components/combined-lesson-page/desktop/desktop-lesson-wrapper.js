@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
 
-import Menu from './lesson-menu';
-import PlayerFrame from '../player/frame'
-import LessonFrame from './lesson-frame';
+import Menu from '../menu';
+import PlayerFrame from './player-frame'
+import LessonFrame from '../lesson-frame';
 
 import $ from 'jquery'
 import Platform from 'platform';
@@ -69,7 +68,7 @@ export default class Wrapper extends React.Component {
         }
 
         return (
-            <div className='lesson-wrapper'>
+            <div className='lesson-wrapper js-player desktop'>
                 <div className='lecture-wrapper'
                      id={this.props.isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                      style={_coverStyle}>

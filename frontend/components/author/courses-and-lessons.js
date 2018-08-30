@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import {authorSelector} from '../../ducks/author'
-import {ImageSize, getCoverPath, getRandomInt} from '../../tools/page-tools'
+import {ImageSize, getCoverPath} from '../../tools/page-tools'
 import LessonFull from "../common/lecture-full-wrapper";
 
 class CoursesBlock extends React.Component {
@@ -95,8 +95,6 @@ class Course extends React.Component {
 
     constructor(props) {
         super(props);
-        let _number = getRandomInt(1, 12);
-        this.maskNumber = _number.toString().padStart(2, '0');
     }
 
     render() {
