@@ -94,8 +94,10 @@ export default class Wrapper extends React.Component {
 
     render() {
         let {isPlayer} = this.props;
-        const _coverStyle = {
-            backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
+        const _coverStyle = {}
+
+        if (!isPlayer)  {
+            _coverStyle.backgroundImage ="radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
         }
 
         if (this.state.wrapperHeight) {
@@ -105,7 +107,7 @@ export default class Wrapper extends React.Component {
         return (
             <section className='lecture-wrapper lesson-player js-player mobile'
                      id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                     style={isPlayer ? null : _coverStyle}>
+                     style={_coverStyle}>
                 <div className={'lesson-sub-wrapper'}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>
