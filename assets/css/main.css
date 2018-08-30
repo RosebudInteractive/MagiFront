@@ -302,8 +302,6 @@ ul {
     /*transform: translate(-50%, 80px); }*/
 }
 
-
-
 html {
   width: 100%; }
 
@@ -348,6 +346,18 @@ body {
   body.overflow {
     height: 100%;
     overflow: hidden; }
+
+.size-info {
+  position: fixed;
+  background-color: #2f2f2f;
+  top: 60px;
+  right: 10px;
+}
+
+.size-info p{
+  margin: 5px 10px 5px 10px;
+  color: #fff
+}
 
 .global-wrapper {
   display: -webkit-box;

@@ -9,6 +9,8 @@ import {
     HIDE_USER_BLOCK,
     SHOW_LESSONS_BOOKMARKS,
     SHOW_COURSES_BOOKMARKS,
+    SHOW_SIZE_INFO,
+    HIDE_SIZE_INFO,
 } from '../constants/app'
 
 import {
@@ -25,6 +27,7 @@ const initialState = {
     showUserBlock: false,
     showLessonBookmarks: false,
     showCourseBookmarks: true,
+    showSizeInfo: false,
 };
 
 export default function app(state = initialState, action) {
@@ -88,6 +91,14 @@ export default function app(state = initialState, action) {
 
         case SHOW_COURSES_BOOKMARKS: {
             return {...state, showLessonBookmarks: false, showCourseBookmarks: true}
+        }
+
+        case SHOW_SIZE_INFO: {
+            return {...state, showSizeInfo: true}
+        }
+
+        case HIDE_SIZE_INFO: {
+            return {...state, showSizeInfo: false}
         }
 
         default:

@@ -9,10 +9,14 @@ import * as appActions from '../../actions/app-actions';
 import * as playerActions from "../../actions/player-actions";
 
 import LessonsListWrapper from './lessons-list-wrapper';
+import SizeInfo from '../size-info'
 import $ from "jquery";
 
 
 class Menu extends React.Component {
+    constructor(props) {
+        super(props)
+    }
 
     _getMenuType() {
         let _scrollTop = $(window).scrollTop();
@@ -22,17 +26,22 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        let _wrapper = $(".global-wrapper"),
-            _player = $('.js-player'),
-
-            _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
-            _wrapperOffsetPosition = _wrapper.offset().top,
-            _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
-            _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
-
-        $('html, body').animate({
-            scrollTop: _scroll
-        }, 600);
+        // let _wrapper = $(".global-wrapper"),
+        //     _player = $('.js-player'),
+        //
+        //     _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
+        //     _wrapperOffsetPosition = _wrapper.offset().top,
+        //     _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
+        //     _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
+        //
+        // $('html, body').animate({
+        //     scrollTop: _scroll
+        // }, 600);
+        if (this.props.showSizeInfo) {
+            this.props.appActions.hideSizeInfo()
+        } else {
+            this.props.appActions.showSizeInfo()
+        }
     }
 
     render() {
@@ -248,6 +257,7 @@ function mapStateToProps(state) {
         menuId: state.app.menuId,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
+        showSizeInfo: state.app.showSizeInfo,
     }
 }
 
