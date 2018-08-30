@@ -1,17 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import PlayerFrame from './frame'
-import LessonFrame from './lesson-frame';
+import PlayerFrame from './player-frame'
+import LessonFrame from '../lesson-frame';
 
 import $ from 'jquery'
-import Platform from 'platform';
+// import 'jquery.cookeis'
+// import Platform from 'platform';
 
-const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
-    _isAndroid = Platform.os.family === "Android";
+// const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
+//     _isAndroid = Platform.os.family === "Android";
+
+let _landscapeHeight = 0;
+
+function _isLandscape() {
+    return $(window).innerHeight() < $(window).innerWidth();
+}
 
 function _getHeight() {
-    return (_isSafariOnIPad || _isAndroid) ? $(window).outerHeight() : $(window).innerHeight();
+    if (_isLandscape()) {
+        if (_landscapeHeight < $(window).outerHeight()) {
+            _landscapeHeight = $(window).outerHeight()
+            // $.cookie('landscapeHeight', _landscapeHeight);
+        }
+
+        return _landscapeHeight
+    } else {
+        let _outer = $(window).outerHeight(),
+            _inner = $(window).innerHeight();
+
+        return (_outer > _inner) ? _outer : _inner;
+    }
 }
 
 function _getWidth() {
@@ -34,15 +53,35 @@ export default class Wrapper extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this._resizeHandler = () => {
+            let _width = _getWidth(),
+                _height = _getHeight(),
+                _control = $('.lesson-player');
+
+            const _rate = 0.71
+
+            if (_control.length > 0) {
+                if ((_width * _rate) <= _height) {
+                    _control.addClass('added')
+                } else {
+                    _control.removeClass('added')
+                }
+            }
+        }
+
+        $(window).resize(this._resizeHandler)
     }
 
     componentDidMount() {
+        this._resizeHandler();
     }
 
     componentDidUpdate() {
     }
 
     componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler);
     }
 
     render() {

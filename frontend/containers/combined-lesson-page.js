@@ -5,7 +5,7 @@ import {Redirect} from 'react-router';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
-import MobileLessonWrapper from '../components/combined-lesson-page/mobile-lesson-wrapper';
+import MobileLessonWrapper from '../components/combined-lesson-page/mobile/mobile-lesson-wrapper';
 import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';

@@ -9,7 +9,6 @@ import * as appActions from '../../actions/app-actions';
 import * as playerActions from "../../actions/player-actions";
 
 import LessonsListWrapper from './lessons-list-wrapper';
-import SizeInfo from '../size-info'
 import $ from "jquery";
 
 
