@@ -3,7 +3,8 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "../player/progress";
-import Controls from "./controls";
+import ScreenControls from "./mobile/screen-controls";
+import Controls from "./desktop/bottom-controls";
 
 import $ from 'jquery'
 import Titles from "../player/titles";
@@ -47,7 +48,7 @@ class Frame extends Component {
             const _rate = 0.75
 
             if (_control.length > 0) {
-                if ((_width * _rate) < _height) {
+                if ((_width * _rate) <= _height) {
                     _control.addClass('added')
                 } else {
                     _control.removeClass('added')
@@ -261,37 +262,70 @@ class Frame extends Component {
                         [
                             <div
                                 className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
-                            <Controls {...this.props}/>,
+                            <ScreenControls {...this.props}/>,
                             <Titles/>,
-                            <div className="player-block">
-                                <Progress id={_id}/>
-                                <div className="player-block__row">
-                                    <div className="player-block__controls">
-                                        <TimeInfo/>
+                            this.props.isMobileControls ?
+                                <div className="player-block">
+                                    <Progress id={_id}/>
+                                    <div className="player-block__row">
+                                        <div className="player-block__controls">
+                                            <TimeInfo/>
+                                        </div>
+                                        <div className="player-block__stats">
+                                            <SoundButton/>
+                                            <SoundBar/>
+                                            {
+                                                this.props.contentArray.length > 0 ?
+                                                    <button type="button"
+                                                            className="content-button js-contents-trigger player-button"
+                                                            onClick={::this._openContent}>
+                                                        <svg width="18" height="12"
+                                                             dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                    </button>
+                                                    :
+                                                    null
+                                            }
+                                            <button type="button"
+                                                    className="speed-button js-speed-trigger player-button"
+                                                    onClick={::this._openRate}>
+                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
+                                            </button>
+                                        </div>
+                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                        {showSpeedTooltip ? <RateTooltip/> : ''}
                                     </div>
-                                    <div className="player-block__stats">
-                                        <SoundButton/>
-                                        <SoundBar/>
-                                        {
-                                            this.props.contentArray.length > 0 ?
-                                                <button type="button"
-                                                        className="content-button js-contents-trigger player-button"
-                                                        onClick={::this._openContent}>
-                                                    <svg width="18" height="12"
-                                                         dangerouslySetInnerHTML={{__html: _contents}}/>
-                                                </button>
-                                                :
-                                                null
-                                        }
-                                        <button type="button" className="speed-button js-speed-trigger player-button"
-                                                onClick={::this._openRate}>
-                                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                        </button>
-                                    </div>
-                                    {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                    {showSpeedTooltip ? <RateTooltip/> : ''}
                                 </div>
-                            </div>
+                                :
+                                <div className="player-frame">
+                                    <div className="player-block">
+                                        <Progress id={_id}/>
+                                        <div className="player-block__row desktop">
+                                            <Controls {...this.props}/>
+                                            <div className="player-block__stats">
+                                                <TimeInfo/>
+                                                <button type="button"
+                                                        className="speed-button js-speed-trigger player-button"
+                                                        onClick={::this._openRate}>
+                                                    <svg width="18" height="18"
+                                                         dangerouslySetInnerHTML={{__html: _speed}}/>
+                                                </button>
+                                                {
+                                                    this.props.contentArray.length > 0 ?
+                                                        <button type="button"
+                                                                className="content-button js-contents-trigger player-button"
+                                                                onClick={::this._openContent}>
+                                                            <svg width="18" height="12"
+                                                                 dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                        </button>
+                                                        :
+                                                        null
+                                                }
+                                            </div>
+                                            {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                            {showSpeedTooltip ? <RateTooltip/> : ''}
+                                        </div>
+                                    </div>
+                                </div>
                         ]
                         :
                         null

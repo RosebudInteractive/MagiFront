@@ -16043,6 +16043,11 @@ ul.lectures-tab {
       -ms-transform: translateY(-7px);
       transform: translateY(-7px);
     }
+    .lesson-player .player-block__row.desktop {
+      -webkit-order: 0;
+      -ms-flex-order: 0;
+      order: 0;
+    }
       /*@media (max-width: 1399px) {*/
         /*.lesson-player .player-block__row {*/
           /*-webkit-box-ordinal-group: 0;*/

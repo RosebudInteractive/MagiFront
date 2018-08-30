@@ -16,6 +16,15 @@ import RateTooltip from '../../player/rate-tooltip';
 import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
 
+const _rate = 1;
+
+function _isLandscape() {
+    let _width = $(window).innerWidth(),
+        _height = $(window).innerHeight();
+
+    return (_width * _rate) > _height
+}
+
 class Frame extends Component {
 
     static propTypes = {
@@ -39,7 +48,20 @@ class Frame extends Component {
             this._applyViewPort()
         }
 
+        this._resizeHandler = () => {
+            let _control = $('.js-player');
+
+            if (_control.length > 0) {
+                if (!_isLandscape()) {
+                    _control.addClass('added')
+                } else {
+                    _control.removeClass('added')
+                }
+            }
+        }
+
         $(document).ready(this._onDocumentReady)
+        $(window).resize(this._resizeHandler)
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
     }
 
@@ -98,6 +120,8 @@ class Frame extends Component {
             this._clearTimeOut();
             this._initTimeOut();
         });
+
+        this._resizeHandler();
     }
 
     _clearTimeOut() {
@@ -170,6 +194,7 @@ class Frame extends Component {
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
+        $(window).unbind('resize', this._resizeHandler);
     }
 
     _openContent() {

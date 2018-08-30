@@ -2,7 +2,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as playerStartActions from '../../actions/player-start-actions'
+import * as playerStartActions from '../../../actions/player-start-actions'
 
 class Controls extends React.Component {
 
