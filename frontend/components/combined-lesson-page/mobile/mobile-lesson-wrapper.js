@@ -5,36 +5,21 @@ import PlayerFrame from './player-frame'
 import LessonFrame from '../lesson-frame';
 
 import $ from 'jquery'
-// import 'jquery.cookeis'
-// import Platform from 'platform';
-
-// const _isSafariOnIPad = (Platform.os.family === "iOS") && (Platform.product === "iPad") && (Platform.name === "Safari"),
-//     _isAndroid = Platform.os.family === "Android";
 
 let _landscapeHeight = 0;
 
+const K2 = 1;
+
 function _isLandscape() {
-    return $(window).innerHeight() < $(window).innerWidth();
+    return $(window).outerHeight() * K2 < $(window).outerWidth();
 }
 
-function _getHeight() {
-    if (_isLandscape()) {
-        if (_landscapeHeight < $(window).outerHeight()) {
-            _landscapeHeight = $(window).outerHeight()
-            // $.cookie('landscapeHeight', _landscapeHeight);
-        }
-
-        return _landscapeHeight
-    } else {
-        let _outer = $(window).outerHeight(),
-            _inner = $(window).innerHeight();
-
-        return (_outer > _inner) ? _outer : _inner;
+function _getLandscapeHeight() {
+    if (_landscapeHeight < $(window).outerHeight()) {
+        _landscapeHeight = $(window).outerHeight()
+        // $.cookie('landscapeHeight', _landscapeHeight);
     }
-}
-
-function _getWidth() {
-    return $(window).innerWidth();
+    return _landscapeHeight
 }
 
 export default class Wrapper extends React.Component {
@@ -54,19 +39,33 @@ export default class Wrapper extends React.Component {
     constructor(props) {
         super(props)
 
+        this.state = {wrapperHeight: null};
+        // this._lastIsLandscape = _isLandscape();
+
         this._resizeHandler = () => {
-            let _width = _getWidth(),
-                _height = _getHeight(),
-                _control = $('.lesson-player');
+            let _control = $('.lesson-player');
+                // _menu = $('.js-plain-menu'),
+                // _menuHeight = _menu.height(),
+                // _val = this._lastIsLandscape;
 
-            const _rate = 0.71
+            // this._lastIsLandscape = _isLandscape();
 
-            if (_control.length > 0) {
-                if ((_width * _rate) <= _height) {
-                    _control.addClass('added')
-                } else {
-                    _control.removeClass('added')
-                }
+            if (_isLandscape()) {
+                _control.removeClass('added')
+
+                // let _height = _getLandscapeHeight();
+                // if (!_val) {
+                //     _height = _height - _menuHeight;
+                // }
+
+                this.setState({
+                    wrapperHeight: _getLandscapeHeight() + 'px'
+                })
+            } else {
+                _control.addClass('added')
+                this.setState({
+                    wrapperHeight: null
+                })
             }
         }
 
@@ -75,6 +74,15 @@ export default class Wrapper extends React.Component {
 
     componentDidMount() {
         this._resizeHandler();
+
+        // const _menu = $('.js-plain-menu'),
+        //     _menuHeight = _menu.height();
+
+        if (_isLandscape()) {
+            this.setState({
+                wrapperHeight: _getLandscapeHeight() + 'px'
+            })
+        }
     }
 
     componentDidUpdate() {
@@ -90,10 +98,14 @@ export default class Wrapper extends React.Component {
             backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
         }
 
+        if (this.state.wrapperHeight) {
+            _coverStyle.height = this.state.wrapperHeight;
+        }
+
         return (
             <section className='lecture-wrapper lesson-player js-player mobile'
-                 id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                 style={isPlayer ? null : _coverStyle}>
+                     id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
+                     style={isPlayer ? null : _coverStyle}>
                 <div className={'lesson-sub-wrapper'}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>
