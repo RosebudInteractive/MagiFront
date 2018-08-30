@@ -644,7 +644,7 @@ const DbLesson = class DbLesson extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
-    clearCache(id) {
+    clearCache(id, isListOnly) {
         let key = id;
         return new Promise((resolve) => {
             let rc = [key];
@@ -668,15 +668,18 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(rc);
         })
             .then((result) => {
-                if (result && (result.length > 0))
-                    return Utils.seqExec(result, (elem) => {
+                let rc = result;
+                if ((!isListOnly) && result && (result.length > 0))
+                    rc = Utils.seqExec(result, (elem) => {
                         return this._prerenderCache.del(elem);
-                    });
+                    })
+                        .then(() => result);
+                return rc;
             });
     }
 
-    prerender(id) {
-        return this.clearCache(id)
+    prerender(id, isListOnly, oldUrl) {
+        return this.clearCache(oldUrl ? oldUrl : id, isListOnly)
             .then(() => {
                 return new Promise((resolve, reject) => {
                     let dialect = {
@@ -698,7 +701,7 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                         })
                         if (cnt !== 2)
-                            throw new Error(`prerender: Invalid "id" parameter: "${id}"`);
+                            throw new Error(`DbLesson::prerender: Invalid "id" parameter: "${id}"`);
                         dialect = {
                             mysql: _.template(GET_LESSON_FOR_PRERENDER_BY_URL_MYSQL)({ lesson_url: lesson_url, course_url: course_url }),
                             mssql: _.template(GET_LESSON_FOR_PRERENDER_BY_URL_MSSQL)({ lesson_url: lesson_url, course_url: course_url })
@@ -708,20 +711,32 @@ const DbLesson = class DbLesson extends DbObject {
                 })
             })
             .then((result) => {
+                let res = [];
+                let rc = Promise.resolve(res);
                 if (result && result.detail && (result.detail.length > 0)) {
-                    return Utils.seqExec(result.detail, (elem) => {
+                    rc = Utils.seqExec(result.detail, (elem) => {
                         return new Promise((resolve, reject) => {
-                            let url = config.proxyServer.siteHost + "/" + elem.URL + "/" + elem.LURL + "/";
-                            let headers = { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
-                            request({ url: url, headers: headers }, (error, response, body) => {
-                                if (error)
-                                    reject(error)
-                                else
-                                    resolve();
-                            });
+                            let path = "/" + elem.URL + "/" + elem.LURL + "/";
+                            res.push(path);
+                            if (isListOnly)
+                                resolve()
+                            else {
+                                let url = config.proxyServer.siteHost + path;
+                                let headers = { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
+                                request({ url: url, headers: headers }, (error, response, body) => {
+                                    if (error)
+                                        reject(error)
+                                    else
+                                        resolve();
+                                });
+                            }
                         });
-                    });
+                    })
+                        .then(() => {
+                            return res;
+                        });
                 }
+                return rc;
             });
     }
 
@@ -1849,6 +1864,7 @@ const DbLesson = class DbLesson extends DbObject {
 
             let isModified = false;
             let course_url;
+            let old_url;
             let urls_to_delete = [];
             
             resolve(
@@ -1871,6 +1887,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Lesson (Id = " + id + ") doesn't exist.");
                         lsn_obj = collection.get(0);
+                        old_url = lsn_obj.uRL();
 
                         root_ch = course_obj.getDataRoot("LessonCourse");
                         ch_collection = root_ch.getCol("DataElements");
@@ -2305,7 +2322,7 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         let rc = result;
                         if (isModified)
-                            rc = this.prerender(id)
+                            rc = this.prerender(id, false, "/" + course_url + "/" + old_url + "/")
                                 .then(() => {
                                     if (urls_to_delete.length > 0)
                                         return Utils.seqExec(urls_to_delete, (url) => {

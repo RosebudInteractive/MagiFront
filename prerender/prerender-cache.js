@@ -5,6 +5,7 @@ const { RedisConnections, ConnectionWrapper } = require('../database/providers/r
 
 const KEY_PREFIX = "pg:";
 const DFLT_EXPIRATION = 0;
+const SCAN_PAGE_SIZE = 100;
 
 let PrerenderCache = class {
     constructor(options) {
@@ -24,6 +25,21 @@ let PrerenderCache = class {
         if ((rc.length === 0) || (rc[rc.length - 1] !== "/"))
             rc += "/";
         return this._prefix + rc;
+    }
+
+    getList() {
+        let rc;
+        return new Promise((resolve, reject) => {
+            if (this._isRedis) {
+                let filter = this._prefix + "*";
+                rc = ConnectionWrapper((connection) => {
+                    return connection.getKeyList(filter, SCAN_PAGE_SIZE);
+                });
+            }
+            else
+                rc = Object.keys(this._cache);
+            resolve(rc);
+        });
     }
 
     get(key) {
@@ -74,10 +90,40 @@ let PrerenderCache = class {
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
                     return connection.delAsync(id);
+                    // return connection.unlinkAsync(id);// Available since Redis 4.0
                 });
             }
             else
                 delete this._cache[id];
+            resolve(rc);
+        });
+    }
+
+    rename(old_key, new_key, withError) {
+        return new Promise((resolve, reject) => {
+            let rc;
+            let old_id = this._prepareKey(old_key);
+            let new_id = this._prepareKey(new_key);
+            if (this._isRedis) {
+                rc = ConnectionWrapper((connection) => {
+                    return connection.renameAsync(old_id, new_id);
+                })
+                    .then((result) => {
+                        return ({ isErr: false, result: result });
+                    })
+                    .catch((err) => {
+                        if (withError)
+                            throw err;
+                        return ({ isErr: true, result: err });
+                    });
+            }
+            else {
+                let val = this._cache[old_id];
+                if (typeof (val) !== "undefined") {
+                    delete this._cache[old_id];
+                    this._cache[new_id] = val;
+                }
+            }
             resolve(rc);
         });
     }

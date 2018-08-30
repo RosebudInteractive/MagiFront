@@ -3,6 +3,7 @@ const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { ACCOUNT_ID } = require('../const/sql-req-common');
 const _ = require('lodash');
+let { LessonsService } = require('./db-lesson');
 
 const LESSON_REQ_TREE = {
     expr: {
@@ -438,6 +439,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                             result = result.then(() => { return res; })
                         return result;
                     })
+                    .then((result) => {
+                        return LessonsService().prerender(lesson_id)
+                            .then(() => result);
+                    })
             );
         })
     }
@@ -463,6 +468,8 @@ const DbEpisode = class DbEpisode extends DbObject {
             let transactionId = null;
             let durationDelta = 0;
             let languageId;
+
+            let isModified = false;
 
             resolve(
                 this._getObjById(id)
@@ -646,17 +653,26 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
                                 return epi_obj.save(opts)
-                                    .then(() => {
-                                        if (durationDelta !== 0)
+                                    .then((result) => {
+                                        isModified = isModified || (result && result.detail && (result.detail.length > 0));
+                                        if (durationDelta !== 0) {
+                                            isModified = true;
                                             return this._updateLessonDuration(id, durationDelta, opts);
+                                        }
                                     })    
                                     .then(() => {
                                         if (root_toc)
-                                            return root_toc.save(opts);
+                                            return root_toc.save(opts)
+                                                .then((result) => {
+                                                    isModified = isModified || (result && result.detail && (result.detail.length > 0));
+                                                });
                                     })
                                     .then(() => {
                                         if (root_content)
-                                            return root_content.save(opts);
+                                            return root_content.save(opts)
+                                                .then((result) => {
+                                                    isModified = isModified || (result && result.detail && (result.detail.length > 0));
+                                                });
                                     });
                             });
                     })
@@ -680,6 +696,13 @@ const DbEpisode = class DbEpisode extends DbObject {
                         else
                             result = result.then(() => { return res;})    
                         return result;
+                    })
+                    .then((result) => {
+                        let rc = result;
+                        if (isModified)
+                            rc = LessonsService().prerender(lesson_id)
+                                .then(() => result);
+                        return rc;
                     })
             );
         })
@@ -863,6 +886,10 @@ const DbEpisode = class DbEpisode extends DbObject {
                         else
                             result = result.then(() => { return res; })
                         return result;
+                    })
+                    .then((result) => {
+                        return LessonsService().prerender(lesson_id)
+                            .then(() => result);
                     })
             );
         })

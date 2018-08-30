@@ -17,7 +17,7 @@ exports.ConnectionWrapper = (func) => {
                         });
                 })
                 .catch((err) => {
-                    redisConnections.releaseConnection(connection)
+                    return redisConnections.releaseConnection(connection)
                         .then(() => {
                             throw err;
                         });
