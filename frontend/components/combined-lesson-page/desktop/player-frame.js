@@ -2,18 +2,28 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import Progress from "./progress";
-import Controls from "./controls";
+import Progress from "../../player/progress";
+import Controls from "../../player/controls";
+import ScreenControls from "./screen-controls";
 
 import $ from 'jquery'
-import PauseScreen from "./pause-screen";
-import Titles from "./titles";
-import TimeInfo from './time-info';
-import ContentTooltip from "./content-tooltip";
-import RateTooltip from './rate-tooltip';
+// import PauseScreen from "./pause-screen";
+import Titles from "../../player/titles";
+import TimeInfo from '../../player/time-info';
+import ContentTooltip from "../../player/content-tooltip";
+import RateTooltip from '../../player/rate-tooltip';
 
-import * as playerActions from '../../actions/player-actions'
-import * as playerStartActions from '../../actions/player-start-actions'
+import * as playerActions from '../../../actions/player-actions'
+import * as playerStartActions from '../../../actions/player-start-actions'
+
+const _rate = 1;
+
+function _isLandscape() {
+    let _width = $(window).innerWidth(),
+        _height = $(window).innerHeight();
+
+    return (_width * _rate) > _height
+}
 
 class Frame extends Component {
 
@@ -38,7 +48,20 @@ class Frame extends Component {
             this._applyViewPort()
         }
 
+        this._resizeHandler = () => {
+            let _control = $('.js-player');
+
+            if (_control.length > 0) {
+                if (!_isLandscape()) {
+                    _control.addClass('added')
+                } else {
+                    _control.removeClass('added')
+                }
+            }
+        }
+
         $(document).ready(this._onDocumentReady)
+        $(window).resize(this._resizeHandler)
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
     }
 
@@ -97,6 +120,8 @@ class Frame extends Component {
             this._clearTimeOut();
             this._initTimeOut();
         });
+
+        this._resizeHandler();
     }
 
     _clearTimeOut() {
@@ -169,6 +194,7 @@ class Frame extends Component {
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
+        $(window).unbind('resize', this._resizeHandler);
     }
 
     _openContent() {
@@ -245,7 +271,9 @@ class Frame extends Component {
                 {
                     this.props.visible ?
                         [
-                            <PauseScreen {...this.props} isFinished={_isFinished}/>,
+                            <div
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
+                            <ScreenControls {...this.props}/>,
                             <Titles/>,
                             <div className="player-frame">
                                 <div className="player-block">

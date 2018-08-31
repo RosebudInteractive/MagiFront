@@ -2,21 +2,22 @@ import React, {Component} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
-import Progress from "../player/progress";
-import Controls from "./controls";
+import Progress from "../../player/progress";
+import ScreenControls from "./screen-controls";
+import Controls from "../desktop/bottom-controls";
 
 import $ from 'jquery'
-import Titles from "../player/titles";
-import TimeInfo from '../player/time-info';
-import ContentTooltip from "../player/content-tooltip";
-import RateTooltip from '../player/rate-tooltip';
-import SoundButton from '../player-controls/sound-button'
-import SoundBar from '../player-controls/sound-bar'
+import Titles from "../../player/titles";
+import TimeInfo from '../../player/time-info';
+import ContentTooltip from "../../player/content-tooltip";
+import RateTooltip from '../../player/rate-tooltip';
+import SoundButton from '../../player-controls/sound-button'
+import SoundBar from '../../player-controls/sound-bar'
 
-import * as playerActions from '../../actions/player-actions'
-import * as playerStartActions from '../../actions/player-start-actions'
+import * as playerActions from '../../../actions/player-actions'
+import * as playerStartActions from '../../../actions/player-start-actions'
 
-class Frame extends Component {
+class PlayerFrame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
@@ -39,26 +40,7 @@ class Frame extends Component {
             this._applyViewPort()
         }
 
-        this._resizeHandler = () => {
-            let _width = $(window).innerWidth(),
-                _height = $(window).innerHeight(),
-                _control = $('.lesson-player');
-
-            const _rate = 0.75
-
-            if (_control.length > 0) {
-                if ((_width * _rate) < _height) {
-                    if (!_control.hasClass('added')) {
-                        _control.toggleClass('added')
-                    }
-                } else {
-                    _control.removeClass('added')
-                }
-            }
-        }
-
         $(document).ready(this._onDocumentReady)
-        $(window).resize(this._resizeHandler)
         this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
     }
 
@@ -116,8 +98,6 @@ class Frame extends Component {
             this._clearTimeOut();
             this._initTimeOut();
         });
-
-        this._resizeHandler();
     }
 
     _clearTimeOut() {
@@ -190,7 +170,6 @@ class Frame extends Component {
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
-        $(window).unbind('resize', this._resizeHandler);
     }
 
     _openContent() {
@@ -261,38 +240,72 @@ class Frame extends Component {
                 {
                     this.props.visible ?
                         [
-                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
-                            <Controls {...this.props}/>,
+                            <div
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
+                            <ScreenControls {...this.props}/>,
                             <Titles/>,
-                            <div className="player-block">
-                                <Progress id={_id}/>
-                                <div className="player-block__row">
-                                    <div className="player-block__controls">
-                                        <TimeInfo/>
+                            this.props.isMobileControls ?
+                                <div className="player-block">
+                                    <Progress id={_id}/>
+                                    <div className="player-block__row">
+                                        <div className="player-block__controls">
+                                            <TimeInfo/>
+                                        </div>
+                                        <div className="player-block__stats">
+                                            <SoundButton/>
+                                            <SoundBar/>
+                                            {
+                                                this.props.contentArray.length > 0 ?
+                                                    <button type="button"
+                                                            className="content-button js-contents-trigger player-button"
+                                                            onClick={::this._openContent}>
+                                                        <svg width="18" height="12"
+                                                             dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                    </button>
+                                                    :
+                                                    null
+                                            }
+                                            <button type="button"
+                                                    className="speed-button js-speed-trigger player-button"
+                                                    onClick={::this._openRate}>
+                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
+                                            </button>
+                                        </div>
+                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                        {showSpeedTooltip ? <RateTooltip/> : ''}
                                     </div>
-                                    <div className="player-block__stats">
-                                        <SoundButton/>
-                                        <SoundBar/>
-                                        {
-                                            this.props.contentArray.length > 0 ?
-                                                <button type="button"
-                                                        className="content-button js-contents-trigger player-button"
-                                                        onClick={::this._openContent}>
-                                                    <svg width="18" height="12"
-                                                         dangerouslySetInnerHTML={{__html: _contents}}/>
-                                                </button>
-                                                :
-                                                null
-                                        }
-                                        <button type="button" className="speed-button js-speed-trigger player-button"
-                                                onClick={::this._openRate}>
-                                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                        </button>
-                                    </div>
-                                    {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                    {showSpeedTooltip ? <RateTooltip/> : ''}
                                 </div>
-                            </div>
+                                :
+                                <div className="player-frame">
+                                    <div className="player-block desktop">
+                                        <Progress id={_id}/>
+                                        <div className="player-block__row desktop">
+                                            <Controls {...this.props}/>
+                                            <div className="player-block__stats">
+                                                <TimeInfo/>
+                                                <button type="button"
+                                                        className="speed-button js-speed-trigger player-button"
+                                                        onClick={::this._openRate}>
+                                                    <svg width="18" height="18"
+                                                         dangerouslySetInnerHTML={{__html: _speed}}/>
+                                                </button>
+                                                {
+                                                    this.props.contentArray.length > 0 ?
+                                                        <button type="button"
+                                                                className="content-button js-contents-trigger player-button"
+                                                                onClick={::this._openContent}>
+                                                            <svg width="18" height="12"
+                                                                 dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                        </button>
+                                                        :
+                                                        null
+                                                }
+                                            </div>
+                                            {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                            {showSpeedTooltip ? <RateTooltip/> : ''}
+                                        </div>
+                                    </div>
+                                </div>
                         ]
                         :
                         null
@@ -326,4 +339,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Frame);
+export default connect(mapStateToProps, mapDispatchToProps)(PlayerFrame);

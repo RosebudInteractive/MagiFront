@@ -13,6 +13,9 @@ import $ from "jquery";
 
 
 class Menu extends React.Component {
+    constructor(props) {
+        super(props)
+    }
 
     _getMenuType() {
         let _scrollTop = $(window).scrollTop();
@@ -22,17 +25,22 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        let _wrapper = $(".global-wrapper"),
-            _player = $('.js-player'),
-
-            _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
-            _wrapperOffsetPosition = _wrapper.offset().top,
-            _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
-            _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
-
-        $('html, body').animate({
-            scrollTop: _scroll
-        }, 600);
+        // let _wrapper = $(".global-wrapper"),
+        //     _player = $('.js-player'),
+        //
+        //     _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
+        //     _wrapperOffsetPosition = _wrapper.offset().top,
+        //     _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
+        //     _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
+        //
+        // $('html, body').animate({
+        //     scrollTop: _scroll
+        // }, 600);
+        if (this.props.showSizeInfo) {
+            this.props.appActions.hideSizeInfo()
+        } else {
+            this.props.appActions.showSizeInfo()
+        }
     }
 
     render() {
@@ -47,7 +55,9 @@ class Menu extends React.Component {
 
         return (
             <div
-                className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type + (this.props.isLessonMenuOpened ? ' opened' : '')}>
+                className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
+                            (this.props.isLessonMenuOpened ? ' opened' : '') +
+                            (this.props.extClass ? ' ' + this.props.extClass : '')}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
                 <ListBlock total={_total}
                            courseUrl={_courseUrl}
@@ -203,8 +213,7 @@ class Navigation extends React.Component {
     render() {
         let {isNeedHideRefs} = this.props;
 
-        const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>',
-            _style = isNeedHideRefs && ($(window).innerWidth() > 899) ? {width : '100%'} : null;
+        const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
 
         return (
             <section className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
@@ -212,8 +221,8 @@ class Navigation extends React.Component {
                     <span className="visually-hidden">Меню</span>
                     <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
                 </button>
-                <div className={"section-nav__list" + (this.props.isNeedHideRefs ? ' single' : '')}>
-                    <ul className={"section-nav-list" + (this.props.isNeedHideRefs ? ' single' : '')}>
+                <div className={"section-nav__list" + (isNeedHideRefs ? ' single' : '')}>
+                    <ul className={"section-nav-list" + (isNeedHideRefs ? ' single' : '')}>
                         <li className={"section-nav-list__item js-section-menu-control" + (this.state.showToc ? ' expanded' : '')}onClick={::this._switchToc}>
                             <a href="#transcript" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Транскрипт</a>
                             <ol className={"section-nav-sublist" + (this.state.showToc ? ' show' : '')}>
@@ -221,7 +230,7 @@ class Navigation extends React.Component {
                             </ol>
                         </li>
                         {
-                            this.props.isNeedHideRefs
+                            isNeedHideRefs
                                 ?
                                 null
                                 :
@@ -247,6 +256,7 @@ function mapStateToProps(state) {
         menuId: state.app.menuId,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
+        showSizeInfo: state.app.showSizeInfo,
     }
 }
 

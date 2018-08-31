@@ -39,11 +39,8 @@ class LessonsListWrapper extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-    // componentWillReceiveProps(nextProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
-            if (!$('body').hasClass('overflow')) {
-                $('body').toggleClass('overflow');
-            }
+            $('body').addClass('overflow');
 
             let _control = $("#lesson-" + this.props.active);
             if (_control.length > 0) {
@@ -170,7 +167,8 @@ class SubList extends React.Component {
         return this.props.subLessons.map((lesson, index) => {
             let _isActive = lesson.Id === active;
 
-            return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index} id={'lesson-' + lesson.Id}>
+            return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}
+                       id={'lesson-' + lesson.Id}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-sublist__title">
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>

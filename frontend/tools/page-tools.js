@@ -93,10 +93,8 @@ export const getCoverPath = (coverOwner, size) => {
     return _fileName;
 }
 
-export const getRandomInt = (min, max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
 export const widthLessThan900 = () => {
     return window.innerWidth < 900
 }
+
+export const fadeTimeout = 5000;
