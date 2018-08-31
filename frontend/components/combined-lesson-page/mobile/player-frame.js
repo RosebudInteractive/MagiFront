@@ -277,7 +277,7 @@ class PlayerFrame extends Component {
                                 </div>
                                 :
                                 <div className="player-frame">
-                                    <div className="player-block">
+                                    <div className="player-block desktop">
                                         <Progress id={_id}/>
                                         <div className="player-block__row desktop">
                                             <Controls {...this.props}/>

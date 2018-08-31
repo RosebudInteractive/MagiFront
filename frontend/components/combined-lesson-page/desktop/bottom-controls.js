@@ -79,8 +79,6 @@ class Controls extends React.Component {
                             style={{left: (this.props.volume * 100) + "%"}}>Громкость
                     </button>
                 </div>
-                <Link to={this.props.lesson.URL + "/transcript"}
-                      className="link-to-transcript controls-row">Транскрипт <br/>и материалы</Link>
             </div>
         );
     }
