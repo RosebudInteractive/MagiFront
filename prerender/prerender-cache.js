@@ -7,7 +7,6 @@ const { SEO } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const KEY_PREFIX = "pg:";
-const DFLT_EXPIRATION = 0;
 const SCAN_PAGE_SIZE = 100;
 
 const DFLT_RENDER_MAX_COUNT = 5;
@@ -17,7 +16,6 @@ let PrerenderCache = class {
     constructor(options) {
         this._cache = {};
         this._prefix = config.has("server.prerender.redisPrefix") ? config.get("server.prerender.redisPrefix") : KEY_PREFIX;
-        this._dfltExpSec = config.has("server.prerender.expInSec") ? config.get("server.prerender.expInSec") : DFLT_EXPIRATION;
         this._isRedis = config.get("server.prerender.useRedis");
         if (this._isRedis) {
             RedisConnections(options);
@@ -115,7 +113,7 @@ let PrerenderCache = class {
             .then(() => res);
     }
 
-    prerender(path, headers) {
+    prerender(path, isPersist, headers) {
         return new Promise((resolve, reject) => {
             let url = config.proxyServer.siteHost + path;
             let hs = headers ? headers : { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
@@ -125,7 +123,15 @@ let PrerenderCache = class {
                 else
                     resolve();
             });
-        });
+        })
+            .then(() => {
+                if (isPersist) {
+                    let id = this.getKey(path);
+                    return ConnectionWrapper((connection) => {
+                        return connection.persistAsync(id);
+                    });
+                }
+            });
     }
 
     get(key) {
@@ -143,23 +149,17 @@ let PrerenderCache = class {
         });
     }
 
-    set(key, data, expInSec) {
-        let self = this;
+    set(key, data, ttlInSec) {
         return new Promise((resolve, reject) => {
             let rc;
             let id = this.getKey(key);
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
                     let args = [id, data];
-                    if ((typeof (expInSec) === "number") && (expInSec > 0)) {
+                    if ((typeof (ttlInSec) === "number") && (ttlInSec > 0)) {
                         args.push("EX");
-                        args.push(expInSec);
+                        args.push(ttlInSec);
                     }
-                    else
-                        if (self._dfltExpSec) {
-                            args.push("EX");
-                            args.push(self._dfltExpSec);
-                        }
                     return connection.setAsync(args);
                 });
             }

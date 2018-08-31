@@ -12,7 +12,7 @@ const LessonPositionsRedis = class LessonPositionsRedis extends LessonPositionsB
 
     _getAllPos(userId) {
         return ConnectionWrapper(((connection) => {
-            return connection.hgetAll(this.keyPrefix + userId)
+            return connection.hgetAllAsync(this.keyPrefix + userId)
                 .then((result) => {
                     let res = {};
                     if (result)
@@ -27,7 +27,7 @@ const LessonPositionsRedis = class LessonPositionsRedis extends LessonPositionsB
 
     _setPos(userId, pos) {
         return ConnectionWrapper(((connection) => {
-            return connection.hset(this.keyPrefix + userId, pos.id, JSON.stringify(pos.data))
+            return connection.hsetAsync(this.keyPrefix + userId, pos.id, JSON.stringify(pos.data))
                 .then((result) => {
                     return;
                 });

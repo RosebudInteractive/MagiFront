@@ -56,10 +56,11 @@ class RedisConnection {
         this.mgetAsync = promisify(this._client.mget).bind(this._client);
         this.renameAsync = promisify(this._client.rename).bind(this._client);
         this.unlinkAsync = promisify(this._client.unlink).bind(this._client); // Available since Redis 4.0
-        this.hgetAll = promisify(this._client.hgetall).bind(this._client);
-        this.hset = promisify(this._client.hset).bind(this._client);
-        this.hget = promisify(this._client.hget).bind(this._client);
-        this.hdel = promisify(this._client.hdel).bind(this._client);
+        this.persistAsync = promisify(this._client.persist).bind(this._client);
+        this.hgetAllAsync = promisify(this._client.hgetall).bind(this._client);
+        this.hsetAsync = promisify(this._client.hset).bind(this._client);
+        this.hgetAsync = promisify(this._client.hget).bind(this._client);
+        this.hdelAsync = promisify(this._client.hdel).bind(this._client);
     }
 
     client() { return this._client; }

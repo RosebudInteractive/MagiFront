@@ -5,6 +5,9 @@ const config = require('config');
 const { PrerenderCache } = require('./prerender-cache');
 const { SEO } = require('../const/common');
 
+const DFLT_EXPIRATION = 14 * 24 * 60 * 60; // 14 days
+const DFLT_MAX_DEV = 14 * 24 * 60 * 60; // 7 days
+
 let additionalBots = [
     "yandex",
     SEO.FORCE_RENDER_USER_AGENT,
@@ -40,11 +43,17 @@ exports.setupPrerender = (app) => {
 
                 case "get":
                     rc = prerenderCache.get(path)
-                        .then((data) => { content = data });
+                        .then((data) => {
+                            if (data)
+                                content = data
+                            else
+                                throw new Error(`Path [${path}] doesn't exist.`);
+                        });
                     break;
 
                 case "render":
-                    rc = prerenderCache.prerender(path)
+                    let isPersist = (req.query && req.query.persist) ? (req.query.persist === "true") : false;
+                    rc = prerenderCache.prerender(path, isPersist)
                         .then(() => [path]);
                     break;
 
@@ -86,14 +95,19 @@ exports.PrerenderInit = (app) => {
         });
 
         let prerenderCache = PrerenderCache();
+        let expInSec = config.has("server.prerender.expInSec") ? config.get("server.prerender.expInSec") : DFLT_EXPIRATION;
+        let maxDevSec = config.has("server.prerender.maxDevSec") ? config.get("server.prerender.maxDevSec") : DFLT_MAX_DEV;
+
         prerender
             .set('crawlerUserAgents', crawlerUserAgents)
             .set('beforeRender', function (req, done) {
                 // do whatever you need to do
                 let userAgent = req.headers['user-agent'];
                 console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
-                if (userAgent === SEO.FORCE_RENDER_USER_AGENT)
-                    done(null, null)
+                if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
+                    req.forceRender = true;
+                    done(null, null);
+                }
                 else
                     prerenderCache.get(req.path)
                         .then((res) => {
@@ -106,10 +120,15 @@ exports.PrerenderInit = (app) => {
             .set('afterRender', function (err, req, prerender_res) {
                 // do whatever you need to do
                 if (!err) {
-                    prerenderCache.get(req.path)
+                    (req.forceRender ? Promise.resolve() : prerenderCache.get(req.path))
                         .then((res) => {
-                            if (!res)
-                                return prerenderCache.set(req.path, prerender_res.body);
+                            if (!res) {
+                                let ttl = expInSec;
+                                if (ttl) {
+                                    ttl += Math.round((Math.random() - 0.5) * (maxDevSec ? maxDevSec : ttl));
+                                }
+                                return prerenderCache.set(req.path, prerender_res.body, ttl);
+                            }
                         })
                         .catch((err) => {
                             console.error(`prerender:afterRender::${err && err.message ? err.message : JSON.stringify(err)}`);

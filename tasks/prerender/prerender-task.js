@@ -47,19 +47,18 @@ exports.PrerenderTask = class PrerenderTask extends Task {
             this._totLinks++;
             if (!this._links[cacheKey]) {
                 let now = new Date();
-                if ((!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) <= this._prerenderSettings.maxAgeSec)) {
-                    if ((!this._prerenderSettings.maxLinksLimit) ||
-                        (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
-                        this._renderedLinks++;
-                        rc = this._delay(this._lastReqTime ? (this._prerenderSettings.renderDelay - (now - this._lastReqTime)) : 0)
-                            .then(() => {
-                                this._lastReqTime = new Date();
-                                return this._prerenderCache.prerender(key);
-                            });
-                    }
+                let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) <= this._prerenderSettings.maxAgeSec);
+                if ((!this._prerenderSettings.maxLinksLimit) ||
+                    (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
+                    this._renderedLinks++;
+                    if (isOutDated)
+                        this._outdatedLinks++;
+                    rc = this._delay(this._lastReqTime ? (this._prerenderSettings.renderDelay - (now - this._lastReqTime)) : 0)
+                        .then(() => {
+                            this._lastReqTime = new Date();
+                            return this._prerenderCache.prerender(key, isOutDated);
+                        });
                 }
-                else
-                    this._outdatedLinks++;
             }
             else {
                 this._alreadyCached++;
