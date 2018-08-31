@@ -24,7 +24,7 @@ const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const { FileUpload } = require("./database/file-upload");
 const config = require('config');
-const { init: prerenderInit } = require('./prerender');
+const { PrerenderInit } = require('./prerender');
 
 //bld.initDatabase()
 Promise.resolve()
@@ -152,7 +152,7 @@ Promise.resolve()
             res.sendFile(__dirname + '/adm-index.html');
         });
 
-        prerenderInit(app);
+        PrerenderInit(app);
         app.get("/*", function (req, res) {
             res.sendFile(__dirname + '/index.html');
         });

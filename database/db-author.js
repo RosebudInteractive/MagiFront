@@ -127,9 +127,6 @@ const GET_AUTHOR_FOR_PRERENDER_BY_URL_MYSQL =
     "select `URL` from `Author`\n" +
     "where `URL` = '<%= url %>'";
 
-const { SEO } = require('../const/common');
-const request = require('request');
-const config = require('config');
 const { PrerenderCache } = require('../prerender/prerender-cache');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
@@ -225,16 +222,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                             res.push(path);
                             if (isListOnly)
                                 resolve()
-                            else {
-                                let url = config.proxyServer.siteHost + path;
-                                let headers = { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
-                                request({ url: url, headers: headers }, (error, response, body) => {
-                                    if (error)
-                                        reject(error)
-                                    else
-                                        resolve();
-                                });
-                            }
+                            else
+                                resolve(this._prerenderCache.prerender(path));
                         });
                     })
                         .then(() => {

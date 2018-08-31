@@ -79,7 +79,6 @@ class RedisConnection {
                 }
                 return this.scanAsync(args)
                     .then((result) => {
-                        console.log(result);
                         if (Array.isArray(result) && (result.length == 2)) {
                             if (Array.isArray(result[1])) {
                                 result[1].forEach((elem) => {

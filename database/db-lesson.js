@@ -627,9 +627,6 @@ const GET_LESSON_FOR_PRERENDER_BY_URL_MYSQL =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where lc.`State` = 'R' and c.`State` = 'P' and l.`URL` = '<%= lesson_url %>' and c.`URL` = '<%= course_url %>'";
 
-const { SEO } = require('../const/common');
-const request = require('request');
-const config = require('config');
 const { PrerenderCache } = require('../prerender/prerender-cache');
 
 const DbLesson = class DbLesson extends DbObject {
@@ -720,16 +717,8 @@ const DbLesson = class DbLesson extends DbObject {
                             res.push(path);
                             if (isListOnly)
                                 resolve()
-                            else {
-                                let url = config.proxyServer.siteHost + path;
-                                let headers = { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
-                                request({ url: url, headers: headers }, (error, response, body) => {
-                                    if (error)
-                                        reject(error)
-                                    else
-                                        resolve();
-                                });
-                            }
+                            else
+                                resolve(this._prerenderCache.prerender(path));
                         });
                     })
                         .then(() => {
