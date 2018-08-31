@@ -111,24 +111,11 @@ class TranscriptLessonPage extends React.Component {
             }
         }
 
-        // this._resizeHandler = () => {
-        //     let _control = $('.js-player');
-        //
-        //     if (_control.length > 0) {
-        //         if (!_isLandscape()) {
-        //             _control.addClass('added')
-        //         } else {
-        //             _control.removeClass('added')
-        //         }
-        //     }
-        // }
-
         this._addEventListeners();
     }
 
     _addEventListeners() {
         window.addEventListener('scroll', this._handleScroll);
-        // $(window).resize(this._resizeHandler)
 
     }
 
@@ -164,7 +151,6 @@ class TranscriptLessonPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // this._resizeHandler()
         let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {

@@ -40,32 +40,25 @@ export default class Wrapper extends React.Component {
         super(props)
 
         this.state = {wrapperHeight: null};
-        // this._lastIsLandscape = _isLandscape();
 
         this._resizeHandler = () => {
             let _control = $('.lesson-player');
-                // _menu = $('.js-plain-menu'),
-                // _menuHeight = _menu.height(),
-                // _val = this._lastIsLandscape;
 
-            // this._lastIsLandscape = _isLandscape();
-
-            if (_isLandscape()) {
-                _control.removeClass('added')
-
-                // let _height = _getLandscapeHeight();
-                // if (!_val) {
-                //     _height = _height - _menuHeight;
-                // }
-
-                this.setState({
-                    wrapperHeight: _getLandscapeHeight() + 'px'
-                })
-            } else {
+            if (!this.props.isMobileControls) {
                 _control.addClass('added')
-                this.setState({
-                    wrapperHeight: null
-                })
+            } else {
+                if (_isLandscape()) {
+                    _control.removeClass('added')
+
+                    this.setState({
+                        wrapperHeight: _getLandscapeHeight() + 'px'
+                    })
+                } else {
+                    _control.addClass('added')
+                    this.setState({
+                        wrapperHeight: null
+                    })
+                }
             }
         }
 
@@ -75,10 +68,7 @@ export default class Wrapper extends React.Component {
     componentDidMount() {
         this._resizeHandler();
 
-        // const _menu = $('.js-plain-menu'),
-        //     _menuHeight = _menu.height();
-
-        if (_isLandscape()) {
+        if (this.props.isMobileControls && _isLandscape()) {
             this.setState({
                 wrapperHeight: _getLandscapeHeight() + 'px'
             })
