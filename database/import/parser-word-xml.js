@@ -9,9 +9,10 @@ const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 
 const { Import } = require('../../const/common');
+const { XMLParserBase } = require('../../utils/xml-parser-base');
 
-exports.ParserWordXML = class ParserWordXML {
-    constructor() { }
+exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
+    constructor() { super(); }
 
     parseDocXMLFile(fileXml, options) {
         return readFileAsync(fileXml, 'utf8')
@@ -495,34 +496,5 @@ exports.ParserWordXML = class ParserWordXML {
             });
         };
         return result;
-    }
-
-    _findAll(tag, root, nodes, isDeep, tp) {
-        let type = tp ? tp : "element";
-        if (root && root.elements && (root.elements.length > 0)) {
-            for (let i = 0; i < root.elements.length; i++) {
-                let elem = root.elements[i];
-                if ((elem.type === type) && (elem.name == tag))
-                    nodes.push(elem);
-                if (isDeep)
-                    this._findAll(tag, elem, nodes, isDeep, tp);
-            }
-        }
-    }
-
-    _findFirst(tag, root, tp) {
-        let node = null;
-        let type = tp ? tp : "element";
-        if (root && root.elements && (root.elements.length > 0)) {
-            for (let i = 0; (node === null) && (i < root.elements.length); i++) {
-                let elem = root.elements[i];
-                if ((elem.type === type) && (elem.name == tag)) {
-                    node = elem;
-                    break;
-                }
-                node = this._findFirst(tag, elem, tp);
-            }
-        }
-        return node;
     }
 };

@@ -43,8 +43,8 @@ const MIN_FB_DELAY = 30 * 1000;
 const FB_REPAIR_TIME = 65 * 60 * 1000;
 const FB_USAGE_LIMIT_PERC = 90;
 
+let dfltSnets = ["facebook", "vkontakte", "odnoklassniki"];
 let dfltSettings = {
-    snets: ["facebook", "vkontakte", "odnoklassniki"],
     urlDelay: URL_DELAY,
     offset: 0,
     maxUrls: MAX_URLS,
@@ -63,10 +63,13 @@ exports.SnCounterTask = class SnCounterTask extends Task {
         super(name, options);
         let opts = options || {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
+        if (!this._settings.snets)
+            this._settings.snets = dfltSnets;
         this._settings.baseUrl = this._settings.baseUrl ? this._settings.baseUrl : config.proxyServer.siteHost;
         this._snList = {};
         this._snListById = {};
         this._courses = {};
+        this._setDfltDelay(this._settings.urlDelay);
     }
 
     _getSnList() {
@@ -368,19 +371,6 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                     return root_obj.save();
                 })
         }, options);
-    }
-
-    _delay(dt) {
-        let delay = dt ? (dt > 0 ? dt : 0) : this._settings.urlDelay;
-        let rc = Promise.resolve();
-        if (delay) {
-            rc = rc.then(() => {
-                return new Promise((resolve) => {
-                    setTimeout(() => { resolve() }, delay);
-                })
-            })
-        }
-        return rc;
     }
 
     _processLessons() {

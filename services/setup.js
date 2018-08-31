@@ -28,6 +28,7 @@ const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
+const { setupPrerender } = require('../prerender');
 
 function errorHandler(err, req, res, next) {
     console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
@@ -88,6 +89,7 @@ function setupAPI(express, app) {
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
+    setupPrerender(app);
     setupProtectedStatic(app);
     setupLessonPositions(app);
     setupDebugRoutes(app);

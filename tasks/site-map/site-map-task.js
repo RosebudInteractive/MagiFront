@@ -111,7 +111,7 @@ let dfltSiteMapSettings = {
     },
     author: {
         file: "author-sitemap.xml",
-        prefixUrl: "/author",
+        prefixUrl: "/autor",
         guid: "300111dd-0432-4e8f-aed1-cbc056e0659b"
     },
     page: {
@@ -173,10 +173,10 @@ exports.SiteMapTask = class SiteMapTask extends FileTask {
                             lastmodISO: elem.ReadyDate.toISOString(),
                             img: [img]
                         });
-                        urls.push({
-                            url: this._href(this._siteHost + "/" + elem.URL + "/" + elem.LURL + this._siteMapSettings.lesson.transcriptUrl),
-                            lastmodISO: firstTranscriptDate > elem.ReadyDate ? firstTranscriptDate.toISOString() : elem.ReadyDate.toISOString(),
-                        });
+                        // urls.push({
+                        //     url: this._href(this._siteHost + "/" + elem.URL + "/" + elem.LURL + this._siteMapSettings.lesson.transcriptUrl),
+                        //     lastmodISO: firstTranscriptDate > elem.ReadyDate ? firstTranscriptDate.toISOString() : elem.ReadyDate.toISOString(),
+                        // });
                     });
                     let siteMapOptions = { urls: urls };
                     let xslUrl = this._siteMapSettings.lesson.xslUrl || this._xslUrl;
