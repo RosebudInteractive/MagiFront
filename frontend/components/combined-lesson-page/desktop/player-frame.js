@@ -272,7 +272,7 @@ class Frame extends Component {
                     this.props.visible ?
                         [
                             <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,,
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
                             <ScreenControls {...this.props}/>,
                             <Titles/>,
                             <div className="player-frame">
