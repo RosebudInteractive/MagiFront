@@ -35,6 +35,7 @@ class PlayerFrame extends Component {
         }
 
         this._firstTap = true;
+        this._touchMoved = false;
 
         this._onDocumentReady = () => {
             this._applyViewPort()
@@ -45,9 +46,16 @@ class PlayerFrame extends Component {
     }
 
     componentDidMount() {
-        let that = this
+        let that = this,
+            _player = $('.js-player');
 
-        document.body.addEventListener(this._touchEventName, (e) => {
+
+        // document.body.addEventListener(this._touchEventName, (e) => {
+        _player.on(this._touchEventName, (e) => {
+            if (this._touchMoved) {
+                return
+            }
+
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
                 _isPlayer = e.target.closest('.ws-container'),
@@ -80,11 +88,10 @@ class PlayerFrame extends Component {
             if (that._hideRateTooltip) {
                 that.props.playerActions.hideSpeedTooltip()
             }
-        });
-
-        $(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', () => {
-            let _isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
-            this.setState({fullScreen: _isFullScreen})
+        }).on('touchmove', () =>{
+            this._touchMoved = true;
+        }).on('touchstart', () => {
+            this._touchMoved = false;
         });
 
         $(window).keydown((e) => {
@@ -110,16 +117,18 @@ class PlayerFrame extends Component {
 
     _initTimeOut() {
         if (!this.props.paused) {
-            this._timer = setTimeout(() => {
-                if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
-                    this._firstTap = true;
-                    $('.lecture-frame__play-block-wrapper').addClass('fade');
-                    // $('.player-block__controls').removeClass('show')
-                }
-            }, 7000);
+            this._timer = setTimeout(::this._hideScreenControls, 7000);
         } else {
             this._timer = null
         }
+    }
+
+    _hideScreenControls() {
+        // if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
+            this._firstTap = true;
+            $('.lecture-frame__play-block-wrapper').addClass('fade');
+            // $('.player-block__controls').removeClass('show')
+        // }
     }
 
     componentDidUpdate(prevProps) {
@@ -135,7 +144,8 @@ class PlayerFrame extends Component {
             this._clearTimeOut()
         } else {
             if (prevProps.paused && !this.props.paused) {
-                this._initTimeOut();
+                // this._initTimeOut();
+                this._hideScreenControls();
             }
         }
     }
@@ -166,7 +176,7 @@ class PlayerFrame extends Component {
     }
 
     _removeListeners() {
-        $(document).off(this._touchEventName);
+        $('.js-player').unbind(this._touchEventName);
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
@@ -233,7 +243,7 @@ class PlayerFrame extends Component {
 
         return (
             <div style={this.props.visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={_isFinished ? {display: 'none'} : null}>
+                <div className="player-frame__poster" style={_isFinished ? {visibility: 'hidden'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
