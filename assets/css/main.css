@@ -170,9 +170,9 @@ ul {
   font-style: normal; }
 
 @font-face {
-  font-family: 'Fira Mono';
-  src: url("../fonts/FiraMono-Regular.eot");
-  src: url("../fonts/FiraMono-Regular.eot") format("embedded-opentype"), url("../fonts/FiraMono-Regular.woff2") format("woff2"), url("../fonts/FiraMono-Regular.woff") format("woff");
+  font-family: 'Open Sans';
+  src: url("../fonts/OpenSans-Regular.eot");
+  src: url("../fonts/OpenSans-Regular.eot") format("embedded-opentype"), url("../fonts/OpenSans-Regular.woff2") format("woff2"), url("../fonts/OpenSans-Regular.woff") format("woff");
   /*font-weight: 400;*/
   font-style: normal; }
 
@@ -15772,8 +15772,11 @@ ul.lectures-tab {
     margin-top: 2.5%;
   }
   .lesson-player .player-frame__poster-text {
-    transition: none;
+    /*transition: none;*/
     bottom: 75px;
+  }
+  .lesson-player .player-frame__poster-text.low {
+    bottom: 35px
   }
   .lesson-player .player-frame__screen{
     -webkit-transition: opacity 0.7s ease;
@@ -16013,6 +16016,9 @@ ul.lectures-tab {
     padding: 0 18px 10px 18px;
     min-height: 40px;
     pointer-events: initial; }
+  .lesson-player .player-block.hide {
+    opacity: 0;
+  }
   .lesson-player .player-block.desktop {
     padding-bottom: 0;
   }
