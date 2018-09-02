@@ -272,20 +272,22 @@ class PlayerFrame extends Component {
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>'
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
+
+        let { visible, starting, paused, contentArray, } = this.props;
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}}>
+            <div style={visible ? null : {display: 'none'}}>
                 <div className="player-frame__poster" style={_isFinished ? {visibility: 'hidden'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {
-                    this.props.visible ?
+                    visible ?
                         [
                             <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
-                            <ScreenControls {...this.props}/>,
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
+                            starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
                             this.props.isMobileControls ?
                                 <div className="player-block">
@@ -298,7 +300,7 @@ class PlayerFrame extends Component {
                                             <SoundButton/>
                                             <SoundBar/>
                                             {
-                                                this.props.contentArray.length > 0 ?
+                                                contentArray.length > 0 ?
                                                     <button type="button"
                                                             className="content-button js-contents-trigger player-button"
                                                             onClick={::this._openContent}>
@@ -323,7 +325,7 @@ class PlayerFrame extends Component {
                                     <div className="player-block desktop">
                                         <Progress id={_id}/>
                                         <div className="player-block__row desktop">
-                                            <Controls {...this.props}/>
+                                            starting ? null : <ScreenControls {...this.props}/>,
                                             <div className="player-block__stats">
                                                 <TimeInfo/>
                                                 <button type="button"
@@ -333,7 +335,7 @@ class PlayerFrame extends Component {
                                                          dangerouslySetInnerHTML={{__html: _speed}}/>
                                                 </button>
                                                 {
-                                                    this.props.contentArray.length > 0 ?
+                                                    contentArray.length > 0 ?
                                                         <button type="button"
                                                                 className="content-button js-contents-trigger player-button"
                                                                 onClick={::this._openContent}>
@@ -368,6 +370,7 @@ function mapStateToProps(state) {
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
+        starting: state.player.starting,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

@@ -14,7 +14,7 @@ import {
     SHOW_CONTENT_TOOLTIP,
     HIDE_CONTENT_TOOLTIP,
     SHOW_SPEED_TOOLTIP,
-    HIDE_SPEED_TOOLTIP,
+    HIDE_SPEED_TOOLTIP, PLAYER_START_PLAY_LESSON,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -28,6 +28,7 @@ const initialState = {
     currentTime: 0,
     bufferedTime: 0,
     currentContent: null,
+    starting: false,
     paused: true,
     ended: false,
     muted: false,
@@ -55,18 +56,22 @@ export default function player(state = initialState, action) {
             return {...state, playingLesson: Object.assign({}, action.payload)}
         }
 
+        case PLAYER_START_PLAY_LESSON: {
+            return {...state, starting: true}
+        }
+
         case PLAYER_PLAYED:
-            return {...state, paused: false, ended: false, stopped: false};
+            return {...state, paused: false, ended: false, stopped: false, starting: false, };
 
         case PLAYER_PAUSED:
-            return {...state, paused: true};
+            return {...state, paused: true, starting: false,};
 
         case PLAYER_STOPPED:
             // return initialState;
-            return {...state, stopped: true, currentTime: 0};
+            return {...state, stopped: true, currentTime: 0, starting: false,};
 
         case PLAYER_ENDED:
-            return {...state, ended: true};
+            return {...state, ended: true, starting: false,};
 
         case PLAYER_SET_CURRENT_TIME: {
             let _delta = (action.payload - state.currentTime)
