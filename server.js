@@ -139,6 +139,10 @@ Promise.resolve()
             res.sendFile(__dirname + '/debug/RegTestPage.html');
         });
 
+        app.get("/pushtest", function (req, res) {
+            res.sendFile(__dirname + '/debug/PushTestPage.html');
+        });
+
         app.get("/testrecovery/:activationKey", function (req, res) {
             let template = fs.readFileSync(__dirname + '/debug/templates/PwdRecoverTest.tmpl', 'utf8');
             let body = _.template(template)(
