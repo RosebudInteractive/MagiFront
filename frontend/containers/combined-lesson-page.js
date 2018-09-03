@@ -23,6 +23,12 @@ import * as playerStartActions from "../actions/player-start-actions";
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Platform from "platform";
 
+let _scrollTop = 0;
+
+export const setScrollTop = (value) => {
+    _scrollTop = value;
+}
+
 const _rate = 1;
 
 function _isLandscape() {
@@ -96,13 +102,19 @@ class TranscriptLessonPage extends React.Component {
 
 
             if ($('.js-player').length) {
-                if (st > ($('.js-player').outerHeight())) {
-                    $('.js-lectures-menu').removeClass('_dark');
-                    $('.js-lectures-menu').addClass('_fixed');
+                let _height = $('.js-player').outerHeight(),
+                    _menu = $('.js-lectures-menu');
+
+                console.log(st, ' : ', _height);
+                _height = _menu.hasClass('desktop') ? _height - _menu.height() : _height;
+
+                if (st > _height) {
+                    _menu.removeClass('_dark');
+                    _menu.addClass('_fixed');
                     // this.props.playerStartActions.startPause()
                 } else {
-                    $('.js-lectures-menu').addClass('_dark');
-                    $('.js-lectures-menu').removeClass('_fixed');
+                    _menu.addClass('_dark');
+                    _menu.removeClass('_fixed');
                 }
 
                 if (st < $('.js-player').outerHeight()) {
@@ -143,6 +155,11 @@ class TranscriptLessonPage extends React.Component {
         $('body').addClass('_player');
         $('[data-fancybox]').fancybox();
         this._handleScroll();
+
+        if (_scrollTop > 0) {
+            $('body, html').scrollTop(_scrollTop);
+            _scrollTop = 0;
+        }
     }
 
     componentWillUnmount() {
@@ -185,6 +202,11 @@ class TranscriptLessonPage extends React.Component {
 
         if (_lesson) {
             document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
+        }
+
+        if (_scrollTop > 0) {
+            $('body, html').scrollTop(_scrollTop);
+            _scrollTop = 0;
         }
     }
 
@@ -317,6 +339,7 @@ class TranscriptLessonPage extends React.Component {
 
         return (!this._isMobile && _isLandscape()) ?
             <DesktopLessonWrapper lesson={lesson}
+                                  episodes={this.props.lessonText.episodes}
                                   courseUrl={this.props.courseUrl}
                                   lessonUrl={lesson.URL}
                                   isPlayer={_playingLessonUrl || _lessonInPlayer}

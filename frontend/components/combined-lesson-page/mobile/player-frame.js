@@ -274,7 +274,7 @@ class PlayerFrame extends Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let { visible, starting, paused, contentArray, } = this.props;
+        let { visible, starting, paused, contentArray, isMobileApp, } = this.props;
 
         return (
             <div style={visible ? null : {display: 'none'}}>
@@ -289,7 +289,7 @@ class PlayerFrame extends Component {
                                 className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
                             starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
-                            this.props.isMobileControls ?
+                            isMobileApp ?
                                 <div className="player-block">
                                     <Progress id={_id}/>
                                     <div className="player-block__row">
@@ -325,7 +325,7 @@ class PlayerFrame extends Component {
                                     <div className="player-block desktop">
                                         <Progress id={_id}/>
                                         <div className="player-block__row desktop">
-                                            starting ? null : <ScreenControls {...this.props}/>,
+                                            <Controls {...this.props}/>
                                             <div className="player-block__stats">
                                                 <TimeInfo/>
                                                 <button type="button"

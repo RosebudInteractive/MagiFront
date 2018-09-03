@@ -12,6 +12,8 @@ import {
     removeLessonFromBookmarks
 } from "../../ducks/profile";
 
+import {setScrollTop} from "../../containers/combined-lesson-page";
+
 class LessonFrame extends React.Component {
     static propTypes = {
         courseUrl: PropTypes.string,
@@ -50,6 +52,7 @@ class LessonFrame extends React.Component {
     }
 
     _play() {
+        setScrollTop($('body, html').scrollTop())
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
         // this.forceUpdate()
