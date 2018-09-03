@@ -6,7 +6,6 @@ import Progress from "../../player/progress";
 import ScreenControls from "./screen-controls";
 import Controls from "../desktop/bottom-controls";
 
-import $ from 'jquery'
 import Titles from "../../player/titles";
 import TimeInfo from '../../player/time-info';
 import ContentTooltip from "../../player/content-tooltip";
@@ -16,6 +15,9 @@ import SoundBar from '../../player-controls/sound-bar'
 
 import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
+
+import $ from 'jquery'
+import {isLandscape} from "./tools";
 
 class PlayerFrame extends Component {
 
@@ -36,6 +38,7 @@ class PlayerFrame extends Component {
 
         this._firstTap = true;
         this._touchMoved = false;
+        this._firstHide = true;
 
         this._onDocumentReady = () => {
             this._applyViewPort()
@@ -50,7 +53,6 @@ class PlayerFrame extends Component {
             _player = $('.js-player');
 
 
-        // document.body.addEventListener(this._touchEventName, (e) => {
         _player.on(this._touchEventName, (e) => {
             if (this._touchMoved) {
                 return
@@ -101,18 +103,39 @@ class PlayerFrame extends Component {
             }
         })
 
-        $(document).on('mousemove', () => {
-            this._clearTimeOut();
-            this._initTimeOut();
-        });
+        if (!this.props.isMobileApp) {
+            $(document).on('mousemove', () => {
+                this._clearTimeOut();
+                this._initTimeOut();
+            });
+        }
+
+        this._resizeHandler = () => {
+            if (isLandscape()) {
+                this._initTimeOut();
+                this._hideScreenControls();
+            } else {
+                this._showButtomControls()
+            }
+
+        }
+
+        if (this.props.isMobileApp) {
+            $(window).resize(this._resizeHandler)
+        }
     }
 
     _clearTimeOut() {
         $('.lecture-frame__play-block-wrapper').removeClass('fade');
-        // $('.player-block__controls').addClass('show')
+        this._showButtomControls()
         if (this._timer) {
             clearTimeout(this._timer);
         }
+    }
+
+    _showButtomControls() {
+        $('.player-block').removeClass('hide');
+        $('.player-frame__poster-text').removeClass('low');
     }
 
     _initTimeOut() {
@@ -127,7 +150,14 @@ class PlayerFrame extends Component {
         // if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
             this._firstTap = true;
             $('.lecture-frame__play-block-wrapper').addClass('fade');
-            // $('.player-block__controls').removeClass('show')
+            if (isLandscape()) {
+                if (!this._firstHide) {
+                    $('.player-block').addClass('hide');
+                    $('.player-frame__poster-text').addClass('low');
+                }  else {
+                    this._firstHide = false;
+                }
+            }
         // }
     }
 
@@ -144,7 +174,7 @@ class PlayerFrame extends Component {
             this._clearTimeOut()
         } else {
             if (prevProps.paused && !this.props.paused) {
-                // this._initTimeOut();
+                this._initTimeOut();
                 this._hideScreenControls();
             }
         }
@@ -180,6 +210,9 @@ class PlayerFrame extends Component {
         $(document).off('keydown');
         $(document).off('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
+        if (this.props.isMobileApp) {
+            $(window).unbind('resize', this._resizeHandler);
+        }
     }
 
     _openContent() {
@@ -239,22 +272,24 @@ class PlayerFrame extends Component {
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>'
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
+
+        let { visible, starting, paused, contentArray, isMobileApp, } = this.props;
 
         return (
-            <div style={this.props.visible ? null : {display: 'none'}}>
+            <div style={visible ? null : {display: 'none'}}>
                 <div className="player-frame__poster" style={_isFinished ? {visibility: 'hidden'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {
-                    this.props.visible ?
+                    visible ?
                         [
                             <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (this.props.paused ? "" : " hide")}/>,
-                            <ScreenControls {...this.props}/>,
+                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
+                            starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
-                            this.props.isMobileControls ?
+                            isMobileApp ?
                                 <div className="player-block">
                                     <Progress id={_id}/>
                                     <div className="player-block__row">
@@ -265,7 +300,7 @@ class PlayerFrame extends Component {
                                             <SoundButton/>
                                             <SoundBar/>
                                             {
-                                                this.props.contentArray.length > 0 ?
+                                                contentArray.length > 0 ?
                                                     <button type="button"
                                                             className="content-button js-contents-trigger player-button"
                                                             onClick={::this._openContent}>
@@ -300,7 +335,7 @@ class PlayerFrame extends Component {
                                                          dangerouslySetInnerHTML={{__html: _speed}}/>
                                                 </button>
                                                 {
-                                                    this.props.contentArray.length > 0 ?
+                                                    contentArray.length > 0 ?
                                                         <button type="button"
                                                                 className="content-button js-contents-trigger player-button"
                                                                 onClick={::this._openContent}>
@@ -335,6 +370,7 @@ function mapStateToProps(state) {
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
+        starting: state.player.starting,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

@@ -125,7 +125,6 @@ class PlayBlock extends React.Component {
                         :
                         this._getButton(_isThisLessonPlaying, _isFinished)
                 }
-                <div className="duration">{_duration}</div>
             </button>
         )
     }

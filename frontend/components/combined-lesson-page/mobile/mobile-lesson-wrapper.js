@@ -5,14 +5,9 @@ import PlayerFrame from './player-frame'
 import LessonFrame from '../lesson-frame';
 
 import $ from 'jquery'
+import {isLandscape} from "./tools";
 
 let _landscapeHeight = 0;
-
-const K2 = 1;
-
-function _isLandscape() {
-    return $(window).outerHeight() * K2 < $(window).outerWidth();
-}
 
 function _getLandscapeHeight() {
     if (_landscapeHeight < $(window).outerHeight()) {
@@ -47,7 +42,7 @@ export default class Wrapper extends React.Component {
             if (!this.props.isMobileControls) {
                 _control.addClass('added')
             } else {
-                if (_isLandscape()) {
+                if (isLandscape()) {
                     _control.removeClass('added')
 
                     this.setState({
@@ -68,7 +63,7 @@ export default class Wrapper extends React.Component {
     componentDidMount() {
         this._resizeHandler();
 
-        if (this.props.isMobileControls && _isLandscape()) {
+        if (this.props.isMobileControls && isLandscape()) {
             this.setState({
                 wrapperHeight: _getLandscapeHeight() + 'px'
             })
