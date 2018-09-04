@@ -3,21 +3,36 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import * as playerStartActions from '../../../actions/player-start-actions'
+import {showScreenControlsSelector} from '../../../ducks/player-screen'
+import FadeTimer from '../fade-timer';
 
 class Controls extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this._timer = new FadeTimer()
+    }
 
     componentDidMount() {
 
     }
 
     _onBackward() {
-        let _newPosition = (this.props.currentTime < 10) ? 0 : (this.props.currentTime - 10);
-        this.props.playerStartActions.startSetCurrentTime(_newPosition);
+        if (this.props.showScreenControls) {
+            let _newPosition = (this.props.currentTime < 10) ? 0 : (this.props.currentTime - 10);
+            this.props.playerStartActions.startSetCurrentTime(_newPosition);
+        } else {
+            this._timer.restart()
+        }
     }
 
     _onForward() {
-        let _newPosition = (this.props.totalDuration - this.props.currentTime < 10) ? 0 : (this.props.currentTime + 10);
-        this.props.playerStartActions.startSetCurrentTime(_newPosition);
+        if (this.props.showScreenControls) {
+            let _newPosition = (this.props.totalDuration - this.props.currentTime < 10) ? 0 : (this.props.currentTime + 10);
+            this.props.playerStartActions.startSetCurrentTime(_newPosition);
+        } else {
+            this._timer.restart()
+        }
     }
 
     _setVolume(current, total) {
@@ -28,6 +43,14 @@ class Controls extends React.Component {
     _startPlay() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
+    }
+
+    _startPause() {
+        if (this.props.showScreenControls) {
+            this.props.playerStartActions.startPause()
+        } else {
+            this._timer.restart()
+        }
     }
 
     render() {
@@ -54,7 +77,7 @@ class Controls extends React.Component {
                             </button>
                             :
                             <button type="button" className="play-btn-big lecture-frame__play-btn ctrl paused"
-                                    onClick={::this.props.playerStartActions.startPause}>
+                                    onClick={::this._startPause}>
                                 <span className="visually-hidden">Воспроизвести</span>
                                 <svg className="pause" width="68" height="92"
                                      dangerouslySetInnerHTML={{__html: _pause}}/>
@@ -77,6 +100,7 @@ function mapStateToProps(state) {
         totalDuration: state.player.totalDuration,
         currentTime: state.player.currentTime,
         paused: state.player.paused,
+        showScreenControls: showScreenControlsSelector(state)
     }
 }
 

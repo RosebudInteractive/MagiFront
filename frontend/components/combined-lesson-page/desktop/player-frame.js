@@ -3,11 +3,10 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "../../player/progress";
-import Controls from "../../player/controls";
+import Controls from "./controls";
 import ScreenControls from "./screen-controls";
 
 import $ from 'jquery'
-// import PauseScreen from "./pause-screen";
 import Titles from "../../player/titles";
 import TimeInfo from '../../player/time-info';
 import ContentTooltip from "../../player/content-tooltip";
@@ -15,6 +14,8 @@ import RateTooltip from '../../player/rate-tooltip';
 
 import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
+
+import FadeTimer from '../fade-timer';
 
 const _rate = 1;
 
@@ -36,13 +37,11 @@ class Frame extends Component {
         super(props)
         this._lessonId = this.props.lesson.Id;
 
-        this._timer = null;
+        this._fadeTimer = new FadeTimer()
 
         this.state = {
             fullScreen: document.fullscreen,
         }
-
-        this._firstTap = true;
 
         this._onDocumentReady = () => {
             this._applyViewPort()
@@ -62,7 +61,7 @@ class Frame extends Component {
 
         $(document).ready(this._onDocumentReady)
         $(window).resize(this._resizeHandler)
-        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+        this._touchEventName = 'mouseup'
     }
 
     componentDidMount() {
@@ -80,14 +79,7 @@ class Frame extends Component {
             }
 
             if (_isPlayer) {
-                if (that.props.isMobileApp && that._firstTap) {
-                    that._firstTap = false;
-                    that._clearTimeOut();
-                    that._initTimeOut();
-                } else {
-                    that.props.playerStartActions.startPause()
-                }
-
+                that.props.playerStartActions.startPause()
             }
 
             if (_isPauseFrame) {
@@ -117,33 +109,10 @@ class Frame extends Component {
         })
 
         $(document).on('mousemove', () => {
-            this._clearTimeOut();
-            this._initTimeOut();
+            this._fadeTimer.restart()
         });
 
         this._resizeHandler();
-    }
-
-    _clearTimeOut() {
-        $('body').removeClass('fade');
-        $('.player-block__controls').addClass('show')
-        if (this._timer) {
-            clearTimeout(this._timer);
-        }
-    }
-
-    _initTimeOut() {
-        if (!this.props.paused) {
-            this._timer = setTimeout(() => {
-                if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
-                    this._firstTap = true;
-                    $('body').addClass('fade');
-                    $('.player-block__controls').removeClass('show')
-                }
-            }, 7000);
-        } else {
-            this._timer = null
-        }
     }
 
     componentDidUpdate(prevProps) {
@@ -156,10 +125,10 @@ class Frame extends Component {
         }
 
         if (!prevProps.paused && this.props.paused) {
-            this._clearTimeOut()
+            this._fadeTimer.stop()
         } else {
             if (prevProps.paused && !this.props.paused) {
-                this._initTimeOut();
+                this._fadeTimer.start();
             }
         }
     }
@@ -170,7 +139,7 @@ class Frame extends Component {
         }
 
         this._removeListeners();
-        this._clearTimeOut();
+        this._fadeTimer.stop()
         this._clearViewPort();
     }
 
@@ -199,24 +168,18 @@ class Frame extends Component {
 
     _openContent() {
         if (!this._hideContentTooltip) {
-            $('#fp-nav').addClass('hide');
-            this._clearTimeOut()
             this.props.playerActions.showContentTooltip()
         } else {
             this._hideContentTooltip = false
-            $('#fp-nav').removeClass('hide');
             this.props.playerActions.hideContentTooltip()
         }
     }
 
     _openRate() {
         if (!this._hideRateTooltip) {
-            $('#fp-nav').addClass('hide');
-            this._clearTimeOut()
             this.props.playerActions.showSpeedTooltip()
         } else {
             this._hideRateTooltip = false
-            $('#fp-nav').removeClass('hide');
             this.props.playerActions.hideSpeedTooltip()
         }
     }
@@ -326,7 +289,6 @@ class Frame extends Component {
 
 function mapStateToProps(state) {
     return {
-        isMobileApp: state.app.isMobileApp,
         fetching: state.singleLesson.fetching,
         lessonInfo: state.singleLesson,
         course: state.singleLesson.course,

@@ -90,7 +90,7 @@ export default class Wrapper extends React.Component {
         }
 
         return (
-            <section className='lecture-wrapper lesson-player js-player mobile'
+            <section className={'lecture-wrapper lesson-player js-player' + (this.props.isMobileControls ? ' mobile' : '')}
                      id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                      style={_coverStyle}>
                 <div className={'lesson-sub-wrapper'}>

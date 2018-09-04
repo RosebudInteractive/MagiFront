@@ -18,6 +18,8 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 
 import $ from 'jquery'
 import {isLandscape} from "./tools";
+import FadeTimer from '../fade-timer';
+import {showScreenControlsSelector} from "../../../ducks/player-screen";
 
 class PlayerFrame extends Component {
 
@@ -30,15 +32,13 @@ class PlayerFrame extends Component {
         super(props)
         this._lessonId = this.props.lesson.Id;
 
-        this._timer = null;
+        this._fadeTimer = new FadeTimer()
 
         this.state = {
             fullScreen: document.fullscreen,
         }
 
-        this._firstTap = true;
         this._touchMoved = false;
-        this._firstHide = true;
 
         this._onDocumentReady = () => {
             this._applyViewPort()
@@ -60,7 +60,7 @@ class PlayerFrame extends Component {
 
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-container'),
+                _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block') && !e.target.closest('.lecture-frame__play-block button')),
                 _isPauseFrame = e.target.closest('.player-frame__screen'),
                 _isMenuButton = e.target.closest('.menu-button');
 
@@ -69,10 +69,8 @@ class PlayerFrame extends Component {
             }
 
             if (_isPlayer) {
-                if (that.props.isMobileApp && that._firstTap) {
-                    that._firstTap = false;
-                    that._clearTimeOut();
-                    that._initTimeOut();
+                if (that.props.isMobileApp && !that.props.showScreenControls) {
+                    that._fadeTimer.restart()
                 } else {
                     that.props.playerStartActions.startPause()
                 }
@@ -90,7 +88,7 @@ class PlayerFrame extends Component {
             if (that._hideRateTooltip) {
                 that.props.playerActions.hideSpeedTooltip()
             }
-        }).on('touchmove', () =>{
+        }).on('touchmove', () => {
             this._touchMoved = true;
         }).on('touchstart', () => {
             this._touchMoved = false;
@@ -105,17 +103,16 @@ class PlayerFrame extends Component {
 
         if (!this.props.isMobileApp) {
             $(document).on('mousemove', () => {
-                this._clearTimeOut();
-                this._initTimeOut();
+                this._fadeTimer.restart()
             });
         }
 
         this._resizeHandler = () => {
             if (isLandscape()) {
-                this._initTimeOut();
-                this._hideScreenControls();
+                this._fadeTimer.start();
+                this._fadeTimer.hideScreenControls();
             } else {
-                this._showButtomControls()
+                this._fadeTimer.clearFade()
             }
 
         }
@@ -123,42 +120,6 @@ class PlayerFrame extends Component {
         if (this.props.isMobileApp) {
             $(window).resize(this._resizeHandler)
         }
-    }
-
-    _clearTimeOut() {
-        $('.lecture-frame__play-block-wrapper').removeClass('fade');
-        this._showButtomControls()
-        if (this._timer) {
-            clearTimeout(this._timer);
-        }
-    }
-
-    _showButtomControls() {
-        $('.player-block').removeClass('hide');
-        $('.player-frame__poster-text').removeClass('low');
-    }
-
-    _initTimeOut() {
-        if (!this.props.paused) {
-            this._timer = setTimeout(::this._hideScreenControls, 7000);
-        } else {
-            this._timer = null
-        }
-    }
-
-    _hideScreenControls() {
-        // if (!(this.state.showContent || this.state.showRate || this.props.isLessonMenuOpened)) {
-            this._firstTap = true;
-            $('.lecture-frame__play-block-wrapper').addClass('fade');
-            if (isLandscape()) {
-                if (!this._firstHide) {
-                    $('.player-block').addClass('hide');
-                    $('.player-frame__poster-text').addClass('low');
-                }  else {
-                    this._firstHide = false;
-                }
-            }
-        // }
     }
 
     componentDidUpdate(prevProps) {
@@ -171,11 +132,11 @@ class PlayerFrame extends Component {
         }
 
         if (!prevProps.paused && this.props.paused) {
-            this._clearTimeOut()
+            this._fadeTimer.stop()
         } else {
             if (prevProps.paused && !this.props.paused) {
-                this._initTimeOut();
-                this._hideScreenControls();
+                this._fadeTimer.start()
+                this._fadeTimer.hideScreenConrols()
             }
         }
     }
@@ -187,7 +148,7 @@ class PlayerFrame extends Component {
 
         this._removeListeners();
         this._clearViewPort();
-        this._clearTimeOut();
+        this._fadeTimer.stop()
     }
 
     _applyViewPort() {
@@ -217,21 +178,21 @@ class PlayerFrame extends Component {
 
     _openContent() {
         if (!this._hideContentTooltip) {
-            this._clearTimeOut()
             this.props.playerActions.showContentTooltip()
         } else {
             this._hideContentTooltip = false
             this.props.playerActions.hideContentTooltip()
+            this._fadeTimer.start()
         }
     }
 
     _openRate() {
         if (!this._hideRateTooltip) {
-            this._clearTimeOut()
             this.props.playerActions.showSpeedTooltip()
         } else {
             this._hideRateTooltip = false
             this.props.playerActions.hideSpeedTooltip()
+            this._fadeTimer.start()
         }
     }
 
@@ -274,7 +235,7 @@ class PlayerFrame extends Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let { visible, starting, paused, contentArray, isMobileApp, } = this.props;
+        let {visible, starting, paused, contentArray, isMobileApp,} = this.props;
 
         return (
             <div style={visible ? null : {display: 'none'}}>
@@ -375,6 +336,7 @@ function mapStateToProps(state) {
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
         lessonInfoStorage: state.lessonInfoStorage,
+        showScreenControls: showScreenControlsSelector(state)
     }
 }
 
