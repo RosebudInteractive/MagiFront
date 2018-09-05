@@ -45,7 +45,8 @@ class Controls extends React.Component {
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
-    _startPause() {
+    _startPause(e) {
+        console.log(e.target)
         if (this.props.showScreenControls) {
             this.props.playerStartActions.startPause()
         } else {
@@ -99,7 +100,7 @@ function mapStateToProps(state) {
     return {
         totalDuration: state.player.totalDuration,
         currentTime: state.player.currentTime,
-        paused: state.player.paused,
+        // paused: state.player.paused,
         showScreenControls: showScreenControlsSelector(state)
     }
 }

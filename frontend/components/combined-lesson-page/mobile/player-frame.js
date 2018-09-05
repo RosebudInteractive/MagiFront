@@ -59,11 +59,10 @@ class PlayerFrame extends Component {
 
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block') && !e.target.closest('.lecture-frame__play-block button')),
-                _isPauseFrame = e.target.closest('.player-frame__screen'),
-                _isMenuButton = e.target.closest('.menu-button');
+                _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button')),
+                _isPauseFrame = e.target.closest('.player-frame__screen') || (e.target.closest('.lecture-frame__play-block-wrapper') && !e.target.closest('.lecture-frame__play-block button'));
 
-            if (_isContent || _isRate || _isMenuButton) {
+            if (_isContent || _isRate) {
                 return
             }
 
@@ -118,8 +117,8 @@ class PlayerFrame extends Component {
             this._fadeTimer.stop()
         } else {
             if (prevProps.paused && !this.props.paused) {
+                this._fadeTimer.forceHideScreenControls()
                 this._fadeTimer.start()
-                this._fadeTimer.hideScreenControls()
             }
         }
     }

@@ -423,7 +423,7 @@ class GalleryButtons extends React.Component {
             _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
 
         return (
-            <div className="js-gallery-controls gallery-controls hide">
+            <div className="js-gallery-controls gallery-controls hide" style={{display : 'none'}}>
                 <button className="gallery-trigger js-gallery-trigger" type="button">
                     <span className="visually-hidden">Галерея</span>
                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>

@@ -94,6 +94,7 @@ class LessonFrame extends React.Component {
                 <div style={_style} onClick={::this._unlock}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
                         <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _playLock}}/>
+                        Воспроизвести
                     </span>
                 </div>
             )
@@ -104,6 +105,7 @@ class LessonFrame extends React.Component {
                         <div style={_style} onClick={::this._play}>
                             <span className="play-btn-big lecture-frame__play-btn lock">
                                 <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _replay}}/>
+                                Воспроизвести
                             </span>
                         </div>
                     )

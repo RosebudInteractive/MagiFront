@@ -69,7 +69,8 @@ export default class Wrapper extends React.Component {
 
     _getLandscapeLayout() {
         let {lesson, isPlayer} = this.props,
-            _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id
+            _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id,
+            _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
 
         const _coverStyle = {
             backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
@@ -80,7 +81,7 @@ export default class Wrapper extends React.Component {
                 <div className='lecture-wrapper' id={_divId} style={_coverStyle}>
                     <Menu {...this.props} current={lesson.Number}
                           id={'lesson-menu-' + lesson.Id} extClass={'landscape'}/>
-                    <div className={'lesson-sub-wrapper'}>
+                    <div className={_subwrapperClassName}>
                         <LandscapePlayerFrame {...this.props}
                                               visible={isPlayer}/>
                         <LessonFrame {...this.props}
@@ -95,7 +96,8 @@ export default class Wrapper extends React.Component {
 
     _getPortraitLayout() {
         let {lesson, isPlayer} = this.props,
-            _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id
+            _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id,
+            _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
 
         const _coverStyle = {}
 
@@ -105,7 +107,7 @@ export default class Wrapper extends React.Component {
 
         return (
             <section className='lecture-wrapper lesson-player js-player desktop' id={_divId} style={_coverStyle}>
-                <div className='lesson-sub-wrapper'>
+                <div className={_subwrapperClassName}>
                     <PortraitPlayerFrame {...this.props}
                                          visible={this.props.isPlayer}/>
                     <LessonFrame {...this.props}

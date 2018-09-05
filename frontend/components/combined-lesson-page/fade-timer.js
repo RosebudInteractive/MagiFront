@@ -73,6 +73,14 @@ export default class FadeTimer {
         }
     }
 
+    forceHideScreenControls() {
+        $('.lecture-frame__play-block-wrapper').addClass('force-hide')
+        this.hideScreenControls()
+        setTimeout(() => {
+            $('.lecture-frame__play-block-wrapper').removeClass('force-hide')
+        }, 500)
+    }
+
     showScreenContols() {
         store.dispatch(showScreenControls())
         $('.player-block__controls').addClass('show')
