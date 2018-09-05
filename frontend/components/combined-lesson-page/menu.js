@@ -25,22 +25,22 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        // let _wrapper = $(".global-wrapper"),
-        //     _player = $('.js-player'),
-        //
-        //     _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
-        //     _wrapperOffsetPosition = _wrapper.offset().top,
-        //     _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
-        //     _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
-        //
-        // $('html, body').animate({
-        //     scrollTop: _scroll
-        // }, 600);
-        if (this.props.showSizeInfo) {
-            this.props.appActions.hideSizeInfo()
-        } else {
-            this.props.appActions.showSizeInfo()
-        }
+        let _wrapper = $(".global-wrapper"),
+            _player = $('.js-player'),
+
+            _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
+            _wrapperOffsetPosition = _wrapper.offset().top,
+            _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
+            _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
+
+        $('html, body').animate({
+            scrollTop: _scroll
+        }, 600);
+        // if (this.props.showSizeInfo) {
+        //     this.props.appActions.hideSizeInfo()
+        // } else {
+        //     this.props.appActions.showSizeInfo()
+        // }
     }
 
     render() {
