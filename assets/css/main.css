@@ -16907,6 +16907,13 @@ ul.lectures-tab {
     display: block;
     margin-left: 4px;
     fill: rgba(255, 255, 255, 0.8); }
+  ._player .text-block .play-btn svg,
+  ._player .text-block .play-btn .lecture__btn {
+      margin-left: 0;
+  }
+    ._player .text-block .play-btn .lecture__btn.play {
+        margin-left: 4px;
+    }
   .play-btn .duration {
     position: absolute;
     top: -3px;

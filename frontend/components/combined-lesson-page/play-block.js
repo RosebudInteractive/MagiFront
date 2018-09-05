@@ -82,7 +82,7 @@ class PlayBlock extends React.Component {
                         <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
                     </button>
                     :
-                    <button type="button" className="lecture__btn"
+                    <button type="button" className="lecture__btn play"
                             onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
                         <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
                     </button>
@@ -152,7 +152,7 @@ class PlayBlock extends React.Component {
                             ?
                             this._getButton(_isThisLessonPlaying, _isFinished)
                             :
-                            <button className="play-block__btn paused"
+                            <button className="lecture__btn paused"
                                     onClick={::this.props.playerStartActions.startPause}>
                                 <svg width="23" height="36" dangerouslySetInnerHTML={{__html: _pause}}/>
                             </button>
