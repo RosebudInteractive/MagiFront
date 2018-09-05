@@ -34,7 +34,6 @@
     <script>
         $(function () {
             // video id = yv8TD8CsMD0
-            console.log("bebe");
 
             let tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
@@ -79,6 +78,17 @@
                     events: {
                         'onReady': onPlayerReady,
                         'onStateChange': onPlayerStateChange
+                    },
+                    playerVars: {
+                        autoplay: 0,
+                        controls: 0,
+                        disablekb: 1,
+                        modestbranding: 1,
+                        autohide: 1,
+                        showinfo: 0,
+                        showsearch: 0,
+                        enablejsapi: 1,
+                        origin: "http://new.magisteria.ru/"
                     }
                 });
             };
@@ -110,6 +120,6 @@
         <div id="youtube-player"></div>
     </div>
     <div id="log" class="test-log"></div>
-    <audio id="a1" src="/testfiles/2016/09/Nasonov_Bach_Cantatas_02_Early-01_BWV-4_Stereo_128Kbps_May_16_2016.mp3"></audio>
+    <audio id="a1" src="/data/2016/09/Nasonov_Bach_Cantatas_02_Early-01_BWV-4_Stereo_128Kbps_May_16_2016.mp3"></audio>
 </body>
 </html>
