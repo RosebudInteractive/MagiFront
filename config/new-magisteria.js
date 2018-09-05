@@ -12,7 +12,15 @@ module.exports = {
     server: {
         protocol: 'http',
         address: '0.0.0.0',
-        port: 3000
+        port: 3000,
+        prerender: {
+            usePrerender: true,
+            useRedis: true,
+            redisPrefix: "pg:",
+            expInSec: 14 * 24 * 60 * 60,
+            maxDevSec: 14 * 24 * 60 * 60,
+            url: 'http://127.0.0.1:8000'
+        },
     },
     dbProvider: 'mysql',
     session: {

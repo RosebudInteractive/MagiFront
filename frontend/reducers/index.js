@@ -15,6 +15,7 @@ import user from './user'
 import lessonInfoStorage from './lesson-info-storage';
 import authorReducer, {moduleName as authorModule} from '../ducks/author'
 import profileReducer, {moduleName as profileModule} from '../ducks/profile'
+import playerScreenReducer, {moduleName as playerScreenModule} from '../ducks/player-screen'
 
 export default combineReducers({
 
@@ -32,6 +33,7 @@ export default combineReducers({
     user,
     [authorModule]: authorReducer,
     [profileModule]: profileReducer,
+    [playerScreenModule]: playerScreenReducer,
     routing: routerReducer,
     form: formReducer,
 })

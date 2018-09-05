@@ -7,7 +7,7 @@ import {
     SHOW_LESSON_MENU,
     SET_APP_TYPE_MOBILE,
     SHOW_USER_BLOCK,
-    HIDE_USER_BLOCK, SHOW_LESSONS_BOOKMARKS, SHOW_COURSES_BOOKMARKS,
+    HIDE_USER_BLOCK, SHOW_LESSONS_BOOKMARKS, SHOW_COURSES_BOOKMARKS, SHOW_SIZE_INFO, HIDE_SIZE_INFO,
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
@@ -87,6 +87,20 @@ export const showLessonsBookmarks = () => {
 export const showCoursesBookmarks = () => {
     return {
         type: SHOW_COURSES_BOOKMARKS,
+        payload: null
+    }
+};
+
+export const showSizeInfo = () => {
+    return {
+        type: SHOW_SIZE_INFO,
+        payload: null
+    }
+};
+
+export const hideSizeInfo = () => {
+    return {
+        type: HIDE_SIZE_INFO,
         payload: null
     }
 };

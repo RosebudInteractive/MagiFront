@@ -111,15 +111,127 @@ const AUTHOR_MYSQL_REF_PUB_REQ =
     "where(l.`AuthorId` = <%= authorId %>) and(lc.`State` = 'R')\n" +
     "group by l.`Id`";
 
+const GET_AUTHOR_FOR_PRERENDER_MSSQL =
+    "select [URL] from [Author]\n" +
+    "where [Id] = <%= id %>";
+
+const GET_AUTHOR_FOR_PRERENDER_BY_URL_MSSQL =
+    "select [URL] from [Author]\n" +
+    "where [URL] = '<%= url %>'";
+
+const GET_AUTHOR_FOR_PRERENDER_MYSQL =
+    "select `URL` from `Author`\n" +
+    "where `Id` = <%= id %>";
+
+const GET_AUTHOR_FOR_PRERENDER_BY_URL_MYSQL =
+    "select `URL` from `Author`\n" +
+    "where `URL` = '<%= url %>'";
+
+const { PrerenderCache } = require('../prerender/prerender-cache');
+const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+
+const URL_PREFIX = "autor";
+
 const DbAuthor = class DbAuthor extends DbObject {
 
     constructor(options) {
         super(options);
+        this._prerenderCache = PrerenderCache();
     }
 
     _getObjById(id, expression, options) {
         var exp = expression || AUTHOR_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    clearCache(id, isListOnly) {
+        let key = id;
+        return new Promise((resolve) => {
+            let rc = [];
+            if (typeof (key) === "string") {
+                if ((key.length > 0) && (key[0] !== "/"))
+                    key = "/" + key;
+                rc.push("/" + URL_PREFIX + key);
+            }
+            else
+                if (typeof (key) === "number") {
+                    rc = $data.execSql({
+                        dialect: {
+                            mysql: _.template(GET_AUTHOR_FOR_PRERENDER_MYSQL)({ id: id }),
+                            mssql: _.template(GET_AUTHOR_FOR_PRERENDER_MSSQL)({ id: id })
+                        }
+                    }, {})
+                        .then((result) => {
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                let res = [];
+                                result.detail.forEach((elem) => {
+                                    res.push("/" + URL_PREFIX + "/" + elem.URL + "/");
+                                })
+                                return res;
+                            }
+                        });
+                }
+            resolve(rc);
+        })
+            .then((result) => {
+                let rc = result;
+                if ((!isListOnly) && result && (result.length > 0))
+                    rc = Utils.seqExec(result, (elem) => {
+                        return this._prerenderCache.del(elem);
+                    })
+                        .then(() => result);
+                return rc;
+            });
+    }
+
+    prerender(id, isListOnly, oldUrl) {
+        return this.clearCache(oldUrl ? oldUrl : id, isListOnly)
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    let dialect = {
+                        mysql: _.template(GET_AUTHOR_FOR_PRERENDER_MYSQL)({ id: id }),
+                        mssql: _.template(GET_AUTHOR_FOR_PRERENDER_MSSQL)({ id: id })
+                    };
+                    if (typeof (id) === "string") {
+                        let url;
+                        let urls = id.split("/");
+                        let cnt = 0;
+                        urls.forEach((elem) => {
+                            if (elem.length > 0) {
+                                cnt++;
+                                url = elem;
+                            }
+                        })
+                        if (cnt !== 1)
+                            throw new Error(`DbAuthor::prerender: Invalid "id" parameter: "${id}"`);
+                        dialect = {
+                            mysql: _.template(GET_AUTHOR_FOR_PRERENDER_BY_URL_MYSQL)({ url: url }),
+                            mssql: _.template(GET_AUTHOR_FOR_PRERENDER_BY_URL_MSSQL)({ url: url })
+                        };
+                    }
+                    resolve($data.execSql({ dialect: dialect }, {}));
+                })
+            })
+            .then((result) => {
+                let res = [];
+                let rc = Promise.resolve(res);
+                if (result && result.detail && (result.detail.length > 0)) {
+                    rc = Utils.seqExec(result.detail, (elem) => {
+                        return new Promise((resolve, reject) => {
+                            let path = "/" + URL_PREFIX + "/" + elem.URL + "/";
+                            res.push(path);
+                            if (isListOnly)
+                                resolve()
+                            else
+                                resolve(this._prerenderCache.prerender(path));
+                        });
+                    })
+                        .then(() => {
+                            return res;
+                        });
+                }
+                return rc;
+            });
     }
 
     getPublic(url) {
@@ -297,6 +409,7 @@ const DbAuthor = class DbAuthor extends DbObject {
             let opts = {};
             let newId = null;
             let collection = null;
+            let url;
             resolve(
                 this._getObjById(id)
                     .then((result) => {
@@ -307,7 +420,9 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return result.edit()
                     })
                     .then(() => {
-                        collection._del(collection.get(0));
+                        let author = collection.get(0);
+                        url = author.uRL();
+                        collection._del(author);
                         return root_obj.save(opts);
                     })
                     .then(() => {
@@ -324,6 +439,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                                 throw new Error("Error: " + JSON.stringify(res));
                         return res;
                     })
+                    .then((result) => {
+                        return this.clearCache(url)
+                            .then(() => result);
+                    })
             );
         })
     }
@@ -335,6 +454,8 @@ const DbAuthor = class DbAuthor extends DbObject {
             let opts = {};
             let newId = null;
             let inpFields = data || {};
+            let isModified = false;
+            let old_url;
             resolve(
                 this._getObjById(id)
                     .then((result) => {
@@ -343,6 +464,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Author (Id = " + id + ") doesn't exist.");
                         auth_obj = collection.get(0);
+                        old_url = auth_obj.uRL();
                         collection = auth_obj.getDataRoot("AuthorLng").getCol("DataElements");
                         if (collection.count() != 1)
                             throw new Error("Author (Id = " + id + ") has inconsistent \"LNG\" part.");
@@ -362,7 +484,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                             auth_lng_obj.lastName(inpFields["LastName"]);
                         if (typeof (inpFields["Description"]) !== "undefined")
                             auth_lng_obj.description(inpFields["Description"]);
-                        return auth_obj.save(opts);
+                        return auth_obj.save(opts)
+                            .then((result) => {
+                                isModified = isModified || (result && result.detail && (result.detail.length > 0));
+                            });
                     })
                     .then(() => {
                         console.log("Author updated: Id=" + id + ".");
@@ -377,6 +502,13 @@ const DbAuthor = class DbAuthor extends DbObject {
                             else
                                 throw new Error("Error: " + JSON.stringify(res));
                         return res;
+                    })
+                    .then((result) => {
+                        let rc = result;
+                        if (isModified)
+                            rc = this.prerender(id, false, old_url)
+                                .then(() => result);
+                        return rc;
                     })
             );
         })
@@ -441,6 +573,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                             else
                                 throw new Error("Error: " + JSON.stringify(res));
                         return res;
+                    })
+                    .then((result) => {
+                        return this.prerender(newId)
+                            .then(() => result);
                     })
             );
         })

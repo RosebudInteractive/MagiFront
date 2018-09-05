@@ -24,6 +24,7 @@ const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const { FileUpload } = require("./database/file-upload");
 const config = require('config');
+const { PrerenderInit } = require('./prerender');
 
 //bld.initDatabase()
 Promise.resolve()
@@ -138,6 +139,10 @@ Promise.resolve()
             res.sendFile(__dirname + '/debug/RegTestPage.html');
         });
 
+        app.get("/pushtest", function (req, res) {
+            res.sendFile(__dirname + '/debug/PushTestPage.html');
+        });
+
         app.get("/testrecovery/:activationKey", function (req, res) {
             let template = fs.readFileSync(__dirname + '/debug/templates/PwdRecoverTest.tmpl', 'utf8');
             let body = _.template(template)(
@@ -151,6 +156,7 @@ Promise.resolve()
             res.sendFile(__dirname + '/adm-index.html');
         });
 
+        PrerenderInit(app);
         app.get("/*", function (req, res) {
             res.sendFile(__dirname + '/index.html');
         });

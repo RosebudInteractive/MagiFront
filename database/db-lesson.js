@@ -591,15 +591,142 @@ const GET_COURSE_LANG_MYSQL =
     "  join `CourseLng` l on l.`CourseId` = c.`Id`\n" +
     "where c.`Id` = <%= courseId %>";
 
+const GET_LESSON_FOR_PRERENDER_MSSQL =
+    "select c.[URL], l.[URL] as [LURL] from[Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P' and l.[Id] = <%= id %>";
+
+const GET_LESSON_FOR_PRERENDER_MYSQL =
+    "select c.`URL`, l.`URL` as `LURL` from`Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P' and l.`Id` = <%= id %>";
+
+const GET_LESSON_URL_MSSQL =
+    "select c.[URL], l.[URL] as [LURL] from[Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where l.id = <%= id %>";
+
+const GET_LESSON_URL_MYSQL =
+    "select c.`URL`, l.`URL` as `LURL` from`Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where l.id = <%= id %>";
+
+const GET_LESSON_FOR_PRERENDER_BY_URL_MSSQL =
+    "select c.[URL], l.[URL] as [LURL] from[Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where lc.[State] = 'R' and c.[State] = 'P' and l.[URL] = '<%= lesson_url %>' and c.[URL] = '<%= course_url %>'";
+
+const GET_LESSON_FOR_PRERENDER_BY_URL_MYSQL =
+    "select c.`URL`, l.`URL` as `LURL` from`Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where lc.`State` = 'R' and c.`State` = 'P' and l.`URL` = '<%= lesson_url %>' and c.`URL` = '<%= course_url %>'";
+
+const { PrerenderCache } = require('../prerender/prerender-cache');
+
 const DbLesson = class DbLesson extends DbObject {
 
     constructor(options) {
         super(options);
+        this._prerenderCache = PrerenderCache();
     }
 
     _getObjById(id, expression, options) {
         var exp = expression || LESSON_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    clearCache(id, isListOnly) {
+        let key = id;
+        return new Promise((resolve) => {
+            let rc = [key];
+            if (typeof (key) === "number") {
+                rc = $data.execSql({
+                    dialect: {
+                        mysql: _.template(GET_LESSON_URL_MYSQL)({ id: id }),
+                        mssql: _.template(GET_LESSON_URL_MSSQL)({ id: id })
+                    }
+                }, {})
+                    .then((result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let res = [];
+                            result.detail.forEach((elem) => {
+                                res.push("/" + elem.URL + "/" + elem.LURL + "/");
+                            })
+                            return res;
+                        }
+                    });
+            }
+            resolve(rc);
+        })
+            .then((result) => {
+                let rc = result;
+                if ((!isListOnly) && result && (result.length > 0))
+                    rc = Utils.seqExec(result, (elem) => {
+                        return this._prerenderCache.del(elem);
+                    })
+                        .then(() => result);
+                return rc;
+            });
+    }
+
+    prerender(id, isListOnly, oldUrl) {
+        return this.clearCache(oldUrl ? oldUrl : id, isListOnly)
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    let dialect = {
+                        mysql: _.template(GET_LESSON_FOR_PRERENDER_MYSQL)({ id: id }),
+                        mssql: _.template(GET_LESSON_FOR_PRERENDER_MSSQL)({ id: id })
+                    };
+                    if (typeof (id) === "string") {
+                        let lesson_url;
+                        let course_url;
+                        let urls = id.split("/");
+                        let cnt = 0;
+                        urls.forEach((elem) => {
+                            if (elem.length > 0) {
+                                cnt++;
+                                if (course_url)
+                                    lesson_url = elem
+                                else
+                                    course_url = elem;
+                            }
+                        })
+                        if (cnt !== 2)
+                            throw new Error(`DbLesson::prerender: Invalid "id" parameter: "${id}"`);
+                        dialect = {
+                            mysql: _.template(GET_LESSON_FOR_PRERENDER_BY_URL_MYSQL)({ lesson_url: lesson_url, course_url: course_url }),
+                            mssql: _.template(GET_LESSON_FOR_PRERENDER_BY_URL_MSSQL)({ lesson_url: lesson_url, course_url: course_url })
+                        };
+                    }
+                    resolve($data.execSql({ dialect: dialect }, {}));
+                })
+            })
+            .then((result) => {
+                let res = [];
+                let rc = Promise.resolve(res);
+                if (result && result.detail && (result.detail.length > 0)) {
+                    rc = Utils.seqExec(result.detail, (elem) => {
+                        return new Promise((resolve, reject) => {
+                            let path = "/" + elem.URL + "/" + elem.LURL + "/";
+                            res.push(path);
+                            if (isListOnly)
+                                resolve()
+                            else
+                                resolve(this._prerenderCache.prerender(path));
+                        });
+                    })
+                        .then(() => {
+                            return res;
+                        });
+                }
+                return rc;
+            });
     }
 
     get(id, course_id) {
@@ -1534,6 +1661,9 @@ const DbLesson = class DbLesson extends DbObject {
             let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let curr_parent_id;
             let lc_parent_id;
+            let course_url;
+            let lesson_url;
+            let urls_to_clear = [];
 
             let lsn_to_delete = [];
             resolve(
@@ -1543,6 +1673,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (ls_course_collection.count() != 1)
                             throw new Error("Course (Id = " + course_id + ") doesn't exist.");
                         course_obj = ls_course_collection.get(0);
+                        course_url = course_obj.uRL();
                         ls_course_collection = course_obj.getDataRoot("LessonCourse").getCol("DataElements");
                         for (let i = 0; i < ls_course_collection.count(); i++) {
                             if (ls_course_collection.get(i).lessonId() === id) {
@@ -1590,12 +1721,17 @@ const DbLesson = class DbLesson extends DbObject {
                             throw new Error("Lesson (Id = " + id + ") doesn't exist.");
 
                         let lesson_obj = collection.get(0);
+                        lesson_url = lesson_obj.uRL();
+                        urls_to_clear.push("/" + course_url + "/" + lesson_obj.uRL() + "/");
                         if (lesson_obj.courseId() === course_id) {
                             // We need to remove whole lesson here    
                             lsn_to_delete.push(lesson_obj.id());
                             let ch_collection = lesson_obj.getDataRoot("Lesson").getCol("DataElements");
-                            for (let i = 0; i < ch_collection.count(); i++)
-                                lsn_to_delete.unshift(ch_collection.get(i).id());
+                            for (let i = 0; i < ch_collection.count(); i++) {
+                                let ch_lsn = ch_collection.get(i);
+                                lsn_to_delete.unshift(ch_lsn.id());
+                                urls_to_clear.push("/" + course_url + "/" + ch_lsn.uRL() + "/");
+                            }
                         }
 
                         // Removing lesson reference from course
@@ -1660,6 +1796,16 @@ const DbLesson = class DbLesson extends DbObject {
                             result = result.then(() => { return res; })
                         return result;
                     })
+                    .then((result) => {
+                        let rc = Promise.resolve(result);
+                        if (urls_to_clear.length > 0) {
+                            rc = Utils.seqExec(urls_to_clear, (url) => {
+                                return this.clearCache(url);
+                            })
+                                .then(() => result);
+                        }
+                        return rc;
+                    })
             );
         })
     }
@@ -1705,6 +1851,11 @@ const DbLesson = class DbLesson extends DbObject {
             let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let isDurationChanged = false;
 
+            let isModified = false;
+            let course_url;
+            let old_url;
+            let urls_to_delete = [];
+            
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
                     .then((result) => {
@@ -1712,6 +1863,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Course (Id = " + course_id + ") doesn't exist.");
                         course_obj = collection.get(0);
+                        course_url = course_obj.uRL();
 
                         return course_obj.edit()
                             .then(() => {
@@ -1724,6 +1876,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (collection.count() != 1)
                             throw new Error("Lesson (Id = " + id + ") doesn't exist.");
                         lsn_obj = collection.get(0);
+                        old_url = lsn_obj.uRL();
 
                         root_ch = course_obj.getDataRoot("LessonCourse");
                         ch_collection = root_ch.getCol("DataElements");
@@ -1941,9 +2094,9 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["URL"]) !== "undefined")
                             lsn_obj.uRL(inpFields["URL"]);
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
-                            lsn_obj.isAuthRequired(inpFields["IsAuthRequired"]);
+                            lsn_obj.isAuthRequired(inpFields["IsAuthRequired"] ? true : false);
                         if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
-                            lsn_obj.isSubsRequired(inpFields["IsSubsRequired"]);
+                            lsn_obj.isSubsRequired(inpFields["IsSubsRequired"] ? true : false);
                         if (typeof (inpFields["FreeExpDate"]) !== "undefined")
                             lsn_obj.freeExpDate(inpFields["FreeExpDate"]);
                         if (lsn_obj.isSubsRequired())
@@ -2074,13 +2227,20 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
+                        isModified = needToDeleteOwnCh || needToDeleteOwn || isDurationChanged;
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts = { transactionId: transactionId };
                                 return lsn_obj.save(opts)
-                                    .then(() => {
+                                    .then((result) => {
+                                        if (result && result.detail && (result.detail.length > 0))
+                                            isModified = true;
                                         return course_obj.save(opts);
+                                    })
+                                    .then((result) => {
+                                        if (result && result.detail && (result.detail.length > 0))
+                                            isModified = true;
                                     });
                             });
                     })
@@ -2090,6 +2250,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 let rc = Promise.resolve();
                                 if (elem.deleted && elem.isOwner) {
                                     let id = elem.ownObj.id();
+                                    urls_to_delete.push("/" + course_url + "/" + elem.ownObj.uRL() + "/");
                                     let mysql_script = [];
                                     LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
                                         mysql_script.push(_.template(elem)({ id: id }));
@@ -2146,6 +2307,19 @@ const DbLesson = class DbLesson extends DbObject {
                         else
                             result = result.then(() => { return res;})    
                         return result;
+                    })
+                    .then((result) => {
+                        let rc = result;
+                        if (isModified)
+                            rc = this.prerender(id, false, "/" + course_url + "/" + old_url + "/")
+                                .then(() => {
+                                    if (urls_to_delete.length > 0)
+                                        return Utils.seqExec(urls_to_delete, (url) => {
+                                            return this.clearCache(url);
+                                        });
+                                })
+                                .then(() => result);
+                        return rc;
                     })
             );
         })
@@ -2208,10 +2382,10 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["URL"] = inpFields["URL"];
                         fields["IsAuthRequired"] = false;
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
-                            fields["IsAuthRequired"] = inpFields["IsAuthRequired"];
+                            fields["IsAuthRequired"] = inpFields["IsAuthRequired"] ? true : false;
                         fields["IsSubsRequired"] = false;
                         if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
-                            fields["IsSubsRequired"] = inpFields["IsSubsRequired"];
+                            fields["IsSubsRequired"] = inpFields["IsSubsRequired"] ? true : false;
                         if (typeof (inpFields["FreeExpDate"]) !== "undefined")
                             fields["FreeExpDate"] = inpFields["FreeExpDate"];
                         if (fields["IsSubsRequired"])
@@ -2421,6 +2595,10 @@ const DbLesson = class DbLesson extends DbObject {
                         else
                             result = result.then(() => { return res; })
                         return result;
+                    })
+                    .then((result) => {
+                        return this.prerender(newId)
+                            .then(() => result);
                     })
             );
         })

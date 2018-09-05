@@ -4,13 +4,17 @@ import {connect} from 'react-redux';
 class Titles extends React.Component {
 
     render() {
-        return !this.props.paused ?
+        // return !this.props.paused ?
+        return (
             <div className="player-frame__poster-text">
-                <h2 className="player-frame__poster-title">{this.props.title}</h2>
-                <p className="player-frame__poster-subtitle">{this.props.subTitle}</p>
+                <span className="player-frame__poster-title">{this.props.title}</span>
+                <p>
+                    <span className="player-frame__poster-subtitle">{this.props.subTitle}</span>
+                </p>
             </div>
-            :
-            null
+        )
+        // :
+        // null
 
     }
 }

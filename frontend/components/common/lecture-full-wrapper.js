@@ -71,7 +71,7 @@ export class LessonFull extends React.Component {
                     <PlayBlock {...this.props}/>
                     <div className="lecture-full__info-block">
                         <div className="lecture-full__text-block">
-                            <button type="button" class="lecture-full__fav" onClick={::this._favoritesClick}>
+                            <button type="button" className="lecture-full__fav" onClick={::this._favoritesClick}>
                                 <svg width="14" height="23"
                                      dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks(lessonUrl) ? _redFlag : _flag}}/>
                             </button>
@@ -118,7 +118,7 @@ class Extras extends React.Component {
     }
 
     render() {
-        const _label = (this.props.subLessons.length > 1) ? 'Дополнительные эпизоды' : 'Дополнительный эпизод'
+        const _label = (this.props.subLessons && this.props.subLessons.length > 1) ? 'Дополнительные эпизоды' : 'Дополнительный эпизод'
 
         return (this.props.subLessons && (this.props.subLessons.length > 0)) ?
             <div className="lecture-full__extras">

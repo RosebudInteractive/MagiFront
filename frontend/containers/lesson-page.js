@@ -4,8 +4,6 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 
 import $ from 'jquery'
-// import 'fullpage.js'
-// import 'script-lib/jquery.fullpage'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as playerStartActions from '../actions/player-start-actions';
@@ -232,8 +230,6 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         playingLesson: state.player.playingLesson,
-        lessonEnded: state.player.ended,
-        isMobileApp: state.app.isMobileApp,
         authorized: !!state.user.user,
     }
 }

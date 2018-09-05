@@ -13,9 +13,15 @@ function setupAuthors(app) {
             });
     });
 
-    app.get('/api/adm/authors', (req, res, next) => {
-        AuthorsService()
-            .getAll()
+    app.get('/api/adm/authors/prerender/:id', (req, res, next) => {
+        new Promise((resolve, reject) => {
+            let id = (req.query && req.query.url) ? req.query.url : parseInt(req.params.id);
+            if ((typeof (id) === "number") && isNaN(id))
+                throw new Error(`Invalid parameter: ${req.params.id}`);
+            let rc = AuthorsService()
+                .prerender(id);
+            resolve(rc);
+        })
             .then(rows => {
                 res.send(rows);
             })
@@ -27,6 +33,17 @@ function setupAuthors(app) {
     app.get('/api/adm/authors/:id', (req, res, next) => {
         AuthorsService()
             .get(parseInt(req.params.id))
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/adm/authors', (req, res, next) => {
+        AuthorsService()
+            .getAll()
             .then(rows => {
                 res.send(rows);
             })

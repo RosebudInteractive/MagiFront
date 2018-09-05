@@ -7,7 +7,8 @@ import {Switch, Route, withRouter} from 'react-router-dom'
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
-import LessonPage from './containers/lesson-page';
+// import LessonPage from './containers/lesson-page';
+import CombineLessonPage from './containers/combined-lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
@@ -34,6 +35,8 @@ import AuthConfirmForm from './containers/auth-confirm-form'
 import PasswordConfirmForm from './containers/password-confirm-form'
 import AuthErrorForm from './containers/auth-error-form'
 
+import SizeInfo from './components/size-info'
+
 import Platform from 'platform';
 
 Polifyll.registry();
@@ -55,7 +58,7 @@ class App extends Component {
         };
         this._handleScroll = this._handleScroll.bind(this);
 
-        let _isMobile = ((Platform.os.family === "Android") || (Platform.os.family === "iOS"));
+        let _isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone");
         if (_isMobile) {
             this.props.appActions.setAppTypeMobile()
         }
@@ -195,7 +198,7 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
-                <Route path={_homePath + ':courseUrl/:lessonUrl'} component={LessonPage}/>
+                <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
 
             </Switch>
         )
@@ -219,6 +222,7 @@ class App extends Component {
                 {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
                     <PageFooter/> : null}
                 <AuthPopup visible={this.props.showSignInForm}/>
+                {this.props.showSizeInfo ? <SizeInfo/> : null}
             </div>
         );
     }
@@ -229,6 +233,7 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
+        showSizeInfo: state.app.showSizeInfo,
         playInfo: state.player.playingLesson,
         showSignInForm: state.app.showSignInForm,
         ownProps,

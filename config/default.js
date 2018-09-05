@@ -19,6 +19,14 @@ module.exports = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
+        prerender: {
+            usePrerender: false,
+            useRedis: false,
+            redisPrefix: "pg:",
+            expInSec: 14 * 24 * 60 * 60,
+            maxDevSec: 7 * 24 * 60 * 60,
+            url: 'http://127.0.0.1:8000'
+        },
         siteHost: defer(function () {
             return this.server.protocol + '://' +
                 (this.server.address === '0.0.0.0' ? 'localhost' : this.server.address) + ':' + this.server.port;

@@ -54,13 +54,48 @@ class RedisConnection {
         this.expireAsync = promisify(this._client.expire).bind(this._client);
         this.pexpireAsync = promisify(this._client.pexpire).bind(this._client);
         this.mgetAsync = promisify(this._client.mget).bind(this._client);
-        this.hgetAll = promisify(this._client.hgetall).bind(this._client);
-        this.hset = promisify(this._client.hset).bind(this._client);
-        this.hget = promisify(this._client.hget).bind(this._client);
-        this.hdel = promisify(this._client.hdel).bind(this._client);
+        this.renameAsync = promisify(this._client.rename).bind(this._client);
+        this.unlinkAsync = promisify(this._client.unlink).bind(this._client); // Available since Redis 4.0
+        this.persistAsync = promisify(this._client.persist).bind(this._client);
+        this.hgetAllAsync = promisify(this._client.hgetall).bind(this._client);
+        this.hsetAsync = promisify(this._client.hset).bind(this._client);
+        this.hgetAsync = promisify(this._client.hget).bind(this._client);
+        this.hdelAsync = promisify(this._client.hdel).bind(this._client);
     }
 
     client() { return this._client; }
+
+    getKeyList(match, count) {
+        return new Promise((resolve, reject) => {
+            let list = {};
+            let scanFunc = (cursor) => {
+                let args = [cursor];
+                if (match) {
+                    args.push("MATCH");
+                    args.push(match);
+                }
+                if (count) {
+                    args.push("COUNT");
+                    args.push(count);
+                }
+                return this.scanAsync(args)
+                    .then((result) => {
+                        if (Array.isArray(result) && (result.length == 2)) {
+                            if (Array.isArray(result[1])) {
+                                result[1].forEach((elem) => {
+                                    list[elem] = true;
+                                })
+                            }
+                            if (result[0] !== "0")
+                                return scanFunc(result[0])
+                            else
+                                return Object.keys(list);
+                        }
+                    });
+            };
+            resolve(scanFunc("0"));
+        });
+    }
 
     close() {
         return new Promise((resolve) => {

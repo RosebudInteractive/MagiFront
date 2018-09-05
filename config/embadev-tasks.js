@@ -18,12 +18,26 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Prerender",
+            module: "./prerender",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
+                mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
+                maxLinksLimit: 10,
+                maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                renderDelay: 5 * 1000 // render request delay in ms
+            }
+        },
+        {
             name: "Share Counters Update",
             module: "./sn-counters",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             // schedule: "0/30 * * * * *", // run every 30 sec
-            schedule: "0 37 14 * * *", // run at 10:00
+            schedule: "0 42 16 * * *", // run at 10:00
             options: {
                 baseUrl: "https://magisteria.ru",
                 snets: ["facebook", "vkontakte", "odnoklassniki"],
@@ -83,7 +97,14 @@ let options = {
     server: {
         protocol: 'http',
         address: '0.0.0.0',
-        port: 3000
+        port: 3000,
+        prerender: {
+            usePrerender: false,
+            useRedis: true,
+            redisPrefix: "pg:",
+            expInSec: 14 * 24 * 60 * 60,
+            url: 'http://127.0.0.1:8000'
+        }
     },
     dbProvider: 'mssql',
     trace: {

@@ -1,8 +1,24 @@
 const path = require('path');
 const defer = require('config/defer').deferConfig;
 
+const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitemaps"));
+
 module.exports = {
     tasks: [
+        {
+            name: "Prerender",
+            module: "./prerender",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
+            options: {
+                path: siteMapsPath,
+                mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
+                maxLinksLimit: 100,
+                maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                renderDelay: 10 * 1000 // render request delay in ms
+            }
+        },
         {
             name: "5 TOP Share Counters Update",
             module: "./sn-counters",
@@ -70,7 +86,7 @@ module.exports = {
             disabled: false,
             schedule: "0 */10 * * * *", // run every 10 min
             options: {
-                path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
+                path: siteMapsPath,
                 xslUrl: "/main-sitemap.xsl",
                 maps: {
                     lesson: {
@@ -93,7 +109,15 @@ module.exports = {
     server: {
         protocol: 'http',
         address: '0.0.0.0',
-        port: 3000
+        port: 3000,
+        prerender: {
+            usePrerender: false,
+            useRedis: true,
+            redisPrefix: "pg:",
+            expInSec: 14 * 24 * 60 * 60,
+            maxDevSec: 14 * 24 * 60 * 60,
+            url: 'http://127.0.0.1:8000'
+        }
     },
     dbProvider: 'mysql',
     trace: {

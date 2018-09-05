@@ -211,7 +211,7 @@ class Frame extends Component {
         let requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen,
             cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
 
-        if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
             requestFullScreen.call(docEl);
         }
         else {
@@ -244,23 +244,25 @@ class Frame extends Component {
                 </div>
                 {
                     this.props.visible ?
-                        <div>
-                            <PauseScreen {...this.props} isFinished={_isFinished}/>
+                        [
+                            <PauseScreen {...this.props} isFinished={_isFinished}/>,
+                            <Titles/>,
                             <div className="player-frame">
-                                <Titles/>
                                 <div className="player-block">
                                     <Progress id={_id}/>
                                     <div className="player-block__row">
                                         <Controls {...this.props}/>
                                         <div className="player-block__stats">
                                             <TimeInfo/>
-                                            <button type="button" className="speed-button js-speed-trigger player-button"
+                                            <button type="button"
+                                                    className="speed-button js-speed-trigger player-button"
                                                     onClick={::this._openRate}>
                                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
                                             </button>
                                             {
                                                 this.props.contentArray.length > 0 ?
-                                                    <button type="button" className="content-button js-contents-trigger player-button"
+                                                    <button type="button"
+                                                            className="content-button js-contents-trigger player-button"
                                                             onClick={::this._openContent}>
                                                         <svg width="18" height="12"
                                                              dangerouslySetInnerHTML={{__html: _contents}}/>
@@ -282,7 +284,7 @@ class Frame extends Component {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        ]
                         :
                         null
                 }
@@ -290,7 +292,6 @@ class Frame extends Component {
         )
     }
 }
-
 
 
 function mapStateToProps(state) {
