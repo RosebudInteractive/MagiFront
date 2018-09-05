@@ -24,7 +24,7 @@ export default class FadeTimer {
                     _paused = _state.player.paused;
 
                 if (!_paused) {
-                    this.hideScreenConrols();
+                    this.hideScreenControls();
 
                     if (!_hasOpenedMenu) {
                         this._fade()
@@ -64,10 +64,13 @@ export default class FadeTimer {
         }
     }
 
-    hideScreenConrols() {
-        store.dispatch(hideScreenControls())
-        $('.player-block__controls').removeClass('show')
-        $('.lecture-frame__play-block-wrapper').addClass('fade');
+    hideScreenControls() {
+        let _state = store.getState();
+        if (!_state.player.paused) {
+            store.dispatch(hideScreenControls())
+            $('.player-block__controls').removeClass('show')
+            $('.lecture-frame__play-block-wrapper').addClass('fade');
+        }
     }
 
     showScreenContols() {

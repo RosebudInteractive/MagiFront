@@ -25,10 +25,21 @@ class LessonFrame extends React.Component {
         isMain: true
     };
 
-    componentDidMount() {
-        let that = this
+    constructor(props) {
+        super(props)
+        this._touchMoved = false;
+        this._touchEventName = this.props.isMobileApp ? 'touchend' : 'mouseup'
+    }
 
-        $(document).mouseup((e) => {
+    componentDidMount() {
+        let that = this,
+            _player = $('.js-player');
+
+        _player.on(this._touchEventName, (e) => {
+            if (this._touchMoved) {
+                return
+            }
+
             let _isLessonScreen = e.target.closest('#lesson-' + that.props.lesson.Id),
                 _isMenu = e.target.closest('.lectures-menu'),
                 _isButtonTarget = e.target.closest('.lecture-frame__play-btn'),
@@ -40,7 +51,11 @@ class LessonFrame extends React.Component {
             if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu && !_isFavoritesButton) {
                 that._play()
             }
-        })
+        }).on('touchmove', () => {
+            this._touchMoved = true;
+        }).on('touchstart', () => {
+            this._touchMoved = false;
+        });
     }
 
     componentWillUnmount() {
@@ -48,7 +63,9 @@ class LessonFrame extends React.Component {
     }
 
     _removeListeners() {
-        $(document).off('mouseup');
+        $('.js-player').unbind(this._touchEventName);
+        $('.js-player').unbind('touchmove');
+        $('.js-player').unbind('touchstart');
     }
 
     _play() {

@@ -3,25 +3,31 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import Progress from "../../player/progress";
+import Controls from "./controls";
 import ScreenControls from "./screen-controls";
-import Controls from "../desktop/bottom-controls";
 
+import $ from 'jquery'
 import Titles from "../../player/titles";
 import TimeInfo from '../../player/time-info';
 import ContentTooltip from "../../player/content-tooltip";
 import RateTooltip from '../../player/rate-tooltip';
-import SoundButton from '../../player-controls/sound-button'
-import SoundBar from '../../player-controls/sound-bar'
 
 import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
 
-import $ from 'jquery'
-import {isLandscape} from "./tools";
 import FadeTimer from '../fade-timer';
-import {showScreenControlsSelector} from "../../../ducks/player-screen";
 
-class PlayerFrame extends Component {
+$.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top;
+    var elementBottom = elementTop + $(this).outerHeight();
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+
+class Frame extends Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
@@ -33,33 +39,41 @@ class PlayerFrame extends Component {
         this._lessonId = this.props.lesson.Id;
 
         this._fadeTimer = new FadeTimer()
+        this._playerInViewPort = false;
 
         this.state = {
             fullScreen: document.fullscreen,
         }
 
-        this._touchMoved = false;
-
         this._onDocumentReady = () => {
             this._applyViewPort()
         }
 
-        $(document).ready(::this._onDocumentReady)
+        this._resizeHandler = () => {
+            let _isPlayerVisible = $('.js-player').isInViewport()
+            if (this._playerInViewPort && !_isPlayerVisible) {
+                this._fadeTimer.stop()
+            }
+
+            if (!this._playerInViewPort && _isPlayerVisible) {
+                this._fadeTimer.start()
+            }
+
+            this._playerInViewPort = _isPlayerVisible;
+        }
+
+        $(document).ready(this._onDocumentReady)
+        $(window).on('resize scroll', ::this._resizeHandler)
     }
 
     componentDidMount() {
         let that = this,
             _player = $('.js-player');
 
-
-        _player.on('touchend', (e) => {
-            if (this._touchMoved) {
-                return
-            }
-
+        _player.on('mouseup', (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-container') || (e.target.closest('.lecture-frame__play-block') && !e.target.closest('.lecture-frame__play-block button')),
+                _isPlayer = e.target.closest('.ws-container'),
                 _isPauseFrame = e.target.closest('.player-frame__screen'),
                 _isMenuButton = e.target.closest('.menu-button');
 
@@ -68,11 +82,7 @@ class PlayerFrame extends Component {
             }
 
             if (_isPlayer) {
-                if (!that.props.showScreenControls) {
-                    that._fadeTimer.restart()
-                } else {
-                    that.props.playerStartActions.startPause()
-                }
+                that.props.playerStartActions.startPause()
             }
 
             if (_isPauseFrame) {
@@ -87,22 +97,23 @@ class PlayerFrame extends Component {
             if (that._hideRateTooltip) {
                 that.props.playerActions.hideSpeedTooltip()
             }
-        }).on('touchmove', () => {
-            this._touchMoved = true;
-        }).on('touchstart', () => {
-            this._touchMoved = false;
         });
 
-        this._resizeHandler = () => {
-            if (isLandscape()) {
-                this._fadeTimer.start();
-                this._fadeTimer.hideScreenControls();
-            } else {
-                this._fadeTimer.clearFade()
-            }
-        }
+        $(document).bind('webkitfullscreenchange mozfullscreenchange fullscreenchange', () => {
+            let _isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+            this.setState({fullScreen: _isFullScreen})
+        });
 
-        $(window).resize(::this._resizeHandler)
+        $(window).keydown((e) => {
+            if (e.which === 32) {
+                this._onPause()
+                e.preventDefault();
+            }
+        })
+
+        _player.on('mousemove', () => {
+            this._fadeTimer.restart()
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -118,8 +129,7 @@ class PlayerFrame extends Component {
             this._fadeTimer.stop()
         } else {
             if (prevProps.paused && !this.props.paused) {
-                this._fadeTimer.start()
-                this._fadeTimer.hideScreenControls()
+                this._fadeTimer.start();
             }
         }
     }
@@ -130,8 +140,8 @@ class PlayerFrame extends Component {
         }
 
         this._removeListeners();
-        this._clearViewPort();
         this._fadeTimer.stop()
+        this._clearViewPort();
     }
 
     _applyViewPort() {
@@ -150,9 +160,11 @@ class PlayerFrame extends Component {
     }
 
     _removeListeners() {
-        $('.js-player').unbind(this._touchEventName);
+        $('.js-player').unbind('mouseup');
+        $('.js-player').unbind('mousemove');
+        $(document).off('keydown');
         $(document).unbind('ready', this._onDocumentReady);
-        $(window).unbind('resize', this._resizeHandler);
+        $(window).unbind('resize scroll', this._resizeHandler);
     }
 
     _openContent() {
@@ -161,7 +173,6 @@ class PlayerFrame extends Component {
         } else {
             this._hideContentTooltip = false
             this.props.playerActions.hideContentTooltip()
-            this._fadeTimer.start()
         }
     }
 
@@ -171,7 +182,6 @@ class PlayerFrame extends Component {
         } else {
             this._hideRateTooltip = false
             this.props.playerActions.hideSpeedTooltip()
-            this._fadeTimer.start()
         }
     }
 
@@ -209,16 +219,18 @@ class PlayerFrame extends Component {
 
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
-            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>'
+            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
+            _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen"/>',
+            _screen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#screen"/>'
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let {visible, starting, paused, contentArray, } = this.props;
+        let { visible, starting, paused, contentArray, } = this.props;
 
         return (
             <div style={visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={_isFinished ? {visibility: 'hidden'} : null}>
+                <div className="player-frame__poster" style={_isFinished ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
@@ -229,37 +241,43 @@ class PlayerFrame extends Component {
                                 className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
                             starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
-                            <div className="player-block">
-                                <Progress id={_id}/>
-                                <div className="player-block__row">
-                                    <div className="player-block__controls">
-                                        <TimeInfo/>
+                            <div className="player-frame">
+                                <div className="player-block">
+                                    <Progress id={_id}/>
+                                    <div className="player-block__row">
+                                        <Controls {...this.props}/>
+                                        <div className="player-block__stats">
+                                            <TimeInfo/>
+                                            <button type="button"
+                                                    className="speed-button js-speed-trigger player-button"
+                                                    onClick={::this._openRate}>
+                                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
+                                            </button>
+                                            {
+                                                contentArray.length > 0 ?
+                                                    <button type="button"
+                                                            className="content-button js-contents-trigger player-button"
+                                                            onClick={::this._openContent}>
+                                                        <svg width="18" height="12"
+                                                             dangerouslySetInnerHTML={{__html: _contents}}/>
+                                                    </button>
+                                                    :
+                                                    null
+                                            }
+                                            <button type="button"
+                                                    className={"fullscreen-button js-fullscreen" + (this.state.fullScreen ? ' active' : '')}
+                                                    onClick={::this._toggleFullscreen}>
+                                                <svg className="full" width="20" height="18"
+                                                     dangerouslySetInnerHTML={{__html: _fullscreen}}/>
+                                                <svg className="normal" width="20" height="18"
+                                                     dangerouslySetInnerHTML={{__html: _screen}}/>
+                                            </button>
+                                        </div>
+                                        {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
+                                        {showSpeedTooltip ? <RateTooltip/> : ''}
                                     </div>
-                                    <div className="player-block__stats">
-                                        <SoundButton/>
-                                        <SoundBar/>
-                                        {
-                                            contentArray.length > 0 ?
-                                                <button type="button"
-                                                        className="content-button js-contents-trigger player-button"
-                                                        onClick={::this._openContent}>
-                                                    <svg width="18" height="12"
-                                                         dangerouslySetInnerHTML={{__html: _contents}}/>
-                                                </button>
-                                                :
-                                                null
-                                        }
-                                        <button type="button"
-                                                className="speed-button js-speed-trigger player-button"
-                                                onClick={::this._openRate}>
-                                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _speed}}/>
-                                        </button>
-                                    </div>
-                                    {showContentTooltip ? <ContentTooltip id={_id}/> : ''}
-                                    {showSpeedTooltip ? <RateTooltip/> : ''}
                                 </div>
                             </div>
-
                         ]
                         :
                         null
@@ -283,7 +301,6 @@ function mapStateToProps(state) {
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
         lessonInfoStorage: state.lessonInfoStorage,
-        showScreenControls: showScreenControlsSelector(state)
     }
 }
 
@@ -294,4 +311,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlayerFrame);
+export default connect(mapStateToProps, mapDispatchToProps)(Frame);

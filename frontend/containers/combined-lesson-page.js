@@ -19,9 +19,9 @@ import $ from 'jquery'
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as appActions from "../actions/app-actions";
 import * as playerStartActions from "../actions/player-start-actions";
+import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson-page/desktop/tools'
 
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
-import Platform from "platform";
 
 let _scrollTop = 0;
 
@@ -29,24 +29,16 @@ export const setScrollTop = (value) => {
     _scrollTop = value;
 }
 
-const _rate = 1;
-
-function _isLandscape() {
-    let _width = $(window).innerWidth(),
-        _height = $(window).innerHeight();
-
-    return (_width * _rate) > _height
-}
-
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
-        this._isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone")
+        // this._isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone")
 
         this.state = {
             redirectToPlayer: false,
-
         }
+
+        this._resizeTimer = null;
 
         this._handleScroll = () => {
             let _controls = $('.js-gallery-controls');
@@ -105,7 +97,6 @@ class TranscriptLessonPage extends React.Component {
                 let _height = $('.js-player').outerHeight(),
                     _menu = $('.js-lectures-menu');
 
-                console.log(st, ' : ', _height);
                 _height = _menu.hasClass('desktop') ? _height - _menu.height() : _height;
 
                 if (st > _height) {
@@ -123,16 +114,25 @@ class TranscriptLessonPage extends React.Component {
             }
         }
 
+        this._resizeHandler = () => {
+            $('body').addClass('resizing');
+            clearTimeout(this._resizeTimer);
+            this._resizeTimer = setTimeout(() => {
+                $('body').removeClass('resizing');
+            }, 500);
+        }
         this._addEventListeners();
     }
 
     _addEventListeners() {
         window.addEventListener('scroll', this._handleScroll);
+        window.addEventListener('resize', this._resizeHandler);
 
     }
 
     _removeEventListeners() {
         window.removeEventListener('scroll', this._handleScroll);
+        window.removeEventListener('resize', this._resizeHandler);
         $('body').removeClass('_player');
     }
 
@@ -325,35 +325,38 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {authors} = this.props.lessonInfo;
+        let {authors} = this.props.lessonInfo,
+            {lessonText, lessonUrl, playingLesson, isMobileApp, } = this.props,
+            _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         lesson.Author = authors.find((author) => {
             return author.Id === lesson.AuthorId
         });
 
 
-        let _playingLessonUrl = (lesson.URL === this.props.lessonUrl) && (this.props.params === '?play'),
-            _lessonInPlayer = (this.props.playingLesson && (lesson.URL === this.props.playingLesson.lessonUrl))
+        let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
+            _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
 
         let _audios = this._getAudios(lesson);
 
-        return (!this._isMobile && _isLandscape()) ?
-            <DesktopLessonWrapper lesson={lesson}
-                                  episodes={this.props.lessonText.episodes}
-                                  courseUrl={this.props.courseUrl}
-                                  lessonUrl={lesson.URL}
-                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
-                                  audios={_audios}
-                                  history={this.props.history}
-            />
-            :
+        return (isMobileApp) ?
             <MobileLessonWrapper lesson={lesson}
                                  courseUrl={this.props.courseUrl}
                                  lessonUrl={lesson.URL}
                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
                                  audios={_audios}
                                  history={this.props.history}
-                                 isMobileControls={this._isMobile}
+            />
+            :
+            <DesktopLessonWrapper lesson={lesson}
+                                  isNeedHideRefs={_isNeedHideRefs}
+                                  episodes={lessonText.episodes}
+                                  active={lesson.Id}
+                                  courseUrl={this.props.courseUrl}
+                                  lessonUrl={lesson.URL}
+                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                  audios={_audios}
+                                  history={this.props.history}
             />
     }
 
@@ -373,20 +376,17 @@ class TranscriptLessonPage extends React.Component {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
-        let _isNeedHideFixedMenu = _isLandscape() && !this._isMobile;
-
         return (
             fetching || !(lesson && _lesson && lessonText.loaded) ?
                 <p>Загрузка...</p>
                 :
-
                 [
                     <Menu lesson={_lesson}
                           isNeedHideRefs={_isNeedHideRefs}
                           episodes={lessonText.episodes}
                           active={_lesson.Id}
                           history={this.props.history}
-                          extClass={_isNeedHideFixedMenu ? 'desktop landscape' : ''}/>,
+                          extClass={isDesktopInLandscape() ? 'pushed' : ''}/>,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
@@ -441,6 +441,7 @@ class GalleryButtons extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
+        isMobileApp: state.app.isMobileApp,
         courseUrl: ownProps.match.params.courseUrl,
         lessonUrl: ownProps.match.params.lessonUrl,
         params: ownProps.location.search,
