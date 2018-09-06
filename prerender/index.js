@@ -1,5 +1,6 @@
 'use strict'
-let prerender = require('prerender-node');
+// let prerender = require('prerender-node');
+let prerender = require('./prerender-magisteria');
 const _ = require('lodash');
 const config = require('config');
 const { PrerenderCache } = require('./prerender-cache');
