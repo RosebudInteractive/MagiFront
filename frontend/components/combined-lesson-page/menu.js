@@ -25,39 +25,40 @@ class Menu extends React.Component {
     }
 
     _onFullScreenClick() {
-        // let _wrapper = $(".global-wrapper"),
-        //     _player = $('.js-player'),
-        //
-        //     _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
-        //     _wrapperOffsetPosition = _wrapper.offset().top,
-        //     _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
-        //     _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
-        //
-        // $('html, body').animate({
-        //     scrollTop: _scroll
-        // }, 600);
-        if (this.props.showSizeInfo) {
-            this.props.appActions.hideSizeInfo()
-        } else {
-            this.props.appActions.showSizeInfo()
-        }
+        let _wrapper = $(".global-wrapper"),
+            _player = $('.js-player'),
+
+            _wrapperCurrentScrollPosition = _wrapper.scrollTop(),
+            _wrapperOffsetPosition = _wrapper.offset().top,
+            _playerOffsetPosition = _player.offset().top - _wrapperOffsetPosition,
+            _scroll = _wrapperCurrentScrollPosition + _playerOffsetPosition;
+
+        $('html, body').animate({
+            scrollTop: _scroll
+        }, 600);
+        // if (this.props.showSizeInfo) {
+        //     this.props.appActions.hideSizeInfo()
+        // } else {
+        //     this.props.appActions.showSizeInfo()
+        // }
     }
 
     render() {
         const _fullscreen = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
 
-        let {course, lessons} = this.props,
+        let {course, lessons, isLessonMenuOpened, isMobileApp, extClass} = this.props,
             _courseTitle = course ? course.Name : '',
             _courseUrl = course ? course.URL : '',
-            _total = lessons.object.length;
-
-        let _type = this._getMenuType();
+            _total = lessons.object.length,
+            _type = this._getMenuType(),
+            _menuClassName = "lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
+                (isLessonMenuOpened ? ' opened' : '') +
+                (isMobileApp ? ' mobile' : ' desktop') +
+                (extClass ? ' ' + extClass : '')
 
         return (
             <div
-                className={"lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
-                            (this.props.isLessonMenuOpened ? ' opened' : '') +
-                            (this.props.extClass ? ' ' + this.props.extClass : '')}>
+                className={_menuClassName}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
                 <ListBlock total={_total}
                            courseUrl={_courseUrl}
@@ -211,12 +212,14 @@ class Navigation extends React.Component {
     }
 
     render() {
-        let {isNeedHideRefs} = this.props;
+        let {isNeedHideRefs} = this.props,
+            _sectionClassName = "lectures-menu__section section-nav js-section-nav" +
+                (this.state.expanded ? ' expanded' : '')
 
         const _dots = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#dots"/>';
 
         return (
-            <section className={"lectures-menu__section section-nav js-section-nav" + (this.state.expanded ? ' expanded' : '')}>
+            <section className={_sectionClassName}>
                 <button className="section-nav__trigger js-section-nav-trigger" onClick={::this._onTriggerClick}>
                     <span className="visually-hidden">Меню</span>
                     <svg width="4" height="18" dangerouslySetInnerHTML={{__html: _dots}}/>
@@ -249,6 +252,7 @@ class Navigation extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        isMobileApp: state.app.isMobileApp,
         lessons: state.lessons,
         course: state.singleLesson.course,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

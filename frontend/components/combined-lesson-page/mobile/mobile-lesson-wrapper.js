@@ -39,31 +39,27 @@ export default class Wrapper extends React.Component {
         this._resizeHandler = () => {
             let _control = $('.lesson-player');
 
-            if (!this.props.isMobileControls) {
-                _control.addClass('added')
-            } else {
-                if (isLandscape()) {
-                    _control.removeClass('added')
+            if (isLandscape()) {
+                _control.removeClass('added')
 
-                    this.setState({
-                        wrapperHeight: _getLandscapeHeight() + 'px'
-                    })
-                } else {
-                    _control.addClass('added')
-                    this.setState({
-                        wrapperHeight: null
-                    })
-                }
+                this.setState({
+                    wrapperHeight: _getLandscapeHeight() + 'px'
+                })
+            } else {
+                _control.addClass('added')
+                this.setState({
+                    wrapperHeight: null
+                })
             }
         }
 
-        $(window).resize(this._resizeHandler)
+        $(window).resize(::this._resizeHandler)
     }
 
     componentDidMount() {
         this._resizeHandler();
 
-        if (this.props.isMobileControls && isLandscape()) {
+        if (isLandscape()) {
             this.setState({
                 wrapperHeight: _getLandscapeHeight() + 'px'
             })
@@ -81,8 +77,8 @@ export default class Wrapper extends React.Component {
         let {isPlayer} = this.props;
         const _coverStyle = {}
 
-        if (!isPlayer)  {
-            _coverStyle.backgroundImage ="radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
+        if (!isPlayer) {
+            _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
         }
 
         if (this.state.wrapperHeight) {
@@ -90,9 +86,10 @@ export default class Wrapper extends React.Component {
         }
 
         return (
-            <section className='lecture-wrapper lesson-player js-player mobile'
-                     id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                     style={_coverStyle}>
+            <section
+                className='lecture-wrapper lesson-player js-player mobile'
+                id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
+                style={_coverStyle}>
                 <div className={'lesson-sub-wrapper'}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>
