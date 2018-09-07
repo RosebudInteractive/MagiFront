@@ -203,7 +203,11 @@ class TranscriptLessonPage extends React.Component {
 
         if ((!prevProps.playingLesson && this.props.playingLesson) || (prevProps.playingLesson && this.props.playingLesson && prevProps.playingLesson.LessonId !== this.props.playingLesson.LessonId)) {
             if (_scrollTop > 0) {
-                $('body, html').scrollTop(_scrollTop);
+                $('html, body').animate({
+                    scrollTop: _scrollTop
+                }, 300);
+
+                // $('body, html').scrollTop(_scrollTop);
                 _scrollTop = 0;
             }
         }

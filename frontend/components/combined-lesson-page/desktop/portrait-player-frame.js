@@ -15,6 +15,7 @@ import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
 
 import $ from 'jquery'
+import FadeTimer from '../fade-timer';
 
 class PlayerFrame extends Component {
 
@@ -30,6 +31,8 @@ class PlayerFrame extends Component {
         this.state = {
             fullScreen: document.fullscreen,
         }
+
+        this._fadeTimer = new FadeTimer()
 
         this._onDocumentReady = () => {
             this._applyViewPort()
@@ -72,6 +75,10 @@ class PlayerFrame extends Component {
             }
         })
 
+        _player.on('mousemove', () => {
+            this._fadeTimer.restart()
+        });
+
         $(window).keydown((e) => {
             if (e.which === 32) {
                 this._onPause()
@@ -88,6 +95,14 @@ class PlayerFrame extends Component {
                 this._viewPortApplied = false;
             }
         }
+
+        if (!prevProps.paused && this.props.paused) {
+            this._fadeTimer.stop()
+        } else {
+            if (prevProps.paused && !this.props.paused) {
+                this._fadeTimer.start();
+            }
+        }
     }
 
     componentWillUnmount() {
@@ -96,6 +111,7 @@ class PlayerFrame extends Component {
         }
 
         this._removeListeners();
+        this._fadeTimer.stop()
         this._clearViewPort();
     }
 
@@ -116,6 +132,7 @@ class PlayerFrame extends Component {
 
     _removeListeners() {
         $('.js-player').unbind('mouseup');
+        $('.js-player').unbind('mousemove');
         $(document).unbind('ready', this._onDocumentReady);
         $(window).unbind('keydown');
     }
