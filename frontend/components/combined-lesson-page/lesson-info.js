@@ -76,72 +76,86 @@ class LessonInfo extends React.Component {
     render() {
         let {lesson} = this.props;
 
+        return (
+            lesson && lesson.Lessons && (lesson.Lessons.length > 0)
+                ?
+                <section className="lecture-info">
+                    <div className="lecture-info__wrapper">
+                        {/*<InfoBlock lesson = {lesson}/>*/}
+                        {/*<SocialBlock/>*/}
+                        <div className="lecture-info__extras">
+                            <p className="lecture-info__extras-label">Доп<span
+                                className="mobile">олнительные</span><span
+                                className="desktop">.</span> эпизоды</p>
+                            <ol className="lecture-info__extras-list extras-list _full" data-number="10">
+                                {this._getSublessonList()}
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+                :
+                null
+        )
+    }
+}
+
+class InfoBlock extends React.Component {
+
+    render() {
+        let {lesson} = this.props;
+
+        return (
+            <div className="lecture-info__block _mobile">
+                <h2 className="lecture-info__title">
+                    <span className="number">{lesson.Number + '. '}</span>{lesson.Name}
+                </h2>
+                <p className="lecture-info__descr">{lesson.ShortDescription + ' '}
+                    <span
+                        className="lecture-info__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</span>
+                </p>
+            </div>
+        )
+    }
+
+}
+
+class SocialBlock extends React.Component {
+    render() {
+
         const _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
             _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>',
             _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>';
 
         return (
-            lesson
-                ?
-                <section className="lecture-info">
-                    <div className="lecture-info__wrapper">
-                        <div className="lecture-info__block _mobile">
-                            <h2 className="lecture-info__title">
-                                <span className="number">{lesson.Number + '. '}</span>{lesson.Name}
-                            </h2>
-                            <p className="lecture-info__descr">{lesson.ShortDescription + ' '}
-                                <span
-                                    className="lecture-info__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</span>
-                            </p>
+            <div className="social-block social-block--dark _mobile">
+                <div className="social-block__inner">
+                    <a href="#" className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
-                        <div className="social-block social-block--dark _mobile">
-                            <div className="social-block__inner">
-                                <a href="#" className="social-btn _active">
-                                    <div className="social-btn__icon">
-                                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                                    </div>
-                                    <span className="social-btn__actions">64</span>
-                                </a>
-                                <a href="#" className="social-btn _active">
-                                    <div className="social-btn__icon">
-                                        <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
-                                    </div>
-                                    <span className="social-btn__actions">91</span>
-                                </a>
-                                <a href="#" className="social-btn _active">
-                                    <div className="social-btn__icon">
-                                        <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
-                                    </div>
-                                    <span className="social-btn__actions">4</span>
-                                </a>
-                                <a href="#" className="social-btn">
-                                    <div className="social-btn__icon">
-                                        <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
-                                    </div>
-                                    <span className="social-btn__actions"/>
-                                </a>
-                            </div>
+                        <span className="social-btn__actions">64</span>
+                    </a>
+                    <a href="#" className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
-                        {
-                            lesson.Lessons && (lesson.Lessons.length > 0)
-                                ?
-                                <div className="lecture-info__extras">
-                                    <p className="lecture-info__extras-label">Доп<span
-                                        className="mobile">олнительные</span><span
-                                        className="desktop">.</span> эпизоды</p>
-                                    <ol className="lecture-info__extras-list extras-list _full" data-number="10">
-                                        {this._getSublessonList()}
-                                    </ol>
-                                </div>
-                                :
-                                null
-                        }
-
-                    </div>
-                </section>
-                :
-                null
+                        <span className="social-btn__actions">91</span>
+                    </a>
+                    <a href="#" className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
+                        </div>
+                        <span className="social-btn__actions">4</span>
+                    </a>
+                    <a href="#" className="social-btn">
+                        <div className="social-btn__icon">
+                            <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
+                        </div>
+                        <span className="social-btn__actions"/>
+                    </a>
+                </div>
+            </div>
         )
     }
 }

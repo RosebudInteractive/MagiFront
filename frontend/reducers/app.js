@@ -11,6 +11,8 @@ import {
     SHOW_COURSES_BOOKMARKS,
     SHOW_SIZE_INFO,
     HIDE_SIZE_INFO,
+    OPEN_GALLERY,
+    CLOSE_GALLERY,
 } from '../constants/app'
 
 import {
@@ -28,6 +30,7 @@ const initialState = {
     showLessonBookmarks: false,
     showCourseBookmarks: true,
     showSizeInfo: false,
+    galleryIsOpen: false,
 };
 
 export default function app(state = initialState, action) {
@@ -99,6 +102,14 @@ export default function app(state = initialState, action) {
 
         case HIDE_SIZE_INFO: {
             return {...state, showSizeInfo: false}
+        }
+
+        case OPEN_GALLERY: {
+            return {...state, galleryIsOpen: true}
+        }
+
+        case CLOSE_GALLERY: {
+            return {...state, galleryIsOpen: false}
         }
 
         default:

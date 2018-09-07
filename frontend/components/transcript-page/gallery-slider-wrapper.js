@@ -1,11 +1,16 @@
 import React from 'react';
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 import PropTypes from 'prop-types';
 import Swiper from 'swiper';
+
+import * as appActions from "../../actions/app-actions";
+
 import $ from 'jquery'
 import {getImagePath, ImageSize} from "../../tools/page-tools";
 import {Link} from 'react-router-dom';
 
-export default class GalleryWrapper extends React.Component {
+class GalleryWrapper extends React.Component {
 
     static propTypes = {
         gallery: PropTypes.array.isRequired,
@@ -55,6 +60,10 @@ export default class GalleryWrapper extends React.Component {
         });
     }
 
+    componentWillUnmount() {
+        this.props.appActions.closeGallery()
+    }
+
     _openGallerySlider() {
         let _controls = $('.js-gallery-controls'),
             _wrap = $('.js-gallery-slider-wrapper'),
@@ -63,6 +72,8 @@ export default class GalleryWrapper extends React.Component {
         _controls.removeClass('hide').addClass('show');
         _wrap.addClass('show');
         _stickyBlock.addClass('slider-opened');
+
+        this.props.appActions.openGallery()
     }
 
     _closeGallerySlider() {
@@ -73,6 +84,8 @@ export default class GalleryWrapper extends React.Component {
         _controls.addClass('hide').removeClass('show');
         _wrap.removeClass('show');
         _stickyBlock.removeClass('slider-opened');
+
+        this.props.appActions.closeGallery()
     }
 
     _getList() {
@@ -106,3 +119,11 @@ export default class GalleryWrapper extends React.Component {
         )
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        appActions: bindActionCreators(appActions, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(GalleryWrapper);

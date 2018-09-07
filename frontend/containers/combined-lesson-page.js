@@ -32,7 +32,6 @@ export const setScrollTop = (value) => {
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
-        // this._isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone")
 
         this.state = {
             redirectToPlayer: false,
@@ -102,7 +101,9 @@ class TranscriptLessonPage extends React.Component {
                 if (st > _height) {
                     _menu.removeClass('_dark');
                     _menu.addClass('_fixed');
-                    // this.props.playerStartActions.startPause()
+                    if (this.props.galleryIsOpen) {
+                        _openGallerySlider()
+                    }
                 } else {
                     _menu.addClass('_dark');
                     _menu.removeClass('_fixed');
@@ -155,11 +156,6 @@ class TranscriptLessonPage extends React.Component {
         $('body').addClass('_player');
         $('[data-fancybox]').fancybox();
         this._handleScroll();
-
-        if (_scrollTop > 0) {
-            $('body, html').scrollTop(_scrollTop);
-            _scrollTop = 0;
-        }
     }
 
     componentWillUnmount() {
@@ -204,9 +200,12 @@ class TranscriptLessonPage extends React.Component {
             document.title = 'Лекция: ' + _lesson.Name + ' - Магистерия'
         }
 
-        if (_scrollTop > 0) {
-            $('body, html').scrollTop(_scrollTop);
-            _scrollTop = 0;
+
+        if ((!prevProps.playingLesson && this.props.playingLesson) || (prevProps.playingLesson && this.props.playingLesson && prevProps.playingLesson.LessonId !== this.props.playingLesson.LessonId)) {
+            if (_scrollTop > 0) {
+                $('body, html').scrollTop(_scrollTop);
+                _scrollTop = 0;
+            }
         }
     }
 
@@ -297,6 +296,13 @@ class TranscriptLessonPage extends React.Component {
         return _lesson
     }
 
+    _isMainLesson() {
+        let {lessonUrl, lessonInfo} = this.props,
+            lesson = lessonInfo.object;
+
+        return lesson.URL === lessonUrl
+    }
+
     _getAudios(lesson) {
         let {lessons} = this.props,
             _lessonAudios = null;
@@ -346,6 +352,7 @@ class TranscriptLessonPage extends React.Component {
                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
                                  audios={_audios}
                                  history={this.props.history}
+                                 isMain={this._isMainLesson()}
             />
             :
             <DesktopLessonWrapper lesson={lesson}
@@ -357,6 +364,7 @@ class TranscriptLessonPage extends React.Component {
                                   isPlayer={_playingLessonUrl || _lessonInPlayer}
                                   audios={_audios}
                                   history={this.props.history}
+                                  isMain={this._isMainLesson()}
             />
     }
 
@@ -365,7 +373,8 @@ class TranscriptLessonPage extends React.Component {
             lesson,
             lessonText,
             fetching,
-            authorized
+            authorized,
+            isMobileApp
         } = this.props;
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
@@ -386,7 +395,7 @@ class TranscriptLessonPage extends React.Component {
                           episodes={lessonText.episodes}
                           active={_lesson.Id}
                           history={this.props.history}
-                          extClass={isDesktopInLandscape() ? 'pushed' : ''}/>,
+                          extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>,
                     _isNeedHideGallery ? null : <GalleryButtons/>,
                     lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                     this._getLessonsBundles(),
@@ -413,6 +422,16 @@ function closeGallerySlider() {
     controls.addClass('hide').removeClass('show');
     wrap.removeClass('show');
     stickyBlock.removeClass('slider-opened');
+}
+
+function _openGallerySlider() {
+    let _controls = $('.js-gallery-controls'),
+        _wrap = $('.js-gallery-slider-wrapper'),
+        _stickyBlock = $('.js-sticky-block');
+
+    _controls.removeClass('hide').addClass('show');
+    _wrap.addClass('show');
+    _stickyBlock.addClass('slider-opened');
 }
 
 class GalleryButtons extends React.Component {
@@ -457,6 +476,7 @@ function mapStateToProps(state, ownProps) {
 
         playInfo: state.lessonPlayInfo.playInfo,
         playingLesson: state.player.playingLesson,
+        galleryIsOpen: state.app.galleryIsOpen,
     }
 }
 

@@ -99,6 +99,8 @@ class TextBlock extends React.Component {
                     }
 
                 }
+
+                _isToc = false;
             })
 
             _re.lastIndex = 0;
