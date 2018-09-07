@@ -7,7 +7,13 @@ import {
     SHOW_LESSON_MENU,
     SET_APP_TYPE_MOBILE,
     SHOW_USER_BLOCK,
-    HIDE_USER_BLOCK, SHOW_LESSONS_BOOKMARKS, SHOW_COURSES_BOOKMARKS, SHOW_SIZE_INFO, HIDE_SIZE_INFO,
+    HIDE_USER_BLOCK,
+    SHOW_LESSONS_BOOKMARKS,
+    SHOW_COURSES_BOOKMARKS,
+    SHOW_SIZE_INFO,
+    HIDE_SIZE_INFO,
+    OPEN_GALLERY,
+    CLOSE_GALLERY,
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
@@ -101,6 +107,20 @@ export const showSizeInfo = () => {
 export const hideSizeInfo = () => {
     return {
         type: HIDE_SIZE_INFO,
+        payload: null
+    }
+};
+
+export const openGallery = () => {
+    return {
+        type: OPEN_GALLERY,
+        payload: null
+    }
+};
+
+export const closeGallery = () => {
+    return {
+        type: CLOSE_GALLERY,
         payload: null
     }
 };
