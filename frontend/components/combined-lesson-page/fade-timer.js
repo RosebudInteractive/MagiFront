@@ -53,6 +53,7 @@ export default class FadeTimer {
     clearFade() {
         store.dispatch(clearFade())
         $('body').removeClass('fade');
+        $('.lecture-frame__fav').removeClass('fade')
     }
 
     _fade() {
@@ -62,6 +63,8 @@ export default class FadeTimer {
             store.dispatch(setFade())
             $('body').addClass('fade');
         }
+
+        $('.lecture-frame__fav').addClass('fade')
     }
 
     hideScreenControls() {

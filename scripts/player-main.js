@@ -19,6 +19,12 @@ import 'jquery-ui/jquery-ui.js';
 import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
 
+import 'script-lib/../widgets/work-shop/work-shop-custom.css'
+import 'script-lib/../widgets/work-shop/player.css'
+import '../css/font-awesome.css'
+import 'jquery-ui/jquery-ui.min.css';
+import 'jquery-ui/jquery-ui.structure.min.css';
+
 var Utils = {};
 
 Utils.guid = function () {

@@ -7738,14 +7738,26 @@ body[data-page="fullpage-player"] .lectures-menu {
     /*background-color: rgba(255, 255, 255, 0);*/
     border: none;
     outline: none;
-    -webkit-transition: opacity 0.3s ease;
-    transition: opacity 0.3s ease;
+    -webkit-transition: opacity 0.5s ease;
+    transition: opacity 0.5s ease;
     position: absolute;
-    top: 45px;
-    right: 32px;
-    width: 14px;
-    height: 23px; background-color: rgba(47, 47, 47, 0.6);
-    border-radius: 50%;}
+    top: 35px;
+    right: 18px;
+    /*width: 14px;*/
+    /*height: 23px; */
+    /*background-color: rgba(47, 47, 47, 0.6);*/
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    background-color: rgba(47, 47, 47, 0.6);
+    border-radius: 50%;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lecture-frame__fav.fade {
+    opacity: 0;
+    pointer-events: none;
+  }
   .lesson-wrapper.desktop .lecture-frame__fav {
     top: 76px;
   }
@@ -7772,6 +7784,10 @@ body[data-page="fullpage-player"] .lectures-menu {
           -ms-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%); } }
     .lecture-frame__fav svg {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      top: 50%;
       display: block;
       width: 14px;
       height: 23px;
