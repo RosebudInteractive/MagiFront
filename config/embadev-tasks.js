@@ -18,10 +18,28 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Mailing",
+            module: "./mailing",
+            type: "scheduled-task",
+            disabled: false,
+            // schedule: "0 35 5 * * mon", // run at 5:35 on monday
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                testUrl: "https://new.magisteria.ru",
+                first_date: "2018-3-1",
+                period: "week",
+                sender: "test.magisteria.ru",
+                senderName: "Magisteria.Ru",
+                mailList: "My Emails",
+                infoMailList: "Info",
+                errMailList: "Errors"
+            }
+        },
+        {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
@@ -134,6 +152,10 @@ let options = {
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },
     mail: {
+        sendPulse: {
+            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
+            apiSecret: "2593d02228f842c412e51d24de824dde"
+        },
         userReg: {
             type: "test",//"smtp",
             template: "./templates/mail/registration.tmpl",

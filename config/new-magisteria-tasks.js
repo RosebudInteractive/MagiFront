@@ -101,6 +101,7 @@ module.exports = {
     ],
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
+    dataUrl: '/data',
     proxyServer: {
         protocol: 'https',
         address: 'new.magisteria.ru',
