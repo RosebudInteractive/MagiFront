@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const defer = require('config/defer').deferConfig;
 
 const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitemaps"));
@@ -130,6 +131,11 @@ module.exports = {
         keyPrefix: 'lpos:uid:'
     },
     mail: {
+        sendPulse: {
+            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
+            apiSecret: "2593d02228f842c412e51d24de824dde",
+            tmpPath: path.join(os.tmpdir(), path.sep),
+        },
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",

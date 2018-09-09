@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const defer = require('config/defer').deferConfig;
 
 let proxyServer = {
@@ -28,9 +29,9 @@ let options = {
                 testUrl: "https://new.magisteria.ru",
                 first_date: "2018-3-1",
                 period: "week",
-                sender: "test.magisteria.ru",
+                sender: "test@magisteria.ru",
                 senderName: "Magisteria.Ru",
-                mailList: "My Emails",
+                mailList: "My emails",
                 infoMailList: "Info",
                 errMailList: "Errors"
             }
@@ -154,7 +155,8 @@ let options = {
     mail: {
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
-            apiSecret: "2593d02228f842c412e51d24de824dde"
+            apiSecret: "2593d02228f842c412e51d24de824dde",
+            tmpPath: path.join(os.tmpdir(), path.sep),
         },
         userReg: {
             type: "test",//"smtp",

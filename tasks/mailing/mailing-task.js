@@ -49,9 +49,9 @@ const GET_LESSONS_MYSQL =
 
 const dfltSettings = {
     period: "week",
-    sender: "test.magisteria.ru",
+    sender: "test@magisteria.ru",
     senderName: "Magisteria.Ru",
-    mailList: "My Emails",
+    mailList: "My emails",
     infoMailList: "Info",
     errMailList: "Errors",
     imgDir: "mails",
@@ -75,8 +75,10 @@ exports.MailingTask = class MailingTask extends Task {
     constructor(name, options) {
         super(name, options);
         let opts = options || {};
+        this._addressBooks = {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
         this._settings.baseUrl = this._settings.testUrl ? this._settings.testUrl : config.proxyServer.siteHost;
+        sendpulse.init(config.mail.sendPulse.apiUserId, config.mail.sendPulse.apiSecret, config.mail.sendPulse.tmpPath);
     }
 
     _formatDate(dt, mode) {
@@ -106,9 +108,9 @@ exports.MailingTask = class MailingTask extends Task {
     }
 
     _getLessons() {
+        let first_date;
+        let last_date;
         return new Promise((resolve, reject) => {
-            let first_date;
-            let last_date;
             this._settings.letter = {};
             switch (this._settings.period) {
                 case "week":
@@ -137,7 +139,11 @@ exports.MailingTask = class MailingTask extends Task {
         })
             .then((result) => {
                 let data = (result && result.detail && (result.detail.length > 0)) ? result.detail : [];
-                return data;
+                return {
+                    first_date: first_date,
+                    last_date: new Date(last_date.setDate(last_date.getDate() - 1)),
+                    data: data
+                };
             })
     }
 
@@ -282,9 +288,9 @@ exports.MailingTask = class MailingTask extends Task {
 
     _buildLetter(lessons) {
         let imgDir;
-        let letter = {};
+        let letter = { first_date: lessons.first_date, last_date: lessons.last_date, ids: [] };
         let letterTmpl;
-        return new Promise(resolve=>{
+        return new Promise(resolve => {
             imgDir = path.join(config.uploadPath, this._settings.imgDir);
             resolve(this._forceDir(imgDir));
         })
@@ -296,7 +302,7 @@ exports.MailingTask = class MailingTask extends Task {
                 let lessons_body = "";
                 return readFileAsync("./mailing/templates/lesson-item.tmpl", "utf8")
                     .then(lessonTmpl => {
-                        return Utils.seqExec(lessons, (lesson) => {
+                        return Utils.seqExec(lessons.data, (lesson) => {
                             return this._makePicture(lesson, imgDir)
                                 .then(imgFile => {
                                     let lsn = _.template(lessonTmpl)({
@@ -309,11 +315,11 @@ exports.MailingTask = class MailingTask extends Task {
                                         lesson_img_url: this._settings.baseUrl + this._settings.imgUrl + imgFile
                                     });
                                     lessons_body += lsn;
+                                    letter.ids.push(lesson.Id);
                                 });
                         });
                     })
                     .then(() => {
-                        console.log(lessons_body);
                         letter.body = _.template(letterTmpl)({
                             root_url: this._settings.baseUrl,
                             logo_url: this._settings.baseUrl + this._settings.mailLogo,
@@ -328,15 +334,58 @@ exports.MailingTask = class MailingTask extends Task {
                             ok_img_url: this._settings.baseUrl + this._settings.okLogo
                         });
                         return writeFileAsync("../../test.html", letter.body, "utf8");
+                    })
+                    .then(() => letter);
+            });
+    }
+
+    _sendLetter(letter) {
+        let mailList;
+        return new Promise(resolve => {
+            this._addressBooks = {};
+            sendpulse.listAddressBooks(result => {
+                if (result && Array.isArray(result) && (result.length)) {
+                    result.forEach(elem => {
+                        this._addressBooks[elem.name] = elem;
+                    })
+                    mailList = this._addressBooks[this._settings.mailList];
+                    if (!mailList)
+                        throw new Error(`Mail list "${this._settings.mailList}" is missing!`);
+                    resolve(mailList);
+                }
+                else
+                    throw new Error(`List of address books is empty!`);
+            });
+        })
+            .then(() => {
+                return new Promise((resolve, reject) => {
+                    let msgSubject = _.template("Новые лекции с <%= first_date %> по <%= last_date %>")({
+                        first_date: this._formatDate(letter.first_date, "text"),
+                        last_date: this._formatDate(letter.last_date, "text")
                     });
+                    sendpulse.createCampaign(data => {
+                        if (data && (!data.is_error)) {
+                            resolve(data);
+                        }
+                        else
+                            reject(new Error(`Send error: ${data.message ? data.message : "Unknown error."}`));
+                    }, this._settings.senderName, this._settings.sender, msgSubject, letter.body, mailList.id, msgSubject);
+                });
+            })
+            .then(data => {
+                console.log(data);
             });
     }
 
     run(fireDate) {
         return this._getLessons()
             .then(lessons => {
-                if (lessons.length > 0)
+                if (lessons && (lessons.data.length > 0))
                     return this._buildLetter(lessons);
+            })
+            .then(letter => {
+                if (letter)
+                    return this._sendLetter(letter);
             });
     }
 };
