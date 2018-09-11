@@ -30,10 +30,10 @@ let options = {
                 first_date: "2018-3-1",
                 period: "week",
                 sender: "test@magisteria.ru",
-                senderName: "Magisteria.Ru",
+                senderName: "Magisteria.ru",
                 mailList: "My emails",
-                infoMailList: "Info",
-                errMailList: "Errors"
+                infoRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru",
+                errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
             }
         },
         {
@@ -158,11 +158,25 @@ let options = {
             apiSecret: "2593d02228f842c412e51d24de824dde",
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
-        userReg: {
+        mailing: {
             type: "test",//"smtp",
+            sender: '"Magisteria.ru" <' + process.env.GMAIL_USER + '@gmail.com>',
+            options: {
+                disableUrlAccess: false,
+                host: process.env.GMAIL_SMTP_HOST,
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: process.env.GMAIL_USER,
+                    pass: process.env.GMAIL_PWD
+                }
+            }
+        },
+        userReg: {
+            type: "test",//,"smtp"
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <' + process.env.YANDEX_USER + '@yandex.ru>',
+            sender: '"Magisteria.ru" <' + process.env.YANDEX_USER + '@yandex.ru>',
             options: {
                 disableUrlAccess: false,
                 host: process.env.YANDEX_SMTP_HOST,
@@ -178,7 +192,7 @@ let options = {
             type: "test",//"smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <' + process.env.GMAIL_USER + '@gmail.com>',
+            sender: '"Magisteria.ru" <' + process.env.GMAIL_USER + '@gmail.com>',
             options: {
                 disableUrlAccess: false,
                 host: process.env.GMAIL_SMTP_HOST,

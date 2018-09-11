@@ -136,11 +136,25 @@ module.exports = {
             apiSecret: "2593d02228f842c412e51d24de824dde",
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
+        mailing: {
+            type: "smtp",
+            sender: '"Magisteria.ru" <test@magisteria.ru>',
+            options: {
+                disableUrlAccess: false,
+                host: "smtp.yandex.ru",
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: "test@magisteria.ru",
+                    pass: "S4zf4ckK"
+                }
+            }
+        },
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            sender: '"Magisteria.ru" <test@magisteria.ru>',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
@@ -156,7 +170,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <test@magisteria.ru>',
+            sender: '"Magisteria.ru" <test@magisteria.ru>',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
