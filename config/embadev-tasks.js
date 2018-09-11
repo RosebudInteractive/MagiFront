@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const defer = require('config/defer').deferConfig;
 
 let proxyServer = {
@@ -18,10 +19,28 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Mailing",
+            module: "./mailing",
+            type: "scheduled-task",
+            disabled: false,
+            // schedule: "0 35 5 * * mon", // run at 5:35 on monday
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                testUrl: "https://new.magisteria.ru",
+                first_date: "2018-3-1",
+                period: "week",
+                sender: "test@magisteria.ru",
+                senderName: "Magisteria.ru",
+                mailList: "My emails",
+                infoRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru",
+                errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
+            }
+        },
+        {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
@@ -134,11 +153,30 @@ let options = {
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },
     mail: {
-        userReg: {
+        sendPulse: {
+            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
+            apiSecret: "2593d02228f842c412e51d24de824dde",
+            tmpPath: path.join(os.tmpdir(), path.sep),
+        },
+        mailing: {
             type: "test",//"smtp",
+            sender: '"Magisteria.ru" <' + process.env.GMAIL_USER + '@gmail.com>',
+            options: {
+                disableUrlAccess: false,
+                host: process.env.GMAIL_SMTP_HOST,
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: process.env.GMAIL_USER,
+                    pass: process.env.GMAIL_PWD
+                }
+            }
+        },
+        userReg: {
+            type: "test",//,"smtp"
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <' + process.env.YANDEX_USER + '@yandex.ru>',
+            sender: '"Magisteria.ru" <' + process.env.YANDEX_USER + '@yandex.ru>',
             options: {
                 disableUrlAccess: false,
                 host: process.env.YANDEX_SMTP_HOST,
@@ -154,7 +192,7 @@ let options = {
             type: "test",//"smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <' + process.env.GMAIL_USER + '@gmail.com>',
+            sender: '"Magisteria.ru" <' + process.env.GMAIL_USER + '@gmail.com>',
             options: {
                 disableUrlAccess: false,
                 host: process.env.GMAIL_SMTP_HOST,

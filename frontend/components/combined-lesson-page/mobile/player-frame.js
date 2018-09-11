@@ -97,7 +97,8 @@ class PlayerFrame extends Component {
                 this._fadeTimer.start();
                 this._fadeTimer.hideScreenControls();
             } else {
-                this._fadeTimer.clearFade()
+                this._fadeTimer.restart()
+                this._fadeTimer.hideScreenControls();
             }
         }
 

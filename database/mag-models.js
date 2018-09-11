@@ -286,6 +286,22 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("EndPoint", { type: "string", length: Data.ENDPOINT_FIELD_LENGTH, allowNull: false })
             .addField("Data", { type: "string", allowNull: false });
 
+        metaDataMgr.addModel("Mailing", "7ea07bf1-e339-4616-975d-7a9f8f172093", "RootMailing", "81e84c39-5490-47ee-afaa-463d597013d2")
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("SenderName", { type: "string", length: 255, allowNull: false })
+            .addField("SenderEmail", { type: "string", length: 255, allowNull: false })
+            .addField("Subject", { type: "string", length: 255, allowNull: false })
+            .addField("BookId", { type: "int", allowNull: false })
+            .addField("Body", { type: "string", allowNull: false })
+            .addField("IsSent", { type: "boolean", allowNull: false })
+            .addField("CampaignId", { type: "int", allowNull: true })
+            .addField("Status", { type: "int", allowNull: true })
+            .addField("ResBody", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("LsnMailing", "8dbdc40b-4360-4f80-8ef5-c1eb436dd781", "RootLsnMailing", "c07c0736-f97b-4965-a622-f0b0e74c535f")
+            .addField("MailingId", { type: "dataRef", model: "Mailing", refAction: "parentCascade", allowNull: false })
+            .addField("LessonId", { type: "int", allowNull: false });
+
         metaDataMgr.checkSchema();
     }
 }
