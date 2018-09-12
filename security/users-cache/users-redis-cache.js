@@ -2,7 +2,7 @@
 
 const config = require('config');
 const { UsersBaseCache } = require('./users-base-cache');
-const { RedisConnections, ConnectionWrapper } = require('../database/providers/redis/redis-connections');
+const { RedisConnections, ConnectionWrapper } = require('../../database/providers/redis/redis-connections');
 
 class UsersRedisCache extends UsersBaseCache {
 
@@ -56,5 +56,5 @@ class UsersRedisCache extends UsersBaseCache {
 
 let usersRedisCache = null;
 exports.UsersRedisCache = (opts) => {
-    return usersRedisCache ? usersRedisCache : new UsersRedisCache(opts);
+    return usersRedisCache = (usersRedisCache ? usersRedisCache : new UsersRedisCache(opts));
 }

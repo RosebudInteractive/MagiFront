@@ -5,8 +5,7 @@ const passport = require('passport');
 const passportLocal = require('passport-local');
 const reCAPTCHA = require('recaptcha2');
 const { HttpCode } = require("../const/http-codes");
-const { UsersMemCache } = require("./users-mem-cache");
-const { UsersRedisCache } = require("./users-redis-cache");
+const { UsersCache } = require("./users-cache");
 const { UserRegister } = require("./user-register");
 const { SendRegMail } = require("./user-register");
 const { UserActivate } = require("./user-activate");
@@ -45,7 +44,7 @@ class AuthLocal {
                 session: true
             };
 
-        usersCache = this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+        usersCache = this._usersCache = UsersCache();
 
         serialize(this._usersCache);
 

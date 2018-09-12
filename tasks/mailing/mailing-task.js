@@ -154,7 +154,6 @@ exports.MailingTask = class MailingTask extends Task {
     _makePicture(lesson, imgDir) {
         return new Promise(resolve => {
             let coverPath = path.join(config.uploadPath, lesson.Cover);
-            console.log(coverPath);
             let fn = lesson.Id + ".png";
             let rc = sharp(coverPath)
                 .resize(IMG_WIDTH, IMG_HEIGHT)
