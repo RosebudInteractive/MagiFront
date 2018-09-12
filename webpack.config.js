@@ -1,6 +1,7 @@
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
+let ExtractTextPlugin = require ('extract-text-webpack-plugin');
 // require('webpack-jquery-ui');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
@@ -24,7 +25,8 @@ const _prodConfig = {
         }),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
-        })
+        }),
+        new ExtractTextPlugin('player.css'),
     ],
     module: {
         rules: [
@@ -42,7 +44,10 @@ const _prodConfig = {
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                })
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
@@ -113,7 +118,8 @@ const _devConfig = {
         }),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
-        })
+        }),
+        new ExtractTextPlugin('player.css'),
     ],
     module: {
         rules: [
@@ -132,7 +138,11 @@ const _devConfig = {
             },
             {
                 test: /\.css$/,
-                loader: ["style-loader", "css-loader"]
+                // loader: ["style-loader", "css-loader"]
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                })
             },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
