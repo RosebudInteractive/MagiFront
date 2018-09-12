@@ -3,7 +3,6 @@ const path = require('path');
 const _ = require('lodash');
 const config = require('config');
 const sharp = require('sharp');
-const sendpulse = require("sendpulse-api");
 const { URL, URLSearchParams } = require('url');
 const fs = require('fs');
 
@@ -13,6 +12,7 @@ const writeFileAsync = promisify(fs.writeFile);
 const statAsync = promisify(fs.stat);
 const mkdirAsync = promisify(fs.mkdir);
 
+const { SubscriptionService } = require('../../services/mail-subscription');
 const { Task } = require('../lib/task');
 const { HttpCode } = require('../../const/http-codes');
 const { SendMail } = require('../../mail');
@@ -76,7 +76,7 @@ exports.MailingTask = class MailingTask extends Task {
         let opts = options || {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
         this._settings.baseUrl = this._settings.testUrl ? this._settings.testUrl : config.proxyServer.siteHost;
-        sendpulse.init(config.mail.sendPulse.apiUserId, config.mail.sendPulse.apiSecret, config.mail.sendPulse.tmpPath);
+        this._subsServise = SubscriptionService();
     }
 
     _formatDate(dt, mode) {
@@ -222,10 +222,10 @@ exports.MailingTask = class MailingTask extends Task {
     }
 
     _getAddressBook(options) {
-        return new Promise(resolve => {
-            options.addressBooks = {};
-            options.mailList = null;
-            sendpulse.listAddressBooks(result => {
+        options.addressBooks = {};
+        options.mailList = null;
+        return this._subsServise.listAddressBooks()
+            .then(result => {
                 if (result && Array.isArray(result) && (result.length)) {
                     result.forEach(elem => {
                         options.addressBooks[elem.name] = elem;
@@ -233,12 +233,11 @@ exports.MailingTask = class MailingTask extends Task {
                     options.mailList = options.addressBooks[this._settings.mailList];
                     if (!options.mailList)
                         throw new Error(`Mail list "${this._settings.mailList}" is missing!`);
-                    resolve(options.mailList);
+                    return options.mailList;
                 }
                 else
                     throw new Error(`List of address books is empty!`);
             });
-        })
     }
 
     _getMailingName(options) {
@@ -323,12 +322,8 @@ exports.MailingTask = class MailingTask extends Task {
                     return new_obj.edit();
                 })
                 .then(() => {
-                    return new Promise((resolve, reject) => {
-                        sendpulse.createCampaign(data => {
-                            resolve(data);
-                        }, options.letter.senderName, options.letter.senderEmail,
-                            options.letter.subject, options.letter.body, options.mailList.id, options.letter.name);
-                    })
+                    return this._subsServise.createCampaign(options.letter.senderName, options.letter.senderEmail,
+                        options.letter.subject, options.letter.body, options.mailList.id, options.letter.name);
                 })
                 .then(data => {
                     options.result = data;
