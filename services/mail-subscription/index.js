@@ -31,17 +31,19 @@ if (config.has("mail.autosubscribe.enabled") && config.mail.autosubscribe.enable
 
 exports.SubscriptionService = subscriptionService;
 exports.SetupRoute = (app) => {
-    let subsService = subscriptionService();
-    let mailList = config.mail.autosubscribe.mailList;
-    app.post('/api/mail-subscription', (req, res, next) => {
-        subsService.addEmailToAddressBook(mailList, req.body.Email, req.body.Name, req.body.LastName)
-            .then(result => {
-                if (result === false)
-                    throw new Error(`Failed to add email "${req.body.Email}" to mailing list: "${mailList}".`)
-                res.send({ result: "OK" });
-            })
-            .catch(err => {
-                next(err);
-            });
-    });
+    if (config.has("mail.autosubscribe.mailList")) {
+        let subsService = subscriptionService();
+        let mailList = config.mail.autosubscribe.mailList;
+        app.post('/api/mail-subscription', (req, res, next) => {
+            subsService.addEmailToAddressBook(mailList, req.body.Email, req.body.Name, req.body.LastName)
+                .then(result => {
+                    if (result === false)
+                        throw new Error(`Failed to add email "${req.body.Email}" to mailing list: "${mailList}".`)
+                    res.send({ result: "OK" });
+                })
+                .catch(err => {
+                    next(err);
+                });
+        });
+    }
 };
