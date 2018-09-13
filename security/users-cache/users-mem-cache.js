@@ -53,5 +53,5 @@ class UsersMemCache extends UsersBaseCache {
 
 let usersMemCache = null;
 exports.UsersMemCache = (opts) => {
-    return usersMemCache ? usersMemCache : new UsersMemCache(opts);
+    return usersMemCache = (usersMemCache ? usersMemCache : new UsersMemCache(opts));
 }

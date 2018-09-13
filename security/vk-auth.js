@@ -3,8 +3,7 @@ const config = require('config');
 const passport = require("passport");
 const passportVKontakte = require('passport-vkontakte');
 const { HttpCode } = require("../const/http-codes");
-const { UsersMemCache } = require("./users-mem-cache");
-const { UsersRedisCache } = require("./users-redis-cache");
+const { UsersCache } = require("./users-cache");
 const { StdLoginProcessor, DestroySession } = require('./local-auth');
 
 class AuthVK {
@@ -21,7 +20,7 @@ class AuthVK {
                 passReqToCallback: true
             };
 
-        this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+        this._usersCache = UsersCache();
 
         const strategy = new VKontakteStrategy(VKontakteOptions,
             ((req, accessToken, refreshToken, rawParams, profile, done) => {

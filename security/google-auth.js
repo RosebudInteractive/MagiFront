@@ -3,8 +3,7 @@ const config = require('config');
 const passport = require("passport");
 const passportGoogle = require('passport-google-oauth20');
 const { HttpCode } = require("../const/http-codes");
-const { UsersMemCache } = require("./users-mem-cache");
-const { UsersRedisCache } = require("./users-redis-cache");
+const { UsersCache } = require("./users-cache");
 const { StdLoginProcessor, DestroySession } = require('./local-auth');
 
 class AuthGoogle {
@@ -19,7 +18,7 @@ class AuthGoogle {
                 passReqToCallback: true
             };
 
-        this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+        this._usersCache = UsersCache();
 
         const strategy = new GoogleStrategy(GoogleOptions,
             ((req, accessToken, refreshToken, params, profile, done) => {

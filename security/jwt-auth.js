@@ -4,8 +4,7 @@ const passport = require("passport");
 const config = require('config');
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
-const { UsersMemCache } = require("./users-mem-cache");
-const { UsersRedisCache } = require("./users-redis-cache");
+const { UsersCache } = require("./users-cache");
 const { DestroySession } = require('./local-auth');
 
 class AuthJWT {
@@ -18,7 +17,7 @@ class AuthJWT {
         jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
         jwtOptions.secretOrKey = config.get('authentication.secret');
         
-        this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+        this._usersCache = UsersCache();
         
         const strategy = new JwtStrategy(jwtOptions,
             ((jwt_payload, next) => {

@@ -29,6 +29,7 @@ const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
 const { setupPrerender } = require('../prerender');
+const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 
 function errorHandler(err, req, res, next) {
     console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
@@ -90,6 +91,7 @@ function setupAPI(express, app) {
     }
 
     setupPrerender(app);
+    setupMailSubscription(app);
     setupProtectedStatic(app);
     setupLessonPositions(app);
     setupDebugRoutes(app);

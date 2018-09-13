@@ -1,4 +1,5 @@
 const path = require('path');
+const os = require('os');
 const defer = require('config/defer').deferConfig;
 
 let proxyServer = {
@@ -65,6 +66,15 @@ let options = {
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
     },
     mail: {
+        autosubscribe: {
+            enabled: true,
+            mailList: "My emails"
+        },
+        sendPulse: {
+            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
+            apiSecret: "2593d02228f842c412e51d24de824dde",
+            tmpPath: path.join(os.tmpdir(), path.sep),
+        },
         userReg: {
             type: "test",//"smtp",
             template: "./templates/mail/registration.tmpl",

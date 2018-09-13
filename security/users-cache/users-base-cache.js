@@ -5,8 +5,8 @@ const hasher = require('wordpress-hash-node');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
-const { ACCOUNT_ID } = require('../const/sql-req-common');
-const { UserLoginError } = require("./errors");
+const { ACCOUNT_ID } = require('../../const/sql-req-common');
+const { UserLoginError } = require("../errors");
 
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
@@ -74,10 +74,17 @@ exports.UsersBaseCache = class UsersBaseCache {
         this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TOKEN_UPD_TIME;
         this._userUpdTime = options.userUpdTime ? options.userUpdTime : USER_UPD_TIME;
         this._convUserDataFn = typeof (options.convUserDataFn) === "function" ? options.convUserDataFn : CONV_USER_DATA_FN;
+        this._afterUserCreateEvent = null;
         this._sNProviders = null;
         this._roles = null;
         this._rolesById = null;
         this._db = $memDataBase;
+    }
+
+    setAfterUserCreateEvent(func) {
+        if (typeof (func) !== "function")
+            throw new Error(`UsersBaseCache::setAfterUserCreateEvent: Incorrect argument "fun" type: "${typeof (func)}".`);
+        this._afterUserCreateEvent = func;
     }
 
     userToClientJSON(user) {
@@ -343,6 +350,11 @@ exports.UsersBaseCache = class UsersBaseCache {
                     return root_obj.save()
                         .then(() => {
                             return this.getUserInfoById(user.id(), true)
+                        })
+                        .then(result => {
+                            if (this._afterUserCreateEvent)
+                                return this._afterUserCreateEvent(result);
+                            return result;
                         });
                 })
         }).bind(this), options);
@@ -525,6 +537,7 @@ exports.UsersBaseCache = class UsersBaseCache {
     getUserByProfile(profile) {
 
         let providerId;
+        let isNewUser = false;
 
         let getUserByEmailOrCreate = ((email, profile) => {
 
@@ -583,6 +596,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                     }
                     else {
                         // Create new user
+                        isNewUser = true;
                         let fields = {
                             Name: profile.username,
                             DisplayName: profile.displayName,
@@ -676,6 +690,11 @@ exports.UsersBaseCache = class UsersBaseCache {
                             throw new Error("Error: " + JSON.stringify(res));
                     }
                     return this.getUserInfoById(user.id(), true);
+                })
+                .then(result => {
+                    if (isNewUser && this._afterUserCreateEvent)
+                        return this._afterUserCreateEvent(result);
+                    return result;
                 });
         }).bind(this);
 

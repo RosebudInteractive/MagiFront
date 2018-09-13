@@ -2,8 +2,7 @@ const _ = require('lodash');
 const config = require('config');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { DbObject } = require('./db-object');
-const { UsersMemCache } = require("../security/users-mem-cache");
-const { UsersRedisCache } = require("../security/users-redis-cache");
+const { UsersCache } = require('../security/users-cache');
 const { PositionsService } = require('../services/lesson-positions');
 const { Intervals } = require('../const/common');
 
@@ -194,7 +193,7 @@ const DbUser = class DbUser extends DbObject {
 
     constructor(options) {
         super(options);
-        this._usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+        this._usersCache = UsersCache();
     }
 
     _getObjById(id, expression, options) {

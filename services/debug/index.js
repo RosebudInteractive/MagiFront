@@ -5,8 +5,7 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { HttpCode } = require("../../const/http-codes");
-const { UsersMemCache } = require("../../security/users-mem-cache");
-const { UsersRedisCache } = require("../../security/users-redis-cache");
+const { UsersCache } = require("../../security/users-cache");
 
 function setUserSubsExpDate(id, subExpDate) {
 
@@ -72,7 +71,7 @@ exports.SetupRoute = (app) => {
                 if (isNaN(ms))
                     throw new Error(`Invalid date format: "${req.params.date}".`);
                 if (!usersCache)
-                    usersCache = config.get('authentication.storage') === "redis" ? UsersRedisCache() : UsersMemCache(); // UsersMemCache can't be used in cluster mode
+                    usersCache = UsersCache();
                 resolve(setUserSubsExpDate(req.user.Id, new Date(ms)));
             })
                 .then(() => {
