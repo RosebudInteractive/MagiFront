@@ -32,6 +32,29 @@ class TextBlock extends React.Component {
         episodes: PropTypes.array.isRequired,
     };
 
+    constructor(props) {
+        super(props)
+
+        this._onLinkClick = (e) => {
+            let _target = $(e.target),
+                _href = _target ? _target.attr('href') : null;
+
+            if (_target && _href && _href.includes('#')) {
+                let _name = _href.split('#'),
+                    _elem = $('a[name =' + _name[1] + ']');
+
+                if (_elem) {
+                    let _elemTop = _elem.offset().top,
+                        _scrollTop = _elemTop - 53;
+
+                    $('html,body').animate({scrollTop: _scrollTop}, 300);
+
+                    e.preventDefault();
+                }
+            }
+        }
+    }
+
     _parseTranscript(episode) {
         let _div = [];
         const _re = /<h2>(.*?)<\/h2>/gim;
@@ -121,7 +144,6 @@ class TextBlock extends React.Component {
         return _div
     }
 
-
     _getText() {
         let _div = [];
 
@@ -135,6 +157,12 @@ class TextBlock extends React.Component {
 
     componentDidMount() {
         this._setIndent()
+
+        $('.text-block__wrapper a').on('click', this._onLinkClick)
+    }
+    
+    componentWillUnmount() {
+        $('.text-block__wrapper a').unbind('click', this._onLinkClick)
     }
 
     componentDidUpdate() {
@@ -145,7 +173,7 @@ class TextBlock extends React.Component {
         let _number = $('.text-block__headline .number')
 
         if (_number.length > 0) {
-            if ((window.innerWidth < 899) && (window.innerWidth > 599)){
+            if ((window.innerWidth < 899) && (window.innerWidth > 599)) {
                 let _width = _number[0].offsetWidth;
                 $('.text-block__headline').css('text-indent', -_width);
             } else {
