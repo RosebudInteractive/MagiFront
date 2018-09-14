@@ -449,6 +449,9 @@ namespace MagImport
             public string Name { get; set; }
             public string ShortDescription { get; set; }
             public string FullDescription { get; set; }
+            public string SnPost { get; set; }
+            public string SnName { get; set; }
+            public string SnDescription { get; set; }
             public int? Duration { get; set; }
             public string DurationFmt { get; set; }
         };
@@ -493,7 +496,7 @@ namespace MagImport
         };
 
         //
-        // LessonCourse
+        // Reference
         //
         public class ReferenceFields : BaseFieldsData
         {
@@ -516,6 +519,30 @@ namespace MagImport
             const string CLASS_GUID = "8d5fd37d-e686-4eec-a8e8-b7df91160a92";
             public override string GetClassName() { return "Reference"; }
             public ReferenceRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // LessonMetaImage
+        //
+        public class LessonMetaImageFields : BaseFieldsData
+        {
+            public int LessonLngId { get; set; }
+            public string Type { get; set; }
+            public string URL { get; set; }
+            public int ResourceId { get; set; }
+        };
+
+        public class LessonMetaImage : DataObjTyped<LessonMetaImageFields, LessonMetaImageRoot>
+        {
+            const string CLASS_GUID = "0eba67e3-ff9f-4c81-87f4-72e95816bc05";
+            public LessonMetaImage() : base(CLASS_GUID) { }
+        };
+
+        public class LessonMetaImageRoot : RootDataObject
+        {
+            const string CLASS_GUID = "84ba5f1d-29d6-49f7-9884-03171320957d";
+            public override string GetClassName() { return "LessonMetaImage"; }
+            public LessonMetaImageRoot() : base(CLASS_GUID) { }
         };
 
         //
@@ -1766,6 +1793,7 @@ namespace MagImport
             }
             rdr.Close();
 
+            LessonMetaImage.AllData = allData;
             Reference.AllData = allData;
             EpisodeToc.AllData = allData;
             EpisodeTocLng.AllData = allData;
@@ -1802,6 +1830,17 @@ namespace MagImport
                 rdr.Close();
 
                 int int_val = 0;
+
+                // SEO data
+                if (lesson_prop_value.TryGetValue(att_lsn_seo_name, out val))
+                    if (!String.IsNullOrEmpty(val))
+                        lesson_lng.Fields.SnName = val;
+                if (lesson_prop_value.TryGetValue(att_lsn_seo_description, out val))
+                    if (!String.IsNullOrEmpty(val))
+                        lesson_lng.Fields.SnDescription = val;
+                if (lesson_prop_value.TryGetValue(att_lsn_seo_post, out val))
+                    if (!String.IsNullOrEmpty(val))
+                        lesson_lng.Fields.SnPost = val;
 
                 if (lesson_prop_value.TryGetValue(att_lsn_readydate_name, out val))
                 {
@@ -1973,38 +2012,8 @@ namespace MagImport
                                     {
                                         JSObject meta = null;
                                         Dictionary<string, string> file_desc = getFileDecription(picture_id, out meta);
-                                        string fn;
-                                        if (file_desc.TryGetValue("FileName", out fn))
-                                        {
-                                            resource = new Resource();
-                                            resource.Fields.LessonId = lesson.Fields.Id;
-                                            resource.Fields.ResType = "P";
-                                            resource.Fields.FileName = fn;
-                                            int show_flag = 1;
-                                            if(lesson_prop_value.TryGetValue(att_show_flag, out val))
-                                                Int32.TryParse(val, out show_flag);
-                                            resource.Fields.ShowInGalery = show_flag == 1;
-
-                                            res_lng = new ResourceLng();
-                                            res_lng.Fields.ResourceId = resource.Fields.Id;
-                                            res_lng.Fields.LanguageId = LANGUAGE_ID;
-                                            if (file_desc.TryGetValue("Description", out fn))
-                                                res_lng.Fields.Name = fn;
-                                            else
-                                                throw new Exception(String.Format("Picture (Id={0}): Description is empty.", picture_id));
-                                            if (file_desc.TryGetValue("ExtDescription", out fn))
-                                                res_lng.Fields.Description = fn;
-                                            if (file_desc.TryGetValue("AltAttribute", out fn))
-                                                res_lng.Fields.AltAttribute = fn;
-                                            if (file_desc.TryGetValue("MetaData", out fn))
-                                            {
-                                                res_lng.Fields.RawMetaData = fn;
-                                                PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
-                                                res_lng.Fields.MetaData = pict.ToJSONString();
-                                            }
-
-                                            resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
-                                        }
+                                        createResource(file_desc, meta, picture_id, lesson, lesson_prop_value,
+                                            resourcesDB, att_show_flag, out resource, out res_lng);
                                     }
                                     if ((resource != null) && (res_lng != null))
                                     {
@@ -2065,6 +2074,51 @@ namespace MagImport
                             }
                     }
 
+                // Social network pictures
+                //
+                {
+                    JSObject meta = null;
+                    Resource resource = null;
+                    ResourceLng res_lng = null;
+                    int picture_id = -1;
+
+                    // Open Graph
+                    if (lesson_prop_value.TryGetValue(att_lsn_seo_og_image, out val))
+                        if (!String.IsNullOrEmpty(val))
+                        {
+                            Dictionary<string, string> file_desc = getFileDecription(val, out meta, out picture_id);
+                            createResource(file_desc, meta, picture_id, lesson, lesson_prop_value,
+                                resourcesDB, null, out resource, out res_lng);
+                            if ((resource != null) && (res_lng != null))
+                            {
+                                LessonMetaImage img = new LessonMetaImage();
+                                img.Fields.LessonLngId= lesson_lng.Fields.Id;
+                                img.Fields.Type = "og";
+                                img.Fields.ResourceId = resource.Fields.Id;
+                            }
+                            else
+                                throw new Exception(String.Format("\"Open Graph\" image ( url = {0} ) is missing.", val));
+                        }
+
+                    // Twitter
+                    if (lesson_prop_value.TryGetValue(att_lsn_seo_tw_image, out val))
+                        if (!String.IsNullOrEmpty(val))
+                        {
+                            Dictionary<string, string> file_desc = getFileDecription(val, out meta, out picture_id);
+                            createResource(file_desc, meta, picture_id, lesson, lesson_prop_value,
+                                resourcesDB, null, out resource, out res_lng);
+                            if ((resource != null) && (res_lng != null))
+                            {
+                                LessonMetaImage img = new LessonMetaImage();
+                                img.Fields.LessonLngId = lesson_lng.Fields.Id;
+                                img.Fields.Type = "tw";
+                                img.Fields.ResourceId = resource.Fields.Id;
+                            }
+                            else
+                                throw new Exception(String.Format("\"Twitter\" image ( url = {0} ) is missing.", val));
+                        }
+                }
+
                 // Cover
                 //
                 if (photo_id != 0)
@@ -2099,6 +2153,49 @@ namespace MagImport
                 root_path = root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
             users.ToJSONFile(Path.Combine(root_path, "users", "users.json"), JSONFormatting, JSONEncoding, JSONSettings);
+        }
+
+        void createResource(Dictionary<string, string> file_desc, JSObject meta, int picture_id, Lesson lesson,
+            Dictionary<string, string> lesson_prop_value, Dictionary<int, Tuple<Resource, ResourceLng>> resourcesDB,
+            string att_show_flag, out Resource resource, out ResourceLng res_lng)
+        {
+            string fn;
+            string val;
+            resource = null;
+            res_lng = null;
+
+            if (file_desc.TryGetValue("FileName", out fn))
+            {
+                resource = new Resource();
+                resource.Fields.LessonId = lesson.Fields.Id;
+                resource.Fields.ResType = "P";
+                resource.Fields.FileName = fn;
+                int show_flag = 0;
+                if (!String.IsNullOrEmpty(att_show_flag))
+                    if (lesson_prop_value.TryGetValue(att_show_flag, out val))
+                        Int32.TryParse(val, out show_flag);
+                resource.Fields.ShowInGalery = show_flag == 1;
+
+                res_lng = new ResourceLng();
+                res_lng.Fields.ResourceId = resource.Fields.Id;
+                res_lng.Fields.LanguageId = LANGUAGE_ID;
+                if (file_desc.TryGetValue("Description", out fn))
+                    res_lng.Fields.Name = fn;
+                else
+                    throw new Exception(String.Format("Picture (Id={0}): Description is empty.", picture_id));
+                if (file_desc.TryGetValue("ExtDescription", out fn))
+                    res_lng.Fields.Description = fn;
+                if (file_desc.TryGetValue("AltAttribute", out fn))
+                    res_lng.Fields.AltAttribute = fn;
+                if (file_desc.TryGetValue("MetaData", out fn))
+                {
+                    res_lng.Fields.RawMetaData = fn;
+                    PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                    res_lng.Fields.MetaData = pict.ToJSONString();
+                }
+
+                resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
+            }
         }
 
         static string ErrInvSymbolExpMsg = "MagisteryToJSON::_JSONParse: Invalid symbol \"{0}\" at position {1}. Expected one is \"{2}\".";
@@ -2356,16 +2453,31 @@ namespace MagImport
 
         Dictionary<string, string> getFileDecription(int obj_id, out JSObject raw_meta)
         {
-            Dictionary<string, string> res = new Dictionary<string, string>();
-            raw_meta = null;
             MySqlCommand cmd = new MySqlCommand(sql_get_file_desc, conn);
             cmd.Parameters.AddWithValue("@PostId", obj_id);
+            int id;
+            return _getFileDecription(cmd, out raw_meta, out id);
+        }
+
+        Dictionary<string, string> getFileDecription(string url, out JSObject raw_meta, out int id)
+        {
+            MySqlCommand cmd = new MySqlCommand(sql_get_file_desc_by_url, conn);
+            cmd.Parameters.AddWithValue("@Guid", url);
+            return _getFileDecription(cmd, out raw_meta, out id);
+        }
+
+        Dictionary<string, string> _getFileDecription(MySqlCommand cmd, out JSObject raw_meta, out int id)
+        {
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            raw_meta = null;
+            id = -1;
             rdr = cmd.ExecuteReader();
             bool is_first = true;
             while (rdr.Read())
             {
                 if (is_first)
                 {
+                    id = rdr.GetInt32("id");
                     res["ExtDescription"] = String.IsNullOrEmpty(rdr.GetString("ext_desc")) ? null : rdr.GetString("ext_desc");
                     res["Description"] = rdr.GetString("desc");
                     res["Name"] = rdr.GetString("name");
@@ -2439,10 +2551,16 @@ namespace MagImport
             "where `p`.`id` = @PostId and `m`.`meta_key` = @MetaKey";
 
         const string sql_get_file_desc =
-            "select `p`.`post_content` as `ext_desc`, `p`.`post_title` as `desc`, `p`.`post_name` as `name`,\n"+
+            "select `p`.`id`, `p`.`post_content` as `ext_desc`, `p`.`post_title` as `desc`, `p`.`post_name` as `name`,\n" +
             "  `m`.`meta_value`, `m`.`meta_key` from `wp_posts` `p`\n" +
             "  left join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id`\n" +
             "where `p`.`id` = @PostId";
+
+        const string sql_get_file_desc_by_url =
+            "select `p`.`id`, `p`.`post_content` as `ext_desc`, `p`.`post_title` as `desc`, `p`.`post_name` as `name`,\n" +
+            "  `m`.`meta_value`, `m`.`meta_key` from `wp_posts` `p`\n" +
+            "  left join `wp_postmeta` `m` on `m`.`post_id` = `p`.`id`\n" +
+            "where `p`.`guid` = @Guid";
 
         const string sql_get_author_to_course =
             "select distinct `t`.`term_id` as `author_id`, `t`.`name` as `author_name`, `tc`.`term_id` as `course_id`, `tc`.`name` as `course_name` from `wp_terms` `t`\n" +
@@ -2477,7 +2595,12 @@ namespace MagImport
         const string att_lsn_parent_id_name = "main_lecture";
         const string att_lsn_audio_name = "audio";
         const string att_lsn_readydate_name = "предполагаемая_дата_публикации";
-
+        const string att_lsn_seo_name = "_yoast_wpseo_opengraph-title";
+        const string att_lsn_seo_description = "_yoast_wpseo_opengraph-description";
+        const string att_lsn_seo_og_image = "_yoast_wpseo_opengraph-image";
+        const string att_lsn_seo_tw_image = "_yoast_wpseo_twitter-image";
+        const string att_lsn_seo_post = "text_post_social";
+        
         const string att_lsn_toc_name = "оглавление";
         const string att_lsn_toc_dsc_name = "оглавление_{0}_название";
         const string att_lsn_toc_tm_name = "оглавление_{0}_время";

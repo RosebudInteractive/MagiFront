@@ -31,7 +31,7 @@ let options = {
                 period: "week",
                 sender: "test@magisteria.ru",
                 senderName: "Magisteria.ru",
-                mailList: "My emails",
+                mailList: "Магистерия",
                 infoRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru",
                 errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
             }

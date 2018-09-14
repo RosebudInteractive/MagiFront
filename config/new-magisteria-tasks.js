@@ -7,6 +7,22 @@ const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitema
 module.exports = {
     tasks: [
         {
+            name: "Mailing",
+            module: "./mailing",
+            type: "scheduled-task",
+            disabled: false,
+            // schedule: "0 35 5 * * mon", // run at 5:35 on monday
+            schedule: "33 0 11,20 * * *", // run twice a day
+            options: {
+                period: "week",
+                sender: "test@magisteria.ru",
+                senderName: "Magisteria.ru",
+                mailList: "Магистерия",
+                infoRecipients: "alexander.f.sokolov@gmail.com, sokolov-af@yandex.ru",
+                errRecipients: "alexander.f.sokolov@gmail.com, sokolov-af@yandex.ru"
+            }
+        },
+        {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
