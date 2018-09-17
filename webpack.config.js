@@ -26,7 +26,9 @@ const _prodConfig = {
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
         }),
-        new ExtractTextPlugin('player.css'),
+        new ExtractTextPlugin('player.css', {
+            allChunks: true
+        }),
     ],
     module: {
         rules: [
@@ -97,7 +99,6 @@ const _devConfig = {
     entry: {
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         'babel-polyfill': 'babel-polyfill',
-
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
@@ -119,7 +120,9 @@ const _devConfig = {
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
         }),
-        new ExtractTextPlugin('player.css'),
+        new ExtractTextPlugin('player.css', {
+            allChunks: true
+        }),
     ],
     module: {
         rules: [

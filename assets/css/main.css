@@ -7208,6 +7208,8 @@ body[data-page="fullpage-player"] .lectures-menu {
         padding-left: 4px; } }
     .lectures-list__item:hover .lectures-list__item-title span {
       border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+    .lectures-list__item:hover .lectures-list__item-title.draft span {
+      border-bottom: none; }
     .lectures-list__item.active:hover .lectures-list__item-title span {
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
     .lectures-list__item:before {
@@ -7317,6 +7319,10 @@ body[data-page="fullpage-player"] .lectures-menu {
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       -webkit-transition: border-color 0.3s ease;
       transition: border-color 0.3s ease; }
+    .lectures-list__item-title span {
+      border-bottom: none;
+      -webkit-transition: none;
+      transition: none; }
   .lectures-list__item-author {
     margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;
