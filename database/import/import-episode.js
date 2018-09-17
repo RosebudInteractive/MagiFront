@@ -23,8 +23,7 @@ const IMPOPT_OPTIONS_DFLT = {
 };
 
 const GET_LESSON_PIC_MSSQL =
-    "select r.[Id], l.[MetaData] from [Resource] r\n" +
-    "  join[ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
+    "select r.[Id], r.[MetaData] from [Resource] r\n" +
     "where r.[ResType] = 'P' and  r.[LessonId] = <%= idLesson %>";
 
 const GET_EPISODE_DURATION_MSSQL =
@@ -33,8 +32,7 @@ const GET_EPISODE_DURATION_MSSQL =
     "where e.[Id] = <%= idEpisode %>";
 
 const GET_LESSON_PIC_MYSQL =
-    "select r.`Id`, l.`MetaData` from `Resource` r\n" +
-    "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
+    "select r.`Id`, r.`MetaData` from `Resource` r\n" +
     "where r.`ResType` = 'P' and  r.`LessonId` = <%= idLesson %>";
 
 const GET_EPISODE_DURATION_MYSQL =

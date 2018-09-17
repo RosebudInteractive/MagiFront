@@ -197,7 +197,7 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "where l.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_RESOURCE_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[AltAttribute], l.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[AltAttribute], r.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
     "  left join [Language] ll on ll.[Id] = r.[ResLanguageId]\n" +
     "where r.[LessonId] = <%= id %>";
@@ -248,7 +248,7 @@ const LESSON_EPI_MSSQL_CONTENT_REQ =
     "order by pl.[Number], e.[Id], t.[StartTime]";
 
 const LESSON_MSSQL_ASSETS_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], rl.[MetaData] from [EpisodeContent] t\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], r.[MetaData] from [EpisodeContent] t\n" +
     "  join[EpisodeLng] l on l.[Id] = t.[EpisodeLngId]\n" +
     "  join[Episode] e on e.[Id] = l.[EpisodeId]\n" +
     "  join[Resource] r on t.[ResourceId] = r.[Id]\n" +
@@ -257,7 +257,7 @@ const LESSON_MSSQL_ASSETS_REQ =
     "where pl.[LessonId] = <%= id %>";
 
 const LESSON_MSSQL_ASSETS_ALL_REQ =
-    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], rl.[MetaData] from [Resource] r\n" +
+    "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], rl.[Name], rl.[Description], r.[MetaData] from [Resource] r\n" +
     "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
     "  join[Episode] e on e.[LessonId] = r.[LessonId]\n" +
     "where e.[Id] = <%= episodeId %>";
@@ -315,9 +315,8 @@ const LESSON_SHARE_COUNTERS_MSSQL_REQ =
     "where[LessonId] = <%= id %>";
 
 const LESSON_IMG_META_MSSQL_REQ =
-    "select i.[Type], r.[FileName], rl.[MetaData] from [LessonMetaImage] i\n" +
+    "select i.[Type], r.[FileName], r.[MetaData] from [LessonMetaImage] i\n" +
     "  join[Resource] r on r.[Id] = i.[ResourceId]\n" +
-    "  join[ResourceLng] rl on rl.[ResourceId] = r.[Id]\n" +
     "where r.[LessonId] = <%= id %>";
 
 const PARENT_MSSQL_REQ =
@@ -352,7 +351,7 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "where l.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_RESOURCE_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`AltAttribute`, l.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`AltAttribute`, r.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
     "  left join `Language` ll on ll.`Id` = r.`ResLanguageId`\n" +
     "where r.`LessonId` = <%= id %>";
@@ -403,7 +402,7 @@ const LESSON_EPI_MYSQL_CONTENT_REQ =
     "order by pl.`Number`, e.`Id`, t.`StartTime`";
 
 const LESSON_MYSQL_ASSETS_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, rl.`MetaData` from `EpisodeContent` t\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, r.`MetaData` from `EpisodeContent` t\n" +
     "  join`EpisodeLng` l on l.`Id` = t.`EpisodeLngId`\n" +
     "  join`Episode` e on e.`Id` = l.`EpisodeId`\n" +
     "  join`Resource` r on t.`ResourceId` = r.`Id`\n" +
@@ -412,7 +411,7 @@ const LESSON_MYSQL_ASSETS_REQ =
     "where pl.`LessonId` = <%= id %>";
 
 const LESSON_MYSQL_ASSETS_ALL_REQ =
-    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, rl.`MetaData` from `Resource` r\n" +
+    "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, rl.`Name`, rl.`Description`, r.`MetaData` from `Resource` r\n" +
     "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
     "  join`Episode` e on e.`LessonId` = r.`LessonId`\n" +
     "where e.`Id` = <%= episodeId %>";
@@ -470,9 +469,8 @@ const LESSON_SHARE_COUNTERS_MYSQL_REQ =
     "where`LessonId` = <%= id %>";
 
 const LESSON_IMG_META_MYSQL_REQ =
-    "select i.`Type`, r.`FileName`, rl.`MetaData` from `LessonMetaImage` i\n" +
+    "select i.`Type`, r.`FileName`, r.`MetaData` from `LessonMetaImage` i\n" +
     "  join`Resource` r on r.`Id` = i.`ResourceId`\n" +
-    "  join`ResourceLng` rl on rl.`ResourceId` = r.`Id`\n" +
     "where r.`LessonId` = <%= id %>";
 
 const PARENT_MYSQL_REQ =
@@ -1971,7 +1969,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (typeof (elem.AltAttribute) !== "undefined")
                                     data.lng.AltAttribute = elem.AltAttribute;
                                 if (typeof (elem.MetaData) !== "undefined")
-                                    data.lng.MetaData = elem.MetaData;
+                                    data.res.MetaData = elem.MetaData;
                                 if (typeof (elem.Id) === "number") {
                                     if (res_list[elem.Id]) {
                                         res_list[elem.Id].deleted = false;
@@ -2496,6 +2494,8 @@ const DbLesson = class DbLesson extends DbObject {
                                     fields["ResLanguageId"] = elem["ResLanguageId"];
                                 if (typeof (elem["ShowInGalery"]) !== "undefined")
                                     fields["ShowInGalery"] = elem["ShowInGalery"];
+                                if (typeof (elem["MetaData"]) !== "undefined")
+                                    fields["MetaData"] = elem["MetaData"];
                                 return root_res.newObject({
                                     fields: fields
                                 }, opts)
@@ -2509,8 +2509,6 @@ const DbLesson = class DbLesson extends DbObject {
                                             fields["Description"] = elem["Description"];
                                         if (typeof (elem["AltAttribute"]) !== "undefined")
                                             fields["AltAttribute"] = elem["AltAttribute"];
-                                        if (typeof (elem["MetaData"]) !== "undefined")
-                                            fields["MetaData"] = elem["MetaData"];
                                         return root_res_lng.newObject({
                                             fields: fields
                                         }, opts);

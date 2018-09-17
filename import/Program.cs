@@ -678,6 +678,8 @@ namespace MagImport
             public string ResType { get; set; }
             public string FileName { get; set; }
             public bool? ShowInGalery { get; set; }
+            public string RawMetaData { get; set; }
+            public string MetaData { get; set; }
         };
 
         public class Resource : DataObjTyped<ResourceFields, ResourceRoot>
@@ -703,8 +705,6 @@ namespace MagImport
             public string Name { get; set; }
             public string Description { get; set; }
             public string AltAttribute { get; set; }
-            public string RawMetaData { get; set; }
-            public string MetaData { get; set; }
         };
 
         public class ResourceLng : DataObjTyped<ResourceLngFields, ResourceLngRoot>
@@ -2175,6 +2175,12 @@ namespace MagImport
                     if (lesson_prop_value.TryGetValue(att_show_flag, out val))
                         Int32.TryParse(val, out show_flag);
                 resource.Fields.ShowInGalery = show_flag == 1;
+                if (file_desc.TryGetValue("MetaData", out fn))
+                {
+                    resource.Fields.RawMetaData = fn;
+                    PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
+                    resource.Fields.MetaData = pict.ToJSONString();
+                }
 
                 res_lng = new ResourceLng();
                 res_lng.Fields.ResourceId = resource.Fields.Id;
@@ -2187,12 +2193,6 @@ namespace MagImport
                     res_lng.Fields.Description = fn;
                 if (file_desc.TryGetValue("AltAttribute", out fn))
                     res_lng.Fields.AltAttribute = fn;
-                if (file_desc.TryGetValue("MetaData", out fn))
-                {
-                    res_lng.Fields.RawMetaData = fn;
-                    PictureResourceDescriptionObj pict = new PictureResourceDescriptionObj(meta);
-                    res_lng.Fields.MetaData = pict.ToJSONString();
-                }
 
                 resourcesDB.Add(picture_id, new Tuple<Resource, ResourceLng>(resource, res_lng));
             }

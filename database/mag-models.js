@@ -258,16 +258,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("ResLanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: true })
             .addField("ResType", { type: "enum", values: ["P", "V"], allowNull: false })
             .addField("FileName", { type: "string", length: 255, allowNull: false })
-            .addField("ShowInGalery", { type: "boolean", allowNull: true });
+            .addField("ShowInGalery", { type: "boolean", allowNull: true })
+            .addField("MetaData", { type: "string", allowNull: true })
+            .addField("RawMetaData", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("ResourceLng", "08fc5411-e11e-48be-bbb4-b7638a600f71", "RootResourceLng", "4f1238b4-c65c-4c19-bea8-b67413d724aa")
             .addField("ResourceId", { type: "dataRef", model: "Resource", refAction: "parentCascade", allowNull: false })
             .addField("LanguageId", { type: "dataRef", model: "Language", refAction: "parentRestrict", allowNull: false })
             .addField("Name", { type: "string", allowNull: false })
             .addField("Description", { type: "string", allowNull: true })
-            .addField("AltAttribute", { type: "string", length: 255, allowNull: true })
-            .addField("MetaData", { type: "string", allowNull: true })
-            .addField("RawMetaData", { type: "string", allowNull: true });
+            .addField("AltAttribute", { type: "string", length: 255, allowNull: true });
 
         metaDataMgr.addModel("EpisodeContent", "b6b2fbd3-57e6-48c1-aa8b-7751daa2bfed", "RootEpisodeContent", "1996d0fc-a93f-420f-b1c3-627fef86bb60")
             .addField("EpisodeLngId", { type: "dataRef", model: "EpisodeLng", refAction: "parentRestrict", allowNull: false })
