@@ -74,7 +74,9 @@ export default class Wrapper extends React.Component {
     }
 
     render() {
-        let {isPlayer} = this.props;
+        let {isPlayer} = this.props,
+            _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
+
         const _coverStyle = {}
 
         if (!isPlayer) {
@@ -90,7 +92,7 @@ export default class Wrapper extends React.Component {
                 className='lecture-wrapper lesson-player js-player mobile'
                 id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
                 style={_coverStyle}>
-                <div className={'lesson-sub-wrapper'}>
+                <div className={_subwrapperClassName}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>
                     <LessonFrame {...this.props}

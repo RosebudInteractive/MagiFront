@@ -116,7 +116,7 @@ class ListItem extends React.Component {
             <li className="lectures-list__item lectures-list__item--old">
                 <div className="lectures-list__item-header">
                     <div className="lectures-list__item-info">
-                        <h3 className="lectures-list__item-title"><span>{lesson.Name}</span></h3>
+                        <h3 className="lectures-list__item-title draft"><span>{lesson.Name}</span></h3>
                         {
                             this.props.showAuthor ?
                                 <p className="lectures-list__item-author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
