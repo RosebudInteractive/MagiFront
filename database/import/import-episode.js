@@ -105,6 +105,7 @@ exports.ImportEpisode = class ImportEpisode {
         let opts = _.defaultsDeep(options, IMPOPT_OPTIONS_DFLT);
         opts.importErrors = [];
         opts.importWarnings = [];
+        let dbopts = typeof (opts.userId) === "number" ? { userId: opts.userId } : {};
         let idLesson;
         let idEpisode;
         let self = this;
@@ -317,7 +318,7 @@ exports.ImportEpisode = class ImportEpisode {
                                         }
                                     })
                                     .then(() => {
-                                        return root_obj.save();
+                                        return root_obj.save(dbopts);
                                     })
                                     .then(() => {
                                         return episode;
@@ -328,7 +329,7 @@ exports.ImportEpisode = class ImportEpisode {
                 return result;
             })
             .then((episode) => {
-                return EpisodesService().update(idEpisode, idLesson, episode);
+                return EpisodesService().update(idEpisode, idLesson, episode, dbopts);
             })
             .then(() => {
                 return opts.importWarnings.length > 0 ? { result: "WARN", warnings: opts.importWarnings } : { result: "OK" };

@@ -99,7 +99,8 @@ function setupLessons(app) {
 
     app.post('/api/adm/lessons/:courseId/:parentId', (req, res, next) => {
         LessonsService()
-            .insert(req.body, parseInt(req.params.courseId), req.params.parentId ? parseInt(req.params.parentId) : null)
+            .insert(req.body, parseInt(req.params.courseId),
+                req.params.parentId ? parseInt(req.params.parentId) : null, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })
@@ -110,7 +111,8 @@ function setupLessons(app) {
 
     app.put('/api/adm/lessons/:id/:courseId/:parentId', (req, res, next) => {
         LessonsService()
-            .update(parseInt(req.params.id), parseInt(req.params.courseId), req.body, req.params.parentId ? parseInt(req.params.parentId) : null)
+            .update(parseInt(req.params.id), parseInt(req.params.courseId),
+                req.body, req.params.parentId ? parseInt(req.params.parentId) : null, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })

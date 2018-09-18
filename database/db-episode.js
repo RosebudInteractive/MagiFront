@@ -447,11 +447,11 @@ const DbEpisode = class DbEpisode extends DbObject {
         })
     }
 
-    update(id, lesson_id, data) {
+    update(id, lesson_id, data, options) {
         return new Promise((resolve, reject) => {
             let epi_obj;
             let epi_lng_obj;
-            let opts = {};
+            let opts = options || {};
 
             let root_toc = null;
             let toc_collection;
@@ -651,7 +651,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
-                                opts = { transactionId: transactionId };
+                                opts.transactionId = transactionId;
                                 return epi_obj.save(opts)
                                     .then((result) => {
                                         isModified = isModified || (result && result.detail && (result.detail.length > 0));
@@ -708,12 +708,12 @@ const DbEpisode = class DbEpisode extends DbObject {
         })
     }
 
-    insert(data, lesson_id) {
+    insert(data, lesson_id, options) {
         return new Promise((resolve, reject) => {
 
             let root_obj;
             let lesson_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let new_obj = null;
             let new_lng_obj = null;
@@ -853,7 +853,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
-                                opts = { transactionId: transactionId };
+                                opts.transactionId = transactionId;
                                 return root_obj.save(opts);
                             })
                             .then(() => {

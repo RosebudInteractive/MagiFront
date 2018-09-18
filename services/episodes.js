@@ -31,7 +31,7 @@ function setupEpisodes(app) {
 
     app.post('/api/episodes/:lessonId', (req, res, next) => {
         EpisodesService()
-            .insert(req.body, parseInt(req.params.lessonId))
+            .insert(req.body, parseInt(req.params.lessonId), { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })
@@ -42,7 +42,7 @@ function setupEpisodes(app) {
 
     app.put('/api/episodes/:id/:lessonId', (req, res, next) => {
         EpisodesService()
-            .update(parseInt(req.params.id), parseInt(req.params.lessonId), req.body)
+            .update(parseInt(req.params.id), parseInt(req.params.lessonId), req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })

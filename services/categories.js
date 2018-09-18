@@ -26,7 +26,7 @@ function setupCategories(app) {
 
     app.post('/api/adm/categories', (req, res, next) => {
         CategoriesService()
-            .insert(req.body)
+            .insert(req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })
@@ -37,7 +37,7 @@ function setupCategories(app) {
 
     app.put('/api/adm/categories/:id', (req, res, next) => {
         CategoriesService()
-            .update(parseInt(req.params.id), req.body)
+            .update(parseInt(req.params.id), req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })

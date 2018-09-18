@@ -1808,7 +1808,7 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    update(id, course_id, data, parent_id) {
+    update(id, course_id, data, parent_id, options) {
         let self = this;
         return new Promise((resolve, reject) => {
             let course_obj;
@@ -1832,7 +1832,7 @@ const DbLesson = class DbLesson extends DbObject {
             let ref_list = {};
             let img_list = {};
             let epi_list = {};
-            let opts = {};
+            let opts = options || {};
             let inpFields = data || {};
             
             let ch_new = [];
@@ -2229,7 +2229,7 @@ const DbLesson = class DbLesson extends DbObject {
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
-                                opts = { transactionId: transactionId };
+                                opts.transactionId = transactionId;
                                 return lsn_obj.save(opts)
                                     .then((result) => {
                                         if (result && result.detail && (result.detail.length > 0))
@@ -2323,11 +2323,11 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    insert(data, course_id, parent_id) {
+    insert(data, course_id, parent_id, options) {
         return new Promise((resolve, reject) => {
             let root_obj;
             let course_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let new_obj = null;
             let new_lng_obj = null;
@@ -2564,7 +2564,7 @@ const DbLesson = class DbLesson extends DbObject {
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
-                                opts = { transactionId: transactionId };
+                                opts.transactionId = transactionId;
                                 return root_obj.save(opts);
                             })
                             .then(() => {
