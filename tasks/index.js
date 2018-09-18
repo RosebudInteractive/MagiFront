@@ -12,9 +12,12 @@ const { DbUtils } = require('../database/db-utils');
 let activeTasks = {};
 let dfmt = { h: "h ", m: "m ", s: "s", ms: true };
 
-function getStatStr(taskDsc, duration, dfmt) {
+function getStatStr(taskDsc, duration, dfmt, isErr) {
     let isFirst = !taskDsc.num;
     taskDsc.num = taskDsc.num ? taskDsc.num : 0;
+    taskDsc.err = taskDsc.err ? taskDsc.err : 0;
+    if (isErr)
+        taskDsc.err++;
     taskDsc.num++;
     taskDsc.max = (isFirst || (duration > taskDsc.max)) ? duration : taskDsc.max;
     taskDsc.min = (isFirst || (duration < taskDsc.min)) ? duration : taskDsc.min;
@@ -23,7 +26,8 @@ function getStatStr(taskDsc, duration, dfmt) {
         `Avg: [${DbUtils.fmtDuration(taskDsc.avg, dfmt)}] ` +
         `Min: [${DbUtils.fmtDuration(taskDsc.min, dfmt)}] ` +
         `Max: [${DbUtils.fmtDuration(taskDsc.max, dfmt)}] ` +
-        `Tot: ${taskDsc.num})`;
+        `Tot: ${taskDsc.num} `+
+        `Errors: ${taskDsc.err})`;
 }
 
 Promise.resolve()
@@ -74,7 +78,7 @@ if (config.has("tasks")) {
                                                 taskDsc.lastFinish = finDt;
                                                 taskDsc.error = err;
                                                 let dt = (finDt - startDt) / 1000;
-                                                console.error(`${finDt.toLocaleString()} #### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt)}. Error: ${err}`);
+                                                console.error(`${finDt.toLocaleString()} #### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt, true)}. Error: ${err}`);
                                             });
                                     }
                                     else
