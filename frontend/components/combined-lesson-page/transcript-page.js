@@ -160,7 +160,7 @@ class TextBlock extends React.Component {
 
         $('.text-block__wrapper a').on('click', this._onLinkClick)
     }
-    
+
     componentWillUnmount() {
         $('.text-block__wrapper a').unbind('click', this._onLinkClick)
     }

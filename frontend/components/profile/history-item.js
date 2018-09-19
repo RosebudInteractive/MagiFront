@@ -36,18 +36,18 @@ export default class Item extends React.Component {
                         </Link>
                     </h3>
                     <h4 className="history-item__lecture">
-                        <Link to={item.courseUrl + '/' + item.URL}>
+                        <Link to={'/' + item.courseUrl + '/' + item.URL}>
                             <span className="num">{item.Number + '.'}</span>
                             <span className="text">{' ' + item.Name}</span>
                         </Link>
                     </h4>
-                    <Link to={'autor/' + item.authorUrl}>
+                    <Link to={'/autor/' + item.authorUrl}>
                         <p className="history-item__author">{item.authorName}</p>
                     </Link>
                 </div>
-                    <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
-                                        courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
-                                        totalDuration={item.Duration}/>
+                <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
+                                      courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
+                                      totalDuration={item.Duration}/>
             </div>
         )
     }
