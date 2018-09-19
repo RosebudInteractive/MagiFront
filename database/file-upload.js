@@ -296,6 +296,7 @@ exports.FileUpload = {
         return (req, res, next) => {
             let res_files = [];
             let all_files = [];
+            let userId = req.user ? req.user.Id : null;
 
             const processErr = (err) => {
                 let error = err instanceof Error ? err.message : err.toString();
@@ -334,6 +335,8 @@ exports.FileUpload = {
                                 if (typeof (val) != "undefined")
                                     options[param] = val;
                             });
+                            if (typeof (userId) === "number")
+                                options.userId = userId;
                             result = result
                                 .then(() => postProcessor(uploadDir, res_files, options));
                         }

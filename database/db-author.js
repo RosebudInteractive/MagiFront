@@ -447,11 +447,11 @@ const DbAuthor = class DbAuthor extends DbObject {
         })
     }
 
-    update(id, data) {
+    update(id, data, options) {
         return new Promise((resolve, reject) => {
             let auth_obj;
             let auth_lng_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let inpFields = data || {};
             let isModified = false;
@@ -514,10 +514,10 @@ const DbAuthor = class DbAuthor extends DbObject {
         })
     }
 
-    insert(data) {
+    insert(data, options) {
         return new Promise((resolve, reject) => {
             let root_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let inpFields = data || {};
             resolve(

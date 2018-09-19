@@ -74,6 +74,8 @@ Promise.resolve()
             app.use('/static', express.static(path.join(__dirname, 'static')));
         }
 
+        app.use("/doc", express.static(__dirname + '/static-files/doc'));
+
         app.use("/images", express.static(__dirname + '/images'));
         app.use("/fonts", express.static(__dirname + '/fonts'));
         app.use("/css", express.static(__dirname + '/css'));

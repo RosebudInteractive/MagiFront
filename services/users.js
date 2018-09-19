@@ -134,7 +134,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .update(req.user.Id, req.body)
+                .update(req.user.Id, req.body, { userId: req.user.Id })
                 .then(rows => {
                     res.send(rows);
                 })

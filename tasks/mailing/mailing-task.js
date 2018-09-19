@@ -52,7 +52,7 @@ const dfltSettings = {
     period: "week",
     sender: "test@magisteria.ru",
     senderName: "Magisteria.ru",
-    mailList: "My emails",
+    mailList: "Магистерия",
     imgDir: "mails",
     imgUrl: "/data/mails/",
     fbUrl: "/",

@@ -54,7 +54,7 @@ function setupAuthors(app) {
 
     app.post('/api/adm/authors', (req, res, next) => {
         AuthorsService()
-            .insert(req.body)
+            .insert(req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })
@@ -65,7 +65,7 @@ function setupAuthors(app) {
 
     app.put('/api/adm/authors/:id', (req, res, next) => {
         AuthorsService()
-            .update(parseInt(req.params.id), req.body)
+            .update(parseInt(req.params.id), req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })

@@ -31,6 +31,9 @@ const { SetupRoute: setupDebugRoutes } = require('./debug');
 const { setupPrerender } = require('../prerender');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 
+const { FileUpload } = require("../database/file-upload");
+const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
+
 function errorHandler(err, req, res, next) {
     console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
     res.status(HttpCode.ERR_INTERNAL).json({ message: err.message ? err.message : err.toString() });
@@ -89,6 +92,9 @@ function setupAPI(express, app) {
         app.use("/api/adm", AuthenticateJWT(app, true)); // JWT Authentication
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
+
+    app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
+    app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 
     setupPrerender(app);
     setupMailSubscription(app);

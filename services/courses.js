@@ -78,7 +78,7 @@ function setupCourses(app) {
 
     app.post('/api/adm/courses', (req, res, next) => {
         CoursesService()
-            .insert(req.body)
+            .insert(req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })
@@ -89,7 +89,7 @@ function setupCourses(app) {
 
     app.put('/api/adm/courses/:id', (req, res, next) => {
         CoursesService()
-            .update(parseInt(req.params.id), req.body)
+            .update(parseInt(req.params.id), req.body, { userId: req.user.Id })
             .then(rows => {
                 res.send(rows);
             })

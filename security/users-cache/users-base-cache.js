@@ -467,10 +467,11 @@ exports.UsersBaseCache = class UsersBaseCache {
     //
     // Currently we can edit only "Password" and "DisplayName" here
     //
-    editUser(id, user_data) {
+    editUser(id, user_data, opts) {
         let options = { dbRoots: [] };
         let root_obj;
         let user = null;
+        let dbopts = opts || {};
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -525,7 +526,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                                 }
                             });
                     return rc.then(() => {
-                        return root_obj.save()
+                        return root_obj.save(dbopts)
                             .then(() => {
                                 return this.getUserInfoById(user.id(), true)
                             });

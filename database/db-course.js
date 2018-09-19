@@ -1293,7 +1293,7 @@ const DbCourse = class DbCourse extends DbObject {
                         return $data.tranStart({})
                             .then((result) => {
                                 transactionId = result.transactionId;
-                                opts = { transactionId: transactionId };
+                                opts.transactionId = transactionId;
                                 return crs_obj.save(opts)
                                     .then((result) => {
                                         isModified = isModified || (result && result.detail && (result.detail.length > 0));
@@ -1386,10 +1386,10 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    insert(data) {
+    insert(data, options) {
         return new Promise((resolve, reject) => {
             let root_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let new_obj = null;
             let inpFields = data || {};

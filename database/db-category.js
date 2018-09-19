@@ -115,11 +115,11 @@ const DbCategory = class DbCategory extends DbObject {
         })
     }
 
-    update(id, data) {
+    update(id, data, options) {
         return new Promise((resolve, reject) => {
             let ctg_obj;
             let ctg_lng_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let inpFields = data || {};
             resolve(
@@ -163,10 +163,10 @@ const DbCategory = class DbCategory extends DbObject {
         })
     }
 
-    insert(data) {
+    insert(data, options) {
         return new Promise((resolve, reject) => {
             let root_obj;
-            let opts = {};
+            let opts = options || {};
             let newId = null;
             let inpFields = data || {};
             resolve(

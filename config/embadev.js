@@ -68,7 +68,7 @@ let options = {
     mail: {
         autosubscribe: {
             enabled: true,
-            mailList: "My emails"
+            mailList: "Магистерия"
         },
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",

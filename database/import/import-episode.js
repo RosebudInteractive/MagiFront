@@ -23,8 +23,7 @@ const IMPOPT_OPTIONS_DFLT = {
 };
 
 const GET_LESSON_PIC_MSSQL =
-    "select r.[Id], l.[MetaData] from [Resource] r\n" +
-    "  join[ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
+    "select r.[Id], r.[MetaData] from [Resource] r\n" +
     "where r.[ResType] = 'P' and  r.[LessonId] = <%= idLesson %>";
 
 const GET_EPISODE_DURATION_MSSQL =
@@ -33,8 +32,7 @@ const GET_EPISODE_DURATION_MSSQL =
     "where e.[Id] = <%= idEpisode %>";
 
 const GET_LESSON_PIC_MYSQL =
-    "select r.`Id`, l.`MetaData` from `Resource` r\n" +
-    "  join`ResourceLng` l on l.`ResourceId` = r.`Id`\n" +
+    "select r.`Id`, r.`MetaData` from `Resource` r\n" +
     "where r.`ResType` = 'P' and  r.`LessonId` = <%= idLesson %>";
 
 const GET_EPISODE_DURATION_MYSQL =
@@ -107,6 +105,7 @@ exports.ImportEpisode = class ImportEpisode {
         let opts = _.defaultsDeep(options, IMPOPT_OPTIONS_DFLT);
         opts.importErrors = [];
         opts.importWarnings = [];
+        let dbopts = typeof (opts.userId) === "number" ? { userId: opts.userId } : {};
         let idLesson;
         let idEpisode;
         let self = this;
@@ -197,10 +196,15 @@ exports.ImportEpisode = class ImportEpisode {
                                                 if (lngCollection && (lngCollection.count() === 1)) {
                                                     let elem = lngCollection.get(0);
                                                     try {
-                                                        if (elem.metaData()) {
-                                                            let meta = JSON.parse(elem.metaData());
+                                                        if (resObj.metaData()) {
+                                                            let meta = JSON.parse(resObj.metaData());
                                                             if (meta.fileId)
-                                                                picts[meta.fileId] = { id: resObj.id(), obj: elem, meta: meta, isUpdated: false };
+                                                                picts[meta.fileId] = {
+                                                                    id: resObj.id(),
+                                                                    obj: { res: resObj, lng: elem },
+                                                                    meta: meta,
+                                                                    isUpdated: false
+                                                                };
                                                         }
                                                     } catch (err) { };
                                                 }
@@ -222,23 +226,23 @@ exports.ImportEpisode = class ImportEpisode {
                                                     item.Content = { track: file.track, duration: elem.duration / 1000 };
                                                     if (!pict.isUpdated) {
                                                         if (file.title) {
-                                                            pict.name(file.title);
+                                                            pict.lng.name(file.title);
                                                             meta.name = file.title;
                                                         }
                                                         else {
-                                                            pict.name("");
+                                                            pict.lng.name("");
                                                             meta.name = "";
                                                         }
                                                         if (file.title2) {
-                                                            pict.description(file.title2);
+                                                            pict.lng.description(file.title2);
                                                             meta.description = file.title2;
                                                         }
                                                         else {
-                                                            pict.description(null);
+                                                            pict.lng.description(null);
                                                             delete meta.description;
                                                         }
                                                         pict.isUpdated = true;
-                                                        pict.metaData(JSON.stringify(meta));
+                                                        pict.res.metaData(JSON.stringify(meta));
                                                     }
                                                     if (file.title)
                                                         item.Content.title = file.title;
@@ -314,7 +318,7 @@ exports.ImportEpisode = class ImportEpisode {
                                         }
                                     })
                                     .then(() => {
-                                        return root_obj.save();
+                                        return root_obj.save(dbopts);
                                     })
                                     .then(() => {
                                         return episode;
@@ -325,7 +329,7 @@ exports.ImportEpisode = class ImportEpisode {
                 return result;
             })
             .then((episode) => {
-                return EpisodesService().update(idEpisode, idLesson, episode);
+                return EpisodesService().update(idEpisode, idLesson, episode, dbopts);
             })
             .then(() => {
                 return opts.importWarnings.length > 0 ? { result: "WARN", warnings: opts.importWarnings } : { result: "OK" };
