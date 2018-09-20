@@ -30,6 +30,7 @@ const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
 const { setupPrerender } = require('../prerender');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
+const { SetupRoute: setupFeedback } = require('./feedback');
 
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
@@ -98,6 +99,7 @@ function setupAPI(express, app) {
 
     setupPrerender(app);
     setupMailSubscription(app);
+    setupFeedback(app);
     setupProtectedStatic(app);
     setupLessonPositions(app);
     setupDebugRoutes(app);

@@ -70,6 +70,23 @@ let options = {
             enabled: true,
             mailList: "Магистерия"
         },
+        feedback: {
+            type: "test",//"smtp"
+            template: "./templates/mail/feedback.tmpl",
+            subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
+            sender: '"Magisteria" <' + process.env.YANDEX_USER + '@yandex.ru>',
+            recipients: process.env.YANDEX_USER + '@yandex.ru',
+            options: {
+                disableUrlAccess: false,
+                host: process.env.YANDEX_SMTP_HOST,
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: process.env.YANDEX_USER,
+                    pass: process.env.YANDEX_PWD
+                }
+            }
+        },
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
             apiSecret: "2593d02228f842c412e51d24de824dde",

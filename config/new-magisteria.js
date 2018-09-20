@@ -66,6 +66,23 @@ module.exports = {
             enabled: true,
             mailList: "Магистерия"
         },
+        feedback: {
+            type: "smtp",
+            template: "./templates/mail/feedback.tmpl",
+            subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
+            sender: '"Magisteria" <test@magisteria.ru>',
+            recipients: 'sokolov@yandex.ru',
+            options: {
+                disableUrlAccess: false,
+                host: "smtp.yandex.ru",
+                port: 465,//587
+                secure: true, // true for 465, false for other ports
+                auth: {
+                    user: "test@magisteria.ru",
+                    pass: "S4zf4ckK"
+                }
+            }
+        },
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
             apiSecret: "2593d02228f842c412e51d24de824dde",

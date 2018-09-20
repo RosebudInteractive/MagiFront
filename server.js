@@ -140,6 +140,10 @@ Promise.resolve()
             res.sendFile(__dirname + '/debug/LoginTestPage.html');
         });
 
+        app.get("/feedbacktest", function (req, res) {
+            res.sendFile(__dirname + '/debug/FeedbackTestPage.html');
+        });
+
         app.get("/regtest", function (req, res) {
             res.sendFile(__dirname + '/debug/RegTestPage.html');
         });
