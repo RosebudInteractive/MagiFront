@@ -531,7 +531,7 @@ class CourseEditor extends ObjectEditor {
                         id: "file-uploader",
                         type: "iconButton",
                         icon: 'upload',
-                        upload: "/upload",
+                        upload: "/api/adm/upload",
                         multiple: false,
                         datatype: "json",
                         accept: "image/*",

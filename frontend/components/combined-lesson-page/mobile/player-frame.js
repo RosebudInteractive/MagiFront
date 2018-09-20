@@ -234,10 +234,10 @@ class PlayerFrame extends Component {
                                 <div className="player-block__row">
                                     <div className="player-block__controls">
                                         <TimeInfo/>
-                                    </div>
-                                    <div className="player-block__stats">
                                         <SoundButton/>
                                         <SoundBar/>
+                                    </div>
+                                    <div className="player-block__stats">
                                         {
                                             contentArray.length > 0 ?
                                                 <button type="button"
