@@ -22,7 +22,6 @@ let bld = new DatabaseBuilder(magisteryConfig)
 let log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
-const { FileUpload } = require("./database/file-upload");
 const config = require('config');
 const { PrerenderInit } = require('./prerender');
 
@@ -177,11 +176,6 @@ Promise.resolve()
         // app.get("/", function (req, res) {
         //     res.sendFile(__dirname + '/adm-index.html');
         // });
-
-        app.post('/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
-
-        const { ImportEpisode, ImportEpisodeParams } = require('./database/import');
-        app.post('/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 
         app.listen(port, address, function (error) {
             if (error) {
