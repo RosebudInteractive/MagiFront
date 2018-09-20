@@ -112,7 +112,7 @@ export const uploadPackage = (object) => {
         data.append('idEpisode', object.idEpisode)
         data.append('idLesson', object.idLesson)
 
-        fetch('/import',
+        fetch('/api/adm/import',
             {
                 method: 'POST',
                 body: data,

@@ -149,7 +149,7 @@ class ResourceForm extends React.Component {
                                     view: "uploader",
                                     id: "file-uploader",
                                     apiOnly: true,
-                                    upload: "/upload",
+                                    upload: "/api/adm/upload",
                                     multiple: false,
                                     datatype: "json",
                                     accept: "image/*",
