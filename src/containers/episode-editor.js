@@ -433,7 +433,7 @@ class EpisodeEditor extends ObjectEditor {
                         type: "iconButton",
                         icon: 'upload',
                         link: "file-name",
-                        upload: "/upload",
+                        upload: " /api/adm/upload",
                         multiple: false,
                         datatype: "json",
                         accept: "audio/*",

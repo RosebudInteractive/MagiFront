@@ -15896,7 +15896,23 @@ ul.lectures-tab {
     .lesson-player .player-frame__poster-title,
     .lesson-player .player-frame__poster-subtitle {
       font-size: 12px;
-      line-height: 14px;
+      line-height: 16px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+    }
+    .lesson-player .player-frame__poster-title {
+      -webkit-line-clamp: 1;
+      max-height: 16px;
+    }
+    .lesson-player .player-frame__poster-title.single {
+      -webkit-line-clamp: 3;
+      max-height: 48px;
+    }
+    .lesson-player .player-frame__poster-subtitle {
+      -webkit-line-clamp: 2;
+      max-height: 32px;
     }
   }
   .lesson-player .player-frame__poster-text p {

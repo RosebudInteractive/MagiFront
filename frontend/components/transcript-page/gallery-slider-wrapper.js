@@ -34,6 +34,7 @@ class GalleryWrapper extends React.Component {
             on: {
                 resize: () => {
                     this.gallerySlider.update();
+                    // $('.gallery-slide__image').css('width', 'auto')
                 }
             }
         });
