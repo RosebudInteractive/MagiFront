@@ -14,7 +14,9 @@ import {
     SHOW_CONTENT_TOOLTIP,
     HIDE_CONTENT_TOOLTIP,
     SHOW_SPEED_TOOLTIP,
-    HIDE_SPEED_TOOLTIP, PLAYER_START_PLAY_LESSON,
+    HIDE_SPEED_TOOLTIP,
+    PLAYER_START_PLAY_LESSON,
+    PLAYER_CAN_NOT_START_PLAY_LESSON,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -28,7 +30,9 @@ const initialState = {
     currentTime: 0,
     bufferedTime: 0,
     currentContent: null,
+
     starting: false,
+    canNotPlay: false,
     paused: true,
     ended: false,
     muted: false,
@@ -60,8 +64,12 @@ export default function player(state = initialState, action) {
             return {...state, starting: true}
         }
 
+        case PLAYER_CAN_NOT_START_PLAY_LESSON: {
+            return {...state, canNotPlay: true,}
+        }
+
         case PLAYER_PLAYED:
-            return {...state, paused: false, ended: false, stopped: false, starting: false, };
+            return {...state, paused: false, ended: false, stopped: false, starting: false, canNotPlay: false,};
 
         case PLAYER_PAUSED:
             return {...state, paused: true, starting: false,};

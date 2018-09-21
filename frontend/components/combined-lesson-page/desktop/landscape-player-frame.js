@@ -226,19 +226,18 @@ class Frame extends Component {
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let { visible, starting, paused, contentArray, } = this.props;
+        let { visible, starting, paused, contentArray, canNotPlay} = this.props;
 
         return (
             <div style={visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={_isFinished ? {display: 'none'} : null}>
+                <div className="player-frame__poster" style={_isFinished || canNotPlay ? {display: 'none'} : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>
                 {
                     visible ?
                         [
-                            <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
+                            <div className={"player-frame__screen" + (_isFinished || canNotPlay ? " finished" : "") + (paused ? "" : " hide")}/>,
                             starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
                             <div className="player-frame">
@@ -296,6 +295,7 @@ function mapStateToProps(state) {
         lessons: state.lessons,
         contentArray: state.player.contentArray,
         paused: state.player.paused,
+        canNotPlay: state.player.canNotPlay,
         starting: state.player.starting,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,

@@ -221,6 +221,7 @@ class NestedPlayer {
             })
             .catch((e) => {
                 console.log(e)
+                store.dispatch(playerActions.canNotPlay())
             })
 
         this._hasStoppedOnSwitch = false;
@@ -428,6 +429,9 @@ class NestedPlayer {
             },
             onBuffered: (value) => {
                 store.dispatch(playerActions.setBufferedTime(value))
+            },
+            onError: (e) => {
+                console.log(e)
             }
         };
     }
