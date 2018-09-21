@@ -3,7 +3,6 @@ const { URL, URLSearchParams } = require('url');
 const config = require('config');
 const passport = require('passport');
 const passportLocal = require('passport-local');
-const reCAPTCHA = require('recaptcha2');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { UserRegister } = require("./user-register");
@@ -11,14 +10,10 @@ const { SendRegMail } = require("./user-register");
 const { UserActivate } = require("./user-activate");
 const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
-
+const { recaptcha } = require('./recaptcha');
 const serialize = require('./serialize');
 
 let usersCache = null;
-let recaptcha = new reCAPTCHA({
-    siteKey: config.authentication.reCapture.siteKey,
-    secretKey: config.authentication.reCapture.secretKey
-});
 
 class AuthLocal {
 
@@ -280,6 +275,7 @@ let AuthLocalInit = (app) => {
         authLocal = new AuthLocal(app);
 };
 
+exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession;
 exports.StdLoginProcessor = StdLoginProcessor;

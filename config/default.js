@@ -72,6 +72,13 @@ module.exports = {
         }
     },
     mail: {
+        feedback: {
+            type: "test",
+            template: "./templates/mail/feedback.tmpl",
+            subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
+            sender: '"Magisteria" <administrator@magisteria.ru>',
+            recipients: 'administrator@magisteria.ru'
+        },
         userReg: {
             type: "test",
             template: "./templates/mail/registration.tmpl",

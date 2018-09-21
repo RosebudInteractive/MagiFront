@@ -302,6 +302,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("MailingId", { type: "dataRef", model: "Mailing", refAction: "parentCascade", allowNull: false })
             .addField("LessonId", { type: "int", allowNull: false });
 
+        metaDataMgr.addModel("Feedback", "3446c50a-6b58-4d42-8a57-bb87e42494d5", "RootFeedback", "5099cf78-6aff-4717-ba04-973626d4d8da")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: true })
+            .addField("Recipients", { type: "string", length: 255, allowNull: true })
+            .addField("SenderContact", { type: "string", allowNull: false })
+            .addField("MessageText", { type: "string", allowNull: false })
+            .addField("Subject", { type: "string", length: 255, allowNull: true })
+            .addField("Body", { type: "string", allowNull: true })
+            .addField("Status", { type: "string", length: 50, allowNull: false })
+            .addField("ResBody", { type: "string", allowNull: true });
+
         metaDataMgr.checkSchema();
     }
 }
