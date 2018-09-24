@@ -16572,6 +16572,7 @@ ul.lectures-tab {
 
 .lectures-menu._plain-menu {
   position: absolute;
+  height: 52px;
   top: 0;
   left: 0;
   right: 0;
@@ -17146,7 +17147,7 @@ ul.lectures-tab {
         background-color: #2f2f2f;
         border-color: rgba(255, 255, 255, 0); } }
   .section-nav-list__item {
-    padding: 15px 18px;
+    padding: 14px 18px;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 14px;
     line-height: 23px;

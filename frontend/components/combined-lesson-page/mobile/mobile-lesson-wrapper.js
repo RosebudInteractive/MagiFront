@@ -80,7 +80,8 @@ export default class Wrapper extends React.Component {
         const _coverStyle = {}
 
         if (!isPlayer) {
-            _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, 0.2) 0%, rgb(28, 27, 23, 0.4) 30%, rgb(28, 27, 23, 0.8) 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
+            // _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, .2) 0%, rgb(28, 27, 23, .4) 30%, rgb(28, 27, 23, .8) 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
+            _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, .5) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
         }
 
         if (this.state.wrapperHeight) {

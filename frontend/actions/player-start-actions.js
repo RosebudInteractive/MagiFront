@@ -13,20 +13,16 @@ import {
 } from '../constants/player'
 
 export const startPlayLesson = (lesson) => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_START_PLAY_LESSON,
-            payload: lesson
-        });
+    return {
+        type: PLAYER_START_PLAY_LESSON,
+        payload: lesson
     }
 };
 
 export const startPlay = (lessonId) => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_START_PLAY,
-            payload: lessonId
-        });
+    return {
+        type: PLAYER_START_PLAY,
+        payload: lessonId
     };
 };
 
@@ -48,11 +44,9 @@ export const startPause = () => {
 };
 
 export const startStop = () => {
-    return (dispatch) => {
-        dispatch({
-            type: PLAYER_START_STOP,
-            payload: null
-        });
+    return {
+        type: PLAYER_START_STOP,
+        payload: null
     }
 };
 

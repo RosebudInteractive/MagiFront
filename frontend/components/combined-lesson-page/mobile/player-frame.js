@@ -209,24 +209,28 @@ class PlayerFrame extends Component {
 
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
-            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>'
+            _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
+            _coverStyle = {
+                backgroundImage : "url(" + '/data/' + this.props.lesson.Cover + ")",
+                backgroundSize :  "cover",
+                backgroundPosition : "top center",
+            };
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
 
-        let {visible, starting, paused, contentArray, } = this.props;
+        let {visible, starting, paused, contentArray, canNotPlay} = this.props;
 
         return (
             <div style={visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={_isFinished ? {visibility: 'hidden'} : null}>
-                    <div className='ws-container' id={'player' + _id}>
+                <div className="player-frame__poster" style={_isFinished || canNotPlay ? _coverStyle : null}>
+                    <div className='ws-container' id={'player' + _id} style={_isFinished || canNotPlay? {visibility: 'hidden'} : null}>
                     </div>
                 </div>
                 {
                     visible ?
                         [
-                            <div
-                                className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
+                            <div className={"player-frame__screen" + (_isFinished ? " finished" : "") + (paused ? "" : " hide")}/>,
                             starting ? null : <ScreenControls {...this.props}/>,
                             <Titles/>,
                             <div className="player-block">
@@ -279,6 +283,7 @@ function mapStateToProps(state) {
         contentArray: state.player.contentArray,
         paused: state.player.paused,
         starting: state.player.starting,
+        canNotPlay: state.player.canNotPlay,
         showContentTooltip: state.player.showContentTooltip,
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,

@@ -19,6 +19,7 @@ import {
     HIDE_CONTENT_TOOLTIP,
     SHOW_SPEED_TOOLTIP,
     HIDE_SPEED_TOOLTIP,
+    PLAYER_CAN_NOT_START_PLAY_LESSON,
 } from '../constants/player'
 
 export const startInit = () => {
@@ -31,6 +32,13 @@ export const startInit = () => {
 export const play = () => {
     return {
         type: PLAYER_PLAYED,
+        payload: null
+    }
+};
+
+export const canNotPlay = () => {
+    return {
+        type: PLAYER_CAN_NOT_START_PLAY_LESSON,
         payload: null
     }
 };
