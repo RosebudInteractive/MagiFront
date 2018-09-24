@@ -37,7 +37,9 @@ class YandexKassa extends Payment {
             }, idempotenceKey)
                 .then(function (result) {
                     console.log({ payment: result });
-                    return result;
+                    return result && result.confirmation ? {
+                        confirmationUrl: result.confirmation.confirmation_url
+                    } : {};
                 })
                 .catch(function (err) {
                     console.error(err);

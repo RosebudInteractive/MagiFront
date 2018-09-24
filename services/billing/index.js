@@ -11,8 +11,8 @@ exports.SetupRoute = (app) => {
             if (req.user) {
                 paymentObject.createPayment({ value: req.body.value, currency: "RUB", type: "bank_card" })
                     .then(result => {
-                        if (result && result.redirectUrl)
-                            res.redirect(result.redirectUrl)
+                        if (result && result.confirmationUrl)
+                            res.redirect(result.confirmationUrl)
                         else
                             res.send({ result: "OK", paymentData: result });
                     })
