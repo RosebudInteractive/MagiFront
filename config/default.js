@@ -57,6 +57,16 @@ module.exports = {
             "set-user-subscription": false
         }
     },
+    billing: {
+        module: "./yandex-kassa",
+        enabled: false,
+        yandexKassa: {
+            shopId: "536331",
+            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            callBack: "/api/yandex-kassa/callback",
+            returnUrl: "/"
+        }
+    },
     authentication: {
         enabled: false,
         useJWT: false,

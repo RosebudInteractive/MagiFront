@@ -31,6 +31,7 @@ const { SetupRoute: setupDebugRoutes } = require('./debug');
 const { setupPrerender } = require('../prerender');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 const { SetupRoute: setupFeedback } = require('./feedback');
+const { SetupRoute: setupBilling } = require('./billing');
 
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
@@ -98,6 +99,7 @@ function setupAPI(express, app) {
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 
     setupPrerender(app);
+    setupBilling(app);
     setupMailSubscription(app);
     setupFeedback(app);
     setupProtectedStatic(app);

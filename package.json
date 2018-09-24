@@ -116,6 +116,7 @@
     "whatwg-fetch": "^2.0.3",
     "winston": "^2.4.0",
     "wordpress-hash-node": "^1.0.0",
-    "xml-js": "^1.6.4"
+    "xml-js": "^1.6.4",
+    "yandex-checkout": "^1.0.11"
   }
 }
