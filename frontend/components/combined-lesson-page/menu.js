@@ -141,7 +141,14 @@ class Navigation extends React.Component {
             expanded: false,
             showToc: false,
         }
+
+        this._resizeHandler = () => {
+            let _list = $('.section-nav__list');
+
+
+        }
     }
+
 
     _hasToc() {
         let {episodes} = this.props;
