@@ -21,7 +21,7 @@ class GalleryWrapper extends React.Component {
     };
 
     componentDidMount() {
-        this.gallerySlider = new Swiper('.js-gallery-slider', {
+        let _gallerySlider = new Swiper('.js-gallery-slider', {
             navigation: {
                 prevEl: '.js-gallery-controls .swiper-button-prev',
                 nextEl: '.js-gallery-controls .swiper-button-next'
@@ -33,10 +33,10 @@ class GalleryWrapper extends React.Component {
             slidesPerView: 'auto',
             on: {
                 resize: () => {
-                    this.gallerySlider.update();
-                    // $('.gallery-slide__image').css('width', 'auto')
+                    _gallerySlider.update();
                 }
-            }
+            },
+            // observer: true,
         });
 
         let that = this;

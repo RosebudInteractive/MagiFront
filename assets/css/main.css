@@ -15413,12 +15413,14 @@ ul.lectures-tab {
     bottom: 4px; }
   .gallery-slider-wrapper .gallery-slide {
     position: relative;
+    flex: none;
     height: 30vh;
     min-height: 160px;
     width: auto !important;
     border-right: 1px solid rgba(255, 255, 255, 1);
     cursor: pointer; }
     .gallery-slider-wrapper .gallery-slide__image {
+      flex: none;
       padding-left: 0;
       height: 30vh;
       min-height: 160px;
@@ -15439,8 +15441,11 @@ ul.lectures-tab {
         .gallery-slider-wrapper .gallery-slide__image {
           padding-right: 0; } }
       .gallery-slider-wrapper .gallery-slide__image img {
-        height: 100%;
-        width: auto; }
+          height: 100%;
+          height: 30vh;
+          min-height: 160px;
+          width: auto;
+          flex: none; }
         @media (max-width: 1279px) {
           .gallery-slider-wrapper .gallery-slide__image img {
             position: static; } }
