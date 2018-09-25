@@ -37,8 +37,14 @@ const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
 function errorHandler(err, req, res, next) {
-    console.error("setup::errorHandler ==> " + err.message ? err.message : err.toString());
-    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message ? err.message : err.toString() });
+    let error = err.message ? err.message : err.toString();
+    let statusCode = HttpCode.ERR_INTERNAL;
+    if (err.statusCode && err.error) {
+        statusCode = err.statusCode;
+        error = err.error;
+    }
+    console.error(`setup::errorHandler ==> ${error}`);
+    res.status(statusCode).json({ error: error });
 }
 
 function setupAPI(express, app) {

@@ -6,10 +6,16 @@ const { HttpCode } = require("../../const/http-codes");
 exports.SetupRoute = (app) => {
     if (config.billing.enabled && config.has("billing.module")) {
         const { PaymentObject } = require(config.billing.module);
-        let paymentObject = PaymentObject(app);
+        let paymentObject = PaymentObject({ app: app });
         app.post('/api/payment', (req, res, next) => {
             if (req.user) {
-                paymentObject.createPayment({ value: req.body.value, currency: "RUB", type: "bank_card" })
+                paymentObject.createPayment({
+                    returnUrl: req.body.returnUrl,
+                    value: req.body.value,
+                    currency: "RUB",
+                    type: "bank_card",
+                    payment: req.body.payment
+                })
                     .then(result => {
                         if (result && result.confirmationUrl)
                             res.redirect(result.confirmationUrl)
