@@ -115,6 +115,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             });
     }
 
+    // А можно и без авторизации: https://graph.facebook.com/?id=https://magisteria.ru/islam/intro/
     /*
         https://magisteria.ru/quattrocento/brunelleschi/
         FB: https://graph.facebook.com/v3.0/?id=https%3A%2F%2Fmagisteria.ru%2Fquattrocento%2Fbrunelleschi%2F&fields=engagement&access_token=591000364592228|386e5c11ab88a43c5c96b7df69c9e06d

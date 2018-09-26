@@ -113,11 +113,11 @@
     "text-loader": "0.0.1",
     "transliteration": "^1.6.2",
     "url-loader": "^0.6.2",
+    "uuid": "^3.3.2",
     "webix": "^5.1.1",
     "whatwg-fetch": "^2.0.3",
     "winston": "^2.4.0",
     "wordpress-hash-node": "^1.0.0",
-    "xml-js": "^1.6.4",
-    "yandex-checkout": "^1.0.11"
+    "xml-js": "^1.6.4"
   }
 }
