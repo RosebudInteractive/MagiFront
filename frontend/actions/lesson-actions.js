@@ -29,7 +29,7 @@ export const getLesson = (courseUrl, lessonUrl) => {
             payload: null
         });
 
-        fetch("/api/lessons/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+        fetch("/api/lessons/v2/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -150,10 +150,10 @@ const parseJSON = (response) => {
 // };
 //
 const handleData = (data) => {
-    let _lesson = data.Lesson;
+    let _lesson = data;
     _lesson.courseUrl = data.Course.URL;
     let _parentNumber = _lesson.Number;
-    _lesson.Lessons.forEach((lesson) => {
+    _lesson.Childs.forEach((lesson) => {
         lesson.courseUrl = data.Course.URL;
         lesson.Number = _parentNumber + '.' + lesson.Number
     })

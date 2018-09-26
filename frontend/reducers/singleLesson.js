@@ -27,7 +27,7 @@ export default function singleLesson(state = initialState, action) {
         case GET_LESSON_SUCCESS: {
             return {
                 ...state,
-                object: action.payload.Lesson,
+                object: action.payload,
                 course: action.payload.Course,
                 authors: action.payload.Authors,
                 isSublesson: action.payload.hasOwnProperty('SubLessonIdx'),

@@ -218,6 +218,32 @@ class Navigation extends React.Component {
         e.preventDefault()
     }
 
+    componentDidUpdate(prevProps, prevState) {
+
+
+        if ((!prevState.showToc) && (this.state.showToc)) {
+            // $('body').addClass('overflow');
+
+            // let _control = $("#lesson-" + this.props.active);
+            // if (_control.length > 0) {
+            //     let _list = $(".lectures-list-wrapper"),
+            //         _listCurrentScrollPosition = _list.scrollTop(),
+            //         _listOffsetPosition = _list.offset().top,
+            //         _itemOffsetPosition = _control.offset().top - _listOffsetPosition,
+            //         _itemCurrentScrollPosition = _control.scrollTop();
+            //
+            //     if (_itemCurrentScrollPosition - _itemOffsetPosition !== 0) {
+            //         _list.scrollTop(_listCurrentScrollPosition + _itemOffsetPosition)
+            //     }
+            // }
+
+        }
+
+        if ((prevState.showToc) && (!this.state.showToc)) {
+            // $('body').removeClass('overflow');
+        }
+    }
+
     render() {
         let {isNeedHideRefs} = this.props,
             _sectionClassName = "lectures-menu__section section-nav js-section-nav" +

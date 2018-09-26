@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import PlayBlock from './play-block'
+import SocialBlock from './social-block'
 
 import GallerySlides from '../transcript-page/gallery-slides';
 import $ from 'jquery'
@@ -189,7 +190,7 @@ class TextBlock extends React.Component {
         return (
             <div className="transcript-page _nested" id="transcript">
                 <section className="text-block js-social-start">
-                    <SocialBlock/>
+                    <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
@@ -204,7 +205,7 @@ class TextBlock extends React.Component {
     }
 }
 
-class SocialBlock extends React.Component {
+class SocialBlockMoc extends React.Component {
 
     render() {
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
