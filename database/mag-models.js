@@ -312,6 +312,115 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Status", { type: "string", length: 50, allowNull: false })
             .addField("ResBody", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("ProductType", "a226321b-04fa-40c8-8c53-6efff100fb1f", "RootProductType", "fae9c1e4-b735-4241-a06e-a56333762e0b")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("Currency", "8f5503e0-ce9d-447b-9b9b-e0ca03c5c376", "RootCurrency", "e00b80e3-0fbe-48c1-847c-8fbffe1e6cb4")
+            .addField("Code", { type: "string", length: 20, allowNull: false })
+            .addField("Symbol", { type: "string", length: 5, allowNull: false }) // ք, $, €, £
+            .addField("Name", { type: "string", length: 255, allowNull: false });
+
+        metaDataMgr.addModel("VATType", "c0c9f48b-d057-4139-aa48-0761a92e239b", "RootVATType", "ec912725-a333-4f5d-93d1-bf6c1ec2babd")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true })
+            .addField("ExtFields", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("VATRate", "dfd5a184-7595-44d9-9dd1-64e8e10b02d9", "RootVATRate", "9ede10eb-10f4-400f-a51e-52ec9aa707ec")
+            .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentCascade", allowNull: false })
+            .addField("Rate", { type: "decimal", precision: 6, scale: 4, allowNull: false })
+            .addField("FirstDate", { type: "datetime", allowNull: false })
+            .addField("LastDate", { type: "datetime", allowNull: true });
+
+        metaDataMgr.addModel("Product", "76e0b31d-899b-4806-8272-95fa283e7cdb", "RootProduct", "ab6d0779-1a8f-4486-a428-697fcd10f7fe")
+            .addField("ProductTypeId", { type: "dataRef", model: "ProductType", refAction: "parentRestrict", allowNull: false })
+            .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentRestrict", allowNull: false })
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Picture", { type: "string", length: 255, allowNull: true })
+            .addField("PictureMeta", { type: "string", allowNull: true })
+            .addField("Description", { type: "string", allowNull: true })
+            .addField("ExtFields", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("PriceList", "aed10527-ed66-4a5b-864f-05463edba73c", "RootPriceList", "414407d4-01f6-44cc-b9f7-c2cb21bb7f4f")
+            .addField("CurrencyId", { type: "dataRef", model: "Currency", refAction: "parentRestrict", allowNull: false })
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("Price", "ff0e3c29-b8a9-4bb2-a764-d1ba308188be", "RootPrice", "e67b1a90-073e-4d2d-81c4-ac13ec6caa5f")
+            .addField("PriceListId", { type: "dataRef", model: "PriceList", refAction: "parentCascade", allowNull: false })
+            .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: false })
+            .addField("Price", { type: "decimal", precision: 12, scale: 4, allowNull: false })
+            .addField("FirstDate", { type: "datetime", allowNull: false })
+            .addField("LastDate", { type: "datetime", allowNull: true });
+
+        metaDataMgr.addModel("InvoiceType", "fff2ecf1-b5be-4d00-b102-fbaebb1d7f5f", "RootInvoiceType", "5f592dd0-24e1-41f0-9ad0-e4cb6ccfbe7f")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("InvoiceState", "61914e17-649c-49e3-a64c-1fd282eeda5e", "RootInvoiceState", "70e22c90-2523-4ec8-9c21-a7214812667b")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("Invoice", "04cb63fb-c922-465b-bd6c-a6d86aaa5d0b", "RootInvoice", "db354256-c562-41a4-a055-d9fa8d3c909f")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "Invoice", refAction: "parentRestrict", allowNull: true })
+            .addField("InvoiceTypeId", { type: "dataRef", model: "InvoiceType", refAction: "parentRestrict", allowNull: false })
+            .addField("StateId", { type: "dataRef", model: "InvoiceState", refAction: "parentRestrict", allowNull: false })
+            .addField("CurrencyId", { type: "dataRef", model: "Currency", refAction: "parentRestrict", allowNull: false })
+            .addField("ChequeId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: true })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true })
+            .addField("InvoiceNum", { type: "string", length: 255, allowNull: false })
+            .addField("InvoiceDate", { type: "datetime", allowNull: false })
+            .addField("Sum", { type: "decimal", precision: 12, scale: 4, allowNull: false })
+
+        metaDataMgr.addModel("InvoiceItem", "09280816-42fe-4f1c-bcad-988cd3f6c2ad", "RootInvoiceItem", "7a8e98d7-6bfb-41df-afe2-2cf19d01ea94")
+            .addField("InvoiceId", { type: "dataRef", model: "Invoice", refAction: "parentCascade", allowNull: false })
+            .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: false })
+            .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentRestrict", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "InvoiceItem", refAction: "parentRestrict", allowNull: true })
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("VATRate", { type: "decimal", precision: 6, scale: 4, allowNull: false })
+            .addField("Price", { type: "decimal", precision: 12, scale: 4, allowNull: false })
+            .addField("Qty", { type: "decimal", precision: 10, scale: 4, allowNull: false })
+            .addField("ExtFields", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("ChequeType", "111c7c08-3fef-47a8-9fde-59d8c10559e4", "RootChequeType", "f5c2521c-cfc4-425b-bd07-309ffc2b6f73")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("ChequeState", "b2562862-8fb2-4f82-ba2a-dc36676c1be6", "RootChequeState", "5098f53c-01a0-4439-b7a9-df230347f782")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
+        metaDataMgr.addModel("Cheque", "51e54d9c-2265-4895-b958-fdddaf69b10d", "RootCheque", "6e51fd38-a635-4182-8eda-b855e696c504")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: true })
+            .addField("ChequeTypeId", { type: "dataRef", model: "ChequeType", refAction: "parentRestrict", allowNull: false })
+            .addField("StateId", { type: "dataRef", model: "ChequeState", refAction: "parentRestrict", allowNull: false })
+            .addField("CurrencyId", { type: "dataRef", model: "Currency", refAction: "parentRestrict", allowNull: false })
+            .addField("InvoiceId", { type: "dataRef", model: "Invoice", refAction: "parentRestrict", allowNull: true })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("ChequeNum", { type: "string", length: 50, allowNull: false })
+            .addField("ChequeDate", { type: "datetime", allowNull: false })
+            .addField("Sum", { type: "decimal", precision: 12, scale: 4, allowNull: false });
+
+        metaDataMgr.addModel("ChequeLog", "aa0f517a-23cd-4a51-8073-58d86b583f97", "RootChequeLog", "e989a4ca-1e67-46a0-b45f-021bb74da09c")
+            .addField("ChequeId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: false })
+            .addField("ResultCode", { type: "string", length: 50, allowNull: false })
+            .addField("Operation", { type: "string", length: 255, allowNull: false })
+            .addField("Request", { type: "string", allowNull: true })
+            .addField("Response", { type: "string", allowNull: true });
+
         metaDataMgr.checkSchema();
     }
 }
