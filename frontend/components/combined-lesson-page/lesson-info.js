@@ -46,11 +46,9 @@ class LessonInfo extends React.Component {
 
         let {lesson} = this.props;
 
-
-        return lesson.Lessons.map((item) => {
+        return lesson.Childs.map((item) => {
             let _cover = getCoverPath(item, ImageSize.icon),
                 _inFavorites = this._isLessonInBookmarks(item.courseUrl, item.URL)
-
 
             return (
                 <li>
@@ -77,7 +75,7 @@ class LessonInfo extends React.Component {
         let {lesson} = this.props;
 
         return (
-            lesson && lesson.Lessons && (lesson.Lessons.length > 0)
+            lesson && lesson.Childs && (lesson.Childs.length > 0)
                 ?
                 <section className="lecture-info">
                     <div className="lecture-info__wrapper">

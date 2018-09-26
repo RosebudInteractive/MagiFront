@@ -11,6 +11,12 @@ import {
     getUserBookmarks,
     removeLessonFromBookmarks
 } from "../../ducks/profile";
+import {
+    FacebookShareButton,
+    TwitterShareButton,
+    VKShareButton,
+    OKShareButton,
+} from 'react-share';
 
 import {setScrollTop} from "../../containers/combined-lesson-page";
 
@@ -186,7 +192,7 @@ class LessonFrame extends React.Component {
                             <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
                         </div>
                     </div>
-                    <SocialBlock/>
+                    <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                 </div>
                 <div className="progress-bar">
                     <div className="progress-bar__bar" style={{width: _playPercent + '%'}}/>
@@ -197,12 +203,9 @@ class LessonFrame extends React.Component {
 }
 
 class SocialBlock extends React.Component {
-    static propTypes = {
-        inFavorites: PropTypes.bool,
-        onFavoritesClick: PropTypes.func,
-    }
-
     render() {
+        let {shareUrl, title, counter} = this.props;
+
         const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
             _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
@@ -210,30 +213,37 @@ class SocialBlock extends React.Component {
 
         return (
             <div className="social-block">
-                <a href="#" className="social-btn">
-                    <div className="social-btn__icon">
-                        <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
-                    </div>
-                    <span className="social-btn__actions"/>
-                </a>
-                <a href="#" className="social-btn _active">
-                    <div className="social-btn__icon">
-                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                    </div>
-                    <span className="social-btn__actions">64</span>
-                </a>
-                <a href="#" className="social-btn _active">
-                    <div className="social-btn__icon">
-                        <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
-                    </div>
-                    <span className="social-btn__actions">91</span>
-                </a>
-                <a href="#" className="social-btn _active">
-                    <div className="social-btn__icon">
-                        <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
-                    </div>
-                    <span className="social-btn__actions">4</span>
-                </a>
+                <div className='social-button-wrapper'>
+                    <TwitterShareButton url={shareUrl} title={title} className="social-btn">
+                        <div className="social-btn__icon">
+                            <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
+                        </div>
+                    </TwitterShareButton>
+                </div>
+                <div className='social-button-wrapper'>
+                    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
+                    </FacebookShareButton>
+                </div>
+                <div className='social-button-wrapper'>
+                    <VKShareButton url={shareUrl} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
+                    </VKShareButton>
+                </div>
+                <div className='social-button-wrapper'>
+                    <OKShareButton url={shareUrl} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
+                    </OKShareButton>
+                </div>
             </div>
         )
     }

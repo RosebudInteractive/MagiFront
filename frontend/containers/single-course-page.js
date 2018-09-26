@@ -56,6 +56,17 @@ class Main extends React.Component {
         })
     }
 
+    // _getShareUrl() {
+    //     let _href = window.location.href,
+    //         _search = window.location.search;
+    //
+    //     if ((_search !== '') && _href.endsWith(_search)) {
+    //         _href = _href.slice(0, _href.length - _search.length);
+    //     }
+    //
+    //     return _href;
+    // }
+
     render() {
         let {
             course,
@@ -71,7 +82,13 @@ class Main extends React.Component {
                         :
                         course ?
                             <div className="courses">
-                                <CourseModuleExt title={course.Name} isFavorite={this._isCourseInBookmarks()} onFavoritesClick={::this._favoritesClick}/>
+                                <CourseModuleExt
+                                    title={course.Name}
+                                    isFavorite={this._isCourseInBookmarks()}
+                                    onFavoritesClick={::this._favoritesClick}
+                                    shareUrl={window.location.href}
+                                    counter={course.ShareCounters}
+                                />
                                 <CourseTabs
                                     lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                     books={{total: course.Books.length}}
@@ -89,7 +106,7 @@ class CourseModuleExt extends React.Component {
         return (
             <div className="course-module course-module--extended">
                 <TitleWrapper {...this.props}/>
-                <Inner/>
+                <Inner shareUrl={this.props.shareUrl} counter={this.props.counter}/>
             </div>
         )
     }
@@ -115,7 +132,7 @@ class Inner extends React.Component {
         return (
             <div className="course-module__inner">
                 <Cover/>
-                <Content/>
+                <Content shareUrl={this.props.shareUrl} counter={this.props.counter}/>
             </div>
         )
     }

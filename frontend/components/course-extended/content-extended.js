@@ -1,6 +1,12 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import * as svg from '../../tools/svg-paths';
+import {
+    FacebookShareButton,
+    TwitterShareButton,
+    VKShareButton,
+    OKShareButton,
+} from 'react-share';
 
 class Content extends React.Component {
 
@@ -13,7 +19,7 @@ class Content extends React.Component {
 
         return (
             <div className="course-module__info-block">
-                <SocialBlock/>
+                <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                 <Description descr={_descr}/>
                 <BookCard/>
             </div>
@@ -23,31 +29,47 @@ class Content extends React.Component {
 
 class SocialBlock extends React.Component {
     render() {
+        let {shareUrl, title, counter} = this.props;
+
+        const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
+            _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
+            _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
+            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
+
         return (
             <div className="social-block social-block--dark">
-                <SocialButton href={'tw'} icoWidth={27} icoHeght={22}/>
-                <SocialButton href={'fb'} icoWidth={24} icoHeght={24} count={64}/>
-                <SocialButton href={'vk'} icoWidth={26} icoHeght={15} count={91}/>
-                <SocialButton href={'ok'} icoWidth={14} icoHeght={24} count={4}/>
-            </div>
-        )
-
-    }
-}
-
-class SocialButton extends React.Component {
-    render() {
-        let {href, count, icoWidth, icoHeight} = this.props;
-
-        return (
-            <a className={"social-btn" + (count ? ' _active' : '')}>
-                <div className="social-btn__icon">
-                    <svg width={icoWidth} height={icoHeight}>
-                        {svg.social[href]}
-                    </svg>
+                <div className='social-button-wrapper'>
+                    <TwitterShareButton url={shareUrl} title={title} className="social-btn">
+                        <div className="social-btn__icon">
+                            <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
+                        </div>
+                    </TwitterShareButton>
                 </div>
-                <span className="social-btn__actions">{count ? count : null}</span>
-            </a>
+                <div className='social-button-wrapper'>
+                    <FacebookShareButton url={shareUrl} quote={title} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
+                    </FacebookShareButton>
+                </div>
+                <div className='social-button-wrapper'>
+                    <VKShareButton url={shareUrl} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
+                    </VKShareButton>
+                </div>
+                <div className='social-button-wrapper'>
+                    <OKShareButton url={shareUrl} className="social-btn _active">
+                        <div className="social-btn__icon">
+                            <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
+                        </div>
+                        <span className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
+                    </OKShareButton>
+                </div>
+            </div>
         )
     }
 }

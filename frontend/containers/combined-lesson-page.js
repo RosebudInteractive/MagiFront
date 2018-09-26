@@ -221,7 +221,7 @@ class TranscriptLessonPage extends React.Component {
         return ((info.object.courseUrl === courseUrl) && (info.object.URL === lessonUrl)) ?
             info.object
             :
-            info.object.Lessons.find((lesson) => {
+            info.object.Childs.find((lesson) => {
                 return ((lesson.courseUrl === courseUrl) && (lesson.URL === lessonUrl))
             })
     }
@@ -280,19 +280,15 @@ class TranscriptLessonPage extends React.Component {
         let {lessonUrl, lessonInfo} = this.props,
             lesson = lessonInfo.object;
 
-        let _lesson = (lesson.URL === lessonUrl) ? lesson : lesson.Lessons.find((subLesson) => {
+        let _lesson = (lesson.URL === lessonUrl) ? lesson : lesson.Childs.find((subLesson) => {
             return subLesson.URL === lessonUrl
         })
 
         if (_lesson) {
-            let _audios = this._getAudios(_lesson)
-            _lesson.Audios = Object.assign({}, _audios)
-
-            let _hasSubLessons = _lesson.Lessons && (_lesson.Lessons.length > 0)
+            let _hasSubLessons = _lesson.Childs && (_lesson.Childs.length > 0)
             if (_hasSubLessons) {
-                _lesson.Lessons.forEach(sublesson => {
-                    let _audios = this._getAudios(sublesson)
-                    sublesson.Audios = Object.assign({}, _audios)
+                _lesson.Childs.forEach(sublesson => {
+                    sublesson.Author = Object.assign({}, _lesson.Author)
                 })
             }
         }
@@ -315,8 +311,8 @@ class TranscriptLessonPage extends React.Component {
             let _founded = item.Id === lesson.Id
 
             if (!_founded) {
-                if (item.Lessons.length > 0) {
-                    return item.Lessons.some((subItem) => {
+                if (item.Childs && (item.Childs.length > 0)) {
+                    return item.Childs.some((subItem) => {
                         if (subItem.Id === lesson.Id) {
                             _lessonAudios = subItem;
                         }
@@ -335,19 +331,14 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {authors} = this.props.lessonInfo,
-            {lessonText, lessonUrl, playingLesson, isMobileApp, } = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp,} = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
-
-        lesson.Author = authors.find((author) => {
-            return author.Id === lesson.AuthorId
-        });
-
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
             _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
 
-        let _audios = this._getAudios(lesson);
+        // let _audios = this._getAudios(lesson);
+        let _audios = lesson.Audios;
 
         return (isMobileApp) ?
             <MobileLessonWrapper lesson={lesson}
@@ -357,6 +348,8 @@ class TranscriptLessonPage extends React.Component {
                                  audios={_audios}
                                  history={this.props.history}
                                  isMain={this._isMainLesson()}
+                                 shareUrl={this._getShareUrl()}
+                                 counter={lesson.ShareCounters}
             />
             :
             <DesktopLessonWrapper lesson={lesson}
@@ -369,7 +362,20 @@ class TranscriptLessonPage extends React.Component {
                                   audios={_audios}
                                   history={this.props.history}
                                   isMain={this._isMainLesson()}
+                                  shareUrl={this._getShareUrl()}
+                                  counter={lesson.ShareCounters}
             />
+    }
+
+    _getShareUrl() {
+        let _href = window.location.href,
+            _search = window.location.search;
+
+        if ((_search !== '') && _href.endsWith(_search)) {
+            _href = _href.slice(0, _href.length - _search.length);
+        }
+
+        return _href;
     }
 
     render() {
@@ -412,7 +418,9 @@ class TranscriptLessonPage extends React.Component {
                                     lesson={_lesson}
                                     history={this.props.history}
                                     courseUrl={this.props.courseUrl}
-                                    lessonUrl={this.props.lessonUrl}/>
+                                    lessonUrl={this.props.lessonUrl}
+                                    shareUrl={this._getShareUrl()}
+                                    counter={_lesson.ShareCounters}/>
                 ]
         )
     }
@@ -446,7 +454,7 @@ class GalleryButtons extends React.Component {
             _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
 
         return (
-            <div className="js-gallery-controls gallery-controls hide" style={{display : 'none'}}>
+            <div className="js-gallery-controls gallery-controls hide" style={{display: 'none'}}>
                 <button className="gallery-trigger js-gallery-trigger" type="button">
                     <span className="visually-hidden">Галерея</span>
                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
