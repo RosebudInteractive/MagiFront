@@ -847,6 +847,280 @@ namespace MagImport
         };
 
         //
+        // ProductType
+        //
+        public class ProductTypeFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class ProductType : DataObjTyped<ProductTypeFields, ProductTypeRoot>
+        {
+            const string CLASS_GUID = "a226321b-04fa-40c8-8c53-6efff100fb1f";
+            public ProductType() : base(CLASS_GUID) { }
+        };
+
+        public class ProductTypeRoot : RootDataObject
+        {
+            const string CLASS_GUID = "fae9c1e4-b735-4241-a06e-a56333762e0b";
+            public override string GetClassName() { return "ProductType"; }
+            public ProductTypeRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // Currency
+        //
+        public class CurrencyFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Symbol { get; set; }
+            public string Name { get; set; }
+        };
+
+        public class Currency : DataObjTyped<CurrencyFields, CurrencyRoot>
+        {
+            const string CLASS_GUID = "8f5503e0-ce9d-447b-9b9b-e0ca03c5c376";
+            public Currency() : base(CLASS_GUID) { }
+        };
+
+        public class CurrencyRoot : RootDataObject
+        {
+            const string CLASS_GUID = "e00b80e3-0fbe-48c1-847c-8fbffe1e6cb4";
+            public override string GetClassName() { return "Currency"; }
+            public CurrencyRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // VATType
+        //
+        public class VATTypeExtFields : JSONSerializable
+        {
+            public int yandexKassaCode { get; set; }
+        }
+
+        public class VATTypeFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public string ExtFields { get; set; }
+        };
+
+        public class VATType : DataObjTyped<VATTypeFields, VATTypeRoot>
+        {
+            const string CLASS_GUID = "c0c9f48b-d057-4139-aa48-0761a92e239b";
+            public VATType() : base(CLASS_GUID) { }
+        };
+
+        public class VATTypeRoot : RootDataObject
+        {
+            const string CLASS_GUID = "ec912725-a333-4f5d-93d1-bf6c1ec2babd";
+            public override string GetClassName() { return "VATType"; }
+            public VATTypeRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // VATRate
+        //
+        public class VATRateFields : BaseFieldsData
+        {
+            public int VATTypeId { get; set; }
+            public double Rate { get; set; }
+            public DateTime FirstDate { get; set; }
+            public DateTime? LastDate { get; set; }
+        };
+
+        public class VATRate : DataObjTyped<VATRateFields, VATRateRoot>
+        {
+            const string CLASS_GUID = "dfd5a184-7595-44d9-9dd1-64e8e10b02d9";
+            public VATRate() : base(CLASS_GUID) { }
+        };
+
+        public class VATRateRoot : RootDataObject
+        {
+            const string CLASS_GUID = "9ede10eb-10f4-400f-a51e-52ec9aa707ec";
+            public override string GetClassName() { return "VATRate"; }
+            public VATRateRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // Product
+        //
+        public class ProductExtFields : JSONSerializable
+        {
+            public string units { get; set; }
+            public int duration { get; set; }
+        }
+
+        public class ProductFields : BaseFieldsData
+        {
+            public int ProductTypeId { get; set; }
+            public int VATTypeId { get; set; }
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Picture { get; set; }
+            public string PictureMeta { get; set; }
+            public string Description { get; set; }
+            public string ExtFields { get; set; }
+        };
+
+        public class Product : DataObjTyped<ProductFields, ProductRoot>
+        {
+            const string CLASS_GUID = "76e0b31d-899b-4806-8272-95fa283e7cdb";
+            public Product() : base(CLASS_GUID) { }
+        };
+
+        public class ProductRoot : RootDataObject
+        {
+            const string CLASS_GUID = "ab6d0779-1a8f-4486-a428-697fcd10f7fe";
+            public override string GetClassName() { return "Product"; }
+            public ProductRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // PriceList
+        //
+        public class PriceListFields : BaseFieldsData
+        {
+            public int CurrencyId { get; set; }
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class PriceList : DataObjTyped<PriceListFields, PriceListRoot>
+        {
+            const string CLASS_GUID = "aed10527-ed66-4a5b-864f-05463edba73c";
+            public PriceList() : base(CLASS_GUID) { }
+        };
+
+        public class PriceListRoot : RootDataObject
+        {
+            const string CLASS_GUID = "414407d4-01f6-44cc-b9f7-c2cb21bb7f4f";
+            public override string GetClassName() { return "PriceList"; }
+            public PriceListRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // Price
+        //
+        public class PriceFields : BaseFieldsData
+        {
+            public int PriceListId { get; set; }
+            public int ProductId { get; set; }
+            public double Price { get; set; }
+            public DateTime FirstDate { get; set; }
+            public DateTime? LastDate { get; set; }
+        };
+
+        public class Price : DataObjTyped<PriceFields, PriceRoot>
+        {
+            const string CLASS_GUID = "ff0e3c29-b8a9-4bb2-a764-d1ba308188be";
+            public Price() : base(CLASS_GUID) { }
+        };
+
+        public class PriceRoot : RootDataObject
+        {
+            const string CLASS_GUID = "e67b1a90-073e-4d2d-81c4-ac13ec6caa5f";
+            public override string GetClassName() { return "Price"; }
+            public PriceRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // InvoiceType
+        //
+        public class InvoiceTypeFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class InvoiceType : DataObjTyped<InvoiceTypeFields, InvoiceTypeRoot>
+        {
+            const string CLASS_GUID = "fff2ecf1-b5be-4d00-b102-fbaebb1d7f5f";
+            public InvoiceType() : base(CLASS_GUID) { }
+        };
+
+        public class InvoiceTypeRoot : RootDataObject
+        {
+            const string CLASS_GUID = "5f592dd0-24e1-41f0-9ad0-e4cb6ccfbe7f";
+            public override string GetClassName() { return "InvoiceType"; }
+            public InvoiceTypeRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // InvoiceState
+        //
+        public class InvoiceStateFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class InvoiceState : DataObjTyped<InvoiceStateFields, InvoiceStateRoot>
+        {
+            const string CLASS_GUID = "61914e17-649c-49e3-a64c-1fd282eeda5e";
+            public InvoiceState() : base(CLASS_GUID) { }
+        };
+
+        public class InvoiceStateRoot : RootDataObject
+        {
+            const string CLASS_GUID = "70e22c90-2523-4ec8-9c21-a7214812667b";
+            public override string GetClassName() { return "InvoiceState"; }
+            public InvoiceStateRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // ChequeType
+        //
+        public class ChequeTypeFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class ChequeType : DataObjTyped<ChequeTypeFields, ChequeTypeRoot>
+        {
+            const string CLASS_GUID = "111c7c08-3fef-47a8-9fde-59d8c10559e4";
+            public ChequeType() : base(CLASS_GUID) { }
+        };
+
+        public class ChequeTypeRoot : RootDataObject
+        {
+            const string CLASS_GUID = "f5c2521c-cfc4-425b-bd07-309ffc2b6f73";
+            public override string GetClassName() { return "ChequeType"; }
+            public ChequeTypeRoot() : base(CLASS_GUID) { }
+        };
+
+        //
+        // ChequeState
+        //
+        public class ChequeStateFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class ChequeState : DataObjTyped<ChequeStateFields, ChequeStateRoot>
+        {
+            const string CLASS_GUID = "b2562862-8fb2-4f82-ba2a-dc36676c1be6";
+            public ChequeState() : base(CLASS_GUID) { }
+        };
+
+        public class ChequeStateRoot : RootDataObject
+        {
+            const string CLASS_GUID = "5098f53c-01a0-4439-b7a9-df230347f782";
+            public override string GetClassName() { return "ChequeState"; }
+            public ChequeStateRoot() : base(CLASS_GUID) { }
+        };
+
+        //
         // UserRole
         //
         public class UserRoleFields : BaseFieldsData
@@ -1307,6 +1581,131 @@ namespace MagImport
             user.fields.IsOld = false;
             user.fields._PData.isAdmin = true;
             user.fields.RegDate = DateTime.Now;
+
+            Currency.AllData = allData;
+            Currency curr = new Currency();
+            curr.Fields.Code = "RUB";
+            curr.Fields.Symbol = "ք";
+            curr.Fields.Name = "Российский рубль";
+            int currId = curr.Fields.Id;
+
+            curr = new Currency();
+            curr.Fields.Code = "USD";
+            curr.Fields.Symbol = "$";
+            curr.Fields.Name = "Доллар США";
+
+            curr = new Currency();
+            curr.Fields.Code = "EUR";
+            curr.Fields.Symbol = "€";
+            curr.Fields.Name = "Евро";
+
+            ProductType.AllData = allData;
+            ProductType prodType = new ProductType();
+            prodType.Fields.Code = "SUBS";
+            prodType.Fields.Name = "Подписка на лекции";
+            int subsTypeId = prodType.Fields.Id;
+
+            prodType = new ProductType();
+            prodType.Fields.Code = "BOOK";
+            prodType.Fields.Name = "Печатные книги";
+
+            prodType = new ProductType();
+            prodType.Fields.Code = "AUDIOBOOK";
+            prodType.Fields.Name = "Аудио книги";
+
+            prodType = new ProductType();
+            prodType.Fields.Code = "EBOOK";
+            prodType.Fields.Name = "Электронные книги";
+
+            VATType.AllData = allData;
+            VATRate.AllData = allData;
+            VATType vtype = new VATType();
+            vtype.Fields.Code = "VAT18";
+            vtype.Fields.Name = "НДС 18%";
+            vtype.Fields.ExtFields = (new VATTypeExtFields() { yandexKassaCode = 4 }).ToJSONString();
+            int subsVTypeId = vtype.Fields.Id;
+            VATRate vrate = new VATRate();
+            vrate.Fields.VATTypeId = vtype.Fields.Id;
+            vrate.Fields.Rate = 18.0;
+            vrate.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            vtype = new VATType();
+            vtype.Fields.Code = "VAT10";
+            vtype.Fields.Name = "НДС 10%";
+            vtype.Fields.ExtFields = (new VATTypeExtFields() { yandexKassaCode = 3 }).ToJSONString();
+            vrate = new VATRate();
+            vrate.Fields.VATTypeId = vtype.Fields.Id;
+            vrate.Fields.Rate = 10.0;
+            vrate.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            PriceList.AllData = allData;
+            PriceList main = new PriceList();
+            main.Fields.CurrencyId = currId;
+            main.Fields.Code = "MAIN";
+            main.Fields.Name= "Основной прайс-лист";
+            int priceListId = main.Fields.Id;
+
+            Product.AllData = allData;
+            Price.AllData = allData;
+            Product prod = new Product();
+            Price price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBSFREE1M";
+            prod.Fields.Name = "Бесплатная подписка на 1 мес.";
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 1 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 0;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            prod = new Product();
+            price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBS1M";
+            prod.Fields.Name = "Подписка на 1 мес.";
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 1 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 200;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            prod = new Product();
+            price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBS3M";
+            prod.Fields.Name = "Подписка на 3 мес.";
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 3 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 550;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            prod = new Product();
+            price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBS6M";
+            prod.Fields.Name = "Подписка на 6 мес.";
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 6 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 900;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            prod = new Product();
+            price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBS1Y";
+            prod.Fields.Name = "Подписка на 1 год";
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "y", duration = 1 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 1500;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
 
             conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
