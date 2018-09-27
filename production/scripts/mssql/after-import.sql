@@ -56,3 +56,65 @@ CREATE UNIQUE INDEX [u_Idx_SNetProvider_URL] ON [SNetProvider]([URL]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Bookmark_UserId_CourseId_LessonCourseId] ON [Bookmark]([UserId], [CourseId], [LessonCourseId]);
 GO
+CREATE UNIQUE INDEX [u_Idx_ProductType_Code] ON [ProductType]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_ProductType_Name] ON [ProductType]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_Currency_Code] ON [Currency]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_Currency_Name] ON [Currency]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_VATType_Code] ON [VATType]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_VATType_Name] ON [VATType]([Name]);
+GO
+CREATE INDEX [idx_VATRate_FirstDate] ON [VATRate]([FirstDate]);
+GO
+CREATE INDEX [idx_VATRate_LastDate] ON [VATRate]([LastDate]);
+GO
+CREATE UNIQUE INDEX [u_Idx_Product_Code] ON [Product]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_Product_Name] ON [Product]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_PriceList_Code] ON [PriceList]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_PriceList_Name] ON [PriceList]([Name]);
+GO
+CREATE INDEX [idx_Price_FirstDate] ON [Price]([FirstDate]);
+GO
+CREATE INDEX [idx_Price_LastDate] ON [Price]([LastDate]);
+GO
+CREATE UNIQUE INDEX [u_Idx_InvoiceType_Code] ON [InvoiceType]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_InvoiceType_Name] ON [InvoiceType]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_InvoiceState_Code] ON [InvoiceState]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_InvoiceState_Name] ON [InvoiceState]([Name]);
+GO
+CREATE INDEX [idx_Invoice_Name] ON [Invoice]([Name]);
+GO
+CREATE INDEX [idx_Invoice_InvoiceNum] ON [Invoice]([InvoiceNum]);
+GO
+CREATE INDEX [idx_Invoice_InvoiceDate] ON [Invoice]([InvoiceDate]);
+GO
+CREATE INDEX [idx_InvoiceItem_Code] ON [InvoiceItem]([Code]);
+GO
+CREATE INDEX [idx_InvoiceItem_Name] ON [InvoiceItem]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_ChequeType_Code] ON [ChequeType]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_ChequeType_Name] ON [ChequeType]([Name]);
+GO
+CREATE UNIQUE INDEX [u_Idx_ChequeState_Code] ON [ChequeState]([Code]);
+GO
+CREATE UNIQUE INDEX [u_Idx_ChequeState_Name] ON [ChequeState]([Name]);
+GO
+CREATE INDEX [idx_Cheque_Name] ON [Cheque]([Name]);
+GO
+CREATE INDEX [idx_Cheque_ChequeNum] ON [Cheque]([ChequeNum]);
+GO
+CREATE INDEX [idx_Cheque_ChequeDate] ON [Cheque]([ChequeDate]);
+GO
+CREATE INDEX [idx_ChequeLog_ResultCode] ON [ChequeLog]([ResultCode]);
+GO

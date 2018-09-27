@@ -331,6 +331,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
         metaDataMgr.addModel("VATRate", "dfd5a184-7595-44d9-9dd1-64e8e10b02d9", "RootVATRate", "9ede10eb-10f4-400f-a51e-52ec9aa707ec")
             .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentCascade", allowNull: false })
             .addField("Rate", { type: "decimal", precision: 6, scale: 4, allowNull: false })
+            .addField("ExtFields", { type: "string", allowNull: true })
             .addField("FirstDate", { type: "datetime", allowNull: false })
             .addField("LastDate", { type: "datetime", allowNull: true });
 

@@ -928,6 +928,7 @@ namespace MagImport
         {
             public int VATTypeId { get; set; }
             public double Rate { get; set; }
+            public string ExtFields { get; set; }
             public DateTime FirstDate { get; set; }
             public DateTime? LastDate { get; set; }
         };
@@ -1584,36 +1585,43 @@ namespace MagImport
 
             Currency.AllData = allData;
             Currency curr = new Currency();
+            curr.Fields.Id = 1;
             curr.Fields.Code = "RUB";
             curr.Fields.Symbol = "ք";
             curr.Fields.Name = "Российский рубль";
             int currId = curr.Fields.Id;
 
             curr = new Currency();
+            curr.Fields.Id = 2;
             curr.Fields.Code = "USD";
             curr.Fields.Symbol = "$";
             curr.Fields.Name = "Доллар США";
 
             curr = new Currency();
+            curr.Fields.Id = 3;
             curr.Fields.Code = "EUR";
             curr.Fields.Symbol = "€";
             curr.Fields.Name = "Евро";
 
             ProductType.AllData = allData;
             ProductType prodType = new ProductType();
+            prodType.Fields.Id = 1;
             prodType.Fields.Code = "SUBS";
             prodType.Fields.Name = "Подписка на лекции";
             int subsTypeId = prodType.Fields.Id;
 
             prodType = new ProductType();
+            prodType.Fields.Id = 2;
             prodType.Fields.Code = "BOOK";
             prodType.Fields.Name = "Печатные книги";
 
             prodType = new ProductType();
+            prodType.Fields.Id = 3;
             prodType.Fields.Code = "AUDIOBOOK";
             prodType.Fields.Name = "Аудио книги";
 
             prodType = new ProductType();
+            prodType.Fields.Id = 4;
             prodType.Fields.Code = "EBOOK";
             prodType.Fields.Name = "Электронные книги";
 
@@ -1627,6 +1635,7 @@ namespace MagImport
             VATRate vrate = new VATRate();
             vrate.Fields.VATTypeId = vtype.Fields.Id;
             vrate.Fields.Rate = 18.0;
+            vrate.Fields.ExtFields = (new VATTypeExtFields() { yandexKassaCode = 4 }).ToJSONString();
             vrate.Fields.FirstDate = new DateTime(2018, 9, 1);
 
             vtype = new VATType();
@@ -1636,6 +1645,7 @@ namespace MagImport
             vrate = new VATRate();
             vrate.Fields.VATTypeId = vtype.Fields.Id;
             vrate.Fields.Rate = 10.0;
+            vrate.Fields.ExtFields = (new VATTypeExtFields() { yandexKassaCode = 3 }).ToJSONString();
             vrate.Fields.FirstDate = new DateTime(2018, 9, 1);
 
             PriceList.AllData = allData;
@@ -1706,6 +1716,75 @@ namespace MagImport
             price.Fields.ProductId = prod.Fields.Id;
             price.Fields.Price = 1500;
             price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            InvoiceType.AllData = allData;
+            InvoiceType invType = new InvoiceType();
+            invType.Fields.Code = "PURCHASE";
+            invType.Fields.Id = 1;
+            invType.Fields.Name = "Заказ";
+
+            invType = new InvoiceType();
+            invType.Fields.Id = 2;
+            invType.Fields.Code = "REFUND";
+            invType.Fields.Name = "Возврат";
+
+            InvoiceState.AllData = allData;
+            InvoiceState invState = new InvoiceState();
+            invState.Fields.Id = 1;
+            invState.Fields.Code = "DRAFT";
+            invState.Fields.Name = "Черновик";
+
+            invState = new InvoiceState();
+            invState.Fields.Id = 2;
+            invState.Fields.Code = "APPROVED";
+            invState.Fields.Name = "Подтвержден";
+
+            invState = new InvoiceState();
+            invState.Fields.Id = 3;
+            invState.Fields.Code = "PAYED";
+            invState.Fields.Name = "Оплачен";
+
+            invState = new InvoiceState();
+            invState.Fields.Id = 4;
+            invState.Fields.Code = "CANCELED";
+            invState.Fields.Name = "Отменен";
+
+            ChequeType.AllData = allData;
+            ChequeType chqType = new ChequeType();
+            chqType.Fields.Id = 1;
+            chqType.Fields.Code = "PAYMENT";
+            chqType.Fields.Name = "Оплата";
+
+            chqType = new ChequeType();
+            chqType.Fields.Id = 2;
+            chqType.Fields.Code = "REFUND";
+            chqType.Fields.Name = "Возврат";
+
+            ChequeState.AllData = allData;
+            ChequeState chqState = new ChequeState();
+            chqState.Fields.Id = 1;
+            chqState.Fields.Code = "DRAFT";
+            chqState.Fields.Name = "Черновик";
+
+            chqState = new ChequeState();
+            chqState.Fields.Id = 2;
+            chqState.Fields.Code = "PENDING";
+            chqState.Fields.Name = "Ожидание действий пользователя";
+
+            chqState = new ChequeState();
+            chqState.Fields.Id = 3;
+            chqState.Fields.Code = "WFCAPTURE";
+            chqState.Fields.Name = "Ожидание подтверждения";
+
+            chqState = new ChequeState();
+            chqState.Fields.Id = 4;
+            chqState.Fields.Code = "SUCCEEDED";
+            chqState.Fields.Name = "Успешно завершен";
+
+            chqState = new ChequeState();
+            chqState.Fields.Id = 5;
+            chqState.Fields.Code = "CANCELED";
+            chqState.Fields.Name = "Отменен";
 
             conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
