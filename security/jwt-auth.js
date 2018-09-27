@@ -38,10 +38,7 @@ class AuthJWT {
                 if (req.body && req.body.login && req.body.password) {
                     let login = req.body.login;
                     let password = req.body.password;
-                    let token = req.headers["authorization"];
                     let promise = Promise.resolve();
-                    if (token)
-                        promise = this._usersCache.destroyToken(token);
                     promise.
                         then(() => {
                             return DestroySession(req);

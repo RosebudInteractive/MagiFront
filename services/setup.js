@@ -13,7 +13,7 @@ const methodOverride = require('method-override');
 
 const { HttpCode } = require("../const/http-codes");
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
-const { AuthLocalInit, AuthenticateLocal } = require('../security/local-auth');
+const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
 const { AuthFBInit } = require('../security/fb-auth');
 const { AuthGoogleInit } = require('../security/google-auth');
@@ -101,6 +101,7 @@ function setupAPI(express, app) {
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
+    SetupWhoAmI(app);
     app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 

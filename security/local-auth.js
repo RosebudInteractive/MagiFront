@@ -27,6 +27,20 @@ class AuthLocal {
             else
                 resolve();
         })
+            .then(() => {
+                let token = req.headers["authorization"];
+                if (token)
+                    return usersCache.destroyToken(token);
+            });
+    }
+
+    static setupWhoAmI(app) {
+        app.get("/api/whoami", (req, res) => {
+            if (req.user && usersCache)
+                res.json(usersCache.userToClientJSON(req.user))
+            else
+                res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
+        });
     }
 
     constructor(app) {
@@ -63,13 +77,6 @@ class AuthLocal {
         passport.use(strategy);
 
         app.post("/api/login", StdLoginProcessor('local', config.authentication.useCapture));
-
-        app.get("/api/whoami", (req, res) => {
-            if (req.user)
-                res.json(usersCache.userToClientJSON(req.user))
-            else
-                res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
-        });
 
         app.get("/api/get-activated-user/:activationKey", (req, res) => {
             usersCache.getUserInfo({ field: "ActivationKey", op: "=", value: req.params.activationKey }, true)
@@ -275,6 +282,7 @@ let AuthLocalInit = (app) => {
         authLocal = new AuthLocal(app);
 };
 
+exports.SetupWhoAmI = (app) => { AuthLocal.setupWhoAmI(app) };
 exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession;
