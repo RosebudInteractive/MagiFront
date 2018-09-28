@@ -73,6 +73,10 @@ exports.DbObject = class DbObject {
         });
     }
 
+    _dateToString(dt) {
+        return "" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+    }
+
     getAll() {
         return new Promise((resolve, reject) => {
             resolve({});
