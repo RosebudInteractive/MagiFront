@@ -25,6 +25,7 @@ const { setupCourses } = require('./courses');
 const { setupLanguages } = require('./languages');
 const { setupLessons } = require('./lessons');
 const { setupProducts } = require('./products');
+const { setupInvoices } = require('./invoices');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
@@ -114,6 +115,7 @@ function setupAPI(express, app) {
     setupLessonPositions(app);
     setupDebugRoutes(app);
     setupProducts(app);
+    setupInvoices(app);
     setupEpisodes(app);
     setupUsers(app);
     setupAuthors(app);

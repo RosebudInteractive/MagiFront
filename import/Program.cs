@@ -964,6 +964,7 @@ namespace MagImport
             public string Picture { get; set; }
             public string PictureMeta { get; set; }
             public string Description { get; set; }
+            public bool Discontinued { get; set; }
             public string ExtFields { get; set; }
         };
 
@@ -1663,7 +1664,21 @@ namespace MagImport
             prod.Fields.VATTypeId = subsVTypeId;
             prod.Fields.Code = "SUBSFREE1M";
             prod.Fields.Name = "Бесплатная подписка на 1 мес.";
+            prod.Fields.Discontinued = false;
             prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 1 }).ToJSONString();
+            price.Fields.PriceListId = priceListId;
+            price.Fields.ProductId = prod.Fields.Id;
+            price.Fields.Price = 0;
+            price.Fields.FirstDate = new DateTime(2018, 9, 1);
+
+            prod = new Product();
+            price = new Price();
+            prod.Fields.ProductTypeId = subsTypeId;
+            prod.Fields.VATTypeId = subsVTypeId;
+            prod.Fields.Code = "SUBSFREE3M";
+            prod.Fields.Name = "Бесплатная подписка на 3 мес.";
+            prod.Fields.Discontinued = false;
+            prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 3 }).ToJSONString();
             price.Fields.PriceListId = priceListId;
             price.Fields.ProductId = prod.Fields.Id;
             price.Fields.Price = 0;
@@ -1675,6 +1690,7 @@ namespace MagImport
             prod.Fields.VATTypeId = subsVTypeId;
             prod.Fields.Code = "SUBS1M";
             prod.Fields.Name = "Подписка на 1 мес.";
+            prod.Fields.Discontinued = false;
             prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 1 }).ToJSONString();
             price.Fields.PriceListId = priceListId;
             price.Fields.ProductId = prod.Fields.Id;
@@ -1687,6 +1703,7 @@ namespace MagImport
             prod.Fields.VATTypeId = subsVTypeId;
             prod.Fields.Code = "SUBS3M";
             prod.Fields.Name = "Подписка на 3 мес.";
+            prod.Fields.Discontinued = false;
             prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 3 }).ToJSONString();
             price.Fields.PriceListId = priceListId;
             price.Fields.ProductId = prod.Fields.Id;
@@ -1699,6 +1716,7 @@ namespace MagImport
             prod.Fields.VATTypeId = subsVTypeId;
             prod.Fields.Code = "SUBS6M";
             prod.Fields.Name = "Подписка на 6 мес.";
+            prod.Fields.Discontinued = false;
             prod.Fields.ExtFields = (new ProductExtFields() { units = "m", duration = 6 }).ToJSONString();
             price.Fields.PriceListId = priceListId;
             price.Fields.ProductId = prod.Fields.Id;
@@ -1711,6 +1729,7 @@ namespace MagImport
             prod.Fields.VATTypeId = subsVTypeId;
             prod.Fields.Code = "SUBS1Y";
             prod.Fields.Name = "Подписка на 1 год";
+            prod.Fields.Discontinued = false;
             prod.Fields.ExtFields = (new ProductExtFields() { units = "y", duration = 1 }).ToJSONString();
             price.Fields.PriceListId = priceListId;
             price.Fields.ProductId = prod.Fields.Id;

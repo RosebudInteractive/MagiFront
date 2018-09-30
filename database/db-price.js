@@ -3,6 +3,7 @@ const _ = require('lodash');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
 const PRICE_REQ_TREE = {
     expr: {

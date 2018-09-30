@@ -343,6 +343,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Picture", { type: "string", length: 255, allowNull: true })
             .addField("PictureMeta", { type: "string", allowNull: true })
             .addField("Description", { type: "string", allowNull: true })
+            .addField("Discontinued", { type: "boolean", allowNull: false })
             .addField("ExtFields", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("PriceList", "aed10527-ed66-4a5b-864f-05463edba73c", "RootPriceList", "414407d4-01f6-44cc-b9f7-c2cb21bb7f4f")
@@ -380,17 +381,18 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("InvoiceNum", { type: "string", length: 255, allowNull: false })
             .addField("InvoiceDate", { type: "datetime", allowNull: false })
             .addField("Sum", { type: "decimal", precision: 12, scale: 4, allowNull: false })
+            .addField("RefundSum", { type: "decimal", precision: 12, scale: 4, allowNull: false });
 
         metaDataMgr.addModel("InvoiceItem", "09280816-42fe-4f1c-bcad-988cd3f6c2ad", "RootInvoiceItem", "7a8e98d7-6bfb-41df-afe2-2cf19d01ea94")
             .addField("InvoiceId", { type: "dataRef", model: "Invoice", refAction: "parentCascade", allowNull: false })
             .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: false })
             .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentRestrict", allowNull: false })
-            .addField("ParentId", { type: "dataRef", model: "InvoiceItem", refAction: "parentRestrict", allowNull: true })
             .addField("Code", { type: "string", length: 50, allowNull: false })
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("VATRate", { type: "decimal", precision: 6, scale: 4, allowNull: false })
             .addField("Price", { type: "decimal", precision: 12, scale: 4, allowNull: false })
             .addField("Qty", { type: "decimal", precision: 10, scale: 4, allowNull: false })
+            .addField("RefundQty", { type: "decimal", precision: 10, scale: 4, allowNull: false })
             .addField("ExtFields", { type: "string", allowNull: true });
 
         metaDataMgr.addModel("ChequeType", "111c7c08-3fef-47a8-9fde-59d8c10559e4", "RootChequeType", "f5c2521c-cfc4-425b-bd07-309ffc2b6f73")

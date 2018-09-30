@@ -3,6 +3,7 @@ const _ = require('lodash');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
 const VAT_REQ_TREE = {
     expr: {
@@ -28,6 +29,11 @@ const DbVat = class DbVat extends DbObject {
     _getObjById(id, expression, options) {
         var exp = expression || VAT_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    mergeVatFields(type, rate) {
+        let result = _.defaultsDeep({}, rate, type);
+        return result;
     }
 
     get(id, options) {

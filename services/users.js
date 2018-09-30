@@ -1,5 +1,5 @@
 const { HttpCode } = require("../const/http-codes");
-let { UsersService } = require('./../database/db-user');
+const { UsersService } = require('../database/db-user');
 
 function setupUsers(app) {
 

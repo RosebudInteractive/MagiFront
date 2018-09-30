@@ -1,8 +1,10 @@
 'use strict';
 const _ = require('lodash');
 const { DbObject } = require('./db-object');
+const { VatService } = require('./db-vat');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
 const PRODUCT_REQ_TREE = {
     expr: {
@@ -13,12 +15,12 @@ const PRODUCT_REQ_TREE = {
 };
 
 const GET_PROD_MSSQL =
-    "select p.[Id], p.[Code], p.[Name], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields], p.[ProductTypeId]\n" +
+    "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields], p.[ProductTypeId]\n" +
     "from[Product] p\n" +
     "where p.[<%= field %>] <%= cond %>";
 
 const GET_PROD_DETAIL_MSSQL =
-    "select p.[Id], p.[Code], p.[Name], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
+    "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
     "  p.[ProductTypeId], pt.[Code] as [TypeCode], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
     "  pl.[CurrencyId], c.[Code] as [Currency]\n" +
@@ -35,7 +37,7 @@ const GET_PROD_DETAIL_MSSQL =
     "  and((vr.LastDate > convert(datetime, '<%= dt %>')) or(vr.LastDate is NULL)))";
 
 const GET_PROD_DETAIL_MYSQL =
-    "select p.`Id`, p.`Code`, p.`Name`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
+    "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
     "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
     "  pl.`CurrencyId`, c.`Code` as `Currency`\n" +
@@ -52,7 +54,7 @@ const GET_PROD_DETAIL_MYSQL =
     "  and((vr.LastDate > '<%= dt %>') or(vr.LastDate is NULL)))";
 
 const GET_PROD_MYSQL =
-    "select p.`Id`, p.`Code`, p.`Name`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`, p.`ProductTypeId`\n" +
+    "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`, p.`ProductTypeId`\n" +
     "from`Product` p\n" +
     "where p.`<%= field %>` <%= cond %>";
 
@@ -72,7 +74,7 @@ const DbProduct = class DbProduct extends DbObject {
 
     get(options) {
         let opts = options || {};
-        let dbOpts = {};
+        let dbOpts = opts.dbOptions || {};
         let products = [];
         let dt;
         return new Promise(resolve => {
@@ -80,10 +82,8 @@ const DbProduct = class DbProduct extends DbObject {
             let codes;
             let field = "Id";
             let cond;
-            if (opts.transactionId)
-                dbOpts.transactionId = opts.transactionId;
-            let priceList = opts.priceList ? opts.priceList : DEFAUL_PRICE_LIST_CODE;
-            if ((opts.detail === "true") || (opts.detail === true)) {
+            let priceList = opts.PriceList ? opts.PriceList : DEFAUL_PRICE_LIST_CODE;
+            if ((opts.Detail === "true") || (opts.Detail === true)) {
                 dt = new Date();
                 if (opts.date) {
                     let ms = Date.parse(opts.date);
@@ -92,59 +92,59 @@ const DbProduct = class DbProduct extends DbObject {
                     dt = new Date(ms);
                 }
             }
-            if (opts.id) {
-                let id = parseInt(opts.id);
+            if (opts.Id) {
+                let id = typeof (opts.Id) === "number" ? opts.Id : parseInt(opts.Id);
                 if (isNaN(id))
-                    throw new Error(`Invalid parameter "id": "${opts.id}".`);
+                    throw new Error(`Invalid parameter "Id": "${opts.Id}".`);
                 cond = `= ${id}`;
             }
             else
-                if (opts.code) {
+                if (opts.Code) {
                     field = "Code";
-                    cond = `= '${opts.code}'`;
+                    cond = `= '${opts.Code}'`;
                 }
                 else
-                    if (opts.ids) {
-                        if (typeof (opts.ids) === "string") {
-                            let arr = opts.ids.split(",");
+                    if (opts.Ids) {
+                        if (typeof (opts.Ids) === "string") {
+                            let arr = opts.Ids.split(",");
                             ids = [];
                             arr.forEach(element => {
                                 let val = parseInt(element);
                                 if (isNaN(val))
-                                    throw new Error(`Invalid element in "ids": "${element}".`);
+                                    throw new Error(`Invalid element in "Ids": "${element}".`);
                                 ids.push(val);
                             });
                             if (ids.length === 0)
-                                throw new Error(`Invalid parameter "ids": ${opts.ids}.`);
+                                throw new Error(`Invalid parameter "Ids": ${opts.Ids}.`);
                         }
                         else {
-                            if (!Array.isArray(opts.ids))
-                                throw new Error(`Invalid parameter "ids": ${JSON.stringify(opts.ids)}.`);
-                            ids = opts.ids;
+                            if (!Array.isArray(opts.Ids))
+                                throw new Error(`Invalid parameter "Ids": ${JSON.stringify(opts.Ids)}.`);
+                            ids = opts.Ids;
                         }
                         cond = `in (${ids.join()})`;
                     }
                     else
-                        if (opts.codes) {
+                        if (opts.Codes) {
                             field = "Code";
-                            if (typeof (opts.codes) === "string") {
-                                let arr = opts.codes.split(",");
+                            if (typeof (opts.Codes) === "string") {
+                                let arr = opts.Codes.split(",");
                                 codes = [];
                                 arr.forEach(element => {
                                     codes.push("'" + element + "'");
                                 });
                                 if (codes.length === 0)
-                                    throw new Error(`Invalid parameter "codes": ${opts.codes}.`);
+                                    throw new Error(`Invalid parameter "codes": ${opts.Codes}.`);
                             }
                             else {
-                                if (!Array.isArray(opts.codes))
-                                    throw new Error(`Invalid parameter "codes": ${JSON.stringify(opts.codes)}.`);
-                                codes = opts.codes;
+                                if (!Array.isArray(opts.Codes))
+                                    throw new Error(`Invalid parameter "Codes": ${JSON.stringify(opts.Codes)}.`);
+                                codes = opts.Codes;
                             }
                             cond = `in (${codes.join()})`;
                         };
             if (!cond)
-                throw new Error(`Invalid parameters: Missing "id" or "code" or "ids" or "codes".`);
+                throw new Error(`Invalid parameters: Missing "Id" or "Code" or "Ids" or "Codes".`);
 
             let sql = dt ?
                 {
@@ -171,7 +171,7 @@ const DbProduct = class DbProduct extends DbObject {
                             let ext = JSON.parse(elem.VtExt);
                             delete elem.VtExt;
                             if (elem.VrExt) {
-                                ext = this._mergeVatFields(ext, JSON.parse(elem.VrExt));
+                                ext = VatService().mergeVatFields(ext, JSON.parse(elem.VrExt));
                                 delete elem.VrExt;
                             }
                             elem.VatExtFields = ext;
