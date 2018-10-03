@@ -7,6 +7,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 const { ACCOUNT_ID } = require('../../const/sql-req-common');
 const { UserLoginError } = require("../errors");
+const { DbObject } = require('../../database/db-object');
 
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
@@ -16,7 +17,7 @@ const LOGIN_FIELD = "Email";
 const STATUS_ACTIVE = 1;
 const STATUS_PENDING = 2;
 
-const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate"];
+const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
 const CONV_USER_DATA_FN = (rawUser) => {
     if (typeof (rawUser.PData) === "string") {
         try {
@@ -27,6 +28,14 @@ const CONV_USER_DATA_FN = (rawUser) => {
     return rawUser;
 };
 
+const ALLOWED_TO_EDIT = {
+    "Name": true,
+    "DisplayName": true,
+    "SubsExpDate": true,
+    "SubsAutoPay": true,
+    "SubsAutoPayId": true,
+    "SubsProductId": true
+}
 const GET_SN_PROVIDERS_MSSQL = "select [Id], [Code], [Name], [URL] from [SNetProvider]";
 const GET_ROLES_MSSQL = "select [Id], [Code], [Name], [ShortCode]  from [Role]";
 const GET_SN_PROFILE_MSSQL =
@@ -54,7 +63,7 @@ const USER_USERROLE_EXPRESSION = {
     }
 };
 
-exports.UsersBaseCache = class UsersBaseCache {
+exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
     static UserToClientJSON(user) {
         return {
@@ -67,6 +76,7 @@ exports.UsersBaseCache = class UsersBaseCache {
     }
 
     constructor(opts) {
+        super(opts);
         let options = opts || {};
         this._loginField = options.loginField || LOGIN_FIELD;
         this._userFields = options.userFields || USER_FIELDS;
@@ -78,7 +88,6 @@ exports.UsersBaseCache = class UsersBaseCache {
         this._sNProviders = null;
         this._roles = null;
         this._rolesById = null;
-        this._db = $memDataBase;
     }
 
     setAfterUserCreateEvent(func) {
@@ -467,20 +476,21 @@ exports.UsersBaseCache = class UsersBaseCache {
     //
     // Currently we can edit only "Password" and "DisplayName" here
     //
-    editUser(id, user_data, opts) {
-        let options = { dbRoots: [] };
+    editUser(id, user_data, options) {
+        let memDbOptions = { dbRoots: [] };
         let root_obj;
         let user = null;
-        let dbopts = opts || {};
+        let dbopts = options || {};
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
                 if (!user_data)
                     throw new Error("UsersBaseCache::editUser: Empty \"user_data\" argument.");
 
-                if (!((typeof (user_data.DisplayName) === "string") ||
-                    ((typeof (user_data.Password) === "string") && (typeof (user_data.NewPassword) === "string"))))
-                    throw new Error("UsersBaseCache::editUser: Invalid \"user_data\" arguments.");
+                if (!user_data.alter)
+                    if (!((typeof (user_data.DisplayName) === "string") ||
+                        ((typeof (user_data.Password) === "string") && (typeof (user_data.NewPassword) === "string"))))
+                        throw new Error("UsersBaseCache::editUser: Invalid \"user_data\" arguments.");
 
                 let predicate = new Predicate(this._db, {});
                 predicate
@@ -501,7 +511,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                     else
                         throw new Error("UsersBaseCache::editUser: Invalid result of \"getData\": " + JSON.stringify(result));
 
-                    options.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                     return root_obj.edit();
                 })
                 .then(() => {
@@ -511,20 +521,29 @@ exports.UsersBaseCache = class UsersBaseCache {
 
                     user = collection.get(0);
                     let rc = Promise.resolve();
-                    if (user_data.DisplayName)
-                        user.displayName(user_data.DisplayName);
-                    if (user_data.Password)
-                        rc = $dbUser.checkPwd(user_data.Password, user.pwdHash())
-                            .then((result) => {
-                                if (!result)
-                                    throw new Error("UsersBaseCache::editUser: Invalid password!");
-                                if (user_data.NewPassword) {
-                                    return $dbUser.getPwdHash(user_data.NewPassword)
-                                        .then((hash) => {
-                                            user.pwdHash(hash);
-                                        })
-                                }
-                            });
+                    if (user_data.alter) {
+                        for (let key in user_data.alter){
+                            if (ALLOWED_TO_EDIT[key]) {
+                                user[this._genGetterName(key)](user_data.alter[key]);
+                            }
+                        };
+                    }
+                    else {
+                        if (user_data.DisplayName)
+                            user.displayName(user_data.DisplayName);
+                        if (user_data.Password)
+                            rc = $dbUser.checkPwd(user_data.Password, user.pwdHash())
+                                .then((result) => {
+                                    if (!result)
+                                        throw new Error("UsersBaseCache::editUser: Invalid password!");
+                                    if (user_data.NewPassword) {
+                                        return $dbUser.getPwdHash(user_data.NewPassword)
+                                            .then((hash) => {
+                                                user.pwdHash(hash);
+                                            })
+                                    }
+                                });
+                    }
                     return rc.then(() => {
                         return root_obj.save(dbopts)
                             .then(() => {
@@ -532,7 +551,7 @@ exports.UsersBaseCache = class UsersBaseCache {
                             });
                     });
                 })
-        }).bind(this), options);
+        }).bind(this), memDbOptions);
     }
 
     getUserByProfile(profile) {

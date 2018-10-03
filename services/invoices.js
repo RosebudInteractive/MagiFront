@@ -19,7 +19,7 @@ function setupInvoices(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             InvoiceService()
-                .insert(req.body)
+                .insert(req.body, { dbOptions: { userId: req.user.Id } })
                 .then(rows => {
                     res.send(rows);
                 })

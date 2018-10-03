@@ -1805,6 +1805,11 @@ namespace MagImport
             chqState.Fields.Code = "CANCELED";
             chqState.Fields.Name = "Отменен";
 
+            chqState = new ChequeState();
+            chqState.Fields.Id = 6;
+            chqState.Fields.Code = "ERROR";
+            chqState.Fields.Name = "Ошибка создания чека";
+
             conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");
             conn.Open();

@@ -44,6 +44,9 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("RegDate", { type: "datetime", allowNull: true })
             .addField("ExpDate", { type: "datetime", allowNull: true })
             .addField("SubsExpDate", { type: "datetime", allowNull: true })
+            .addField("SubsAutoPay", { type: "boolean", allowNull: true })
+            .addField("SubsAutoPayId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: true })
+            .addField("SubsProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: true })
             .addField("ActivationKey", { type: "string", length: 50, allowNull: true })
             .addField("Status", { type: "int", allowNull: true })
             .addField("IsOld", { type: "boolean", allowNull: true })
@@ -415,7 +418,10 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("ChequeNum", { type: "string", length: 50, allowNull: false })
             .addField("ChequeDate", { type: "datetime", allowNull: false })
-            .addField("Sum", { type: "decimal", precision: 12, scale: 4, allowNull: false });
+            .addField("ChequeData", { type: "string", allowNull: true })
+            .addField("IsSaved", { type: "boolean", allowNull: false })
+           .addField("Sum", { type: "decimal", precision: 12, scale: 4, allowNull: false })
+           .addField("RefundSum", { type: "decimal", precision: 12, scale: 4, allowNull: false });
 
         metaDataMgr.addModel("ChequeLog", "aa0f517a-23cd-4a51-8073-58d86b583f97", "RootChequeLog", "e989a4ca-1e67-46a0-b45f-021bb74da09c")
             .addField("ChequeId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: false })
