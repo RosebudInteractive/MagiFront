@@ -118,6 +118,14 @@ export default class CWSPlayer extends CWSBase {
                     if (this._audioState.audio.readyState >= 1) {
                         this._onAudioLoadedHandler(this._audioState.audio);
                     }
+
+                    window.postMessage(
+                      JSON.stringify({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'dataIsSet',
+                        _nativeAppDataUuid: data2._nativeAppDataUuid
+                      })
+                    );
                 });
 
         }
@@ -717,6 +725,12 @@ export default class CWSPlayer extends CWSBase {
             this._audioState.currentTime = position - newStart.start;
             this._audioState.globalTime = position;
 
+            const onSetPosition = () => {
+              if (this._options.onSetPosition) {
+                this._options.onSetPosition(_this5._audioState);
+              }
+            }
+
             if (this._audioState.currentEpisode != epIdx) {
                 this._audioState.currentEpisode = epIdx;
                 // this._audioState.audio.pause();
@@ -786,6 +800,9 @@ export default class CWSPlayer extends CWSBase {
                             if (this._audioState.audio.paused) {
                                 this._audioState.audio.play()
                             }
+
+                            onSetPosition()
+
                             this._addDevErr('----- SEEKED FINISH -----')
                         }
 
@@ -817,6 +834,8 @@ export default class CWSPlayer extends CWSBase {
                 this._options.loader.setPosition(position);
                 this._audioState.audio.currentTime = this._audioState.currentTime;
                 this._setElementsPosition(position);
+
+                onSetPosition()
             }
         }
     }

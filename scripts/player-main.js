@@ -45,48 +45,52 @@ window.Utils = Utils;
         // require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
 
 
-        var o1 = getPlayerOptions();
-        //var o2 = getPlayerOptions();
-        //var o3 = getPlayerOptions();
-        var pl1 = new Player($("#pl1"), o1);
-        var pl2 = new Player($("#pl2"), o1);
-        //var pl3 = new Player($("#pl3"), o3);
+        var playerOptions = getPlayerOptions();
+        var player = new Player($("#player"), playerOptions);
 
-        var pl = pl1;
+        var playerNameInWindow = 'player' + (new Date).getTime()
 
-        window.player = pl;
+        window[playerNameInWindow] = player;
 
-        $.ajax({
-            url: "/genData",
-            type: "GET",
-            dataType: "json",
-            responseType: 'json',
-            success: function (result) {
-                pl1.render();
-                pl2.render();
-                //pl3.render();
-
-                pl1.setData(result);
-                pl2.setData(result);
-                //pl3.setData(result);
-
-                var content = pl1.getLectureContent();
-                renderContent(content);
-            },
-            fail: function (err) {
-                console.error(err);
-            }
-        });
+        window.postMessage(
+          JSON.stringify({
+            eventType: 'magisteriaPlayer',
+            eventName: 'playerLoaded',
+            playerObject: 'window.' + playerNameInWindow
+          })
+        )
 
         function getPlayerOptions() {
             return {
                 designMode: true,
                 loader: new Loader(),
-                onCurrentTimeChanged: function () {
+                onCurrentTimeChanged: function onCurrentTimeChanged(audioState, value) {
+                  window.postMessage(
+                    JSON.stringify({
+                      eventType: 'magisteriaPlayer',
+                      eventName: 'onCurrentTimeChanged',
+                      data: {
+                        currentTime: audioState.currentTime,
+                        globalTime: audioState.globalTime,
+                        baseTime: audioState.baseTime
+                      }
+                    })
+                  )
                 },
                 onAudioLoaded: function () {
                 },
-                onSetPosition: function () {
+                onSetPosition: function onSetPosition(audioState) {
+                  window.postMessage(
+                    JSON.stringify({
+                      eventType: 'magisteriaPlayer',
+                      eventName: 'onSetPosition',
+                      data: {
+                        currentTime: audioState.currentTime,
+                        globalTime: audioState.globalTime,
+                        baseTime: audioState.baseTime
+                      }
+                    })
+                  )
                 },
                 onFocused: function () {
                 },
@@ -108,17 +112,30 @@ window.Utils = Utils;
                 onChangeContent: function (content) {
                     console.log(content);
                 },
-                    onPaused: function () {
-                        console.log("paused event handler")
-                    },
-                    onStarted: function () {
-                        console.log("started event handler")
-                    },
-                    onError: function (e) {
-                        console.error("playback error. player was suspended", e);
-                    }
-
-                };
+                onPaused: function () {
+                    console.log("paused event handler")
+                    window.postMessage(
+                      JSON.stringify({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerPaused'
+                      })
+                    )
+                },
+                onEnded: function() {
+                  window.postMessage(
+                    JSON.stringify({
+                      eventType: 'magisteriaPlayer',
+                      eventName: 'playerStopped'
+                    })
+                  )
+                },
+                onStarted: function () {
+                    console.log("started event handler")
+                },
+                onError: function (e) {
+                    console.error("playback error. player was suspended", e);
+                }
+            };
         }
 
         function renderContent(content) {

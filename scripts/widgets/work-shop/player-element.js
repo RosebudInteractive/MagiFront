@@ -100,6 +100,13 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.interval = setTimeout(() => {
             this.stop();
         }, _timeInterval);
+
+        window.postMessage(
+          JSON.stringify({
+            eventType: 'magisteriaPlayer',
+            eventName: 'playerPlaying'
+          })
+        )
     }
 
     stop() {
@@ -119,6 +126,13 @@ export default class CWSPlayerElement extends CWSBase {
             position: 0,
             interval: 0,
         };
+
+        window.postMessage(
+          JSON.stringify({
+            eventType: 'magisteriaPlayer',
+            eventName: 'playerStopped'
+          })
+        )
     }
 
     _hide(item) {
@@ -232,4 +246,3 @@ export default class CWSPlayerElement extends CWSBase {
         }
     }
 }
-
