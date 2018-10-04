@@ -195,8 +195,11 @@ const DbInvoice = class DbInvoice extends DbObject {
                         else
                             throw new Error(`Can't modify field "InvoiceDate" in state "${this._stateIdToString(currStateId)}".`);
 
+                    if (inpFields.Items && (invoiceObj.invoiceTypeId() !== Accounting.InvoiceType.Refund))
+                        throw new Error(`Can't modify "Items" in "Purchase return" invoice.`);
+
                     if (inpFields.Items && (currStateId !== Accounting.InvoiceState.Draft))
-                        throw new Error(`Can't modify "Items" in state "${this._stateIdToString(currStateId)}".`);
+                        throw new Error(`Can't modify "Items" in a state "${this._stateIdToString(currStateId)}".`);
 
                     if (inpFields.Items && Array.isArray(inpFields.Items)) {
                         let itm_collection = root_item.getCol("DataElements");
@@ -338,6 +341,7 @@ const DbInvoice = class DbInvoice extends DbObject {
         let opts = options || {};
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
+        let root_parent = null;
         let inpFields = data || {};
         let invoiceObj = null;
         let newId;
@@ -345,7 +349,7 @@ const DbInvoice = class DbInvoice extends DbObject {
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(-1));
+                resolve(this._getObjById(-1, null, dbOpts));
             })
                 .then((result) => {
                     root_obj = result;
@@ -354,7 +358,6 @@ const DbInvoice = class DbInvoice extends DbObject {
                 })
                 .then(() => {
                     let fields = {
-                        InvoiceTypeId: Accounting.InvoiceType.Purchase,
                         StateId: Accounting.InvoiceState.Draft,
                         CurrencyId: Accounting.DfltCurrencyId,
                         InvoiceDate: new Date(),
@@ -366,7 +369,9 @@ const DbInvoice = class DbInvoice extends DbObject {
                     if (typeof (inpFields.ParentId) !== "undefined")
                         fields.ParentId = inpFields.ParentId;
                     if (typeof (inpFields.InvoiceTypeId) !== "undefined")
-                        fields.InvoiceTypeId = inpFields.InvoiceTypeId;
+                        fields.InvoiceTypeId = inpFields.InvoiceTypeId
+                    else
+                        throw new Error(`Missing field "InvoiceTypeId"`);
                     if (typeof (inpFields.StateId) !== "undefined")
                         fields.StateId = inpFields.StateId;
                     if (typeof (inpFields.CurrencyId) !== "undefined")
@@ -389,90 +394,177 @@ const DbInvoice = class DbInvoice extends DbObject {
                 .then((result) => {
                     newId = result.keyValue;
                     invoiceObj = this._db.getObj(result.newObject);
-                    if (!invoiceObj.invoiceNum())
-                        invoiceObj.invoiceNum(newId + "/" + invoiceObj.userId());
-                    if (!invoiceObj.name()) {
-                        let name = (invoiceObj.invoiceTypeId() === Accounting.InvoiceType.Purchase ? "Заказ" : "Возврат") +
-                            " №" + invoiceObj.invoiceNum();
-                        invoiceObj.name(name);
-                    }
                     root_item = invoiceObj.getDataRoot("InvoiceItem");
-                    if (inpFields.Items && (inpFields.Items.length > 0)) {
-                        let rc = Promise.resolve();
-                        let field;
-                        let fieldSrc;
-                        let reqParam;
-                        let item = inpFields.Items[0];
-                        if (item.ProductId) {
-                            field = "ProductId";
-                            fieldSrc = "Id";
-                            reqParam = "Ids";
-                        }
-                        else
-                            if (item.Code) {
-                                field = "Code";
-                                fieldSrc = "Code";
-                                reqParam = "Codes";
+
+                    switch (invoiceObj.invoiceTypeId()) {
+                        case Accounting.InvoiceType.Purchase:
+                            if (!invoiceObj.invoiceNum())
+                                invoiceObj.invoiceNum(newId + "/" + invoiceObj.userId());
+                            if (!invoiceObj.name()) {
+                                let name = `Заказ №${invoiceObj.invoiceNum()}`;
+                                invoiceObj.name(name);
                             }
-                            else
-                                if (item.Id && (invoiceObj.invoiceTypeId() === Accounting.InvoiceType.Refund)) {
-                                    field = "Id";
+                            if (inpFields.Items && (inpFields.Items.length > 0)) {
+                                let rc = Promise.resolve();
+                                let field;
+                                let fieldSrc;
+                                let reqParam;
+                                let item = inpFields.Items[0];
+                                if (item.ProductId) {
+                                    field = "ProductId";
                                     fieldSrc = "Id";
+                                    reqParam = "Ids";
                                 }
-                        if (!field)
-                            throw new Error(`Missing field "ProductId" or "Code" or "Id" in "item" array.`);
-                        if (invoiceObj.invoiceTypeId() === Accounting.InvoiceType.Purchase) {
-                            let reqArr = [];
-                            inpFields.Items.forEach(elem => {
-                                reqArr.push(elem[field]);
-                            });
-                            let request = { Detail: true };
-                            request[reqParam] = reqArr;
-                            rc = rc.then(() => {
-                                return ProductService().get(request);
-                            })
-                                .then((prods => {
-                                    let productList = {};
-                                    prods.forEach(elem => {
-                                        productList[elem[fieldSrc]] = elem;
-                                    });
-                                    return Utils.seqExec(inpFields.Items, (elem) => {
+                                else
+                                    if (item.Code) {
+                                        field = "Code";
+                                        fieldSrc = "Code";
+                                        reqParam = "Codes";
+                                    }
+                                if (!field)
+                                    throw new Error(`Missing field "ProductId" or "Code" in "item" array.`);
+                                let reqArr = [];
+                                inpFields.Items.forEach(elem => {
+                                    reqArr.push(elem[field]);
+                                });
+                                let request = { Detail: true };
+                                request[reqParam] = reqArr;
+                                rc = rc.then(() => {
+                                    return ProductService().get(request);
+                                })
+                                    .then((prods => {
+                                        let productList = {};
+                                        prods.forEach(elem => {
+                                            productList[elem[fieldSrc]] = elem;
+                                        });
+                                        return Utils.seqExec(inpFields.Items, (elem) => {
+                                            let fields = { RefundQty: 0 };
+                                            let p = productList[elem[field]];
+                                            if (!p)
+                                                throw new Error(`Product "${field}" = "${elem[field]}" doesn't exist.`);
+                                            fields.ProductId = elem.ProductId ? elem.ProductId : p.Id;
+                                            fields.VATTypeId = elem.VATTypeId ? elem.VATTypeId : p.VATTypeId;
+                                            fields.Code = elem.Code ? elem.Code : p.Code;
+                                            fields.Name = elem.Name ? elem.Name : p.Name;
+                                            fields.VATRate = elem.VATRate ? elem.VATRate : p.Rate;
+                                            fields.Price = typeof (elem.Price) === "number" ? elem.Price : p.Price;
+                                            fields.Qty = elem.Qty ? elem.Qty : 1;
+                                            let sum = invoiceObj.sum() + fields.Price * fields.Qty;
+                                            invoiceObj.sum(sum);
+                                            let ext = {
+                                                prodType: p.ProductTypeId,
+                                                prod: p.ExtFields,
+                                                vat: p.VatExtFields
+                                            };
+                                            fields.ExtFields = JSON.stringify(ext);
+                                            return root_item.newObject({
+                                                fields: fields
+                                            }, dbOpts);
+                                        });
+                                    }));
+                                return rc;
+                            }
+                            break;
+
+                        case Accounting.InvoiceType.Refund:
+                            if (!invoiceObj.parentId())
+                                throw new Error(`Field "ParenId" is missing.`);
+                            let parentInvoice = null;
+                            let parent_item_collection = null;
+                            return this._getObjById(invoiceObj.parentId(), null, dbOpts)
+                                .then(result => {
+                                    root_parent = result;
+                                    memDbOptions.dbRoots.push(root_parent); // Remember DbRoot to delete it finally in editDataWrapper
+                                    let collection = root_parent.getCol("DataElements");
+                                    if (collection.count() !== 1)
+                                        throw new Error("Invoice (Id = " + invoiceObj.parentId() + ") doesn't exist.");
+                                    parentInvoice = collection.get(0);
+                                    parent_item_collection = parentInvoice.getDataRoot("InvoiceItem").getCol("DataElements");
+                                    return root_parent.edit();
+                                })
+                                .then(() => {
+                                    if (parentInvoice.stateId() !== Accounting.InvoiceState.Payed)
+                                        throw new Error(`Invoice "${parentInvoice.name()}" should be payed.`);
+                                        
+                                    invoiceObj.userId(parentInvoice.userId());
+                                    if (!invoiceObj.invoiceNum())
+                                        invoiceObj.invoiceNum(newId + "/" + invoiceObj.userId());
+                                    if (!invoiceObj.name()) {
+                                        let name = `Возврат №${invoiceObj.invoiceNum()}`;
+                                        invoiceObj.name(name);
+                                    }
+                                    let item_list = {};
+                                    let item_array = [];
+                                    for (let i = 0; i < parent_item_collection.count(); i++) {
+                                        let itm = parent_item_collection.get(i);
+                                        let qty = itm.qty() - itm.refundQty();
+                                        if (qty > 0) {
+                                            let obj = { Qty: qty, obj: itm };
+                                            item_list[itm.id()] = obj
+                                            item_array.push(obj);
+                                        }
+                                    }
+                                    if (inpFields.Items && (inpFields.Items.length > 0)) {
+                                        item_array = [];
+                                        inpFields.Items.forEach(elem => {
+                                            let id = elem.Id;
+                                            if (!id)
+                                                throw new Error(`Missing or invalid field "Id" in "Items" array.`);
+                                            let obj = item_list[id];
+                                            if (!obj)
+                                                throw new Error(`Missing item "Id=${id}" in "${parentInvoice.name()}".`);
+                                            if (elem.Qty) {
+                                                if (elem.Qty > obj.Qty)
+                                                    throw new Error(`Can't return "Qty=${elem.Qty}". Max allowed: ${obj.Qty}, item: "${obj.name()}".`);
+                                                obj.Qty = elem.Qty;
+                                            }
+                                            item_array.push(obj);
+                                        })
+                                    }
+                                    if (item_array.length === 0)
+                                        throw new Error(`There is no items to return in "${parentInvoice.name()}".`);
+                                    
+                                    return Utils.seqExec(item_array, (elem) => {
                                         let fields = { RefundQty: 0 };
-                                        let p = productList[elem[field]];
-                                        if (!p)
-                                            throw new Error(`Product "${field}" = "${elem[field]}" doesn't exist.`);
-                                        fields.ProductId = elem.ProductId ? elem.ProductId : p.Id;
-                                        fields.VATTypeId = elem.VATTypeId ? elem.VATTypeId : p.VATTypeId;
-                                        fields.Code = elem.Code ? elem.Code : p.Code;
-                                        fields.Name = elem.Name ? elem.Name : p.Name;
-                                        fields.VATRate = elem.VATRate ? elem.VATRate : p.Rate;
-                                        fields.Price = typeof (elem.Price) === "number" ? elem.Price : p.Price;
-                                        fields.Qty = elem.Qty ? elem.Qty : 1;
-                                        let sum = invoiceObj.sum() + fields.Price * fields.Qty;
-                                        invoiceObj.sum(sum);
-                                        let ext = {
-                                            prodType: p.ProductTypeId,
-                                            prod: p.ExtFields,
-                                            vat: p.VatExtFields
-                                        };
-                                        fields.ExtFields = JSON.stringify(ext);
+                                        fields.ParentId = elem.obj.id();
+                                        fields.ProductId = elem.obj.productId();
+                                        fields.VATTypeId = elem.obj.vATTypeId();
+                                        fields.Code = elem.obj.code();
+                                        fields.Name = elem.obj.name();
+                                        fields.VATRate = elem.obj.vATRate();
+                                        fields.Price = elem.obj.price();
+                                        fields.Qty = elem.Qty;
+                                        elem.obj.refundQty(elem.obj.refundQty() + elem.Qty);
+                                        let sum = fields.Price * fields.Qty;
+                                        invoiceObj.sum(invoiceObj.sum() + sum);
+                                        parentInvoice.refundSum(parentInvoice.refundSum() + sum);
+                                        fields.ExtFields = elem.obj.extFields();
                                         return root_item.newObject({
                                             fields: fields
                                         }, dbOpts);
                                     });
-                                }));
-                        }
-                        else
-                            if (invoiceObj.invoiceTypeId() === Accounting.InvoiceType.Refund) {
-                                throw new Error(`Refunds aren't implemented yet!`);
-                            }
-                            else
-                                throw new Error(`Unknown "InvoiceTypeId": ${invoiceObj.invoiceTypeId()}.`);
-                        return rc;
+                                })
+                            break;
+
+                        default:
+                            throw new Error(`Unknown "InvoiceTypeId": ${invoiceObj.invoiceTypeId()}.`);
                     }
                 })
                 .then(() => {
-                    return root_obj.save(dbOpts);
+                    let dbOptsInt;
+                    return $data.tranStart(dbOpts)
+                        .then(result => {
+                            dbOptsInt = _.cloneDeep(dbOpts);
+                            dbOptsInt.transactionId = result.transactionId;
+                            memDbOptions.transactionId = result.transactionId; // set transaction to editDataWrapper
+                        })
+                        .then(() => {
+                            return root_obj.save(dbOptsInt);
+                        })
+                        .then(() => {
+                            if (root_parent)
+                                return root_parent.save(dbOptsInt);
+                        })
                 })
                 .then(() => {
                     return { result: "OK", id: newId };

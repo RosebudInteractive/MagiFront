@@ -61,6 +61,7 @@ let options = {
     billing: {
         module: "./yandex-kassa",
         enabled: true,
+        debug: true,
         yandexKassa: {
             shopId: "536331",
             secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",

@@ -117,7 +117,7 @@ exports.Payment = class Payment extends DbObject {
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                     let collection = root_obj.getCol("DataElements");
                     if (collection.count() !== 1)
-                        throw new Error(`Cheque (${searchField} = "${id}") doesn't exist.`);
+                        throw new Error(`Cheque ("id" = "${id}") doesn't exist.`);
                     chequeObj = collection.get(0);
                     isDone = (typeof (inpData.CheckueStateId) === "number") && (chequeObj.stateId() !== inpData.CheckueStateId);
                     if (!isDone) {
@@ -135,7 +135,7 @@ exports.Payment = class Payment extends DbObject {
             .then(result => {
                 if (result.isError)
                     throw result.result;
-                return result.result;
+                return inpData.debug ? result.result : { result: "OK" };
             });
     }
 
@@ -295,18 +295,39 @@ exports.Payment = class Payment extends DbObject {
         let opts = options || {};
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
+        let parent_root = null;
         let invoiceData = null;
         let chequeObj = null;
+        let parentCheque = null;
         let newId;
         let dbOptsInt;
+        let chequeTypeId;
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
                 let rc;
-                if (!data.Payment)
-                    throw new Error(`Missing "Payment" object.`);
-                if (data.Invoice)
-                    rc = this._getOrCreateInvoice(data.Invoice, opts);
+                if (!(data.Payment || data.Refund))
+                    throw new Error(`Missing "Payment" or "Refund" object.`);
+                
+                chequeTypeId = data.Payment ? Accounting.ChequeType.Payment : Accounting.ChequeType.Refund;
+
+                if (data.Refund) {
+                    if (!data.Refund.payment_id)
+                        throw new Error(`Missing argument "payment_id" of "Refund" object.`);
+                    rc = this._getChequeByIdOrCode(id, dbOpts)
+                        .then(result => {
+                            parent_root = result;
+                            memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper
+                            let collection = parent_root.getCol("DataElements");
+                            if (collection.count() !== 1)
+                                throw new Error(`Cheque ("payment_id" = "${id}") doesn't exist.`);
+                            parentCheque = collection.get(0);
+                        })
+                }
+                else {
+                    if (data.Invoice)
+                        rc = this._getOrCreateInvoice(data.Invoice, opts);
+                }
                 resolve(rc);
             })
                 .then(invoice => {
@@ -349,7 +370,8 @@ exports.Payment = class Payment extends DbObject {
             .then(result => {
                 if (result.isError)
                     throw result.result;
-                let rc = result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } : result.result;
+                let rc = result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
+                    (opts.debug ? result.result : { result: "OK" });
                 return rc;
             });
     }

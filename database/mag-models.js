@@ -388,6 +388,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("InvoiceItem", "09280816-42fe-4f1c-bcad-988cd3f6c2ad", "RootInvoiceItem", "7a8e98d7-6bfb-41df-afe2-2cf19d01ea94")
             .addField("InvoiceId", { type: "dataRef", model: "Invoice", refAction: "parentCascade", allowNull: false })
+            .addField("ParentId", { type: "dataRef", model: "InvoiceItem", refAction: "parentRestrict", allowNull: true })
             .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: false })
             .addField("VATTypeId", { type: "dataRef", model: "VATType", refAction: "parentRestrict", allowNull: false })
             .addField("Code", { type: "string", length: 50, allowNull: false })

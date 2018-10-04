@@ -33,7 +33,7 @@ exports.SetupRoute = (app) => {
 
         app.post('/api/payments', (req, res, next) => {
             if (req.user) {
-                paymentObject.insert(req.body, { dbOptions: { userId: req.user.Id } })
+                paymentObject.insert(req.body, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
                     .then(result => {
                         if (result && result.confirmationUrl)
                             res.redirect(result.confirmationUrl)

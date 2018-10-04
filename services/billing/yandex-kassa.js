@@ -48,7 +48,8 @@ class YandexKassa extends Payment {
             });
             opts.app.get("/api/adm/yandex-kassa/payments/:paymentId", (req, res, next) => {//
                 // this._getPayment(req.params.paymentId)
-                this.checkAndChangeState(req.params.paymentId)
+                this.checkAndChangeState(req.params.paymentId,
+                    { debug: config.billing.debug ? true : false }, { dbOptions: { userId: req.user.Id } })
                     .then(data => {
                         res.send(data);
                     })
