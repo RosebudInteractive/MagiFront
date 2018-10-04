@@ -727,7 +727,7 @@ export default class CWSPlayer extends CWSBase {
 
             const onSetPosition = () => {
               if (this._options.onSetPosition) {
-                this._options.onSetPosition(_this5._audioState);
+                this._options.onSetPosition(this._audioState);
               }
             }
 
