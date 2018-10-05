@@ -100,6 +100,8 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.interval = setTimeout(() => {
             this.stop();
         }, _timeInterval);
+
+        this._broadcastPlay();
     }
 
     stop() {
@@ -119,6 +121,8 @@ export default class CWSPlayerElement extends CWSBase {
             position: 0,
             interval: 0,
         };
+
+        this._broadcastStop()
     }
 
     _hide(item) {
@@ -231,5 +235,19 @@ export default class CWSPlayerElement extends CWSBase {
             item.parent().empty();
         }
     }
-}
 
+    setEventsHandler(options) {
+        this._options.onPlay = options.onPlay;
+        this._options.onStop = options.onStop;
+    }
+
+    _broadcastPlay() {
+        if (this._options.onPlay)
+            this._options.onPlay();
+    }
+
+    _broadcastStop() {
+        if (this._options.onStop)
+            this._options.onStop();
+    }
+}

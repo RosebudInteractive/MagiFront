@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8">
-    <title>Player</title>
+    <!-- <title>Player</title> -->
     <!--<link rel="stylesheet" type="text/css" href="/scripts/lib/jquery-ui/jquery-ui.min.css">-->
     <!--<link rel="stylesheet" type="text/css" href="/scripts/lib/jquery-ui/jquery-ui.structure.min.css">-->
 
@@ -11,14 +10,26 @@
     <!--<link rel="stylesheet" type="text/css" href="/scripts/widgets/work-shop/work-shop-custom.css">-->
     <!--<link rel="stylesheet" href="/css/font-awesome.min.css">-->
     <link rel="stylesheet" type="text/css" href="/static/player.css">
-    <script src="/static/player-main.js"></script>
+    <script src="/static/player-app.js"></script>
     <script src="/scripts/lib/class-extend.js"></script>
     <script src="/scripts/lib/iscroll.js"></script>
     <script src="/scripts/lib/require.js"></script>
-</head>
-
-<body>
-    <h2>Player page</h2>
-</body>
-
+  </head>
+  <body>
+    <style>
+      #player {
+        padding: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+      #player .ws-player-main {
+        top: 0;
+        transform: none;
+      }
+    </style>
+    <div id="player" class="ws-container"></div>
+  </body>
 </html>
