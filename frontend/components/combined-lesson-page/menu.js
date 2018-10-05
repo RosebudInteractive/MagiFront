@@ -219,28 +219,23 @@ class Navigation extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-
+        let _menu = window.innerWidth > 899 ? $('.section-nav-sublist') : $('.section-nav__list')
 
         if ((!prevState.showToc) && (this.state.showToc)) {
-            // $('body').addClass('overflow');
+            let _menuTop = _menu.position().top,
+                _menuBottom = _menuTop + _menu.height();
 
-            // let _control = $("#lesson-" + this.props.active);
-            // if (_control.length > 0) {
-            //     let _list = $(".lectures-list-wrapper"),
-            //         _listCurrentScrollPosition = _list.scrollTop(),
-            //         _listOffsetPosition = _list.offset().top,
-            //         _itemOffsetPosition = _control.offset().top - _listOffsetPosition,
-            //         _itemCurrentScrollPosition = _control.scrollTop();
-            //
-            //     if (_itemCurrentScrollPosition - _itemOffsetPosition !== 0) {
-            //         _list.scrollTop(_listCurrentScrollPosition + _itemOffsetPosition)
-            //     }
-            // }
+            console.log(_menuBottom)
 
+            if (_menuBottom > window.innerHeight) {
+                $('body').addClass('overflow');
+                _menu.addClass('scroll');
+            }
         }
 
         if ((prevState.showToc) && (!this.state.showToc)) {
-            // $('body').removeClass('overflow');
+            $('body').removeClass('overflow');
+            _menu.removeClass('scroll');
         }
     }
 
