@@ -101,12 +101,7 @@ export default class CWSPlayerElement extends CWSBase {
             this.stop();
         }, _timeInterval);
 
-        window.postMessage(
-          JSON.stringify({
-            eventType: 'magisteriaPlayer',
-            eventName: 'playerPlaying'
-          })
-        )
+        this._broadcastPlay();
     }
 
     stop() {
@@ -127,12 +122,7 @@ export default class CWSPlayerElement extends CWSBase {
             interval: 0,
         };
 
-        window.postMessage(
-          JSON.stringify({
-            eventType: 'magisteriaPlayer',
-            eventName: 'playerStopped'
-          })
-        )
+        this._broadcastStop()
     }
 
     _hide(item) {
@@ -244,5 +234,20 @@ export default class CWSPlayerElement extends CWSBase {
         if (item.length != 0) {
             item.parent().empty();
         }
+    }
+
+    setEventsHandler(options) {
+        this._options.onPlay = options.onPlay;
+        this._options.onStop = options.onStop;
+    }
+
+    _broadcastPlay() {
+        if (this._options.onPlay)
+            this._options.onPlay();
+    }
+
+    _broadcastStop() {
+        if (this._options.onStop)
+            this._options.onStop();
     }
 }

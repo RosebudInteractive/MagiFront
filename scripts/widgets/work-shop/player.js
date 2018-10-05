@@ -76,6 +76,7 @@ export default class CWSPlayer extends CWSBase {
         for (let i = 0; i < this._elements.array.length; i++) {
             let el = this._elements.array[i];
             el.initContainer(cont);
+            el.setEventsHandler({onPlay: this._options.onElementPlay, onStop: this._options.onElementStop})
             if (el.Id in this._audioState.playingNow)
                 el.renderPosition(this._audioState.globalTime);
             else
@@ -119,13 +120,7 @@ export default class CWSPlayer extends CWSBase {
                         this._onAudioLoadedHandler(this._audioState.audio);
                     }
 
-                    window.postMessage(
-                      JSON.stringify({
-                        eventType: 'magisteriaPlayer',
-                        eventName: 'dataIsSet',
-                        _nativeAppDataUuid: data2._nativeAppDataUuid
-                      })
-                    );
+                    this._broadcastSetData(data2._nativeAppDataUuid);
                 });
 
         }
@@ -545,6 +540,18 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
+    _broadcastSetPosition(value) {
+        if (this._options.onSetPosition) {
+            this._options.onSetPosition(value)
+        }
+    }
+
+    _broadcastSetData(value) {
+        if (this._options.onSetData) {
+            this._options.onSetData(value)
+        }
+    }
+
     getAudioState() {
         let result = $.extend(true, {}, this._audioState);
         return result;
@@ -723,13 +730,6 @@ export default class CWSPlayer extends CWSBase {
 
             this._audioState.baseTime = newStart.start;
             this._audioState.currentTime = position - newStart.start;
-            this._audioState.globalTime = position;
-
-            const onSetPosition = () => {
-              if (this._options.onSetPosition) {
-                this._options.onSetPosition(this._audioState);
-              }
-            }
 
             if (this._audioState.currentEpisode != epIdx) {
                 this._audioState.currentEpisode = epIdx;
@@ -801,7 +801,7 @@ export default class CWSPlayer extends CWSBase {
                                 this._audioState.audio.play()
                             }
 
-                            onSetPosition()
+                            this._broadcastSetPosition(this._audioState)
 
                             this._addDevErr('----- SEEKED FINISH -----')
                         }
@@ -835,7 +835,7 @@ export default class CWSPlayer extends CWSBase {
                 this._audioState.audio.currentTime = this._audioState.currentTime;
                 this._setElementsPosition(position);
 
-                onSetPosition()
+                this._broadcastSetPosition(this._audioState)
             }
         }
     }
