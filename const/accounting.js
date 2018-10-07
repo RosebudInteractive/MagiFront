@@ -13,7 +13,7 @@ exports.Accounting = {
     InvoiceState: {
         Draft: 1,
         Approved: 2,
-        Payed: 3,
+        Paid: 3,
         Canceled: 4
     },
     ChequeType: {
@@ -27,5 +27,10 @@ exports.Accounting = {
         Succeeded: 4,
         Canceled: 5,
         Error: 6
+    },
+    ReceiptState: {
+        Pending: 1,
+        Succeeded: 2,
+        Canceled: 3
     }
 };

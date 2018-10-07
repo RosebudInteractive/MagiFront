@@ -161,7 +161,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                     if (typeof (inpFields.StateId) !== "undefined")
                         newStateId = invoiceObj.stateId(inpFields.StateId);
                     if (currStateId !== newStateId)
-                        if ((currStateId === Accounting.InvoiceState.Canceled) || (currStateId === Accounting.InvoiceState.Payed))
+                        if ((currStateId === Accounting.InvoiceState.Canceled) || (currStateId === Accounting.InvoiceState.Paid))
                             throw new Error(`Can't change field "StateId" from "${this._stateIdToString(currStateId)}" to "${this._stateIdToString(newStateId)}".`);
                     if (typeof (inpFields.CurrencyId) !== "undefined")
                         if (currStateId === Accounting.InvoiceState.Draft)
@@ -169,7 +169,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                         else
                             throw new Error(`Can't modify field "StateId" in state "${this._stateIdToString(currStateId)}".`);
                     if (typeof (inpFields.ChequeId) !== "undefined")
-                        if ((currStateId !== Accounting.InvoiceState.Payed) && (currStateId !== Accounting.InvoiceState.Canceled))
+                        if ((currStateId !== Accounting.InvoiceState.Paid) && (currStateId !== Accounting.InvoiceState.Canceled))
                             invoiceObj.chequeId(inpFields.ChequeId)
                         else
                             if (invoiceObj.chequeId() !== inpFields.ChequeId)
@@ -483,7 +483,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                     return root_parent.edit();
                                 })
                                 .then(() => {
-                                    if (parentInvoice.stateId() !== Accounting.InvoiceState.Payed)
+                                    if (parentInvoice.stateId() !== Accounting.InvoiceState.Paid)
                                         throw new Error(`Invoice "${parentInvoice.name()}" should be payed.`);
                                         
                                     invoiceObj.userId(parentInvoice.userId());
@@ -522,7 +522,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                         })
                                     }
                                     if (item_array.length === 0)
-                                        throw new Error(`There is no items to return in "${parentInvoice.name()}".`);
+                                        throw new Error(`There are no items to return in "${parentInvoice.name()}".`);
                                     
                                     return Utils.seqExec(item_array, (elem) => {
                                         let fields = { RefundQty: 0 };

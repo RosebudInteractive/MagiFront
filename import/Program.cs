@@ -1123,6 +1123,29 @@ namespace MagImport
         };
 
         //
+        // ReceiptState
+        //
+        public class ReceiptStateFields : BaseFieldsData
+        {
+            public string Code { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        };
+
+        public class ReceiptState : DataObjTyped<ReceiptStateFields, ReceiptStateRoot>
+        {
+            const string CLASS_GUID = "0758ed86-79a0-4006-8a9e-01efce113dda";
+            public ReceiptState() : base(CLASS_GUID) { }
+        };
+
+        public class ReceiptStateRoot : RootDataObject
+        {
+            const string CLASS_GUID = "3663d347-3cee-4b9e-9ca5-9a0754254592";
+            public override string GetClassName() { return "ReceiptState"; }
+            public ReceiptStateRoot() : base(CLASS_GUID) { }
+        };
+
+        //
         // UserRole
         //
         public class UserRoleFields : BaseFieldsData
@@ -1760,7 +1783,7 @@ namespace MagImport
 
             invState = new InvoiceState();
             invState.Fields.Id = 3;
-            invState.Fields.Code = "PAYED";
+            invState.Fields.Code = "PAID";
             invState.Fields.Name = "Оплачен";
 
             invState = new InvoiceState();
@@ -1809,6 +1832,22 @@ namespace MagImport
             chqState.Fields.Id = 6;
             chqState.Fields.Code = "ERROR";
             chqState.Fields.Name = "Ошибка создания чека";
+
+            ReceiptState.AllData = allData;
+            ReceiptState rcpState = new ReceiptState();
+            rcpState.Fields.Id = 1;
+            rcpState.Fields.Code = "PENDING";
+            rcpState.Fields.Name = "Ожидание";
+
+            rcpState = new ReceiptState();
+            rcpState.Fields.Id = 2;
+            rcpState.Fields.Code = "SUCCEEDED";
+            rcpState.Fields.Name = "Успешно завершен";
+
+            rcpState = new ReceiptState();
+            rcpState.Fields.Id = 3;
+            rcpState.Fields.Code = "CANCELED";
+            rcpState.Fields.Name = "Отменен";
 
             conn = new MySqlConnection(conn_str);
             Console.WriteLine("Connecting to MySQL...");

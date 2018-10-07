@@ -409,6 +409,11 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("Description", { type: "string", allowNull: true });
 
+        metaDataMgr.addModel("ReceiptState", "0758ed86-79a0-4006-8a9e-01efce113dda", "RootReceiptState", "3663d347-3cee-4b9e-9ca5-9a0754254592")
+            .addField("Code", { type: "string", length: 50, allowNull: false })
+            .addField("Name", { type: "string", length: 255, allowNull: false })
+            .addField("Description", { type: "string", allowNull: true });
+
         metaDataMgr.addModel("Cheque", "51e54d9c-2265-4895-b958-fdddaf69b10d", "RootCheque", "6e51fd38-a635-4182-8eda-b855e696c504")
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
             .addField("ParentId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: true })
@@ -416,6 +421,7 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("StateId", { type: "dataRef", model: "ChequeState", refAction: "parentRestrict", allowNull: false })
             .addField("CurrencyId", { type: "dataRef", model: "Currency", refAction: "parentRestrict", allowNull: false })
             .addField("InvoiceId", { type: "dataRef", model: "Invoice", refAction: "parentRestrict", allowNull: true })
+            .addField("ReceiptStateId", { type: "dataRef", model: "ReceiptState", refAction: "parentRestrict", allowNull: true })
             .addField("Name", { type: "string", length: 255, allowNull: false })
             .addField("ChequeNum", { type: "string", length: 50, allowNull: false })
             .addField("ChequeDate", { type: "datetime", allowNull: false })

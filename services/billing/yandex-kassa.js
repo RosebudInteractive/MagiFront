@@ -29,7 +29,8 @@ class YandexKassa extends Payment {
                     res.send({ result: "OK" });
                 });
             opts.app.get("/api/adm/yandex-kassa/payments/:paymentId/capture", (req, res, next) => {
-                this._capturePayment(req.params.paymentId, {})
+                this.checkAndChangeState(req.params.paymentId,
+                    { debug: config.billing.debug ? true : false }, { dbOptions: { userId: req.user.Id } })
                     .then(data => {
                         res.send(data);
                     })
@@ -38,7 +39,8 @@ class YandexKassa extends Payment {
                     });
             });
             opts.app.get("/api/adm/yandex-kassa/payments/:paymentId/cancel", (req, res, next) => {
-                this._cancelPayment(req.params.paymentId)
+                this.cancel(req.params.paymentId,
+                    { debug: config.billing.debug ? true : false }, { dbOptions: { userId: req.user.Id } })
                     .then(data => {
                         res.send(data);
                     })
@@ -47,7 +49,6 @@ class YandexKassa extends Payment {
                     });
             });
             opts.app.get("/api/adm/yandex-kassa/payments/:paymentId", (req, res, next) => {//
-                // this._getPayment(req.params.paymentId)
                 this.checkAndChangeState(req.params.paymentId,
                     { debug: config.billing.debug ? true : false }, { dbOptions: { userId: req.user.Id } })
                     .then(data => {
@@ -58,22 +59,22 @@ class YandexKassa extends Payment {
                     });
             });
             opts.app.get("/api/adm/yandex-kassa/refunds/:paymentId/create", (req, res, next) => {
-                this._getPayment(req.params.paymentId)
-                    .then(data => {
-                        let payload = { amount: data.amount };
-                        if (data.receipt)
-                            payload.receipt = data.receipt;
-                        return this._createRefund(req.params.paymentId, payload)
-                    })
-                    .then(data => {
-                        res.send(data);
+                let data = {
+                    Refund: {
+                        payment_id: req.params.paymentId
+                    }
+                };
+                this.insert(data, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
+                    .then(result => {
+                        res.send({ result: "OK", paymentData: result });
                     })
                     .catch(err => {
                         next(err);
                     });
             });
             opts.app.get("/api/adm/yandex-kassa/refunds/:refundId", (req, res, next) => {
-                this._getRefundInfo(req.params.refundId)
+                this.checkAndChangeState(req.params.refundId,
+                    { debug: config.billing.debug ? true : false }, { dbOptions: { userId: req.user.Id } })
                     .then(data => {
                         res.send(data);
                     })
@@ -162,15 +163,12 @@ class YandexKassa extends Payment {
         return this._req('POST', func, {}, idempotenceKey);
     }
 
-    _createRefund(paymentId, payload, op, idempotenceKey) {
+    _createRefund(payload, op, idempotenceKey) {
         let obj = _.cloneDeep(payload);
-        obj.payment_id = paymentId;
         let method = 'POST';
         let func = 'refunds';
-        if (op) {
+        if (op)
             op.operation = method + " " + func;
-            op.request = obj;
-        }
         return this._req(method, func, obj, idempotenceKey);
     }
 
@@ -201,6 +199,22 @@ class YandexKassa extends Payment {
         return rc;
     }
 
+    _convertReceiptStatusToState(status) {
+        let rc = null;
+        switch (status) {
+            case "pending":
+                rc = Accounting.ReceiptState.Pending;
+                break;
+            case "succeeded":
+                rc = Accounting.ReceiptState.Succeeded;
+                break;
+            case "canceled":
+                rc = Accounting.ReceiptState.Canceled;
+                break;
+        }
+        return rc;
+    }
+
     _onCapturePayment(paymentId) {
         let op = {};
         return new Promise(resolve => {
@@ -209,13 +223,15 @@ class YandexKassa extends Payment {
                 .then(result => {
                     chequeState = this._convertStatusToState(result.status);
                     let cheque = { chequeState: chequeState, id: result.id };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
                     let rc = { isError: false, operation: op, req: {}, result: result, cheque: cheque };
                     if (result.created_at) {
                         let ms = Date.parse(result.created_at);
-                        rc.cheque.chequeDate = new Date(ms);
+                        cheque.chequeDate = new Date(ms);
                     }
                     if (result.payment_method && result.payment_method.saved)
-                        rc.cheque.isSaved = true;
+                        cheque.isSaved = true;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -233,12 +249,62 @@ class YandexKassa extends Payment {
                     chequeState = this._convertStatusToState(result.status);
                     let cheque = { chequeState: chequeState, id: result.id };
                     let rc = { isError: false, operation: op, req: {}, result: result, cheque: cheque };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
                     if (result.created_at) {
                         let ms = Date.parse(result.created_at);
-                        rc.cheque.chequeDate = new Date(ms);
+                        cheque.chequeDate = new Date(ms);
                     }
                     if (result.payment_method && result.payment_method.saved)
-                        rc.cheque.isSaved = true;
+                        cheque.isSaved = true;
+                    return rc;
+                }, err => {
+                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                });
+            resolve(rc);
+        });
+    }
+
+    _onCancelPayment(paymentId) {
+        let op = {};
+        return new Promise(resolve => {
+            let chequeState = Accounting.ChequeState.Error;
+            let rc = this._cancelPayment(paymentId, op)
+                .then(result => {
+                    chequeState = this._convertStatusToState(result.status);
+                    let cheque = { chequeState: chequeState, id: result.id };
+                    let rc = { isError: false, operation: op, req: {}, result: result, cheque: cheque };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
+                    if (result.created_at) {
+                        let ms = Date.parse(result.created_at);
+                        cheque.chequeDate = new Date(ms);
+                    }
+                    if (result.payment_method && result.payment_method.saved)
+                        cheque.isSaved = true;
+                    return rc;
+                }, err => {
+                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                });
+            resolve(rc);
+        });
+    }
+
+    _onGetRefund(refundId) {
+        let op = {};
+        return new Promise(resolve => {
+            let chequeState = Accounting.ChequeState.Error;
+            let rc = this._getRefundInfo(refundId, op)
+                .then(result => {
+                    chequeState = this._convertStatusToState(result.status);
+                    let cheque = { chequeState: chequeState, id: result.id };
+                    let rc = { isError: false, operation: op, req: {}, result: result, cheque: cheque };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
+                    if (result.created_at) {
+                        let ms = Date.parse(result.created_at);
+                        cheque.chequeDate = new Date(ms);
+                    }
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -256,14 +322,16 @@ class YandexKassa extends Payment {
                     chequeState = this._convertStatusToState(result.status);
                     let cheque = { chequeState: chequeState, id: result.id };
                     let rc = { isError: false, operation: op, req: payment, result: result, cheque: cheque };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
                     if (result.created_at) {
                         let ms = Date.parse(result.created_at);
-                        rc.cheque.chequeDate = new Date(ms);
+                        cheque.chequeDate = new Date(ms);
                     }
                     if (result.confirmation && result.confirmation.confirmation_url)
                         rc.confirmationUrl = result.confirmation.confirmation_url;
                     if (result.payment_method && result.payment_method.saved)
-                        rc.cheque.isSaved = true;
+                        cheque.isSaved = true;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -272,7 +340,30 @@ class YandexKassa extends Payment {
         });
     }
 
-    _onPreparePaymentFields(id, payment, invoice, userId) {
+    _onCreateRefund(refund) {
+        let op = {};
+        return new Promise(resolve => {
+            let chequeState = Accounting.ChequeState.Error;
+            let rc = this._createRefund(refund, op)
+                .then(result => {
+                    chequeState = this._convertStatusToState(result.status);
+                    let cheque = { chequeState: chequeState, id: result.id };
+                    let rc = { isError: false, operation: op, req: refund, result: result, cheque: cheque };
+                    if (result.receipt_registration)
+                        cheque.ReceiptStateId = this._convertReceiptStatusToState(result.receipt_registration);
+                    if (result.created_at) {
+                        let ms = Date.parse(result.created_at);
+                        cheque.chequeDate = new Date(ms);
+                    }
+                    return rc;
+                }, err => {
+                    return { isError: true, operation: op, req: refund, result: err, cheque: { chequeState: chequeState } };
+                });
+            resolve(rc);
+        });
+    }
+
+    _onPreparePaymentFields(id, chequeTypeId, payment, invoice, userId) {
         let result = {}
         let paymentObject = result.paymentObject = _.cloneDeep(payment);
         let fields = result.fields = {};
@@ -290,21 +381,29 @@ class YandexKassa extends Payment {
                     value: sumStr,
                     currency: curr
                 }
-                paymentObject.capture = false;
-                if (!paymentObject.payment_method_id) {
-                    if (!paymentObject.confirmation) {
-                        paymentObject.confirmation = {
-                            type: "redirect",
-                            return_url: config.proxyServer.siteHost +
-                                (paymentObject.returnUrl ? paymentObject.returnUrl : config.billing.yandexKassa.returnUrl)
-                        };
-                        delete paymentObject.returnUrl;
+                if (chequeTypeId === Accounting.ChequeType.Payment) {
+                    paymentObject.capture = false;
+                    if (!paymentObject.payment_method_id) {
+                        if (!paymentObject.confirmation) {
+                            paymentObject.confirmation = {
+                                type: "redirect",
+                                return_url: config.proxyServer.siteHost +
+                                    (paymentObject.returnUrl ? paymentObject.returnUrl : config.billing.yandexKassa.returnUrl)
+                            };
+                            delete paymentObject.returnUrl;
+                        }
                     }
-                }
-                else
-                    delete paymentObject.confirmation;
+                    else
+                        delete paymentObject.confirmation;
 
-                paymentObject.description = "Оплата";
+                    paymentObject.metadata = {
+                        ChequeId: id
+                    };
+                    if (invoice)
+                        paymentObject.metadata.InvoiceId = invoice.Id;
+                }
+
+                paymentObject.description = chequeTypeId === Accounting.ChequeType.Payment ? "Оплата" : "Возврат";
 
                 if (invoice) {
                     if (invoice.Name)
@@ -330,13 +429,9 @@ class YandexKassa extends Payment {
                         });
                     }
                 }
-                paymentObject.metadata = {
-                    ChequeId: id
-                };
-                if (invoice)
-                    paymentObject.metadata.InvoiceId = invoice.Id;
+
                 fields.UserId = user.Id;
-                fields.ChequeTypeId = Accounting.ChequeType.Payment;
+                fields.ChequeTypeId = chequeTypeId;
                 fields.CurrencyId = invoice ? invoice.CurrencyId : Accounting.DfltCurrencyId;
                 fields.InvoiceId = invoice ? invoice.Id : null;
                 fields.Name = paymentObject.description;

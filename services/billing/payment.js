@@ -49,15 +49,33 @@ exports.Payment = class Payment extends DbObject {
         })
     }
 
+    _onCancelPayment(paymentId) {
+        return new Promise(reject => {
+            reject(new Error(`Payment::_onCancelPayment isn't implemented. You shouldn't invoke this method of base class.`));
+        })
+    }
+
+    _onGetRefund(refundId) {
+        return new Promise(reject => {
+            reject(new Error(`Payment::_onGetRefund isn't implemented. You shouldn't invoke this method of base class.`));
+        })
+    }
+
     _onCapturePayment(paymentId) {
         return new Promise(reject => {
             reject(new Error(`Payment::_onCapturePayment isn't implemented. You shouldn't invoke this method of base class.`));
         })
     }
 
-    _onCreatePayment(payment, invoice) {
+    _onCreatePayment(payment) {
         return new Promise(reject => {
             reject(new Error(`Payment::_onCreatePayment isn't implemented. You shouldn't invoke this method of base class.`));
+        })
+    }
+
+    _onCreateRefund(refund) {
+        return new Promise(reject => {
+            reject(new Error(`Payment::_onCreateRefund isn't implemented. You shouldn't invoke this method of base class.`));
         })
     }
 
@@ -93,10 +111,55 @@ exports.Payment = class Payment extends DbObject {
         }
         else
             if (typeof (id) === "number")
-                rc = this._getObjById(n, null, dbOpts)
+                rc = this._getObjById(id, null, dbOpts)
             else
                 throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
         return rc;
+    }
+
+    cancel(id, data, options) {
+        let memDbOptions = { dbRoots: [] };
+        let inpData = data || {};
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let chequeObj = null;
+        let wrongState = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getChequeByIdOrCode(id, dbOpts));
+            })
+                .then(result => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() !== 1)
+                        throw new Error(`Cheque ("id" = "${id}") doesn't exist.`);
+                    chequeObj = collection.get(0);
+                    if (chequeObj.chequeTypeId() === Accounting.ChequeType.Refund)
+                        throw new Error(`Can't cancel refund cheque".`);
+                    return this._onGetPayment(chequeObj.chequeNum());
+                })
+                .then(result => {
+                    let res = result;
+                    if (!(result && result.cheque && (result.cheque.chequeState === Accounting.ChequeState.WaitForCapture)))
+                        wrongState = result.cheque.chequeState
+                    else
+                        res = this._onCancelPayment(chequeObj.chequeNum());
+                    return res;
+                })
+                .then(result => {
+                    return this._updateChequeState(result, root_obj, { chequeObj: chequeObj }, dbOpts, memDbOptions);
+                })
+        }, memDbOptions)
+            .then(result => {
+                if (result.isError)
+                    throw result.result;
+                if (wrongState)
+                    throw new Error(`Can't cancel cheque because it's not in "WaitForCapture" state ("StateId" = ${wrongState}).`);
+                return inpData.debug ? result.result : { result: "OK" };
+            });
     }
 
     checkAndChangeState(id, data, options) {
@@ -107,6 +170,8 @@ exports.Payment = class Payment extends DbObject {
         let root_obj = null;
         let chequeObj = null;
         let isDone = false;
+        let parentCheque = null;
+        let isRefund = false;
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -121,13 +186,32 @@ exports.Payment = class Payment extends DbObject {
                     chequeObj = collection.get(0);
                     isDone = (typeof (inpData.CheckueStateId) === "number") && (chequeObj.stateId() !== inpData.CheckueStateId);
                     if (!isDone) {
-                        return this._onGetPayment(chequeObj.chequeNum());
+                        isRefund = chequeObj.chequeTypeId() === Accounting.ChequeType.Refund;
+                        let rc;
+                        if (isRefund) {
+                            if (chequeObj.parentId())
+                                rc = this._getChequeByIdOrCode(chequeObj.parentId(), dbOpts)
+                                    .then(result => {
+                                        let parent_root = result;
+                                        memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper
+                                        let collection = parent_root.getCol("DataElements");
+                                        if (collection.count() !== 1)
+                                            throw new Error(`Cheque ("payment_id" = "${id}") doesn't exist.`);
+                                        parentCheque = collection.get(0);
+                                    })
+                                    .then(() => {
+                                        return this._onGetRefund(chequeObj.chequeNum());
+                                    });
+                        }
+                        else
+                            rc = this._onGetPayment(chequeObj.chequeNum());
+                        return rc;
                     }
                 })
                 .then(result => {
                     let rc = {};
                     if (!isDone) {
-                        rc = this._updateChequeState(result, root_obj, chequeObj, dbOpts, memDbOptions);
+                        rc = this._updateChequeState(result, root_obj, { chequeObj: chequeObj, parentCheque: parentCheque }, dbOpts, memDbOptions);
                     }
                     return rc;
                 })
@@ -139,7 +223,9 @@ exports.Payment = class Payment extends DbObject {
             });
     }
 
-    _updateChequeState(req_result, root_obj, chequeObj, dbOpts, memDbOptions, invoiceData) {
+    _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoiceData) {
+        let chequeObj = cheque.chequeObj;
+        let parentCheque = cheque.parentCheque;
 
         function updateState(reqResult) {
             let dbOptsInt;
@@ -147,14 +233,22 @@ exports.Payment = class Payment extends DbObject {
             let isStateChanged = false;
             let rc = root_obj.edit()
                 .then(() => {
+                    if (parentCheque)
+                        return parentCheque.edit();
+                })
+                .then(() => {
                     isStateChanged = chequeObj.stateId() !== reqResult.cheque.chequeState;
                     chequeObj.stateId(reqResult.cheque.chequeState);
+                    if (parentCheque && isStateChanged && (chequeObj.stateId() === Accounting.ChequeState.Succeeded))
+                        parentCheque.refundSum(parentCheque.refundSum() + chequeObj.sum());
                     if (reqResult.cheque.chequeDate)
                         chequeObj.chequeDate(reqResult.cheque.chequeDate);
                     if (reqResult.cheque.id)
                         chequeObj.chequeNum(reqResult.cheque.id);
                     if (reqResult.cheque.isSaved)
                         chequeObj.isSaved(reqResult.cheque.isSaved);
+                    if (reqResult.cheque.ReceiptStateId)
+                        chequeObj.receiptStateId(reqResult.cheque.ReceiptStateId);
                     chequeObj.chequeData(JSON.stringify(reqResult.result));
                     root_item = chequeObj.getDataRoot("ChequeLog");
                     let fields = {
@@ -184,17 +278,99 @@ exports.Payment = class Payment extends DbObject {
                             let data = {
                                 ChequeId: chequeObj.id(),
                                 StateId: chequeObj.stateId() === Accounting.ChequeState.Succeeded ?
-                                    Accounting.InvoiceState.Payed : Accounting.InvoiceState.Approved
+                                    Accounting.InvoiceState.Paid :
+                                    (chequeObj.stateId() === Accounting.ChequeState.Canceled ?
+                                        Accounting.InvoiceState.Canceled : Accounting.InvoiceState.Approved)
                             };
                             return InvoiceService().update(chequeObj.invoiceId(), data, { dbOptions: dbOptsInt });
                         });
-                    return rc.then(() => {
-                        return root_obj.save(dbOptsInt);
-                    });
+                    return rc
+                        .then(() => {
+                            return root_obj.save(dbOptsInt);
+                        })
+                        .then(() => {
+                            if (parentCheque)
+                                return parentCheque.save(dbOptsInt);
+                        });
                 });
             return rc.then(() => reqResult);
         }
 
+        function updateUserSubscription() {
+            //
+            // Set subscription data and saved payment
+            //
+            let rci = Promise.resolve();
+            let isRefund = chequeObj.chequeTypeId() === Accounting.ChequeType.Refund;
+
+            if (memDbOptions.transactionId) {
+                // Commit internal transaction
+                let transactionId = memDbOptions.transactionId;
+                delete memDbOptions.transactionId;
+                rci = $data.tranCommit(transactionId);
+            };
+            if (!invoiceData) {
+                rci = rci
+                    .then(() => {
+                        return InvoiceService().get(chequeObj.invoiceId(), { dbOptions: dbOpts });
+                    })
+                    .then(invoice => {
+                        invoiceData = invoice.data;
+                    });
+            }
+            rci = rci
+                .then(() => {
+                    return UsersCache().getUserInfoById(chequeObj.userId(), true);
+                })
+                .then(user => {
+                    let fields = {};
+                    if (chequeObj.isSaved())
+                        fields.SubsAutoPayId = chequeObj.id();
+                    if (invoiceData) {
+                        // Calculate new subscription duration
+                        //
+                        let duration = null;
+                        let prod = null;
+                        for (let i = 0; i < invoiceData.Items.length; i++) {
+                            let itm = prod = invoiceData.Items[i];
+                            if (itm.ExtFields && itm.ExtFields.prod &&
+                                (itm.ExtFields.prodType === Accounting.SubsProdType)) {
+                                duration = itm.ExtFields.prod;
+                                break;
+                            }
+                        }
+                        if (duration) {
+                            let now = new Date();
+                            let current = user.SubsExpDate ? user.SubsExpDate : now;
+                            let sign = isRefund ? -1 : 1;
+                            switch (duration.units) {
+                                case "d":
+                                    current.setDate(current.getDate() + sign * duration.duration);
+                                    break;
+
+                                case "m":
+                                    current.setMonth(current.getMonth() + sign * duration.duration);
+                                    break;
+
+                                case "y":
+                                    current.setFullYear(current.getFullYear() + sign * duration.duration);
+                                    break;
+
+                                default:
+                                    throw new Error(`Invalid "unit": "${duration.units}".`);
+                            }
+                            fields.SubsExpDate = current > now ? current : null;
+                            fields.SubsProductId = fields.SubsExpDate ? prod.ProductId : null;
+                        }
+                    }
+                    if (Object.keys(fields).length > 0) {
+                        return UsersCache().editUser(user.Id, { alter: fields }, dbOpts);
+                    }
+                })
+            return rci;
+        }
+
+        let iniState = chequeObj.stateId();
         return updateState(req_result)
             .then(result => {
                 if (chequeObj.stateId() === Accounting.ChequeState.WaitForCapture) {
@@ -212,82 +388,23 @@ exports.Payment = class Payment extends DbObject {
                         })
                         .then(result => {
                             // Set status "Paid" to cheque and invoice
-                            return this._updateChequeState(result, root_obj, chequeObj, dbOpts, memDbOptions);
+                            return this._updateChequeState(result, root_obj, cheque, dbOpts, memDbOptions);
                         })
                         .then(result => {
-                            //
-                            // Set subscription data and saved payment
-                            //
-                            let rci = Promise.resolve();
-                            if (memDbOptions.transactionId) {
-                                // Commit internal transaction
-                                let transactionId = memDbOptions.transactionId;
-                                delete memDbOptions.transactionId;
-                                rci = $data.tranCommit(transactionId);
-                            };
-                            if (!invoiceData) {
-                                rci = rci
-                                    .then(() => {
-                                        return InvoiceService().get(chequeObj.invoiceId(), { dbOptions: dbOpts });
-                                    })
-                                    .then(invoice => {
-                                        invoiceData = invoice.data;
-                                    });
-                            }
-                            rci = rci
-                                .then(() => {
-                                    return UsersCache().getUserInfoById(chequeObj.userId(), true);
-                                })
-                                .then(user => {
-                                    let fields = {};
-                                    if (chequeObj.isSaved())
-                                        fields.SubsAutoPayId = chequeObj.id();
-                                    if (invoiceData) {
-                                        // Calculate new subscription duration
-                                        //
-                                        let duration = null;
-                                        let prod = null;
-                                        for (let i = 0; i < invoiceData.Items.length; i++){
-                                            let itm = prod = invoiceData.Items[i];
-                                            if (itm.ExtFields && itm.ExtFields.prod &&
-                                                (itm.ExtFields.prodType === Accounting.SubsProdType)) {
-                                                duration = itm.ExtFields.prod;
-                                                break;
-                                            }
-                                        }
-                                        if (duration) {
-                                            let current = user.SubsExpDate ? user.SubsExpDate : (new Date());
-                                            switch (duration.units) {
-                                                case "d":
-                                                    current.setDate(current.getDate() + duration.duration);
-                                                    break;
-
-                                                case "m":
-                                                    current.setMonth(current.getMonth() + duration.duration);
-                                                    break;
-
-                                                case "y":
-                                                    current.setFullYear(current.getFullYear() + duration.duration);
-                                                    break;
-
-                                                default:
-                                                    throw new Error(`Invalid "unit": "${duration.units}".`);
-                                            }
-                                            fields.SubsExpDate = current;
-                                            fields.SubsProductId = prod.ProductId;
-                                        }
-                                    }
-                                    if (Object.keys(fields).length > 0) {
-                                        return UsersCache().editUser(user.Id, { alter: fields }, dbOpts);
-                                    }
-                                })
-                            return rci.then(() => result);
+                            iniState = chequeObj.stateId(); // !!! Prevent to invoke "updateUserSubscription" twice
+                            return result;
                         });
                     return rc;
                 }
                 else
                     return result;
             })
+            .then(result => {
+                let changeUserSubs = (chequeObj.stateId() === Accounting.ChequeState.Succeeded)
+                    && (chequeObj.stateId() !== iniState);
+                let rc = changeUserSubs ? updateUserSubscription() : Promise.resolve();
+                return rc.then(() => result);
+            });
     }
 
     insert(data, options) {
@@ -314,7 +431,7 @@ exports.Payment = class Payment extends DbObject {
                 if (data.Refund) {
                     if (!data.Refund.payment_id)
                         throw new Error(`Missing argument "payment_id" of "Refund" object.`);
-                    rc = this._getChequeByIdOrCode(id, dbOpts)
+                    rc = this._getChequeByIdOrCode(data.Refund.payment_id, dbOpts)
                         .then(result => {
                             parent_root = result;
                             memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper
@@ -322,6 +439,14 @@ exports.Payment = class Payment extends DbObject {
                             if (collection.count() !== 1)
                                 throw new Error(`Cheque ("payment_id" = "${id}") doesn't exist.`);
                             parentCheque = collection.get(0);
+                            if (parentCheque.stateId() !== Accounting.ChequeState.Succeeded)
+                                throw new Error(`To create refund cheque "${id}" should be in "Succeeded" state.`);
+                            if (parentCheque.invoiceId()) {
+                                let inv = { ParentId: parentCheque.invoiceId(), InvoiceTypeId: Accounting.InvoiceType.Refund };
+                                if (data.Invoice && data.Invoice.Items)
+                                    inv.Items = _.cloneDeep(data.Invoice.Items);
+                                return this._getOrCreateInvoice(inv, opts);
+                            }
                         })
                 }
                 else {
@@ -348,10 +473,12 @@ exports.Payment = class Payment extends DbObject {
                 .then(result => {
                     newId = result.keyValue;
                     chequeObj = this._db.getObj(result.newObject);
-                    return this._onPreparePaymentFields(chequeObj.id(),
-                        data.Payment, invoiceData, invoiceData ? invoiceData.UserId : data.UserId);
+                    return this._onPreparePaymentFields(chequeObj.id(), chequeTypeId,
+                        data.Payment ? data.Payment : data.Refund, invoiceData, invoiceData ? invoiceData.UserId : data.UserId);
                 })
                 .then(result => {
+                    if (parentCheque)
+                        chequeObj.parentId(parentCheque.id());
                     chequeObj.chequeNum(DRAFT_CHEQUE_ID);
                     chequeObj.stateId(Accounting.ChequeState.Draft);
                     for (let key in result.fields) {
@@ -361,10 +488,11 @@ exports.Payment = class Payment extends DbObject {
                         .then(() => result.paymentObject);
                 })
                 .then(paymentObject => {
-                    return this._onCreatePayment(paymentObject);
+                    return chequeTypeId === Accounting.ChequeType.Payment ?
+                        this._onCreatePayment(paymentObject) : this._onCreateRefund(paymentObject);
                 })
                 .then(result => {
-                    return this._updateChequeState(result, root_obj, chequeObj, dbOpts, memDbOptions);
+                    return this._updateChequeState(result, root_obj, { chequeObj: chequeObj, parentCheque: parentCheque }, dbOpts, memDbOptions);
                 })
         }, memDbOptions)
             .then(result => {
