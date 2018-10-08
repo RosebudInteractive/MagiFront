@@ -1,0 +1,36 @@
+#player.ws-container {
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #2f2f2f !important;
+}
+#player.ws-container .ws-player-main {
+  background-color: transparent !important;
+  width: 100% !important;
+  height: 100% !important;
+  top: 0 !important;
+  transform: none !important;
+}
+#player.ws-container .ws-player-main > .ws-player-content {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  overflow: initial !important;
+}
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element {
+  position: relative !important;
+  left: initial !important;
+  top: initial !important;
+  bottom: initial !important;
+  right: initial !important;
+}
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-player-elem-content,
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-player-elem-content img {
+  position: relative !important;
+}
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element svg,
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-ball,
+#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-maximize {
+  display: none !important;
+}
