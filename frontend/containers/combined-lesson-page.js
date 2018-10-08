@@ -2,6 +2,7 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
+import MetaTags from 'react-meta-tags';
 
 import Menu from '../components/combined-lesson-page/menu'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
@@ -368,14 +369,60 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _getShareUrl() {
-        let _href = window.location.href,
-            _search = window.location.search;
+        return window.location.protocol + window.location.host + window.location.pathname;
+    }
 
-        if ((_search !== '') && _href.endsWith(_search)) {
-            _href = _href.slice(0, _href.length - _search.length);
+    _getMetaTags() {
+        let {lesson} = this.props,
+            _url = this._getShareUrl(),
+            _domain = window.location.protocol + window.location.host,
+            _imagePath = _domain + '/data/';
+
+        let _getWidth = (meta) => {
+            let _data = JSON.parse(meta);
+
+            return _data ? _data.size.width : 0
         }
 
-        return _href;
+        let _getHeight = (meta) => {
+            let _data = JSON.parse(meta);
+
+            return _data ? _data.size.height : 0
+        }
+
+        return lesson
+            ?
+            <MetaTags>
+                <meta name="description" content={lesson.PageMeta.Post}/>
+                <link rel="canonical" href={_url}/>
+                <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
+                <meta property="og:locale" content="ru_RU"/>
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content={lesson.PageMeta.Name}/>
+                <meta property="og:description" content={lesson.PageMeta.Description}/>
+                <meta property="og:url" content={_url}/>
+                <meta property="og:site_name" content="Магистерия"/>
+                <meta property="article:publisher" content="https://www.facebook.com/Magisteria.ru/"/>
+                <meta property="article:section" content={lesson.Name}/>
+                <meta property="article:published_time" content={lesson.ReadyDate}/>
+                <meta property="article:modified_time" content={lesson.ReadyDate}/>
+                <meta property="og:updated_time" content={lesson.ReadyDate}/>
+                <meta property="fb:app_id" content="???"/>
+                <meta property="og:image" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
+                <meta property="og:image:secure_url" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
+                <meta property="og:image:width" content={_getWidth(lesson.PageMeta.Images.og.MetaData)}/>
+                <meta property="og:image:height" content={_getHeight(lesson.PageMeta.Images.og.MetaData)}/>
+                <meta name="twitter:card" content="summary_large_image"/>
+                <meta name="twitter:description" content={lesson.PageMeta.Description}/>
+                <meta name="twitter:title" content={lesson.PageMeta.Name}/>
+                <meta name="twitter:site" content="@MagisteriaRu"/>
+                <meta name="twitter:image" content={_imagePath + lesson.PageMeta.Images.tw.FileName}/>
+                <meta name="twitter:creator" content="@MagisteriaRu"/>
+                <meta name="apple-mobile-web-app-title" content="Magisteria"/>
+                <meta name="application-name" content="Magisteria"/>
+            </MetaTags>
+            :
+            null
     }
 
     render() {
@@ -400,6 +447,7 @@ class TranscriptLessonPage extends React.Component {
                 <p>Загрузка...</p>
                 :
                 [
+                    this._getMetaTags(),
                     <Menu lesson={_lesson}
                           isNeedHideRefs={_isNeedHideRefs}
                           episodes={lessonText.episodes}
