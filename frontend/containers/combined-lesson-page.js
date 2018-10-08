@@ -162,6 +162,7 @@ class TranscriptLessonPage extends React.Component {
     componentWillUnmount() {
         this._removeEventListeners();
         this.props.lessonActions.clearLesson();
+        this._removeMetaTags();
     }
 
     componentDidUpdate(prevProps) {
@@ -304,33 +305,6 @@ class TranscriptLessonPage extends React.Component {
         return lesson.URL === lessonUrl
     }
 
-    _getAudios(lesson) {
-        let {lessons} = this.props,
-            _lessonAudios = null;
-
-        lessons.object.some((item) => {
-            let _founded = item.Id === lesson.Id
-
-            if (!_founded) {
-                if (item.Childs && (item.Childs.length > 0)) {
-                    return item.Childs.some((subItem) => {
-                        if (subItem.Id === lesson.Id) {
-                            _lessonAudios = subItem;
-                        }
-                        return subItem.Id === lesson.Id
-                    })
-                } else {
-                    return false
-                }
-            } else {
-                _lessonAudios = item;
-                return true
-            }
-        })
-
-        return _lessonAudios ? _lessonAudios.Audios : null;
-    }
-
     _createBundle(lesson) {
         let {lessonText, lessonUrl, playingLesson, isMobileApp,} = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
@@ -338,7 +312,6 @@ class TranscriptLessonPage extends React.Component {
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
             _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
 
-        // let _audios = this._getAudios(lesson);
         let _audios = lesson.Audios;
 
         return (isMobileApp) ?
@@ -423,6 +396,34 @@ class TranscriptLessonPage extends React.Component {
             </MetaTags>
             :
             null
+    }
+
+    _removeMetaTags() {
+        $('meta[name="description"]').remove();
+        $('meta[property="og:locale"]').remove();
+        $('meta[property="og:type"]').remove();
+        $('meta[property="og:title"]').remove();
+        $('meta[property="og:description"]').remove();
+        $('meta[property="og:url"]').remove();
+        $('meta[property="og:site_name"]').remove();
+        $('meta[property="article:publisher"]').remove();
+        $('meta[property="article:section"]').remove();
+        $('meta[property="article:published_time"]').remove();
+        $('meta[property="article:modified_time"]').remove();
+        $('meta[property="og:updated_time"]').remove();
+        $('meta[property="fb:app_id"]').remove();
+        $('meta[property="og:image"]').remove();
+        $('meta[property="og:image:secure_url"]').remove();
+        $('meta[property="og:image:width"]').remove();
+        $('meta[property="og:image:height"]').remove();
+        $('meta[name="twitter:card"]').remove();
+        $('meta[name="twitter:description"]').remove();
+        $('meta[name="twitter:title"]').remove();
+        $('meta[name="twitter:site"]').remove();
+        $('meta[name="twitter:image"]').remove();
+        $('meta[name="twitter:creator"]').remove();
+        $('meta[name="apple-mobile-web-app-title"]').remove();
+        $('meta[name="application-name"]').remove();
     }
 
     render() {
