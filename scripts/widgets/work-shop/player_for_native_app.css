@@ -15,22 +15,22 @@
   display: flex !important;
   flex-direction: column !important;
   justify-content: center !important;
-  align-items: center !important;
+  align-items: stretch !important;
   overflow: initial !important;
 }
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element {
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element {
   position: relative !important;
   left: initial !important;
   top: initial !important;
   bottom: initial !important;
   right: initial !important;
 }
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-player-elem-content,
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-player-elem-content img {
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element .ws-player-elem-content,
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element .ws-player-elem-content img {
   position: relative !important;
 }
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element svg,
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-ball,
-#player.ws-container .ws-player-main > ws-player-content > .ws-player-element .ws-maximize {
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element svg,
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element .ws-ball,
+#player.ws-container .ws-player-main > .ws-player-content > .ws-player-element .ws-maximize {
   display: none !important;
 }
