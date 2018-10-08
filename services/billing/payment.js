@@ -341,7 +341,7 @@ exports.Payment = class Payment extends DbObject {
                         }
                         if (duration) {
                             let now = new Date();
-                            let current = user.SubsExpDate ? user.SubsExpDate : now;
+                            let current = user.SubsExpDate ? user.SubsExpDate : new Date(now);
                             let sign = isRefund ? -1 : 1;
                             switch (duration.units) {
                                 case "d":

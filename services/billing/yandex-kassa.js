@@ -26,7 +26,18 @@ class YandexKassa extends Payment {
             if (config.has("billing.yandexKassa.callBack"))
                 opts.app.post(config.billing.yandexKassa.callBack, (req, res, next) => {
                     console.log(`### YandexKassa Callback: method: "${req.method}", data: ${JSON.stringify(req.body, null, 2)}`);
-                    res.send({ result: "OK" });
+                    if (req.body && req.body.object)
+                        this.checkAndChangeState(req.body.object.id,
+                            { CheckueStateId: Accounting.ChequeState.Pending })
+                            .then(data => {
+                                console.log(`### YandexKassa Callback: method result: ${JSON.stringify(data, null, 2)}`);
+                                res.send(data);
+                            })
+                            .catch(err => {
+                                next(err);
+                            })
+                    else
+                        res.send({});
                 });
             opts.app.get("/api/adm/yandex-kassa/payments/:paymentId/capture", (req, res, next) => {
                 this.checkAndChangeState(req.params.paymentId,
