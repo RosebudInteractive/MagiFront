@@ -17125,6 +17125,10 @@ ul.lectures-tab {
   -ms-flex-align: start;
   align-items: flex-start;
   background-color: #fff; }
+  .section-nav-list.scroll {
+    height: calc(100vh - 53px);
+    overflow-y: scroll;
+  }
   ._dark .section-nav-list {
     background-color: #2f2f2f; }
   .lesson-wrapper.desktop ._dark .section-nav-list {
@@ -17222,6 +17226,10 @@ ul.lectures-tab {
   .resizing .section-nav-sublist {
       -webkit-transition: none;
       transition: none;
+  }
+  .section-nav__list.scroll{
+    height: calc(100vh - 53px);
+    overflow-y: scroll;
   }
   .section-nav__list.single{
     width: 100%;

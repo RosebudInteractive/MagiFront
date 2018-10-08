@@ -12,6 +12,7 @@ const _prodConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
+        'player-app': './scripts/player-app',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
@@ -104,6 +105,7 @@ const _devConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
+        'player-app': './scripts/player-app',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
