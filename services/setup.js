@@ -124,6 +124,22 @@ function setupAPI(express, app) {
     setupLanguages(app);
     setupLessons(app);
 
+    //
+    // Common API options
+    //
+    app.get('/api/options', function (req, res, next) {
+        Promise.resolve()
+            .then(() => {
+                let options = { appId: {} };
+                if (config.has('snets.facebook.appId'))
+                    options.appId.fb = config.snets.facebook.appId;
+                res.send(options);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api', function (req, res) {
         res.send('API is running');
     });
