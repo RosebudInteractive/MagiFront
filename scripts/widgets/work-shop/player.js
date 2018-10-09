@@ -76,7 +76,6 @@ export default class CWSPlayer extends CWSBase {
         for (let i = 0; i < this._elements.array.length; i++) {
             let el = this._elements.array[i];
             el.initContainer(cont);
-            el.setEventsHandler({onPlay: this._options.onElementPlay, onStop: this._options.onElementStop})
             if (el.Id in this._audioState.playingNow)
                 el.renderPosition(this._audioState.globalTime);
             else
@@ -993,7 +992,7 @@ export default class CWSPlayer extends CWSBase {
                         let elOptions = this._getElementOptions(elData);
                         let ElConstructor = this._getElementConstructor(elData);
                         elem = new ElConstructor(cont, elOptions);
-
+                        elem.setEventsHandler({onPlay: this._options.onElementPlay, onStop: this._options.onElementStop})
                         this._elements.trackElIdx[elData.trackElement] = elem;
                         this._elements.array.push(elem);
                     }
