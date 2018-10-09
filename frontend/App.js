@@ -102,6 +102,8 @@ class App extends Component {
             this.props.userActions.whoAmI()
             // this.props.getUserBookmarks()
         }
+
+        this.props.appActions.getAppOptions()
     }
 
     componentDidMount() {

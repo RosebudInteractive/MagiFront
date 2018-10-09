@@ -53,7 +53,6 @@ export const pages = {
     profile: {name: 'profile', url: '/profile/'},
 }
 
-
 export const ImageSize = {
     icon: 'icon',
     small: 's',
@@ -98,3 +97,19 @@ export const widthLessThan900 = () => {
 }
 
 export const fadeTimeout = 5000;
+
+export const getDomain = () => {
+    return window.location.protocol + '//' + window.location.host
+}
+
+export const getDomainImagesPath = () => {
+    return getDomain() + '/data/';
+}
+
+export const getPageUrl = () => {
+    return getDomain() + window.location.pathname;
+}
+
+
+
+

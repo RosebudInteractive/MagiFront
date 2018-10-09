@@ -14,6 +14,9 @@ import {
     HIDE_SIZE_INFO,
     OPEN_GALLERY,
     CLOSE_GALLERY,
+    GET_APP_OPTIONS_REQUEST,
+    GET_APP_OPTIONS_SUCCESS,
+    GET_APP_OPTIONS_FAIL,
 } from '../constants/app'
 
 export const switchSizeTo = (size) => {
@@ -124,3 +127,43 @@ export const closeGallery = () => {
         payload: null
     }
 };
+
+export const getAppOptions = () => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_APP_OPTIONS_REQUEST,
+            payload: null
+        });
+
+        fetch("/api/options", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: GET_APP_OPTIONS_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_APP_OPTIONS_FAIL,
+                    payload: err
+                });
+            });
+    }
+};
+
+const checkStatus = (response) => {
+    if (response.status >= 200 && response.status < 300) {
+        return response
+    } else {
+        let error = new Error(response.statusText);
+        error.response = response;
+        throw error
+    }
+};
+
+const parseJSON = (response) => {
+    return response.json()
+};
+

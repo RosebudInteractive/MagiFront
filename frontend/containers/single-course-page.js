@@ -1,6 +1,7 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import MetaTags from 'react-meta-tags';
 
 import Cover from '../components/course-extended/cover-extended';
 import Content from '../components/course-extended/content-extended';
@@ -12,13 +13,14 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import * as userActions from "../actions/user-actions";
 
+import $ from 'jquery'
+
+import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
 import {
     addCourseToBookmarks,
     userBookmarksSelector,
     removeCourseFromBookmarks
 } from "../ducks/profile";
-
-import {pages} from '../tools/page-tools';
 
 class Main extends React.Component {
     constructor(props) {
@@ -36,6 +38,10 @@ class Main extends React.Component {
         if (this.props.course) {
             document.title = 'Курс: ' + this.props.course.Name + ' - Магистерия'
         }
+    }
+
+    componentWillUnmount() {
+        this._removeMetaTags();
     }
 
     _favoritesClick() {
@@ -56,16 +62,60 @@ class Main extends React.Component {
         })
     }
 
-    // _getShareUrl() {
-    //     let _href = window.location.href,
-    //         _search = window.location.search;
-    //
-    //     if ((_search !== '') && _href.endsWith(_search)) {
-    //         _href = _href.slice(0, _href.length - _search.length);
-    //     }
-    //
-    //     return _href;
-    // }
+    _getMetaTags() {
+        let {course, facebookAppID} = this.props,
+            _url = getPageUrl(),
+            _domain = getDomain(),
+            _title = course ? (course.Name + ' - Магистерия') : '';
+
+        return course
+            ?
+            <MetaTags>
+                <meta name="description" content={course.Description}/>
+                <link rel="canonical" href={_url}/>
+                <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
+                <meta property="og:locale" content="ru_RU"/>
+                <meta property="og:type" content="object"/>
+                <meta property="og:title" content={_title}/>
+                <meta property="og:description" content={course.Description}/>
+                <meta property="og:url" content={_url}/>
+                <meta property="og:site_name" content="Магистерия"/>
+                <meta property="fb:app_id" content={facebookAppID}/>
+                <meta property="og:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta property="og:image:secure_url" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta name="twitter:card" content="summary_large_image"/>
+                <meta name="twitter:description" content={course.Description}/>
+                <meta name="twitter:title" content={_title}/>
+                <meta name="twitter:site" content="@MagisteriaRu"/>
+                <meta name="twitter:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta name="apple-mobile-web-app-title" content="Magisteria"/>
+                <meta name="application-name" content="Magisteria"/>
+            </MetaTags>
+            :
+            null
+    }
+
+    _removeMetaTags() {
+        $('meta[name="description"]').remove();
+        $('link[rel="canonical"]').remove();
+        $('link[rel="publisher"]').remove();
+        $('meta[property="og:locale"]').remove();
+        $('meta[property="og:type"]').remove();
+        $('meta[property="og:title"]').remove();
+        $('meta[property="og:description"]').remove();
+        $('meta[property="og:url"]').remove();
+        $('meta[property="og:site_name"]').remove();
+        $('meta[property="fb:app_id"]').remove();
+        $('meta[property="og:image"]').remove();
+        $('meta[property="og:image:secure_url"]').remove();
+        $('meta[name="twitter:card"]').remove();
+        $('meta[name="twitter:description"]').remove();
+        $('meta[name="twitter:title"]').remove();
+        $('meta[name="twitter:site"]').remove();
+        $('meta[name="twitter:image"]').remove();
+        $('meta[name="apple-mobile-web-app-title"]').remove();
+        $('meta[name="application-name"]').remove();
+    }
 
     render() {
         let {
@@ -81,20 +131,24 @@ class Main extends React.Component {
                         <p>Загрузка...</p>
                         :
                         course ?
-                            <div className="courses">
-                                <CourseModuleExt
-                                    title={course.Name}
-                                    isFavorite={this._isCourseInBookmarks()}
-                                    onFavoritesClick={::this._favoritesClick}
-                                    shareUrl={window.location.href}
-                                    counter={course.ShareCounters}
-                                />
-                                <CourseTabs
-                                    lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
-                                    books={{total: course.Books.length}}
-                                    courseUrl={courseUrl}
-                                />
-                            </div> : null
+                            [
+                                this._getMetaTags(),
+                                <div className="courses">
+                                    <CourseModuleExt
+                                        title={course.Name}
+                                        isFavorite={this._isCourseInBookmarks()}
+                                        onFavoritesClick={::this._favoritesClick}
+                                        shareUrl={window.location.href}
+                                        counter={course.ShareCounters}
+                                    />
+                                    <CourseTabs
+                                        lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
+                                        books={{total: course.Books.length}}
+                                        courseUrl={courseUrl}
+                                    />
+                                </div>
+                            ]
+                             : null
                 }
             </div>
         )
@@ -240,6 +294,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleCourse.object,
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
+        facebookAppID: state.app.facebookAppID,
     }
 }
 

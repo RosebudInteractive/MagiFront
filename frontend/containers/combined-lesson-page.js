@@ -346,7 +346,7 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _getMetaTags() {
-        let {lesson} = this.props,
+        let {lesson, facebookAppID} = this.props,
             _url = this._getShareUrl(),
             _domain = window.location.protocol + '//' + window.location.host,
             _imagePath = _domain + '/data/';
@@ -380,7 +380,7 @@ class TranscriptLessonPage extends React.Component {
                 <meta property="article:published_time" content={lesson.ReadyDate}/>
                 <meta property="article:modified_time" content={lesson.ReadyDate}/>
                 <meta property="og:updated_time" content={lesson.ReadyDate}/>
-                <meta property="fb:app_id" content="???"/>
+                <meta property="fb:app_id" content={facebookAppID}/>
                 <meta property="og:image" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
                 <meta property="og:image:secure_url" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
                 <meta property="og:image:width" content={_getWidth(lesson.PageMeta.Images.og.MetaData)}/>
@@ -400,6 +400,8 @@ class TranscriptLessonPage extends React.Component {
 
     _removeMetaTags() {
         $('meta[name="description"]').remove();
+        $('link[rel="canonical"]').remove();
+        $('link[rel="publisher"]').remove();
         $('meta[property="og:locale"]').remove();
         $('meta[property="og:type"]').remove();
         $('meta[property="og:title"]').remove();
@@ -538,6 +540,8 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.lessonPlayInfo.playInfo,
         playingLesson: state.player.playingLesson,
         galleryIsOpen: state.app.galleryIsOpen,
+
+        facebookAppID: state.app.facebookAppID,
     }
 }
 
