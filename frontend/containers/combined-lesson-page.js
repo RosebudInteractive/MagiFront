@@ -342,13 +342,13 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _getShareUrl() {
-        return window.location.protocol + window.location.host + window.location.pathname;
+        return window.location.protocol + '//' + window.location.host + window.location.pathname;
     }
 
     _getMetaTags() {
         let {lesson} = this.props,
             _url = this._getShareUrl(),
-            _domain = window.location.protocol + window.location.host,
+            _domain = window.location.protocol + '//' + window.location.host,
             _imagePath = _domain + '/data/';
 
         let _getWidth = (meta) => {
