@@ -26,15 +26,16 @@ class YandexKassa extends Payment {
             if (config.has("billing.yandexKassa.callBack"))
                 opts.app.post(config.billing.yandexKassa.callBack, (req, res, next) => {
                     console.log(`### YandexKassa Callback: method: "${req.method}", data: ${JSON.stringify(req.body, null, 2)}`);
-                    if (req.body && req.body.object)
-                        this.checkAndChangeState(req.body.object.id,
+                    if (req.body && req.body.object && req.body.object.metadata && req.body.object.metadata.ChequeId)
+                        this.checkAndChangeState(parseInt(req.body.object.metadata.ChequeId),
                             { CheckueStateId: Accounting.ChequeState.Pending })
                             .then(data => {
                                 console.log(`### YandexKassa Callback: method result: ${JSON.stringify(data, null, 2)}`);
                                 res.send(data);
                             })
                             .catch(err => {
-                                next(err);
+                                console.error(`### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
+                                res.send({});
                             })
                     else
                         res.send({});
@@ -242,7 +243,7 @@ class YandexKassa extends Payment {
                         cheque.chequeDate = new Date(ms);
                     }
                     if (result.payment_method && result.payment_method.saved)
-                        cheque.isSaved = true;
+                        cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -267,7 +268,7 @@ class YandexKassa extends Payment {
                         cheque.chequeDate = new Date(ms);
                     }
                     if (result.payment_method && result.payment_method.saved)
-                        cheque.isSaved = true;
+                        cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -292,7 +293,7 @@ class YandexKassa extends Payment {
                         cheque.chequeDate = new Date(ms);
                     }
                     if (result.payment_method && result.payment_method.saved)
-                        cheque.isSaved = true;
+                        cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
@@ -342,7 +343,7 @@ class YandexKassa extends Payment {
                     if (result.confirmation && result.confirmation.confirmation_url)
                         rc.confirmationUrl = result.confirmation.confirmation_url;
                     if (result.payment_method && result.payment_method.saved)
-                        cheque.isSaved = true;
+                        cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
                     return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
