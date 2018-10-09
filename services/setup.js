@@ -40,12 +40,14 @@ const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
 function errorHandler(err, req, res, next) {
     let error = err.message ? err.message : err.toString();
+    let errStr = error;
     let statusCode = HttpCode.ERR_INTERNAL;
     if (err.statusCode && err.error) {
         statusCode = err.statusCode;
         error = err.error;
+        errStr = JSON.stringify(err.error);
     }
-    console.error(`setup::errorHandler ==> ${error}`);
+    console.error(`setup::errorHandler ==> ${errStr}`);
     res.status(statusCode).json({ error: error });
 }
 
