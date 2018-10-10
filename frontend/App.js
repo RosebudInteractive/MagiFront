@@ -13,6 +13,7 @@ import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
 import BookmarksPage from './containers/bookmark-page'
+import ProjectPage from './containers/project-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
@@ -201,7 +202,7 @@ class App extends Component {
                     <TranscriptPage {...props} height={this.height}/>
                 )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
-
+                <Route path={_homePath + 'about'} component={ProjectPage}/>
             </Switch>
         )
     }
