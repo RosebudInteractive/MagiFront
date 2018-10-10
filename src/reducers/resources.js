@@ -5,6 +5,8 @@ import {
     MULTI_UPLOAD_RESOURCES_START,
     MULTI_UPLOAD_RESOURCES_CANCEL,
     MULTI_UPLOAD_RESOURCES_FINISH,
+    SELECT_SN_IMAGE_START,
+    SELECT_SN_IMAGE_FINISH,
 } from '../constants/lesson/lessonResources';
 
 import {
@@ -17,6 +19,7 @@ const initialState = {
     hasChanges: false,
     showEditor: false,
     showMultiUploadEditor: false,
+    showSnImageSelectDialogEditor: false,
     internalId: -1,
     editMode: EDIT_MODE_INSERT,
 };
@@ -57,6 +60,20 @@ export default function resources(state = initialState, action) {
             return {
                 ...state,
                 showMultiUploadEditor: false,
+            };
+        }
+
+        case SELECT_SN_IMAGE_START:{
+            return {
+                ...state,
+                showSnImageSelectDialogEditor: true,
+            };
+        }
+
+        case SELECT_SN_IMAGE_FINISH :{
+            return {
+                ...state,
+                showSnImageSelectDialogEditor: false,
             };
         }
 

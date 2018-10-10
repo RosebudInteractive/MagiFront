@@ -4,7 +4,7 @@ import {
     CLEAR_RESOURCE,
     MULTI_UPLOAD_RESOURCES_START,
     MULTI_UPLOAD_RESOURCES_CANCEL,
-    MULTI_UPLOAD_RESOURCES_FINISH,
+    MULTI_UPLOAD_RESOURCES_FINISH, SELECT_SN_IMAGE_START, SELECT_SN_IMAGE_FINISH,
 } from '../constants/lesson/lessonResources';
 
 export const create = () => {
@@ -35,7 +35,19 @@ export const finishUpload = () => {
     }
 };
 
+export const selectSnImageStart = () => {
+    return {
+        type: SELECT_SN_IMAGE_START,
+        payload: null
+    }
+}
 
+export const selectSnImageFinish = () => {
+    return {
+        type: SELECT_SN_IMAGE_FINISH,
+        payload: null
+    }
+}
 
 export const edit = (value) => {
     return (dispatch) => {
