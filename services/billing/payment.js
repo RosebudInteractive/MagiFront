@@ -23,6 +23,30 @@ const CHEQUE_REQ_TREE = {
     }
 };
 
+const GET_CHEQUE_MSSQL =
+    "select c.[Id], c.[UserId], c.[ParentId], c.[ChequeTypeId], ct.[Name] as [TypeName], c.[StateId], cs.[Name] as [StateName], c.[CurrencyId], c.[InvoiceId],\n" +
+    "  c.[ReceiptStateId], rs.[Name] as [RcpName], c.[Name], c.[ChequeNum], c.[ChequeDate], c.[ChequeData], c.[IsSaved], c.[Sum], c.[RefundSum],\n" +
+    "  cl.[Id] as [LogId], cl.[ResultCode], cl.[Operation], cl.[Request], cl.[Response], cl.[TimeCr]\n" +
+    "from[Cheque] c\n" +
+    "  left join[ChequeLog] cl on cl.[ChequeId] = c.[Id]\n" +
+    "  join[ChequeState] cs on cs.[Id] = c.[StateId]\n" +
+    "  join[ChequeType] ct on ct.[Id] = c.[ChequeTypeId]\n" +
+    "  left join[ReceiptState] rs on rs.[Id] = c.[ReceiptStateId]\n" +
+    "where c.[<%= field %>] = <%= value %>\n" +
+    "order by c.[Id], cl.[Id]";
+
+const GET_CHEQUE_MYSQL =
+    "select c.`Id`, c.`UserId`, c.`ParentId`, c.`ChequeTypeId`, ct.`Name` as `TypeName`, c.`StateId`, cs.`Name` as `StateName`, c.`CurrencyId`, c.`InvoiceId`,\n" +
+    "  c.`ReceiptStateId`, rs.`Name` as `RcpName`, c.`Name`, c.`ChequeNum`, c.`ChequeDate`, c.`ChequeData`, c.`IsSaved`, c.`Sum`, c.`RefundSum`,\n" +
+    "  cl.`Id` as `LogId`, cl.`ResultCode`, cl.`Operation`, cl.`Request`, cl.`Response`, cl.`TimeCr`\n" +
+    "from`Cheque` c\n" +
+    "  left join`ChequeLog` cl on cl.`ChequeId` = c.`Id`\n" +
+    "  join`ChequeState` cs on cs.`Id` = c.`StateId`\n" +
+    "  join`ChequeType` ct on ct.`Id` = c.`ChequeTypeId`\n" +
+    "  left join`ReceiptState` rs on rs.`Id` = c.`ReceiptStateId`\n" +
+    "where c.`<%= field %>` = <%= value %>\n" +
+    "order by c.`Id`, cl.`Id`";
+
 const DRAFT_CHEQUE_ID = "00000000-0000-0000-0000-000000000000";
 const GUID_REG_EXP = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
@@ -94,27 +118,117 @@ exports.Payment = class Payment extends DbObject {
             });  
     }
 
-    _getChequeByIdOrCode(id, dbOpts) {
-        let rc;
-        let searchField = "Id";
-        if (typeof (id) === "string") {
-            if (id.match(GUID_REG_EXP)) {
-                searchField = "ChequeNum";
-                rc = this._getObjects(CHEQUE_REQ_TREE, { field: searchField, op: "=", value: id }, dbOpts)
+    _getChequeByIdOrCode(id, strFieldFunc, numFieldFunc, dbOpts) {
+        return new Promise(resolve => {
+            let rc;
+            if (typeof (id) === "string") {
+                if (id.match(GUID_REG_EXP)) {
+                    rc = strFieldFunc(id, dbOpts)
+                }
+                else {
+                    let n = parseInt(id);
+                    if (isNaN(n))
+                        throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
+                    rc = numFieldFunc(n, dbOpts);
+                }
             }
-            else {
-                let n = parseInt(id);
-                if (isNaN(n))
-                    throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
-                rc = this._getObjById(n, null, dbOpts);
-            }
-        }
-        else
-            if (typeof (id) === "number")
-                rc = this._getObjById(id, null, dbOpts)
             else
-                throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
-        return rc;
+                if ((typeof (id) === "number") && (!isNaN(n)))
+                    rc = numFieldFunc(id, dbOpts)
+                else
+                    throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
+            resolve(rc);
+        });
+    }
+
+    _getCheque(id, dbOpts) {
+        return this._getChequeByIdOrCode(id,
+            (id, dbOpts) => {
+                return this._getObjects(CHEQUE_REQ_TREE, { field: "ChequeNum", op: "=", value: id }, dbOpts);
+            },
+            (id, dbOpts) => {
+                return this._getObjById(id, null, dbOpts);
+            }, dbOpts);
+    }
+
+    get(id, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+
+        return new Promise(resolve => {
+            let rc = this._getChequeByIdOrCode(id,
+                (id, dbOpts) => {
+                    return $data.execSql({
+                        dialect: {
+                            mysql: _.template(GET_CHEQUE_MYSQL)({ field: "ChequeNum", value: `'${id}'` }),
+                            mssql: _.template(GET_CHEQUE_MSSQL)({ field: "ChequeNum", value: `'${id}'` })
+                        }
+                    }, dbOpts);
+                },
+                (id, dbOpts) => {
+                    return $data.execSql({
+                        dialect: {
+                            mysql: _.template(GET_CHEQUE_MYSQL)({ field: "Id", value: id }),
+                            mssql: _.template(GET_CHEQUE_MSSQL)({ field: "Id", value: id })
+                        }
+                    }, dbOpts);
+                }, dbOpts);
+
+            resolve(rc);
+        })
+            .then(result => {
+                let data = [];
+                if (result && result.detail && (result.detail.length > 0)) {
+                    let currObj = { Id: 0 };
+                    result.detail.forEach(elem => {
+                        if (currObj.Id !== elem.Id) {
+                            currObj = { Id: elem.Id };
+                            data.push(currObj);
+                            currObj.UserId = elem.UserId;
+                            currObj.ParentId = elem.ParentId;
+                            currObj.ChequeTypeId = elem.ChequeTypeId;
+                            currObj.TypeName = elem.TypeName;
+                            currObj.StateId = elem.StateId;
+                            currObj.StateName = elem.StateName;
+                            currObj.CurrencyId = elem.CurrencyId;
+                            currObj.InvoiceId = elem.InvoiceId;
+                            currObj.ReceiptStateId = elem.ReceiptStateId;
+                            currObj.RcpName = elem.RcpName;
+                            currObj.Name = elem.Name;
+                            currObj.ChequeNum = elem.ChequeNum;
+                            currObj.ChequeDate = elem.ChequeDate;
+                            currObj.IsSaved = elem.IsSaved ? true : false;
+                            currObj.Sum = elem.Sum;
+                            currObj.RefundSum = elem.RefundSum;
+                            currObj.ChequeData = elem.ChequeData;
+                            if (currObj.ChequeData)
+                                try {
+                                    currObj.ChequeData = JSON.parse(elem.ChequeData);
+                                } catch (err) {
+                                    currObj.ChequeData = { error: err.toString(), data: elem.ChequeData };
+                                };
+                            currObj.Log = [];
+                        }
+                        let logElem = {};
+                        logElem.Id = elem.LogId;
+                        logElem.TimeCr = elem.TimeCr;
+                        logElem.ResultCode = elem.ResultCode;
+                        logElem.Operation = elem.Operation;
+                        try {
+                            logElem.Request = JSON.parse(elem.Request);
+                        } catch (err) {
+                            logElem.Request = { error: err.toString(), data: elem.Request };
+                        }
+                        try {
+                            logElem.Response = JSON.parse(elem.Response);
+                        } catch (err) {
+                            logElem.Response = { error: err.toString(), data: elem.Response };
+                        }
+                        currObj.Log.push(logElem);
+                    });
+                }
+                return { data: data };
+            });
     }
 
     cancel(id, data, options) {
@@ -128,7 +242,7 @@ exports.Payment = class Payment extends DbObject {
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
-                resolve(this._getChequeByIdOrCode(id, dbOpts));
+                resolve(this._getCheque(id, dbOpts));
             })
                 .then(result => {
                     root_obj = result;
@@ -175,7 +289,7 @@ exports.Payment = class Payment extends DbObject {
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
-                resolve(this._getChequeByIdOrCode(id, dbOpts));
+                resolve(this._getCheque(id, dbOpts));
             })
                 .then(result => {
                     root_obj = result;
@@ -190,7 +304,7 @@ exports.Payment = class Payment extends DbObject {
                         let rc;
                         if (isRefund) {
                             if (chequeObj.parentId())
-                                rc = this._getChequeByIdOrCode(chequeObj.parentId(), dbOpts)
+                                rc = this._getCheque(chequeObj.parentId(), dbOpts)
                                     .then(result => {
                                         let parent_root = result;
                                         memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper
@@ -431,7 +545,7 @@ exports.Payment = class Payment extends DbObject {
                 if (data.Refund) {
                     if (!data.Refund.payment_id)
                         throw new Error(`Missing argument "payment_id" of "Refund" object.`);
-                    rc = this._getChequeByIdOrCode(data.Refund.payment_id, dbOpts)
+                    rc = this._getCheque(data.Refund.payment_id, dbOpts)
                         .then(result => {
                             parent_root = result;
                             memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper

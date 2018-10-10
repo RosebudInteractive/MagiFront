@@ -31,6 +31,20 @@ exports.SetupRoute = (app) => {
                 res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });
         });
 
+        app.get('/api/payments/:id', (req, res, next) => {
+            if (req.user) {
+                paymentObject.get(req.params.id, { debug: config.billing.debug ? true : false })
+                    .then(result => {
+                        res.send(result);
+                    })
+                    .catch(err => {
+                        next(err);
+                    });
+            }
+            else
+                res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });;
+        });
+
         app.post('/api/payments', (req, res, next) => {
             if (req.user) {
                 paymentObject.insert(req.body, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
