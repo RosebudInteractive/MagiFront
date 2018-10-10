@@ -61,11 +61,11 @@ export default function singleLesson(state = initialState, action) {
 
             if (_lesson && _lesson.Images) {
                 _lesson.Images.forEach(image => {
-                    if (image.type === 'og') {
+                    if (image.Type === 'og') {
                         _ogImageId = image.ResourceId;
                     }
 
-                    if (image.type === 'twitter') {
+                    if (image.Type === 'twitter') {
                         _twitterId = image.ResourceId;
                     }
                 })
@@ -76,7 +76,7 @@ export default function singleLesson(state = initialState, action) {
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
                 ogImageId: _ogImageId,
-                twitterId: _twitterId,
+                twitterImageId: _twitterId,
                 fetching: false,
                 hasChanges: false,
             };
@@ -117,11 +117,11 @@ export default function singleLesson(state = initialState, action) {
 
             if (_lesson && _lesson.Images) {
                 _lesson.Images.forEach(image => {
-                    if (image.type === 'og') {
+                    if (image.Type === 'og') {
                         _ogImageId = image.ResourceId;
                     }
 
-                    if (image.type === 'twitter') {
+                    if (image.Type === 'twitter') {
                         _twitterId = image.ResourceId;
                     }
                 })
@@ -133,7 +133,7 @@ export default function singleLesson(state = initialState, action) {
                 current: Object.assign({}, state.initial),
                 fetching: false,
                 ogImageId: _ogImageId,
-                twitterId: _twitterId,
+                twitterImageId: _twitterId,
                 hasChanges: false,
             };
         }

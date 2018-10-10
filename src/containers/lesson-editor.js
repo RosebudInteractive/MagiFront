@@ -141,30 +141,6 @@ export class LessonEditor extends ObjectEditor {
 
         this.cover = lesson ? lesson.Cover : null;
         this.coverMeta = lesson ? lesson.CoverMeta : null;
-
-        if (ogImageId) {
-            let _resource = this.props.resources.find((item) => {
-                return item.Id === ogImageId
-            })
-
-            if (_resource) {
-                window.$$('og-image-file').setValue(_resource.Name);
-            } else {
-                this.props.lessonActions.setOgImage(null)
-            }
-        }
-
-        if (twitterImageId) {
-            let _resource = this.props.resources.find((item) => {
-                return item.Id === twitterImageId
-            })
-
-            if (_resource) {
-                window.$$('twitter-image-file').setValue(_resource.Name);
-            } else {
-                this.props.lessonActions.setTwitterImage(null)
-            }
-        }
     }
 
     componentDidUpdate(prevProps) {
@@ -175,7 +151,37 @@ export class LessonEditor extends ObjectEditor {
         if (prevProps.twitterImageId && !this.props.twitterImageId) {
             window.$$('twitter-image-file').setValue('');
         }
+
+        if (this.props.ogImageId) {
+            let _resource = this.props.resources.find((item) => {
+                return item.Id === this.props.ogImageId
+            })
+
+            if (_resource) {
+                window.$$('og-image-file').setValue(_resource.Name);
+            } else {
+                if (this.props.resourcesLoaded) {
+                    this.props.lessonActions.setOgImage(null)
+                }
+            }
+        }
+
+        if (this.props.twitterImageId) {
+            let _resource = this.props.resources.find((item) => {
+                return item.Id === this.props.twitterImageId
+            })
+
+            if (_resource) {
+                window.$$('twitter-image-file').setValue(_resource.Name);
+            } else {
+                if (this.props.resourcesLoaded) {
+                    this.props.lessonActions.setTwitterImage(null)
+                }
+            }
+        }
     }
+
+
 
     _getInitStateOfNewObject(props) {
         return {
@@ -1133,6 +1139,7 @@ function mapStateToProps(state, ownProps) {
         commonRef: state.lessonCommonRefs.current,
         subLessons: state.subLessons.current,
         resources: state.lessonResources.current,
+        resourcesLoaded: state.lessonResources.loaded,
         // parentLesson: state.parentLesson,
 
         selectedMainEpisode: state.lessonMainEpisodes.selected,
