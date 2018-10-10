@@ -27,6 +27,18 @@ const LESSON_REQ_TREE = {
             childs: [
                 {
                     dataObject: {
+                        name: "Resource",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "ResourceLng"
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    dataObject: {
                         name: "LessonLng",
                         childs: [
                             {
@@ -49,18 +61,6 @@ const LESSON_REQ_TREE = {
                 },
                 {
                     dataObject: {
-                        name: "Resource",
-                        childs: [
-                            {
-                                dataObject: {
-                                    name: "ResourceLng"
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    dataObject: {
                         name: "EpisodeLesson"
                     }
                 }
@@ -74,6 +74,18 @@ const LESSON_UPD_TREE = {
         model: {
             name: "Lesson",
             childs: [
+                {
+                    dataObject: {
+                        name: "Resource",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "ResourceLng"
+                                }
+                            }
+                        ]
+                    }
+                },
                 {
                     dataObject: {
                         name: "LessonLng",
@@ -99,18 +111,6 @@ const LESSON_UPD_TREE = {
                 {
                     dataObject: {
                         name: "Lesson"
-                    }
-                },
-                {
-                    dataObject: {
-                        name: "Resource",
-                        childs: [
-                            {
-                                dataObject: {
-                                    name: "ResourceLng"
-                                }
-                            }
-                        ]
                     }
                 },
                 {
@@ -1837,6 +1837,7 @@ const DbLesson = class DbLesson extends DbObject {
             
             let ch_new = [];
             let res_new = [];
+            let newResIds = {};
             let ref_new = [];
             let img_new = [];
             let epi_new = [];
@@ -1976,12 +1977,15 @@ const DbLesson = class DbLesson extends DbObject {
                                         res_list[elem.Id].data = data;
                                     }
                                     else {
+                                        data.Id = elem.Id;
                                         delete elem.Id;
                                         res_new.push(data);
                                     }
                                 }
-                                else
+                                else {
+                                    data.Id = 0;
                                     res_new.push(data);
+                                }
                             })
                         }
 
@@ -2151,14 +2155,6 @@ const DbLesson = class DbLesson extends DbObject {
                                     ref_list[key].obj[self._genGetterName(field)](ref_list[key].data[field]);    
                             }
                         
-                        for (let key in img_list)
-                            if (img_list[key].deleted)
-                                img_collection._del(img_list[key].obj)
-                            else {
-                                for (let field in img_list[key].data)
-                                    img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
-                            }
-
                         for (let key in epi_list)
                             if (epi_list[key].deleted) {
                                 if (epi_list[key].isOwner)
@@ -2183,11 +2179,14 @@ const DbLesson = class DbLesson extends DbObject {
                     .then(() => {
                         if (res_new && (res_new.length > 0)) {
                             return Utils.seqExec(res_new, (elem) => {
+                                let newId = elem.Id;
                                 return root_res.newObject({
                                     fields: elem.res
                                 }, opts)
                                     .then((result) => {
                                         let new_res_obj = this._db.getObj(result.newObject);
+                                        if (newId < 0)
+                                            newResIds[newId] = new_res_obj.id();
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
                                         return root_res_lng.newObject({
                                             fields: elem.lng
@@ -2206,8 +2205,30 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
+                        for (let key in img_list)
+                            if (img_list[key].deleted)
+                                img_collection._del(img_list[key].obj)
+                            else {
+                                let resId = img_list[key].data["ResourceId"];
+                                if ((typeof (resId) === "number") && (resId < 0)) {
+                                    let newResId = newResIds[resId];
+                                    if (!newResId)
+                                        throw new Error(`Images: Invalid "ResourceId": "${resId}", "Type": "${img_list[key].data["Type"]}"`);
+                                    img_list[key].data["ResourceId"] = newResId;
+                                }
+                                for (let field in img_list[key].data)
+                                    img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
+                            }
+
                         if (img_new && (img_new.length > 0)) {
                             return Utils.seqExec(img_new, (elem) => {
+                                let resId = elem["ResourceId"];
+                                if ((typeof (resId) === "number") && (resId < 0)) {
+                                    let newResId = newResIds[resId];
+                                    if (!newResId)
+                                        throw new Error(`Images: Invalid "ResourceId": "${resId}", "Type": "${elem["Type"]}"`);
+                                    elem["ResourceId"] = newResId;
+                                }
                                 return root_img.newObject({
                                     fields: elem
                                 }, opts);
@@ -2335,6 +2356,7 @@ const DbLesson = class DbLesson extends DbObject {
             let transactionId = null;
             let hasParent = (typeof (parent_id) === "number") && (!isNaN(parent_id));
             let languageId;
+            let newResIds = {};
 
             resolve(
                 this._getObjById(course_id, COURSE_REQ_TREE)
@@ -2467,25 +2489,15 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                     })
                     .then(() => {
-                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
-                        if (inpFields.Images && (inpFields.Images.length > 0)) {
-                            return Utils.seqExec(inpFields.Images, (elem) => {
-                                let fields = {};
-                                if (typeof (elem["Type"]) !== "undefined")
-                                    fields["Type"] = elem["Type"];
-                                if (typeof (elem["ResourceId"]) !== "undefined")
-                                    fields["ResourceId"] = elem["ResourceId"];
-                                return root_img.newObject({
-                                    fields: fields
-                                }, opts);
-                            });
-                        }
-                    })
-                    .then(() => {
                         let root_res = new_obj.getDataRoot("Resource");
+                        let newId = 0;
+                        let cnt = 0;
                         if (inpFields.Resources && (inpFields.Resources.length > 0)) {
                             return Utils.seqExec(inpFields.Resources, (elem) => {
                                 let fields = { ResType: "P" };
+                                newId = 0;
+                                if ((typeof (elem["Id"]) === "number") && (elem["Id"] < 0))
+                                    newId = elem["Id"];
                                 if (typeof (elem["ResType"]) !== "undefined")
                                     fields["ResType"] = elem["ResType"];
                                 if (typeof (elem["FileName"]) !== "undefined")
@@ -2501,6 +2513,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 }, opts)
                                     .then((result) => {
                                         let new_res_obj = this._db.getObj(result.newObject);
+                                        if (newId < 0)
+                                            newResIds[newId] = new_res_obj.id();
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
                                         let fields = { Name: "", LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
@@ -2513,6 +2527,28 @@ const DbLesson = class DbLesson extends DbObject {
                                             fields: fields
                                         }, opts);
                                     });
+                            });
+                        }
+                    })
+                    .then(() => {
+                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
+                        if (inpFields.Images && (inpFields.Images.length > 0)) {
+                            return Utils.seqExec(inpFields.Images, (elem) => {
+                                let fields = {};
+                                if (typeof (elem["Type"]) !== "undefined")
+                                    fields["Type"] = elem["Type"];
+                                if (typeof (elem["ResourceId"]) === "number") {
+                                    fields["ResourceId"] = elem["ResourceId"];
+                                    if (elem["ResourceId"] < 0) {
+                                        let newId = newResIds[elem["ResourceId"]];
+                                        if (!newId)
+                                            throw new Error(`Images: Invalid "ResourceId": "${elem["ResourceId"]}", "Type": "${elem["Type"]}"`);
+                                        fields["ResourceId"] = newId;
+                                    }
+                                }
+                                return root_img.newObject({
+                                    fields: fields
+                                }, opts);
                             });
                         }
                     })
