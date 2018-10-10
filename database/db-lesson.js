@@ -1634,10 +1634,7 @@ const DbLesson = class DbLesson extends DbObject {
                     if (root_obj)
                         this._db._deleteRoot(root_obj.getRoot());
                     if (isErr) {
-                        if (res instanceof Error)
-                            throw res
-                        else
-                            throw new Error("Error: " + JSON.stringify(res));
+                        throw res;
                     }
                     return res;
                 });
@@ -1784,10 +1781,7 @@ const DbLesson = class DbLesson extends DbObject {
                             this._db._deleteRoot(course_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -2138,9 +2132,7 @@ const DbLesson = class DbLesson extends DbObject {
                             }
 
                         for (let key in res_list)
-                            if (res_list[key].deleted)
-                                res_collection._del(res_list[key].obj)
-                            else {
+                            if (!res_list[key].deleted) {
                                 for (let field in res_list[key].data.res)
                                     res_list[key].obj[self._genGetterName(field)](res_list[key].data.res[field]);
                                 for (let field in res_list[key].data.lng)
@@ -2255,6 +2247,18 @@ const DbLesson = class DbLesson extends DbObject {
                                     .then((result) => {
                                         if (result && result.detail && (result.detail.length > 0))
                                             isModified = true;
+                                        return lsn_obj.edit()
+                                            .then(() => {
+                                                // Delete Resources after LessonMetaImages !!!
+                                                for (let key in res_list)
+                                                    if (res_list[key].deleted)
+                                                        res_collection._del(res_list[key].obj);
+                                                return lsn_obj.save(opts);
+                                            });
+                                    })
+                                    .then((result) => {
+                                        if (result && result.detail && (result.detail.length > 0))
+                                            isModified = true;
                                         return course_obj.save(opts);
                                     })
                                     .then((result) => {
@@ -2317,10 +2321,7 @@ const DbLesson = class DbLesson extends DbObject {
                             this._db._deleteRoot(lsn_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -2620,10 +2621,7 @@ const DbLesson = class DbLesson extends DbObject {
                             this._db._deleteRoot(course_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
