@@ -94,6 +94,15 @@ window.Utils = Utils;
                 },
                 onAddElement: function () {
                 },
+                onSetData: (data) => {
+                    console.log('onSetData', data)
+                },
+                onElementPlay: () => {
+                    console.log('onElementPlay')
+                },
+                onElementStop: () => {
+                    console.log('onElementStop')
+                },
                 onChangeTitles: function (titles) {
                     var html = "";
                     for (var i = 0; i < titles.length; i++) {

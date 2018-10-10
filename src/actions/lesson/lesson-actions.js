@@ -12,7 +12,7 @@ import {
     GET_LESSON_RESOURCES_FAIL,
 
     SAVE_LESSON_SUCCESS,
-    CLEAR_LESSON,
+    CLEAR_LESSON, SET_OG_IMAGE_RESOURCE_ID, SET_TWITTER_IMAGE_RESOURCE_ID,
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -163,11 +163,23 @@ export const cancelChanges = () => {
 };
 
 export const clear = () => {
-    return (dispatch) => {
-        dispatch({
+    return {
             type: CLEAR_LESSON,
             payload: null
-        });
+    }
+};
+
+export const setOgImage = (resourceId) => {
+    return {
+            type: SET_OG_IMAGE_RESOURCE_ID,
+            payload: resourceId
+    }
+};
+
+export const setTwitterImage = (resourceId) => {
+    return {
+            type: SET_TWITTER_IMAGE_RESOURCE_ID,
+            payload: resourceId
     }
 };
 

@@ -13,6 +13,8 @@ import {
     HIDE_SIZE_INFO,
     OPEN_GALLERY,
     CLOSE_GALLERY,
+    GET_APP_OPTIONS_SUCCESS,
+    GET_APP_OPTIONS_FAIL,
 } from '../constants/app'
 
 import {
@@ -31,6 +33,7 @@ const initialState = {
     showCourseBookmarks: true,
     showSizeInfo: false,
     galleryIsOpen: false,
+    facebookAppID: '',
 };
 
 export default function app(state = initialState, action) {
@@ -110,6 +113,14 @@ export default function app(state = initialState, action) {
 
         case CLOSE_GALLERY: {
             return {...state, galleryIsOpen: false}
+        }
+
+        case GET_APP_OPTIONS_SUCCESS: {
+            return {...state, facebookAppID: action.payload.appId.fb}
+        }
+
+        case GET_APP_OPTIONS_FAIL: {
+            return {...state, facebookAppID: ''}
         }
 
         default:

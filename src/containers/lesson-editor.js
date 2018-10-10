@@ -28,6 +28,7 @@ import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import ResourceForm from "../components/resource-form";
 import MultiResourceForm from "../components/multi-resource-form";
+import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
 
 export class LessonEditor extends ObjectEditor {
@@ -45,6 +46,9 @@ export class LessonEditor extends ObjectEditor {
         }
 
         singleCourseActions.getCourseAuthors(courseId);
+
+        this._needSetOgImage = false;
+        this._needSetTwitterImage = false;
     }
 
     getObject() {
@@ -125,6 +129,8 @@ export class LessonEditor extends ObjectEditor {
         const {
             lesson,
             course,
+            ogImageId,
+            twitterImageId
         } = next;
 
         if (this.editMode === EDIT_MODE_INSERT) {
@@ -135,6 +141,40 @@ export class LessonEditor extends ObjectEditor {
 
         this.cover = lesson ? lesson.Cover : null;
         this.coverMeta = lesson ? lesson.CoverMeta : null;
+
+        if (ogImageId) {
+            let _resource = this.props.resources.find((item) => {
+                return item.Id === ogImageId
+            })
+
+            if (_resource) {
+                window.$$('og-image-file').setValue(_resource.Name);
+            } else {
+                this.props.lessonActions.setOgImage(null)
+            }
+        }
+
+        if (twitterImageId) {
+            let _resource = this.props.resources.find((item) => {
+                return item.Id === twitterImageId
+            })
+
+            if (_resource) {
+                window.$$('twitter-image-file').setValue(_resource.Name);
+            } else {
+                this.props.lessonActions.setTwitterImage(null)
+            }
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.ogImageId && !this.props.ogImageId) {
+            window.$$('og-image-file').setValue('');
+        }
+
+        if (prevProps.twitterImageId && !this.props.twitterImageId) {
+            window.$$('twitter-image-file').setValue('');
+        }
     }
 
     _getInitStateOfNewObject(props) {
@@ -197,7 +237,22 @@ export class LessonEditor extends ObjectEditor {
             References: [],
             Resources: [],
             Childs: (this.props.subLessons.length > 0) ? [] : null,
+            SnName: value.SnName,
+            SnDescription: value.SnDescription,
+            SnPost: value.SnPost,
         };
+
+        if (this.props.ogImageId || this.props.twitterImageId) {
+            _obj.Images = [];
+
+            if (this.props.ogImageId) {
+                _obj.Images.push({Type: 'og', ResourceId: this.props.ogImageId})
+            }
+
+            if (this.props.twitterImageId) {
+                _obj.Images.push({Type: 'twitter', ResourceId: this.props.twitterImageId})
+            }
+        }
 
         this._fillEpisodes(_obj.Episodes);
         this._fillReferences(_obj.References);
@@ -448,6 +503,28 @@ export class LessonEditor extends ObjectEditor {
         this.props.lessonResourcesActions.remove(id);
     }
 
+    _selectSnImage() {
+        this.props.resourcesActions.selectSnImageStart()
+    }
+
+    _cancelSelectSnImage() {
+        this.props.resourcesActions.selectSnImageFinish()
+    }
+
+    _setSnImage(value) {
+        this.props.resourcesActions.selectSnImageFinish()
+
+        if (this._needSetOgImage) {
+            this.props.lessonActions.setOgImage(value.Id);
+            this._needSetOgImage = false
+        }
+
+        if (this._needSetTwitterImage) {
+            this.props.lessonActions.setTwitterImage(value.Id);
+            this._needSetTwitterImage = false;
+        }
+    }
+
     _createResource() {
         this.props.resourcesActions.create()
     }
@@ -469,6 +546,16 @@ export class LessonEditor extends ObjectEditor {
         (resourceEditMode === EDIT_MODE_EDIT) ? lessonResourcesActions.update(value) : lessonResourcesActions.insert(value);
 
         this.props.resourcesActions.clear();
+
+        if (this._needSetOgImage) {
+            this.props.lessonActions.setOgImage(value.Id);
+            this._needSetOgImage = false
+        }
+
+        if (this._needSetTwitterImage) {
+            this.props.lessonActions.setTwitterImage(value.Id);
+            this._needSetTwitterImage = false;
+        }
     }
 
     _cancelEditResource() {
@@ -639,6 +726,14 @@ export class LessonEditor extends ObjectEditor {
             _dialogs.push(<MultiResourceForm
                 cancel={::this._cancelUploadResources}
                 finish={::this._finishUploadResource}
+            />)
+        }
+
+        if (this.props.showSnImageSelectDialogEditor) {
+            _dialogs.push(<SnImageSelectForm
+                cancel={::this._cancelSelectSnImage}
+                save={::this._setSnImage}
+                lessonId={this.props.lessonId}
             />)
         }
 
@@ -919,6 +1014,109 @@ export class LessonEditor extends ObjectEditor {
                     },
                 ]
             },
+            {template: "Социальные сети", type: "section"},
+            {
+                view: "text",
+                name: "SnName",
+                label: "Название",
+                placeholder: "Введите название",
+                labelWidth: labelWidth,
+            },
+            {
+                view: "textarea",
+                name: "SnDescription",
+                label: "Описание",
+                labelWidth: labelWidth,
+                height: 100,
+            },
+            {
+                view: "textarea",
+                name: "SnPost",
+                label: "Текст поста",
+                labelWidth: labelWidth,
+                height: 200,
+            },
+            {
+                cols: [
+                    {
+                        view: "label",
+                        label: "Изображение для Facebook",
+                        width: labelWidth,
+                    },
+                    {
+                        view: 'text',
+                        id: 'og-image-file',
+                        width: 500,
+                        on: {
+                            onChange: function () {
+                                that._externalValidate(this);
+                            },
+                        },
+                    },
+                    {
+                        cols: [
+                            {
+                                view: 'button',
+                                value: 'Загрузить...',
+                                icon: 'bars',
+                                click: function () {
+                                    that._needSetOgImage = true;
+                                    that._createResource()
+                                }
+                            },
+                            {
+                                view: 'button',
+                                value: 'Выбрать...',
+                                click: function () {
+                                    that._needSetOgImage = true;
+                                    that._selectSnImage()
+                                }
+                            }
+                        ]
+                    }
+
+                ]
+            },
+            {
+                cols: [
+                    {
+                        view: "label",
+                        label: "Изображение для Twitter",
+                        width: labelWidth,
+                    },
+                    {
+                        view: 'text',
+                        id: 'twitter-image-file',
+                        width: 500,
+                        on: {
+                            onChange: function () {
+                                that._externalValidate(this);
+                            },
+                        },
+                    },
+                    {
+                        cols: [
+                            {
+                                view: 'button',
+                                value: 'Загрузить...',
+                                click: function () {
+                                    that._needSetTwitterImage = true;
+                                    that._createResource()
+                                }
+                            },
+                            {
+                                view: 'button',
+                                value: 'Выбрать...',
+                                click: function () {
+                                    that._needSetTwitterImage = true;
+                                    that._selectSnImage()
+                                }
+                            }
+                        ]
+                    }
+
+                ]
+            },
         ];
     }
 }
@@ -927,6 +1125,8 @@ function mapStateToProps(state, ownProps) {
     return {
         authors: state.courseAuthorsList.authors,
         lesson: state.singleLesson.current,
+        ogImageId: state.singleLesson.ogImageId,
+        twitterImageId: state.singleLesson.twitterImageId,
 
         mainEpisodes: state.lessonMainEpisodes.current,
         recommendedRef: state.lessonRecommendedRefs.current,
@@ -946,6 +1146,7 @@ function mapStateToProps(state, ownProps) {
         referenceEditMode: state.references.editMode,
         course: state.singleCourse.current,
 
+        showSnImageSelectDialogEditor: state.resources.showSnImageSelectDialogEditor,
         showResourceEditor: state.resources.showEditor,
         showMultiUploadResourcesEditor: state.resources.showMultiUploadEditor,
         resource: state.resources.object,

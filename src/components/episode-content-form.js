@@ -108,7 +108,7 @@ class EpisodeResourceForm extends React.Component {
                             view: "combo",
                             labelPosition: "top",
                             name: "ResourceId",
-                            label: "Ресурса",
+                            label: "Ресурс",
                             options : this._getResourceArray(),
                             width: 329,
                         },
