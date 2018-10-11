@@ -6,7 +6,7 @@ import {
     MULTI_UPLOAD_RESOURCES_CANCEL,
     MULTI_UPLOAD_RESOURCES_FINISH,
     SELECT_SN_IMAGE_START,
-    SELECT_SN_IMAGE_FINISH,
+    SELECT_SN_IMAGE_FINISH, MULTIPLE_INSERT_RESOURCE,
 } from '../constants/lesson/lessonResources';
 
 import {
@@ -54,6 +54,20 @@ export default function resources(state = initialState, action) {
                 ...state,
                 showMultiUploadEditor: false,
             };
+        }
+
+        case MULTIPLE_INSERT_RESOURCE: {
+            let _array = action.payload;
+
+            if (_array) {
+                _array.forEach(item => {
+                    if (!item.Id) {
+                        item.Id = --state.internalId
+                    }
+                })
+            }
+
+            return {...state}
         }
 
         case MULTI_UPLOAD_RESOURCES_FINISH:{

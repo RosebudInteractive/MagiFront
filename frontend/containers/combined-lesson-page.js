@@ -381,15 +381,30 @@ class TranscriptLessonPage extends React.Component {
                 <meta property="article:modified_time" content={lesson.ReadyDate}/>
                 <meta property="og:updated_time" content={lesson.ReadyDate}/>
                 <meta property="fb:app_id" content={facebookAppID}/>
-                <meta property="og:image" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
-                <meta property="og:image:secure_url" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>
-                <meta property="og:image:width" content={_getWidth(lesson.PageMeta.Images.og.MetaData)}/>
-                <meta property="og:image:height" content={_getHeight(lesson.PageMeta.Images.og.MetaData)}/>
+                {
+                    lesson.PageMeta && lesson.PageMeta.Images && lesson.PageMeta.Images.og
+                        ?
+                        [
+                            <meta property="og:image" content={_imagePath + lesson.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:secure_url"
+                                  content={_imagePath + lesson.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:width" content={_getWidth(lesson.PageMeta.Images.og.MetaData)}/>,
+                            <meta property="og:image:height" content={_getHeight(lesson.PageMeta.Images.og.MetaData)}/>
+                        ]
+                        :
+                        null
+                }
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:description" content={lesson.PageMeta.Description}/>
                 <meta name="twitter:title" content={lesson.PageMeta.Name}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                <meta name="twitter:image" content={_imagePath + lesson.PageMeta.Images.tw.FileName}/>
+                {
+                    lesson.PageMeta && lesson.PageMeta.Images && lesson.PageMeta.Images.tw
+                        ?
+                        <meta name="twitter:image" content={_imagePath + lesson.PageMeta.Images.tw.FileName}/>
+                        :
+                        null
+                }
                 <meta name="twitter:creator" content="@MagisteriaRu"/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
