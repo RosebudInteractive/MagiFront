@@ -26,7 +26,7 @@ export default class CWSResourceLoader {
         if (_usePreinit) {
             let _mapKeys = _audioMap.keys();
             let _sourceNotEqual = (_audioMap.size !== sources.length) || sources.some((src) => {
-                let _source = '/data/' + src,
+                let _source = src.indexOf("://") >= 0 ? src : '/data/' + src,
                     _key = _mapKeys.next()
                 return _source !== _key.value
             })
@@ -34,7 +34,7 @@ export default class CWSResourceLoader {
             if (_sourceNotEqual) {
                 _audioMap.clear();
                 sources.forEach((src) => {
-                    let _src = '/data/' + src,
+                    let _src = src.indexOf("://") >= 0 ? src : '/data/' + src,
                         _audio = new Audio()
 
                     _audio.src = _src;
@@ -509,7 +509,7 @@ export default class CWSResourceLoader {
             let mode = that._state.mode;
             if (asset) {
                 that._state.loading[id] = true;
-                let url = "/data/" + asset.file;
+                let url = asset.file.indexOf("://") >= 0 ? asset.file : "/data/" + asset.file;
                 $.ajax({
                     url: url,
                     type: "GET",
@@ -571,7 +571,7 @@ export default class CWSResourceLoader {
         }
 
         if (id && !this._alreadyLoadedAudio(id)) {
-            let url = "/data/" + id;
+            let url = id.indexOf("://") >= 0 ? id : "/data/" + id;
 
             let audio = null;
 

@@ -1,3 +1,4 @@
+const config = require('config');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
@@ -6,6 +7,30 @@ exports.DbObject = class DbObject {
 
     constructor(options) {
         this._db = $memDataBase;
+        this._dataPrefix = config.proxyServer.siteHost + config.dataUrl + "/";
+    }
+
+    _convertMeta(metaStr) {
+        let rc = null;
+        try {
+            rc = JSON.parse(metaStr);
+        }
+        catch (err) {
+        }
+        if (rc) {
+            let path = this._dataPrefix + rc.path;
+            if (rc.content) {
+                if (rc.content.l)
+                    rc.content.l = path + rc.content.l;
+                if (rc.content.m)
+                    rc.content.m = path + rc.content.m;
+                if (rc.content.s)
+                    rc.content.s = path + rc.content.s;
+            }
+            if (rc.icon)
+                rc.icon = path + rc.icon;
+        }
+        return rc;
     }
 
     _genGetterName(fname) {
