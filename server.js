@@ -114,6 +114,9 @@ Promise.resolve()
         app.get('/player-app', function (req, res) {
             res.render('player-app.html', {});
         });
+        app.get('/player-app-test', function (req, res) {
+            res.render('player-app-test.html', {});
+        });
         app.get('/player2', function (req, res) {
             res.render('player2.html', {});
         });

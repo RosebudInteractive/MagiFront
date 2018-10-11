@@ -13,6 +13,7 @@ const _prodConfig = {
         adm: './src/index',
         'player-main': './scripts/player-main',
         'player-app': './scripts/player-app',
+        'player-app-test': './scripts/player-app-test',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
@@ -106,6 +107,7 @@ const _devConfig = {
         adm: './src/index',
         'player-main': './scripts/player-main',
         'player-app': './scripts/player-app',
+        'player-app-test': './scripts/player-app-test',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
