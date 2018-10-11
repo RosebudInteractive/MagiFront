@@ -44,7 +44,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons/play/:id', (req, res, next) => {
         LessonsService()
-            .getPlayerData(parseInt(req.params.id))
+            .getPlayerData(parseInt(req.params.id), null, req.query)
             .then(rows => {
                 res.send(rows);
             })

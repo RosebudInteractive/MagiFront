@@ -1,9 +1,10 @@
+const _ = require('lodash');
+const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
-const _ = require('lodash');
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -1473,10 +1474,13 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getPlayerData(id, episodeId) {
+    getPlayerData(id, episodeId, options) {
         let data = { id: id, assets: [], episodes: [] };
         let epi_list = {};
         let assets_list = {};
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let dataPrefix = config.proxyServer.siteHost + config.dataUrl + "/";
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1494,9 +1498,22 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (!assets_list[elem.Id]) {
                                     let asset = {
                                         id: elem.Id,
-                                        file: elem.FileName,
+                                        file: isAbsPath ? dataPrefix + elem.FileName : elem.FileName,
                                         info: JSON.parse(elem.MetaData)
                                     };
+                                    if (isAbsPath && asset.info) {
+                                        let path = dataPrefix + asset.info.path;
+                                        if (asset.info.content) {
+                                            if (asset.info.content.l)
+                                                asset.info.content.l = path + asset.info.content.l;
+                                            if (asset.info.content.m)
+                                                asset.info.content.m = path + asset.info.content.m;
+                                            if (asset.info.content.s)
+                                                asset.info.content.s = path + asset.info.content.s;
+                                        }
+                                        if (asset.info.icon)
+                                            asset.info.icon = path + asset.info.icon;
+                                    }
                                     if (elem.Name)
                                         asset.title = elem.Name;
                                     if (elem.Description)
@@ -1528,7 +1545,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         title: elem.Name,
                                         elements: [],
                                         audio: {
-                                            file: elem.Audio,
+                                            file: isAbsPath ? dataPrefix + elem.Audio : elem.Audio,
                                             info: JSON.parse(elem.AudioMeta)
                                         },
                                         contents: []
