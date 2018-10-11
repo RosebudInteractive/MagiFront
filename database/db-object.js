@@ -7,28 +7,33 @@ exports.DbObject = class DbObject {
 
     constructor(options) {
         this._db = $memDataBase;
-        this._dataPrefix = config.proxyServer.siteHost + config.dataUrl + "/";
+        this._absDataUrl = config.proxyServer.siteHost + config.dataUrl + "/";
+        this._absCourseUrl = config.proxyServer.siteHost + config.courseUrl + "/";
+        this._absAuthorUrl = config.proxyServer.siteHost + config.authorUrl + "/";
+        this._absCategoryUrl = config.proxyServer.siteHost + config.categoryUrl + "/";
     }
 
     _convertMeta(metaStr) {
         let rc = null;
-        try {
-            rc = JSON.parse(metaStr);
-        }
-        catch (err) {
-        }
-        if (rc) {
-            let path = this._dataPrefix + rc.path;
-            if (rc.content) {
-                if (rc.content.l)
-                    rc.content.l = path + rc.content.l;
-                if (rc.content.m)
-                    rc.content.m = path + rc.content.m;
-                if (rc.content.s)
-                    rc.content.s = path + rc.content.s;
+        if (metaStr) {
+            try {
+                rc = JSON.parse(metaStr);
             }
-            if (rc.icon)
-                rc.icon = path + rc.icon;
+            catch (err) {
+            }
+            if (rc) {
+                let path = this._absDataUrl + rc.path;
+                if (rc.content) {
+                    if (rc.content.l)
+                        rc.content.l = path + rc.content.l;
+                    if (rc.content.m)
+                        rc.content.m = path + rc.content.m;
+                    if (rc.content.s)
+                        rc.content.s = path + rc.content.s;
+                }
+                if (rc.icon)
+                    rc.icon = path + rc.icon;
+            }
         }
         return rc;
     }

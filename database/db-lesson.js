@@ -294,7 +294,7 @@ const LESSON_MSSQL_REQ_V2 =
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
     "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
     "  join[AuthorLng] al on al.[AuthorId] = a.[Id]\n" +
-    "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
+    "<%= cond %>";
 
 const LESSON_MSSQL_CHILDS_REQ =
     "select l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
@@ -330,6 +330,22 @@ const PARENT_MSSQL_REQ =
     "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
     "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
+    "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
+
+const PARENT_MSSQL_REQ_COND =
+    "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
+    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
+    "from[LessonCourse] lc\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
+    "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
+    "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
+    "<%= cond %>";
+const PARENT_MSSQL_COND_ID =
+    "where l.[Id] = <%= id %>";
+const PARENT_MSSQL_COND_URL =
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const LESSON_MSSQL_TRANSCRIPT_REQ =
@@ -448,7 +464,7 @@ const LESSON_MYSQL_REQ_V2 =
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
     "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
     "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
-    "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
+    "<%= cond %> ";
 
 const LESSON_MYSQL_CHILDS_REQ =
     "select l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
@@ -484,6 +500,22 @@ const PARENT_MYSQL_REQ =
     "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
     "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
+    "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
+
+const PARENT_MYSQL_REQ_COND =
+    "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
+    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
+    "from`LessonCourse` lc\n" +
+    "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
+    "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
+    "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
+    "<%= cond %>";
+const PARENT_MYSQL_COND_ID =
+    "where l.`Id` = <%= id %>";
+const PARENT_MYSQL_COND_URL =
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const LESSON_MYSQL_TRANSCRIPT_REQ =
@@ -1239,16 +1271,39 @@ const DbLesson = class DbLesson extends DbObject {
         let id;
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
-        let hostUrl = config.proxyServer.siteHost + "/";
+        let hostUrl;
         let courseUrl;
+        let condMSSQL;
+        let condMYSQL;
+        let isInt;
 
         return new Promise((resolve, reject) => {
-            resolve(
+            hostUrl = config.proxyServer.siteHost + "/";
+            let id = course_url;
+            isInt = (typeof (id) === "number");
+            if(isInt && isNaN(id))
+                throw new Error(`Invalid argument "lesson_url": ${url}.`);
+            if (!isInt)
+                if (typeof (id) === "string") {
+                    let res = id.match(/[0-9]*/);
+                    if (res && (id.length > 0) && (res[0].length === id.length)) {
+                        id = parseInt(id);
+                        isInt = true;
+                    }
+                }
+                else
+                    throw new Error(`Invalid argument "lesson_url": ${url}.`);
 
+            condMSSQL = isInt ? _.template(PARENT_MSSQL_COND_ID)({ id: id })
+                : _.template(PARENT_MSSQL_COND_URL)({ course_url: course_url, lesson_url: lesson_url })
+            condMYSQL = isInt ? _.template(PARENT_MYSQL_COND_ID)({ id: id })
+                : _.template(PARENT_MYSQL_COND_URL)({ course_url: course_url, lesson_url: lesson_url })
+            
+            resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
-                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
+                        mysql: _.template(PARENT_MYSQL_REQ_COND)({ cond: condMYSQL }),
+                        mssql: _.template(PARENT_MSSQL_REQ_COND)({ cond: condMSSQL })
                     }
                 }, {})
                     .then((result) => {
@@ -1267,16 +1322,16 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
-                                URL: isAbsPath ? hostUrl + +"category/" + elem.CURL : elem.CURL
+                                URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL
                             };
                         }
                         else
-                            throw new Error("Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
+                            throw new Error(`Can't find lesson "${course_url}"${isInt ? "" : " : \"" + lesson_url + "\""}.`);
 
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(LESSON_MYSQL_REQ_V2)({ course_url: course_url, lesson_url: lesson_url }),
-                                mssql: _.template(LESSON_MSSQL_REQ_V2)({ course_url: course_url, lesson_url: lesson_url })
+                                mysql: _.template(LESSON_MYSQL_REQ_V2)({ cond: condMYSQL }),
+                                mssql: _.template(LESSON_MSSQL_REQ_V2)({ cond: condMSSQL })
                             }
                         }, {})
                     })
@@ -1287,7 +1342,7 @@ const DbLesson = class DbLesson extends DbObject {
                             parentId = elem.ParentId;
                             data.Id= elem.Id;
                             data.Name = elem.Name;
-                            data.Cover = isAbsPath ? this._dataPrefix + elem.Cover : elem.Cover;
+                            data.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
                             data.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
                             data.State = elem.State;
                             data.ReadyDate = elem.ReadyDate;
@@ -1306,9 +1361,9 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.AuthorId,
                                 FirstName: elem.FirstName,
                                 LastName: elem.LastName,
-                                Portrait: isAbsPath ? this._dataPrefix + elem.Portrait : elem.Portrait,
+                                Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
                                 PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta,
-                                URL: isAbsPath ? hostUrl + "autor/" + elem.AURL : elem.AURL,
+                                URL: isAbsPath ? this._absAuthorUrl + elem.AURL : elem.AURL,
                             };
                             data.Number = elem.Number;
                             data.ShortDescription = elem.ShortDescription;
@@ -1332,7 +1387,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     child = childs[elem.Id] = {};
                                     child.Id = elem.Id;
                                     child.Name = elem.Name;
-                                    child.Cover = isAbsPath ? this._dataPrefix + elem.Cover : elem.Cover;
+                                    child.Cover = isAbsPath ? this._absDataUrl + elem.Cover : elem.Cover;
                                     child.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
                                     child.State = elem.State;
                                     child.ReadyDate = elem.ReadyDate;
@@ -1349,7 +1404,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     data.Childs.push(child);
                                 }
                                 if (elem.Audio)
-                                    child.Audios.push(isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio);
+                                    child.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                             })
                         }
                         return $data.execSql({
@@ -1377,7 +1432,7 @@ const DbLesson = class DbLesson extends DbObject {
                             data.PageMeta.Images = {};
                             result.detail.forEach((elem) => {
                                 data.PageMeta.Images[elem.Type] = {
-                                    FileName: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                    FileName: isAbsPath ? this._absDataUrl + elem.FileName : elem.FileName,
                                     MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
                                 };
                             })
@@ -1395,7 +1450,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (!assets_list[elem.Id]) {
                                     let asset = {
                                         Id: elem.Id,
-                                        FileName: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                        FileName: isAbsPath ? this._absDataUrl + elem.FileName : elem.FileName,
                                         MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
                                     };
                                     if (elem.Name)
@@ -1426,7 +1481,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     Toc: []
                                 };
                                 data.Episodes.push(curr_episode);
-                                data.Audios.push(isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio);
+                                data.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                                 epi_list[elem.Id] = curr_episode;
                             });
                         }
@@ -1502,7 +1557,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (!assets_list[elem.Id]) {
                                     let asset = {
                                         id: elem.Id,
-                                        file: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                        file: isAbsPath ? this._absDataUrl + elem.FileName : elem.FileName,
                                         info: isAbsPath ? this._convertMeta(elem.MetaData) : JSON.parse(elem.MetaData)
                                     };
                                     if (elem.Name)
@@ -1536,7 +1591,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         title: elem.Name,
                                         elements: [],
                                         audio: {
-                                            file: isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio,
+                                            file: isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio,
                                             info: JSON.parse(elem.AudioMeta)
                                         },
                                         contents: []
