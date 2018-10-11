@@ -1232,11 +1232,15 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getLessonV2(course_url, lesson_url) {
+    getLessonV2(course_url, lesson_url, options) {
         let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
         let epi_list = {};
         let assets_list = {};
         let id;
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let hostUrl = config.proxyServer.siteHost + "/";
+        let courseUrl;
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1250,9 +1254,10 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         if (result && result.detail && (result.detail.length == 1)) {
                             let elem = result.detail[0];
+                            courseUrl = hostUrl + elem.CURL + "/";
                             if (elem.URL) {
                                 data.Parent = {
-                                    URL: elem.URL,
+                                    URL: isAbsPath ? courseUrl + elem.URL : elem.URL,
                                     Name: elem.Name,
                                     Number: elem.Number
                                 }
@@ -1262,7 +1267,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
-                                URL: elem.CURL
+                                URL: isAbsPath ? hostUrl + +"category/" + elem.CURL : elem.CURL
                             };
                         }
                         else
@@ -1282,13 +1287,13 @@ const DbLesson = class DbLesson extends DbObject {
                             parentId = elem.ParentId;
                             data.Id= elem.Id;
                             data.Name = elem.Name;
-                            data.Cover = elem.Cover;
-                            data.CoverMeta = elem.CoverMeta;
+                            data.Cover = isAbsPath ? this._dataPrefix + elem.Cover : elem.Cover;
+                            data.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
                             data.State = elem.State;
                             data.ReadyDate = elem.ReadyDate;
                             data.Duration = elem.Duration;
                             data.DurationFmt = elem.DurationFmt;
-                            data.URL = elem.URL;
+                            data.URL = isAbsPath ? courseUrl + elem.URL : elem.URL;
                             data.IsAuthRequired = elem.IsAuthRequired ? true : false;
                             data.IsSubsRequired = elem.IsSubsRequired ? true : false;
                             if (elem.SnName)
@@ -1301,9 +1306,9 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.AuthorId,
                                 FirstName: elem.FirstName,
                                 LastName: elem.LastName,
-                                Portrait: elem.Portrait,
-                                PortraitMeta: elem.PortraitMeta,
-                                URL: elem.AURL,
+                                Portrait: isAbsPath ? this._dataPrefix + elem.Portrait : elem.Portrait,
+                                PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta,
+                                URL: isAbsPath ? hostUrl + "autor/" + elem.AURL : elem.AURL,
                             };
                             data.Number = elem.Number;
                             data.ShortDescription = elem.ShortDescription;
@@ -1327,13 +1332,13 @@ const DbLesson = class DbLesson extends DbObject {
                                     child = childs[elem.Id] = {};
                                     child.Id = elem.Id;
                                     child.Name = elem.Name;
-                                    child.Cover = elem.Cover;
-                                    child.CoverMeta = elem.CoverMeta;
+                                    child.Cover = isAbsPath ? this._dataPrefix + elem.Cover : elem.Cover;
+                                    child.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
                                     child.State = elem.State;
                                     child.ReadyDate = elem.ReadyDate;
                                     child.Duration = elem.Duration;
                                     child.DurationFmt = elem.DurationFmt;
-                                    child.URL = elem.URL;
+                                    child.URL = isAbsPath ? courseUrl + elem.URL : elem.URL;
                                     child.IsAuthRequired = elem.IsAuthRequired ? true : false;
                                     child.IsSubsRequired = elem.IsSubsRequired ? true : false;
                                     child.Number = elem.Number;
@@ -1344,7 +1349,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     data.Childs.push(child);
                                 }
                                 if (elem.Audio)
-                                    child.Audios.push(elem.Audio);
+                                    child.Audios.push(isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio);
                             })
                         }
                         return $data.execSql({
@@ -1372,8 +1377,8 @@ const DbLesson = class DbLesson extends DbObject {
                             data.PageMeta.Images = {};
                             result.detail.forEach((elem) => {
                                 data.PageMeta.Images[elem.Type] = {
-                                    FileName: elem.FileName,
-                                    MetaData: elem.MetaData
+                                    FileName: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                    MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
                                 };
                             })
                         }
@@ -1390,8 +1395,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (!assets_list[elem.Id]) {
                                     let asset = {
                                         Id: elem.Id,
-                                        FileName: elem.FileName,
-                                        MetaData: elem.MetaData
+                                        FileName: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                        MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
                                     };
                                     if (elem.Name)
                                         asset.Name = elem.Name;
@@ -1421,7 +1426,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     Toc: []
                                 };
                                 data.Episodes.push(curr_episode);
-                                data.Audios.push(elem.Audio);
+                                data.Audios.push(isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio);
                                 epi_list[elem.Id] = curr_episode;
                             });
                         }
@@ -1480,7 +1485,6 @@ const DbLesson = class DbLesson extends DbObject {
         let assets_list = {};
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
-        let dataPrefix = config.proxyServer.siteHost + config.dataUrl + "/";
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1498,22 +1502,9 @@ const DbLesson = class DbLesson extends DbObject {
                                 if (!assets_list[elem.Id]) {
                                     let asset = {
                                         id: elem.Id,
-                                        file: isAbsPath ? dataPrefix + elem.FileName : elem.FileName,
-                                        info: JSON.parse(elem.MetaData)
+                                        file: isAbsPath ? this._dataPrefix + elem.FileName : elem.FileName,
+                                        info: isAbsPath ? this._convertMeta(elem.MetaData) : JSON.parse(elem.MetaData)
                                     };
-                                    if (isAbsPath && asset.info) {
-                                        let path = dataPrefix + asset.info.path;
-                                        if (asset.info.content) {
-                                            if (asset.info.content.l)
-                                                asset.info.content.l = path + asset.info.content.l;
-                                            if (asset.info.content.m)
-                                                asset.info.content.m = path + asset.info.content.m;
-                                            if (asset.info.content.s)
-                                                asset.info.content.s = path + asset.info.content.s;
-                                        }
-                                        if (asset.info.icon)
-                                            asset.info.icon = path + asset.info.icon;
-                                    }
                                     if (elem.Name)
                                         asset.title = elem.Name;
                                     if (elem.Description)
@@ -1545,7 +1536,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         title: elem.Name,
                                         elements: [],
                                         audio: {
-                                            file: isAbsPath ? dataPrefix + elem.Audio : elem.Audio,
+                                            file: isAbsPath ? this._dataPrefix + elem.Audio : elem.Audio,
                                             info: JSON.parse(elem.AudioMeta)
                                         },
                                         contents: []
