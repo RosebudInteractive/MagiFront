@@ -387,6 +387,15 @@ const DbCourse = class DbCourse extends DbObject {
         this._prerenderCache = PrerenderCache();
     }
 
+    _isNumericString(str) {
+        let result = false;
+        if (typeof (str) === "string") {
+            let res = str.match(/[0-9]*/);
+            result = (res && (str.length > 0) && (res[0].length === str.length))
+        }
+        return result;
+    }
+
     _getObjById(id, expression, options) {
         var exp = expression || COURSE_REQ_TREE;
         return super._getObjById(id, exp, options);
@@ -1058,10 +1067,7 @@ const DbCourse = class DbCourse extends DbObject {
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -1246,8 +1252,11 @@ const DbCourse = class DbCourse extends DbObject {
                         // Changing "LanguageId" isn't allowed !
                         // if (typeof (inpFields["LanguageId"]) !== "undefined")
                         //     crs_obj.languageId(inpFields["LanguageId"]);
-                        if (typeof (inpFields["URL"]) !== "undefined")
+                        if (typeof (inpFields["URL"]) !== "undefined") {
                             new_url = crs_obj.uRL(inpFields["URL"]);
+                            if (this._isNumericString(inpFields["URL"]))
+                                throw new Error(`Course URL can't be numeric: ${inpFields["URL"]}`);
+                        }
 
                         crs_obj.oneLesson(false);
                         if (typeof (inpFields["OneLesson"]) === "boolean")
@@ -1397,10 +1406,7 @@ const DbCourse = class DbCourse extends DbObject {
                             this._db._deleteRoot(crs_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -1457,8 +1463,11 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["LanguageId"]) !== "undefined")
                             languageId = fields["LanguageId"] = inpFields["LanguageId"];
-                        if (typeof (inpFields["URL"]) !== "undefined")
+                        if (typeof (inpFields["URL"]) !== "undefined") {
                             fields["URL"] = inpFields["URL"];
+                            if (this._isNumericString(inpFields["URL"]))
+                                throw new Error(`Course URL can't be numeric: ${inpFields["URL"]}`);
+                        }
                         fields["OneLesson"] = false;
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             fields["OneLesson"] = inpFields["OneLesson"];
@@ -1531,10 +1540,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
                     .then((result) => {

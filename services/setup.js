@@ -48,7 +48,7 @@ function errorHandler(err, req, res, next) {
         errStr = JSON.stringify(err.error);
     }
     console.error(`setup::errorHandler ==> ${errStr}`);
-    res.status(statusCode).json({ message: errStr, error: error });
+    res.status(statusCode).json({ statusCode: statusCode, message: errStr, error: error });
 }
 
 function setupAPI(express, app) {
