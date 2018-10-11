@@ -1,18 +1,3 @@
-/**
- * Created by levan.kiknadze on 06/12/2017.
- */
-/*requirejs.config({
-    baseUrl: 'scripts',
-    nodeRequire: require,
-    paths: {
-        "text": '/scripts/lib/text',
-        "underscore": '/scripts/lib/underscore',
-        "lodash": '/scripts/lib/lodash.min',
-        "template": '/scripts/lib/template',
-        "work-shop": '/scripts/widgets/work-shop'
-    }
-});
-*/
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader";
 import 'jquery-ui/jquery-ui.js';
@@ -21,6 +6,7 @@ import 'script-lib/mouseheld.js'
 
 import 'script-lib/../widgets/work-shop/work-shop-custom.css'
 import 'script-lib/../widgets/work-shop/player.css'
+import 'script-lib/../widgets/work-shop/player-for-native-app.css'
 import '../css/font-awesome.css'
 import '../css/general-player.css'
 import 'jquery-ui/jquery-ui.min.css';
@@ -42,9 +28,6 @@ window.Utils = Utils;
 
 (function ($) {
     $(document).ready(function () {
-        // require(["work-shop/player", "work-shop/resource-loader"], function (Player, Loader) {
-
-
         var playerOptions = getPlayerOptions();
         var player = new Player($("#player"), playerOptions);
 
