@@ -142,7 +142,15 @@ window.Utils = Utils;
                 },
                 onError: function (e) {
                     console.error("playback error. player was suspended", e);
-                }
+                },
+                onCanPlay: () => {
+                    window.postMessage(
+                        JSON.stringify({
+                            eventType: 'magisteriaPlayer',
+                            eventName: 'playerCanPlay'
+                        })
+                    )
+                },
             };
         }
 
