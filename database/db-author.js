@@ -433,10 +433,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
                     .then((result) => {
@@ -497,10 +494,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         if (auth_obj)
                             this._db._deleteRoot(auth_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
                     .then((result) => {
@@ -568,10 +562,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
                     .then((result) => {

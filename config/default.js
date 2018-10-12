@@ -5,6 +5,9 @@ module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     dataUrl: '/data',
+    courseUrl: '/category',
+    authorUrl: '/autor',
+    categoryUrl: '/razdel',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',

@@ -1,3 +1,4 @@
+const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { Intervals } = require('../const/common');
@@ -262,8 +263,13 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
-    "where c.[URL] = '<%= courseUrl %>'\n" +
+    "<%= where %>\n" +
     "order by lc.[ParentId], lc.[Number], el.[Number]";
+const COURSE_MSSQL_PUBLIC_WHERE_URL =
+    "where c.[URL] = '<%= courseUrl %>'";
+const COURSE_MSSQL_PUBLIC_WHERE_ID =
+    "where c.[Id] = <%= id %>";
+
 const AUTHOR_COURSE_MSSQL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] from [AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -304,8 +310,13 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
-    "where c.`URL` = '<%= courseUrl %>'\n" +
+    "<%= where %>\n" +
     "order by lc.`ParentId`, lc.`Number`, el.`Number`";
+const COURSE_MYSQL_PUBLIC_WHERE_URL =
+    "where c.`URL` = '<%= courseUrl %>'";
+const COURSE_MYSQL_PUBLIC_WHERE_ID =
+    "where c.`Id` = <%= id %>";
+
 const CATEGORY_COURSE_MYSQL_WHERE = "where cc.`CourseId` = <%= courseId %>\n";
 const COURSE_REF_MYSQL_PUBLIC_REQ =
     "select l.`Id`, count(r.`Id`) as `NRef` from `Course` c\n" +
@@ -374,6 +385,15 @@ const DbCourse = class DbCourse extends DbObject {
     constructor(options) {
         super(options);
         this._prerenderCache = PrerenderCache();
+    }
+
+    _isNumericString(str) {
+        let result = false;
+        if (typeof (str) === "string") {
+            let res = str.match(/[0-9]*/);
+            result = (res && (str.length > 0) && (res[0].length === str.length))
+        }
+        return result;
     }
 
     _getObjById(id, expression, options) {
@@ -506,7 +526,7 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    getAllPublic(langId) {
+    getAllPublic(options) {
         let courses = [];
         let authors = [];
         let categories = [];
@@ -514,10 +534,13 @@ const DbCourse = class DbCourse extends DbObject {
         let lessons_list = {};
         let authors_list = {};
         let categories_list = {};
-        let languageId = (typeof (langId) === "number") && (!isNaN(langId)) ? langId : LANGUAGE_ID;
+        let opts = options || {};
+        let languageId = (typeof (opts.lang_id) === "number") && (!isNaN(opts.lang_id)) ? opts.lang_id : LANGUAGE_ID;
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let baseUrl;
 
         return new Promise((resolve, reject) => {
-
+            baseUrl = config.proxyServer.siteHost + "/";
             resolve(
                 $data.execSql({
                     dialect: {
@@ -530,19 +553,21 @@ const DbCourse = class DbCourse extends DbObject {
                             let crs_id = -1;
                             let curr_course;
                             let now = new Date();
+                            let baseCourseUrl;
                             result.detail.forEach((elem) => {
                                 if (elem.Id !== crs_id) {
                                     crs_id = elem.Id;
+                                    baseCourseUrl = baseUrl + elem.URL + "/";
                                     curr_course = courses_list[elem.Id];
                                     if (!curr_course) {
                                         curr_course = {
                                             Id: elem.Id,
-                                            Cover: elem.Cover,
-                                            CoverMeta: elem.CoverMeta,
+                                            Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                            CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                             Mask: elem.Mask,
                                             Color: elem.Color,
                                             Name: elem.Name,
-                                            URL: elem.URL,
+                                            URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
                                             Authors: [],
                                             Categories: [],
@@ -559,9 +584,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: elem.LCover,
-                                        CoverMeta: elem.LCoverMeta,
-                                        URL: elem.LURL,
+                                        Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
+                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        URL: isAbsPath ? baseCourseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
@@ -577,7 +602,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     curr_course.Lessons.push(lesson);
                                     lessons_list[elem.LessonId] = lesson;
                                 }
-                                lesson.Audios.push(elem.Audio);
+                                if (elem.Audio)
+                                    lesson.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                             })
                             return $data.execSql({
                                 dialect: {
@@ -603,7 +629,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Id: elem.Id,
                                         FirstName: elem.FirstName,
                                         LastName: elem.LastName,
-                                        URL: elem.URL
+                                        URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
                                     };
                                     authors.push(author);
                                     authors_list[elem.Id] = author;
@@ -633,7 +659,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     category = {
                                         Id: elem.Id,
                                         Name: elem.Name,
-                                        URL: elem.URL,
+                                        URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
                                         Counter: 0
                                     };
                                     categories.push(category);
@@ -652,19 +678,42 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    getPublic(url) {
+    getPublic(url, options) {
         let course = null;
         let courseId = 0;
         let lsn_list = {};
         let lc_list = {};
         let languageId;
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let baseUrl;
 
         return new Promise((resolve, reject) => {
+            baseUrl = config.proxyServer.siteHost + "/";
+            let id = url;
+            let isInt = (typeof (id) === "number");
+            if (isInt && isNaN(id))
+                throw new Error(`Invalid argument "url": ${url}.`);
+            if (!isInt)
+                if (typeof (id) === "string") {
+                    let res = id.match(/[0-9]*/);
+                    if (res && (id.length > 0) && (res[0].length === id.length)) {
+                        id = parseInt(id);
+                        isInt = true;
+                    }
+                }
+                else
+                    throw new Error(`Invalid argument "url": ${url}.`);
+
+            let whereMSSQL = isInt ? _.template(COURSE_MSSQL_PUBLIC_WHERE_ID)({ id: id })
+                : _.template(COURSE_MSSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
+            let whereMYSQL = isInt ? _.template(COURSE_MYSQL_PUBLIC_WHERE_ID)({ id: id })
+                : _.template(COURSE_MYSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ courseUrl: url }),
-                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ courseUrl: url })
+                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ where: whereMYSQL }),
+                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
                     }
                 }, {})
                     .then((result) => {
@@ -672,21 +721,23 @@ const DbCourse = class DbCourse extends DbObject {
                             let isFirst = true;
                             let authors_list = {};
                             let now = new Date();
+                            let courseUrl;
                             result.detail.forEach((elem) => {
                                 if (isFirst) {
                                     isFirst = false;
                                     languageId = elem.LanguageId;
                                     courseId = elem.Id;
+                                    courseUrl = baseUrl + elem.URL + "/";
                                     course = {
                                         Id: elem.Id,
                                         LanguageId: elem.LanguageId,
-                                        Cover: elem.Cover,
-                                        CoverMeta: elem.CoverMeta,
+                                        Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                        CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                         Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
-                                        URL: elem.URL,
+                                        URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsSubsRequired: false,
                                         Authors: [],
                                         Categories: [],
@@ -702,9 +753,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: elem.LCover,
-                                        CoverMeta: elem.LCoverMeta,
-                                        URL: elem.LURL,
+                                        Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
+                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
@@ -735,7 +786,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     }
                                     lsn_list[elem.LessonId] = lsn;
                                 }
-                                lsn.Audios.push(elem.Audio);
+                                if (elem.Audio)
+                                    lsn.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                             })
                             let authors = "";
                             isFirst = true;
@@ -766,9 +818,9 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
-                                    Portrait: elem.Portrait,
-                                    PortraitMeta: elem.PortraitMeta,
-                                    URL: elem.URL
+                                    Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
+                                    PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta,
+                                    URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
                                 };
                                 course.Authors.push(author);
                             })
@@ -795,7 +847,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 let category = {
                                     Id: elem.Id,
                                     Name: elem.Name,
-                                    URL: elem.URL
+                                    URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL
                                 };
                                 course.Categories.push(category);
                             })
@@ -1015,10 +1067,7 @@ const DbCourse = class DbCourse extends DbObject {
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -1203,8 +1252,11 @@ const DbCourse = class DbCourse extends DbObject {
                         // Changing "LanguageId" isn't allowed !
                         // if (typeof (inpFields["LanguageId"]) !== "undefined")
                         //     crs_obj.languageId(inpFields["LanguageId"]);
-                        if (typeof (inpFields["URL"]) !== "undefined")
+                        if (typeof (inpFields["URL"]) !== "undefined") {
                             new_url = crs_obj.uRL(inpFields["URL"]);
+                            if (this._isNumericString(inpFields["URL"]))
+                                throw new Error(`Course URL can't be numeric: ${inpFields["URL"]}`);
+                        }
 
                         crs_obj.oneLesson(false);
                         if (typeof (inpFields["OneLesson"]) === "boolean")
@@ -1354,10 +1406,7 @@ const DbCourse = class DbCourse extends DbObject {
                             this._db._deleteRoot(crs_obj.getRoot());
                         if (isErr) {
                             result = result.then(() => {
-                                if (res instanceof Error)
-                                    throw res
-                                else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                throw res;
                             });
                         }
                         else
@@ -1414,8 +1463,11 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["State"] = inpFields["State"];
                         if (typeof (inpFields["LanguageId"]) !== "undefined")
                             languageId = fields["LanguageId"] = inpFields["LanguageId"];
-                        if (typeof (inpFields["URL"]) !== "undefined")
+                        if (typeof (inpFields["URL"]) !== "undefined") {
                             fields["URL"] = inpFields["URL"];
+                            if (this._isNumericString(inpFields["URL"]))
+                                throw new Error(`Course URL can't be numeric: ${inpFields["URL"]}`);
+                        }
                         fields["OneLesson"] = false;
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             fields["OneLesson"] = inpFields["OneLesson"];
@@ -1488,10 +1540,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
                     .then((result) => {

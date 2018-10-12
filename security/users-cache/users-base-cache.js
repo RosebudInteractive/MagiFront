@@ -704,10 +704,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     if (root_obj)
                         this._db._deleteRoot(root_obj.getRoot());
                     if (isErr) {
-                        if (res instanceof Error)
-                            throw res
-                        else
-                            throw new Error("Error: " + JSON.stringify(res));
+                        throw res;
                     }
                     return this.getUserInfoById(user.id(), true);
                 })

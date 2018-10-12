@@ -64,6 +64,17 @@ function setupLessons(app) {
             });
     });
 
+    app.get('/api/lessons/v2/:id', (req, res, next) => {
+        LessonsService()
+            .getLessonV2(parseInt(req.params.id), null, req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/lessons-text/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
             .getLessonText(req.params.course_url, req.params.lesson_url)

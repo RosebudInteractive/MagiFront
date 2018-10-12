@@ -602,7 +602,7 @@ const DbUser = class DbUser extends DbObject {
                                         throw new Error(message);
                                 }
                                 else
-                                    throw new Error("Error: " + JSON.stringify(res));
+                                    throw res;
                         return res;
                     })
             })
