@@ -10,6 +10,7 @@ import {
 
 
 import 'whatwg-fetch';
+import {handleJsonError} from '../tools/fetch-tools';
 
 export const getLanguages = ()=> {
     return (dispatch) => {
@@ -30,16 +31,19 @@ export const getLanguages = ()=> {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_LANGUAGES_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_LANGUAGES_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };

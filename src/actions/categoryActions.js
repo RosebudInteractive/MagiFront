@@ -16,6 +16,7 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
+import {handleJsonError} from "../tools/fetch-tools";
 
 export const create = (obj) => {
     return (dispatch) => {
@@ -45,16 +46,19 @@ export const get = (id)=> {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_CATEGORY_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_CATEGORY_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };
@@ -86,11 +90,14 @@ export const save = (values, mode) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };

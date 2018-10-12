@@ -12,6 +12,7 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
+import {handleJsonError} from "../tools/fetch-tools";
 
 export const getCategories = () => {
     return (dispatch) => {
@@ -32,16 +33,19 @@ export const getCategories = () => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_CATEGORIES_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_CATEGORIES_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };
@@ -85,11 +89,14 @@ export const deleteCategory = (id) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };

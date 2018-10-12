@@ -12,7 +12,6 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
-
 import {handleJsonError} from '../tools/fetch-tools';
 
 export const getCourses = () => {

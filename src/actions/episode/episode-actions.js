@@ -39,17 +39,19 @@ export const get = (id, lessonId) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_SINGLE_EPISODE_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_SINGLE_EPISODE_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
     }
 };
 
@@ -90,12 +92,14 @@ export const save = (values, mode) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
-
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
     }
 };
 
