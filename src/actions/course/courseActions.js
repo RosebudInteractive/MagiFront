@@ -22,6 +22,7 @@ import {
 } from '../../constants/Common';
 
 import 'whatwg-fetch';
+import {handleJsonError} from '../../tools/fetch-tools';
 
 export const create = () => {
     return (dispatch) => {
@@ -32,7 +33,7 @@ export const create = () => {
     }
 };
 
-export const get = (id)=> {
+export const get = (id) => {
     return (dispatch) => {
         dispatch({
             type: GET_SINGLE_COURSE_REQUEST,
@@ -51,15 +52,18 @@ export const get = (id)=> {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_SINGLE_COURSE_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_SINGLE_COURSE_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
             });
 
     }
@@ -91,11 +95,14 @@ export const save = (values, mode) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };
@@ -109,7 +116,7 @@ export const changeData = (object) => {
     }
 };
 
-export const cancelChanges = ()=> {
+export const cancelChanges = () => {
     return (dispatch) => {
         dispatch({
             type: CANCEL_CHANGE_COURSE_DATA,
@@ -118,7 +125,7 @@ export const cancelChanges = ()=> {
     }
 };
 
-export const clear = ()=> {
+export const clear = () => {
     return (dispatch) => {
         dispatch({
             type: CLEAR_COURSE,
@@ -146,16 +153,19 @@ export const getCourseAuthors = (courseId) => {
                 })
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_COURSE_AUTHORS_FAIL,
-                    payload: err
-                });
+                handleJsonError(err)
+                    .then((message) => {
+                        dispatch({
+                            type: GET_COURSE_AUTHORS_FAIL,
+                            payload: message
+                        });
 
-                dispatch({
-                    type: SHOW_ERROR_DIALOG,
-                    payload: err.message
-                })
-            });
+                        dispatch({
+                            type: SHOW_ERROR_DIALOG,
+                            payload: message
+                        })
+                    });
+            })
 
     }
 };

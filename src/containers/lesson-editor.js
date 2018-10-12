@@ -144,6 +144,8 @@ export class LessonEditor extends ObjectEditor {
     }
 
     componentDidUpdate(prevProps) {
+        super.componentDidUpdate(prevProps)
+
         if (prevProps.ogImageId && !this.props.ogImageId) {
             window.$$('og-image-file').setValue('');
         }
