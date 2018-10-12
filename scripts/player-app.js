@@ -26,6 +26,12 @@ Utils.guid = function () {
 
 window.Utils = Utils;
 
+const informNativeApp = (props) => {
+  window.postMessage(
+    JSON.stringify(props)
+  )
+}
+
 (function ($) {
     $(document).ready(function () {
         var playerOptions = getPlayerOptions();
@@ -35,70 +41,58 @@ window.Utils = Utils;
 
         window[playerNameInWindow] = player;
 
-        window.postMessage(
-          JSON.stringify({
-            eventType: 'magisteriaPlayer',
-            eventName: 'playerLoaded',
-            playerObject: 'window.' + playerNameInWindow
-          })
-        )
+        informNativeApp({
+          eventType: 'magisteriaPlayer',
+          eventName: 'playerLoaded',
+          playerObject: 'window.' + playerNameInWindow
+        })
 
         function getPlayerOptions() {
             return {
                 designMode: true,
                 loader: new Loader(),
                 onCurrentTimeChanged: function onCurrentTimeChanged(audioState, value) {
-                  window.postMessage(
-                    JSON.stringify({
-                      eventType: 'magisteriaPlayer',
-                      eventName: 'onCurrentTimeChanged',
-                      data: {
-                        currentTime: audioState.currentTime,
-                        globalTime: audioState.globalTime,
-                        baseTime: audioState.baseTime
-                      }
-                    })
-                  )
+                  informNativeApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'onCurrentTimeChanged',
+                    data: {
+                      currentTime: audioState.currentTime,
+                      globalTime: audioState.globalTime,
+                      baseTime: audioState.baseTime
+                    }
+                  })
                 },
                 onAudioLoaded: function () {
                 },
                 onSetPosition: function onSetPosition(audioState) {
-                  window.postMessage(
-                    JSON.stringify({
-                      eventType: 'magisteriaPlayer',
-                      eventName: 'onSetPosition',
-                      data: {
-                        currentTime: audioState.currentTime,
-                        globalTime: audioState.globalTime,
-                        baseTime: audioState.baseTime
-                      }
-                    })
-                  )
+                  informNativeApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'onSetPosition',
+                    data: {
+                      currentTime: audioState.currentTime,
+                      globalTime: audioState.globalTime,
+                      baseTime: audioState.baseTime
+                    }
+                  })
                 },
                 onSetData: (data) => {
-                    window.postMessage(
-                        JSON.stringify({
-                            eventType: 'magisteriaPlayer',
-                            eventName: 'dataIsSet',
-                            _nativeAppDataUuid: data
-                        })
-                    );
+                  informNativeApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'dataIsSet',
+                    _nativeAppDataUuid: data
+                  })
                 },
                 onElementPlay: () => {
-                    window.postMessage(
-                        JSON.stringify({
-                            eventType: 'magisteriaPlayer',
-                            eventName: 'playerPlaying'
-                        })
-                    )
+                    informNativeApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerPlaying'
+                    })
                 },
                 onElementStop: () => {
-                    window.postMessage(
-                        JSON.stringify({
-                            eventType: 'magisteriaPlayer',
-                            eventName: 'playerStopped'
-                        })
-                    )
+                    informNativeApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerStopped',
+                    })
                 },
                 onFocused: function () {
                 },
@@ -107,35 +101,29 @@ window.Utils = Utils;
                 onAddElement: function () {
                 },
                 onChangeTitles: function (titles) {
-                    var html = "";
-                    for (var i = 0; i < titles.length; i++) {
-                        if (titles[i].title) {
-                            if (html != "") html += "<br/>";
-                            html += titles[i].title;
-                        }
-                    }
-
-                    $("#titles-place").html(html);
+                    informNativeApp({
+                      eventType: 'magisteriaPlayer',
+                      eventName: 'onChangeTitles',
+                      data: {
+                        titles,
+                      }
+                    })
                 },
                 onChangeContent: function (content) {
                     console.log(content);
                 },
                 onPaused: function () {
                     console.log("paused event handler")
-                    window.postMessage(
-                      JSON.stringify({
+                    informNativeApp({
                         eventType: 'magisteriaPlayer',
-                        eventName: 'playerPaused'
-                      })
-                    )
+                        eventName: 'playerPaused',
+                    })
                 },
                 onEnded: function() {
-                  window.postMessage(
-                    JSON.stringify({
+                  informNativeApp({
                       eventType: 'magisteriaPlayer',
-                      eventName: 'playerStopped'
-                    })
-                  )
+                      eventName: 'playerStopped',
+                  })
                 },
                 onStarted: function () {
                     console.log("started event handler")
@@ -144,12 +132,10 @@ window.Utils = Utils;
                     console.error("playback error. player was suspended", e);
                 },
                 onCanPlay: () => {
-                    window.postMessage(
-                        JSON.stringify({
-                            eventType: 'magisteriaPlayer',
-                            eventName: 'playerCanPlay'
-                        })
-                    )
+                    informNativeApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerCanPlay',
+                    })
                 },
             };
         }
