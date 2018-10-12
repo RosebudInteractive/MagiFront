@@ -105,10 +105,7 @@ const DbCategory = class DbCategory extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
             );
@@ -153,10 +150,7 @@ const DbCategory = class DbCategory extends DbObject {
                         if (ctg_obj)
                             this._db._deleteRoot(ctg_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
             );
@@ -211,10 +205,7 @@ const DbCategory = class DbCategory extends DbObject {
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
                         if (isErr)
-                            if (res instanceof Error)
-                                throw res
-                            else
-                                throw new Error("Error: " + JSON.stringify(res));
+                            throw res;
                         return res;
                     })
             );
