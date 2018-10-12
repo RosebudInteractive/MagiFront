@@ -125,7 +125,8 @@ const LESSON_UPD_TREE = {
 };
 
 const LESSON_MSSQL_ID_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" + 
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
+    "  ll.[SnPost], ll.[SnName], ll.[SnDescription],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -157,6 +158,7 @@ const LESSON_MSSQL_CHLD_REQ =
 
 const LESSON_MYSQL_ID_REQ =
     "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
