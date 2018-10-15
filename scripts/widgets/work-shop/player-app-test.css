@@ -1,0 +1,15 @@
+.ctrl_buttons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto;
+    z-index: 10;
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.ctrl_buttons .btn {
+    width: 150px;
+    margin-top: 6px;
+    padding: 4px 0px 4px 0px;
+}

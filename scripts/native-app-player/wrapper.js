@@ -1,6 +1,6 @@
 import Player from "work-shop/player";
 import Loader from "work-shop/resource-loader";
-import 'jquery-ui/jquery-ui.js';
+import 'jquery-ui/jquery-ui';
 import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
 
@@ -39,6 +39,7 @@ export default class NativeAppPlayer {
         }
 
         this._ended = false;
+        this._currentTime = 0;
     }
 
     setData(data) {
@@ -50,7 +51,8 @@ export default class NativeAppPlayer {
             }
 
             this._player = new Player(this._div, this._getPlayerOptions())
-            this._player.setData(data)
+            this._player.render();
+            this._player.setData(data);
         }
     }
 
@@ -92,26 +94,44 @@ export default class NativeAppPlayer {
         }
     }
 
+    seek(position) {
+        if (this._player) {
+            this._player.setPosition(position)
+        }
+    }
+
+    _setCurrentTime(value) {
+        let _delta = value.globalTime - this._currentTime;
+        if ((_delta > 0.5) || (_delta < 0)) {
+            this._currentTime = value.globalTime;
+
+            this._sendMessageToApp({
+                eventType: 'magisteriaPlayer',
+                eventName: 'onCurrentTimeChanged',
+                data: {
+                    currentTime: value.currentTime,
+                    globalTime: value.globalTime,
+                    baseTime: value.baseTime
+                }
+            })
+        }
+    }
+
     _sendMessageToApp(props) {
         window.postMessage(
             JSON.stringify(props), '*'
         )
+        console.log(JSON.stringify(props))
     }
 
     _getPlayerOptions() {
         return {
             designMode: true,
             loader: new Loader(),
-            onCurrentTimeChanged: (audioState) => {
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'onCurrentTimeChanged',
-                    data: {
-                        currentTime: audioState.currentTime,
-                        globalTime: audioState.globalTime,
-                        baseTime: audioState.baseTime
-                    }
-                })
+            onCurrentTimeChanged: (audioState, isRealTimeChanged) => {
+                if (!isRealTimeChanged) return
+
+                this._setCurrentTime(audioState)
             },
             onSetPosition: (audioState) => {
                 this._sendMessageToApp({
@@ -169,10 +189,14 @@ export default class NativeAppPlayer {
                     eventName: 'playerStopped',
                 })
             },
-            onStarted: function () {
+            onStarted: () => {
                 console.log("started event handler")
             },
-            onError: function (e) {
+            onError: (e) => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerError',
+                })
                 console.error("playback error. player was suspended", e);
             },
             onCanPlay: () => {
