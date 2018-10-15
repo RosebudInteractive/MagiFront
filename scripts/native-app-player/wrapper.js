@@ -119,9 +119,9 @@ export default class NativeAppPlayer {
 
     _sendMessageToApp(props) {
         window.postMessage(
-            JSON.stringify(props), '*'
+            JSON.stringify(props)
         )
-        console.log(JSON.stringify(props))
+        // console.log(JSON.stringify(props))
     }
 
     _getPlayerOptions() {
