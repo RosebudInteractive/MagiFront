@@ -12,7 +12,7 @@ import 'jquery-ui/jquery-ui.structure.min.css';
 (function ($) {
     $(document).ready(function () {
 
-        new AppPlayer()
+        new AppPlayer({debug: true})
 
         function getData(id) {
             return new Promise((resolve, reject) => {
