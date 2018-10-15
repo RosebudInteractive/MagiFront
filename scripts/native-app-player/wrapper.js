@@ -19,8 +19,9 @@ Utils.guid = function () {
 window.Utils = Utils;
 
 export default class NativeAppPlayer {
-    constructor() {
+    constructor(options) {
         this._div = $("#player");
+        this._debug = options && options.debug;
         if (this._div && this._div.length) {
 
             this._playerName = 'magisteriaPlayer';// + (new Date).getTime();
@@ -118,10 +119,17 @@ export default class NativeAppPlayer {
     }
 
     _sendMessageToApp(props) {
-        window.postMessage(
-            JSON.stringify(props)
-        )
-        // console.log(JSON.stringify(props))
+        if (this._debug) {
+            window.postMessage(
+                JSON.stringify(props),
+                '*'
+            )
+            console.log(JSON.stringify(props))
+        } else {
+            window.postMessage(
+                JSON.stringify(props)
+            )
+        }
     }
 
     _getPlayerOptions() {
