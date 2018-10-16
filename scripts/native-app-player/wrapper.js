@@ -41,6 +41,7 @@ export default class NativeAppPlayer {
 
         this._ended = false;
         this._currentTime = 0;
+        this._timeChanged = false;
     }
 
     setData(data) {
@@ -110,6 +111,15 @@ export default class NativeAppPlayer {
     }
 
     _setCurrentTime(value) {
+        if (!this._timeChanged) {
+            this._timeChanged = true;
+
+            this._sendMessageToApp({
+                eventType: 'magisteriaPlayer',
+                eventName: 'playerStarted',
+            })
+        }
+
         let _delta = value.globalTime - this._currentTime;
         if ((_delta > 0.5) || (_delta < 0)) {
             this._currentTime = value.globalTime;
@@ -204,7 +214,7 @@ export default class NativeAppPlayer {
                     eventName: 'playerStopped',
                 })
             },
-            onStarted: () => { this._started = true},
+            onStarted: () => { this._started = true },
             onError: (e) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
@@ -233,10 +243,12 @@ export default class NativeAppPlayer {
                 })
             },
             onPlaying: () => {
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerStarted',
-                })
+                if (this._timeChanged) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerStarted',
+                    })
+                }
             },
         };
     }
