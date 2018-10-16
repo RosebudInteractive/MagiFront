@@ -283,7 +283,9 @@ export default class CWSPlayer extends CWSBase {
                 .off("canplay")
                 .off("progress")
                 .off("seeked")
-                .off("loadedmetadata");
+                .off("loadedmetadata")
+                .off('waiting')
+                .off('playing')
         }
     }
 
@@ -395,6 +397,12 @@ export default class CWSPlayer extends CWSBase {
             .on("loadedmetadata", function() {
                 // console.log('loadedmetadata : ', this.src)
                 that._calcBuffered(this)
+            })
+            .on('waiting', () => {
+                this._broadcastWaiting()
+            })
+            .on('playing', () => {
+                this._broadcastPlaying()
             })
     }
 
@@ -548,6 +556,18 @@ export default class CWSPlayer extends CWSBase {
     _broadcastSetData(value) {
         if (this._options.onSetData) {
             this._options.onSetData(value)
+        }
+    }
+
+    _broadcastWaiting() {
+        if (this._options.onWaiting) {
+            this._options.onWaiting()
+        }
+    }
+
+    _broadcastPlaying() {
+        if (this._options.onPlaying) {
+            this._options.onPlaying()
         }
     }
 

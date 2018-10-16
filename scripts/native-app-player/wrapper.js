@@ -45,6 +45,8 @@ export default class NativeAppPlayer {
 
     setData(data) {
         if (data) {
+            this._started = false;
+
             let _audios =  data.episodes.map((item) => {
                 return item.audio.file
             });
@@ -202,12 +204,7 @@ export default class NativeAppPlayer {
                     eventName: 'playerStopped',
                 })
             },
-            onStarted: () => {
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerStarted',
-                })
-            },
+            onStarted: () => { this._started = true},
             onError: (e) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
@@ -215,16 +212,30 @@ export default class NativeAppPlayer {
                 })
             },
             onCanPlay: () => {
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerCanPlay',
-                })
+                if (!this._started) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerCanPlay',
+                    })
+                }
             },
             onBuffered: (value) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffered',
                     value: value,
+                })
+            },
+            onWaiting: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerBuffering',
+                })
+            },
+            onPlaying: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerStarted',
                 })
             },
         };
