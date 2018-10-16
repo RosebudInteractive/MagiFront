@@ -47,6 +47,7 @@ export default class NativeAppPlayer {
     setData(data) {
         if (data) {
             this._started = false;
+            this._timeChanged = false;
 
             let _audios =  data.episodes.map((item) => {
                 return item.audio.file
@@ -116,7 +117,7 @@ export default class NativeAppPlayer {
 
             this._sendMessageToApp({
                 eventType: 'magisteriaPlayer',
-                eventName: 'playerStarted',
+                eventName: 'playerStarted-time',
             })
         }
 
