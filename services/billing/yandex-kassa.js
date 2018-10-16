@@ -375,15 +375,34 @@ class YandexKassa extends Payment {
         });
     }
 
-    _onPreparePaymentFields(id, chequeTypeId, payment, invoice, userId) {
+    _onPreparePaymentFields(id, chequeTypeId, payment, invoice, userId, options) {
         let result = {}
         let paymentObject = result.paymentObject = _.cloneDeep(payment);
         let fields = result.fields = {};
+        let user;
         return new Promise(resolve => {
             let id = invoice ? invoice.UserId : userId;
             resolve(UsersCache().getUserInfoById(id));
         })
-            .then(user => {
+            .then(result => {
+                user = result;
+                let rc;
+                if (paymentObject.cheque_id) {
+                    rc = this.get(paymentObject.cheque_id, options)
+                        .then(cheque => {
+                            if (cheque && cheque.data && (cheque.data.length === 1)) {
+                                if (!cheque.data[0].IsSaved)
+                                    throw new Error(`Cheque "cheque_id": "${paymentObject.cheque_id}" isn't saved.`);
+                                paymentObject.payment_method_id = cheque.data[0].ChequeNum;
+                                delete paymentObject.cheque_id;
+                            }
+                            else
+                                throw new Error(`Cheque "cheque_id": "${paymentObject.cheque_id}" doesn't exist.`);
+                        });
+                }
+                return rc;
+            })
+            .then(() => {
                 let curr = invoice ? invoice.CurrencyCode : Accounting.DfltCurrencyCode;
                 let sumStr = invoice ? invoice.Sum.toFixed(Accounting.SumPrecision) : (payment.amount ? payment.amount.value : null);
                 let sum = parseFloat(sumStr);
@@ -424,10 +443,18 @@ class YandexKassa extends Payment {
                         paymentObject.description = invoice.Items[0].Name;
                     if (invoice.Items && (invoice.Items.length > 0)) {
                         let items = [];
-                        paymentObject.receipt = {
-                            items: items,
-                            email: user.Email
+                        paymentObject.receipt = { items: items };
+                        if (paymentObject.phone) {
+                            paymentObject.receipt.phone = paymentObject.phone;
+                            fields.ReceiptPhone = paymentObject.phone;
+                            delete paymentObject.phone;
                         }
+                        else
+                        {
+                            paymentObject.receipt.email = paymentObject.email ? paymentObject.email : user.Email;
+                            fields.ReceiptEmail = paymentObject.receipt.email;
+                        };
+                        delete paymentObject.email;
                         invoice.Items.forEach(elem => {
                             let item = {};
                             if (elem.ExtFields && elem.ExtFields.vat && elem.ExtFields.vat.yandexKassaCode)

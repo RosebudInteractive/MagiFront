@@ -19,10 +19,27 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Auto Subscription",
+            module: "./auto-subscription",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                autoPay: true,
+                autoPayCheck: false,
+                checkExpire: false,
+                autoPayCheckPeriods: [1, 3],
+                checkExpirePeriods: [1, 3],
+                priceListCode: "MAIN",
+                infoRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru",
+                errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
+            }
+        },
+        {
             name: "Mailing",
             module: "./mailing",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {

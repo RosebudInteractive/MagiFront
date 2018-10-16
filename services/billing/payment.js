@@ -61,7 +61,7 @@ exports.Payment = class Payment extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
-    _onPreparePaymentFields(id, payment, invoice, userId) {
+    _onPreparePaymentFields(id, payment, invoice, userId, options) {
         return new Promise(reject => {
             reject(new Error(`Payment::_onPreparePaymentFields isn't implemented. You shouldn't invoke this method of base class.`));
         })
@@ -133,7 +133,7 @@ exports.Payment = class Payment extends DbObject {
                 }
             }
             else
-                if ((typeof (id) === "number") && (!isNaN(n)))
+                if ((typeof (id) === "number") && (!isNaN(id)))
                     rc = numFieldFunc(id, dbOpts)
                 else
                     throw new Error(`Invalig arg "id": ${JSON.stringify(id)}.`);
@@ -588,7 +588,7 @@ exports.Payment = class Payment extends DbObject {
                     newId = result.keyValue;
                     chequeObj = this._db.getObj(result.newObject);
                     return this._onPreparePaymentFields(chequeObj.id(), chequeTypeId,
-                        data.Payment ? data.Payment : data.Refund, invoiceData, invoiceData ? invoiceData.UserId : data.UserId);
+                        data.Payment ? data.Payment : data.Refund, invoiceData, invoiceData ? invoiceData.UserId : data.UserId, options);
                 })
                 .then(result => {
                     if (parentCheque)
@@ -610,8 +610,10 @@ exports.Payment = class Payment extends DbObject {
                 })
         }, memDbOptions)
             .then(result => {
-                if (result.isError)
+                if (result.isError) {
+                    result.result.newId = newId;
                     throw result.result;
+                }
                 let rc = result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
                     (opts.debug ? result.result : { result: "OK" });
                 return rc;

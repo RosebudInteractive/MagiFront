@@ -28,7 +28,7 @@ const GET_INVOICE_MSSQL =
     "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
     "from[Invoice] i\n" +
     "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
-    "  join[InvoiceItem] it on it.[InvoiceId] = i.[Id]\n" +
+    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]\n" +
     "where i.[Id] = <%= id %>";
 
 const GET_INVOICE_MYSQL =
@@ -37,7 +37,7 @@ const GET_INVOICE_MYSQL =
     "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
     "from`Invoice` i\n" +
     "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
-    "  join`InvoiceItem` it on it.`InvoiceId` = i.`Id`\n" +
+    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`\n" +
     "where i.`Id` = <%= id %>";
 
 const DbInvoice = class DbInvoice extends DbObject {
@@ -88,18 +88,19 @@ const DbInvoice = class DbInvoice extends DbObject {
                             invoice.RefundSum = elem.RefundSum;
                             invoice.Items = [];
                         }
-                        invoice.Items.push({
-                            Id: elem.ItemId,
-                            ProductId: elem.ProductId,
-                            VATTypeId: elem.VATTypeId,
-                            Code: elem.Code,
-                            Name: elem.ItemName,
-                            VATRate: elem.VATRate,
-                            Price: elem.Price,
-                            Qty: elem.Qty,
-                            RefundQty: elem.RefundQty,
-                            ExtFields: JSON.parse(elem.ExtFields)
-                        });
+                        if (typeof (elem.ItemId) === "number")
+                            invoice.Items.push({
+                                Id: elem.ItemId,
+                                ProductId: elem.ProductId,
+                                VATTypeId: elem.VATTypeId,
+                                Code: elem.Code,
+                                Name: elem.ItemName,
+                                VATRate: elem.VATRate,
+                                Price: elem.Price,
+                                Qty: elem.Qty,
+                                RefundQty: elem.RefundQty,
+                                ExtFields: JSON.parse(elem.ExtFields)
+                            });
                     })
                 }
                 return inv;
