@@ -2,7 +2,7 @@ import AppPlayer from "./wrapper";
 
 import 'script-lib/../widgets/work-shop/work-shop-custom.css'
 import 'script-lib/../widgets/work-shop/player.css'
-import 'script-lib/../widgets/work-shop/player-app-test.css'
+import './player-app-test.css'
 import 'script-lib/../widgets/work-shop/player-for-native-app.css'
 import '../../css/font-awesome.css'
 import '../../css/general-player.css'

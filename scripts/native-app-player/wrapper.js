@@ -48,6 +48,7 @@ export default class NativeAppPlayer {
         if (data) {
             this._started = false;
             this._timeChanged = false;
+            this._currentTime = 0;
 
             let _audios =  data.episodes.map((item) => {
                 return item.audio.file
@@ -72,6 +73,13 @@ export default class NativeAppPlayer {
             return
         }
 
+        if (!this._timeChanged) {
+            this._sendMessageToApp({
+                eventType: 'magisteriaPlayer',
+                eventName: 'playerBuffering',
+            })
+        }
+
         if (this._ended) {
             this._player.setPosition(0)
         }
@@ -88,7 +96,7 @@ export default class NativeAppPlayer {
                 console.log(e)
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'playerLoadedError',
+                    eventName: 'playerError',
                 })
             })
     }
@@ -154,7 +162,7 @@ export default class NativeAppPlayer {
 
     _getPlayerOptions() {
         return {
-            designMode: true,
+            designMode: false,
             loader: new Loader(),
             onCurrentTimeChanged: (audioState, isRealTimeChanged) => {
                 if (!isRealTimeChanged) return
@@ -182,13 +190,13 @@ export default class NativeAppPlayer {
             onElementPlay: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'playerPlaying'
+                    eventName: 'assetShowed'
                 })
             },
             onElementStop: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'playerStopped',
+                    eventName: 'assetRemoved',
                 })
             },
             onChangeTitles: (titles) => {
