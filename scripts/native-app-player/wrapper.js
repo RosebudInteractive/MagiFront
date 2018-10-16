@@ -41,10 +41,14 @@ export default class NativeAppPlayer {
 
         this._ended = false;
         this._currentTime = 0;
+        this._timeChanged = false;
     }
 
     setData(data) {
         if (data) {
+            this._started = false;
+            this._timeChanged = false;
+
             let _audios =  data.episodes.map((item) => {
                 return item.audio.file
             });
@@ -110,6 +114,16 @@ export default class NativeAppPlayer {
     _setCurrentTime(value) {
         let _delta = value.globalTime - this._currentTime;
         if ((_delta > 0.5) || (_delta < 0)) {
+
+            if (!this._timeChanged) {
+                this._timeChanged = true;
+
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerStarted',
+                })
+            }
+
             this._currentTime = value.globalTime;
 
             this._sendMessageToApp({
@@ -150,7 +164,7 @@ export default class NativeAppPlayer {
             onSetPosition: (audioState) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'onSetPosition',
+                    eventName: 'onSeeked',
                     data: {
                         currentTime: audioState.currentTime,
                         globalTime: audioState.globalTime,
@@ -190,7 +204,6 @@ export default class NativeAppPlayer {
                 console.log(content);
             },
             onPaused: () => {
-                console.log("paused event handler")
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerPaused',
@@ -203,21 +216,41 @@ export default class NativeAppPlayer {
                     eventName: 'playerStopped',
                 })
             },
-            onStarted: () => {
-                console.log("started event handler")
-            },
+            onStarted: () => { this._started = true },
             onError: (e) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerError',
                 })
-                console.error("playback error. player was suspended", e);
             },
             onCanPlay: () => {
+                if (!this._started) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerCanPlay',
+                    })
+                }
+            },
+            onBuffered: (value) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'playerCanPlay',
+                    eventName: 'playerBuffered',
+                    value: value,
                 })
+            },
+            onWaiting: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerBuffering',
+                })
+            },
+            onPlaying: () => {
+                if (this._timeChanged) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerStarted',
+                    })
+                }
             },
         };
     }

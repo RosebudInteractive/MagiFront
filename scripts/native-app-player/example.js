@@ -9,8 +9,18 @@ import '../../css/general-player.css'
 import 'jquery-ui/jquery-ui.min.css';
 import 'jquery-ui/jquery-ui.structure.min.css';
 
+let listener = (event) => {
+    let _data = event.data;
+    if (_data) {
+        _data = JSON.parse(_data);
+        $('.debug_console').append("<div class='debug_message'>" + _data.eventName + "</div>")
+    }
+}
+
 (function ($) {
     $(document).ready(function () {
+
+        window.addEventListener("message", listener);
 
         new AppPlayer({debug: true})
 
@@ -65,5 +75,7 @@ import 'jquery-ui/jquery-ui.structure.min.css';
             let _rate = $('#rate').val();
             window.magisteriaPlayer.setPlaybackSpeed(_rate)
         })
+
+
     });
 })(jQuery)
