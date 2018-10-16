@@ -190,7 +190,6 @@ export default class NativeAppPlayer {
                 console.log(content);
             },
             onPaused: () => {
-                console.log("paused event handler")
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerPaused',
@@ -204,7 +203,10 @@ export default class NativeAppPlayer {
                 })
             },
             onStarted: () => {
-                console.log("started event handler")
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerStarted',
+                })
             },
             onError: (e) => {
                 this._sendMessageToApp({
