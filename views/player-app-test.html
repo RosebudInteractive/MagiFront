@@ -9,27 +9,25 @@
     <script src="/scripts/lib/require.js"></script>
 </head>
 <body>
-<div class="ctl-buttons">
-    <br/>
-    <button role="play">Play</button>
-    <button role="pause">Pause</button>
-    <br/>
+<div class="ctrl_buttons">
+    <button class="btn set_data_btn">Set data of lesson id</button>
+    <input type="text" id="lecture-id" value="1"><br/>
+    <button class="btn play_btn">Play</button><br/>
+    <button class="btn play_from_pos_btn">Play from</button>
+    <input type="text" id="init_position" value="0"><br/>
+    <button class="btn pause_btn">Pause</button><br/>
+    <button class="btn set_rate_btn">Set rate</button>
+    <select id="rate">
+        <option value="0.5">0.5</option>
+        <option value="0.75">0.75</option>
+        <option value="1" selected>1</option>
+        <option value="1.25">1.25</option>
+        <option value="1.5">1.5</option>
+        <option value="2">2</option>
+    </select><br/>
+    <button class="btn set_position_btn">Set position</button>
+    <input type="text" id="position" value="0"><br/>
 </div>
-<style>
-    #player {
-        padding: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
-
-    #player .ws-player-main {
-        top: 0;
-        transform: none;
-    }
-</style>
 <div id="player" class="ws-container"></div>
 </body>
 </html>

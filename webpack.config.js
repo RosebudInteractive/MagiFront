@@ -12,8 +12,8 @@ const _prodConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
-        'player-app': './scripts/player-app',
-        'player-app-test': './scripts/player-app-test',
+        'player-app': './scripts/native-app-player/player-app',
+        'player-app-test': './scripts/native-app-player/example',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
@@ -106,8 +106,8 @@ const _devConfig = {
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
-        'player-app': './scripts/player-app',
-        'player-app-test': './scripts/player-app-test',
+        'player-app': './scripts/native-app-player/player-app',
+        'player-app-test': './scripts/native-app-player/example',
         'workshop-main': './scripts/workshop-main',
     },
     output: {
