@@ -45,6 +45,12 @@ export default class NativeAppPlayer {
 
     setData(data) {
         if (data) {
+            let _audios =  data.episodes.map((item) => {
+                return item.audio.file
+            });
+
+            Loader.preinitAudio(_audios);
+
             if (this._player) {
                 this._player.pause();
                 this._player.destroy();
