@@ -112,17 +112,18 @@ export default class NativeAppPlayer {
     }
 
     _setCurrentTime(value) {
-        if (!this._timeChanged) {
-            this._timeChanged = true;
-
-            this._sendMessageToApp({
-                eventType: 'magisteriaPlayer',
-                eventName: 'playerStarted-time',
-            })
-        }
-
         let _delta = value.globalTime - this._currentTime;
         if ((_delta > 0.5) || (_delta < 0)) {
+
+            if (!this._timeChanged) {
+                this._timeChanged = true;
+
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerStarted-time',
+                })
+            }
+
             this._currentTime = value.globalTime;
 
             this._sendMessageToApp({
