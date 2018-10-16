@@ -211,12 +211,18 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerError',
                 })
-                console.error("playback error. player was suspended", e);
             },
             onCanPlay: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerCanPlay',
+                })
+            },
+            onBuffered: (value) => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerBuffered',
+                    value: value,
                 })
             },
         };
