@@ -120,7 +120,7 @@ export default class NativeAppPlayer {
 
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'playerStarted-time',
+                    eventName: 'playerStarted',
                 })
             }
 
