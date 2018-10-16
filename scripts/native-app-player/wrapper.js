@@ -150,7 +150,7 @@ export default class NativeAppPlayer {
             onSetPosition: (audioState) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
-                    eventName: 'onSetPosition',
+                    eventName: 'onSeeked',
                     data: {
                         currentTime: audioState.currentTime,
                         globalTime: audioState.globalTime,
