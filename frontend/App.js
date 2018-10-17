@@ -17,6 +17,7 @@ import ProjectPage from './containers/project-page'
 
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
+import FeedbackMessageBox from './components/messages/feedback';
 
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
@@ -24,6 +25,7 @@ import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks} from "./ducks/profile";
+import {showFeedbackWindowSelector} from "./ducks/message";
 
 
 import * as Polifyll from './tools/polyfill';
@@ -133,6 +135,15 @@ class App extends Component {
                 }
             }
         }
+
+        if (!this.props.showFeedbackWindow && nextProps.showFeedbackWindow) {
+            $('body').addClass('modal-open')
+        }
+
+        if (this.props.showFeedbackWindow && !nextProps.showFeedbackWindow) {
+            $('body').removeClass('modal-open')
+        }
+
     }
 
     componentWillUnmount() {
@@ -226,6 +237,7 @@ class App extends Component {
                     <PageFooter/> : null}
                 <AuthPopup visible={this.props.showSignInForm}/>
                 {this.props.showSizeInfo ? <SizeInfo/> : null}
+                {this.props.showFeedbackWindow ? <FeedbackMessageBox/> : null}
             </div>
         );
     }
@@ -239,6 +251,7 @@ function mapStateToProps(state, ownProps) {
         showSizeInfo: state.app.showSizeInfo,
         playInfo: state.player.playingLesson,
         showSignInForm: state.app.showSignInForm,
+        showFeedbackWindow: showFeedbackWindowSelector(state),
         ownProps,
     }
 }

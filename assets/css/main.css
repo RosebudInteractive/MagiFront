@@ -3774,7 +3774,8 @@ li.fancybox-thumbs-loading {
           padding-left: 0; } }
     .footer-actions li:last-child {
       border-right: none; }
-  .footer-actions a {
+  .footer-actions a,
+  .footer-actions .footer-actions__item{
     -webkit-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease;
     display: -webkit-box;
@@ -3794,13 +3795,16 @@ li.fancybox-thumbs-loading {
     min-width: 158px;
     padding: 12px 27px 14px 4px;
     color: #2f2f2f; }
-    .footer-actions a:hover {
+    .footer-actions a:hover,
+    .footer-actions .footer-actions__item:hover{
       opacity: 0.7; }
     @media (max-width: 1023px) {
-      .footer-actions a {
+      .footer-actions a,
+      .footer-actions .footer-actions__item{
         padding-left: 9px; } }
     @media (max-width: 899px) {
-      .footer-actions a {
+      .footer-actions a,
+      .footer-actions .footer-actions__item{
         padding-top: 14px;
         padding-left: 10px;
         padding-right: 10px;
@@ -3820,9 +3824,13 @@ li.fancybox-thumbs-loading {
         -ms-flex-pack: center;
         justify-content: center; } }
     @media (max-width: 639px) {
-      .footer-actions a {
+      .footer-actions a,
+      .footer-actions .footer-actions__item{
         padding-left: 0;
         padding-right: 0; } }
+  .footer-actions .footer-actions__item {
+    cursor: pointer;
+  }
   .footer-actions .icon {
     position: relative;
     margin-right: 10px;
@@ -14300,7 +14308,7 @@ ul.lectures-tab {
   position: relative;
   top: 6px;
   display: none;
-  margin: 15px;
+  margin: 0;
   text-align: center;
   font-family: "Fira Sans", Arial, sans-serif;
   font-size: 13px;
@@ -14308,6 +14316,26 @@ ul.lectures-tab {
   color: #E02F37; }
   .form__error-message.show {
     display: block; }
+
+.form__message {
+  padding: 0;
+  background-color: rgba(255, 255, 255, 0);
+  border: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  font-family: "Fira Sans", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 26px;
+  color: #2f2f2f;
+  border-bottom: 1px solid rgba(47, 47, 74, 0.2);
+  resize: none; }
+  .form__message:focus {
+    outline: none; }
+  @media (max-width: 899px) {
+    .form__message {
+      font-size: 15px; } }
 
 .password-form {
   margin: 0 auto;
@@ -17292,6 +17320,145 @@ ul.lectures-tab {
   ._plain-menu._fixed .section-nav-sublist__link{
     color: #2f2f2f
   }
+
+.video-block {
+  position: relative;
+  padding-top: 43.75%; }
+  @media (max-width: 1023px) {
+    .video-block {
+      padding-top: 56.25%; } }
+  @media (max-width: 639px) {
+    .video-block {
+      -webkit-box-ordinal-group: 0;
+      -webkit-order: -1;
+      -moz-box-ordinal-group: 0;
+      -ms-flex-order: -1;
+      order: -1;
+      margin-top: 20px; } }
+  .video-block video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: block;
+    width: 100%;
+    height: 100%; }
+    @media (max-width: 1023px) {
+      .video-block video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        height: 100%;
+        width: auto;
+        min-width: 100%; } }
+  .video-block__btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    padding: 0;
+    background-color: rgba(255, 255, 255, 0);
+    border: none;
+    outline: none;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+    width: 102px;
+    height: 90px; }
+    .video-block__btn:focus {
+      outline: none; }
+    .video-block__btn:hover {
+      opacity: 0.7; }
+    @media (max-width: 1023px) {
+      .video-block__btn {
+        -webkit-transform: translate(-50%, -50%) scale(0.5);
+        -ms-transform: translate(-50%, -50%) scale(0.5);
+        transform: translate(-50%, -50%) scale(0.5); } }
+    .video-block__btn:before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 45px 0 45px 102px;
+      border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #fff; }
+
+.modal-form {
+  margin: 0 auto; }
+  @media (max-width: 767px) {
+    .modal-form {
+      max-width: -webkit-calc(100% - 40px);
+      max-width: calc(100% - 40px); } }
+  .modal-form__row {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    margin-top: 18px; }
+    @media (max-width: 640px) {
+      .modal-form__row {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: normal;
+        -webkit-flex-direction: column;
+        -moz-box-orient: vertical;
+        -moz-box-direction: normal;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        -webkit-box-align: start;
+        -webkit-align-items: flex-start;
+        -moz-box-align: start;
+        -ms-flex-align: start;
+        align-items: flex-start; } }
+    .modal-form__row .btn {
+      -webkit-box-flex: 0;
+      -webkit-flex: none;
+      -moz-box-flex: 0;
+      -ms-flex: none;
+      flex: none;
+      margin-left: 26px;
+      height: 50px;
+      min-width: 227px;
+      font-weight: 400;
+      font-size: 18px; }
+      @media (max-width: 640px) {
+        .modal-form__row .btn {
+          margin-left: 0;
+          margin-top: 21px;
+          min-width: 100%; } }
+    .modal-form__row .form__field {
+      -webkit-box-flex: 1;
+      -webkit-flex-grow: 1;
+      -moz-box-flex: 1;
+      -ms-flex-positive: 1;
+      flex-grow: 1; }
+  .modal-form .form__field, .modal-form .form__message {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 16px;
+    height: 34px;
+    font-size: 13px;
+    line-height: 17px;
+    border: 1px solid #d5d5d5; }
+  .modal-form .form__message {
+    padding: 12px 16px;
+    height: 165px; }
 
 /*# sourceMappingURL=main.css.map */
 
