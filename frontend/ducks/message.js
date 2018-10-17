@@ -79,7 +79,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const showFeedbackWindowSelector = createSelector(stateSelector, state => state.showFeedbackWindow)
-// export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const showFeedbackResultMessageSelector = createSelector(stateSelector, state => state.showFeedbackResultMessage)
+export const errorMessageSelector = createSelector(stateSelector, state => state.error)
 
 /**
  * Action Creators

@@ -18,6 +18,7 @@ import ProjectPage from './containers/project-page'
 import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
 import FeedbackMessageBox from './components/messages/feedback';
+import FeedbackResultMessage from './components/messages/feedback-result-message';
 
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
@@ -26,6 +27,7 @@ import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks} from "./ducks/profile";
 import {showFeedbackWindowSelector} from "./ducks/message";
+import {showFeedbackResultMessageSelector} from "./ducks/message";
 
 
 import * as Polifyll from './tools/polyfill';
@@ -136,11 +138,11 @@ class App extends Component {
             }
         }
 
-        if (!this.props.showFeedbackWindow && nextProps.showFeedbackWindow) {
+        if ((!this.props.showFeedbackWindow && !this.props.showFeedbackResultMessage) && (nextProps.showFeedbackWindow || nextProps.showFeedbackResultMessage)) {
             $('body').addClass('modal-open')
         }
 
-        if (this.props.showFeedbackWindow && !nextProps.showFeedbackWindow) {
+        if ((this.props.showFeedbackWindow || this.props.showFeedbackResultMessage) && (!nextProps.showFeedbackWindow && !nextProps.showFeedbackResultMessage)) {
             $('body').removeClass('modal-open')
         }
 
@@ -238,6 +240,7 @@ class App extends Component {
                 <AuthPopup visible={this.props.showSignInForm}/>
                 {this.props.showSizeInfo ? <SizeInfo/> : null}
                 {this.props.showFeedbackWindow ? <FeedbackMessageBox/> : null}
+                {this.props.showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
             </div>
         );
     }
@@ -252,6 +255,7 @@ function mapStateToProps(state, ownProps) {
         playInfo: state.player.playingLesson,
         showSignInForm: state.app.showSignInForm,
         showFeedbackWindow: showFeedbackWindowSelector(state),
+        showFeedbackResultMessage: showFeedbackResultMessageSelector(state),
         ownProps,
     }
 }

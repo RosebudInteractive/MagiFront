@@ -17,14 +17,18 @@ class FeedbackMessageBox extends React.Component {
         this.props.close()
     }
 
-    _send() {
+    _handleSubmit(event) {
+        event.preventDefault();
+
         if (this._isSendingEnable()) {
-            this.props.sendFeedback({
-                sender: this.state.sender,
-                message: this.state.message,
-            })
+            const data = new FormData(event.target);
+            data.sender = this.state.sender;
+            data.message = this.state.message;
+
+            this.props.sendFeedback(data)
         }
     }
+
 
     _changeMessage(e) {
         this.setState({message: e.target.value})
@@ -50,13 +54,13 @@ class FeedbackMessageBox extends React.Component {
                     <p className="modal__headline">Хотите помочь проекту?</p>
                 </div>
                 <div className="modal__body">
-                    <form className="form modal-form">
+                    <form className="form modal-form" onSubmit={::this._handleSubmit}>
                         <textarea onChange={::this._changeMessage} name="message" id="message" className="form__message"
                                   placeholder="Если не хотите помочь не пишите."/>
                         <div className="modal-form__row">
                             <input onChange={::this._changeSender} type="text" id="contacts" className="form__field"
                                    placeholder="Как с вами связаться?"/>
-                            <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} onClick={::this._send}>Отправить сообщение</button>
+                            <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} type='submit'>Отправить сообщение</button>
                         </div>
                     </form>
                 </div>
