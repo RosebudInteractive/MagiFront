@@ -146,6 +146,18 @@ module.exports = {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:'
     },
+    billing: {
+        module: "../../services/billing/yandex-kassa",
+        enabled: true,
+        debug: false,
+        subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        yandexKassa: {
+            shopId: "536331",
+            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            callBack: "/api/yandex-kassa/callback",
+            returnUrl: "/"
+        }
+    },
     mail: {
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",

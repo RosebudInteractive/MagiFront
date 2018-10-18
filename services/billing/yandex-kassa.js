@@ -518,6 +518,23 @@ class YandexKassa extends Payment {
             resolve(rc);
         });
     }
+
+    isChequePaid(chequeData) {
+        return chequeData && (chequeData.paid === true) && (chequeData.status === "succeeded") ? true : false;
+    }
+
+    getMeta(chequeData) {
+        let res = chequeData && chequeData.metadata ? chequeData.metadata : null;
+        if (res) {
+            res.ChequeId = parseInt(res.ChequeId);
+            res.InvoiceId = parseInt(res.InvoiceId);
+            if (isNaN(res.ChequeId))
+                delete res.ChequeId;
+            if (isNaN(res.InvoiceId))
+                delete res.InvoiceId;
+        }
+        return res;
+    }
 }
 
 let yandexKassa = null;

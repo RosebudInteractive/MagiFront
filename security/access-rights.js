@@ -38,7 +38,7 @@ exports.AccessRights = class {
                             let rec = result.detail[0];
                             let now = new Date();
                             if ((!rec.FreeExpDate)||(now > rec.FreeExpDate)) {
-                                if (rec.IsSubsRequired && ((!user.SubsExpDate) || (now > rec.SubsExpDate)))
+                                if (rec.IsSubsRequired && ((!user.SubsExpDateExt) || (now > rec.SubsExpDateExt)))
                                     res = false;    
                             }
                         }

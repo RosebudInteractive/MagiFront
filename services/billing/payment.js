@@ -231,6 +231,14 @@ exports.Payment = class Payment extends DbObject {
             });
     }
 
+    isChequePaid(chequeData) {
+        throw new Error(`Payment::isChequePaid isn't implemented. You shouldn't invoke this method of base class.`);
+    }
+
+    getMeta(chequeData) {
+        throw new Error(`Payment::getMeta isn't implemented. You shouldn't invoke this method of base class.`);
+    }
+
     cancel(id, data, options) {
         let memDbOptions = { dbRoots: [] };
         let inpData = data || {};
@@ -455,7 +463,7 @@ exports.Payment = class Payment extends DbObject {
                         }
                         if (duration) {
                             let now = new Date();
-                            let current = user.SubsExpDate && (user.SubsExpDate > now) ? user.SubsExpDate : new Date(now);
+                            let current = user.SubsExpDateExt && (user.SubsExpDateExt > now) ? user.SubsExpDate : new Date(now);
                             let sign = isRefund ? -1 : 1;
                             switch (duration.units) {
                                 case "d":
@@ -614,8 +622,8 @@ exports.Payment = class Payment extends DbObject {
                     result.result.newId = newId;
                     throw result.result;
                 }
-                let rc = result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
-                    (opts.debug ? result.result : { result: "OK" });
+                let rc = opts.fullResult ? result.result : (result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
+                    (opts.debug ? result.result : { result: "OK" }));
                 return rc;
             });
     }

@@ -26,12 +26,9 @@ let options = {
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 autoPay: true,
-                autoPayCheck: false,
                 checkExpire: false,
-                autoPayCheckPeriods: [1, 3],
                 checkExpirePeriods: [1, 3],
                 priceListCode: "MAIN",
-                infoRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru",
                 errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
             }
         },
@@ -168,6 +165,18 @@ let options = {
         useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
+    },
+    billing: {
+        module: "../../services/billing/yandex-kassa",
+        enabled: true,
+        debug: false,
+        subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        yandexKassa: {
+            shopId: "536331",
+            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            callBack: "/api/yandex-kassa/callback",
+            returnUrl: "/"
+        }
     },
     mail: {
         sendPulse: {

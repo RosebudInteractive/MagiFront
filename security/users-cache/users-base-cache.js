@@ -1,5 +1,6 @@
 'use strict'
 const _ = require('lodash');
+const config = require('config');
 const randomstring = require('randomstring');
 const hasher = require('wordpress-hash-node');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
@@ -17,8 +18,16 @@ const LOGIN_FIELD = "Email";
 const STATUS_ACTIVE = 1;
 const STATUS_PENDING = 2;
 
+const SubsExtPeriod = config.has("billing.subsExtPeriod") ? config.get("billing.subsExtPeriod") : null;
+
 const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
 const CONV_USER_DATA_FN = (rawUser) => {
+    rawUser.SubsExpDateExt = null;
+    if (rawUser.SubsExpDate) {
+        rawUser.SubsExpDateExt = new Date(rawUser.SubsExpDate);
+        if (SubsExtPeriod)
+            rawUser.SubsExpDateExt.setHours(rawUser.SubsExpDate.getHours() + SubsExtPeriod);
+    }
     if (typeof (rawUser.PData) === "string") {
         try {
             rawUser.PData = JSON.parse(rawUser.PData);
@@ -71,6 +80,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
             Name: user.Name,
             DisplayName: user.DisplayName,
             SubsExpDate: user.SubsExpDate,
+            SubsExpDateExt: user.SubsExpDateExt ? user.SubsExpDateExt : user.SubsExpDate,
             PData: user.PData
         };
     }

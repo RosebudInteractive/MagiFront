@@ -59,8 +59,6 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("NextSubsExpDate", { type: "datetime", allowNull: false })
             .addField("ChequeId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: true })
             .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: true })
-            .addField("ReceiptEmail", { type: "string", length: 255, allowNull: true })
-            .addField("ReceiptPhone", { type: "string", length: 50, allowNull: true })
             .addField("Succeeded", { type: "boolean", allowNull: false })
             .addField("Error", { type: "string", allowNull: true })
 
