@@ -18,6 +18,8 @@ const initialState = {
     hasChanges: false,
     ogImageId: null,
     twitterImageId: null,
+    hasOgImage: false,
+    hasTwitterImage: false,
 };
 
 export default function singleLesson(state = initialState, action) {
@@ -76,7 +78,9 @@ export default function singleLesson(state = initialState, action) {
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
                 ogImageId: _ogImageId,
+                hasOgImage: !!_ogImageId,
                 twitterImageId: _twitterId,
+                hasTwitterImage: !!_twitterId,
                 fetching: false,
                 hasChanges: false,
             };
@@ -90,15 +94,15 @@ export default function singleLesson(state = initialState, action) {
                 hasChanges: false,};
 
         case SAVE_LESSON_SUCCESS: {
-            let _id = action.payload.id ? action.payload.id : state.current.id;
-            state.current.id = _id;
-            state.current.Id = _id;
+            state.current.Id = action.payload.id ? action.payload.id : state.current.id;
 
             let _newInitialLesson = Object.assign({}, state.current);
 
             return {
                 ...state,
                 initialLesson: _newInitialLesson,
+                hasOgImage: !!state.current.ogImageId,
+                hasTwitterImage: !!state.current.twitterImageId,
                 fetching: false,
                 hasChanges: false,
             };
@@ -142,7 +146,9 @@ export default function singleLesson(state = initialState, action) {
             return {...state, initial: null,
                 current: null,
                 ogImageId: null,
+                hasOgImage: false,
                 twitterImageId: null,
+                hasTwitterImage: false,
                 fetching: true,
                 hasChanges: false,}
         }
