@@ -1,13 +1,15 @@
 import React from 'react';
-// import './page-footer.css';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {showFeedbackWindow} from "../../ducks/message";
 import * as svg from '../../tools/svg-paths';
 
-export default class PageFooter extends React.Component {
+class PageFooter extends React.Component {
 
     render() {
         return (
             <footer className="page-footer">
-                <Wrapper/>
+                <Wrapper {...this.props}/>
                 <Copyright/>
             </footer>
         )
@@ -19,7 +21,7 @@ class Wrapper extends React.Component {
     render() {
         return (
             <div className="page-footer__wrapper">
-                <Row/>
+                <Row {...this.props}/>
                 <Inner/>
             </div>
         )
@@ -27,34 +29,33 @@ class Wrapper extends React.Component {
 }
 
 class Row extends React.Component {
+
     render() {
+        const _logoMob = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#logo-mob"/>',
+            _idea = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#idea"/>',
+            _comment = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#comment"/>';
+
         return (
             <div className="page-footer__row">
                 <a href="#" className="logo-footer">
-                    <svg width="70" height="43">
-                        {svg.logoMob}
-                    </svg>
+                    <svg width="70" height="43" dangerouslySetInnerHTML={{__html: _logoMob}}/>
                 </a>
                 <ul className="footer-actions">
                     <li>
-                        <a href="#">
+                        <a href="http://ideas.magisteria.ru/">
                             <div className="icon">
-                                <svg width="24" height="24">
-                                    {svg.idea}
-                                </svg>
+                                <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _idea}}/>
                             </div>
                             <span>Оставьте идею</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <div className='footer-actions__item' onClick={::this.props.showFeedbackWindow}>
                             <div className="icon">
-                                <svg width="22" height="18">
-                                    {svg.comment}
-                                </svg>
+                                <svg width="22" height="18" dangerouslySetInnerHTML={{__html: _comment}}/>
                             </div>
                             <span>Напишите нам</span>
-                        </a>
+                        </div>
                     </li>
                 </ul>
             </div>
@@ -154,3 +155,11 @@ class Copyright extends React.Component {
         )
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        showFeedbackWindow: bindActionCreators(showFeedbackWindow, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps) (PageFooter)

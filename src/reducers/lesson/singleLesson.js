@@ -16,8 +16,12 @@ const initialState = {
     current: null,
     fetching: false,
     hasChanges: false,
+    ogImageResourceId: null,
     ogImageId: null,
+    twitterImageResourceId: null,
     twitterImageId: null,
+    hasOgImage: false,
+    hasTwitterImage: false,
 };
 
 export default function singleLesson(state = initialState, action) {
@@ -56,17 +60,21 @@ export default function singleLesson(state = initialState, action) {
 
         case GET_SINGLE_LESSON_SUCCESS: {
             let _lesson = action.payload,
+                _ogImageResourceId = null,
+                _twitterResourceId = null,
                 _ogImageId = null,
-                _twitterId = null;
+                _twitterImageId = null;
 
             if (_lesson && _lesson.Images) {
                 _lesson.Images.forEach(image => {
                     if (image.Type === 'og') {
-                        _ogImageId = image.ResourceId;
+                        _ogImageResourceId = image.ResourceId;
+                        _ogImageId = image.Id;
                     }
 
                     if (image.Type === 'twitter') {
-                        _twitterId = image.ResourceId;
+                        _twitterResourceId = image.ResourceId;
+                        _twitterImageId = image.Id;
                     }
                 })
             }
@@ -75,8 +83,12 @@ export default function singleLesson(state = initialState, action) {
                 ...state,
                 initial: action.payload,
                 current: Object.assign({}, action.payload),
+                ogImageResourceId: _ogImageResourceId,
                 ogImageId: _ogImageId,
-                twitterImageId: _twitterId,
+                hasOgImage: !!_ogImageResourceId,
+                twitterImageResourceId: _twitterResourceId,
+                twitterImageId: _twitterImageId,
+                hasTwitterImage: !!_twitterResourceId,
                 fetching: false,
                 hasChanges: false,
             };
@@ -90,15 +102,15 @@ export default function singleLesson(state = initialState, action) {
                 hasChanges: false,};
 
         case SAVE_LESSON_SUCCESS: {
-            let _id = action.payload.id ? action.payload.id : state.current.id;
-            state.current.id = _id;
-            state.current.Id = _id;
+            state.current.Id = action.payload.id ? action.payload.id : state.current.id;
 
             let _newInitialLesson = Object.assign({}, state.current);
 
             return {
                 ...state,
                 initialLesson: _newInitialLesson,
+                hasOgImage: !!state.current.ogImageResourceId,
+                hasTwitterImage: !!state.current.twitterImageResourceId,
                 fetching: false,
                 hasChanges: false,
             };
@@ -132,8 +144,8 @@ export default function singleLesson(state = initialState, action) {
                 ...state,
                 current: Object.assign({}, state.initial),
                 fetching: false,
-                ogImageId: _ogImageId,
-                twitterImageId: _twitterId,
+                ogImageResourceId: _ogImageId,
+                twitterImageResourceId: _twitterId,
                 hasChanges: false,
             };
         }
@@ -141,18 +153,22 @@ export default function singleLesson(state = initialState, action) {
         case CLEAR_LESSON: {
             return {...state, initial: null,
                 current: null,
-                ogImageId: null,
-                twitterImageId: null,
+                ogImageResourceId: null,
+                hasOgImage: false,
+                twitterImageResourceId: null,
+                hasTwitterImage: false,
                 fetching: true,
                 hasChanges: false,}
         }
 
         case SET_OG_IMAGE_RESOURCE_ID: {
-            return {...state, ogImageId: action.payload, hasChanges: true }
+
+
+            return {...state, ogImageResourceId: action.payload, hasChanges: true }
         }
 
         case SET_TWITTER_IMAGE_RESOURCE_ID: {
-            return {...state, twitterImageId: action.payload, hasChanges: true }
+            return {...state, twitterImageResourceId: action.payload, hasChanges: true }
         }
 
         default:

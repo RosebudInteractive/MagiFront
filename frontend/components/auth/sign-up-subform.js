@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-    import {reduxForm, Field, formValueSelector} from 'redux-form';
+import {reduxForm, Field, formValueSelector} from 'redux-form';
 import ButtonsBlock from './buttons-block'
 import Captcha from './captcha'
 import {connect} from 'react-redux'
@@ -87,7 +87,8 @@ let SignUpForm = class SignUpForm extends React.Component {
 
     render() {
         const {invalid, serverError, loading} = this.props;
-        const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
+        const _errorText = serverError &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
@@ -100,7 +101,8 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <div className="form register-form">
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
-                                    <SignUpButton disabled={invalid || !this.props.login || loading} caption={'Продолжить'}
+                                    <SignUpButton disabled={invalid || !this.props.login || loading}
+                                                  caption={'Продолжить'}
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
                             </div>
@@ -115,7 +117,8 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={invalid || !this.state.captcha || loading} caption={'Зарегистрироваться'} type={'submit'}/>
+                                <SignUpButton disabled={invalid || !this.state.captcha || loading}
+                                              caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
                         </div>
                 }

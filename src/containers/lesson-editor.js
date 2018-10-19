@@ -129,8 +129,6 @@ export class LessonEditor extends ObjectEditor {
         const {
             lesson,
             course,
-            ogImageId,
-            twitterImageId
         } = next;
 
         if (this.editMode === EDIT_MODE_INSERT) {
@@ -146,17 +144,17 @@ export class LessonEditor extends ObjectEditor {
     componentDidUpdate(prevProps) {
         super.componentDidUpdate(prevProps)
 
-        if (prevProps.ogImageId && !this.props.ogImageId) {
+        if (prevProps.ogImageResourceId && !this.props.ogImageResourceId) {
             window.$$('og-image-file').setValue('');
         }
 
-        if (prevProps.twitterImageId && !this.props.twitterImageId) {
+        if (prevProps.twitterImageResourceId && !this.props.twitterImageResourceId) {
             window.$$('twitter-image-file').setValue('');
         }
 
-        if (this.props.ogImageId) {
+        if (this.props.ogImageResourceId) {
             let _resource = this.props.resources.find((item) => {
-                return item.Id === this.props.ogImageId
+                return item.Id === this.props.ogImageResourceId
             })
 
             if (_resource) {
@@ -168,9 +166,9 @@ export class LessonEditor extends ObjectEditor {
             }
         }
 
-        if (this.props.twitterImageId) {
+        if (this.props.twitterImageResourceId) {
             let _resource = this.props.resources.find((item) => {
-                return item.Id === this.props.twitterImageId
+                return item.Id === this.props.twitterImageResourceId
             })
 
             if (_resource) {
@@ -182,8 +180,6 @@ export class LessonEditor extends ObjectEditor {
             }
         }
     }
-
-
 
     _getInitStateOfNewObject(props) {
         return {
@@ -250,15 +246,24 @@ export class LessonEditor extends ObjectEditor {
             SnPost: value.SnPost,
         };
 
-        if (this.props.ogImageId || this.props.twitterImageId) {
+        let {
+            ogImageId,
+            ogImageResourceId,
+            twitterImageId,
+            twitterImageResourceId,
+            hasOgImage,
+            hasTwitterImage,
+        } = this.props;
+
+        if (ogImageResourceId || twitterImageResourceId || hasOgImage || hasTwitterImage) {
             _obj.Images = [];
 
-            if (this.props.ogImageId) {
-                _obj.Images.push({Type: 'og', ResourceId: this.props.ogImageId})
+            if (ogImageResourceId) {
+                _obj.Images.push({Id: ogImageId, Type: 'og', ResourceId: ogImageResourceId})
             }
 
-            if (this.props.twitterImageId) {
-                _obj.Images.push({Type: 'twitter', ResourceId: this.props.twitterImageId})
+            if (twitterImageResourceId) {
+                _obj.Images.push({Id: twitterImageId, Type: 'twitter', ResourceId: twitterImageResourceId})
             }
         }
 
@@ -1022,7 +1027,7 @@ export class LessonEditor extends ObjectEditor {
                     },
                 ]
             },
-            {template: "Социальные сети", type: "section"},
+            {template: "Социальные сети", type: "header"},
             {
                 view: "text",
                 name: "SnName",
@@ -1133,8 +1138,12 @@ function mapStateToProps(state, ownProps) {
     return {
         authors: state.courseAuthorsList.authors,
         lesson: state.singleLesson.current,
+        ogImageResourceId: state.singleLesson.ogImageResourceId,
+        twitterImageResourceId: state.singleLesson.twitterImageResourceId,
         ogImageId: state.singleLesson.ogImageId,
         twitterImageId: state.singleLesson.twitterImageId,
+        hasOgImage: state.singleLesson.hasOgImage,
+        hasTwitterImage: state.singleLesson.hasTwitterImage,
 
         mainEpisodes: state.lessonMainEpisodes.current,
         recommendedRef: state.lessonRecommendedRefs.current,
