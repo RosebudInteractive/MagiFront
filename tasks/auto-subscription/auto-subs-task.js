@@ -31,7 +31,7 @@ const GET_SUBS_MSSQL =
     "  join[PriceList] pl on pl.[Id] = pr.[PriceListId]\n" +
     "  join[Currency] cr on cr.[Id] = pl.[CurrencyId]\n" +
     "  left join[AutoSubscription] a on a.[UserId] = u.[SysParentId] and a.[SubsExpDate] = u.[SubsExpDate]\n" +
-    "where(not u.[SubsAutoPayId] is NULL) and(a.[Id] is NULL)\n" +
+    "where(not u.[SubsAutoPayId] is NULL) and(a.[Id] is NULL) and (not u.[SubsExpDate] is NULL)\n" +
     "  and(u.[SubsExpDate] <= GETDATE()) and (u.[SubsAutoPay] = 1)\n" +
     "  and(pl.[Code] = '<%= price_list %>')\n" +
     "  and((pr.[FirstDate] <= GETDATE()) and((pr.[LastDate] > GETDATE()) or(pr.[LastDate] is NULL)))";
@@ -46,13 +46,34 @@ const GET_SUBS_MYSQL =
     "  join`PriceList` pl on pl.`Id` = pr.`PriceListId`\n" +
     "  join`Currency` cr on cr.`Id` = pl.`CurrencyId`\n" +
     "  left join`AutoSubscription` a on a.`UserId` = u.`SysParentId` and a.`SubsExpDate` = u.`SubsExpDate`\n" +
-    "where(not u.`SubsAutoPayId` is NULL) and(a.`Id` is NULL)\n" +
+    "where(not u.`SubsAutoPayId` is NULL) and(a.`Id` is NULL) and (not u.`SubsExpDate` is NULL)\n" +
     "  and(u.`SubsExpDate` <= NOW()) and (u.`SubsAutoPay` = 1)\n" +
     "  and(pl.`Code` = '<%= price_list %>')\n" +
     "  and((pr.`FirstDate` <= NOW()) and((pr.`LastDate` > NOW()) or(pr.`LastDate` is NULL)))";
 
+const GET_EXP_MSSQL =
+    "select top <%= nrec %> u.[SysParentId] as [Id], u.[Email], u.[DisplayName], u.[SubsExpDate] from [User] u\n" +
+    "  left join[SubsNotification] n on u.[SysParentId] = n.[UserId]\n" +
+    "    and u.[SubsExpDate] = n.[SubsExpDate] and n.[Days] = <%= period %>\n" +
+    "where(u.[SubsAutoPay] = 0) and (not u.[SubsExpDate] is NULL)\n" +
+    "  and(u.[SubsExpDate] > DATEADD(d, <%= prev_period %>, DATEFROMPARTS(DATEPART(yy, GETDATE()), DATEPART(m, GETDATE()), DATEPART(d, GETDATE()))))\n" +
+    "  and(u.[SubsExpDate] <= DATEADD(d, <%= period %>, DATEFROMPARTS(DATEPART(yy, GETDATE()), DATEPART(m, GETDATE()), DATEPART(d, GETDATE()))))\n" +
+    "  and(n.[Id] is NULL)";
+
+const GET_EXP_MYSQL =
+    "select u.`SysParentId` as `Id`, u.`Email`, u.`DisplayName`, u.`SubsExpDate` from `User` u\n" +
+    "  left join`SubsNotification` n on u.`SysParentId` = n.`UserId`\n" +
+    "    and u.`SubsExpDate` = n.`SubsExpDate` and n.`Days` = <%= period %>\n" +
+    "where(u.`SubsAutoPay` = 0) and (not u.`SubsExpDate` is NULL)\n" +
+    "  and(u.`SubsExpDate` > DATE_ADD(DATE(NOW()),interval <%= prev_period %> DAY))\n" +
+    "  and(u.`SubsExpDate` <= DATE_ADD(DATE(NOW()),interval <%= period %> DAY))\n" +
+    "  and(n.`Id` is NULL)\n" +
+    "limit <%= nrec %>";
+
+const DFLT_EXP_PERIODS = [1];
 const dfltSettings = {
-    priceListCode: "MAIN"
+    priceListCode: "MAIN",
+    maxExpNum: 20
 };
 
 const IMG_WIDTH = 360;
@@ -64,12 +85,97 @@ exports.AutoSubsTask = class AutoSubsTask extends Task {
         super(name, options);
         let opts = options || {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
+        if (!this._settings.checkExpirePeriods)
+            this._settings.checkExpirePeriods = Array.from(DFLT_EXP_PERIODS);
+        this._settings.checkExpirePeriods.sort((a, b) => { return a - b; });
         if (config.billing.enabled && config.has("billing.module")) {
             const { PaymentObject } = require(config.billing.module);
             this._paymentServise = PaymentObject();
         }
         else
             throw new Error(`Billing isn't configured.`);
+    }
+
+    _checkExpiration() {
+        let errors = [];
+        return new Promise(resolve => {
+            let prev_elem = 0;
+            let nrec = this._settings.maxExpNum;
+            let rc = Utils.seqExec(this._settings.checkExpirePeriods, (elem) => {
+                return $data.execSql({
+                    dialect: {
+                        mysql: _.template(GET_EXP_MYSQL)({ nrec: nrec, period: elem, prev_period: prev_elem }),
+                        mssql: _.template(GET_EXP_MSSQL)({ nrec: nrec, period: elem, prev_period: prev_elem })
+                    }
+                }, {})
+                    .then(result => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let emails = [];
+                            let dbOptions = { dbRoots: [] };
+                            let root_obj;
+                            let db = $memDataBase;
+
+                            return Utils.editDataWrapper(() => {
+                                return new MemDbPromise(db, (resolve, reject) => {
+                                    var predicate = new Predicate(db, {});
+                                    predicate
+                                        .addCondition({ field: "Id", op: "=", value: -1 });
+                                    let exp =
+                                    {
+                                        expr: {
+                                            model: {
+                                                name: "SubsNotification"
+                                            },
+                                            predicate: predicate.serialize(true)
+                                        }
+                                    };
+                                    db._deleteRoot(predicate.getRoot());
+                                    resolve(db.getData(Utils.guid(), null, null, exp, {}));
+                                })
+                                    .then((result) => {
+                                        if (result && result.guids && (result.guids.length === 1)) {
+                                            root_obj = db.getObj(result.guids[0]);
+                                            if (!root_obj)
+                                                throw new Error("Object doesn't exist: " + result.guids[0]);
+                                        }
+                                        else
+                                            throw new Error("Invalid result of \"getData\": " + JSON.stringify(result));
+
+                                        dbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                                        return root_obj.edit();
+                                    })
+                                    .then(() => {
+                                        return Utils.seqExec(result.detail, (user) => {
+                                            emails.push({ name: user.DisplayName, email: user.Email });
+                                            let fields = {
+                                                UserId: user.Id,
+                                                SubsExpDate: user.SubsExpDate,
+                                                Days: elem
+                                            };
+
+                                            return root_obj.newObject({
+                                                fields: fields
+                                            }, {});
+                                        });
+                                    })
+                                    .then(() => {
+                                        return root_obj.save();
+                                    })
+                                    .then(() => {
+                                        return emails;
+                                    })
+                            }, dbOptions);
+                        }
+                    })
+                    .then(emails => {
+                        console.log(elem + " day(s)", JSON.stringify(emails, null, 2));
+                    })
+                    .then(() => {
+                        prev_elem = elem;
+                    });
+            });
+            resolve(rc);
+        })
     }
 
     _autoSubscribe() {
@@ -235,6 +341,10 @@ exports.AutoSubsTask = class AutoSubsTask extends Task {
             .then(() => {
                 if (this._settings.autoPay)
                     return this._autoSubscribe();
+            })
+            .then(() => {
+                if (this._settings.checkExpire)
+                    return this._checkExpiration();
             });
     }
 };

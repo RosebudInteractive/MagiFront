@@ -13,7 +13,7 @@ module.exports = {
             disabled: false,
             schedule: "0 */30 * * * *", // run every 30 min
             options: {
-                autoPay: true,
+                autoPay: false,
                 checkExpire: false,
                 checkExpirePeriods: [1, 3],
                 priceListCode: "MAIN",

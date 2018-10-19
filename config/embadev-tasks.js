@@ -25,8 +25,9 @@ let options = {
             disabled: false,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
-                autoPay: true,
-                checkExpire: false,
+                autoPay: false,
+                checkExpire: true,
+                maxExpNum: 20,
                 checkExpirePeriods: [1, 3],
                 priceListCode: "MAIN",
                 errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"

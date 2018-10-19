@@ -128,3 +128,5 @@ CREATE INDEX `idx_User_NextSubsExpDate` ON `AutoSubscription`(`NextSubsExpDate`)
 GO
 CREATE INDEX `idx_User_Succeeded` ON `AutoSubscription`(`Succeeded`);
 GO
+CREATE UNIQUE INDEX `u_Idx_SubsNotification_UserId_SubsExpDate_Days` ON `SubsNotification`(`UserId`, `SubsExpDate`, `Days`);
+GO

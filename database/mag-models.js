@@ -61,8 +61,12 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: true })
             .addField("Succeeded", { type: "boolean", allowNull: false })
             .addField("Error", { type: "string", allowNull: true })
-
         
+        metaDataMgr.addModel("SubsNotification", "043dfc13-0795-42d4-8791-7c2fb43c48d5", "RootSubsNotification", "35a8e4a5-3ea7-4537-bfa2-6228f15df68e")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+            .addField("SubsExpDate", { type: "datetime", allowNull: false })
+            .addField("Days", { type: "int", allowNull: false })
+
         metaDataMgr.addModel("SNetProfile", "54c9008e-4916-4972-a5f3-7325d229df68", "RootSNetProfile", "45d677c1-9784-426a-b255-024eaa6f1ebc")
             .addField("UserId", { type: "dataRef", model: "User", refAction: "parentCascade", allowNull: false })
             .addField("ProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
