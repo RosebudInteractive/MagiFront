@@ -20,6 +20,7 @@ import {
     SHOW_SPEED_TOOLTIP,
     HIDE_SPEED_TOOLTIP,
     PLAYER_CAN_NOT_START_PLAY_LESSON,
+    PLAYER_SET_PROGRESS_PERCENT,
 } from '../constants/player'
 
 export const startInit = () => {
@@ -68,6 +69,13 @@ export const setCurrentTime = (time) => {
     return {
         type: PLAYER_SET_CURRENT_TIME,
         payload: time
+    };
+};
+
+export const setProgressPercent = (value) => {
+    return {
+        type: PLAYER_SET_PROGRESS_PERCENT,
+        payload: value
     };
 };
 
