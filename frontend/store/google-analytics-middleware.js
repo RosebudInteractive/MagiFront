@@ -8,12 +8,17 @@ const GoogleAnalyticsMiddleware = store => next => action => {
     switch (action.type) {
 
         case SIGN_UP_SUCCESS: {
-            window.dataLayer.push({'event': 'reg'});
+            if (window.dataLayer) {
+                window.dataLayer.push({'event': 'reg'});
+            }
+
             return next(action)
         }
 
         case PLAYER_PLAYED: {
-            window.dataLayer.push({'event': 'play'});
+            if (window.dataLayer) {
+                window.dataLayer.push({'event': 'play'});
+            }
             return next(action)
         }
 
@@ -50,7 +55,9 @@ const GoogleAnalyticsMiddleware = store => next => action => {
                 _newValue = action.payload;
 
             if (_oldValue !== _newValue) {
-                window.dataLayer.push({'event': 'play_' + _newValue});
+                if (window.dataLayer) {
+                    window.dataLayer.push({'event': 'play_' + _newValue});
+                }
             }
 
             return result;
