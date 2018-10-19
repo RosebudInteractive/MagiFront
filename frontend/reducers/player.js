@@ -17,6 +17,7 @@ import {
     HIDE_SPEED_TOOLTIP,
     PLAYER_START_PLAY_LESSON,
     PLAYER_CAN_NOT_START_PLAY_LESSON,
+    PLAYER_SET_PROGRESS_PERCENT,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -47,6 +48,7 @@ const initialState = {
     stopped: false,
     showContentTooltip: false,
     showSpeedTooltip: false,
+    progressPercent: 0,
 };
 
 export default function player(state = initialState, action) {
@@ -57,7 +59,7 @@ export default function player(state = initialState, action) {
         }
 
         case SET_LESSON_PLAY_INFO_LOADED: {
-            return {...state, playingLesson: Object.assign({}, action.payload)}
+            return {...state, playingLesson: Object.assign({}, action.payload), progressPercent: 0}
         }
 
         case PLAYER_START_PLAY_LESSON: {
@@ -92,6 +94,14 @@ export default function player(state = initialState, action) {
 
         case PLAYER_SET_BUFFERED_TIME: {
             return {...state, bufferedTime: action.payload}
+        }
+
+        case PLAYER_SET_PROGRESS_PERCENT: {
+            if (state.progressPercent !== action.payload) {
+                return {...state, progressPercent: action.payload}
+            } else {
+                return state
+            }
         }
 
         case PLAYER_SET_TITLE: {

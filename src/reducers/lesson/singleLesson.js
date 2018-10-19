@@ -102,7 +102,9 @@ export default function singleLesson(state = initialState, action) {
                 hasChanges: false,};
 
         case SAVE_LESSON_SUCCESS: {
-            state.current.Id = action.payload.id ? action.payload.id : state.current.id;
+            let _id = action.payload.id ? action.payload.id : state.current.id;
+            state.current.id = _id;
+            state.current.Id = _id;
 
             let _newInitialLesson = Object.assign({}, state.current);
 

@@ -1314,6 +1314,7 @@ const DbLesson = class DbLesson extends DbObject {
                             courseUrl = hostUrl + elem.CURL + "/";
                             if (elem.URL) {
                                 data.Parent = {
+                                    Id: elem.ParentId,
                                     URL: isAbsPath ? courseUrl + elem.URL : elem.URL,
                                     Name: elem.Name,
                                     Number: elem.Number
