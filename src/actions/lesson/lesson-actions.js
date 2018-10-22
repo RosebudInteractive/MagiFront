@@ -125,14 +125,16 @@ export const save = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            .then((id) => {
+            .then((data) => {
                 dispatch({
                     type: SAVE_LESSON_SUCCESS,
-                    payload: id
+                    payload: data
                 })
+
+                return mode === EDIT_MODE_INSERT ? data.id : values.id;
             })
-            .then(() => {
-                dispatch(get(values.id, values.CourseId))
+            .then((id) => {
+                dispatch(get(id, values.CourseId))
             })
             .catch((err) => {
                 handleJsonError(err)

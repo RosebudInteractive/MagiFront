@@ -30,6 +30,19 @@ class CategoryForm extends ObjectEditor {
         return this.props.categoryActions;
     }
 
+    _save(value) {
+        let _obj = {
+            id: value.id,
+            Id: value.id,
+            Name: value.Name,
+            ParentId: value.ParentId ? value.ParentId  : null,
+            ParentName: value.ParentName,
+            URL: value.URL
+        };
+
+        super._save(_obj)
+    }
+
     componentWillReceiveProps(next) {
         const {
             category,

@@ -145,11 +145,15 @@ export class LessonEditor extends ObjectEditor {
         super.componentDidUpdate(prevProps)
 
         if (prevProps.ogImageResourceId && !this.props.ogImageResourceId) {
-            window.$$('og-image-file').setValue('');
+            if (window.$$('og-image-file')) {
+                window.$$('og-image-file').setValue('');
+            }
         }
 
         if (prevProps.twitterImageResourceId && !this.props.twitterImageResourceId) {
-            window.$$('twitter-image-file').setValue('');
+            if (window.$$('twitter-image-file')) {
+                window.$$('twitter-image-file').setValue('');
+            }
         }
 
         if (this.props.ogImageResourceId) {
