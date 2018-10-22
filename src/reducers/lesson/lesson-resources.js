@@ -74,7 +74,7 @@ export default function lessonResources(state = initialState, action) {
                     current: [],
                     selected: null,
                     hasChanges: false,
-                    loaded: false,
+                    loaded: true,
                     fetching: false,}
             } else {
                 return {
@@ -97,7 +97,7 @@ export default function lessonResources(state = initialState, action) {
                     current: [],
                     selected: null,
                     hasChanges: false,
-                    loaded: false,
+                    loaded: true,
                     fetching: false,}
             } else {
                 return {

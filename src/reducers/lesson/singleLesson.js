@@ -164,8 +164,6 @@ export default function singleLesson(state = initialState, action) {
         }
 
         case SET_OG_IMAGE_RESOURCE_ID: {
-
-
             return {...state, ogImageResourceId: action.payload, hasChanges: true }
         }
 

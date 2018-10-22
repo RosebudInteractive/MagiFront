@@ -131,6 +131,9 @@ export const save = (values, mode) => {
                     payload: id
                 })
             })
+            .then(() => {
+                dispatch(get(values.id, values.CourseId))
+            })
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {
