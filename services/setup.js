@@ -40,7 +40,7 @@ const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
 function errorHandler(err, req, res, next) {
     let now = new Date();
-    let tZ_str = (now.getTimezoneOffset() < 0 ? "-" : "+") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
+    let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
     let errStr = err.message ? err.message : err.toString();
     let error = null;
     let statusCode = HttpCode.ERR_INTERNAL;
