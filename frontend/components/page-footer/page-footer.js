@@ -57,6 +57,11 @@ class Row extends React.Component {
                             <span>Напишите нам</span>
                         </div>
                     </li>
+                    <li>
+                        <a href="/about">
+                            <span>О проекте</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
         )

@@ -160,7 +160,7 @@ export class LessonEditor extends ObjectEditor {
             if (_resource) {
                 window.$$('og-image-file').setValue(_resource.Name);
             } else {
-                if (this.props.resourcesLoaded) {
+                if (!this.props.resourcesFetching) {
                     this.props.lessonActions.setOgImage(null)
                 }
             }
@@ -174,7 +174,7 @@ export class LessonEditor extends ObjectEditor {
             if (_resource) {
                 window.$$('twitter-image-file').setValue(_resource.Name);
             } else {
-                if (this.props.resourcesLoaded) {
+                if (!this.props.resourcesFetching) {
                     this.props.lessonActions.setTwitterImage(null)
                 }
             }
@@ -596,9 +596,12 @@ export class LessonEditor extends ObjectEditor {
         super._notifyDataLoaded();
 
         let _authors = this._getCourseAuthorsArray();
+
+        this._disableChanging();
         if (_authors.length === 1) {
             window.$$('author').setValue(_authors[0].id);
         }
+        this._enableChanging();
 
         if (this.props.lesson.IsSubsRequired) {
             window.$$('free-expr-date').enable()
@@ -1151,6 +1154,7 @@ function mapStateToProps(state, ownProps) {
         subLessons: state.subLessons.current,
         resources: state.lessonResources.current,
         resourcesLoaded: state.lessonResources.loaded,
+        resourcesFetching: state.lessonResources.fetching,
         // parentLesson: state.parentLesson,
 
         selectedMainEpisode: state.lessonMainEpisodes.selected,

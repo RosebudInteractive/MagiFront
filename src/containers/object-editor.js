@@ -22,6 +22,7 @@ export default class ObjectEditor extends React.Component {
 
         this._validateResult = {};
         this._dataLoaded = false;
+        this._isChangingEnable = true;
     }
 
     getObject() {
@@ -127,7 +128,9 @@ export default class ObjectEditor extends React.Component {
     }
 
     _changeData(obj) {
-        this.objectActions.changeData(obj);
+        if (this._isChangingEnable) {
+            this.objectActions.changeData(obj);
+        }
     }
 
     _cancel() {
@@ -192,6 +195,14 @@ export default class ObjectEditor extends React.Component {
     }
 
     _getWebixForm(){}
+
+    _disableChanging() {
+        this._isChangingEnable = false;
+    }
+
+    _enableChanging() {
+        this._isChangingEnable = true;
+    }
 
     getUI() {
         let that = this;

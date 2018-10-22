@@ -3765,14 +3765,17 @@ li.fancybox-thumbs-loading {
     border-right: 1px solid rgba(47, 47, 74, 0.2); }
     @media (max-width: 899px) {
       .footer-actions li {
-        width: 50%; } }
+        width: 33%; } }
     .footer-actions li:nth-child(2) {
       padding-left: 16px;
-      border-right: none; }
+      /*border-right: none; */
+    }
       @media (max-width: 639px) {
         .footer-actions li:nth-child(2) {
           padding-left: 0; } }
     .footer-actions li:last-child {
+      padding-left: 16px;
+      padding-right: 16px;
       border-right: none; }
   .footer-actions a,
   .footer-actions .footer-actions__item{
@@ -3826,6 +3829,7 @@ li.fancybox-thumbs-loading {
     @media (max-width: 639px) {
       .footer-actions a,
       .footer-actions .footer-actions__item{
+        min-width: auto;
         padding-left: 0;
         padding-right: 0; } }
   .footer-actions .footer-actions__item {
@@ -15302,8 +15306,23 @@ ul.lectures-tab {
   background: #c8684c;
   height: 100%;
   width: 2px;
-  -webkit-animation: equalize 2s infinite;
-  animation: equalize 2s infinite; }
+  animation-name: eq-animation;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-duration: 0.3s;
+  /*-webkit-animation: equalize 2s infinite;*/
+  /*animation: equalize 2s infinite; */
+}
+
+  @keyframes eq-animation {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
 
 .equalizer div:nth-child(1) {
   -webkit-animation-delay: -1.2s;

@@ -57,17 +57,20 @@ export default function resources(state = initialState, action) {
         }
 
         case MULTIPLE_INSERT_RESOURCE: {
-            let _array = action.payload;
+            let _array = action.payload,
+                _id = state.internalId;
+
+
 
             if (_array) {
                 _array.forEach(item => {
                     if (!item.Id) {
-                        item.Id = --state.internalId
+                        item.Id = _id--
                     }
                 })
             }
 
-            return {...state}
+            return {...state, internalId: _id}
         }
 
         case MULTI_UPLOAD_RESOURCES_FINISH:{
