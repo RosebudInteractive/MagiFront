@@ -85,11 +85,16 @@ export const save = (values, mode) => {
             })
             .then(checkStatus)
             .then(parseJSON)
-            .then((id) => {
+            .then((data) => {
                 dispatch({
                     type: SAVE_EPISODE_SUCCESS,
-                    payload: id
+                    payload: data
                 })
+
+                return mode === EDIT_MODE_INSERT ? data.id : values.id;
+            })
+            .then((id) => {
+                dispatch(get(id, values.LessonId))
             })
             .catch((err) => {
                 handleJsonError(err)
