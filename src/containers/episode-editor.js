@@ -77,14 +77,6 @@ class EpisodeEditor extends ObjectEditor {
         }
 
         if (!this.props.fetching && prevProps.fetching) {
-            if (!this.props.isResourcesLoaded) {
-                this.props.lessonActions.getResources(this.props.lesson.id);
-            }
-            // this._fillFileId()
-        }
-
-        if (this.props.isResourcesLoaded && !prevProps.isResourcesLoaded) {
-            // this.props.lessonActions.getResources(this.props.lesson.id);
             this._fillFileId()
         }
     }
@@ -583,7 +575,7 @@ function mapStateToProps(state, ownProps) {
         lessonId: parseInt(ownProps.match.params.lessonId),
         courseId: parseInt(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
-        fetching: state.singleLesson.fetching || state.singleEpisode.fetching,
+        fetching: state.singleLesson.fetching || state.singleEpisode.fetching || state.lessonResources.fetching,
 
         isWorkshop: ownProps.location.search === "?workshop",
         ownProps: ownProps,
