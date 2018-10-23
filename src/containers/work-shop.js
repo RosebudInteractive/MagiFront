@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 class WorkShop extends React.Component {
 
     render() {
-        return <div className="ws-container" style={!this.props.visible ? {display : 'none'} : null}></div>
+        return <div className="ws-container" style={!this.props.visible ? {display: 'none'} : null}/>
     }
 }
 

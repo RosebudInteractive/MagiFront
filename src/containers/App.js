@@ -5,7 +5,6 @@ import {Switch, Route, withRouter, Link,} from 'react-router-dom'
 
 import Menu from "../components/Menu"
 import Home from "../components/Home"
-// import Episodes from "./Episodes"
 import Authors from "./Authors"
 import AuthorForm from './authorEditor';
 import Categories from './Categories';
@@ -17,12 +16,30 @@ import SubLessonEditor from './subLesson-editor';
 import EpisodeEditor from './episode-editor';
 import WorkShop from './work-shop';
 
+import {userAuthSelector, whoAmI} from "../ducks/auth";
+import {bindActionCreators} from "redux";
+
 class App extends Component {
+
+    componentWillMount() {
+        this.props.whoAmI();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.location.pathname !== nextProps.location.pathname) {
+            this.props.whoAmI();
+        }
+    }
+
     render() {
-        let _homePath = '/adm';
+        let {workShopVisible, isUserAuthorized} = this.props,
+            _homePath = '/adm',
+            _isNeedHideAdm = workShopVisible || !isUserAuthorized;
+
+        const _hideStyle = {display: 'none'};
 
         return [<WorkShop/>,
-            <div className="app" style={this.props.workShopVisible ? {display: 'none'} : null}>
+            <div className="app" style={_isNeedHideAdm ? _hideStyle : null}>
                 <div className="left bar-bgcolor">
                     <div className="toolbar top-bar-size">
                         <Link to={'/'}>
@@ -97,8 +114,15 @@ function mapStateToProps(state, ownProps) {
         page: state.page,
         menu: state.menu,
         workShopVisible: state.workShop.visible,
+        isUserAuthorized: userAuthSelector(state),
         ownProps,
     }
 }
 
-export default withRouter(connect(mapStateToProps)(App))
+function mapDispatchToProps(dispatch) {
+    return {
+        whoAmI: bindActionCreators(whoAmI, dispatch),
+    }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))

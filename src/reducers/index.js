@@ -36,6 +36,7 @@ import resources from './resources';
 import toc from './toc';
 import content from './content';
 import workShop from './work-shop'
+import authReducer, {moduleName as authModule} from '../ducks/auth'
 
 export default combineReducers({
     page,
@@ -69,5 +70,6 @@ export default combineReducers({
     toc,
     content,
     workShop,
+    [authModule]: authReducer,
     routing: routerReducer,
 })
