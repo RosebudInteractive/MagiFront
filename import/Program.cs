@@ -1578,6 +1578,7 @@ namespace MagImport
             role.Fields.Name = "Administrator";
             role.Fields.ShortCode = 'a';
             roles.Add("a:1:{s:13:\"administrator\";b:1;}", role);
+            int adminRoleId= role.Fields.Id;
 
             role = new Role();
             role.Fields.Code = "EDT";
@@ -1597,6 +1598,7 @@ namespace MagImport
             role.Fields.ShortCode = 'p';
             roles.Add("a:1:{s:7:\"pending\";b:1;}", role);
 
+            UserRole.AllData = allData;
             Users users = new Users();
             User user = users.newUser();
             user.login = "admin";
@@ -1606,6 +1608,38 @@ namespace MagImport
             user.fields.IsOld = false;
             user.fields._PData.isAdmin = true;
             user.fields.RegDate = DateTime.Now;
+            UserRole _ur = new UserRole();
+            _ur.Fields.AccountId = ACCOUNT_ID;
+            _ur.Fields.UserId = user.fields.Id;
+            _ur.Fields.RoleId = adminRoleId;
+
+            user = users.newUser();
+            user.login = "staloverov";
+            user.pwd = "12345";
+            user.fields.Name = "Alexander";
+            user.fields.DisplayName = "Alexander Staloverov";
+            user.fields.Email = "staloverov@rosebud.ru";
+            user.fields.IsOld = false;
+            user.fields._PData.isAdmin = true;
+            user.fields.RegDate = DateTime.Now;
+            _ur = new UserRole();
+            _ur.Fields.AccountId = ACCOUNT_ID;
+            _ur.Fields.UserId = user.fields.Id;
+            _ur.Fields.RoleId = adminRoleId;
+
+            user = users.newUser();
+            user.login = "sokolov";
+            user.pwd = "12345";
+            user.fields.Name = "Sasha";
+            user.fields.DisplayName = "Sasha Sokolov";
+            user.fields.Email = "sokolov@rosebud.ru";
+            user.fields.IsOld = false;
+            user.fields._PData.isAdmin = true;
+            user.fields.RegDate = DateTime.Now;
+            _ur = new UserRole();
+            _ur.Fields.AccountId = ACCOUNT_ID;
+            _ur.Fields.UserId = user.fields.Id;
+            _ur.Fields.RoleId = adminRoleId;
 
             Currency.AllData = allData;
             Currency curr = new Currency();
@@ -1969,7 +2003,6 @@ namespace MagImport
 
             curr_id = -1;
             user = null;
-            isFirstTime = true;
 
             while (rdr.Read())
             {
@@ -1984,11 +2017,6 @@ namespace MagImport
                 if (!roles.TryGetValue(role_data, out role))
                     throw new Exception(String.Format("Can't find role \"{0}\"!", role_data));
 
-                if (isFirstTime)
-                {
-                    UserRole.AllData = allData;
-                    isFirstTime = false;
-                }
                 UserRole ur = new UserRole();
                 ur.Fields.AccountId = ACCOUNT_ID;
                 ur.Fields.UserId = user.fields.Id;
