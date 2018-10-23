@@ -2,7 +2,6 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showFeedbackWindow} from "../../ducks/message";
-import * as svg from '../../tools/svg-paths';
 
 class PageFooter extends React.Component {
 
@@ -89,14 +88,14 @@ class SocialBlock extends React.Component {
             <div className="social-block-big">
                 <h4 className="social-block-big__title">Мы в соц. сетях</h4>
                 <div className="social-block-big__inner">
-                    <SocialLink text={'Facebook'} href={'fb'} icoWidth={18} icoHeight={18}/>
-                    <SocialLink text={'Telegram'} href={'telegram'} icoWidth={16} icoHeight={16}/>
-                    <SocialLink text={'Вконтакте'} href={'vk'} icoWidth={18} icoHeight={11}/>
-                    <SocialLink text={'Youtube'} href={'youtube'} icoWidth={16} icoHeight={12}/>
-                    <SocialLink text={'Twitter'} href={'tw'} icoWidth={18} icoHeight={15}/>
-                    <SocialLink text={'Одноклассники'} href={'ok'} icoWidth={11} icoHeight={18}/>
-                    <SocialLink text={'Instagram'} href={'ig'} icoWidth={16} icoHeight={16}/>
-                    <SocialLink text={'RSS'} href={'rss'} icoWidth={16} icoHeight={16}/>
+                    <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18} href={'https://www.facebook.com/Magisteria.ru/'}/>
+                    <SocialLink text={'Telegram'} logo={'telegram'} icoWidth={16} icoHeight={16} href={'https://t.me/magisteria_ru'}/>
+                    <SocialLink text={'Вконтакте'} logo={'vk'} icoWidth={18} icoHeight={11} href={'https://vk.com/magisteriaru'}/>
+                    <SocialLink text={'Youtube'} logo={'youtube'} icoWidth={16} icoHeight={12} href={'#'}/>
+                    <SocialLink text={'Twitter'} logo={'tw'} icoWidth={18} icoHeight={15} href={'https://twitter.com/MagisteriaRu'}/>
+                    <SocialLink text={'Одноклассники'} logo={'ok'} icoWidth={11} icoHeight={18} href={'https://ok.ru/group/54503517782126'}/>
+                    <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16} href={'https://www.instagram.com/magisteria.ru/'}/>
+                    <SocialLink text={'RSS'} logo={'rss'} icoWidth={16} icoHeight={16} href={'/feed/'}/>
                 </div>
             </div>
         )
@@ -105,14 +104,14 @@ class SocialBlock extends React.Component {
 
 class SocialLink extends React.Component {
     render() {
-        let {href, text, icoWidth, icoHeight} = this.props;
+        let {logo, href, text, icoWidth, icoHeight} = this.props;
+
+        const _logo = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#' + logo + '"/>';
 
         return (
-            <a href="#" className="social-link">
+            <a href={href} className="social-link">
                 <span className="social-link__icon">
-                    <svg width={icoWidth} height={icoHeight}>
-                        {svg.social[href]}
-                    </svg>
+                    <svg width={icoWidth} height={icoHeight} dangerouslySetInnerHTML={{__html: _logo}}/>
                 </span>
                 <span className="social-link__text">{text}</span>
             </a>
@@ -122,6 +121,7 @@ class SocialLink extends React.Component {
 
 class SubscribeBlock extends React.Component {
     render() {
+        const _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#next"/>';
 
         return (
             <div className="subscribe-block">
@@ -133,9 +133,7 @@ class SubscribeBlock extends React.Component {
                         <input type="email" id="email" name="email-field" className="subscribe-form__field"
                                placeholder="E-mail"/>
                         <button className="subscribe-form__submit">
-                            <svg width="18" height="18">
-                                {svg.next}
-                            </svg>
+                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
                         </button>
                     </div>
                 </form>

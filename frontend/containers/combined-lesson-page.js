@@ -30,6 +30,16 @@ export const setScrollTop = (value) => {
     _scrollTop = value;
 }
 
+export const scroll = () => {
+    if (_scrollTop > 0) {
+        $('html, body').animate({
+            scrollTop: _scrollTop
+        }, 300);
+
+        _scrollTop = 0;
+    }
+}
+
 class TranscriptLessonPage extends React.Component {
     constructor(props) {
         super(props);
@@ -204,14 +214,7 @@ class TranscriptLessonPage extends React.Component {
 
 
         if ((!prevProps.playingLesson && this.props.playingLesson) || (prevProps.playingLesson && this.props.playingLesson && prevProps.playingLesson.LessonId !== this.props.playingLesson.LessonId)) {
-            if (_scrollTop > 0) {
-                $('html, body').animate({
-                    scrollTop: _scrollTop
-                }, 300);
-
-                // $('body, html').scrollTop(_scrollTop);
-                _scrollTop = 0;
-            }
+            scroll()
         }
     }
 
