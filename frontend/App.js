@@ -8,7 +8,7 @@ import {Switch, Route, withRouter} from 'react-router-dom'
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 // import LessonPage from './containers/lesson-page';
-import CombineLessonPage from './containers/combined-lesson-page';
+import CombineLessonPage, {scroll} from './containers/combined-lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
@@ -146,6 +146,9 @@ class App extends Component {
             $('body').removeClass('modal-open')
         }
 
+        if ((this.props.location.search !== '?play') && (nextProps.location.search === '?play')) {
+            scroll()
+        }
     }
 
     componentWillUnmount() {

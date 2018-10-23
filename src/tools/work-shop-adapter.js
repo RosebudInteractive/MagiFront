@@ -32,18 +32,3 @@ const _getFileName = (assets, id) => {
 
     return _asset ? _asset.file : null
 }
-
-
-/*
-CompType:"PIC"
-Content:"{"title":"Алексеев Ф.Я. Военный госпиталь в Лефортове, 1800 год","track":1,"duration":60.0}"
-Description:undefined
-Duration:60000
-FileName:"2016/09/Lefortovo.jpg"
-Id:1
-Name:"Алексеев Ф.Я. Военный госпиталь в Лефортове, 1800 год"
-ResType:"P"
-ResourceId:1
-StartTime:0
-id:1
- */

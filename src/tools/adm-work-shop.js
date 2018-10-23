@@ -54,7 +54,7 @@ class AdmWorkShop {
     _initOptions() {
         let that = this;
 
-        let result = {
+        return {
             data: that._onGetData,
             assets: {},
             tracks: {
@@ -71,8 +71,6 @@ class AdmWorkShop {
             onSave: this._onSave,
             onCancel: this._onCancel,
         };
-
-        return result;
     }
 
     _onCancel() {
