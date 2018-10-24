@@ -87,18 +87,6 @@ const parseJSON = (response) => {
     return response.json()
 };
 
-// const parseJSON = (data) => {
-//     return JSON.parse(data)
-// };
-
-// const handleCourse = (course) => {
-//     // course.id = course.Id;
-//     course.ColorHex = '#' + course.Color.toString(16);
-//
-//     // course.stateName =
-//     return course;
-// };
-
 const _getAuthor = (array, id) => {
     return array.find((item) => {
         return item.Id === id
@@ -126,7 +114,6 @@ const handleCourses = (data) => {
                 item.AuthorsObj.push(_getAuthor(data.Authors, author))
             });
 
-            item.ColorHex = '#' + item.Color.toString(16);
             item.Mask = item.Mask ? item.Mask : '_mask01';
 
             let _readyLessonCount = 0;

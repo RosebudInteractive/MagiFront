@@ -117,12 +117,6 @@ class Coureses extends React.Component {
             columns: [
                 {id: 'Name', header: 'Название', width: 230},
                 {
-                    id: 'ColorHex',
-                    header: 'Цвет курса',
-                    width: 50,
-                    template: "<div class='color-box' style = 'background-color : #ColorHex#;'> </div>"
-                },
-                {
                     id: 'URL',
                     header: 'Ярлык URL',
                     width: 150,

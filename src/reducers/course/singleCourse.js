@@ -22,7 +22,6 @@ export default function singleCourse(state = initialState, action) {
 
         case CREATE_NEW_COURSE: {
             let _newObject = {
-                ColorHex: '#FFFFFF',
                 State: 'D',
             };
 

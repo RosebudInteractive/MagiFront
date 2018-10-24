@@ -667,6 +667,7 @@ html,
     color: #fff;
     background-color: #c8684c;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .register-form__buttons {
@@ -691,6 +692,7 @@ html,
     color: rgba(47, 47, 47, 0.6);
     background-color: rgba(47, 47, 47, 0.2);
     pointer-events: none;
+    cursor: auto;
 }
 
 .form__error-message {
@@ -729,3 +731,12 @@ html,
     position: absolute;
     opacity: 0;
     z-index: -100; }
+
+.btn--brown svg {
+    display: block;
+    fill: #fff;
+}
+
+.btn--brown.disabled svg {
+    fill: rgba(47, 47, 47, 0.6);
+}
