@@ -36,6 +36,10 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case WHO_AM_I_START:
+            return state
+                .set('error', null)
+                .set('loading', true)
+
         case SIGN_IN_START:
             return state
                 .set('error', null)
@@ -56,6 +60,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case WHO_AM_I_FAIL:
             return state
                 .set('loading', false)
+                .set('authorized', false)
 
         case SIGN_IN_FAIL:
             return state

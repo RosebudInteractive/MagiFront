@@ -80,7 +80,6 @@ class CourseEditor extends ObjectEditor {
             State: value.State,
             Cover: value.Cover,
             CoverMeta: JSON.stringify(this.coverMeta),
-            Color: value.ColorHex ? parseInt(value.ColorHex.substr(1), 16) : 0,
             LanguageId: value.LanguageId,
             URL: value.URL,
             Description: value.Description,
@@ -401,13 +400,6 @@ class CourseEditor extends ObjectEditor {
                         that._externalValidate(this);
                     },
                 },
-            },
-            {
-                view: "colorpicker",
-                label: "Цвет курса",
-                name: "ColorHex",
-                placeholder: 'Цвет курса',
-                labelWidth: labelWidth
             },
             {
                 view: "combo",

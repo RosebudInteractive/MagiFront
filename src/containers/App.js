@@ -40,7 +40,7 @@ class App extends Component {
         const _hideStyle = {display: 'none'};
 
         return [<WorkShop/>,
-            <SignInForm/>,
+            !isUserAuthorized ? <SignInForm/> : null,
             <div className="app" style={_isNeedHideAdm ? _hideStyle : null}>
                 <div className="left bar-bgcolor">
                     <div className="toolbar top-bar-size">
