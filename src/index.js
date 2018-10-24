@@ -9,18 +9,11 @@ import '../css/general.css'
 import '../css/webix.css'
 import { store } from './store/configureStore'
 import { Router } from 'react-router-dom'
-import UserConfirmation from "./components/userConfirmation";
 import history from './history'
-
-const getConfirmation = (message, callback) => {
-    render((
-        <UserConfirmation message={message} callback={callback} />
-    ), document.getElementById('confirm'));
-};
 
 render(
     <Provider store={store}>
-        <Router getUserConfirmation={getConfirmation} history={history}>
+        <Router history={history}>
             <App />
         </Router>
     </Provider>,

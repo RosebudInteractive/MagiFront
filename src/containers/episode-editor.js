@@ -48,6 +48,8 @@ class EpisodeEditor extends ObjectEditor {
                 }
             },
             window.webix.ui.uploader)
+
+        this._isWorkShopRout = false;
     }
 
     componentWillReceiveProps(next) {
@@ -61,6 +63,8 @@ class EpisodeEditor extends ObjectEditor {
                 this.objectActions.create(this._getInitStateOfNewObject(next));
             }
         }
+
+        this._isWorkShopRout = this.props.isWorkshop || next.isWorkshop;
     }
 
     componentDidMount() {
@@ -79,6 +83,10 @@ class EpisodeEditor extends ObjectEditor {
         if (!this.props.fetching && prevProps.fetching) {
             this._fillFileId()
         }
+    }
+
+    _needShowPrompt() {
+        return this.props.hasChanges && !this._isWorkShopRout;
     }
 
     _fillFileId() {

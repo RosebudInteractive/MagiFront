@@ -77,9 +77,9 @@ export default function episodeContent(state = initialState, action) {
         case EPISODE_CONTENT_APPLY_DATA_FROM_WORKSHOP : {
             return {
                 ...state,
+                hasChanges: Object.is(state.current, action.payload),
                 current: [...action.payload],
                 selected: (action.payload.length > 0) ? action.payload[0].id : null,
-                hasChanges: true,
             }
         }
 

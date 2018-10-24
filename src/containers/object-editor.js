@@ -147,7 +147,6 @@ export default class ObjectEditor extends React.Component {
             fetching,
             message,
             errorDlgShown,
-            hasChanges
         } = this.props;
 
         if (fetching) {
@@ -162,7 +161,7 @@ export default class ObjectEditor extends React.Component {
                         <p>Загрузка...</p>
                         :
                         <div>
-                            <Prompt when={hasChanges} message='Есть несохраненные данные. Перейти без сохранения?'/>
+                            <Prompt when={this._needShowPrompt()} message='Есть несохраненные данные. Перейти без сохранения?'/>
                             {this._getWebixForm()}
                         </div>
                 }
@@ -181,6 +180,10 @@ export default class ObjectEditor extends React.Component {
 
     _notifyDataLoaded() {
         this._dataLoaded = true;
+    }
+
+    _needShowPrompt() {
+        return this.props.hasChanges
     }
 
     _hasChanges() {

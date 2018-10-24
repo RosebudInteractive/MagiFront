@@ -1,4 +1,11 @@
 import React  from 'react'
+import {render} from "react-dom";
+
+export const getConfirmation = (message, callback) => {
+    render((
+        <UserConfirmation message={message} callback={callback} />
+    ), document.getElementById('confirm'));
+};
 
 export default class UserConfirmation extends React.Component {
 

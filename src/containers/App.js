@@ -15,6 +15,7 @@ import LessonEditor from './lesson-editor';
 import SubLessonEditor from './subLesson-editor';
 import EpisodeEditor from './episode-editor';
 import WorkShop from './work-shop';
+import SignInForm from './sign-in-form';
 
 import {userAuthSelector, whoAmI} from "../ducks/auth";
 import {bindActionCreators} from "redux";
@@ -39,6 +40,7 @@ class App extends Component {
         const _hideStyle = {display: 'none'};
 
         return [<WorkShop/>,
+            <SignInForm/>,
             <div className="app" style={_isNeedHideAdm ? _hideStyle : null}>
                 <div className="left bar-bgcolor">
                     <div className="toolbar top-bar-size">

@@ -37,6 +37,7 @@ import toc from './toc';
 import content from './content';
 import workShop from './work-shop'
 import authReducer, {moduleName as authModule} from '../ducks/auth'
+import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
     page,
@@ -72,4 +73,5 @@ export default combineReducers({
     workShop,
     [authModule]: authReducer,
     routing: routerReducer,
+    form: formReducer,
 })
