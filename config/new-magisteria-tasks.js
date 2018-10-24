@@ -7,6 +7,20 @@ const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitema
 module.exports = {
     tasks: [
         {
+            name: "Auto Subscription",
+            module: "./auto-subscription",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 */30 * * * *", // run every 30 min
+            options: {
+                autoPay: false,
+                checkExpire: false,
+                checkExpirePeriods: [1, 3],
+                priceListCode: "MAIN",
+                errRecipients: "alexander.f.sokolov@gmail.com, sokolov-af@yandex.ru"
+            }
+        },
+        {
             name: "Mailing",
             module: "./mailing",
             type: "scheduled-task",
@@ -145,6 +159,18 @@ module.exports = {
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:'
+    },
+    billing: {
+        module: "../../services/billing/yandex-kassa",
+        enabled: true,
+        debug: false,
+        subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        yandexKassa: {
+            shopId: "536331",
+            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            callBack: "/api/yandex-kassa/callback",
+            returnUrl: "/"
+        }
     },
     mail: {
         sendPulse: {

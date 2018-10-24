@@ -120,3 +120,13 @@ CREATE INDEX `idx_Cheque_ChequeDate` ON `Cheque`(`ChequeDate`);
 GO
 CREATE INDEX `idx_ChequeLog_ResultCode` ON `ChequeLog`(`ResultCode`);
 GO
+CREATE INDEX `idx_User_SubsExpDate` ON `User`(`SubsExpDate`);
+GO
+CREATE INDEX `idx_User_SubsExpDate` ON `AutoSubscription`(`SubsExpDate`);
+GO
+CREATE INDEX `idx_User_NextSubsExpDate` ON `AutoSubscription`(`NextSubsExpDate`);
+GO
+CREATE INDEX `idx_User_Succeeded` ON `AutoSubscription`(`Succeeded`);
+GO
+CREATE UNIQUE INDEX `u_Idx_SubsNotification_UserId_SubsExpDate_Days` ON `SubsNotification`(`UserId`, `SubsExpDate`, `Days`);
+GO

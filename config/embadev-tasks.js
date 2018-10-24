@@ -19,10 +19,25 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Auto Subscription",
+            module: "./auto-subscription",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                autoPay: false,
+                checkExpire: true,
+                maxExpNum: 20,
+                checkExpirePeriods: [1, 3],
+                priceListCode: "MAIN",
+                errRecipients: "vadym.zobnin@gmail.com, vadym.zobnin@yandex.ru"
+            }
+        },
+        {
             name: "Mailing",
             module: "./mailing",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
@@ -151,6 +166,18 @@ let options = {
         useCapture: true,
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis'// Also can be 'local' (not applicable for cluster mode)
+    },
+    billing: {
+        module: "../../services/billing/yandex-kassa",
+        enabled: true,
+        debug: false,
+        subsExtPeriod: 6, // free period after suscription has expired in HOURS
+        yandexKassa: {
+            shopId: "536331",
+            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            callBack: "/api/yandex-kassa/callback",
+            returnUrl: "/"
+        }
     },
     mail: {
         sendPulse: {
