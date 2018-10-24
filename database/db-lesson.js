@@ -5,6 +5,8 @@ const { DbUtils } = require('./db-utils');
 const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -1167,7 +1169,7 @@ const DbLesson = class DbLesson extends DbObject {
                             };
                         }
                         else
-                            throw new Error("Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
 
                         return $data.execSql({
                             dialect: {
@@ -1329,7 +1331,7 @@ const DbLesson = class DbLesson extends DbObject {
                             };
                         }
                         else
-                            throw new Error(`Can't find lesson "${course_url}"${isInt ? "" : " : \"" + lesson_url + "\""}.`);
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find lesson "${course_url}"${isInt ? "" : " : \"" + lesson_url + "\""}.`);
 
                         return $data.execSql({
                             dialect: {

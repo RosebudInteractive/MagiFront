@@ -12,6 +12,7 @@ const passport = require('passport');
 const methodOverride = require('method-override');
 
 const { HttpCode } = require("../const/http-codes");
+const { HttpError } = require('../errors/http-error');
 const { AccessRigths } = require('../const/common');
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI } = require('../security/local-auth');
@@ -44,7 +45,7 @@ function errorHandler(err, req, res, next) {
     let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
     let errStr = err.message ? err.message : err.toString();
     let error = null;
-    let statusCode = HttpCode.ERR_INTERNAL;
+    let statusCode = err instanceof HttpError ? err.statusCode : HttpCode.ERR_INTERNAL;
     if (err.statusCode && err.error) {
         statusCode = err.statusCode;
         error = err.error;
