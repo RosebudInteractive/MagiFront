@@ -44,6 +44,7 @@ export const checkStatus = (response) => {
                         catch (e) { }
                     }
                     let error = new Error(_message);
+                    error.status = response.status;
                     reject(error)
                 })
         }

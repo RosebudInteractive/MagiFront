@@ -18,6 +18,7 @@ const prefix = `${appName}/${moduleName}`
 export const GET_AUTHOR_REQUEST = `${prefix}/GET_AUTHOR_REQUEST`
 export const GET_AUTHOR_SUCCESS = `${prefix}/GET_AUTHOR_SUCCESS`
 export const GET_AUTHOR_ERROR = `${prefix}/GET_AUTHOR_ERROR`
+export const SET_NOT_FOUND = `${prefix}/SET_NOT_FOUND`
 
 /**
  * Reducer
@@ -25,7 +26,8 @@ export const GET_AUTHOR_ERROR = `${prefix}/GET_AUTHOR_ERROR`
 export const ReducerRecord = Record({
     author: null,
     loading: false,
-    error: null
+    error: null,
+    notFound: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -36,6 +38,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 .set('loading', true)
+                .set('notFound', false)
 
         case GET_AUTHOR_SUCCESS:
             return state
@@ -46,6 +49,11 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('error', payload.error)
+
+        case SET_NOT_FOUND:
+            return state
+                .set('loading', false)
+                .set('notFound', true)
 
         default:
             return state
@@ -60,6 +68,7 @@ export const stateSelector = state => state[moduleName]
 export const authorSelector = createSelector(stateSelector, state => state.author)
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const notFoundSelector = createSelector(stateSelector, state => state.notFound)
 
 /**
  * Action Creators
@@ -83,10 +92,18 @@ export function getAuthor(url) {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_AUTHOR_ERROR,
-                    payload: err
-                });
+                if (err.status === 404) {
+                    dispatch({
+                        type: SET_NOT_FOUND,
+                        payload: null
+                    });
+                } else {
+                    dispatch({
+                        type: GET_AUTHOR_ERROR,
+                        payload: err
+                    });
+                }
+
             });
     }
 }

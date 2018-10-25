@@ -240,8 +240,7 @@ class App extends Component {
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
-                {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
-                    <PageFooter/> : null}
+                <PageFooter/>
                 <AuthPopup visible={this.props.showSignInForm}/>
                 {this.props.showSizeInfo ? <SizeInfo/> : null}
                 {this.props.showFeedbackWindow ? <FeedbackMessageBox/> : null}

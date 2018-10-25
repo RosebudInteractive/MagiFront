@@ -7,6 +7,8 @@ import Cover from '../components/course-extended/cover-extended';
 import Content from '../components/course-extended/content-extended';
 import CourseLessons from '../components/course-extended/course-lessons';
 import CourseBooks from '../components/course-extended/course-books';
+import NotFoundPage from '../components/not-found';
+import LoadingFrame from '../components/loading-frame';
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -15,7 +17,7 @@ import * as userActions from "../actions/user-actions";
 
 import $ from 'jquery'
 
-import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
+import {pages, getDomain, getPageUrl, getCoverPath, ImageSize,} from '../tools/page-tools';
 import {
     addCourseToBookmarks,
     userBookmarksSelector,
@@ -66,7 +68,9 @@ class Main extends React.Component {
         let {course, facebookAppID} = this.props,
             _url = getPageUrl(),
             _domain = getDomain(),
-            _title = course ? (course.Name + ' - Магистерия') : '';
+            _title = course ? (course.Name + ' - Магистерия') : '',
+            _coverPath = getCoverPath(course, ImageSize.small),
+            _cover = _coverPath ? '/data/' + _coverPath : null;
 
         return course
             ?
@@ -81,13 +85,13 @@ class Main extends React.Component {
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
-                <meta property="og:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
-                <meta property="og:image:secure_url" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta property="og:image" content={_domain + _cover}/>
+                <meta property="og:image:secure_url" content={_domain + _cover}/>
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:description" content={course.Description}/>
                 <meta name="twitter:title" content={_title}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                <meta name="twitter:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta name="twitter:image" content={_domain + _cover}/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
             </MetaTags>
@@ -121,37 +125,35 @@ class Main extends React.Component {
         let {
             course,
             fetching,
-            courseUrl
+            courseUrl,
+            notFound,
         } = this.props;
 
-        return (
-            <div>
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        course ?
-                            [
-                                this._getMetaTags(),
-                                <div className="courses">
-                                    <CourseModuleExt
-                                        title={course.Name}
-                                        isFavorite={this._isCourseInBookmarks()}
-                                        onFavoritesClick={::this._favoritesClick}
-                                        shareUrl={window.location.href}
-                                        counter={course.ShareCounters}
-                                    />
-                                    <CourseTabs
-                                        lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
-                                        books={{total: course.Books.length}}
-                                        courseUrl={courseUrl}
-                                    />
-                                </div>
-                            ]
-                             : null
-                }
-            </div>
-        )
+        return fetching ?
+            <LoadingFrame/>
+            :
+            notFound ?
+                <NotFoundPage/>
+                :
+                course ?
+                    [
+                        this._getMetaTags(),
+                        <div className="courses">
+                            <CourseModuleExt
+                                title={course.Name}
+                                isFavorite={this._isCourseInBookmarks()}
+                                onFavoritesClick={::this._favoritesClick}
+                                shareUrl={window.location.href}
+                                counter={course.ShareCounters}
+                            />
+                            <CourseTabs
+                                lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
+                                books={{total: course.Books.length}}
+                                courseUrl={courseUrl}
+                            />
+                        </div>
+                    ]
+                    : null
     }
 }
 
@@ -173,7 +175,8 @@ class TitleWrapper extends React.Component {
         return (
             <div className="course-module__title-wrapper">
                 <h1 className="course-module__title no_underline">
-                    <span className={"favourites" + (isFavorite ? ' active' : '')} onClick={onFavoritesClick}>В закладки</span>
+                    <span className={"favourites" + (isFavorite ? ' active' : '')}
+                          onClick={onFavoritesClick}>В закладки</span>
                     <p className="course-module__label">Курс:</p> <span>{' ' + title}</span>
                 </h1>
             </div>
@@ -291,6 +294,7 @@ function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.url,
         fetching: state.singleCourse.fetching,
+        notFound: state.singleCourse.notFound,
         course: state.singleCourse.object,
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,

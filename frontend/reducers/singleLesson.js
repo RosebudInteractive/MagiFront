@@ -3,6 +3,7 @@ import {
     GET_LESSON_SUCCESS,
     GET_LESSON_FAIL,
     CLEAR_LESSON,
+    SET_LESSON_NOT_FOUND,
 } from '../constants/lesson'
 
 const initialState = {
@@ -13,6 +14,7 @@ const initialState = {
     loaded: false,
     isSublesson: false,
     currentSubLesson: null,
+    notFound: false,
 };
 
 export default function singleLesson(state = initialState, action) {
@@ -22,7 +24,7 @@ export default function singleLesson(state = initialState, action) {
             return initialState
 
         case GET_LESSON_REQUEST:
-            return {...state, object: null, fetching: true, loaded: false, isSublesson: null};
+            return {...state, object: null, fetching: true, loaded: false, isSublesson: null, notFound: false};
 
         case GET_LESSON_SUCCESS: {
             return {
@@ -39,6 +41,9 @@ export default function singleLesson(state = initialState, action) {
 
         case GET_LESSON_FAIL:
             return initialState;
+
+        case SET_LESSON_NOT_FOUND:
+            return {...state, object: null, fetching: false, loaded: true, isSublesson: null, notFound: true};
 
         default:
             return state;

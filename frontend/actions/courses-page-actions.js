@@ -4,7 +4,7 @@ import {
     GET_COURSES_FAIL,
     GET_SINGLE_COURSE_REQUEST,
     GET_SINGLE_COURSE_SUCCESS,
-    GET_SINGLE_COURSE_FAIL,
+    GET_SINGLE_COURSE_FAIL, SET_COURSE_NOT_FOUND,
 } from '../constants/courses'
 
 import {
@@ -64,10 +64,17 @@ export const getCourse = (url) => {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_SINGLE_COURSE_FAIL,
-                    payload: err
-                });
+                if (err.status === 404) {
+                    dispatch({
+                        type: SET_COURSE_NOT_FOUND,
+                        payload: null
+                    });
+                } else {
+                    dispatch({
+                        type: GET_SINGLE_COURSE_FAIL,
+                        payload: err
+                    });
+                }
             });
 
     }
@@ -78,6 +85,7 @@ const checkStatus = (response) => {
         return response
     } else {
         let error = new Error(response.statusText);
+        error.status = response.status;
         error.response = response;
         throw error
     }

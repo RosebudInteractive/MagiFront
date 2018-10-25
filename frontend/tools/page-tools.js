@@ -51,6 +51,7 @@ export const pages = {
     bookmarks: {name: 'bookmarks', url: '/favorites'},
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile/'},
+    notFound: {name: 'not-found', url: null}
 }
 
 export const ImageSize = {
@@ -90,6 +91,26 @@ export const getCoverPath = (coverOwner, size) => {
     _fileName = _fileName ? _fileName : coverOwner.Cover
 
     return _fileName;
+}
+
+export const getAuthorPortraitPath = (author, size) => {
+    let _fileName = '';
+
+    if (author.PortraitMeta && author.PortraitMeta.content) {
+        if (size === ImageSize.icon) {
+            if (author.PortraitMeta.icon) {
+                _fileName = author.PortraitMeta.path + author.PortraitMeta.icon
+            }
+        } else {
+            if (author.PortraitMeta.content[size]) {
+                _fileName = author.PortraitMeta.path + author.PortraitMeta.content[size]
+            }
+        }
+    }
+
+    _fileName = _fileName ? _fileName : author.Portrait
+
+    return '/data/' + _fileName;
 }
 
 export const widthLessThan900 = () => {
