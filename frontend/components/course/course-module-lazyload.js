@@ -59,11 +59,11 @@ class ImageBlock extends React.Component {
         // _width = _newWidth;
         // _height = 503;
         // }
-        _width = 724;
+        _width = 574;
         _height = 503;
-        let _deltaX = -75;
+        let _deltaX = 0;
 
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" x="' + _deltaX + '" width="' + _width + '" height="' + _height + '"/>';
+        const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" x="' + _deltaX + '" width="' + _width + '" height="' + _height + '"/>';
 
         return (
             <Link to={'/category/' + this.props.url}>
