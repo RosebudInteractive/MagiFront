@@ -169,9 +169,10 @@ const handleCourse = (data) => {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
 
-            let _readyDate = new Date(lesson.ReadyDate);
-            lesson.readyYear = _readyDate.getFullYear();
-            lesson.readyMonth = Months[_readyDate.getMonth()];
+
+            let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null;
+            lesson.readyYear = _readyDate ? _readyDate.getFullYear() : '';
+            lesson.readyMonth = _readyDate ? Months[_readyDate.getMonth()] : '';
         });
 
         data.lessonCount = _lessonCount;

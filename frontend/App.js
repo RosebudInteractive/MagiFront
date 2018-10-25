@@ -39,6 +39,7 @@ import AuthPopup from './containers/auth-form'
 import AuthConfirmForm from './containers/auth-confirm-form'
 import PasswordConfirmForm from './containers/password-confirm-form'
 import AuthErrorForm from './containers/auth-error-form'
+import NotFound from './components/not-found'
 
 import SizeInfo from './components/size-info'
 
@@ -219,6 +220,7 @@ class App extends Component {
                 )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
+                <Route path="*" component={NotFound} />
             </Switch>
         )
     }

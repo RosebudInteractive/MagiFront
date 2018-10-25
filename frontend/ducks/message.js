@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import {reset} from "redux-form";
 
 /**
  * Constants
@@ -17,6 +18,9 @@ export const HIDE_FEEDBACK_RESULT_MESSAGE = `${prefix}/HIDE_FEEDBACK_RESULT_MESS
 export const SEND_FEEDBACK_START = `${prefix}/SEND_FEEDBACK_START`
 export const SEND_FEEDBACK_SUCCESS = `${prefix}/SEND_FEEDBACK_SUCCESS`
 export const SEND_FEEDBACK_ERROR = `${prefix}/SEND_FEEDBACK_ERROR`
+export const MAIL_SUBSCRIBE_START = `${prefix}/MAIL_SUBSCRIBE_START`
+export const MAIL_SUBSCRIBE_SUCCESS = `${prefix}/MAIL_SUBSCRIBE_SUCCESS`
+export const MAIL_SUBSCRIBE_ERROR = `${prefix}/MAIL_SUBSCRIBE_ERROR`
 
 /**
  * Reducer
@@ -25,6 +29,7 @@ export const ReducerRecord = Record({
     showFeedbackWindow: false,
     showFeedbackResultMessage: false,
     fetching: false,
+    successMessage: null,
     error: null
 })
 
@@ -32,6 +37,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
+        case MAIL_SUBSCRIBE_START:
         case SEND_FEEDBACK_START:
             return state
                 .set('error', null)
@@ -43,6 +49,14 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('showFeedbackWindow', false)
                 .set('showFeedbackResultMessage', true)
 
+        case MAIL_SUBSCRIBE_SUCCESS:
+            return state
+                .set('fetching', false)
+                // .set('showFeedbackWindow', false)
+                // .set('showFeedbackResultMessage', true)
+                // .set('successMessage', 'Подписка успешно добавлена')
+
+        case MAIL_SUBSCRIBE_ERROR:
         case SEND_FEEDBACK_ERROR:
             return state
                 .set('fetching', false)
@@ -81,6 +95,7 @@ export const stateSelector = state => state[moduleName]
 export const showFeedbackWindowSelector = createSelector(stateSelector, state => state.showFeedbackWindow)
 export const showFeedbackResultMessageSelector = createSelector(stateSelector, state => state.showFeedbackResultMessage)
 export const errorMessageSelector = createSelector(stateSelector, state => state.error)
+export const loadingSelector = createSelector(stateSelector, state => state.fetching)
 
 /**
  * Action Creators
@@ -111,6 +126,40 @@ export const sendFeedback = (values) => {
             .catch((error) => {
                 dispatch({
                     type: SEND_FEEDBACK_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const subscribe = (values) => {
+    return (dispatch) => {
+        dispatch({
+            type: MAIL_SUBSCRIBE_START,
+            payload: null
+        });
+
+        fetch('/api/mail-subscription', {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(() => {
+                dispatch({
+                    type: MAIL_SUBSCRIBE_SUCCESS,
+                    payload: null
+                });
+
+                dispatch(reset('subscribe-form'));
+            })
+            .catch((error) => {
+                dispatch({
+                    type: MAIL_SUBSCRIBE_ERROR,
                     payload: {error}
                 });
             });

@@ -33,12 +33,15 @@ export const checkStatus = (response) => {
                     let _message = response.statusText;
 
                     if (data) {
-                        let _serverError = JSON.parse(data);
-                        if (_serverError.hasOwnProperty('message')) {
-                            _message = _serverError.message;
-                        } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
-                            _message = _serverError.errors.join(',\n')
+                        try {
+                            let _serverError = JSON.parse(data);
+                            if (_serverError.hasOwnProperty('message')) {
+                                _message = _serverError.message;
+                            } else if (_serverError.hasOwnProperty('errors') && Array.isArray(_serverError.errors)) {
+                                _message = _serverError.errors.join(',\n')
+                            }
                         }
+                        catch (e) { }
                     }
                     let error = new Error(_message);
                     reject(error)

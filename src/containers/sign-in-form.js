@@ -81,7 +81,6 @@ let SignInForm = class SignInForm extends React.Component {
     }
 }
 
-
 SignInForm = reduxForm({
     form: 'SignInForm',
     validate

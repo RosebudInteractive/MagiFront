@@ -1,7 +1,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {showFeedbackWindow} from "../../ducks/message";
+import {showFeedbackWindow,} from "../../ducks/message";
+import SubscribeForm from './subscribe-form'
 
 class PageFooter extends React.Component {
 
@@ -75,7 +76,7 @@ class Inner extends React.Component {
                     <SocialBlock/>
                 </div>
                 <div className='page-footer__col'>
-                    <SubscribeBlock/>
+                    <SubscribeForm/>
                 </div>
             </div>
         )
@@ -91,11 +92,12 @@ class SocialBlock extends React.Component {
                     <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18} href={'https://www.facebook.com/Magisteria.ru/'}/>
                     <SocialLink text={'Telegram'} logo={'telegram'} icoWidth={16} icoHeight={16} href={'https://t.me/magisteria_ru'}/>
                     <SocialLink text={'Вконтакте'} logo={'vk'} icoWidth={18} icoHeight={11} href={'https://vk.com/magisteriaru'}/>
-                    <SocialLink text={'Youtube'} logo={'youtube'} icoWidth={16} icoHeight={12} href={'#'}/>
+                    <SocialLink text={'Youtube'} logo={'youtube'} icoWidth={16} icoHeight={12} href={'https://www.youtube.com/channel/UCVTyCEHsBPD-xRD0aJekeww'}/>
                     <SocialLink text={'Twitter'} logo={'tw'} icoWidth={18} icoHeight={15} href={'https://twitter.com/MagisteriaRu'}/>
                     <SocialLink text={'Одноклассники'} logo={'ok'} icoWidth={11} icoHeight={18} href={'https://ok.ru/group/54503517782126'}/>
                     <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16} href={'https://www.instagram.com/magisteria.ru/'}/>
                     <SocialLink text={'RSS'} logo={'rss'} icoWidth={16} icoHeight={16} href={'/feed/'}/>
+                    <SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16} href={'https://zen.yandex.com/magisteria'}/>
                 </div>
             </div>
         )
@@ -120,19 +122,52 @@ class SocialLink extends React.Component {
 }
 
 class SubscribeBlock extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            email: '',
+            name: ' ',
+            lastName: ' ',
+        }
+    }
+
+    _handleSubmit(event) {
+        event.preventDefault();
+
+        if (this._isSendingEnable()) {
+            const data = new FormData(event.target);
+            data.Email = this.state.email;
+            data.Name = this.state.name;
+            data.LastName = this.state.lastName;
+
+            this.props.subscribe(data)
+        }
+    }
+
+    _changeEmail(e) {
+        this.setState({email: e.target.value})
+    }
+
+    _isSendingEnable() {
+        return (this.state.email !== '') && (this.state.name !== '') && (this.state.lastName !== '')
+    }
+
+
     render() {
         const _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#next"/>';
+        let _disabledBtn = !this._isSendingEnable()
 
         return (
             <div className="subscribe-block">
                 <h4 className="subscribe-block__label">Подписка</h4>
                 <p className="subscribe-block__descr">Оставьте ваш e-mail и мы оповестим вас когда новые лекции появятся
                     на сайте</p>
-                <form action="#" method="post" className="form subscribe-form">
+                <form className="form subscribe-form" onSubmit={::this._handleSubmit}>
                     <div className="subscribe-form__field-wrapper">
                         <input type="email" id="email" name="email-field" className="subscribe-form__field"
-                               placeholder="E-mail"/>
-                        <button className="subscribe-form__submit">
+                               placeholder="E-mail" onChange={::this._changeEmail}/>
+                        <button className={"subscribe-form__submit" + (_disabledBtn ? ' disabled' : '')} type='submit'>
                             <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
                         </button>
                     </div>
@@ -152,7 +187,6 @@ class Copyright extends React.Component {
                             <a>Политика конфиденциальности</a> / <a>Пользовательское соглашение</a>
                         </div>
                     </p>
-
                 </div>
             </div>
         )
