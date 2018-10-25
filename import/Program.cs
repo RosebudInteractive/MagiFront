@@ -296,6 +296,10 @@ namespace MagImport
         public class Course : DataObjTyped<CourseFields, CourseRoot>
         {
             const string CLASS_GUID = "5995f1c7-43dc-4367-8071-532702b94235";
+            [JsonIgnore]
+            public CourseLng courseLng = null;
+            [JsonIgnore]
+            public int maxLessonNumber = 0;
             public Course() : base(CLASS_GUID) { }
         };
 
@@ -427,6 +431,7 @@ namespace MagImport
         public class Lesson : DataObjTyped<LessonFields, LessonRoot>
         {
             const string CLASS_GUID = "caadef95-278b-4cad-acc9-a1e27380d6c6";
+            [JsonIgnore]
             public bool HasParent { get; set; }
             public Lesson() : base(CLASS_GUID) { HasParent = false; }
         };
@@ -2197,14 +2202,15 @@ namespace MagImport
                 course.Fields.LanguageId = LANGUAGE_ID;
                 course.Fields.OneLesson = false;
                 course.Fields.URL = String.IsNullOrEmpty(rdr.GetString("alias")) ? null : rdr.GetString("alias");
-                course.Fields.State = "P";
+                course.Fields.State = "D";
 
                 CourseLng course_lng = new CourseLng();
+                course.courseLng = course_lng;
                 course_lng.Fields.CourseId = course.Fields.Id;
                 course_lng.Fields.LanguageId = LANGUAGE_ID;
                 course_lng.Fields.Name = String.IsNullOrEmpty(rdr.GetString("name")) ? null : rdr.GetString("name");
                 course_lng.Fields.Description = String.IsNullOrEmpty(rdr.GetString("description")) ? null : rdr.GetString("description");
-                course_lng.Fields.State = "R";
+                course_lng.Fields.State = "D";
 
                 CourseCategory course_category = new CourseCategory();
                 course_category.Fields.CourseId = course.Fields.Id;
@@ -2301,8 +2307,8 @@ namespace MagImport
             Episode.AllData = allData;
             EpisodeLng.AllData = allData;
             EpisodeLesson.AllData = allData;
-            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>> lessonsDB =
-                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>>();
+            Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, Course>> lessonsDB =
+                new Dictionary<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, Course>>();
 
             cmd = new MySqlCommand(sql_get_lessons, conn);
             rdr = cmd.ExecuteReader();
@@ -2357,8 +2363,8 @@ namespace MagImport
                 episode_lsn.Fields.Supp = false;
 
                 lessonsDB.Add(db_id, new Tuple<Lesson, LessonLng, LessonCourse, Episode,
-                    EpisodeLng, EpisodeLesson, CourseLng>(lesson, lesson_lng, lesson_course, episode,
-                        episode_lng, episode_lsn, curr_course.Item2));
+                    EpisodeLng, EpisodeLesson, Course>(lesson, lesson_lng, lesson_course, episode,
+                        episode_lng, episode_lsn, curr_course.Item1));
             }
             rdr.Close();
 
@@ -2371,7 +2377,7 @@ namespace MagImport
             ResourceLng.AllData = allData;
             EpisodeContent.AllData = allData;
 
-            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng>> pair in lessonsDB)
+            foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, Course>> pair in lessonsDB)
             {
                 int db_id = pair.Key;
                 Lesson lesson = pair.Value.Item1;
@@ -2380,6 +2386,7 @@ namespace MagImport
                 Episode episode = pair.Value.Item4;
                 EpisodeLng episode_lng = pair.Value.Item5;
                 EpisodeLesson episode_lsn = pair.Value.Item6;
+                Course course = pair.Value.Item7;
 
                 //
                 // Read lesson details
@@ -2411,6 +2418,7 @@ namespace MagImport
                     if (!String.IsNullOrEmpty(val))
                         lesson_lng.Fields.SnPost = val;
 
+                bool isCourseReady = true;
                 if (lesson_prop_value.TryGetValue(att_lsn_readydate_name, out val))
                 {
                     if (!String.IsNullOrEmpty(val))
@@ -2419,8 +2427,15 @@ namespace MagImport
                         lesson_course.Fields.State = "D";
                         lesson_lng.Fields.State = "D";
                         episode_lng.Fields.State = "D";
-                        pair.Value.Item7.Fields.State = "D"; // CourseLng
+                        isCourseReady = false;
                     }
+                }
+                if (isCourseReady)
+                {
+                    // Course has at least 1 ready lesson
+                    //
+                    course.Fields.State = "P";
+                    course.courseLng.Fields.State = "R";
                 }
 
                 if (lesson.HasParent)
@@ -2432,7 +2447,7 @@ namespace MagImport
                     if (parent_db == 0)
                         throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Invalid value of attr \"{2}\".",
                             lesson_lng.Fields.Name, db_id, att_lsn_parent_id_name));
-                    Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, CourseLng> parent = null;
+                    Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, Course> parent = null;
                     if (!lessonsDB.TryGetValue(parent_db, out parent))
                         throw new Exception(String.Format("Lesson \"{0}\" (Id={1}): Can't find parent (DbId={2}).",
                             lesson_lng.Fields.Name, db_id, parent_db));
@@ -2444,9 +2459,19 @@ namespace MagImport
                     lesson_course.Fields.ParentId = lesson_course_parent.Fields.Id;
                 }
 
+                bool hasNumber = false;
                 if (lesson_prop_value.TryGetValue(att_lsn_number_name, out val))
                     if (Int32.TryParse(val, out int_val))
+                    {
+                        if (int_val <= course.maxLessonNumber)
+                            int_val = ++course.maxLessonNumber;
+                        else
+                            course.maxLessonNumber = int_val;
                         lesson_course.Fields.Number = int_val;
+                        hasNumber = true;
+                    }
+                if(!hasNumber)
+                    lesson_course.Fields.Number= ++course.maxLessonNumber;
 
                 int photo_id = 0;
                 if (lesson_prop_value.TryGetValue(att_lsn_cover_name, out val))
@@ -2971,33 +2996,44 @@ namespace MagImport
 
         Dictionary<string, int> monthes = new Dictionary<string, int>()
         {
-            {"январь",0 },
-            {"февраль",1 },
-            {"март",2 },
-            {"апрель",3 },
-            {"май",4 },
-            {"июнь",5 },
-            {"июль",6 },
-            {"август",7 },
-            {"сентябрь",8 },
-            {"октябрь",9 },
-            {"ноябрь",10 },
-            {"декабрь",11 }
+            {"январь",1 },
+            {"февраль",2 },
+            {"март",3 },
+            {"апрель",4 },
+            {"май",5 },
+            {"июнь",6 },
+            {"июль",7 },
+            {"август",8 },
+            {"сентябрь",9 },
+            {"октябрь",10 },
+            {"ноябрь",11 },
+            {"декабрь",12 }
+        };
+
+        Dictionary<string, int> seasons = new Dictionary<string, int>()
+        {
+            {"зима",2 },
+            {"весна",5 },
+            {"лето",8 },
+            {"осень",11 }
         };
 
         DateTime? _monthYearToDate(string month_year)
         {
             DateTime? dt = null;
             string[] date_strs = month_year.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-            if (date_strs.Length == 2)
+            if (date_strs.Length >= 1)
             {
-                int month;
-                if (monthes.TryGetValue(date_strs[0], out month))
+                int year;
+                if (Int32.TryParse(date_strs[date_strs.Length - 1], out year))
                 {
-                    month = (month + 1) % 12;
-                    int year;
-                    if (Int32.TryParse(date_strs[1], out year))
-                        dt = (new DateTime(year, month + 1, 1)).AddDays(-1);
+                    int month = 12;
+                    if (date_strs.Length == 2)
+                    {
+                        if (!monthes.TryGetValue(date_strs[0], out month))
+                            seasons.TryGetValue(date_strs[0], out month);
+                    }
+                    dt = (new DateTime(year, month, 1)).AddMonths(1).AddDays(-1);
                 }
             }
             return dt;
