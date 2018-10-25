@@ -100,7 +100,7 @@ class Course extends React.Component {
     render() {
         let {course} = this.props,
             _cover = getCoverPath(course, ImageSize.medium)
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" width="724" height="503"/>';
+        const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" width="574" height="503"/>';
 
         return (
             <div className="course-announce">

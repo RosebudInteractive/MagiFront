@@ -37,7 +37,7 @@ export default class Item extends React.Component {
         _categories = <div>{_categories}</div>
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
-            _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  _cover + '" width="724" height="503"/>';
+            _image = '<image preserveAspectRatio="xMidYMid slice" xlink:href="' +  _cover + '" width="563" height="514"/>';
 
         return (
             <div className="fav-card">
