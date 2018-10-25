@@ -52,13 +52,16 @@ class ImageBlock extends React.Component {
             _height = size ? size.height : 503;
 
         // if (_height < 503) {
-        let _ratio = 503 / _height,
-            _newWidth = _width * _ratio,
-            _deltaX = Math.round((_width - _newWidth) / 2);
-
-        _width = _newWidth;
-        _height = 503;
+        // let _ratio = 503 / _height,
+        //     _newWidth = _width * _ratio,
+        //     _deltaX = Math.round((_width - _newWidth) / 2);
+        //
+        // _width = _newWidth;
+        // _height = 503;
         // }
+        _width = 724;
+        _height = 503;
+        let _deltaX = -75;
 
         const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" x="' + _deltaX + '" width="' + _width + '" height="' + _height + '"/>';
 
