@@ -4,6 +4,7 @@ exports.HttpCode = {
     OK: 200,
     ERR_BAD_REQ: 400,
     ERR_UNAUTH: 401,
+    ERR_PAYMENT_REQUIRED: 402,
     ERR_FORBIDDEN: 403,
     ERR_NOT_FOUND: 404,
     ERR_CONFLICT: 409,

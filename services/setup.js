@@ -12,6 +12,8 @@ const passport = require('passport');
 const methodOverride = require('method-override');
 
 const { HttpCode } = require("../const/http-codes");
+const { HttpError } = require('../errors/http-error');
+const { AccessRigths } = require('../const/common');
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
@@ -43,7 +45,7 @@ function errorHandler(err, req, res, next) {
     let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
     let errStr = err.message ? err.message : err.toString();
     let error = null;
-    let statusCode = HttpCode.ERR_INTERNAL;
+    let statusCode = err instanceof HttpError ? err.statusCode : HttpCode.ERR_INTERNAL;
     if (err.statusCode && err.error) {
         statusCode = err.statusCode;
         error = err.error;
@@ -99,11 +101,11 @@ function setupAPI(express, app) {
         AuthJWTInit(app);
 
     app.use("/data", AuthenticateLocal(app)); // Optional Local Authentication
-    app.use("/api/adm", AuthenticateLocal(app, useJWT ? false : true)); // Local Authentication
+    app.use("/api/adm", AuthenticateLocal(app, useJWT ? false : true, AccessRigths.ContentManager)); // Local Authentication
     app.use("/api", AuthenticateLocal(app)); // Optional Local Authentication
     if (useJWT) {
         app.use("/data", AuthenticateJWT(app)); // Optional JWT Authentication
-        app.use("/api/adm", AuthenticateJWT(app, true)); // JWT Authentication
+        app.use("/api/adm", AuthenticateJWT(app, true, AccessRigths.ContentManager)); // JWT Authentication
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 

@@ -11,6 +11,7 @@ const { UserActivate } = require("./user-activate");
 const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
 const { recaptcha } = require('./recaptcha');
+const { AccessRigths } = require('../const/common');
 const serialize = require('./serialize');
 
 let usersCache = null;
@@ -275,6 +276,17 @@ let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
     }
 };
 
+let checkPermissions = (user, accessRights) => {
+    let result = 0;
+    if (accessRights & AccessRigths.Administrator)
+        result += user.PData.isAdmin ? AccessRigths.Administrator : 0;
+    if (accessRights & AccessRigths.ContentManager)
+        result += (user.PData.isAdmin || user.PData.roles.e) ? AccessRigths.ContentManager : 0;
+    if (accessRights & AccessRigths.Subscriber)
+        result += AccessRigths.Subscriber;
+    return result;
+};
+
 const isFeatureEnabled = config.get('authentication.enabled');
 let authLocal = null;
 let AuthLocalInit = (app) => {
@@ -282,18 +294,26 @@ let AuthLocalInit = (app) => {
         authLocal = new AuthLocal(app);
 };
 
+exports.CheckPermissions = checkPermissions;
 exports.SetupWhoAmI = (app) => { AuthLocal.setupWhoAmI(app) };
 exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession;
 exports.StdLoginProcessor = StdLoginProcessor;
-exports.AuthenticateLocal = (app, isAuthRequired) => {
+exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {
     AuthLocalInit(app);
     return (req, res, next) => {
-        if (!isFeatureEnabled) { return next(); }
-        if (isAuthRequired && !req.user)
-            return res.status(HttpCode.ERR_UNAUTH).json({ message: "Authorization required" })
-        else
-            next();    
+        if (isFeatureEnabled) {
+            if (isAuthRequired) {
+                if (!req.user)
+                    return res.status(HttpCode.ERR_UNAUTH).json({ message: "Authorization required" });
+                if (accessRights) {
+                    let userRights = checkPermissions(req.user, accessRights)
+                    if(userRights!==accessRights)
+                        return res.status(HttpCode.ERR_FORBIDDEN).json({ message: "Access denied." });
+                }
+            }
+        }
+        return next();    
     };
 };

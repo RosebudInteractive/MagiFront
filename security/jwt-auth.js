@@ -5,7 +5,7 @@ const config = require('config');
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { DestroySession } = require('./local-auth');
+const { CheckPermissions, DestroySession } = require('./local-auth');
 
 class AuthJWT {
 
@@ -79,20 +79,31 @@ let AuthJWTInit = (app) => {
         authJWT = new AuthJWT(app);
 };
 
+let processAuth = (user, isAuthRequired, accessRights, res, next, info) => {
+    if (isAuthRequired) {
+        if (user) {
+            if (accessRights) {
+                let userRights = CheckPermissions(user, accessRights)
+                if (userRights !== accessRights)
+                    return res.status(HttpCode.ERR_FORBIDDEN).json(info ? info : { message: "Access denied." });
+            }
+        }
+        else
+            return res.status(HttpCode.ERR_UNAUTH).json(info ? info : { message: "Authorization required" });
+    }
+    next();
+}
+
 exports.AuthJWTInit = AuthJWTInit;
 
-exports.AuthenticateJWT = (app, isAuthRequired) => {
+exports.AuthenticateJWT = (app, isAuthRequired, accessRights) => {
     AuthJWTInit(app);
     return (req, res, next) => {
         if (!isFeatureEnabled) { return next(); }
-        if (req.user) { return next(); }
-        if (req.jwtResult) {
-            if ((!req.jwtResult.isSuccess) & isAuthRequired)
-                res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info);
-            else
-                next();
-            return;
-        }
+        if (req.user)
+            return processAuth(req.user, isAuthRequired, accessRights, res, next);
+        if (req.jwtResult)
+            return processAuth(req.user, isAuthRequired, accessRights, res, next, req.jwtResult.info);
         req.jwtResult = { isSuccess: false };
         let token = req.headers["authorization"];
         if (token)
@@ -110,7 +121,7 @@ exports.AuthenticateJWT = (app, isAuthRequired) => {
                                 //   but we are using JWT here, so lets keep cookie unathorized, just assign "user" to "req.user"
                                 //
                                 req.user = user;
-                                next();
+                                processAuth(req.user, isAuthRequired, accessRights, res, next);
                                 // req.logIn(user, (err) => {
                                 //     if (err) {
                                 //         return res.status(HttpCode.ERR_INTERNAL).json(
@@ -134,7 +145,7 @@ exports.AuthenticateJWT = (app, isAuthRequired) => {
                                 .json({ message: err.toString() });
                         })
                 else
-                    next();;
+                    next();
             })(req, res, next)
         else {
             req.jwtResult.info = { message: "Not authorized." };

@@ -2,6 +2,8 @@ const _ = require('lodash');
 const { DbObject } = require('./db-object');
 const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 
 const AUTHOR_REQ_TREE = {
     expr: {
@@ -260,6 +262,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                 }
                             }, {})
                         }
+                        else
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find author "${url}".`);
                     })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {

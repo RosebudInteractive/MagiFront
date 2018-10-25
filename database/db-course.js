@@ -2,6 +2,8 @@ const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { Intervals } = require('../const/common');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const {
     ACCOUNT_ID,
@@ -810,6 +812,8 @@ const DbCourse = class DbCourse extends DbObject {
                                 }
                             }, {});
                         }
+                        else
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "${url}".`);                            
                     })
                     .then((result) => {
                         if (course && result && result.detail && (result.detail.length > 0)) {
