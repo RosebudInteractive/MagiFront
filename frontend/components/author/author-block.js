@@ -1,23 +1,14 @@
 import React from "react";
 import {connect} from "react-redux";
 import {authorSelector} from '../../ducks/author'
+import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
 
 class AuthorBlock extends React.Component {
 
     render() {
         let {author} = this.props;
 
-        let _portrait = author ? (
-            (author.PortraitMeta && author.PortraitMeta.content) ?
-                (
-                    author.PortraitMeta.content.m ?
-                        author.PortraitMeta.content.m
-                        :
-                        null
-                ) : null
-        ) : null;
-
-        _portrait = '/data/' + (_portrait ? (author.PortraitMeta.path + _portrait) : author.Portrait);
+        let _portrait = getAuthorPortraitPath(author, ImageSize.medium);
 
         return (
             <div className="author-block">

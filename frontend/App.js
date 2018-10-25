@@ -39,6 +39,7 @@ import AuthPopup from './containers/auth-form'
 import AuthConfirmForm from './containers/auth-confirm-form'
 import PasswordConfirmForm from './containers/password-confirm-form'
 import AuthErrorForm from './containers/auth-error-form'
+import NotFound from './components/not-found'
 
 import SizeInfo from './components/size-info'
 
@@ -219,6 +220,7 @@ class App extends Component {
                 )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
+                <Route path="*" component={NotFound} />
             </Switch>
         )
     }
@@ -238,8 +240,7 @@ class App extends Component {
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
-                {!((this.props.currentPage === pages.lesson) || (this.props.currentPage === pages.player)) ?
-                    <PageFooter/> : null}
+                <PageFooter/>
                 <AuthPopup visible={this.props.showSignInForm}/>
                 {this.props.showSizeInfo ? <SizeInfo/> : null}
                 {this.props.showFeedbackWindow ? <FeedbackMessageBox/> : null}

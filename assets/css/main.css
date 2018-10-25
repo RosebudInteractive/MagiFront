@@ -3959,6 +3959,12 @@ li.fancybox-thumbs-loading {
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%); }
 
+.subscribe-form__submit.disabled{
+  cursor: default; }
+
+.subscribe-form__submit.disabled svg{
+  fill: rgba(47, 47, 47, 0.4); }
+
 .social-block-big {
   padding-top: 13px;
   padding-bottom: 21px; }
@@ -17490,6 +17496,49 @@ ul.lectures-tab {
   .modal-form .form__message {
     padding: 12px 16px;
     height: 165px; }
+
+  .not_found__page{
+    font-family: "Fira Sans", Arial, sans-serif;
+    padding-top: 96px;
+    height: auto; }
+  @media (max-width: 899px) {
+    .not_found__page{
+      padding-top: 64px;
+      height: calc(100vh - 64px);}
+  }
+
+  .not-found__wrapper{
+    padding: 74px 233px 16px 236px;
+  }
+  @media (max-width: 1399px) {
+    .not-found__wrapper{
+      padding-left: 150px;
+      padding-right: 150px;}
+  }
+  @media (max-width: 899px) {
+    .not-found__wrapper{
+      padding-top: 33px;
+      padding-left: 55px;
+      padding-right: 252px;}
+  }
+
+  .not-found__wrapper .header {
+     font-size: 28px;
+     line-height: 34px;
+     align-content: left;
+  }
+
+  .not-found__wrapper .text {
+    font-family: "PT Serif", serif;
+    font-size: 20px;
+    line-height: 27px;
+  }
+
+  .not-found__wrapper .btn {
+    width: 227px;
+    margin-top: 16px;
+  }
+
 
 /*# sourceMappingURL=main.css.map */
 

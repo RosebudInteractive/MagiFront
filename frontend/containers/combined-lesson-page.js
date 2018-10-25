@@ -10,6 +10,8 @@ import MobileLessonWrapper from '../components/combined-lesson-page/mobile/mobil
 import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';
 import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
+import NotFoundPage from '../components/not-found';
+import LoadingFrame from '../components/loading-frame';
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -452,7 +454,8 @@ class TranscriptLessonPage extends React.Component {
             lessonText,
             fetching,
             authorized,
-            isMobileApp
+            isMobileApp,
+            notFound,
         } = this.props;
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
@@ -464,33 +467,39 @@ class TranscriptLessonPage extends React.Component {
         }
 
         return (
-            fetching || !(lesson && _lesson && lessonText.loaded) ?
-                <p>Загрузка...</p>
+            fetching ?
+                <LoadingFrame/>
                 :
-                [
-                    this._getMetaTags(),
-                    <Menu lesson={_lesson}
-                          isNeedHideRefs={_isNeedHideRefs}
-                          episodes={lessonText.episodes}
-                          active={_lesson.Id}
-                          history={this.props.history}
-                          extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>,
-                    _isNeedHideGallery ? null : <GalleryButtons/>,
-                    lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
-                    this._getLessonsBundles(),
-                    <LessonInfo lesson={_lesson}/>,
-                    <TranscriptPage episodes={lessonText.episodes}
-                                    refs={lessonText.refs}
-                                    gallery={lessonText.gallery}
-                                    isNeedHideGallery={_isNeedHideGallery}
-                                    isNeedHideRefs={_isNeedHideRefs}
-                                    lesson={_lesson}
-                                    history={this.props.history}
-                                    courseUrl={this.props.courseUrl}
-                                    lessonUrl={this.props.lessonUrl}
-                                    shareUrl={this._getShareUrl()}
-                                    counter={_lesson.ShareCounters}/>
-                ]
+                notFound ?
+                    <NotFoundPage/>
+                    :
+                    (lesson && _lesson && lessonText.loaded) ?
+                        [
+                            this._getMetaTags(),
+                            <Menu lesson={_lesson}
+                                  isNeedHideRefs={_isNeedHideRefs}
+                                  episodes={lessonText.episodes}
+                                  active={_lesson.Id}
+                                  history={this.props.history}
+                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>,
+                            _isNeedHideGallery ? null : <GalleryButtons/>,
+                            lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
+                            this._getLessonsBundles(),
+                            <LessonInfo lesson={_lesson}/>,
+                            <TranscriptPage episodes={lessonText.episodes}
+                                            refs={lessonText.refs}
+                                            gallery={lessonText.gallery}
+                                            isNeedHideGallery={_isNeedHideGallery}
+                                            isNeedHideRefs={_isNeedHideRefs}
+                                            lesson={_lesson}
+                                            history={this.props.history}
+                                            courseUrl={this.props.courseUrl}
+                                            lessonUrl={this.props.lessonUrl}
+                                            shareUrl={this._getShareUrl()}
+                                            counter={_lesson.ShareCounters}/>
+                        ]
+                        :
+                        null
         )
     }
 }
@@ -549,6 +558,7 @@ function mapStateToProps(state, ownProps) {
         lessonInfo: state.singleLesson,
         fetching: state.singleLesson.fetching || state.lessonText.fetching,
         lesson: state.singleLesson.object,
+        notFound: state.singleLesson.notFound || state.lessonText.notFound,
         authors: state.singleLesson.authors,
         lessonText: state.lessonText,
         course: state.singleLesson.course,

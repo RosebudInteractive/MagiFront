@@ -3,15 +3,16 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import MetaTags from 'react-meta-tags';
 
-import {authorSelector, loadingSelector, getAuthor} from '../ducks/author'
+import {authorSelector, loadingSelector, notFoundSelector, getAuthor} from '../ducks/author'
 import AuthorBlock from '../components/author/author-block';
 import CoursesBlock from '../components/author/courses-and-lessons';
+import NotFoundPage from '../components/not-found'
 
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from "../actions/lesson-info-storage-actions";
 import * as userActions from "../actions/user-actions";
 
-import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
+import {pages, getDomain, getPageUrl, getAuthorPortraitPath, ImageSize,} from '../tools/page-tools';
 import $ from 'jquery'
 
 class AuthorPage extends React.Component {
@@ -40,7 +41,8 @@ class AuthorPage extends React.Component {
         let {author, facebookAppID} = this.props,
             _url = getPageUrl(),
             _domain = getDomain(),
-            _title = author ? (author.FirstName + ' ' + author.LastName + ' - Магистерия') : '';
+            _title = author ? (author.FirstName + ' ' + author.LastName + ' - Магистерия') : '',
+            _portrait = getAuthorPortraitPath(author, ImageSize.small);
 
         return author
             ?
@@ -55,13 +57,13 @@ class AuthorPage extends React.Component {
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
-                <meta property="og:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
-                <meta property="og:image:secure_url" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta property="og:image" content={_domain + _portrait}/>
+                <meta property="og:image:secure_url" content={_domain + _portrait}/>
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:description" content={author.Description}/>
                 <meta name="twitter:title" content={_title}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                <meta name="twitter:image" content={_domain + '/assets/images/apple-touch-icon.png'}/>
+                <meta name="twitter:image" content={_domain + _portrait}/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
             </MetaTags>
@@ -91,27 +93,28 @@ class AuthorPage extends React.Component {
         $('meta[name="application-name"]').remove();
     }
 
-    render() {
-        let {author, loading} = this.props;
+    _getPage() {
+        let {author, notFound} = this.props;
 
-        return (
-            <div>
-                {
-                    loading ?
-                        <p>Загрузка...</p>
-                        :
-                        author ?
-                            [
-                                this._getMetaTags(),
-                                <div className="author-page">
-                                    <AuthorBlock/>
-                                    <CoursesBlock/>
-                                </div>
-                            ]
-                            : null
-                }
-            </div>
-        )
+        return notFound ?
+            <NotFoundPage/>
+            :
+            author ?
+                [
+                    this._getMetaTags(),
+                    <div className="author-page">
+                        <AuthorBlock/>
+                        <CoursesBlock/>
+                    </div>
+                ]
+                : null
+    }
+
+    render() {
+        return this.props.loading ?
+            <p>Загрузка...</p>
+            :
+            this._getPage()
     }
 }
 
@@ -119,6 +122,7 @@ function mapStateToProps(state, ownProps) {
     return {
         author: authorSelector(state),
         loading: loadingSelector(state),
+        notFound: notFoundSelector(state),
         authorUrl: ownProps.match.params.url,
         facebookAppID: state.app.facebookAppID,
     }

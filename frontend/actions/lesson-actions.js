@@ -11,6 +11,8 @@ import {
     CLEAR_LESSON_PLAY_INFO,
     START_LESSON_PLAYING,
     CLEAR_LESSON,
+    SET_LESSON_NOT_FOUND,
+    SET_LESSON_TEXT_NOT_FOUND,
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
@@ -40,10 +42,17 @@ export const getLesson = (courseUrl, lessonUrl) => {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_LESSON_FAIL,
-                    payload: err
-                });
+                if (err.status === 404) {
+                    dispatch({
+                        type: SET_LESSON_NOT_FOUND,
+                        payload: null
+                    });
+                } else {
+                    dispatch({
+                        type: GET_LESSON_FAIL,
+                        payload: err
+                    });
+                }
             });
     }
 };
@@ -94,10 +103,17 @@ export const getLessonText = (courseUrl, lessonUrl) => {
                 });
             })
             .catch((err) => {
-                dispatch({
-                    type: GET_LESSON_TEXT_FAIL,
-                    payload: err
-                });
+                if (err.status === 404) {
+                    dispatch({
+                        type: SET_LESSON_TEXT_NOT_FOUND,
+                        payload: null
+                    });
+                } else {
+                    dispatch({
+                        type: GET_LESSON_TEXT_FAIL,
+                        payload: err
+                    });
+                }
             });
     }
 }
@@ -128,6 +144,7 @@ const checkStatus = (response) => {
         return response
     } else {
         let error = new Error(response.statusText);
+        error.status = response.status;
         error.response = response;
         throw error
     }
