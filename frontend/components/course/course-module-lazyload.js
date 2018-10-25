@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom';
 
 import InfoBlock from './info-block';
 import {ImageSize, getCoverPath} from '../../tools/page-tools';
-import { lazyload } from 'react-lazyload';
+import {lazyload} from 'react-lazyload';
 
 @lazyload({
     height: 200,
@@ -16,7 +16,8 @@ export default class CourseModuleLazyload extends React.Component {
 
     render() {
         let {course, isMobile} = this.props,
-            _cover = getCoverPath(course, ImageSize.medium)
+            _cover = getCoverPath(course, ImageSize.medium),
+            _size = course.CoverMeta.size;
 
         return (
             (course) ?
@@ -26,7 +27,7 @@ export default class CourseModuleLazyload extends React.Component {
                                course={course}
                                isMobile={isMobile}
                     />
-                    <ImageBlock cover={_cover} url={course.URL} mask={course.Mask}/>
+                    <ImageBlock cover={_cover} url={course.URL} mask={course.Mask} size={_size}/>
                 </div>
                 :
                 ''
@@ -46,9 +47,21 @@ class ImageBlock extends React.Component {
     }
 
     render() {
-        const {cover, mask} = this.props;
+        const {cover, mask, size} = this.props;
+        let _width = size ? size.width : 574,
+            _height = size ? size.height : 503,
+            _deltaX = 0;
 
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" width="724" height="503"/>';
+        if (_height < 503) {
+            let _ratio = 503 / _height,
+                _newWidth = _width * _ratio;
+
+            _deltaX = Math.round((_width - _newWidth) / 2);
+            _width = _newWidth;
+            _height = 503;
+        }
+
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" x="' + _deltaX + '" width="' + _width + '" height="' + _height + '"/>';
 
         return (
             <Link to={'/category/' + this.props.url}>

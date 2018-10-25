@@ -35,7 +35,7 @@ class ImageBlock extends React.Component {
     render() {
         const {cover, mask} = this.props;
 
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" width="724" height="503"/>';
+        const _image = '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + cover + '" x="20" width="574" height="503"/>';
 
         return (
             <Link to={'/category/' + this.props.url}>
