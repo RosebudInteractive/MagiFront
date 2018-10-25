@@ -34,7 +34,9 @@ class YandexKassa extends Payment {
                                 res.send(data);
                             })
                             .catch(err => {
-                                console.error(`### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
+                                let now = new Date();
+                                let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
+                                console.error(`[${now.toLocaleString()} ${tZ_str}] ### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
                                 res.send({});
                             })
                     else
