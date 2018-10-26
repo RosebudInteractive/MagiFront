@@ -4,7 +4,7 @@ import {LoginEdit, PasswordEdit, LoginButton} from '../components/auth/editors'
 import Captcha from '../components/auth/captcha'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {userAuthSelector, errorSelector, loadingSelector, login} from "../ducks/auth";
+import {userAuthSelector, errorSelector, loadingSelector, initializedSelector, login} from "../ducks/auth";
 
 const validate = values => {
     const errors = {}
@@ -22,7 +22,7 @@ const validate = values => {
 
 let SignInForm = class SignInForm extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             captcha: null
@@ -41,16 +41,16 @@ let SignInForm = class SignInForm extends React.Component {
 
 
     _onSetCaptcha(value) {
-        this.setState({captcha : value});
+        this.setState({captcha: value});
     }
 
     _onClearCaptcha() {
-        this.setState({captcha : null});
+        this.setState({captcha: null});
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.serverError)  {
-            this.setState({captcha : null})
+        if (nextProps.serverError) {
+            this.setState({captcha: null})
             if (this._recaptchaInstance) {
                 this._recaptchaInstance.reset();
             }
@@ -63,13 +63,15 @@ let SignInForm = class SignInForm extends React.Component {
             this._recaptchaInstance.reset();
         }
     }
-    render() {
-        const {invalid, serverError, loading, isUserAuthorized} = this.props;
-        const _errorText = serverError && <p className="form__error-message" style={{display: "block"}}>{serverError}</p>
 
-        return (
+    render() {
+        const {invalid, serverError, loading, isUserAuthorized, authInitialized} = this.props;
+        const _errorText = serverError &&
+            <p className="form__error-message" style={{display: "block"}}>{serverError}</p>
+
+        return authInitialized ?
             <div className={"auth-wrapper" + (!isUserAuthorized ? " opened" : "")}>
-                <form className="sign-in-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)} >
+                <form className="sign-in-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
@@ -77,7 +79,8 @@ let SignInForm = class SignInForm extends React.Component {
                     <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'}/>
                 </form>
             </div>
-        )
+            :
+            null
     }
 }
 
@@ -91,6 +94,7 @@ function mapStateToProps(state) {
         isUserAuthorized: userAuthSelector(state),
         serverError: errorSelector(state),
         loading: loadingSelector(state),
+        authInitialized: initializedSelector(state),
     }
 }
 

@@ -19,12 +19,17 @@ export const SIGN_IN_START = `${prefix}/SIGN_IN_START`
 export const SIGN_IN_SUCCESS = `${prefix}/SIGN_IN_SUCCESS`
 export const SIGN_IN_FAIL = `${prefix}/SIGN_IN_FAIL`
 
+export const LOGOUT_START = `${prefix}/LOGOUT_START`
+export const LOGOUT_SUCCESS = `${prefix}/LOGOUT_SUCCESS`
+export const LOGOUT_FAIL = `${prefix}/LOGOUT_FAIL`
+
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 
 /**
  * Reducer
  * */
 export const ReducerRecord = Record({
+    initialized: false,
     user: null,
     authorized: false,
     loading: false,
@@ -36,6 +41,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case WHO_AM_I_START:
+        case LOGOUT_START:
             return state
                 .set('error', null)
                 .set('loading', true)
@@ -52,17 +58,21 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('user', payload)
                 .set('authorized', true)
+                .set('initialized', true)
 
-        // case LOGOUT_SUCCESS:
-        //     return state
-        //         .clear()
+        case LOGOUT_SUCCESS:
+            return state
+                .clear()
+                .set('initialized', true)
 
         case WHO_AM_I_FAIL:
             return state
                 .set('loading', false)
                 .set('authorized', false)
+                .set('initialized', true)
 
         case SIGN_IN_FAIL:
+        case LOGOUT_FAIL:
             return state
                 .set('loading', false)
                 .set('error', payload.error.message)
@@ -83,6 +93,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 export const stateSelector = state => state[moduleName]
 export const userSelector = createSelector(stateSelector, state => state.user)
 export const userAuthSelector = createSelector(stateSelector, state => state.authorized)
+export const initializedSelector = createSelector(stateSelector, state => state.initialized)
 
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
@@ -90,6 +101,11 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 /**
  * Action Creators
  * */
+
+const _isUserAdmin = (data) => {
+    let _rights = data.PData;
+    return _rights && (_rights.isAdmin || _rights.e)
+}
 
 export const whoAmI = () => {
     return (dispatch) => {
@@ -103,10 +119,14 @@ export const whoAmI = () => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                dispatch({
-                    type: WHO_AM_I_SUCCESS,
-                    payload: data
-                });
+                if (_isUserAdmin(data)) {
+                    dispatch({
+                        type: WHO_AM_I_SUCCESS,
+                        payload: data
+                    });
+                } else {
+                    throw new Error('Not enough rights')
+                }
             })
             .catch((error) => {
                 dispatch({
@@ -136,12 +156,16 @@ export const login = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                dispatch({
-                    type: SIGN_IN_SUCCESS,
-                    payload: data
-                });
+                if (_isUserAdmin(data)) {
+                    dispatch({
+                        type: SIGN_IN_SUCCESS,
+                        payload: data
+                    });
 
-                dispatch(reset('SignInForm'));
+                    dispatch(reset('SignInForm'));
+                } else {
+                    throw new Error('Not enough rights')
+                }
             })
             .catch((error) => {
                 dispatch({
@@ -157,5 +181,31 @@ export const clearError = () => {
         type: CLEAR_ERROR,
         payload: null
     };
+}
+
+export const logout = () => {
+    return (dispatch) => {
+
+        dispatch({
+            type: LOGOUT_START,
+            payload: null
+        });
+
+        fetch("/api/logout", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: LOGOUT_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: LOGOUT_FAIL,
+                    payload: {error}
+                });
+            });
+    }
 }
 

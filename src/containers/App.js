@@ -19,6 +19,7 @@ import SignInForm from './sign-in-form';
 
 import {userAuthSelector, whoAmI} from "../ducks/auth";
 import {bindActionCreators} from "redux";
+import Toolbar from "../components/app/toolbar";
 
 class App extends Component {
 
@@ -55,10 +56,7 @@ class App extends Component {
                     </div>
                     <div className="right">
                         <div className="right-container">
-                            <div className="right-top top-bar-size">
-                                <div className="toolbar top-bar-size bar-bgcolor">
-                                </div>
-                            </div>
+                            <Toolbar/>
                             <div className="main-area">
                                 <Switch>
                                     <Route exact path={_homePath} component={Home}/>
