@@ -21,7 +21,7 @@ const validate = values => {
 
 class SignInForm extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             captcha: null
@@ -43,43 +43,42 @@ class SignInForm extends React.Component {
     }
 
     _onSetCaptcha(value) {
-        this.setState({captcha : value});
+        this.setState({captcha: value});
     }
 
     _onClearCaptcha() {
-        this.setState({captcha : null});
+        this.setState({captcha: null});
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.serverError)  {
-            this.setState({captcha : null})
-            if (this._recaptchaInstance) {
-                this._recaptchaInstance.reset();
-            }
+        if (nextProps.serverError) {
+            this.setState({captcha: null})
+            Captcha.reset();
         }
     }
 
     componentDidMount() {
         this.props.reset();
-        if (this._recaptchaInstance) {
-            this._recaptchaInstance.reset();
-        }
+        Captcha.reset();
     }
 
     render() {
         const {invalid, serverError, loading} = this.props;
-        const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
+        const _errorText = serverError &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
         return (
             <div className="register-block-wrapper">
                 <ButtonsBlock/>
                 <span className="register-block-wrapper__label">или</span>
-                <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)} >
+                <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <Captcha ref={e => this._recaptchaInstance = e} onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
-                    <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'} onStartRecovery={::this.props.onStartRecovery}/>
+                    <Captcha ref={e => this._recaptchaInstance = e} onSetCapture={::this._onSetCaptcha}
+                             onClearCaptcha={::this._onClearCaptcha}/>
+                    <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'}
+                                 onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
             </div>
         )

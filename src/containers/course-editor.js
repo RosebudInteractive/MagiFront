@@ -484,7 +484,7 @@ class CourseEditor extends ObjectEditor {
                                 template: (obj) => {
                                     return '<div class="cover ' + obj.mask + '" width="'+ obj.width +'px"' + ' height="'+ obj.height +'px">' +
                                         '<svg viewBox="0 0 574 503" width="574" height="503">' +
-                                        '<image preserveAspectRatio="xMaxYMax slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + obj.src + '" width="724" height="503"/>' +
+                                        '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + obj.src + '" width="574" height="503"/>' +
                                         '</svg>' +
                                         '</div>'
                                 },

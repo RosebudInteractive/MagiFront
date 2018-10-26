@@ -49,7 +49,7 @@ class Body extends React.Component {
     render() {
         let {cover, mask} = this.props;
 
-        const _image = '<image preserveAspectRatio="xMaxYMax slice" xlink:href="' +  cover + '" width="724" height="503"/>';
+        const _image = '<image preserveAspectRatio="xMidYMid slice" xlink:href="' +  cover + '" width="574" height="503"/>';
 
         return (
             <div className="course-module__body">

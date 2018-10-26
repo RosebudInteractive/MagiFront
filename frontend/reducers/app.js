@@ -34,6 +34,7 @@ const initialState = {
     showSizeInfo: false,
     galleryIsOpen: false,
     facebookAppID: '',
+    reCapture: '',
 };
 
 export default function app(state = initialState, action) {
@@ -116,7 +117,7 @@ export default function app(state = initialState, action) {
         }
 
         case GET_APP_OPTIONS_SUCCESS: {
-            return {...state, facebookAppID: action.payload.appId.fb}
+            return {...state, facebookAppID: action.payload.appId.fb, reCapture: action.payload.siteKey.reCapture}
         }
 
         case GET_APP_OPTIONS_FAIL: {
