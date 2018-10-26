@@ -432,8 +432,20 @@ namespace MagImport
         {
             const string CLASS_GUID = "caadef95-278b-4cad-acc9-a1e27380d6c6";
             [JsonIgnore]
-            public bool HasParent { get; set; }
-            public Lesson() : base(CLASS_GUID) { HasParent = false; }
+            public bool hasParent { get; set; }
+            [JsonIgnore]
+            public int maxChildNumber { get; set; }
+            [JsonIgnore]
+            public Course course { get; set; }
+            [JsonIgnore]
+            public Lesson parent { get; set; }
+            public Lesson() : base(CLASS_GUID)
+            {
+                hasParent = false;
+                course = null;
+                parent = null;
+                maxChildNumber = 0;
+            }
         };
 
         public class LessonRoot : RootDataObject
@@ -2324,12 +2336,12 @@ namespace MagImport
                 if (!authorsDB.TryGetValue(rdr.GetInt32("author_id"), out curr_author))
                     throw new Exception(String.Format("Can't find author (Id={0}) for lesson (Id={1}).", rdr.GetInt32("author_id"), db_id));
 
-                Lesson lesson = new Lesson();
+                Lesson lesson = new Lesson() { course = curr_course.Item1 };
                 lesson.Fields.AuthorId = curr_author.Item1.Fields.Id;
                 lesson.Fields.CourseId = curr_course.Item1.Fields.Id;
                 lesson.Fields.LessonType = "L";
                 lesson.Fields.URL= rdr.GetString("post_name");
-                lesson.HasParent = String.Compare(rdr.GetString("is_ext"), "1") == 0;
+                lesson.hasParent = String.Compare(rdr.GetString("is_ext"), "1") == 0;
 
                 LessonLng lesson_lng = new LessonLng();
                 lesson_lng.Fields.LessonId = lesson.Fields.Id;
@@ -2376,6 +2388,8 @@ namespace MagImport
             Resource.AllData = allData;
             ResourceLng.AllData = allData;
             EpisodeContent.AllData = allData;
+
+            List<Tuple<Lesson, LessonCourse>> emptyLessonNum = new List<Tuple<Lesson, LessonCourse>>();
 
             foreach (KeyValuePair<int, Tuple<Lesson, LessonLng, LessonCourse, Episode, EpisodeLng, EpisodeLesson, Course>> pair in lessonsDB)
             {
@@ -2438,7 +2452,7 @@ namespace MagImport
                     course.courseLng.Fields.State = "R";
                 }
 
-                if (lesson.HasParent)
+                if (lesson.hasParent)
                 {
                     lesson.Fields.ParentId = null;
                     int parent_db = 0;
@@ -2454,6 +2468,7 @@ namespace MagImport
 
                     Lesson parent_lesson = parent.Item1;
                     lesson.Fields.ParentId = parent_lesson.Fields.Id;
+                    lesson.parent = parent_lesson;
 
                     LessonCourse lesson_course_parent = parent.Item3;
                     lesson_course.Fields.ParentId = lesson_course_parent.Fields.Id;
@@ -2463,15 +2478,20 @@ namespace MagImport
                 if (lesson_prop_value.TryGetValue(att_lsn_number_name, out val))
                     if (Int32.TryParse(val, out int_val))
                     {
-                        if (int_val <= course.maxLessonNumber)
-                            int_val = ++course.maxLessonNumber;
-                        else
-                            course.maxLessonNumber = int_val;
-                        lesson_course.Fields.Number = int_val;
-                        hasNumber = true;
+                        if (int_val > 0)
+                        {
+                            if (lesson.hasParent)
+                                lesson.parent.maxChildNumber = int_val > lesson.parent.maxChildNumber ?
+                                    int_val : lesson.parent.maxChildNumber;
+                            else
+                                lesson.course.maxLessonNumber = int_val > lesson.course.maxLessonNumber ?
+                                    int_val : lesson.course.maxLessonNumber;
+                            lesson_course.Fields.Number = int_val;
+                            hasNumber = true;
+                        }
                     }
-                if(!hasNumber)
-                    lesson_course.Fields.Number= ++course.maxLessonNumber;
+                if (!hasNumber)
+                    emptyLessonNum.Add(new Tuple<Lesson, LessonCourse>(lesson, lesson_course));
 
                 int photo_id = 0;
                 if (lesson_prop_value.TryGetValue(att_lsn_cover_name, out val))
@@ -2740,9 +2760,19 @@ namespace MagImport
             conn.Close();
 
             //
+            // Fill empty lesson numbers
+            //
+            foreach (Tuple<Lesson, LessonCourse> pair in emptyLessonNum)
+            {
+                Lesson lesson = pair.Item1;
+                LessonCourse lesson_course = pair.Item2;
+                lesson_course.Fields.Number = lesson.hasParent ? ++lesson.parent.maxChildNumber : ++lesson.course.maxLessonNumber;
+            }
+
+            //
             // Export to JSON files
             //
-            string root_path= Path.GetDirectoryName(outDir);
+            string root_path = Path.GetDirectoryName(outDir);
             foreach (RootDataObject root in allData)
                 root_path = root.ToJSONFile(outDir, JSONFormatting, JSONEncoding, JSONSettings);
 
