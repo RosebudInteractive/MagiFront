@@ -27,8 +27,6 @@ let SignInForm = class SignInForm extends React.Component {
         this.state = {
             captcha: null
         }
-
-        this._recaptchaInstance = null;
     }
 
     _handleSubmit(values) {
@@ -51,17 +49,13 @@ let SignInForm = class SignInForm extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.serverError) {
             this.setState({captcha: null})
-            if (this._recaptchaInstance) {
-                this._recaptchaInstance.reset();
-            }
+            Captcha.reset();
         }
     }
 
     componentDidMount() {
         this.props.reset();
-        if (this._recaptchaInstance) {
-            this._recaptchaInstance.reset();
-        }
+        Captcha.reset();
     }
 
     render() {
@@ -75,7 +69,7 @@ let SignInForm = class SignInForm extends React.Component {
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <Captcha ref={e => this._recaptchaInstance = e} onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'}/>
                 </form>
             </div>

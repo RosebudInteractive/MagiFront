@@ -18,12 +18,14 @@ import WorkShop from './work-shop';
 import SignInForm from './sign-in-form';
 
 import {userAuthSelector, whoAmI} from "../ducks/auth";
+import {getAppOptions,} from "../ducks/app";
 import {bindActionCreators} from "redux";
 import Toolbar from "../components/app/toolbar";
 
 class App extends Component {
 
     componentWillMount() {
+        this.props.getAppOptions()
         this.props.whoAmI();
     }
 
@@ -124,6 +126,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         whoAmI: bindActionCreators(whoAmI, dispatch),
+        getAppOptions: bindActionCreators(getAppOptions, dispatch)
     }
 }
 
