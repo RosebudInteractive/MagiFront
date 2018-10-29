@@ -45,6 +45,7 @@ export default class NativeAppPlayer {
         this._ended = false;
         this._currentTime = 0;
         this._timeChanged = false;
+        this._setPositionOnPlay = false;
     }
 
     setData(data) {
@@ -94,6 +95,7 @@ export default class NativeAppPlayer {
                 this._ended = false;
 
                 if (option && (option.position !== undefined)) {
+                    this._setPositionOnPlay = true;
                     this._player.setPosition(option.position)
                 }
             })
@@ -128,6 +130,13 @@ export default class NativeAppPlayer {
         let _delta = value.globalTime - this._currentTime;
         if ((_delta > 0.5) || (_delta < 0)) {
 
+            this._currentTime = value.globalTime;
+
+            if (this._setPositionOnPlay) {
+                this._setPositionOnPlay = false;
+                return
+            }
+
             if (!this._timeChanged) {
                 this._timeChanged = true;
 
@@ -136,8 +145,6 @@ export default class NativeAppPlayer {
                     eventName: 'playerStarted',
                 })
             }
-
-            this._currentTime = value.globalTime;
 
             this._sendMessageToApp({
                 eventType: 'magisteriaPlayer',

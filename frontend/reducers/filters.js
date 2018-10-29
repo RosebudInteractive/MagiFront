@@ -19,7 +19,8 @@ export default function filters(state = initialState, action) {
                     id: item.Id,
                     name: item.Name,
                     count: item.Counter,
-                    selected: false
+                    URL: item.URL,
+                    selected: false,
                 })
             });
 

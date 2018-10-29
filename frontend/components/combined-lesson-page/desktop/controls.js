@@ -2,7 +2,6 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import $ from 'jquery'
-import {Link} from 'react-router-dom';
 import Platform from 'platform';
 
 import * as playerStartActions from '../../../actions/player-start-actions'
