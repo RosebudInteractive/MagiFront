@@ -35,7 +35,7 @@ const initialState = {
     galleryIsOpen: false,
     facebookAppID: '',
     reCapture: '',
-    sendPulseScript: '',
+    sendPulseScript: null,
 };
 
 export default function app(state = initialState, action) {
@@ -118,10 +118,14 @@ export default function app(state = initialState, action) {
         }
 
         case GET_APP_OPTIONS_SUCCESS: {
-            return {...state,
+            let _sendPulse = (action.payload.scriptPath && action.payload.scriptPath.sendPulse) ?
+                action.payload.scriptPath.sendPulse : null;
+
+            return {
+                ...state,
                 facebookAppID: action.payload.appId.fb,
                 reCapture: action.payload.siteKey.reCapture,
-                sendPulseScript: "//cdn.sendpulse.com/js/push/700d4d64866e5acf0b24dfead24eac1d_1.js",
+                sendPulseScript: _sendPulse,
             }
         }
 

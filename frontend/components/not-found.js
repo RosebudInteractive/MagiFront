@@ -13,11 +13,13 @@ class NotFoundPage extends React.Component {
     _getMetaTags() {
         return <MetaTags>
             <meta name="robots" content="noindex,follow"/>
+            <meta name="prerender-status-code" content="404"/>
         </MetaTags>
     }
 
     _removeMetaTags() {
         $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 
     componentWillMount() {
