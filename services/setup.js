@@ -136,11 +136,13 @@ function setupAPI(express, app) {
     app.get('/api/options', function (req, res, next) {
         Promise.resolve()
             .then(() => {
-                let options = { appId: {}, siteKey: {} };
+                let options = { appId: {}, siteKey: {}, scriptPath: {} };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
                     options.siteKey.reCapture = config.authentication.reCapture.siteKey;
+                if (config.has('mail.sendPulse.scriptPath'))
+                    options.scriptPath.sendPulse = config.mail.sendPulse.scriptPath;
                 res.send(options);
             })
             .catch(err => {
