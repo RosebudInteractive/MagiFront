@@ -46,7 +46,6 @@ let listener = (event) => {
             getData(_id)
                 .then((data) => {
                     window.magisteriaPlayer.setData(data)
-
                 })
                 .catch((err) => {
                     console.error(err);
@@ -54,26 +53,26 @@ let listener = (event) => {
         })
 
         $('.play_btn').on('click', () => {
-            window.magisteriaPlayer.play()
+            window.magisteriaPlayer.play({playerId: window.magisteriaPlayer._id})
         })
 
         $('.play_from_pos_btn').on('click', () => {
             let _position = $('#init_position').val();
-            window.magisteriaPlayer.play({position: _position})
+            window.magisteriaPlayer.play({position: _position, playerId: window.magisteriaPlayer._id})
         })
 
         $('.set_position_btn').on('click', () => {
             let _position = $('#position').val();
-            window.magisteriaPlayer.seek(_position)
+            window.magisteriaPlayer.seek({position:_position, playerId: window.magisteriaPlayer._id})
         })
 
         $('.pause_btn').on('click', () => {
-            window.magisteriaPlayer.pause()
+            window.magisteriaPlayer.pause({playerId: window.magisteriaPlayer._id})
         })
 
         $('.set_rate_btn').on('click', () => {
             let _rate = $('#rate').val();
-            window.magisteriaPlayer.setPlaybackSpeed(_rate)
+            window.magisteriaPlayer.setPlaybackSpeed({rate: _rate, playerId: window.magisteriaPlayer._id})
         })
 
 
