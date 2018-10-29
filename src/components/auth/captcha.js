@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Recaptcha from './g-recaptcha';
+import {connect} from "react-redux";
+import {reCaptureSelector} from "../../ducks/app";
 
 let recaptchaInstance;
 
-export default class Captcha extends React.Component {
+class Captcha extends React.Component {
 
     static propTypes = {
         onSetCapture: PropTypes.func,
@@ -25,7 +27,7 @@ export default class Captcha extends React.Component {
         }
     }
 
-    reset() {
+    static reset() {
         if (recaptchaInstance) {
             recaptchaInstance.reset()
         }
@@ -40,7 +42,7 @@ export default class Captcha extends React.Component {
             <Recaptcha
                 ref={e => recaptchaInstance = e}
                 render="explicit"
-                sitekey="6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t"
+                sitekey={this.props.reCapture}
                 verifyCallback ={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
                 // theme="dark"
@@ -50,3 +52,11 @@ export default class Captcha extends React.Component {
         );
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        reCapture: reCaptureSelector(state),
+    }
+}
+
+export default connect(mapStateToProps)(Captcha);

@@ -32,7 +32,7 @@ class NotFoundPage extends React.Component {
         return [this._getMetaTags(),
             <div className='not_found__page'>
                 <div className='not-found__wrapper'>
-                    <div className='header'><h2>Ошибка 404 Not Found</h2></div>
+                    <div className='header'>Ошибка 404 Not Found</div>
                     <div className='text'>Ошибка 404 или Not Found («не найдено») — стандартный код ответа HTTP о том,
                         что клиент был в состоянии общаться с сервером, но сервер не может найти данные согласно запросу. Ошибку
                         404 не следует путать с ошибкой «Сервер не найден» или иными ошибками, указывающими на ограничение доступа к

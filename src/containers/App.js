@@ -18,11 +18,14 @@ import WorkShop from './work-shop';
 import SignInForm from './sign-in-form';
 
 import {userAuthSelector, whoAmI} from "../ducks/auth";
+import {getAppOptions,} from "../ducks/app";
 import {bindActionCreators} from "redux";
+import Toolbar from "../components/app/toolbar";
 
 class App extends Component {
 
     componentWillMount() {
+        this.props.getAppOptions()
         this.props.whoAmI();
     }
 
@@ -55,10 +58,7 @@ class App extends Component {
                     </div>
                     <div className="right">
                         <div className="right-container">
-                            <div className="right-top top-bar-size">
-                                <div className="toolbar top-bar-size bar-bgcolor">
-                                </div>
-                            </div>
+                            <Toolbar/>
                             <div className="main-area">
                                 <Switch>
                                     <Route exact path={_homePath} component={Home}/>
@@ -126,6 +126,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         whoAmI: bindActionCreators(whoAmI, dispatch),
+        getAppOptions: bindActionCreators(getAppOptions, dispatch)
     }
 }
 

@@ -17,7 +17,7 @@ import {
 const initialState = {
     selected: MENU_ITEM_NONE,
     items: [
-        {id: 'HOME', name: "Домой", url: "/adm"},
+        // {id: 'HOME', name: "Домой", url: "/adm"},
         {id: MENU_ITEM_AUTHOR, name: "Авторы", url:'/adm/authors'},
         {id: MENU_ITEM_CATEGORIES, name : 'Категории' , url : '/adm/categories'},
         {id: MENU_ITEM_COURSES, name : 'Курсы' , url : '/adm/courses'},
