@@ -14,6 +14,9 @@ module.exports = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
+        publicEnabled: true,
+        adminEnabled: true,
+        pushNotifications: true,
         prerender: {
             usePrerender: true,
             useRedis: true,
@@ -45,7 +48,16 @@ module.exports = {
     },
     debug: {
         routes: {
-            "set-user-subscription": true
+            "set-user-subscription": false,
+            player: true,
+            testupload: true,
+            testimport: true,
+            logintest: true,
+            feedbacktest: true,
+            paymenttest: true,
+            regtest: true,
+            pushtest: true,
+            testrecovery: true
         }
     },
     billing: {

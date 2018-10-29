@@ -22,6 +22,9 @@ module.exports = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
+        publicEnabled: true,
+        adminEnabled: true,
+        pushNotifications: false,
         prerender: {
             usePrerender: false,
             useRedis: false,
@@ -32,7 +35,8 @@ module.exports = {
         },
         siteHost: defer(function () {
             return this.server.protocol + '://' +
-                (this.server.address === '0.0.0.0' ? 'localhost' : this.server.address) + ':' + this.server.port;
+                (this.server.address === '0.0.0.0' ? 'localhost' : this.server.address) + ':' +
+                (this.server.port ? (':' + this.server.port) : '');
         })
     },
     dbProvider: 'mysql',
@@ -57,8 +61,16 @@ module.exports = {
     },
     debug: {
         routes: {
-            "set-user-subscription": false
-        }
+            "set-user-subscription": false,
+            player: true,
+            testupload: true,
+            testimport: true,
+            logintest: true,
+            feedbacktest: true,
+            paymenttest: true,
+            regtest: true,
+            pushtest: true,
+            testrecovery: true        }
     },
     billing: {
         module: "./yandex-kassa",

@@ -142,6 +142,9 @@ module.exports = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
+        publicEnabled: true,
+        adminEnabled: true,
+        pushNotifications: false,
         prerender: {
             usePrerender: false,
             useRedis: true,
@@ -172,11 +175,26 @@ module.exports = {
             returnUrl: "/"
         }
     },
+    debug: {
+        routes: {
+            "set-user-subscription": false,
+            player: true,
+            testupload: true,
+            testimport: true,
+            logintest: true,
+            feedbacktest: true,
+            paymenttest: true,
+            regtest: true,
+            pushtest: true,
+            testrecovery: true
+        }
+    },
     mail: {
         sendPulse: {
             apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
             apiSecret: "2593d02228f842c412e51d24de824dde",
             tmpPath: path.join(os.tmpdir(), path.sep),
+            scriptPath: "//cdn.sendpulse.com/js/push/700d4d64866e5acf0b24dfead24eac1d_1.js",
         },
         mailing: {
             type: "smtp",

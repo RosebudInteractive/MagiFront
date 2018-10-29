@@ -82,6 +82,21 @@ function setupAPI(express, app) {
         passportSession: passport.session()
     };
 
+    let publicEnabled = config.has("server.publicEnabled") && (config.server.publicEnabled === true) ? true : false;
+    let adminEnabled = config.has("server.adminEnabled") && (config.server.adminEnabled === true) ? true : false;
+    app.use("/api", (req, res, next) => {
+        if (publicEnabled || adminEnabled)
+            next()
+        else
+            next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
+    });
+    app.use("/api/adm", (req, res, next) => {
+        if (adminEnabled)
+            next()
+        else
+            next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
+    });
+
     app.use("/api", sessionMiddleware.express);
     app.use("/api", sessionMiddleware.passportInit);
     app.use("/api", sessionMiddleware.passportSession);   
@@ -141,7 +156,9 @@ function setupAPI(express, app) {
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
                     options.siteKey.reCapture = config.authentication.reCapture.siteKey;
-                if (config.has('mail.sendPulse.scriptPath'))
+                if (config.has('server.pushNotifications') &&
+                    (config.server.pushNotifications === true) &&
+                    config.has('mail.sendPulse.scriptPath'))
                     options.scriptPath.sendPulse = config.mail.sendPulse.scriptPath;
                 res.send(options);
             })
