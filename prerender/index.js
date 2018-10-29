@@ -5,6 +5,7 @@ const _ = require('lodash');
 const config = require('config');
 const { PrerenderCache } = require('./prerender-cache');
 const { SEO } = require('../const/common');
+const { HttpCode } = require('../const/http-codes');
 
 const DFLT_EXPIRATION = 14 * 24 * 60 * 60; // 14 days
 const DFLT_MAX_DEV = 14 * 24 * 60 * 60; // 7 days
@@ -55,7 +56,12 @@ exports.setupPrerender = (app) => {
                 case "render":
                     let isPersist = (req.query && req.query.persist) ? (req.query.persist === "true") : false;
                     rc = prerenderCache.prerender(path, isPersist)
-                        .then(() => [path]);
+                        .then(() => prerenderCache.get(path))
+                        .then((data) => {
+                            if (!data)
+                                throw new Error(`Path [${path}] doesn't exist.`);
+                            return [path];
+                        });
                     break;
 
                 case "renew":
@@ -123,13 +129,17 @@ exports.PrerenderInit = (app) => {
                 if (!err) {
                     (req.forceRender ? Promise.resolve() : prerenderCache.get(req.path))
                         .then((res) => {
-                            if (!res) {
-                                let ttl = expInSec;
-                                if (ttl) {
-                                    ttl += Math.round((Math.random() - 0.5) * (maxDevSec ? maxDevSec : ttl));
+                            if (prerender_res.statusCode === HttpCode.OK) { // Save only if result is OK.
+                                if (!res) {
+                                    let ttl = expInSec;
+                                    if (ttl) {
+                                        ttl += Math.round((Math.random() - 0.5) * (maxDevSec ? maxDevSec : ttl));
+                                    }
+                                    return prerenderCache.set(req.path, prerender_res.body, ttl);
                                 }
-                                return prerenderCache.set(req.path, prerender_res.body, ttl);
                             }
+                            else
+                                return prerenderCache.delList(req.path);
                         })
                         .catch((err) => {
                             console.error(`prerender:afterRender::${err && err.message ? err.message : JSON.stringify(err)}`);

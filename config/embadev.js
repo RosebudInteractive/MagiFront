@@ -24,7 +24,7 @@ let options = {
         protocol: 'http',
         address: '0.0.0.0',
         port: 3000,
-        publicEnabled: false,
+        publicEnabled: true,
         adminEnabled: true,
         prerender: {
             usePrerender: true,
