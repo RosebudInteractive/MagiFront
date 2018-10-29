@@ -307,9 +307,9 @@ module.exports = {
         },
         mysql: {
             host: 'localhost',
-            username: 'mag2',
-            password: 'AV5mvwe1',
-            database: 'new_magisteria',
+            username: 'username',
+            password: 'password',
+            database: 'database',
             connection_options: {},
             provider_options: {},
             pool: {
