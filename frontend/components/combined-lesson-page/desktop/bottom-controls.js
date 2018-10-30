@@ -2,7 +2,6 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import $ from 'jquery'
-import {Link} from 'react-router-dom';
 import Platform from 'platform';
 
 import * as playerStartActions from '../../../actions/player-start-actions'
@@ -13,7 +12,7 @@ class Controls extends React.Component {
         let _id = this.props.lesson ? this.props.lesson.Id : '';
 
         $("#sound-bar" + _id).click((event) => {
-            let _current = event.pageX - event.currentTarget.offsetLeft,
+            let _current = event.offsetX,
                 _total = event.currentTarget.offsetWidth - 1;
             this._setVolume(_current, _total)
         });

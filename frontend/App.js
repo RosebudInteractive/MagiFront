@@ -4,10 +4,10 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 import {Switch, Route, withRouter} from 'react-router-dom'
+import MetaTags from 'react-meta-tags';
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
-// import LessonPage from './containers/lesson-page';
 import CombineLessonPage, {scroll} from './containers/combined-lesson-page';
 import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
@@ -31,7 +31,6 @@ import {showFeedbackResultMessageSelector} from "./ducks/message";
 
 
 import * as Polifyll from './tools/polyfill';
-import {pages} from "./tools/page-tools";
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
@@ -104,7 +103,7 @@ class App extends Component {
         let _errorRout = this.props.location.pathname.startsWith('/auth/error'),
             _recoveryRout = this.props.location.pathname.startsWith('/recovery')
 
-        if (!(_recoveryRout || _errorRout)){
+        if (!(_recoveryRout || _errorRout)) {
             this.props.userActions.whoAmI()
             // this.props.getUserBookmarks()
         }
@@ -185,7 +184,6 @@ class App extends Component {
         }
 
 
-
         if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
             this.setState({
                 direction: 'top',
@@ -220,7 +218,7 @@ class App extends Component {
                 )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
-                <Route path="*" component={NotFound} />
+                <Route path="*" component={NotFound}/>
             </Switch>
         )
     }
@@ -235,18 +233,33 @@ class App extends Component {
     }
 
     render() {
-        return (
+        let {
+            sendPulseScript,
+            showSignInForm,
+            showSizeInfo,
+            showFeedbackWindow,
+            showFeedbackResultMessage
+        } = this.props;
+
+        return [
+
+            sendPulseScript ?
+                <MetaTags>
+                    <script charSet="UTF-8" src={sendPulseScript} async/>
+                </MetaTags>
+                :
+                null,
             <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
                 <PageFooter/>
-                <AuthPopup visible={this.props.showSignInForm}/>
-                {this.props.showSizeInfo ? <SizeInfo/> : null}
-                {this.props.showFeedbackWindow ? <FeedbackMessageBox/> : null}
-                {this.props.showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
+                <AuthPopup visible={showSignInForm}/>
+                {showSizeInfo ? <SizeInfo/> : null}
+                {showFeedbackWindow ? <FeedbackMessageBox/> : null}
+                {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
             </div>
-        );
+        ]
     }
 }
 
@@ -255,6 +268,7 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         currentPage: state.pageHeader.currentPage,
         size: state.app.size,
+        sendPulseScript: state.app.sendPulseScript,
         showSizeInfo: state.app.showSizeInfo,
         playInfo: state.player.playingLesson,
         showSignInForm: state.app.showSignInForm,

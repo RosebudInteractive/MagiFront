@@ -1,6 +1,7 @@
 const path = require('path');
 const os = require('os');
 const defer = require('config/defer').deferConfig;
+const pk = require('../../keys');
 
 const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitemaps"));
 
@@ -135,8 +136,8 @@ module.exports = {
     dataUrl: '/data',
     proxyServer: {
         protocol: 'https',
-        address: 'new.magisteria.ru',
-        port: null
+        address: 'magisteria.ru',
+        port: 444
     },
     server: {
         protocol: 'http',
@@ -169,8 +170,8 @@ module.exports = {
         debug: false,
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
-            shopId: "536331",
-            secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
+            shopId: pk.billing.yandexKassa.shopId,
+            secretKey: pk.billing.yandexKassa.secretKey,
             callBack: "/api/yandex-kassa/callback",
             returnUrl: "/"
         }
@@ -178,23 +179,23 @@ module.exports = {
     debug: {
         routes: {
             "set-user-subscription": false,
-            player: true,
-            testupload: true,
-            testimport: true,
-            logintest: true,
-            feedbacktest: true,
-            paymenttest: true,
-            regtest: true,
-            pushtest: true,
-            testrecovery: true
+            player: false,
+            testupload: false,
+            testimport: false,
+            logintest: false,
+            feedbacktest: false,
+            paymenttest: false,
+            regtest: false,
+            pushtest: false,
+            testrecovery: false
         }
     },
     mail: {
         sendPulse: {
-            apiUserId: "1d64cc29ab7ee05f1b339b4e981ec88f",
-            apiSecret: "2593d02228f842c412e51d24de824dde",
-            tmpPath: path.join(os.tmpdir(), path.sep),
-            scriptPath: "//cdn.sendpulse.com/js/push/700d4d64866e5acf0b24dfead24eac1d_1.js",
+            apiUserId: pk.mail.sendPulse.apiUserId,
+            apiSecret: pk.mail.sendPulse.apiSecret,
+            scriptPath: pk.mail.sendPulse.scriptPath,
+            tmpPath: path.join(os.tmpdir(), path.sep)
         },
         mailing: {
             type: "smtp",
@@ -205,8 +206,8 @@ module.exports = {
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.mailing.user,
+                    pass: pk.mail.mailing.pass
                 }
             }
         },
@@ -221,8 +222,8 @@ module.exports = {
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.userReg.user,
+                    pass: pk.mail.userReg.pass
                 }
             }
         },
@@ -237,8 +238,8 @@ module.exports = {
                 port: 465,//587
                 secure: true, // true for 465, false for other ports
                 auth: {
-                    user: "test@magisteria.ru",
-                    pass: "S4zf4ckK"
+                    user: pk.mail.pwdRecovery.user,
+                    pass: pk.mail.pwdRecovery.pass
                 }
 
             }
@@ -246,8 +247,8 @@ module.exports = {
     },
     snets: {
         facebook: {
-            appId: '591000364592228',
-            appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
+            appId: pk.app.facebook.appId,
+            appSecret: pk.app.facebook.appSecret,
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/facebook/oauth',
             profileURL: 'https://graph.facebook.com/v2.12/me',
@@ -260,8 +261,8 @@ module.exports = {
             }
         },
         google: {
-            appId: '504142380752-pci0l3pues6v9kfsi9pkcqg5e8ohi5js.apps.googleusercontent.com',
-            appSecret: 'DY1WmSp__2xXW3Ew1zDV_-UR',
+            appId: pk.app.google.appId,
+            appSecret: pk.app.google.appSecret,
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/google/oauth',
             passportOptions: {
@@ -269,8 +270,8 @@ module.exports = {
             }
         },
         vk: {
-            appId: '6400839',
-            appSecret: 'LsrNgANtMnP0ofdT4dKB',
+            appId: pk.app.vk.appId,
+            appSecret: pk.app.vk.appSecret,
             profileFields: ['about', 'bdate', 'city', 'first_name', 'last_name', 'country'],
             apiVersion: '5.17',
             redirectURL: { success: '/', error: '/auth/error' },
@@ -307,9 +308,9 @@ module.exports = {
         },
         mysql: {
             host: 'localhost',
-            username: 'magisteria',
-            password: 'ukko89QH',
-            database: 'magisteria',
+            username: pk.connections.mysql.username,
+            password: pk.connections.mysql.password,
+            database: pk.connections.mysql.database,
             connection_options: {},
             provider_options: {},
             pool: {

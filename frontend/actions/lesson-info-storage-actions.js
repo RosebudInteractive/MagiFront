@@ -139,6 +139,10 @@ export const updateDbState = (data) => {
 
 export const refreshState = () => {
     return (dispatch, getState) => {
+        let _state = getState();
+
+        if (!_state.user.user) { return }
+
         dispatch({
             type: LESSON_INFO_STORAGE_REFRESH_DB_START,
             payload: null

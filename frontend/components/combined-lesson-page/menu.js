@@ -141,12 +141,14 @@ class Navigation extends React.Component {
             expanded: false,
             showToc: false,
         }
+    }
 
-        this._resizeHandler = () => {
-            let _list = $('.section-nav__list');
+    componentDidMount() {
+        $(window).on('resize', ::this._toggleScrollableStyle)
+    }
 
-
-        }
+    componentWillUnmount() {
+        $(window).unbind('resize', ::this._toggleScrollableStyle)
     }
 
 
@@ -219,21 +221,28 @@ class Navigation extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        let _menu = window.innerWidth > 899 ? $('.section-nav-sublist') : $('.section-nav__list')
+        if ((prevState.showToc !== this.state.showToc) || (prevState.expanded !== this.state.expanded)) {
+            this._toggleScrollableStyle()
+        }
+    }
 
-        if ((!prevState.showToc) && (this.state.showToc)) {
-            let _menuTop = _menu.position().top,
-                _menuBottom = _menuTop + _menu.height();
+    _toggleScrollableStyle() {
+        let _isMobile = window.innerWidth <= 899,
+            _menu =  _isMobile ? $('.section-nav__list') : $('.section-nav-sublist');
 
-            console.log(_menuBottom)
-
-            if (_menuBottom > window.innerHeight) {
-                $('body').addClass('overflow');
-                _menu.addClass('scroll');
-            }
+        if (_isMobile && !this.state.expanded) {
+            $('body').removeClass('overflow');
+            _menu.removeClass('scroll');
+            return
         }
 
-        if ((prevState.showToc) && (!this.state.showToc)) {
+        let _menuTop = _menu.position().top,
+            _menuBottom = _menuTop + _menu.height();
+
+        if (_menuBottom > window.innerHeight) {
+            $('body').addClass('overflow');
+            _menu.addClass('scroll');
+        } else {
             $('body').removeClass('overflow');
             _menu.removeClass('scroll');
         }
@@ -254,8 +263,10 @@ class Navigation extends React.Component {
                 </button>
                 <div className={"section-nav__list" + (isNeedHideRefs ? ' single' : '')}>
                     <ul className={"section-nav-list" + (isNeedHideRefs ? ' single' : '')}>
-                        <li className={"section-nav-list__item js-section-menu-control" + (this.state.showToc ? ' expanded' : '')}onClick={::this._switchToc}>
-                            <a href="#transcript" className="section-nav-list__item-head js-scroll-link" onClick={::this._onLinkMockClick}>Транскрипт</a>
+                        <li className={"section-nav-list__item js-section-menu-control" + (this.state.showToc ? ' expanded' : '')}
+                            onClick={::this._switchToc}>
+                            <a href="#transcript" className="section-nav-list__item-head js-scroll-link"
+                               onClick={::this._onLinkMockClick}>Транскрипт</a>
                             <ol className={"section-nav-sublist" + (this.state.showToc ? ' show' : '')}>
                                 {this._getList()}
                             </ol>

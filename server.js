@@ -82,44 +82,49 @@ Promise.resolve()
         app.use("/images", express.static(path.join(__dirname, 'assets', 'images')));
         app.use("/scripts", express.static(__dirname + '/scripts'));
 
-        app.get('/genData2', function (req, res) {
-            var obj;
-            fs.readFile(__dirname + "/new_data/data2.json", 'utf8', function (err, data) {
-                if (err) throw err;
-                obj = JSON.parse(data);
-                res.json(obj);
+        let player_dbg = config.has("debug.routes.player") && (config.debug.routes.player === true);
+        if (player_dbg) {
+            app.get('/genData2', function (req, res) {
+                var obj;
+                fs.readFile(__dirname + "/new_data/data2.json", 'utf8', function (err, data) {
+                    if (err) throw err;
+                    obj = JSON.parse(data);
+                    res.json(obj);
+                });
             });
-        });
-        app.get('/genData', function (req, res) {
-            var obj;
-            fs.readFile(__dirname + "/new_data/data.json", 'utf8', function (err, data) {
-                if (err) throw err;
-                obj = JSON.parse(data);
-                res.json(obj);
+            app.get('/genData', function (req, res) {
+                var obj;
+                fs.readFile(__dirname + "/new_data/data.json", 'utf8', function (err, data) {
+                    if (err) throw err;
+                    obj = JSON.parse(data);
+                    res.json(obj);
+                });
             });
-        });
+        }
 
         // обработчик файлов html будет шаблонизатор ejs
         app.engine('html', require('ejs').renderFile);
 
-        app.get('/work-shop', function (req, res) {
-            res.render('index.html', {});
-        });
-        app.get('/audio', function (req, res) {
-            res.render('audio.html', {});
-        });
-        app.get('/player', function (req, res) {
-            res.render('player.html', {});
-        });
-        app.get('/player-app', function (req, res) {
-            res.render('player-app.html', {});
-        });
-        app.get('/player-app-test', function (req, res) {
-            res.render('player-app-test.html', {});
-        });
-        app.get('/player2', function (req, res) {
-            res.render('player2.html', {});
-        });
+        if (player_dbg) {
+            app.get('/work-shop', function (req, res) {
+                res.render('index.html', {});
+            });
+            app.get('/audio', function (req, res) {
+                res.render('audio.html', {});
+            });
+            app.get('/player', function (req, res) {
+                res.render('player.html', {});
+            });
+            app.get('/player-app', function (req, res) {
+                res.render('player-app.html', {});
+            });
+            app.get('/player-app-test', function (req, res) {
+                res.render('player-app-test.html', {});
+            });
+            app.get('/player2', function (req, res) {
+                res.render('player2.html', {});
+            });
+        }
         //////////////////////////////////////////
         // player end
         //////////////////////////////////////////
@@ -130,59 +135,62 @@ Promise.resolve()
         let { setupAPI } = require("./services/setup");
         setupAPI(express, app);
 
-        app.get("/testupload", function (req, res) {
-            res.sendFile(__dirname + '/debug/FileUploadTest.html');
-        });
+        if (config.has("debug.routes.testupload") && (config.debug.routes.testupload === true))
+            app.get("/testupload", function (req, res) {
+                res.sendFile(__dirname + '/debug/FileUploadTest.html');
+            });
 
-        app.get("/testimport", function (req, res) {
-            res.sendFile(__dirname + '/debug/EpisodeImportTest.html');
-        });
+        if (config.has("debug.routes.testimport") && (config.debug.routes.testimport === true))
+            app.get("/testimport", function (req, res) {
+                res.sendFile(__dirname + '/debug/EpisodeImportTest.html');
+            });
 
-        app.get("/logintest", function (req, res) {
-            res.sendFile(__dirname + '/debug/LoginTestPage.html');
-        });
+        if (config.has("debug.routes.logintest") && (config.debug.routes.logintest === true))
+            app.get("/logintest", function (req, res) {
+                res.sendFile(__dirname + '/debug/LoginTestPage.html');
+            });
 
-        app.get("/feedbacktest", function (req, res) {
-            res.sendFile(__dirname + '/debug/FeedbackTestPage.html');
-        });
+        if (config.has("debug.routes.feedbacktest") && (config.debug.routes.feedbacktest === true))
+            app.get("/feedbacktest", function (req, res) {
+                res.sendFile(__dirname + '/debug/FeedbackTestPage.html');
+            });
 
-        app.get("/paymenttest", function (req, res) {
-            res.sendFile(__dirname + '/debug/PaymentTestPage.html');
-        });
+        if (config.has("debug.routes.paymenttest") && (config.debug.routes.paymenttest === true))
+            app.get("/paymenttest", function (req, res) {
+                res.sendFile(__dirname + '/debug/PaymentTestPage.html');
+            });
 
-        app.get("/regtest", function (req, res) {
-            res.sendFile(__dirname + '/debug/RegTestPage.html');
-        });
+        if (config.has("debug.routes.regtest") && (config.debug.routes.regtest === true))
+            app.get("/regtest", function (req, res) {
+                res.sendFile(__dirname + '/debug/RegTestPage.html');
+            });
 
-        app.get("/pushtest", function (req, res) {
-            res.sendFile(__dirname + '/debug/PushTestPage.html');
-        });
+        if (config.has("debug.routes.pushtest") && (config.debug.routes.pushtest === true))
+            app.get("/pushtest", function (req, res) {
+                res.sendFile(__dirname + '/debug/PushTestPage.html');
+            });
 
-        app.get("/testrecovery/:activationKey", function (req, res) {
-            let template = fs.readFileSync(__dirname + '/debug/templates/PwdRecoverTest.tmpl', 'utf8');
-            let body = _.template(template)(
-                {
-                    activationKey: req.params.activationKey
-                });
-            res.send(body);
-        });
+        if (config.has("debug.routes.testrecovery") && (config.debug.routes.testrecovery === true))
+            app.get("/testrecovery/:activationKey", function (req, res) {
+                let template = fs.readFileSync(__dirname + '/debug/templates/PwdRecoverTest.tmpl', 'utf8');
+                let body = _.template(template)(
+                    {
+                        activationKey: req.params.activationKey
+                    });
+                res.send(body);
+            });
 
-        app.get("/adm/*", function (req, res) {
-            res.sendFile(__dirname + '/adm-index.html');
-        });
+        if (config.has("server.adminEnabled") && (config.server.adminEnabled === true))
+            app.get("/adm/*", function (req, res) {
+                res.sendFile(__dirname + '/adm-index.html');
+            });
 
         PrerenderInit(app);
-        app.get("/*", function (req, res) {
-            res.sendFile(__dirname + '/index.html');
-        });
 
-        app.get('/ErrorExample', function (req, res, next) {
-            next(new Error('Random error!'));
-        });
-
-        // app.get("/", function (req, res) {
-        //     res.sendFile(__dirname + '/adm-index.html');
-        // });
+        if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
+            app.get("/*", function (req, res) {
+                res.sendFile(__dirname + '/index.html');
+            });
 
         app.listen(port, address, function (error) {
             if (error) {
