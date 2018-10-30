@@ -28,6 +28,12 @@ class LessonPlayBlockSmall extends React.Component {
         this.props.playerStartActions.startPlay(this.props.id)
     }
 
+    _startPlay() {
+        this._redirect = true;
+        this.forceUpdate()
+        this.props.playerStartActions.startPlay(this.props.id);
+    }
+
     render() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
@@ -70,13 +76,13 @@ class LessonPlayBlockSmall extends React.Component {
                             (_isFinished)
                                 ?
                                 <button type="button" className="play-btn-small paused"
-                                        onClick={::this.props.playerStartActions.startPlay}>
+                                        onClick={::this._startPlay}>
                                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
                                     <span>Пауза</span>
                                 </button>
                                 :
                                 <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPlay}>
+                                        onClick={::this._startPlay}>
                                     <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                                     <span>Воспроизвести</span>
                                 </button>
