@@ -104,7 +104,7 @@ module.exports = {
                 secure: true, // true for 465, false for other ports
                 auth: {
                     user: pk.mail.feedback.user,
-                    pass: mail.feedback.pass
+                    pass: pk.mail.feedback.pass
                 }
             }
         },
