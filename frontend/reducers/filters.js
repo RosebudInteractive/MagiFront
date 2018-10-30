@@ -44,6 +44,7 @@ export default function filters(state = initialState, action) {
                 return state;
             }
         }
+
         case CLEAR_FILTERS: {
             let _newItems = [...state.items];
             _newItems.forEach((item) => {

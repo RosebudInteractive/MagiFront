@@ -203,6 +203,7 @@ class App extends Component {
         return (
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
+                <Route exact path={_homePath + 'razdel/:filter'} render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>

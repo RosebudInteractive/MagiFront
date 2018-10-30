@@ -6416,7 +6416,9 @@ ul.user-tooltip {
         transform: translateX(0); } }
 
 .courses {
-  padding-top: 95px; }
+  padding-top: 95px;
+  -webkit-transition: padding-top 0.5s ease;
+  transition: padding-top 0.5s ease;}
   @media (max-width: 899px) {
     .courses {
       padding-top: 64px; } }
@@ -6424,6 +6426,9 @@ ul.user-tooltip {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
     min-height: 0 !important; }
+  @media (min-width: 900px) {
+    .courses.courses_opened_filter_row{
+      padding-top: 191px;}}
 
   .lesson-wrapper {
     height: 100%;
