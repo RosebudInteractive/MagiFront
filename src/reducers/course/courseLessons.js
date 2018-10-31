@@ -4,7 +4,7 @@ import {
     GET_SINGLE_COURSE_SUCCESS,
     CANCEL_CHANGE_COURSE_DATA,
     CLEAR_COURSE,
-    SAVE_COURSE_DATA,
+    SAVE_COURSE_SUCCESS,
 } from '../../constants/course/singleCourse';
 
 import {
@@ -104,7 +104,7 @@ export default function courseLessons(state = initialState, action) {
             };
         }
 
-        case SAVE_COURSE_DATA: {
+        case SAVE_COURSE_SUCCESS: {
             return {
                 ...state,
                 initial: [...state.current],

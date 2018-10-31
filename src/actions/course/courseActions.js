@@ -6,7 +6,9 @@ import {
     CHANGE_COURSE_DATA,
     CANCEL_CHANGE_COURSE_DATA,
     CLEAR_COURSE,
-    SAVE_COURSE_DATA,
+    SAVE_COURSE_START,
+    SAVE_COURSE_SUCCESS,
+    SAVE_COURSE_FAIL,
 } from '../../constants/course/singleCourse'
 
 import {
@@ -72,6 +74,11 @@ export const get = (id) => {
 export const save = (values, mode) => {
 
     return (dispatch) => {
+        dispatch({
+            type: SAVE_COURSE_START,
+            payload: null
+        });
+
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/adm/courses";
         if (mode === EDIT_MODE_EDIT) {
@@ -90,13 +97,18 @@ export const save = (values, mode) => {
             .then(parseJSON)
             .then((id) => {
                 dispatch({
-                    type: SAVE_COURSE_DATA,
+                    type: SAVE_COURSE_SUCCESS,
                     payload: id
                 })
             })
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {
+                        dispatch({
+                            type: SAVE_COURSE_FAIL,
+                            payload: null
+                        });
+
                         dispatch({
                             type: SHOW_ERROR_DIALOG,
                             payload: message

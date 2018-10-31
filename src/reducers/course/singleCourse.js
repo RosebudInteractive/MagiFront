@@ -6,7 +6,9 @@ import {
     CHANGE_COURSE_DATA,
     CANCEL_CHANGE_COURSE_DATA,
     CLEAR_COURSE,
-    SAVE_COURSE_DATA,
+    SAVE_COURSE_START,
+    SAVE_COURSE_SUCCESS,
+    SAVE_COURSE_FAIL,
 } from '../../constants/course/singleCourse'
 
 const initialState = {
@@ -60,7 +62,11 @@ export default function singleCourse(state = initialState, action) {
                 hasChanges: false,
             };
 
-        case SAVE_COURSE_DATA : {
+        case SAVE_COURSE_START : {
+            return {...state, fetching: true,}
+        }
+
+        case SAVE_COURSE_SUCCESS : {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
             state.current.Id = _id;
@@ -71,6 +77,10 @@ export default function singleCourse(state = initialState, action) {
                 fetching: false,
                 hasChanges: false,
             };
+        }
+
+        case SAVE_COURSE_FAIL : {
+            return {...state, fetching: false,}
         }
 
         case CLEAR_COURSE: {

@@ -104,7 +104,7 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 
 const _isUserAdmin = (data) => {
     let _rights = data.PData;
-    return _rights && (_rights.isAdmin || _rights.e)
+    return _rights && (_rights.isAdmin || (_rights.roles && _rights.roles.e))
 }
 
 export const whoAmI = () => {

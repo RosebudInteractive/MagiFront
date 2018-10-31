@@ -213,7 +213,9 @@ export default class ObjectEditor extends React.Component {
         return {
             view: "form",
             id: 'editor-form',
-            width: 1000,
+            // width: 1000,
+            css: "editor-form",
+            padding: 20,
             elements: that._getElements(),
             on: {
                 onChange: function () {
@@ -222,10 +224,10 @@ export default class ObjectEditor extends React.Component {
                 onValues: function () {
                     that._notifyDataLoaded();
 
-                    that._hasChanges() ?
+                    (that._hasChanges() && !that.props.fetching) ?
                         this.elements.btnCancel.enable() : this.elements.btnCancel.disable();
 
-                    (that._hasChanges() && that._enableApplyChanges()) ?
+                    (that._hasChanges() && that._enableApplyChanges() && !that.props.fetching) ?
                         this.elements.btnOk.enable() : this.elements.btnOk.disable();
                 },
             },

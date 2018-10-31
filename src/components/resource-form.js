@@ -124,7 +124,7 @@ class ResourceForm extends React.Component {
                 },
                 {
                     view: "checkbox",
-                    label: "Отображать в галереи",
+                    label: "Отображать в галереe",
                     name: 'ShowInGalery',
                     labelWidth: 347,
                 },

@@ -36,12 +36,13 @@ export class LessonSubLessons extends GridControl{
 export class LessonResources extends GridControl{
     _getColumns() {
         let _columns = [
-            {id: 'FileId', header: 'FileId', width: 120,},
-            {id: 'Name', header: 'Название', fillspace: true,},
+            {id: 'FileId', header: 'FileId', width: 60,},
+            {id: 'Name', header: 'Название', width: 300,},
+            {id: 'Description', header: 'Описание', fillspace: true, },
             // {id: 'FileName', header: 'Имя файла', width: 250},
-            {id: 'Language', header: 'Язык', width: 90},
-            {id: 'ResType', header: 'Тип ресурса', width: 150, editor: 'select',
-                options: [{id: 'P', value: 'Изображение'}, {id: 'V', value: 'Видео'},]},
+            // {id: 'Language', header: 'Язык', width: 90},
+            // {id: 'ResType', header: 'Тип ресурса', width: 150, editor: 'select',
+            //     options: [{id: 'P', value: 'Изображение'}, {id: 'V', value: 'Видео'},]},
         ];
 
         _columns.push(...super._getColumns());

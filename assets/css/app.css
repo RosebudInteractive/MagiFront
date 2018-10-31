@@ -113,8 +113,14 @@
     font-weight: 600;
 }
 
+.editor-form {
+    width: 100% !important;
+    min-width: 500px;
+}
+
 .tabs {
-    width: 1000px;
+    width: 100%;
+    min-width: 500px;
     display: inline-block;
     margin-right: 30px;
     vertical-align: top;
@@ -840,13 +846,6 @@ html,
     padding: 1em 1em 0 1em;
     font-size: 16px;
     font-weight: 600;
-}
-
-.tabs {
-    width: 1000px;
-    display: inline-block;
-    margin-right: 30px;
-    vertical-align: top;
 }
 
 .cover {
