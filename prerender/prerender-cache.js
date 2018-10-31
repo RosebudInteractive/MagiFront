@@ -120,7 +120,7 @@ let PrerenderCache = class {
         return new Promise((resolve, reject) => {
             let url = this._renderHost + path;
             let hs = headers ? headers : { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
-            request({ url: url, headers: hs }, (error, response, body) => {
+            request({ url: url, headers: hs, strictSSL: false }, (error, response, body) => {
                 if (error)
                     reject(error)
                 else
