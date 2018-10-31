@@ -96,10 +96,10 @@ class Extras extends React.Component {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
 
-        return this.props.subLessons.map((lesson) => {
+        return this.props.subLessons.map((lesson, index) => {
             let url = '/' + this.props.courseUrl + '/' + lesson.URL
 
-            return <li>
+            return <li key={index}>
                 <Link to={url} className="extras-list__item">
                     <span className="counter">{this.props.parentNumber + '.'}</span>
                     <span className="inner-counter">{lesson.Number}</span>

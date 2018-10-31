@@ -16,7 +16,7 @@ class DesktopHeaderRow extends React.Component {
         filterActive: PropTypes.bool.isRequired,
         currentPage: PropTypes.object.isRequired,
         onFilterClick: PropTypes.func.isRequired,
-        onBookmarkClick: PropTypes.func.isRequired,
+        onBookmarkClick: PropTypes.func,
     }
 
     render() {

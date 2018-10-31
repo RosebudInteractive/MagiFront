@@ -53,26 +53,31 @@ let listener = (event) => {
         })
 
         $('.play_btn').on('click', () => {
-            window.magisteriaPlayer.play({playerId: window.magisteriaPlayer._id})
+            // window.magisteriaPlayer.play({playerId: window.magisteriaPlayer._id})
+            window.magisteriaPlayer.play()
         })
 
         $('.play_from_pos_btn').on('click', () => {
             let _position = $('#init_position').val();
-            window.magisteriaPlayer.play({position: _position, playerId: window.magisteriaPlayer._id})
+            // window.magisteriaPlayer.play({position: _position, playerId: window.magisteriaPlayer._id})
+            window.magisteriaPlayer.play({position: _position})
         })
 
         $('.set_position_btn').on('click', () => {
             let _position = $('#position').val();
-            window.magisteriaPlayer.seek({position:_position, playerId: window.magisteriaPlayer._id})
+            // window.magisteriaPlayer.seek({position:_position, playerId: window.magisteriaPlayer._id})
+            window.magisteriaPlayer.seek(_position)
         })
 
         $('.pause_btn').on('click', () => {
-            window.magisteriaPlayer.pause({playerId: window.magisteriaPlayer._id})
+            // window.magisteriaPlayer.pause({playerId: window.magisteriaPlayer._id})
+            window.magisteriaPlayer.pause()
         })
 
         $('.set_rate_btn').on('click', () => {
             let _rate = $('#rate').val();
-            window.magisteriaPlayer.setPlaybackSpeed({rate: _rate, playerId: window.magisteriaPlayer._id})
+            // window.magisteriaPlayer.setPlaybackSpeed({rate: _rate, playerId: window.magisteriaPlayer._id})
+            window.magisteriaPlayer.setPlaybackSpeed(_rate)
         })
 
 
