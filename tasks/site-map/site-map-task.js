@@ -130,7 +130,7 @@ exports.SiteMapTask = class SiteMapTask extends FileTask {
     constructor(name, options) {
         super(name, options);
         let opts = options || {};
-        this._siteHost = config.proxyServer.siteHost;
+        this._siteHost = opts.host ? opts.host : config.proxyServer.siteHost;
         this._dataUrl = this._siteHost + config.get('dataUrl');
         this._siteMapSettings = _.defaultsDeep(opts.maps, dfltSiteMapSettings);
         this._xslUrl = opts.xslUrl;

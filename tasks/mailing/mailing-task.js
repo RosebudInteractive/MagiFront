@@ -75,7 +75,7 @@ exports.MailingTask = class MailingTask extends Task {
         super(name, options);
         let opts = options || {};
         this._settings = _.defaultsDeep(opts, dfltSettings);
-        this._settings.baseUrl = this._settings.testUrl ? this._settings.testUrl : config.proxyServer.siteHost;
+        this._settings.baseUrl = this._settings.host ? this._settings.host : config.proxyServer.siteHost;
         this._subsServise = SubscriptionService();
     }
 

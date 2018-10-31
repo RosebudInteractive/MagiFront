@@ -14,11 +14,13 @@ const DFLT_RENDER_DELAY = 10 * 1000; // 10sec
 
 let PrerenderCache = class {
     constructor(options) {
+        let opts = options || {};
         this._cache = {};
         this._prefix = config.has("server.prerender.redisPrefix") ? config.get("server.prerender.redisPrefix") : KEY_PREFIX;
         this._isRedis = config.get("server.prerender.useRedis");
+        this._renderHost = opts.host ? opts.host : config.proxyServer.siteHost;
         if (this._isRedis) {
-            RedisConnections(options);
+            RedisConnections(opts.redis);
         }
     }
 
@@ -115,7 +117,7 @@ let PrerenderCache = class {
 
     prerender(path, isPersist, headers) {
         return new Promise((resolve, reject) => {
-            let url = config.proxyServer.siteHost + path;
+            let url = this._renderHost + path;
             let hs = headers ? headers : { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
             request({ url: url, headers: hs }, (error, response, body) => {
                 if (error)

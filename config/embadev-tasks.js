@@ -22,7 +22,7 @@ let options = {
             name: "Auto Subscription",
             module: "./auto-subscription",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 autoPay: false,
@@ -41,7 +41,7 @@ let options = {
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
-                testUrl: "https://new.magisteria.ru",
+                host: "https://new.magisteria.ru",
                 first_date: "2018-3-1",
                 period: "week",
                 sender: "test@magisteria.ru",
@@ -94,6 +94,7 @@ let options = {
             schedule: "5,15,25,35,45,55 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                host: "https://magisteria.ru",
                 channels: {
                     'yandex-zen': {
                         enabled: true
@@ -112,6 +113,7 @@ let options = {
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
+                host: "https://magisteria.ru",
                 xslUrl: "/main-sitemap.xsl",
                 maps: {
                     lesson: {
