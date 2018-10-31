@@ -2,31 +2,35 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as filtersActions from '../../actions/filters-actions';
 import * as pageHeaderActions from "../../actions/page-header-actions";
+import {clear, filtersSelector, switchFilter} from "../../ducks/filters";
 
 class FiltersRow extends React.Component {
 
     _getFilters() {
-        return this.props.filters.map((item, index) => {
-            return (
-                <li key={index} className={item.selected ? 'active' : null}>
-                    <div className="filter-btn" key={index} onClick={::this._onClick} data-id={item.id}>
-                        <span className="filter-btn__title" data-id={item.id}>{item.name + ' '}
-                            <span className="filter-btn__index" data-id={item.id}>{item.count}</span>
+        let _filterElems = [];
+
+        this.props.filters.forEach((item, key) => {
+            _filterElems.push(
+                <li key={key} className={item.get('selected') ? 'active' : null}>
+                    <div className="filter-btn" key={key} onClick={::this._onClick} data-url={item.get('URL')}>
+                        <span className="filter-btn__title" data-url={item.get('URL')}>{item.get('name') + ' '}
+                            <span className="filter-btn__index" data-url={item.get('URL')}>{item.get('count')}</span>
                         </span>
                     </div>
                 </li>
             )
         })
+
+        return _filterElems
     }
 
     _onClick(e){
-        this.props.filtersActions.switchFilter(e.target.dataset.id)
+        this.props.switchFilter(e.target.dataset.url)
     }
 
     _clearFilter() {
-        this.props.filtersActions.clear();
+        this.props.clearFilter();
         this.props.pageHeaderActions.hideFiltersForm();
     }
 
@@ -49,13 +53,14 @@ class FiltersRow extends React.Component {
 function mapStateToProps(state) {
     return {
         showFiltersForm: state.pageHeader.showFiltersForm,
-        filters: state.filters.items,
+        filters: filtersSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        filtersActions: bindActionCreators(filtersActions, dispatch),
+        switchFilter: bindActionCreators(switchFilter, dispatch),
+        clearFilter: bindActionCreators(clear, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
     }
 }

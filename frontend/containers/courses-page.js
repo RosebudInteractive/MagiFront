@@ -9,8 +9,9 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 
 import * as tools from '../tools/page-tools';
-import {forceCheck} from 'react-lazyload';
+// import {forceCheck} from 'react-lazyload';
 import CourseModule from "../components/course/course-module";
+import {filtersSelector, isEmptyFilterSelector, loadingSelector, selectedFilterSelector, applyExternalFilter} from "../ducks/filters";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -31,40 +32,53 @@ class CoursesPage extends React.Component {
     }
 
     componentWillReceiveProps(newProps) {
-        if (!this.props.pageHeaderState.showFiltersForm && newProps.pageHeaderState.showFiltersForm) {
-            forceCheck();
+        // if (!this.props.pageHeaderState.showFiltersForm && newProps.pageHeaderState.showFiltersForm) {
+        //     forceCheck();
+        // }
+    }
+
+    componentDidUpdate(prevProps) {
+        let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter} = this.props;
+
+        if (prevProps.loadingFilters && !loadingFilters) {
+            if (hasExternalFilter) {
+                this.props.applyExternalFilter(externalFilter)
+            }
+        }
+
+        if (!prevProps.isEmptyFilter && isEmptyFilter) {
+            this.props.history.go('/')
+        }
+
+        if (!prevProps.selectedFilter.equals(selectedFilter)) {
+            let _filter = [];
+            selectedFilter.forEach(item => _filter.push(item.get('URL')));
+            this.props.history.replace('/razdel/' + _filter.join('+'))
         }
     }
 
     _getCoursesBundles() {
 
-        let {filters} = this.props;
+        let {isEmptyFilter, selectedFilter} = this.props;
         let _courses = this.props.courses.items;
-
-        let _cleanFilter = filters.every((filter) => {
-            return !filter.selected;
-        });
 
         return _courses.map((course, index) => {
             let _inFilter = false;
 
-            if (_cleanFilter) {
+            if (isEmptyFilter) {
                 _inFilter = true
             } else {
-
                 _inFilter = course.Categories.some((categoryId) => {
-                    let _filter = filters.find((item) => {
-                        return item.id === categoryId
+                    return selectedFilter.find((item) => {
+                        return item.get('id') === categoryId
                     });
-
-                    return _filter ? _filter.selected : false;
                 });
             }
 
             return (
                 _inFilter
                     ?
-                    _cleanFilter
+                    isEmptyFilter
                         ?
                         <CourseModuleLazyload course={course} key={index} isMobile={this._isMobile()}/>
                         :
@@ -83,7 +97,7 @@ class CoursesPage extends React.Component {
             fetching ?
                 <p>Загрузка...</p>
                 :
-                <div className="courses">
+                <div className={"courses" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')}>
                     {this._getCoursesBundles()}
                 </div>
         )
@@ -94,9 +108,14 @@ class CoursesPage extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         courses: state.courses,
-        filters: state.filters.items,
+        filters: filtersSelector(state),
+        isEmptyFilter: isEmptyFilterSelector(state),
+        loadingFilters: loadingSelector(state),
+        selectedFilter: selectedFilterSelector(state),
         size: state.app.size,
-        pageHeaderState: state.pageHeader,
+        // pageHeaderState: state.pageHeader,
+        showFiltersForm: state.pageHeader.showFiltersForm,
+        externalFilter: ownProps.match.params.filter,
         ownProps,
     }
 }
@@ -106,6 +125,7 @@ function mapDispatchToProps(dispatch) {
         coursesActions: bindActionCreators(coursesActions, dispatch),
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
+        applyExternalFilter: bindActionCreators(applyExternalFilter, dispatch),
     }
 }
 

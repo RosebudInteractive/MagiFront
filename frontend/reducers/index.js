@@ -17,6 +17,7 @@ import authorReducer, {moduleName as authorModule} from '../ducks/author'
 import profileReducer, {moduleName as profileModule} from '../ducks/profile'
 import playerScreenReducer, {moduleName as playerScreenModule} from '../ducks/player-screen'
 import messageReducer, {moduleName as messageModule} from '../ducks/message'
+import filtersReducer, {moduleName as filtersModule} from '../ducks/filters'
 
 export default combineReducers({
 
@@ -36,6 +37,7 @@ export default combineReducers({
     [profileModule]: profileReducer,
     [playerScreenModule]: playerScreenReducer,
     [messageModule]: messageReducer,
+    [filtersModule]: filtersReducer,
     routing: routerReducer,
     form: formReducer,
 })
