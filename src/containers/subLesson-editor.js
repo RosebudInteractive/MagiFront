@@ -33,12 +33,16 @@ class SubLessonEditor extends LessonEditor{
         return this.props.lessonId
     }
 
-    _getAdditionalTab(){
-        return ''
+    componentDidMount() {
+        super.componentDidMount()
+
+        if (!this.props.parentLesson.id) {
+            this.props.parentLessonActions.loadParentLessonInfo(this.props.lessonId, this.props.courseId)
+        }
     }
 
-    _getMainDivClassName(){
-        return "sublesson-content";
+    _getAdditionalTab(){
+        return ''
     }
 
     _getInitStateOfNewObject(props) {
@@ -64,6 +68,7 @@ class SubLessonEditor extends LessonEditor{
         let _result = super._getExtElements();
         _result.splice(1, 0, {
             view: "text",
+            id: 'current-parent-name',
             name: "CurrParentName",
             label: "Основная лекция",
             readonly: true,
@@ -98,7 +103,9 @@ function mapStateToProps(state, ownProps) {
         referenceEditMode: state.references.editMode,
         course: state.singleCourse.current,
 
+        showSnImageSelectDialogEditor: state.resources.showSnImageSelectDialogEditor,
         showResourceEditor: state.resources.showEditor,
+        showMultiUploadResourcesEditor: state.resources.showMultiUploadEditor,
         resource: state.resources.object,
         resourceEditMode: state.resources.editMode,
 

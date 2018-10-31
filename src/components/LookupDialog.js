@@ -29,12 +29,13 @@ export default class LookupDialog extends Component {
 
     render ()
     {
-        const { data } = this.props;
+        const { data, message } = this.props;
         return <div className="dlg">
             <div className="dlg-bg">
             </div>
             <div className="dlg-window">
-                {/*<div className="dlg-message">{message}</div>*/}
+                <div className="dlg_message lookup_header lookup_header_blue">{message}</div>
+                <div id='grid_container' className='grid_container'/>
                 <Webix ui={::this.getUI()} data={data} />
                 <div className="dlg-btn-bar">
                     <button className="btn yes" onClick={::this.yesClicked}>Да</button>
@@ -48,11 +49,14 @@ export default class LookupDialog extends Component {
         return {
             view: "datatable",
             scroll: false,
+            container: 'grid_container',
+            header: false,
+            scrollY: true,
             autoheight: true,
             select: true,
             editable: false,
             columns: [
-                {id: 'value', header: this.props.message, fillspace: true},
+                {id: 'value', fillspace: true},
             ],
             on: {
                 onAfterSelect: (selObj) => {

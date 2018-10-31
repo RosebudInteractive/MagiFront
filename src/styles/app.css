@@ -497,6 +497,7 @@ html,
 }
 
 .app .dlg .dlg-window {
+    max-height: 600px;
     position: relative;
     left: 50%;
     transform: translate(-50%, -50%);

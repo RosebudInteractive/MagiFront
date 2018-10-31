@@ -52,6 +52,10 @@ class EpisodeEditor extends ObjectEditor {
         this._isWorkShopRout = false;
     }
 
+    _getMainDivClassName() {
+        return "course_editor";
+    }
+
     componentWillReceiveProps(next) {
         const {
             lesson,

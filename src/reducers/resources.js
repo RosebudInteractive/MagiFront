@@ -31,6 +31,7 @@ export default function resources(state = initialState, action) {
         case CREATE_RESOURCE:{
             let _obj = {};
             _obj.Id = state.internalId;
+            _obj.ShowInGalery = action.payload ? action.payload.ShowInGalery : true
 
             return {
                 ...state,
@@ -60,11 +61,10 @@ export default function resources(state = initialState, action) {
             let _array = action.payload,
                 _id = state.internalId;
 
-
-
             if (_array) {
                 _array.forEach(item => {
                     if (!item.Id) {
+                        item.ShowInGalery = true,
                         item.Id = _id--
                     }
                 })

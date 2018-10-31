@@ -24,7 +24,7 @@ import {
 
 
 import 'whatwg-fetch';
-import {handleJsonError} from '../../tools/fetch-tools';
+import {handleJsonError, checkStatus, parseJSON} from '../../tools/fetch-tools';
 
 export const getResources = (lessonId) => {
     return (dispatch) => {
@@ -186,20 +186,6 @@ export const setTwitterImage = (resourceId) => {
             type: SET_TWITTER_IMAGE_RESOURCE_ID,
             payload: resourceId
     }
-};
-
-const checkStatus = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        let error = new Error(response.statusText);
-        error.response = response;
-        throw error
-    }
-};
-
-const parseJSON = (response) => {
-    return response.json()
 };
 
 const handleLesson = (lesson) => {

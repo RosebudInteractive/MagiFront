@@ -1,4 +1,4 @@
-import React  from 'react'
+import React from 'react'
 import ErrorDialog from '../components/ErrorDialog';
 import {Prompt} from 'react-router-dom';
 
@@ -61,7 +61,7 @@ export default class ObjectEditor extends React.Component {
         return this.props.ownProps ? this.props.ownProps.location.pathname : '';
     }
 
-    _initEditMode(){
+    _initEditMode() {
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId);
     }
@@ -71,7 +71,7 @@ export default class ObjectEditor extends React.Component {
         // this.objectActions.create(this._getInitStateOfNewObject(this.props))
     }
 
-    _getInitStateOfNewObject(){
+    _getInitStateOfNewObject() {
         return null
     }
 
@@ -94,9 +94,10 @@ export default class ObjectEditor extends React.Component {
         // }
     }
 
-    _onUpdate() {}
+    _onUpdate() {
+    }
 
-    _switchToEditObject(objId){
+    _switchToEditObject(objId) {
         let _newRout = this.getRootRout() + this._getEditRout() + objId;
         this.editMode = EDIT_MODE_EDIT;
         this.props.history.push(_newRout);
@@ -119,7 +120,7 @@ export default class ObjectEditor extends React.Component {
         this.objectActions.clear();
     }
 
-    _goBack(){
+    _goBack() {
         this.props.history.push(this.getRootRout());
     }
 
@@ -138,7 +139,7 @@ export default class ObjectEditor extends React.Component {
         this.objectActions.cancelChanges();
     }
 
-    _getMainDivClassName(){
+    _getMainDivClassName() {
         return "object-content";
     }
 
@@ -161,7 +162,9 @@ export default class ObjectEditor extends React.Component {
                         <p>Загрузка...</p>
                         :
                         <div>
-                            <Prompt when={this._needShowPrompt()} message='Есть несохраненные данные. Перейти без сохранения?'/>
+                            <Prompt when={this._needShowPrompt()}
+                                    message='Есть несохраненные данные. Перейти без сохранения?'/>
+                            <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
                             {this._getWebixForm()}
                         </div>
                 }
@@ -197,7 +200,8 @@ export default class ObjectEditor extends React.Component {
         })
     }
 
-    _getWebixForm(){}
+    _getWebixForm() {
+    }
 
     _disableChanging() {
         this._isChangingEnable = false;
@@ -212,10 +216,13 @@ export default class ObjectEditor extends React.Component {
 
         return {
             view: "form",
+            container: 'webix_editors_wrapper',
             id: 'editor-form',
-            // width: 1000,
+            minWidth: 500,
+            maxWidth: 1000,
+            borderless:true,
+            autowidth: true,
             css: "editor-form",
-            padding: 20,
             elements: that._getElements(),
             on: {
                 onChange: function () {
@@ -240,7 +247,10 @@ export default class ObjectEditor extends React.Component {
 
         _elems.push(
             {
-                view: "button", name: 'btnOk', value: '<<< Назад',
+                view: "button",
+                name: 'btnOk',
+                value: '<<< Назад',
+                align: 'center',
                 click: () => {
                     this._goBack();
                 }
