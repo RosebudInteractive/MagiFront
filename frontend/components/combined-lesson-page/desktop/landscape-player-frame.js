@@ -18,11 +18,14 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 import FadeTimer from '../fade-timer';
 
 $.fn.isInViewport = function() {
-    var elementTop = $(this).offset().top;
-    var elementBottom = elementTop + $(this).outerHeight();
+    let _this = $(this);
+    if (!_this || !_this.length) { return }
 
-    var viewportTop = $(window).scrollTop();
-    var viewportBottom = viewportTop + $(window).height();
+    let elementTop = _this.offset().top;
+    let elementBottom = elementTop + _this.outerHeight();
+
+    let viewportTop = $(window).scrollTop();
+    let viewportBottom = viewportTop + $(window).height();
 
     return elementBottom > viewportTop && elementTop < viewportBottom;
 };

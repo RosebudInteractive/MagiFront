@@ -59,7 +59,7 @@ class NestedPlayer {
                 this._fullPlayer = new Player(fullViewPort, _options, this._initState);
                 this._fullPlayer.render();
             } else {
-                if ((this._playingData) && (this._fullDiv[0].id === 'player' + this._playingData.id)) {
+                if ((this._playingData) && this._fullDiv.length && (this._fullDiv[0].id === 'player' + this._playingData.id)) {
                     this._fullPlayer.initContainer(this._fullDiv);
                     this._fullPlayer.render();
                     if (this.audioState.audio) {
