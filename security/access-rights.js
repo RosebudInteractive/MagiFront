@@ -3,6 +3,7 @@ const _ = require('lodash');
 const { DbUtils } = require('../database/db-utils');
 const { ACCOUNT_ID } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const { AccessFlags } = require('../const/common');
 
 const LESSON_FILE_MSSQL_REQ =
     "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired] from[FreeExpDate] el\n" +
@@ -67,6 +68,19 @@ exports.AccessRights = class {
             }
             resolve(result);
         });
+    }
+
+    static checkPermissions(user, accessRights) {
+        let result = 0;
+        if (accessRights & AccessFlags.Administrator)
+            result += user.PData.isAdmin ? AccessFlags.Administrator : 0;
+        if (accessRights & AccessFlags.ContentManager)
+            result += (user.PData.isAdmin || user.PData.roles.e) ? AccessFlags.ContentManager : 0;
+        if (accessRights & AccessFlags.Pending)
+            result += user.PData.roles.p ? AccessFlags.Pending : 0;
+        if (accessRights & AccessFlags.Subscriber)
+            result += user.PData.roles.s ? AccessFlags.Subscriber : 0;
+        return result;
     }
 };
 

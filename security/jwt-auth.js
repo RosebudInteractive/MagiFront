@@ -5,7 +5,8 @@ const config = require('config');
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { CheckPermissions, DestroySession } = require('./local-auth');
+const { AccessRights } = require('./access-rights');
+const { DestroySession } = require('./local-auth');
 
 class AuthJWT {
 
@@ -83,7 +84,7 @@ let processAuth = (user, isAuthRequired, accessRights, res, next, info) => {
     if (isAuthRequired) {
         if (user) {
             if (accessRights) {
-                let userRights = CheckPermissions(user, accessRights)
+                let userRights = AccessRights.checkPermissions(user, accessRights)
                 if (userRights !== accessRights)
                     return res.status(HttpCode.ERR_FORBIDDEN).json(info ? info : { message: "Access denied." });
             }

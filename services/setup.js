@@ -13,7 +13,7 @@ const methodOverride = require('method-override');
 
 const { HttpCode } = require("../const/http-codes");
 const { HttpError } = require('../errors/http-error');
-const { AccessRigths } = require('../const/common');
+const { AccessFlags } = require('../const/common');
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
 const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
@@ -116,11 +116,11 @@ function setupAPI(express, app) {
         AuthJWTInit(app);
 
     app.use("/data", AuthenticateLocal(app)); // Optional Local Authentication
-    app.use("/api/adm", AuthenticateLocal(app, useJWT ? false : true, AccessRigths.ContentManager)); // Local Authentication
+    app.use("/api/adm", AuthenticateLocal(app, useJWT ? false : true, AccessFlags.ContentManager)); // Local Authentication
     app.use("/api", AuthenticateLocal(app)); // Optional Local Authentication
     if (useJWT) {
         app.use("/data", AuthenticateJWT(app)); // Optional JWT Authentication
-        app.use("/api/adm", AuthenticateJWT(app, true, AccessRigths.ContentManager)); // JWT Authentication
+        app.use("/api/adm", AuthenticateJWT(app, true, AccessFlags.ContentManager)); // JWT Authentication
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
