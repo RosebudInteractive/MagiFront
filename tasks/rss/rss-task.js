@@ -111,7 +111,7 @@ exports.RssTask = class RssTask extends FileTask {
     constructor(name, options) {
         super(name, options);
         let opts = options || {};
-        this._siteHost = config.proxyServer.siteHost;
+        this._siteHost = opts.host ? opts.host : config.proxyServer.siteHost;
         this._rssSettings = _.defaultsDeep(opts.channels, dfltRssSettings);
     }
 

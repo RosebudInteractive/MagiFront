@@ -30,7 +30,7 @@ exports.PrerenderTask = class PrerenderTask extends Task {
         this._prerenderSettings = _.defaultsDeep(opts, dfltPrerenderSettings);
         if (!this._prerenderSettings.mapFiles)
             this._prerenderSettings.mapFiles = dfltMapFiles;
-        this._prerenderCache = PrerenderCache();
+        this._prerenderCache = PrerenderCache(opts.renderCache);
         this._links = {};
         this._lastReqTime = null;
         this._totLinks = 0;

@@ -19,8 +19,9 @@ exports.Intervals = {
     MIN_FREE_LESSON: 60 * 1000 // 1 minute
 };
 
-exports.AccessRigths = {
+exports.AccessFlags = {
     Administrator: 1,
     ContentManager: 2,
-    Subscriber: 4
+    Subscriber: 4,
+    Pending: 8
 };

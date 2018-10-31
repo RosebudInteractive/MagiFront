@@ -11,7 +11,7 @@ module.exports = {
             name: "Auto Subscription",
             module: "./auto-subscription",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "0 */30 * * * *", // run every 30 min
             options: {
                 autoPay: false,
@@ -27,8 +27,9 @@ module.exports = {
             type: "scheduled-task",
             disabled: false,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
-            schedule: "33 0 11,20 * * *", // run twice a day
+            schedule: "33 11 11,20 * * *", // run twice a day
             options: {
+                host: "https://magisteria.ru",
                 period: "week",
                 sender: "test@magisteria.ru",
                 senderName: "Magisteria.ru",
@@ -44,6 +45,9 @@ module.exports = {
             disabled: false,
             schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
             options: {
+                renderCache: {
+                    host: "https://adm.magisteria.ru:444"
+                },
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
                 maxLinksLimit: 100,
@@ -101,6 +105,7 @@ module.exports = {
             schedule: "0 5,15,25,35,45,55 * * * *", // run every 10 min
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "feed")),
+                host: "https://magisteria.ru",
                 channels: {
                     'yandex-zen': {
                         enabled: true
@@ -119,6 +124,7 @@ module.exports = {
             schedule: "0 */10 * * * *", // run every 10 min
             options: {
                 path: siteMapsPath,
+                host: "https://magisteria.ru",
                 xslUrl: "/main-sitemap.xsl",
                 maps: {
                     lesson: {
@@ -150,8 +156,8 @@ module.exports = {
             usePrerender: false,
             useRedis: true,
             redisPrefix: "pg:",
-            expInSec: 14 * 24 * 60 * 60,
-            maxDevSec: 14 * 24 * 60 * 60,
+            expInSec: 7 * 24 * 60 * 60,
+            maxDevSec: 7 * 24 * 60 * 60,
             url: 'http://127.0.0.1:8000'
         }
     },

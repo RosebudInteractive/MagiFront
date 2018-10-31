@@ -75,7 +75,7 @@ module.exports = {
             name: "500 LAST Share Counters Update",
             module: "./sn-counters",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "0 33 19 * * *", // run at 19:33
             options: {
                 baseUrl: "https://magisteria.ru",
