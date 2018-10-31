@@ -128,13 +128,12 @@ class PlayBlock extends React.Component {
     }
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state) {
     return {
         lessonInfoStorage: state.lessonInfoStorage,
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
         authorized: !!state.user.user,
-        ownProps,
     }
 }
 

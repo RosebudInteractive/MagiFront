@@ -26,16 +26,28 @@ class PlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(_audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(this.props.id)
+        this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
     _startPlay() {
-        this.props.playerStartActions.startPlay(this.props.id);
+        if (this._isLocationPlayerPage()) {
+            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+            let scrollTarget = $('.js-player').outerHeight() - $(window).height();
+            $('html, body').animate({
+                scrollTop: scrollTarget
+            }, 600);
+        } else {
+            this._redirect = true;
+            this.forceUpdate()
+            this.props.playerStartActions.startPlay(this.props.lesson.Id);
+        }
+    }
 
-        let scrollTarget = $('.js-player').outerHeight() - $(window).height();
-        $('html, body').animate({
-            scrollTop: scrollTarget
-        }, 600);
+    _isLocationPlayerPage() {
+        let _currentLocation = window.location.pathname + window.location.search,
+            _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL + '?play'
+
+        return _currentLocation === _needLocation;
     }
 
     _unlock() {
