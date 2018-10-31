@@ -18,7 +18,8 @@ let PrerenderCache = class {
         this._cache = {};
         this._prefix = config.has("server.prerender.redisPrefix") ? config.get("server.prerender.redisPrefix") : KEY_PREFIX;
         this._isRedis = config.get("server.prerender.useRedis");
-        this._renderHost = opts.host ? opts.host : config.proxyServer.siteHost;
+        let targetHost = config.has("server.prerender.targetHost") ? config.server.prerender.targetHost : null;
+        this._renderHost = opts.host ? opts.host : (targetHost ? targetHost : config.proxyServer.siteHost);
         if (this._isRedis) {
             RedisConnections(opts.redis);
         }

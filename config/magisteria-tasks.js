@@ -46,7 +46,7 @@ module.exports = {
             schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
             options: {
                 renderCache: {
-                    host: "https://adm.magisteria.ru:444"
+                    host: "https://magisteria.ru:444"
                 },
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
@@ -158,6 +158,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 7 * 24 * 60 * 60,
             maxDevSec: 7 * 24 * 60 * 60,
+            targetHost: "https://magisteria.ru:444",
             url: 'http://127.0.0.1:8000'
         }
     },

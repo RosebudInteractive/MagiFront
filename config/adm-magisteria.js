@@ -24,6 +24,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 14 * 24 * 60 * 60,
             maxDevSec: 14 * 24 * 60 * 60,
+            targetHost: "https://magisteria.ru:444",
             url: 'http://127.0.0.1:8000'
         },
     },
