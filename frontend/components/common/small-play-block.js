@@ -5,6 +5,7 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
+import $ from "jquery";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -26,6 +27,23 @@ class LessonPlayBlockSmall extends React.Component {
         this._redirect = true;
         this.forceUpdate()
         this.props.playerStartActions.startPlay(this.props.id)
+    }
+
+    _startPlay() {
+        if (this._isLocationPlayerPage()) {
+            this.props.playerStartActions.startPlay(this.props.id);
+        } else {
+            this._redirect = true;
+            this.forceUpdate()
+            this.props.playerStartActions.startPlay(this.props.id);
+        }
+    }
+
+    _isLocationPlayerPage() {
+        let _currentLocation = window.location.pathname + window.location.search,
+            _needLocation = '/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'
+
+        return _currentLocation === _needLocation;
     }
 
     render() {
@@ -70,13 +88,13 @@ class LessonPlayBlockSmall extends React.Component {
                             (_isFinished)
                                 ?
                                 <button type="button" className="play-btn-small paused"
-                                        onClick={::this.props.playerStartActions.startPlay}>
+                                        onClick={::this._startPlay}>
                                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
                                     <span>Пауза</span>
                                 </button>
                                 :
                                 <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPlay}>
+                                        onClick={::this._startPlay}>
                                     <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                                     <span>Воспроизвести</span>
                                 </button>
