@@ -17,6 +17,7 @@ module.exports = {
         publicEnabled: true,
         adminEnabled: true,
         pushNotifications: true,
+        corsEnabled: true,
         prerender: {
             usePrerender: true,
             useRedis: true,
