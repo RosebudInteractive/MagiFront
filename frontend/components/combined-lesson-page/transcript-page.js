@@ -64,70 +64,31 @@ class TextBlock extends React.Component {
         let _text = episode.Transcript,
             _isFirstParagraph = true;
 
-        while ((_matches = _re.exec(_text)) !== null) {
-            let _toc = episode.Toc.find((toc) => {
-                return toc.Topic.trim() === _matches[1].trim()
-            });
-
-            _text = _text.slice(_re.lastIndex);
-            let _index = _text.search(/<h2>/gim);
-            let _content = '';
-
-            if (_index > -1) {
-                // _content = _text.substr(0, _index)
-                _content = _text.slice(0, _index)
-                _text = _text.slice(_index)
-            } else {
-                _content = _text
-            }
-
-            _content = _content.trim();
-
-            let _array = _content.split(/<p>(.*?)<\/p>/gim);
-            let _isToc = true;
-
-            _array.forEach((item) => {
-                let _paragraph = item;
-
-                _paragraph.trim();
-                if (_paragraph.length === 0) {
-                    return
-                }
-
-                _paragraph = _paragraph.replace(/<b><u>ts(.*?)<\/u><\/b>/gim, '');
-
-                if (_isFirstParagraph) {
-                    let _firstLetter = _paragraph.slice(0, 1);
-                    _paragraph = _paragraph.slice(1);
-
-                    _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                        <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
-                        <p className='text-intro'>
-                            <span className="first-letter">{_firstLetter}</span>
-                            <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
-                        </p>
-                    </div>)
-
-                    _isFirstParagraph = false;
-                } else {
-                    if (!_isToc) {
-                        _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
-                    } else {
-                        _isToc = false;
-                        _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
-                            <h2 key={_toc ? _toc.Id : 'undefined'}>{_matches[1]}</h2>
-                            <p>
-                                <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
-                            </p>
-                        </div>)
-                    }
-
-                }
-
-                _isToc = false;
-            })
-
+        if (_re.test(_text)) {
             _re.lastIndex = 0;
+
+            while ((_matches = _re.exec(_text)) !== null) {
+                let data = this._parseChapter({
+                    toc: episode.Toc,
+                    tocName: _matches[1].trim(),
+                    text: _text,
+                    lastHeaderPos: _re.lastIndex,
+                    isFirstParagraph: _isFirstParagraph})
+
+                _div.push(data.div)
+                _isFirstParagraph = data.isFirstParagraph
+                _text = data.newTranscriptText
+
+                _re.lastIndex = 0;
+            }
+        } else {
+            let data = this._parseChapter({
+                toc: episode.Toc,
+                text: _text,
+                lastHeaderPos: 0,
+                isFirstParagraph: _isFirstParagraph})
+
+            _div.push(data.div)
         }
 
         if ((_div.length === 0) && (episode.Transcript)) {
@@ -143,6 +104,77 @@ class TextBlock extends React.Component {
         }
 
         return _div
+    }
+
+    _parseChapter(data) {
+        let _div = [],
+            _transcriptText = data.text,
+            _isFirstParagraph = data.isFirstParagraph;
+
+        let _toc = data.toc.find((toc) => {
+            return toc.Topic.trim() === data.tocName
+        });
+
+        // Отрезаем заголовок
+        _transcriptText = _transcriptText.slice(data.lastHeaderPos);
+        let _index = _transcriptText.search(/<h2>/gim);
+        let _content = '';
+
+        // Отрезаем контент
+        if (_index > -1) {
+            _content = _transcriptText.slice(0, _index)
+            _transcriptText = _transcriptText.slice(_index)
+        } else {
+            _content = _transcriptText
+        }
+
+        _content = _content.trim();
+
+        let _array = _content.split(/<p>(.*?)<\/p>/gim);
+        let _isToc = true;
+
+        _array.forEach((item) => {
+            let _paragraph = item;
+
+            _paragraph.trim();
+            if (_paragraph.length === 0) {
+                return
+            }
+
+            _paragraph = _paragraph.replace(/<b><u>ts(.*?)<\/u><\/b>/gim, '');
+
+            if (_isFirstParagraph) {
+                let _firstLetter = _paragraph.slice(0, 1);
+                _paragraph = _paragraph.slice(1);
+
+                _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                    <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
+                    <p className='text-intro'>
+                        <span className="first-letter">{_firstLetter}</span>
+                        <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
+                    </p>
+                </div>)
+
+                _isFirstParagraph = false;
+            } else {
+                if (!_isToc) {
+                    _div.push(<p dangerouslySetInnerHTML={{__html: _paragraph}}/>)
+                } else {
+                    _isToc = false;
+                    _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
+                        <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
+                        <p>
+                            <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
+                        </p>
+                    </div>)
+                }
+            }
+
+            _isToc = false;
+        })
+
+        data.div = _div;
+        return {div: _div, newTranscriptText: _transcriptText, isFirstParagraph: _isFirstParagraph};
     }
 
     _getText() {

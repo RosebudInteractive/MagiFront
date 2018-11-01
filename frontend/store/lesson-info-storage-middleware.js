@@ -9,7 +9,7 @@ import {
     PLAYER_ENDED,
 } from '../constants/player'
 
-import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS} from "../constants/user";
+import {SIGN_IN_SUCCESS, LOGOUT_SUCCESS, WHO_AM_I_SUCCESS} from "../constants/user";
 
 import {
     LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS,
@@ -38,6 +38,22 @@ const LessonInfoStorageMiddleware = store => next => action => {
             LessonInfoStorage.clear();
             let result = next(action)
             LessonInfoStorage.init()
+            return result
+        }
+
+        case WHO_AM_I_SUCCESS: {
+            let _state = store.getState();
+            let _oldUser = _state.user.user;
+            console.log(_state)
+            let result = next(action)
+            _state = store.getState();
+            let _newUser = _state.user.user;
+            console.log(_state)
+
+            if ((!_oldUser && _newUser) || (_oldUser.Id !== _newUser.Id)) {
+                LessonInfoStorage.clear();
+                LessonInfoStorage.init()
+            }
             return result
         }
 
