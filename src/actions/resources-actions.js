@@ -7,10 +7,10 @@ import {
     MULTI_UPLOAD_RESOURCES_FINISH, SELECT_SN_IMAGE_START, SELECT_SN_IMAGE_FINISH,
 } from '../constants/lesson/lessonResources';
 
-export const create = () => {
+export const create = (options) => {
     return {
         type: CREATE_RESOURCE,
-        payload: null
+        payload: options
     }
 };
 

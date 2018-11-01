@@ -8,7 +8,7 @@ import {
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
     SET_OG_IMAGE_RESOURCE_ID,
-    SET_TWITTER_IMAGE_RESOURCE_ID,
+    SET_TWITTER_IMAGE_RESOURCE_ID, LOAD_PARENT_LESSON_SUCCESS,
 } from '../../constants/lesson/singleLesson'
 
 const initialState = {
@@ -47,6 +47,17 @@ export default function singleLesson(state = initialState, action) {
                 fetching: false,
                 hasChanges: false,
             };
+        }
+
+        case LOAD_PARENT_LESSON_SUCCESS: {
+            let _current = Object.assign({}, state.current)
+            _current.CurrParentName = action.payload.name
+            _current.CurrParentId = action.payload.id
+
+            return {
+                ...state,
+                current: _current,
+            }
         }
 
         case GET_SINGLE_LESSON_REQUEST:

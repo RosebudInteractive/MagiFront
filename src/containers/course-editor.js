@@ -72,6 +72,10 @@ class CourseEditor extends ObjectEditor {
         return this.props.courseActions;
     }
 
+    _getMainDivClassName() {
+        return "course_editor";
+    }
+
     _save(value) {
         let _obj = {
             id: value.id,
@@ -375,7 +379,9 @@ class CourseEditor extends ObjectEditor {
 
         return [
             {
-                view: "text", name: "Name",
+                view: "text",
+                align: 'center',
+                name: "Name",
                 label: "Название курса",
                 placeholder: "Введите название",
                 labelWidth: labelWidth,
@@ -389,6 +395,7 @@ class CourseEditor extends ObjectEditor {
             },
             {
                 view: 'text',
+                align: 'center',
                 name: 'URL',
                 label: 'URL',
                 placeholder: "Введите URL",

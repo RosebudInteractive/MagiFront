@@ -120,9 +120,13 @@ export class LessonEditor extends ObjectEditor {
             selection.getRangeAt(0).insertNode(document.createTextNode(paste));
         });
 
-        window.$$('descrition').$view.addEventListener("onPaste", function (text) {
-            window.webix.message("Custom paste behavior: " + text);
-        });
+        let _description = window.$$('descrition');
+
+        if (_description) {
+            _description.$view.addEventListener("onPaste", function (text) {
+                window.webix.message("Custom paste behavior: " + text);
+            });
+        }
     }
 
     componentWillReceiveProps(next) {
@@ -544,7 +548,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _createResource() {
-        this.props.resourcesActions.create()
+        this.props.resourcesActions.create({ShowInGalery : !(this._needSetOgImage || this._needSetTwitterImage)})
     }
 
     _multiUpload() {
@@ -578,6 +582,8 @@ export class LessonEditor extends ObjectEditor {
 
     _cancelEditResource() {
         this.props.resourcesActions.clear();
+        this._needSetOgImage = false
+        this._needSetTwitterImage = false;
     }
 
     _cancelUploadResources() {
@@ -594,7 +600,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _getMainDivClassName() {
-        return "lesson-content";
+        return "lesson_editor";
     }
 
     _notifyDataLoaded() {
