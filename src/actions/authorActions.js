@@ -16,7 +16,7 @@ import {
 } from '../constants/Common';
 
 import 'whatwg-fetch';
-import {handleJsonError} from "../tools/fetch-tools";
+import {checkStatus, parseJSON, handleJsonError} from "../tools/fetch-tools";
 
 export const create = (obj) => {
     return (dispatch) => {
@@ -125,20 +125,6 @@ export const clear = () => {
             payload: null
         });
     }
-};
-
-const checkStatus = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        let error = new Error(response.statusText);
-        error.response = response;
-        throw error
-    }
-};
-
-const parseJSON = (response) => {
-    return response.json()
 };
 
 const handleAuthor = (author) => {

@@ -154,18 +154,6 @@ const parseJSON = (response) => {
     return response.json()
 };
 
-// const _getAuthor = (array, id) => {
-//     return array.find((item) => {
-//         return item.Id === id
-//     })
-// };
-//
-// const _getCategory = (array, id) => {
-//     return array.find((item) => {
-//         return item.Id === id
-//     })
-// };
-//
 const handleData = (data) => {
     let _lesson = data;
     _lesson.courseUrl = data.Course.URL;
