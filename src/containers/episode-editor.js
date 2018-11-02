@@ -361,9 +361,9 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _uploadPackage(files) {
-        let {lessonId, episodeId} = this.props;
+        let {subLessonId, lessonId, episodeId} = this.props;
 
-        this.props.episodeActions.uploadPackage({idLesson: lessonId, idEpisode: episodeId, file: files[0]})
+        this.props.episodeActions.uploadPackage({idLesson: subLessonId ? subLessonId : lessonId, idEpisode: episodeId, file: files[0]})
     }
 
     _getExtElements() {
@@ -371,7 +371,7 @@ class EpisodeEditor extends ObjectEditor {
 
         return [
             {
-                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
+                view: "button", name: 'btnShowWorkShop', value: 'ПерейisInViewportти в монтажный стол', id: 'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
                     if (!that.props.isWorkshop) {

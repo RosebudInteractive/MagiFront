@@ -84,6 +84,12 @@ function mapStateToProps(state, ownProps) {
     return {
         authors: state.courseAuthorsList.authors,
         lesson: state.singleLesson.current,
+        ogImageResourceId: state.singleLesson.ogImageResourceId,
+        twitterImageResourceId: state.singleLesson.twitterImageResourceId,
+        ogImageId: state.singleLesson.ogImageId,
+        twitterImageId: state.singleLesson.twitterImageId,
+        hasOgImage: state.singleLesson.hasOgImage,
+        hasTwitterImage: state.singleLesson.hasTwitterImage,
 
         mainEpisodes: state.lessonMainEpisodes.current,
         recommendedRef: state.lessonRecommendedRefs.current,
