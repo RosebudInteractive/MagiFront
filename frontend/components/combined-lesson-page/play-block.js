@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Redirect} from 'react-router';
+// import {Redirect} from 'react-router';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
