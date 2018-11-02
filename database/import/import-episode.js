@@ -261,6 +261,35 @@ exports.ImportEpisode = class ImportEpisode {
                                             throw new Error(`Inconsistent "LessonLng" part of lesson (Id = ${idLesson}).`);
                                         let lessonLng = col.get(0);
 
+                                        //
+                                        // SN pictures processing 
+                                        //
+                                        image_root = lessonLng.getDataRoot("LessonMetaImage");
+                                        col = image_root.getCol("DataElements");
+                                        let metaImg = {};
+                                        for (let i = 0; i < col.count(); i++){
+                                            let el = col.get(i);
+                                            switch (el.type()) {
+                                                case "og":
+                                                    metaImg["og"] = el;
+                                                    break;
+                                                case "twitter":
+                                                    metaImg["twitter"] = el;
+                                                    break;
+                                            }
+                                        }
+
+                                        [{ id: FB_IMG_ID, tp: "og" }, { id: TW_IMG_ID, tp: "twitter" }].forEach((elem) => {
+                                            let img = picts[elem.id];
+                                            if (img) {
+                                                let el = metaImg[elem.tp];
+                                                if (el)
+                                                    el.resourceId(img.id)
+                                                else
+                                                    images.push({ Type: elem.tp, ResourceId: img.id });
+                                            }
+                                        });
+
                                         if (references) {
                                             refs_root = lessonLng.getDataRoot("Reference");
                                             col = refs_root.getCol("DataElements");
@@ -273,18 +302,6 @@ exports.ImportEpisode = class ImportEpisode {
                                             lessonLng.snPost(resData.General.snPost);
                                             lessonLng.snName(resData.General.snName);
                                             lessonLng.snDescription(resData.General.snDescription);
-
-                                            image_root = lessonLng.getDataRoot("LessonMetaImage");
-                                            col = image_root.getCol("DataElements");
-                                            while (col.count() > 0)
-                                                col._del(col.get(0));
-
-                                            [{ id: FB_IMG_ID, tp: "og" }, { id: TW_IMG_ID, tp: "twitter" }].forEach((elem) => {
-                                                let img = picts[elem.id];
-                                                if (img) {
-                                                    images.push({ Type: elem.tp, ResourceId: img.id });
-                                                }
-                                            });
                                         }
 
                                         if (opts.importErrors.length > 0)

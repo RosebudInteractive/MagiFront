@@ -205,11 +205,11 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
-    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
-    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
-    "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
+    "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "where c.[AccountId] = <%= accountId %> and c.[State] = 'P' and(l.[ParentId] is NULL)\n" +
-    "order by lc.[State] desc, lc.[ReadyDate] desc, el.[Number] desc";
+    "order by lc.[State] desc, lc.[ReadyDate] desc, el.[Number]";
 const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select ac.[CourseId], a.[Id], l.[FirstName], l.[LastName], a.[URL] from[AuthorToCourse] ac\n" +
     "  join[Author] a on a.[Id] = ac.[AuthorId]\n" +
@@ -233,11 +233,11 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
-    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
-    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
-    "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
+    "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "where c.`AccountId` = <%= accountId %> and c.`State` = 'P' and(l.`ParentId` is NULL)\n" +
-    "order by lc.`State` desc, lc.`ReadyDate` desc, el.`Number` desc";
+    "order by lc.`State` desc, lc.`ReadyDate` desc, el.`Number`";
 const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select ac.`CourseId`, a.`Id`, l.`FirstName`, l.`LastName`, a.`URL` from`AuthorToCourse` ac\n" +
     "  join`Author` a on a.`Id` = ac.`AuthorId`\n" +
