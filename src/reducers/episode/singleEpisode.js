@@ -24,12 +24,8 @@ export default function singleEpisode(state = initialState, action) {
 
     switch (action.type) {
         case CREATE_NEW_EPISODE: {
-            let _newObject = {
-                Number: action.payload.Number,
-                State: 'D',
-                EpisodeType: action.payload.EpisodeType,
-                Supp: action.payload.Supp,
-            };
+            let _newObject = Object.assign({}, action.payload);
+            _newObject.State = 'D';
 
             return {
                 ...state,

@@ -155,7 +155,7 @@ class EpisodeEditor extends ObjectEditor {
 
         let _number = lesson ? (isSupp ? lesson.suppEpisodes.length : lesson.mainEpisodes.length) : 0;
         _number++;
-        return {Number: _number, EpisodeType: 'L', Supp: isSupp};
+        return {Number: _number, EpisodeType: 'L', Supp: isSupp, Name : lesson.Name + '.' + 'Эпизод ' + _number};
     }
 
     _save(value) {
@@ -371,7 +371,7 @@ class EpisodeEditor extends ObjectEditor {
 
         return [
             {
-                view: "button", name: 'btnShowWorkShop', value: 'ПерейisInViewportти в монтажный стол', id: 'btn-work-shop',
+                view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
                 disabled: (!that.props.lessonId || !that.props.episodeId),
                 click: () => {
                     if (!that.props.isWorkshop) {

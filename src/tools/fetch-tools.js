@@ -1,3 +1,5 @@
+export const NOT_FOUND_ERR = 404;
+
 export function readResponseBody(response) {
     let _reader = response.body.getReader();
     let _data = '';
@@ -41,6 +43,8 @@ export const checkStatus = (response) => {
                         }
                     }
                     let error = new Error(_message);
+                    error.status = response.status;
+                    error.response = response;
                     reject(error)
                 })
         }
@@ -57,6 +61,9 @@ export const handleJsonError = (error) => {
                     _message = data.message;
                 }
                 resolve(_message)
+            })
+            .catch(() => {
+                resolve(error.message)
             })
     })
 };

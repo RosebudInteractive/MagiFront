@@ -24,7 +24,7 @@ import {
 } from '../../constants/Common';
 
 import 'whatwg-fetch';
-import {handleJsonError} from '../../tools/fetch-tools';
+import {parseJSON, handleJsonError, checkStatus} from '../../tools/fetch-tools';
 
 export const create = () => {
     return (dispatch) => {
@@ -180,20 +180,6 @@ export const getCourseAuthors = (courseId) => {
             })
 
     }
-};
-
-const checkStatus = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        let error = new Error(response.statusText);
-        error.response = response;
-        throw error
-    }
-};
-
-const parseJSON = (response) => {
-    return response.json()
 };
 
 const handleCourse = (course) => {
