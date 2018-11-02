@@ -2459,6 +2459,8 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then(() => {
                         let fields = { CourseId: course_id };
+                        if (hasParent)
+                            fields["ParentId"] = parent_id;
                         if (typeof (inpFields["AuthorId"]) !== "undefined")
                             fields["AuthorId"] = inpFields["AuthorId"];
                         if (typeof (inpFields["LessonType"]) !== "undefined")
