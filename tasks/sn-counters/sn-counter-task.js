@@ -164,8 +164,11 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                         reqUrl.searchParams.append('access_token', config.snets.facebook.appId + '|' + config.snets.facebook.appSecret);
                         options.lastReq = new Date();
                         request(reqUrl.href, (error, response, body) => {
-                            if (error)
+                            if (error) {
+                                console.error(`${(new Date()).toLocaleString()}: FB Counter Error: "${error.message}",` +
+                                    ` API: "${reqUrl.href}", URL: "${_url}"`);
                                 reject(error)
+                            }
                             else {
                                 if (response.statusCode === HttpCode.OK) {
                                     let usageStat = response.headers["x-app-usage"];
