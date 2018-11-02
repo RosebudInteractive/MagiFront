@@ -213,6 +213,16 @@ exports.getSchemaGenFunc = function (uccelloDir) {
             .addField("SNetProviderId", { type: "dataRef", model: "SNetProvider", refAction: "parentRestrict", allowNull: false })
             .addField("Counter", { type: "int", allowNull: false });
 
+        metaDataMgr.addModel("LsnPosition", "e5ddab7f-5e4c-4870-b68a-3db40a0957dc", "RootLsnPosition", "aae5d76e-96dd-4f54-96c6-a5b2845bb108")
+            .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+            .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentCascade", allowNull: false })
+            .addField("Ts", { type: "float", allowNull: false })
+            .addField("LsnTime", { type: "float", allowNull: false })
+            .addField("UserTime", { type: "float", allowNull: false })
+            .addField("Position", { type: "float", allowNull: false })
+            .addField("IsFinished", { type: "boolean", allowNull: false })
+            .addField("RawPosition", { type: "string", allowNull: false });
+
         metaDataMgr.addModel("Reference", "b919a12f-5202-43b5-b1fc-481f75623659", "RootReference", "8d5fd37d-e686-4eec-a8e8-b7df91160a92")
             .addField("LessonLngId", { type: "dataRef", model: "LessonLng", refAction: "parentCascade", allowNull: false })
             .addField("Number", { type: "int", allowNull: false })
