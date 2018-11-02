@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
+import {Link} from 'react-router-dom';
 import * as playerStartActions from '../../actions/player-start-actions'
 import {bindActionCreators} from 'redux';
 import $ from 'jquery'
@@ -52,9 +53,19 @@ class LessonFrame extends React.Component {
                 _isSocialBlock = e.target.closest('.social-block'),
                 _isTranscriptLink = e.target.closest('.link-to-transcript'),
                 _isPlayerBlock = e.target.closest('.player-frame'),
-                _isFavoritesButton = e.target.closest('.lecture-frame__fav');
+                _isFavoritesButton = e.target.closest('.lecture-frame__fav'),
+                _isAuthorLink = e.target.closest('.lecture-frame__author');
 
-            if (_isLessonScreen && !_isButtonTarget && !_isSocialBlock && !_isPlayerBlock && !_isTranscriptLink && !_isMenu && !_isFavoritesButton) {
+            if (
+                _isLessonScreen &&
+                !_isButtonTarget &&
+                !_isSocialBlock &&
+                !_isPlayerBlock &&
+                !_isTranscriptLink &&
+                !_isMenu &&
+                !_isFavoritesButton &&
+                !_isAuthorLink
+            ) {
                 that._play()
             }
         }).on('touchmove', () => {
@@ -189,7 +200,9 @@ class LessonFrame extends React.Component {
                         </h2>
                         <div className="lecture-frame__text-block">
                             <p className="lecture-frame__descr">{lesson.ShortDescription}</p>
-                            <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                            <Link to={'/autor/' + lesson.Author.URL}>
+                                <p className="lecture-frame__author">{lesson.Author.FirstName + ' ' + lesson.Author.LastName}</p>
+                            </Link>
                         </div>
                     </div>
                     <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
@@ -225,7 +238,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
                     </FacebookShareButton>
                 </div>
                 <div className='social-button-wrapper'>
@@ -233,7 +247,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
                     </VKShareButton>
                 </div>
                 <div className='social-button-wrapper'>
@@ -241,7 +256,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
                     </OKShareButton>
                 </div>
             </div>

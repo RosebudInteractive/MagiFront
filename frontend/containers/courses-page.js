@@ -1,6 +1,7 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import {Redirect} from 'react-router';
 
 import CourseModuleLazyload from '../components/course/course-module-lazyload'
 
@@ -17,6 +18,7 @@ class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
         this._isMobile = tools.isMobile.bind(this);
+        this._needRedirectToCourses = false;
     }
 
     componentWillMount() {
@@ -31,12 +33,6 @@ class CoursesPage extends React.Component {
         document.title = 'Магистерия'
     }
 
-    componentWillReceiveProps(newProps) {
-        // if (!this.props.pageHeaderState.showFiltersForm && newProps.pageHeaderState.showFiltersForm) {
-        //     forceCheck();
-        // }
-    }
-
     componentDidUpdate(prevProps) {
         let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter} = this.props;
 
@@ -47,10 +43,10 @@ class CoursesPage extends React.Component {
         }
 
         if (!prevProps.isEmptyFilter && isEmptyFilter) {
-            this.props.history.go('/')
+            this._needRedirectToCourses = true
         }
 
-        if (!prevProps.selectedFilter.equals(selectedFilter)) {
+        if (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) {
             let _filter = [];
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
             this.props.history.replace('/razdel/' + _filter.join('+'))
@@ -90,6 +86,11 @@ class CoursesPage extends React.Component {
     }
 
     render() {
+        if (this._needRedirectToCourses) {
+            this._needRedirectToCourses = false;
+            return <Redirect push to={'/'}/>;
+        }
+
         const {
             fetching,
         } = this.props.courses;

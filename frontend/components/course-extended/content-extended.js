@@ -21,7 +21,7 @@ class Content extends React.Component {
             <div className="course-module__info-block">
                 <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                 <Description descr={_descr}/>
-                <BookCard/>
+                {/*<BookCard/>*/}
             </div>
         );
     }

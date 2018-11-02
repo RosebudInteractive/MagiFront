@@ -77,10 +77,7 @@ export default class NativeAppPlayer {
     }
 
     play(option) {
-        //if (!option || (option.playerId !== this._id) || (!this._player)) return
-        if (!this._player) {
-            return
-        }
+        if (!option || (option.playerId !== this._id) || (!this._player)) return
 
         if (!this._timeChanged) {
             this._sendMessageToApp({
@@ -111,29 +108,21 @@ export default class NativeAppPlayer {
             })
     }
 
-    // pause(options) {
-    //     if (options && (options.playerId === this._id) && this._player) {
-    pause() {
-        if (this._player) {
+    pause(options) {
+        if (options && (options.playerId === this._id) && this._player) {
             this._player.pause();
         }
     }
 
-    // setPlaybackSpeed(options) {
-    //     if (options && (options.playerId === this._id) && this._player) {
-    //         this._player.setRate(options.rate)
-    setPlaybackSpeed(value) {
-        if (this._player) {
-            this._player.setRate(value)
+    setPlaybackSpeed(options) {
+        if (options && (options.playerId === this._id) && this._player) {
+            this._player.setRate(options.rate)
         }
     }
 
-    // seek(options) {
-    //     if (options && (options.playerId === this._id) && this._player) {
-    //         this._player.setPosition(options.position)
-    seek(position) {
-        if (this._player) {
-            this._player.setPosition(position)
+    seek(options) {
+        if (options && (options.playerId === this._id) && this._player) {
+            this._player.setPosition(options.position)
         }
     }
 
