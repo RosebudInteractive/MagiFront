@@ -1,3 +1,4 @@
+const uuidv4 = require('uuid/v4');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const formidable = require('formidable');
 const { DbUtils } = require('./db-utils');
@@ -225,7 +226,14 @@ function parseFileName(fileName) {
         }
     });
 
-    let transName = slugify(fname, { lowercase: false });
+    let fn = fname;
+    let len = fn.length;
+    if (len < 15)
+        fn += `-${uuidv4()}`
+    else
+        if (len < 30)
+            fn += `-${(new Date()) - 0}`;
+    let transName = slugify(fn, { lowercase: false });
     if (fname !== transName)
         res.file = transName + ext;
     return res;
