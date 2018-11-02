@@ -2587,7 +2587,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         let root_res_lng = new_res_obj.getDataRoot("ResourceLng");
                                         let fields = { Name: "", LanguageId: languageId, Duration: 0, DurationFmt: "00:00" };
                                         if (typeof (elem["Name"]) !== "undefined")
-                                            fields["Name"] = elem["Name"];
+                                            fields["Name"] = elem["Name"] ? elem["Name"] : "";
                                         if (typeof (elem["Description"]) !== "undefined")
                                             fields["Description"] = elem["Description"];
                                         if (typeof (elem["AltAttribute"]) !== "undefined")

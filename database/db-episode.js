@@ -1,9 +1,11 @@
+const _ = require('lodash');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { ACCOUNT_ID } = require('../const/sql-req-common');
-const _ = require('lodash');
 let { LessonsService } = require('./db-lesson');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 
 const LESSON_REQ_TREE = {
     expr: {
@@ -219,6 +221,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                                     }
                                 }, {});
                         }
+                        else
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find episode id: '" + id + "', lesson_id:'" + lesson_id + "'.");
                     })
                     .then((result) => {
                         if (!isNotFound) {
