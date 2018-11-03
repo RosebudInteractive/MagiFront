@@ -24,18 +24,18 @@ class SubLessonPlayBlock extends React.Component {
         this.props.playerStartActions.preinitAudios(lesson.Audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(lesson.id)
+        this.props.playerStartActions.startPlay(lesson.Id)
     }
 
     _startPlay() {
         let {lesson} = this.props
 
         if (this._isLocationPlayerPage()) {
-            this.props.playerStartActions.startPlay(lesson.id);
+            this.props.playerStartActions.startPlay(lesson.Id);
         } else {
             this._redirect = true;
             this.forceUpdate()
-            this.props.playerStartActions.startPlay(lesson.id);
+            this.props.playerStartActions.startPlay(lesson.Id);
         }
     }
 
@@ -87,7 +87,7 @@ class SubLessonPlayBlock extends React.Component {
             _radius = 86.75;
 
         let {lesson, playingLesson, paused, } = this.props,
-            {id, Duration: _totalDuration, DurationFmt: duration} = lesson,
+            {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,

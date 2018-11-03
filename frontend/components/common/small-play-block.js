@@ -29,18 +29,18 @@ class LessonPlayBlockSmall extends React.Component {
         this.props.playerStartActions.preinitAudios(lesson.Audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(lesson.id)
+        this.props.playerStartActions.startPlay(lesson.Id)
     }
 
     _startPlay() {
         let {lesson} = this.props
 
         if (this._isLocationPlayerPage()) {
-            this.props.playerStartActions.startPlay(lesson.id);
+            this.props.playerStartActions.startPlay(lesson.Id);
         } else {
             this._redirect = true;
             this.forceUpdate()
-            this.props.playerStartActions.startPlay(lesson.id);
+            this.props.playerStartActions.startPlay(lesson.Id);
         }
     }
 
