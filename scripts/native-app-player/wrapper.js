@@ -32,7 +32,6 @@ export default class NativeAppPlayer {
                 eventType: 'magisteriaPlayer',
                 eventName: 'playerLoaded',
                 playerObject: 'window.' + this._playerName,
-                playerId: this._id,
             })
         } else {
             this._sendMessageToApp({
@@ -153,12 +152,13 @@ export default class NativeAppPlayer {
                     currentTime: value.currentTime,
                     globalTime: value.globalTime,
                     baseTime: value.baseTime
-                }
+                },
             })
         }
     }
 
     _sendMessageToApp(props) {
+        props['playerId'] = this._id
         if (this._debug) {
             window.postMessage(
                 JSON.stringify(props),
@@ -190,7 +190,6 @@ export default class NativeAppPlayer {
                         globalTime: audioState.globalTime,
                         baseTime: audioState.baseTime
                     },
-                    playerId: this._id,
                 })
             },
             onSetData: (data) => {
@@ -198,21 +197,18 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'dataIsSet',
                     _nativeAppDataUuid: data,
-                    playerId: this._id,
                 })
             },
             onElementPlay: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetShowed',
-                    playerId: this._id,
                 })
             },
             onElementStop: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetRemoved',
-                    playerId: this._id,
                 })
             },
             onChangeTitles: (titles) => {
@@ -222,7 +218,6 @@ export default class NativeAppPlayer {
                     data: {
                         titles,
                     },
-                    playerId: this._id,
                 })
             },
             onChangeContent: function (content) {
@@ -232,7 +227,6 @@ export default class NativeAppPlayer {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerPaused',
-                    playerId: this._id,
                 })
             },
             onEnded: () => {
@@ -240,7 +234,6 @@ export default class NativeAppPlayer {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerStopped',
-                    playerId: this._id,
                 })
             },
             onStarted: () => { this._started = true },
@@ -249,7 +242,6 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerError',
                     message: e.message,
-                    playerId: this._id,
                 })
             },
             onCanPlay: () => {
@@ -257,7 +249,6 @@ export default class NativeAppPlayer {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerCanPlay',
-                        playerId: this._id,
                     })
                 }
             },
@@ -266,14 +257,12 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffered',
                     value: value,
-                    playerId: this._id,
                 })
             },
             onWaiting: () => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffering',
-                    playerId: this._id,
                 })
             },
             onPlaying: () => {
@@ -281,7 +270,6 @@ export default class NativeAppPlayer {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerStarted',
-                        playerId: this._id,
                     })
                 }
             },
