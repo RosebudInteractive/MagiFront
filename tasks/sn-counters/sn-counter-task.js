@@ -231,7 +231,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                 return cnt + counter;
             })
             .catch(err => {
-                console.error(`${(new Date()).toLocaleString()} VK Counter Error: "${error.message}",` +
+                console.error(`${(new Date()).toLocaleString()} VK Counter Error: "${err.message}",` +
                     ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
                 return 0;
             });
@@ -265,7 +265,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
     _getOKCount(url, options) {
         let counter = 0;
         let reqUrl;
-        
+
         return getCounter(url)
             .then((cnt) => {
                 counter = cnt;
@@ -275,7 +275,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                 return cnt + counter;
             })
             .catch(err => {
-                console.error(`${(new Date()).toLocaleString()} OK Counter Error: "${error.message}",` +
+                console.error(`${(new Date()).toLocaleString()} OK Counter Error: "${err.message}",` +
                     ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
                 return 0;
             });
