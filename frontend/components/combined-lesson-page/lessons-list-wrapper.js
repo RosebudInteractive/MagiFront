@@ -166,6 +166,7 @@ class SubList extends React.Component {
 
         return this.props.subLessons.map((lesson, index) => {
             let _isActive = lesson.Id === active;
+            lesson.courseUrl = this.props.courseUrl;
 
             return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}
                        id={'lesson-' + lesson.Id}>
@@ -173,9 +174,7 @@ class SubList extends React.Component {
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
-                    <SubLessonPlayBlock duration={lesson.DurationFmt} lessonUrl={lesson.URL}
-                                        courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                                        totalDuration={lesson.Duration} lesson={lesson}/>
+                    <SubLessonPlayBlock lesson={lesson}/>
                 </div>
             </li>
         })

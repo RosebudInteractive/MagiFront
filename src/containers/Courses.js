@@ -39,6 +39,10 @@ class Coureses extends React.Component {
         this.props.coursesActions.selectCourse(id);
     }
 
+    shouldComponentUpdate(nextProps,) {
+        return !(this.props.selected && (this.props.selected !== nextProps.selected));
+    }
+
     render() {
         const {
             courses,

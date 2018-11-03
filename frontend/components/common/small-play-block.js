@@ -89,8 +89,8 @@ class LessonPlayBlockSmall extends React.Component {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _radius = 86.75;
 
-        let {lesson, playingLesson, paused, duration,} = this.props,
-            {id, Duration: _totalDuration,} = lesson,
+        let {lesson, playingLesson, paused, } = this.props,
+            {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,

@@ -97,7 +97,8 @@ class Extras extends React.Component {
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
 
         return this.props.subLessons.map((lesson, index) => {
-            let url = '/' + this.props.courseUrl + '/' + lesson.URL
+            let url = '/' + this.props.courseUrl + '/' + lesson.URL;
+            lesson.courseUrl = this.props.courseUrl;
 
             return <li key={index}>
                 <Link to={url} className="extras-list__item">
@@ -106,10 +107,7 @@ class Extras extends React.Component {
                     {lesson.Name + ' '}
                     <span className="duration">{lesson.DurationFmt}</span>
                 </Link>
-                <LessonPlayBlockSmall lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}
-                                      audios={lesson.Audios} id={lesson.Id}
-                                      totalDuration={lesson.Duration}
-                                      lesson={lesson}/>
+                <LessonPlayBlockSmall lesson={lesson}/>
                 <button className="extras-list__fav" type="button" onClick={() => {
                     this.props.onSwitchFavorites(lesson.URL)
                 }}>
