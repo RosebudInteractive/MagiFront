@@ -220,6 +220,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
     */
     _getVKCount(url, options) {
         let counter = 0;
+        let reqUrl;
 
         return getCounter(url)
             .then((cnt) => {
@@ -228,11 +229,16 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             })
             .then((cnt) => {
                 return cnt + counter;
+            })
+            .catch(err => {
+                console.error(`${(new Date()).toLocaleString()} VK Counter Error: "${error.message}",` +
+                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
+                return 0;
             });
 
         function getCounter(_url) {
             return new Promise((resolve, reject) => {
-                let reqUrl = new URL("https://vk.com/share.php");
+                reqUrl = new URL("https://vk.com/share.php");
                 reqUrl.searchParams.append('act', 'count');
                 reqUrl.searchParams.append('url', _url);
                 request(reqUrl.href, (error, response, body) => {
@@ -258,7 +264,8 @@ exports.SnCounterTask = class SnCounterTask extends Task {
     */
     _getOKCount(url, options) {
         let counter = 0;
-
+        let reqUrl;
+        
         return getCounter(url)
             .then((cnt) => {
                 counter = cnt;
@@ -266,11 +273,16 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             })
             .then((cnt) => {
                 return cnt + counter;
+            })
+            .catch(err => {
+                console.error(`${(new Date()).toLocaleString()} OK Counter Error: "${error.message}",` +
+                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
+                return 0;
             });
 
         function getCounter(_url) {
             return new Promise((resolve, reject) => {
-                let reqUrl = new URL("https://connect.ok.ru/dk");
+                reqUrl = new URL("https://connect.ok.ru/dk");
                 reqUrl.searchParams.append('st.cmd', 'extLike');
                 reqUrl.searchParams.append('uid', 'odklcnt0');
                 reqUrl.searchParams.append('ref', _url);
