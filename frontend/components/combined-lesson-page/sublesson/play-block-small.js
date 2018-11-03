@@ -56,31 +56,43 @@ class PlayBlock extends React.Component {
 
     _getSmallButton(isThisLessonPlaying, isFinished) {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
-            _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>'
+            _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
+            _lockSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock-small"/>'
 
-        return isFinished
-            ?
-            <button type="button" className="lecture__btn paused"
-                    onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+        let {lesson, authorized} = this.props,
+            {IsAuthRequired} = lesson,
+            _button = null;
+
+        if (IsAuthRequired && !authorized) {
+            _button = <button className="lecture__btn paused" onClick={::this._unlock}>
+                <svg width="14" height="15" dangerouslySetInnerHTML={{__html: _lockSmall}}/>
             </button>
-            :
-            <button type="button" className="lecture__btn"
-                    onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-            </button>
+        } else {
+            _button = isFinished
+                ?
+                <button type="button" className="lecture__btn paused"
+                        onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+                </button>
+                :
+                <button type="button" className="lecture__btn"
+                        onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
+                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                </button>
+        }
 
-
+        return _button;
     }
 
     render() {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
             _radius = 86.75;
 
-        let {playingLesson, paused, lesson} = this.props,
+        let {playingLesson, paused, lesson, authorized} = this.props,
+            {IsAuthRequired} = lesson,
             _id = lesson.Id,
             _totalDuration = lesson.Duration,
-            _duration = lesson.DurationFmt,
+            // _duration = lesson.DurationFmt,
             _lessonUrl = lesson.URL,
             _courseUrl = lesson.courseUrl,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
@@ -100,7 +112,7 @@ class PlayBlock extends React.Component {
         }
 
         return (
-            <button className="extras-list__play-btn mobile" type="button">
+            <button className={"extras-list__play-btn mobile" + ((IsAuthRequired && !authorized) ? ' play-btn-small_locked' : '') } type="button">
                 <div className="play-block__loader small">
                     <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
                          version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -128,7 +140,9 @@ class PlayBlock extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
+function
+
+mapStateToProps(state) {
     return {
         lessonInfoStorage: state.lessonInfoStorage,
         paused: state.player.paused,
@@ -137,11 +151,18 @@ function mapStateToProps(state) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
+function
+
+mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlayBlock);
+export default connect(mapStateToProps, mapDispatchToProps)
+
+(
+    PlayBlock
+)
+;

@@ -38,7 +38,7 @@ class PlayBlock extends React.Component {
             _button = null;
 
         if (isAuthRequired && !authorized) {
-            _button = <button className="play-block__btn" onClick={::this._unlock}>
+            _button = <button className="play-block__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
         } else {

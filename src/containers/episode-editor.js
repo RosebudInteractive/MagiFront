@@ -27,13 +27,12 @@ class EpisodeEditor extends ObjectEditor {
         super(props);
         const {
             lessonActions,
-            lessonId,
             courseId,
             lesson
         } = this.props;
 
-        if ((!lesson) || (lesson.id !== lessonId)) {
-            lessonActions.get(lessonId, courseId);
+        if ((!lesson) || (lesson.id !== this.lessonId)) {
+            lessonActions.get(this.lessonId, courseId);
         }
 
         window.webix.protoUI({
@@ -50,6 +49,12 @@ class EpisodeEditor extends ObjectEditor {
             window.webix.ui.uploader)
 
         this._isWorkShopRout = false;
+    }
+
+    get lessonId() {
+        let {subLessonId, lessonId}  = this.props;
+
+        return subLessonId ? subLessonId : lessonId
     }
 
     _getMainDivClassName() {
@@ -138,9 +143,8 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _initEditMode() {
-        let _lessonId = !this.props.subLessonId ? this.props.lessonId : this.props.subLessonId
         this.editMode = EDIT_MODE_EDIT;
-        this.objectActions.get(this.objectId, _lessonId);
+        this.objectActions.get(this.objectId, this.lessonId);
     }
 
     _initInsertMode() {
@@ -167,7 +171,7 @@ class EpisodeEditor extends ObjectEditor {
 
         let _obj = {
             id: value.id,
-            LessonId: this.props.subLessonId ? this.props.subLessonId : this.props.lessonId,
+            LessonId: this.lessonId,
             Number: value.Number,
             Id: value.id,
             Name: value.Name,
@@ -250,11 +254,11 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _openWorkshop() {
-        let {lessonId, episodeId, location} = this.props;
+        let {episodeId, location} = this.props;
 
-        if (lessonId && episodeId) {
+        if (this.lessonId && episodeId) {
             let _object = {
-                lessonId: lessonId,
+                lessonId: this.lessonId,
                 episodeId: episodeId,
                 callingRoute: location.pathname,
             }
@@ -328,7 +332,7 @@ class EpisodeEditor extends ObjectEditor {
                 cancel={::this._cancelEditContentItem}
                 save={::this._saveContentItem}
                 data={this.props.contentItem}
-                lessonId={this.props.lessonId}
+                lessonId={this.lessonId}
             />)
         }
 
@@ -339,7 +343,7 @@ class EpisodeEditor extends ObjectEditor {
     _notifyDataLoaded() {
         super._notifyDataLoaded();
 
-        if (!this.props.lessonId || !this.props.episodeId) {
+        if (!this.lessonId || !this.props.episodeId) {
             window.$$('btn-work-shop').disable()
         } else {
             window.$$('btn-work-shop').enable()
@@ -361,9 +365,9 @@ class EpisodeEditor extends ObjectEditor {
     }
 
     _uploadPackage(files) {
-        let {subLessonId, lessonId, episodeId} = this.props;
+        let {episodeId} = this.props;
 
-        this.props.episodeActions.uploadPackage({idLesson: subLessonId ? subLessonId : lessonId, idEpisode: episodeId, file: files[0]})
+        this.props.episodeActions.uploadPackage({idLesson: this.lessonId, idEpisode: episodeId, file: files[0]})
     }
 
     _getExtElements() {
@@ -372,7 +376,7 @@ class EpisodeEditor extends ObjectEditor {
         return [
             {
                 view: "button", name: 'btnShowWorkShop', value: 'Перейти в монтажный стол', id: 'btn-work-shop',
-                disabled: (!that.props.lessonId || !that.props.episodeId),
+                disabled: (!this.lessonId || !that.props.episodeId),
                 click: () => {
                     if (!that.props.isWorkshop) {
                         that.props.history.push(that.props.location.pathname + '?workshop')

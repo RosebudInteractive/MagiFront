@@ -6232,7 +6232,9 @@ ul.user-tooltip {
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     font-size: 0; }
-    .lecture__btn:hover + .lecture__tooltip {
+    .lecture__btn:hover + .play-block__tooltip,
+    .lecture__btn:hover + .lecture__tooltip{
+      display: inline-block;
       opacity: 1;
       z-index: 1; }
     .lecture__btn svg {
@@ -6240,7 +6242,7 @@ ul.user-tooltip {
       width: 40px;
       cursor: pointer;}
   .lecture__btn.paused {
-      margin-left: 0;
+      margin-left: 0 !important;
   }
   .lecture__descr {
     margin: 0;
@@ -6554,6 +6556,9 @@ ul.user-tooltip {
     z-index: -100;
     -webkit-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease; }
+  .play-block__tooltip {
+    display: none;
+  }
     ._dark .play-block__tooltip, ._dark .play-block__action-tooltip {
       color: #2f2f2f;
       background-color: #fff; }
@@ -7246,6 +7251,10 @@ body[data-page="fullpage-player"] .lectures-menu {
       border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
     .lectures-list__item:hover .lectures-list__item-title.draft span {
       border-bottom: none; }
+    .lectures-list__item:hover .play-block {
+      z-index: 10 }
+    .lectures-list__item .play-block {
+      z-index: 1 }
     .lectures-list__item.active:hover .lectures-list__item-title span {
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
     .lectures-list__item:before {
@@ -7276,6 +7285,9 @@ body[data-page="fullpage-player"] .lectures-menu {
       .lectures-list__item.active .lectures-list__item-header > * {
       position: relative;
       z-index: 1; }
+    .lectures-list__item.active:hover .lectures-list__item-header > * {
+      position: relative;
+      z-index: 10; }
       .lectures-list__item.active .lectures-list__item-header:before {
         content: "";
       position: absolute;
@@ -7536,6 +7548,9 @@ body[data-page="fullpage-player"] .lectures-menu {
     opacity: 0.7; }
   .play-btn-small.paused svg{
     margin-left: 0;}
+  .play-btn-small_locked{
+    background-color: rgba(165, 165, 165, 0.8) !important;
+    border: none !important; }
 
 .link-to-transcript {
   position: absolute;
@@ -15773,6 +15788,9 @@ ul.lectures-tab {
       transform: rotate(-45deg); }
 .extras-list__play-btn .lecture__btn {
   margin-left: 4px;
+}
+.extras-list__play-btn .lecture__btn.paused {
+  margin-left: 0;
 }
 .extras-list__play-btn.mobile .lecture__btn {
     margin-left: 2px;
