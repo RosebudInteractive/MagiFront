@@ -232,7 +232,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             })
             .catch(err => {
                 console.error(`${(new Date()).toLocaleString()} VK Counter Error: "${err.message}",` +
-                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
+                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${url}"`);
                 return 0;
             });
 
@@ -276,7 +276,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             })
             .catch(err => {
                 console.error(`${(new Date()).toLocaleString()} OK Counter Error: "${err.message}",` +
-                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${_url}"`);
+                    ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${url}"`);
                 return 0;
             });
 
