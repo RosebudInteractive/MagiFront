@@ -60,7 +60,7 @@ export class LessonFull extends React.Component {
     }
 
     render() {
-        let { lesson, lessonUrl } = this.props;
+        let {lesson, lessonUrl} = this.props;
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
@@ -82,7 +82,7 @@ export class LessonFull extends React.Component {
                                 parentNumber={lesson.Number}
                                 isLessonInBookmarks={::this._isLessonInBookmarks}
                                 onSwitchFavorites={::this._switchFavorites}
-                                courseUrl = {this.props.courseUrl}/>
+                                courseUrl={this.props.courseUrl}/>
                     </div>
                 </div>
             </li>
@@ -103,13 +103,16 @@ class Extras extends React.Component {
                 <Link to={url} className="extras-list__item">
                     <span className="counter">{this.props.parentNumber + '.'}</span>
                     <span className="inner-counter">{lesson.Number}</span>
-                        {lesson.Name + ' '}
+                    {lesson.Name + ' '}
                     <span className="duration">{lesson.DurationFmt}</span>
                 </Link>
                 <LessonPlayBlockSmall lessonUrl={lesson.URL} courseUrl={this.props.courseUrl}
                                       audios={lesson.Audios} id={lesson.Id}
-                                      totalDuration={lesson.Duration}/>
-                <button className="extras-list__fav" type="button" onClick={() => { this.props.onSwitchFavorites(lesson.URL)}}>
+                                      totalDuration={lesson.Duration}
+                                      lesson={lesson}/>
+                <button className="extras-list__fav" type="button" onClick={() => {
+                    this.props.onSwitchFavorites(lesson.URL)
+                }}>
                     <svg width="14" height="23"
                          dangerouslySetInnerHTML={{__html: this.props.isLessonInBookmarks(lesson.URL) ? _redFlag : _flag}}/>
                 </button>

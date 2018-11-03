@@ -5,7 +5,7 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
-import $ from "jquery";
+import * as userActions from "../../actions/user-actions"
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -14,6 +14,7 @@ class LessonPlayBlockSmall extends React.Component {
         courseUrl: PropTypes.string,
         lessonUrl: PropTypes.string,
         audios: PropTypes.array,
+        lesson: PropTypes.object,
     };
 
     constructor(props) {
@@ -23,40 +24,77 @@ class LessonPlayBlockSmall extends React.Component {
     }
 
     _play() {
-        this.props.playerStartActions.preinitAudios(this.props.audios);
+        let {lesson} = this.props
+
+        this.props.playerStartActions.preinitAudios(lesson.Audios);
         this._redirect = true;
         this.forceUpdate()
-        this.props.playerStartActions.startPlay(this.props.id)
+        this.props.playerStartActions.startPlay(lesson.id)
     }
 
     _startPlay() {
+        let {lesson} = this.props
+
         if (this._isLocationPlayerPage()) {
-            this.props.playerStartActions.startPlay(this.props.id);
+            this.props.playerStartActions.startPlay(lesson.id);
         } else {
             this._redirect = true;
             this.forceUpdate()
-            this.props.playerStartActions.startPlay(this.props.id);
+            this.props.playerStartActions.startPlay(lesson.id);
         }
     }
 
     _isLocationPlayerPage() {
         let _currentLocation = window.location.pathname + window.location.search,
-            _needLocation = '/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'
+            _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL + '?play'
 
         return _currentLocation === _needLocation;
     }
 
-    render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+    _unlock() {
+        this.props.userActions.showSignInForm();
+    }
+
+    _getSmallButton(isThisLessonPlaying, isFinished) {
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
-            _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
+            _lockSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock-small"/>'
+
+        let {lesson, authorized} = this.props,
+            {IsAuthRequired} = lesson,
+            _button = null;
+
+        if (IsAuthRequired && !authorized) {
+            _button = <button className="play-btn-small paused play-btn-small_locked" onClick={::this._unlock}>
+                <svg width="18" height="20" dangerouslySetInnerHTML={{__html: _lockSmall}}/>
+            </button>
+        } else {
+            _button = isFinished
+                ?
+                <button type="button" className="play-btn-small paused"
+                        onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+                </button>
+                :
+                <button type="button" className="play-btn-small"
+                        onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
+                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                </button>
+        }
+
+        return _button;
+    }
+
+    render() {
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _radius = 86.75;
 
-        let {id, totalDuration, playingLesson, paused, duration,} = this.props,
+        let {lesson, playingLesson, paused, duration,} = this.props,
+            {id, Duration: _totalDuration,} = lesson,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _playedPart = (totalDuration && !_isFinished) ? ((_currentTime) / totalDuration) : 0,
+            _playedPart = (_totalDuration && !_isFinished) ? ((_currentTime) / _totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -66,7 +104,7 @@ class LessonPlayBlockSmall extends React.Component {
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL + '?play'}/>;
         }
 
         return (
@@ -85,39 +123,14 @@ class LessonPlayBlockSmall extends React.Component {
                         ?
                         (paused)
                             ?
-                            (_isFinished)
-                                ?
-                                <button type="button" className="play-btn-small paused"
-                                        onClick={::this._startPlay}>
-                                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
-                                    <span>Пауза</span>
-                                </button>
-                                :
-                                <button type="button" className="play-btn-small"
-                                        onClick={::this._startPlay}>
-                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                    <span>Воспроизвести</span>
-                                </button>
-
+                            this._getSmallButton(_isThisLessonPlaying, _isFinished)
                             :
-                            <button type="button" className="play-btn-small paused"
+                            <button className="play-btn-small paused"
                                     onClick={::this.props.playerStartActions.startPause}>
-                                <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _pauseSmall}}/>
-                                <span>Пауза</span>
+                                <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                             </button>
                         :
-                        (_isFinished)
-                            ?
-                            <button type="button" className="play-btn-small paused"
-                                    onClick={::this._play}>
-                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
-                                <span>Пауза</span>
-                            </button>
-                            :
-                            <button type="button" className="play-btn-small" onClick={::this._play}>
-                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                <span>Воспроизвести</span>
-                            </button>
+                        this._getSmallButton(_isThisLessonPlaying, _isFinished)
                 }
             </div>
         )
@@ -129,13 +142,14 @@ function mapStateToProps(state) {
         lessonInfoStorage: state.lessonInfoStorage,
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
-
+        authorized: !!state.user.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

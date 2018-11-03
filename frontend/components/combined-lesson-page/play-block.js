@@ -66,10 +66,10 @@ class PlayBlock extends React.Component {
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
         let {lesson, authorized} = this.props,
-            {isAuthRequired} = lesson,
+            {IsAuthRequired} = lesson,
             _button = null;
 
-        if (isAuthRequired && !authorized) {
+        if (IsAuthRequired && !authorized) {
             _button = <button className="lecture__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
@@ -94,10 +94,10 @@ class PlayBlock extends React.Component {
 
     _getTooltip(isThisLessonPlaying, isFinished) {
         let {lesson, authorized, paused} = this.props,
-            {isAuthRequired} = lesson,
+            {IsAuthRequired} = lesson,
             _tooltip = null;
 
-        if (isAuthRequired && !authorized) {
+        if (IsAuthRequired && !authorized) {
             _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
         } else {
             _tooltip = isThisLessonPlaying ? (paused ? (isFinished ? "С начала" : "Смотреть") : 'Пауза') : (isFinished ? "С начала" : "Смотреть");

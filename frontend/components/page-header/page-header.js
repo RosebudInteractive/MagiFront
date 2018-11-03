@@ -5,7 +5,7 @@ import {bindActionCreators} from "redux";
 import DesktopHeaderRow from './desktop-header';
 import MobileHeaderRow from './mobile-header';
 import MobileFilter from './desktop-filters';
-import TranscriptMenu from '../lesson-page/lesson-transcript-menu';
+import TranscriptMenu from '../combined-lesson-page/lesson-transcript-menu';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import * as appActions from "../../actions/app-actions";

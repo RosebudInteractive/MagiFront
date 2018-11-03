@@ -175,7 +175,7 @@ class SubList extends React.Component {
                 <div className="lectures-sublist__item-info">
                     <SubLessonPlayBlock duration={lesson.DurationFmt} lessonUrl={lesson.URL}
                                         courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                                        totalDuration={lesson.Duration}/>
+                                        totalDuration={lesson.Duration} lesson={lesson}/>
                 </div>
             </li>
         })
