@@ -44,7 +44,7 @@ if (config.has("tasks")) {
     if (tasks.length > 0) {
         for (let i = 0; i < tasks.length; i++) {
             if (tasks[i].disabled) {
-                console.warn(`WARNING: Task [${i}]: "${tasks[i].name}" is disabled.`);
+                console.warn(`${(new Date()).toLocaleString()} ===> WARNING: Task [${i}]: "${tasks[i].name}" is disabled.`);
                 continue;
             }
             let getTaskProcessor = require(tasks[i].module);
@@ -85,14 +85,14 @@ if (config.has("tasks")) {
                                         console.error(`${(new Date()).toLocaleString()} #### Task "${taskDsc.taskName}" (id=${taskId}) is already running. Ignored.`);
                                 }
                                 else
-                                    console.error(`Task id=${taskId} doesn't exist. Ignored.`);
+                                    console.error(`${(new Date()).toLocaleString()} ===> Task id=${taskId} doesn't exist. Ignored.`);
                             });
                             activeTasks[taskId] = {
                                 taskName: taskName,
                                 task: task,
                                 isRunning: false,
                             };
-                            console.log(`Task "${tasks[i].name}" has been scheduled.`);
+                            console.log(`${(new Date()).toLocaleString()} ===> Task "${tasks[i].name}" has been scheduled.`);
                         }
                         else
                             throw new Error(`Missing schedule of task [${i}]: "${tasks[i].name}".`);

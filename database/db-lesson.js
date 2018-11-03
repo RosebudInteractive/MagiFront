@@ -2459,6 +2459,8 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then(() => {
                         let fields = { CourseId: course_id };
+                        if (hasParent)
+                            fields["ParentId"] = parent_id;
                         if (typeof (inpFields["AuthorId"]) !== "undefined")
                             fields["AuthorId"] = inpFields["AuthorId"];
                         if (typeof (inpFields["LessonType"]) !== "undefined")
@@ -2624,7 +2626,7 @@ const DbLesson = class DbLesson extends DbObject {
                     .then(() => {
                         let root_lsn = course_obj.getDataRoot("LessonCourse");
                         let collection = root_lsn.getCol("DataElements");
-                        let Number = collection.count() + 1;
+                        let Number = 1;
                         let parent_lc_id = -1;
                         if (hasParent) {
                             for (let i = 0; i < collection.count(); i++){
@@ -2635,11 +2637,15 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                             if (parent_lc_id === -1)
                                 throw new Error("Parent lesson (Id=" + parent_id + ") doesn't belong to a course (Id=" + course_id + ").");
-                            Number = 1;
                             for (let i = 0; i < collection.count(); i++) {
                                 if (collection.get(i).parentId() === parent_lc_id)
                                     Number++;
                             }
+                        }
+                        else {
+                            for (let i = 0; i < collection.count(); i++)
+                                if (!collection.get(i).parentId())
+                                    Number++;
                         }
                         let fields = { LessonId: newId, State: inpFields.State, Number: Number };
                         if (parent_lc_id !== -1)
