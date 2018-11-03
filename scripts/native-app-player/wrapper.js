@@ -100,10 +100,10 @@ export default class NativeAppPlayer {
             })
             .catch((e) => {
                 console.log(e)
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerError',
-                })
+
+                this._sendErrorMessageToApp(
+                  e.message
+                )
             })
     }
 
@@ -172,6 +172,14 @@ export default class NativeAppPlayer {
         }
     }
 
+    _sendErrorMessageToApp( message ) {
+        this._sendMessageToApp({
+            eventType: 'magisteriaPlayer',
+            eventName: 'playerError',
+            message,
+        })
+    }
+
     _getPlayerOptions() {
         return {
             designMode: false,
@@ -238,11 +246,9 @@ export default class NativeAppPlayer {
             },
             onStarted: () => { this._started = true },
             onError: (e) => {
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerError',
-                    message: e.message,
-                })
+                this._sendErrorMessageToApp(
+                    e.message
+                )
             },
             onCanPlay: () => {
                 if (!this._started) {
