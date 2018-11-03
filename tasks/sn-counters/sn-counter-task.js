@@ -137,6 +137,9 @@ exports.SnCounterTask = class SnCounterTask extends Task {
             })
             .then((cnt) => {
                 return cnt > counter ? cnt : counter;
+            })
+            .catch(err => {
+                return 0;
             });
     
         function getCounter(_url) {
@@ -165,9 +168,9 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                         options.lastReq = new Date();
                         request(reqUrl.href, (error, response, body) => {
                             if (error) {
-                                console.error(`${(new Date()).toLocaleString()}: FB Counter Error: "${error.message}",` +
+                                console.error(`${(new Date()).toLocaleString()} FB Counter Error: "${error.message}",` +
                                     ` API: "${reqUrl.href}", URL: "${_url}"`);
-                                reject(error)
+                                reject(error);
                             }
                             else {
                                 if (response.statusCode === HttpCode.OK) {
@@ -181,7 +184,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
 
                                                 options.lock = true;
                                                 options.lockTime = new Date();
-                                                console.error(`SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
+                                                console.error(`${(new Date()).toLocaleString()} SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
                                                     `${JSON.stringify(usageStat)}`);
                                             }
                                         } catch (err) { };
@@ -197,7 +200,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                                 else {
                                     if (response.statusCode === HttpCode.ERR_FORBIDDEN) {
                                         options.lock = true;
-                                        console.error(`SnCounterTask: FB access error: ${body}`);
+                                        console.error(`${(new Date()).toLocaleString()} SnCounterTask: FB access error: ${body}`);
                                     }
                                 }
                                 resolve(counter);
