@@ -9,6 +9,8 @@ module.exports = {
         name: 'Prerender Server',
         script: './server.js',
         cwd: '/var/www/sites/magisteria/prerender',
+        instances: 2,
+        exec_mode: "cluster",
         instance_var: 'INSTANCE_ID',
         env: {
             NODE_ENV: 'production',
