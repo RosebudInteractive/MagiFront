@@ -48,6 +48,9 @@ let PrerenderCache = class {
                     case "authors":
                         filter = this._prefix + "/autor/*";
                         break;
+                    case "categories":
+                        filter = this._prefix + "/razdel/*";
+                        break;
                     default:
                         if (mode)
                             if (mode.indexOf("*") >= 0)
