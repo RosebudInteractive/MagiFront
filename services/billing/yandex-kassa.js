@@ -2,6 +2,7 @@ const _ = require('lodash');
 const config = require('config');
 const request = require('request');
 const uuidv4 = require('uuid/v4');
+const { getTimeStr } = require('../../utils');
 const { HttpCode } = require("../../const/http-codes");
 const { Payment } = require('./payment');
 const { Accounting } = require('../../const/accounting');
@@ -34,9 +35,7 @@ class YandexKassa extends Payment {
                                 res.send(data);
                             })
                             .catch(err => {
-                                let now = new Date();
-                                let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
-                                console.error(`[${now.toLocaleString()} ${tZ_str}] ### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
+                                console.error(`[${getTimeStr()}] ### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
                                 res.send({});
                             })
                     else

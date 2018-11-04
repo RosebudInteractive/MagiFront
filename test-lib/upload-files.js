@@ -3,12 +3,7 @@ const request = require('request');
 const fs = require('fs');
 const { URL } = require('url');
 const path = require('path');
-
-function getTimeStr() {
-    let now = new Date();
-    let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
-    return `[${now.toLocaleString()} ${tZ_str}]`;
-}
+const { getTimeStr } = require('../utils');
 
 function getFile(url, fileName) {
     return new Promise(resolve => {
