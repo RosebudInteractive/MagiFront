@@ -113,6 +113,16 @@ export const getAuthorPortraitPath = (author, size) => {
     return '/data/' + _fileName;
 }
 
+export const getLessonNumber = (lesson) => {
+    return lesson ?
+        lesson.Parent ?
+            lesson.Parent.Number + '.' + lesson.Number
+            :
+            lesson.Number
+        :
+        ''
+}
+
 export const widthLessThan900 = () => {
     return window.innerWidth < 900
 }

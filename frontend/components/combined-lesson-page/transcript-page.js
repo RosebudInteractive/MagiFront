@@ -6,7 +6,7 @@ import SocialBlock from './social-block'
 
 import GallerySlides from '../transcript-page/gallery-slides';
 import $ from 'jquery'
-import {getCoverPath, ImageSize} from "../../tools/page-tools";
+import {getCoverPath, getLessonNumber, ImageSize} from "../../tools/page-tools";
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -219,6 +219,9 @@ class TextBlock extends React.Component {
         let {lesson, isNeedHideRefs} = this.props,
             _cover = getCoverPath(lesson, ImageSize.icon);
 
+        let _number = getLessonNumber(lesson);
+        _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
+
         return (
             <div className="transcript-page _nested" id="transcript">
                 <section className="text-block js-social-start">
@@ -227,7 +230,7 @@ class TextBlock extends React.Component {
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
                         <div className='text-block__headline'><span
-                            className="number">{lesson.Number + '. '}</span>{lesson.Name}</div>
+                            className="number">{_number}</span>{lesson.Name}</div>
                         {this._getText()}
                         {isNeedHideRefs ? null : <Refs {...this.props}/>}
                     </div>
