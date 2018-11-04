@@ -177,7 +177,7 @@ class TitleWrapper extends React.Component {
                 <h1 className="course-module__title no_underline">
                     <span className={"favourites" + (isFavorite ? ' active' : '')}
                           onClick={onFavoritesClick}>В закладки</span>
-                    <p className="course-module__label">Курс:</p> <span>{' ' + title}</span>
+                    <p className="course-module__label">Курс:</p> <span>{title}</span>
                 </h1>
             </div>
         )

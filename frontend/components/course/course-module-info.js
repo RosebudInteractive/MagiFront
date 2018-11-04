@@ -8,8 +8,8 @@ export default class Info extends React.Component {
         let _multipleAuthors = this.props.authors.length > 1;
         let _multipleCategories = this.props.categories.length > 1;
 
-        let _authors = this.props.authors.map((author) => {
-            return (<Link to={'/autor/' + author.URL}>{author.FirstName + ' ' + author.LastName}</Link>);
+        let _authors = this.props.authors.map((author, index) => {
+            return (<Link to={'/autor/' + author.URL} key={index}>{author.FirstName + ' ' + author.LastName}</Link>);
         });
 
         _authors = (_authors.length > 1) ? <div>{_authors[0]}, {_authors[1]}</div> : _authors
