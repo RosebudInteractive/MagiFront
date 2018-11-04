@@ -13,7 +13,7 @@ let listener = (event) => {
     let _data = event.data;
     if (_data) {
         _data = JSON.parse(_data);
-        $('.debug_console').append("<div class='debug_message'>" + _data.eventName + "</div>")
+        $('.debug_console').append("<div class='debug_message'>" + _data.playerId + ' : ' + _data.eventName + "</div>")
     }
 }
 

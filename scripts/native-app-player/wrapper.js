@@ -65,6 +65,7 @@ export default class NativeAppPlayer {
                 this._player = null;
                 this._id = (new Date).getTime()
             }
+
             this._player = new Player(this._div, this._getPlayerOptions())
             this._player.render();
             this._player.setData(data);
