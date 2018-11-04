@@ -31,6 +31,7 @@ export class LessonFull extends React.Component {
         books: PropTypes.number,
         audios: PropTypes.array,
         isAuthRequired: PropTypes.bool,
+        needShowAuthors: PropTypes.bool,
     };
 
     _switchFavorites(lessonUrl) {
@@ -60,7 +61,7 @@ export class LessonFull extends React.Component {
     }
 
     render() {
-        let {lesson, lessonUrl} = this.props;
+        let {lesson, lessonUrl, needShowAuthors} = this.props;
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
@@ -76,7 +77,10 @@ export class LessonFull extends React.Component {
                                      dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks(lessonUrl) ? _redFlag : _flag}}/>
                             </button>
                             <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title}</Link></h3>
-                            <p className="lecture-full__descr">{' ' + this.props.descr + ' '}</p>
+                            <p className="lecture-full__descr">
+                                {' ' + this.props.descr + ' '}
+                                {needShowAuthors ? <p className="lecture-full__author">{lesson.authorName}</p> : null}
+                            </p>
                         </div>
                         <Extras subLessons={lesson.Lessons}
                                 parentNumber={lesson.Number}
