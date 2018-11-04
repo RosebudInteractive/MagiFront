@@ -83,7 +83,7 @@ class SubLessonPlayBlock extends React.Component {
     }
 
     render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
+        const _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
         let {lesson, playingLesson, paused, } = this.props,
@@ -123,7 +123,7 @@ class SubLessonPlayBlock extends React.Component {
                             :
                             <button className="play-btn-small paused"
                                     onClick={::this.props.playerStartActions.startPause}>
-                                <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _playSmall}}/>
+                                <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _pauseSmall}}/>
                             </button>
                         :
                         this._getSmallButton(_isThisLessonPlaying, _isFinished)

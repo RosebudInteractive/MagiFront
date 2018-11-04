@@ -20,6 +20,7 @@ import {
 } from 'react-share';
 
 import {setScrollTop} from "../../containers/combined-lesson-page";
+import {getLessonNumber} from "../../tools/page-tools";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -167,7 +168,8 @@ class LessonFrame extends React.Component {
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
         let {lesson} = this.props;
-        let _number = this.props.isMain ? (lesson.Number + '. ') : (lesson.Number + ' ');
+        let _number = getLessonNumber(lesson);
+            _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,

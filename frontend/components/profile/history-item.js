@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-// import LessonPlayBlockSmall from './small-play-block'
 import LessonPlayBlockSmall from '../common/small-play-block'
 
 export default class Item extends React.Component {

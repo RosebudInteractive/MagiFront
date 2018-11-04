@@ -10,6 +10,7 @@ import * as playerActions from "../../actions/player-actions";
 
 import LessonsListWrapper from './lessons-list-wrapper';
 import $ from "jquery";
+import {getLessonNumber} from "../../tools/page-tools";
 
 
 class Menu extends React.Component {
@@ -120,12 +121,15 @@ class ListBlock extends React.Component {
     }
 
     render() {
+        let {lesson, total} = this.props,
+            _number = getLessonNumber(lesson)
+
         return (
             <div className="lectures-menu__section lectures-list-block">
                 <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
                         onClick={::this._switchMenu}><span className='caption'>Лекция </span>
                     <span className="num"><span
-                        className="current">{this.props.lesson.Number}</span>{'/' + this.props.total}</span></button>
+                        className="current">{_number}</span>{'/' + total}</span></button>
                 <LessonsListWrapper {...this.props}/>
             </div>
         )

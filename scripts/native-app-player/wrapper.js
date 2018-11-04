@@ -63,10 +63,6 @@ export default class NativeAppPlayer {
                 this._player.pause();
                 this._player.destroy();
                 this._player = null;
-            }
-
-            if (this._player) {
-                this._player.destroy();
                 this._id = (new Date).getTime()
             }
             this._player = new Player(this._div, this._getPlayerOptions())
