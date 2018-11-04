@@ -36,13 +36,11 @@ const { setupPrerender } = require('../prerender');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 const { SetupRoute: setupFeedback } = require('./feedback');
 const { SetupRoute: setupBilling } = require('./billing');
-
+const { getTimeStr } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
 function errorHandler(err, req, res, next) {
-    let now = new Date();
-    let tZ_str = (now.getTimezoneOffset() < 0 ? "+" : "-") + Math.abs(now.getTimezoneOffset() / 60).toFixed(2) + "h";
     let errStr = err.message ? err.message : err.toString();
     let error = null;
     let statusCode = err instanceof HttpError ? err.statusCode : HttpCode.ERR_INTERNAL;
@@ -51,7 +49,7 @@ function errorHandler(err, req, res, next) {
         error = err.error;
         errStr = JSON.stringify(err.error);
     }
-    console.error(`[${now.toLocaleString()} ${tZ_str}] setup::errorHandler [${statusCode}] ==> ${errStr}${error ? "\nErrorObject: " + JSON.stringify(error, null, 2) : ""}`);
+    console.error(`[${getTimeStr()}] setup::errorHandler [${statusCode}] ==> ${errStr}${error ? "\nErrorObject: " + JSON.stringify(error, null, 2) : ""}`);
     res.status(statusCode).json({ statusCode: statusCode, message: errStr, error: error });
 }
 

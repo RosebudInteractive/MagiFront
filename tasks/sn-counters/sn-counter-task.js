@@ -6,6 +6,7 @@ const request = require('request');
 const { URL, URLSearchParams } = require('url');
 const { Task } = require('../lib/task');
 const { HttpCode } = require('../../const/http-codes');
+const { getTimeStr } = require('../../utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
@@ -168,7 +169,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                         options.lastReq = new Date();
                         request(reqUrl.href, (error, response, body) => {
                             if (error) {
-                                console.error(`${(new Date()).toLocaleString()} FB Counter Error: "${error.message}",` +
+                                console.error(`${getTimeStr()} FB Counter Error: "${error.message}",` +
                                     ` API: "${reqUrl.href}", URL: "${_url}"`);
                                 reject(error);
                             }
@@ -184,7 +185,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
 
                                                 options.lock = true;
                                                 options.lockTime = new Date();
-                                                console.error(`${(new Date()).toLocaleString()} SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
+                                                console.error(`${getTimeStr()} SnCounterTask: FB app usage limits have exceeded a threshold (${options.usageLimitPerc}%) : ` +
                                                     `${JSON.stringify(usageStat)}`);
                                             }
                                         } catch (err) { };
@@ -200,7 +201,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                                 else {
                                     if (response.statusCode === HttpCode.ERR_FORBIDDEN) {
                                         options.lock = true;
-                                        console.error(`${(new Date()).toLocaleString()} SnCounterTask: FB access error: ${body}`);
+                                        console.error(`${getTimeStr()} SnCounterTask: FB access error: ${body}`);
                                     }
                                 }
                                 resolve(counter);
@@ -231,7 +232,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                 return cnt + counter;
             })
             .catch(err => {
-                console.error(`${(new Date()).toLocaleString()} VK Counter Error: "${err.message}",` +
+                console.error(`${getTimeStr()} VK Counter Error: "${err.message}",` +
                     ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${url}"`);
                 return 0;
             });
@@ -275,7 +276,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                 return cnt + counter;
             })
             .catch(err => {
-                console.error(`${(new Date()).toLocaleString()} OK Counter Error: "${err.message}",` +
+                console.error(`${getTimeStr()} OK Counter Error: "${err.message}",` +
                     ` API: "${reqUrl ? reqUrl.href : "???"}", URL: "${url}"`);
                 return 0;
             });
