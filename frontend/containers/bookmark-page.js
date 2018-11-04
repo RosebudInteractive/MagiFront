@@ -46,7 +46,9 @@ class BookmarksPage extends React.Component {
             if (!nextProps.authorized) {
                 this._redirect = true;
                 this.forceUpdate();
-                this.props.userActions.showSignInForm();
+                if (!this.props.authorized) {
+                    this.props.userActions.showSignInForm();
+                }
             }
         }
 
