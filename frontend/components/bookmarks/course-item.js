@@ -49,7 +49,7 @@ export default class Item extends React.Component {
                         <Link to={'/category/' + item.URL}>
                             <span className="fav-card__title-text">
                                 <span className="label">Курс:</span>
-                                <span className='title'>{" " + item.Name}</span>
+                                <span className='title'>{item.Name}</span>
                             </span>
                         </Link>
                     </h3>
@@ -59,15 +59,16 @@ export default class Item extends React.Component {
                     </div>
                 </div>
                 <div className="fav-card__body">
-                    <div className="fav-card__col">
-                        <Link to={'category/' + item.URL} className="btn btn--rounded fav-card__link">Подробнее о
-                            курсе</Link>
-                    </div>
-                    <div className="fav-card__col">
+                    <Link to={'/category/' + item.URL} className="fav-card__col">
+                        <div className="btn btn--rounded fav-card__link">
+                            Подробнее о курсе
+                        </div>
+                    </Link>
+                    <Link to={'/category/' + item.URL} className="fav-card__col">
                         <div className={"fav-card__image-block " + item.Mask}>
                             <svg viewBox="0 0 563 514" width="563" height="514" dangerouslySetInnerHTML={{__html: _image}}/>
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         )

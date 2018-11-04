@@ -13,7 +13,7 @@ export default class CourseModule extends React.Component {
         return (
             (course) ?
                 <div className='course-module'>
-                    <InfoBlock title={' ' + course.Name}
+                    <InfoBlock title={course.Name}
                                url={course.URL}
                                course={course}
                                isMobile={isMobile}

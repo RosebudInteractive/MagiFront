@@ -29,8 +29,6 @@ class UserBlock extends React.Component {
     //     }
     // }
 
-
-
     _onLogout() {
         this.props.userActions.logout()
 

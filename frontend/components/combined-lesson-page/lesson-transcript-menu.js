@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import $ from 'jquery'
 
-import LessonsListWrapper from '../lesson-page/lessons-list-wrapper';
+import LessonsListWrapper from './lessons-list-wrapper';
 import {bindActionCreators} from "redux";
 import * as appActions from "../../actions/app-actions";
 import {connect} from "react-redux";
