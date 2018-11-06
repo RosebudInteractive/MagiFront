@@ -749,6 +749,7 @@ export default class CWSPlayer extends CWSBase {
 
             this._audioState.baseTime = newStart.start;
             this._audioState.currentTime = position - newStart.start;
+            this._audioState.globalTime = this._audioState.baseTime + this._audioState.currentTime;
 
             if (this._audioState.currentEpisode != epIdx) {
                 this._audioState.currentEpisode = epIdx;
