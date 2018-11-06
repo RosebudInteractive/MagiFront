@@ -15,6 +15,7 @@ import * as tools from './tools';
 const initialState = {
     items: [],
     fetching: false,
+    loaded: false,
     selected: null,
     editDlgShown: false,
     editMode: EDIT_MODE_INSERT,
@@ -25,13 +26,13 @@ export default function courses(state = initialState, action) {
 
     switch (action.type) {
         case GET_COURSES_REQUEST:
-            return { ...state, items: [], fetching: true, hasError: false };
+            return { ...state, items: [], fetching: true, hasError: false, loaded: false, };
 
         case GET_COURSES_SUCCESS: {
             let _list = action.payload;
             let _selected = (_list.length > 0) ? _list[0].id : null;
 
-            return { ...state, items: action.payload, selected: _selected, fetching: false };
+            return { ...state, items: action.payload, selected: _selected, fetching: false, loaded: true };
         }
 
         case GET_COURSES_FAIL:

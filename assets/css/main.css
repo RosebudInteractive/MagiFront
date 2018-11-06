@@ -10210,6 +10210,7 @@ ul.lectures-tab {
     .lecture-full__title a {
       color: #2f2f2f; }
   .lecture-full__author {
+    white-space: nowrap;
     display: inline;
     margin: 0;
     font-family: "Fira Sans", Arial, sans-serif;

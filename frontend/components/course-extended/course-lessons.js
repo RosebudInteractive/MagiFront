@@ -8,12 +8,26 @@ import {ImageSize, getCoverPath} from '../../tools/page-tools'
 class CourseLessons extends React.Component {
 
     static propTypes = {
-        courseUrl: PropTypes.string.isRequired
+        courseUrl: PropTypes.string.isRequired,
+        needShowAuthors: PropTypes.bool,
     };
 
+    _getAuthor(authorId) {
+        let _author = this.props.course.Authors.find((author) => {
+            return author.Id === authorId
+        })
+
+        return _author ? _author.FirstName + ' ' + _author.LastName : ''
+    }
+
     _getList() {
-        return this.props.course.Lessons.map((lesson, index) => {
+        let {course} = this.props,
+            _needShowAuthors = (course.Authors && course.Authors.length > 1);
+
+        return course.Lessons.map((lesson, index) => {
             let _cover = getCoverPath(lesson, ImageSize.small)
+
+            lesson.authorName = _needShowAuthors ? this._getAuthor(lesson.AuthorId) : '';
 
             return lesson.State === 'R' ?
                 <LessonFull
@@ -32,7 +46,8 @@ class CourseLessons extends React.Component {
                     audios={lesson.Audios}
                     isAuthRequired={lesson.IsAuthRequired}
                     lesson={lesson}
-                    key={index}/>
+                    key={index}
+                    needShowAuthors={_needShowAuthors}/>
                 :
                 <LessonPreview
                     title={lesson.Name}
