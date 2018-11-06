@@ -34,7 +34,7 @@ exports.setupPrerender = (app) => {
             else
             {
                 if (!filter)
-                    throw new Error(`Query argument "filter" is missing. Allowed values: ("all", "courses", "authors" or link path).`);
+                    throw new Error(`Query argument "filter" is missing. Allowed values: ("all", "courses", "authors", "categories" or link path).`);
             };
             let rc;
             switch (mode) {

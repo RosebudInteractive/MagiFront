@@ -44,7 +44,7 @@ module.exports = {
             schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
             options: {
                 path: siteMapsPath,
-                mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
+                mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"],
                 maxLinksLimit: 100,
                 maxAgeSec: 365 * 24 * 60 * 60, // max link age
                 renderDelay: 10 * 1000 // render request delay in ms
