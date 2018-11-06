@@ -8,11 +8,37 @@ import * as commonDlgActions from '../actions/CommonDlgActions';
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/YesNoDialog";
 import ErrorDialog from '../components/ErrorDialog';
+import $ from "jquery";
 
 class Coureses extends React.Component {
-    componentDidMount() {
+    constructor(props) {
+        super(props)
+
+        this._resizeHandler = () => {
+            let _height = $(window).height() - $('.top-bar-size').innerHeight() + $('.action-bar').innerHeight(),
+                _widht = $('.grid-container').innerWidth();
+
+            $('.grid-container').innerHeight(_height);
+
+            // if (window.$$('courses-grid')) {
+            //     window.$$('courses-grid').$setSize(_widht, _height)
+            // }
+        }
+    }
+
+
+    componentWillMount() {
         this.props.coursesActions.getCourses();
         this._selected = null;
+    }
+
+    componentDidMount() {
+        $(window).on('resize', this._resizeHandler);
+        this._resizeHandler();
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
     }
 
     onAddBtnClick() {
@@ -47,6 +73,7 @@ class Coureses extends React.Component {
         const {
             courses,
             fetching,
+            loaded,
             hasError,
             message,
             selected,
@@ -56,36 +83,40 @@ class Coureses extends React.Component {
         this._selected = selected;
 
         return <div className="courses">
-            {
-                fetching ?
-                    <p>Загрузка...</p>
-                    :
-                    hasError ?
-                        <p>{message}</p>
+
+            <div className="courses-content">
+                <div className="action-bar">
+                    <button className='tool-btn new'
+                            onClick={::this.onAddBtnClick}
+                    />
+                    {' '}
+                    <button
+                        className={'tool-btn edit' + (selected === null ? " disabled" : "")}
+                        onClick={::this.onEditBtnClick}
+                        disabled={(selected === null)}
+                    />
+                    {' '}
+                    <button
+                        className={'tool-btn delete' + (selected === null ? " disabled" : "")}
+                        onClick={::this.confirmDeleteCourse}
+                        disabled={(selected === null)}
+                    />
+                </div>
+                {
+                    fetching ?
+                        <p>Загрузка...</p>
                         :
-                        <div className="courses-content">
-                            <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
-                                <button className='tool-btn new'
-                                        onClick={::this.onAddBtnClick}
-                                />
-                                {' '}
-                                <button
-                                    className={'tool-btn edit' + (selected === null ? " disabled" : "")}
-                                    onClick={::this.onEditBtnClick}
-                                    disabled={(selected === null)}
-                                />
-                                {' '}
-                                <button
-                                    className={'tool-btn delete' + (selected === null ? " disabled" : "")}
-                                    onClick={::this.confirmDeleteCourse}
-                                    disabled={(selected === null)}
-                                />
-                            </div>
-                            <div className="grid-container">
-                                <Webix ui={::this.getUI(::this.select)} data={courses}/>
-                            </div>
-                        </div>
-            }
+                        hasError ?
+                            <p>{message}</p>
+                            :
+                            loaded ?
+                                <div className="grid-container">
+                                    <Webix ui={::this.getUI(::this.select)} data={courses}/>
+                                </div>
+                                : null
+                }
+            </div>
+
             {
                 deleteDlgShown ?
                     <YesNoDialog
@@ -114,6 +145,7 @@ class Coureses extends React.Component {
 
         return {
             view: "datatable",
+            id: 'courses-grid',
             scroll: false,
             autoheight: true,
             select: true,
@@ -156,6 +188,8 @@ class Coureses extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        fetching: state.courses.fetching,
+        loaded: state.courses.loaded,
         courses: state.courses.items,
         selected: state.courses.selected,
         editDlgShown: state.courses.editDlgShown,

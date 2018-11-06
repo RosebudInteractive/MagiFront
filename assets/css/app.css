@@ -210,7 +210,6 @@
 
 .tool-btn {
     margin-right: 3px;
-    margin-bottom: 3px;
     border-radius: 2px;
     background-size: contain;
     cursor: pointer;
@@ -472,8 +471,11 @@ html,
 
 .app .action-bar {
     flex: none;
-    height: 4em;
+    height: auto;
     width: 100%;
+    padding-top: 7px;
+    padding-left: 7px;
+    padding-bottom: 7px;
 }
 
 .app .episodes {
@@ -999,20 +1001,6 @@ html,
 
 /*.tabs-1 .tabContent: {}*/
 
-.tool-btn {
-    margin-right: 3px;
-    margin-bottom: 3px;
-    border-radius: 2px;
-    background-size: contain;
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
-    color: #fff;
-    height: 2.5714em;
-    width: 2.5714em;
-    border: none;
-}
-
 .del {
     background: #96c8ff url(../images/icons/basket.svg);
     height: 25px;
@@ -1259,12 +1247,6 @@ html,
     overflow-y: auto;
     padding: 1em;
     position: relative;
-}
-
-.app .action-bar {
-    flex: none;
-    height: 4em;
-    width: 100%;
 }
 
 .app .episodes {
@@ -1616,4 +1598,20 @@ html,
 .toolbar__btn svg {
     fill: #fff
 }
+
+.grid-container {
+    overflow-y: auto;
+    height: calc(100% - 28px);
+    height: -moz-calc(100% - 28px);
+    height: -webkit-calc(100% - 28px);
+}
+
+/*.courses {*/
+    /*height: 100%;*/
+/*}*/
+
+/*.courses-content {*/
+    /*height: 100%;*/
+/*}*/
+
 

@@ -60,7 +60,7 @@ class Categories extends React.Component {
                         <p>{message}</p>
                         :
                         <div className="categories-content">
-                            <div className="action-bar" style={{marginTop: 5, marginBottom: -10, marginLeft: 2}}>
+                            <div className="action-bar">
                                 <button className='tool-btn new'
                                         onClick={::this.onAddBtnClick}
                                 />{' '}
