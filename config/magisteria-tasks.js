@@ -206,7 +206,7 @@ module.exports = {
         },
         mailing: {
             type: "smtp",
-            sender: '"Magisteria.ru" <adm@magisteria.ru>',
+            sender: pk.mail.mailing.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
@@ -222,7 +222,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria.ru" <adm@magisteria.ru>',
+            sender: pk.mail.userReg.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
@@ -238,7 +238,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria.ru" <adm@magisteria.ru>',
+            sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",

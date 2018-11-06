@@ -95,7 +95,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/feedback.tmpl",
             subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
-            sender: '"Magisteria" <adm@magisteria.ru>',
+            sender: pk.mail.feedback.sender,
             recipients: 'sokolov@yandex.ru',
             options: {
                 disableUrlAccess: false,
@@ -118,7 +118,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
             subject: "Registration on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <adm@magisteria.ru>',
+            sender: pk.mail.userReg.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
@@ -134,7 +134,7 @@ module.exports = {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
             subject: "Password recovery on \"Magisteria.Ru\".",
-            sender: '"Magisteria" <adm@magisteria.ru>',
+            sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",
