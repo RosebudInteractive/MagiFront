@@ -1621,7 +1621,7 @@ namespace MagImport
             user.login = "admin";
             user.pwd = "admin";
             user.fields.DisplayName = user.fields.Name = "Admin";
-            user.fields.Email = "test@magisteria.ru";
+            user.fields.Email = "adm@magisteria.ru";
             user.fields.IsOld = false;
             user.fields._PData.isAdmin = true;
             user.fields.RegDate = DateTime.Now;
