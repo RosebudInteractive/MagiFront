@@ -75,12 +75,12 @@ class CoursesBlock extends React.Component {
                 <div className={"author-block__wrap author-block__content" + (this.state.coursesOpened ? ' opened' : '')}>
                     {this._getCourses(author.Courses)}
                 </div>
-                <div className={"author-block__subtitle" + (this.state.lessonsOpened ? ' active' : '')} onClick={::this._switchLessons}>
-                    <h3>Лекции</h3>
-                </div>
-                <ol className={"lectures-tab author-block__content" + (this.state.lessonsOpened ? ' opened' : '')}>
-                    {this._getLessons(author.Lessons)}
-                </ol>
+                {/*<div className={"author-block__subtitle" + (this.state.lessonsOpened ? ' active' : '')} onClick={::this._switchLessons}>*/}
+                    {/*<h3>Лекции</h3>*/}
+                {/*</div>*/}
+                {/*<ol className={"lectures-tab author-block__content" + (this.state.lessonsOpened ? ' opened' : '')}>*/}
+                    {/*{this._getLessons(author.Lessons)}*/}
+                {/*</ol>*/}
             </div>
         )
     }
@@ -111,7 +111,7 @@ class Course extends React.Component {
                 </div>
                 <div className="course-announce__col">
                     <h3 className="course-announce__title">
-                        <Link to={'/category/' + course.URL}><span className="course-announce__label">Курс: </span>{course.Name}</Link>
+                        <Link to={'/category/' + course.URL}><span className="course-announce__label">Курс: </span><span className="course-announce__caption">{course.Name}</span></Link>
                     </h3>
                     <div className="course-announce__row">
                         <div className="course-announce__progress">

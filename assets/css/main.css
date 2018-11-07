@@ -10763,6 +10763,12 @@ ul.lectures-tab {
         line-height: 31px; } }
     .course-announce__title a {
       color: #2f2f2f; }
+    .course-announce__title a:hover .course-announce__caption {
+      border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
+    .course-announce__caption {
+      border-bottom: 1px solid rgba(255, 255, 255, 0);
+      -webkit-transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease; }
   .course-announce__label {
     font-style: italic;
     color: #c8684c; }
