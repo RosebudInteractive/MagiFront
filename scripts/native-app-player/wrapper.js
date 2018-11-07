@@ -45,6 +45,20 @@ export default class NativeAppPlayer {
         this._currentTime = 0;
         this._timeChanged = false;
         this._setPositionOnPlay = false;
+
+
+        let gOldOnError = window.onerror;
+
+        window.onerror = (errorMsg, url, lineNumber) => {
+            this._sendErrorMessageToApp(errorMsg)
+
+            if (gOldOnError) {
+                return gOldOnError(errorMsg, url, lineNumber);
+            }
+
+
+            return false;
+        }
     }
 
     setData(data) {
@@ -53,7 +67,7 @@ export default class NativeAppPlayer {
             this._timeChanged = false;
             this._currentTime = 0;
 
-            let _audios =  data.episodes.map((item) => {
+            let _audios = data.episodes.map((item) => {
                 return item.audio.file
             });
 
@@ -99,7 +113,7 @@ export default class NativeAppPlayer {
                 console.log(e)
 
                 this._sendErrorMessageToApp(
-                  e.message
+                    e.message
                 )
             })
     }
@@ -169,7 +183,7 @@ export default class NativeAppPlayer {
         }
     }
 
-    _sendErrorMessageToApp( message ) {
+    _sendErrorMessageToApp(message) {
         this._sendMessageToApp({
             eventType: 'magisteriaPlayer',
             eventName: 'playerError',
@@ -241,7 +255,9 @@ export default class NativeAppPlayer {
                     eventName: 'playerStopped',
                 })
             },
-            onStarted: () => { this._started = true },
+            onStarted: () => {
+                this._started = true
+            },
             onError: (e) => {
                 this._sendErrorMessageToApp(
                     e.message
