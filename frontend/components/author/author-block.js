@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {authorSelector} from '../../ducks/author'
 import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
 
+
 class AuthorBlock extends React.Component {
 
     constructor(props) {
