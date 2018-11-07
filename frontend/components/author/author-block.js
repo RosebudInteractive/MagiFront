@@ -3,7 +3,27 @@ import {connect} from "react-redux";
 import {authorSelector} from '../../ducks/author'
 import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
 
+
 class AuthorBlock extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this._resizeHandler = (e) => {
+            let _image = $('.author-block__image');
+
+            _image.innerHeight(_image.innerWidth() * 1.16)
+        }
+    }
+
+    componentDidMount() {
+        $(window).on('resize', this._resizeHandler);
+        this._resizeHandler();
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
+    }
 
     render() {
         let {author} = this.props;
@@ -15,7 +35,7 @@ class AuthorBlock extends React.Component {
                 <div className="author-block__inner">
                     <div className="author-block__col">
                         <div className="author-block__image">
-                            <img src={_portrait} width="583" height="884" alt=""/>
+                            <img src={_portrait} alt=""/>
                         </div>
                     </div>
                     <div className="author-block__col">

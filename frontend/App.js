@@ -9,7 +9,6 @@ import MetaTags from 'react-meta-tags';
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import CombineLessonPage, {scroll} from './containers/combined-lesson-page';
-import TranscriptPage from './containers/lesson-transcript-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
 import BookmarksPage from './containers/bookmark-page'
@@ -214,9 +213,6 @@ class App extends Component {
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
-                <Route path={_homePath + ':courseUrl/:lessonUrl/transcript'} render={(props) => (
-                    <TranscriptPage {...props} height={this.height}/>
-                )}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path="*" component={NotFound}/>

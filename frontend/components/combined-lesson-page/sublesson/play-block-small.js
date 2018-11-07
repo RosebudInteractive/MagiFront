@@ -112,7 +112,7 @@ class PlayBlock extends React.Component {
         }
 
         return (
-            <button className={"extras-list__play-btn mobile" + ((IsAuthRequired && !authorized) ? ' play-btn-small_locked' : '') } type="button">
+            <div className={"extras-list__play-btn mobile" + ((IsAuthRequired && !authorized) ? ' play-btn-small_locked' : '') } type="button">
                 <div className="play-block__loader small">
                     <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
                          version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -135,7 +135,7 @@ class PlayBlock extends React.Component {
                         :
                         this._getSmallButton(_isThisLessonPlaying, _isFinished)
                 }
-            </button>
+            </div>
         )
     }
 }
