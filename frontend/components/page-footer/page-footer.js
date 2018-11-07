@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {showFeedbackWindow,} from "../../ducks/message";
 import SubscribeForm from './subscribe-form'
+import {Link} from 'react-router-dom';
 
 class PageFooter extends React.Component {
 
@@ -89,15 +90,23 @@ class SocialBlock extends React.Component {
             <div className="social-block-big">
                 <h4 className="social-block-big__title">Мы в соц. сетях</h4>
                 <div className="social-block-big__inner">
-                    <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18} href={'https://www.facebook.com/Magisteria.ru/'}/>
-                    <SocialLink text={'Telegram'} logo={'telegram'} icoWidth={16} icoHeight={16} href={'https://t.me/magisteria_ru'}/>
-                    <SocialLink text={'Вконтакте'} logo={'vk'} icoWidth={18} icoHeight={11} href={'https://vk.com/magisteriaru'}/>
-                    <SocialLink text={'Youtube'} logo={'youtube'} icoWidth={16} icoHeight={12} href={'https://www.youtube.com/channel/UCVTyCEHsBPD-xRD0aJekeww'}/>
-                    <SocialLink text={'Twitter'} logo={'tw'} icoWidth={18} icoHeight={15} href={'https://twitter.com/MagisteriaRu'}/>
-                    <SocialLink text={'Одноклассники'} logo={'ok'} icoWidth={11} icoHeight={18} href={'https://ok.ru/group/54503517782126'}/>
-                    <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16} href={'https://www.instagram.com/magisteria.ru/'}/>
+                    <SocialLink text={'Facebook'} logo={'fb'} icoWidth={18} icoHeight={18}
+                                href={'https://www.facebook.com/Magisteria.ru/'}/>
+                    <SocialLink text={'Telegram'} logo={'telegram'} icoWidth={16} icoHeight={16}
+                                href={'https://t.me/magisteria_ru'}/>
+                    <SocialLink text={'Вконтакте'} logo={'vk'} icoWidth={18} icoHeight={11}
+                                href={'https://vk.com/magisteriaru'}/>
+                    <SocialLink text={'Youtube'} logo={'youtube'} icoWidth={16} icoHeight={12}
+                                href={'https://www.youtube.com/channel/UCVTyCEHsBPD-xRD0aJekeww'}/>
+                    <SocialLink text={'Twitter'} logo={'tw'} icoWidth={18} icoHeight={15}
+                                href={'https://twitter.com/MagisteriaRu'}/>
+                    <SocialLink text={'Одноклассники'} logo={'ok'} icoWidth={11} icoHeight={18}
+                                href={'https://ok.ru/group/54503517782126'}/>
+                    <SocialLink text={'Instagram'} logo={'ig'} icoWidth={16} icoHeight={16}
+                                href={'https://www.instagram.com/magisteria.ru/'}/>
                     <SocialLink text={'RSS'} logo={'rss'} icoWidth={16} icoHeight={16} href={'/feed/'}/>
-                    <SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16} href={'https://zen.yandex.com/magisteria'}/>
+                    <SocialLink text={'Яндекс Дзен'} logo={'yandex'} icoWidth={16} icoHeight={16}
+                                href={'https://zen.yandex.com/magisteria'}/>
                 </div>
             </div>
         )
@@ -182,10 +191,9 @@ class Copyright extends React.Component {
         return (
             <div className="page-footer__copyright">
                 <div className="page-footer__wrapper">
-                    <p>© Magisteria 2016 - 2017. All rights reserved.
-                        <div>
-                            <a>Политика конфиденциальности</a> / <a>Пользовательское соглашение</a>
-                        </div>
+                    <p>{'© Magisteria 2016 - 2017. All rights reserved. '}
+                            <Link to={'/doc/privacy.pdf'} target="_blank">Политика конфиденциальности</Link> / <Link to={'/doc/terms.pdf'} target="_blank">Пользовательское
+                            соглашение</Link>
                     </p>
                 </div>
             </div>
@@ -199,4 +207,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps) (PageFooter)
+export default connect(null, mapDispatchToProps)(PageFooter)

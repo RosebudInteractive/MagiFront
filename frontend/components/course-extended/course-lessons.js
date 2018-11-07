@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import LessonFull from "../common/lecture-full-wrapper";
-import LessonPreview from './lesson-preview';
+import LessonWrapper from "./lesson/lesson-wrapper";
+import LessonPreview from './lesson/lesson-preview';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class CourseLessons extends React.Component {
@@ -30,7 +30,7 @@ class CourseLessons extends React.Component {
             lesson.authorName = _needShowAuthors ? this._getAuthor(lesson.AuthorId) : '';
 
             return lesson.State === 'R' ?
-                <LessonFull
+                <LessonWrapper
                     id={lesson.Id}
                     title={lesson.Name}
                     url={'../' + this.props.courseUrl + '/' + lesson.URL}

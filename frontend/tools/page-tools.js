@@ -141,6 +141,13 @@ export const getPageUrl = () => {
     return getDomain() + window.location.pathname;
 }
 
+export const TooltipTitles = {
+    locked : 'Для просмотра этой лекции необходимо авторизоваться на сайте',
+    play: 'Начать просмотр',
+    replay : 'С начала',
+    pause: 'Пауза',
+}
+
 
 
 

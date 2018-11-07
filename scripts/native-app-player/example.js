@@ -75,6 +75,12 @@ let listener = (event) => {
             window.magisteriaPlayer.setPlaybackSpeed({rate: _rate, playerId: window.magisteriaPlayer._id})
         })
 
+        $('.test_start_btn').on('click', () => {
+            setTimeout(() => {
+                window.magisteriaPlayer.play({position: 5, playerId: window.magisteriaPlayer._id})
+            }, 1000)
+        })
+
 
     });
 })(jQuery)
