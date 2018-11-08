@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../../actions/player-start-actions'
 import * as userActions from "../../../actions/user-actions";
 import $ from "jquery";
+import {TooltipTitles} from "../../../tools/page-tools";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -64,18 +65,18 @@ class PlayBlock extends React.Component {
             _button = null;
 
         if (IsAuthRequired && !authorized) {
-            _button = <button className="lecture__btn paused" onClick={::this._unlock}>
+            _button = <button className="extras-list__play-btn mobile play-btn-small_locked paused" onClick={::this._unlock}>
                 <svg width="14" height="15" dangerouslySetInnerHTML={{__html: _lockSmall}}/>
             </button>
         } else {
             _button = isFinished
                 ?
-                <button type="button" className="lecture__btn paused"
+                <button type="button" className="extras-list__play-btn mobile paused"
                         onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
                 </button>
                 :
-                <button type="button" className="lecture__btn"
+                <button type="button" className="extras-list__play-btn mobile"
                         onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
                     <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                 </button>
@@ -84,15 +85,32 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
+    _getTooltip(isThisLessonPlaying, isFinished) {
+        let {lesson, authorized, paused} = this.props,
+            {IsAuthRequired} = lesson,
+            _tooltip = null;
+
+        if (IsAuthRequired && !authorized) {
+            _tooltip = TooltipTitles.locked
+        } else {
+            _tooltip = isThisLessonPlaying ?
+                (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
+                :
+                (isFinished ? TooltipTitles.replay : TooltipTitles.play);
+        }
+
+        return _tooltip;
+    }
+
     render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _radius = 86.75;
 
         let {playingLesson, paused, lesson, authorized} = this.props,
             {IsAuthRequired} = lesson,
+            _lessonLocked = (IsAuthRequired && !authorized),
             _id = lesson.Id,
             _totalDuration = lesson.Duration,
-            // _duration = lesson.DurationFmt,
             _lessonUrl = lesson.URL,
             _courseUrl = lesson.courseUrl,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
@@ -112,15 +130,20 @@ class PlayBlock extends React.Component {
         }
 
         return (
-            <div className={"extras-list__play-btn mobile" + ((IsAuthRequired && !authorized) ? ' play-btn-small_locked' : '') } type="button">
-                <div className="play-block__loader small">
-                    <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
-                         version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
-                                strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
-                                strokeDashoffset={_offset} style={{strokeWidth: '18px'}}/>
-                    </svg>
-                </div>
+            <div className="sublesson__play-block__wrapper">
+                { !_lessonLocked ?
+                    <div className="play-block-small">
+                        <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
+                             version="1.1" xmlns="http://www.w3.org/2000/svg">
+                            <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
+                                    strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                    strokeDashoffset={_offset} style={{strokeWidth: '18px'}}/>
+                        </svg>
+                    </div>
+                    :
+                    null
+                }
+
                 {
                     (_isThisLessonPlaying)
                         ?
@@ -128,13 +151,14 @@ class PlayBlock extends React.Component {
                             ?
                             this._getSmallButton(_isThisLessonPlaying, _isFinished)
                             :
-                            <button className="play-block__btn paused"
+                            <button className="extras-list__play-btn paused"
                                     onClick={::this.props.playerStartActions.startPause}>
                                 <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _playSmall}}/>
                             </button>
                         :
                         this._getSmallButton(_isThisLessonPlaying, _isFinished)
                 }
+                <div className="lecture__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
             </div>
         )
     }

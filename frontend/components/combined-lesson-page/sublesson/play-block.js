@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../../actions/player-start-actions'
 import * as userActions from "../../../actions/user-actions";
 import $ from "jquery";
+import {TooltipTitles} from "../../../tools/page-tools";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -86,14 +87,32 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
+    _getTooltip(isThisLessonPlaying, isFinished) {
+        let {lesson, authorized, paused} = this.props,
+            {IsAuthRequired} = lesson,
+            _tooltip = null;
+
+        if (IsAuthRequired && !authorized) {
+            _tooltip = TooltipTitles.locked
+        } else {
+            _tooltip = isThisLessonPlaying ?
+                (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
+                :
+                (isFinished ? TooltipTitles.replay : TooltipTitles.play);
+        }
+
+        return _tooltip;
+    }
+
     render() {
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
-        let {playingLesson, paused, lesson} = this.props,
+        let {playingLesson, paused, lesson, authorized} = this.props,
+            {IsAuthRequired} = lesson,
+            _lessonLocked = (IsAuthRequired && !authorized),
             _id = lesson.Id,
             _totalDuration = lesson.Duration,
-            _duration = lesson.DurationFmt,
             _lessonUrl = lesson.URL,
             _courseUrl= lesson.courseUrl,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
@@ -115,14 +134,19 @@ class PlayBlock extends React.Component {
         return (
             <button className="extras-list__play-btn" type="button"
                     style={{backgroundImage: "url('/data/" + this.props.cover + "')"}}>
-                <div className="play-block__loader">
-                    <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
-                         version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
-                                strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
-                                strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
-                    </svg>
-                </div>
+                {
+                    !_lessonLocked ?
+                        <div className="play-block__loader">
+                            <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
+                                        strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                        strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
+                            </svg>
+                        </div>
+                        :
+                        null
+                }
                 {
                     (_isThisLessonPlaying)
                         ?
@@ -137,6 +161,7 @@ class PlayBlock extends React.Component {
                         :
                         this._getButton(_isThisLessonPlaying, _isFinished)
                 }
+                <div className="lecture__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
             </button>
         )
     }
