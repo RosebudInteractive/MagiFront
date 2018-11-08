@@ -27,7 +27,7 @@ module.exports = {
             type: "scheduled-task",
             disabled: false,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
-            schedule: "33 11 11,20 * * *", // run twice a day
+            schedule: "33 11 10,19 * * *", // run twice a day
             options: {
                 host: "https://magisteria.ru",
                 period: "week",
