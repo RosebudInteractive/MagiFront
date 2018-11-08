@@ -190,7 +190,7 @@ class Copyright extends React.Component {
     render() {
         return (
             <div className="page-footer__copyright">
-                <div className="page-footer__wrapper">
+                <div className="page-footer__wrapper ">
                     <p>{'© Magisteria 2016 - 2017. All rights reserved. '}
                             <Link to={'/doc/privacy.pdf'} target="_blank">Политика конфиденциальности</Link> / <Link to={'/doc/terms.pdf'} target="_blank">Пользовательское
                             соглашение</Link>

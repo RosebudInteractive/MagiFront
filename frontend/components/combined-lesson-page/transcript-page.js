@@ -240,47 +240,6 @@ class TextBlock extends React.Component {
     }
 }
 
-class SocialBlockMoc extends React.Component {
-
-    render() {
-        const _tw = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#tw"/>',
-            _fb = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fb"/>',
-            _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk"/>',
-            _ok = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ok"/>';
-
-        const _style = {top: 0, bottom: 'auto'}
-
-        return (
-            <div className="social-block-vertical _left js-social" style={_style}>
-                <a href="#" className="social-btn-dark">
-                    <div className="social-btn-dark__icon">
-                        <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">19</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">64</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
-                    </div>
-                    <span className="social-btn-dark__actions">91</span>
-                </a>
-                <a href="#" className="social-btn-dark _active">
-                    <div className="social-btn-dark__icon">
-                        <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
-                    </div>
-                    <span className="social-btn-dark__actions"/>
-                </a>
-            </div>
-        )
-    }
-}
-
 class Refs extends React.Component {
 
     _getList() {

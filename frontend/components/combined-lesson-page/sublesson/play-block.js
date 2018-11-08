@@ -132,7 +132,7 @@ class PlayBlock extends React.Component {
         }
 
         return (
-            <button className="extras-list__play-btn" type="button"
+            <div className="extras-list__play-btn sublesson__play-btn-big" type="button"
                     style={{backgroundImage: "url('/data/" + this.props.cover + "')"}}>
                 {
                     !_lessonLocked ?
@@ -162,7 +162,8 @@ class PlayBlock extends React.Component {
                         this._getButton(_isThisLessonPlaying, _isFinished)
                 }
                 <div className="lecture__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
-            </button>
+                <div className="play-block__red-shadow"/>
+            </div>
         )
     }
 }
