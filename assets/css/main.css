@@ -7566,6 +7566,8 @@ body[data-page="fullpage-player"] .lectures-menu {
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid #c8684c;
   border-radius: 50%; }
+  .play-btn-small:hover {
+    box-shadow: 0 3px 12px rgba(200, 104, 76, 0.3); }
   .play-btn-small svg {
     position: absolute;
     top: 50%;
@@ -7584,8 +7586,11 @@ body[data-page="fullpage-player"] .lectures-menu {
   .play-btn-small.paused svg{
     margin-left: 0;}
   .play-btn-small_locked{
+    box-shadow: none  ;
     background-color: rgba(165, 165, 165, 0.8) !important;
     border: none !important; }
+  .play-btn-small_locked:hover {
+    box-shadow: none !important; }
 
 .link-to-transcript {
   position: absolute;
@@ -15890,7 +15895,8 @@ ul.lectures-tab {
 .extras-list__play-btn:focus {
   outline: none; }
 .extras-list__play-btn:hover {
-  opacity: 1; }
+  opacity: 1;
+  box-shadow: 0 3px 12px rgba(200, 104, 76, 0.3); }
 .extras-list__play-btn:hover + .lecture__tooltip{
   display: inline-block;
   opacity: 1;
