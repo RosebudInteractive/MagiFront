@@ -1,15 +1,15 @@
 import React from "react";
 import {connect} from "react-redux";
 import {authorSelector} from '../../ducks/author'
+import $ from 'jquery'
 import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
-
 
 class AuthorBlock extends React.Component {
 
     constructor(props) {
         super(props);
 
-        this._resizeHandler = (e) => {
+        this._resizeHandler = () => {
             let _image = $('.author-block__image');
 
             _image.innerHeight(_image.innerWidth() * 1.16)

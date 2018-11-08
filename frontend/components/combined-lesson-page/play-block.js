@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import {Redirect} from 'react-router';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
@@ -8,6 +7,7 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions";
 import $ from "jquery";
 import history from '../../history';
+import {TooltipTitles} from "../../tools/page-tools";
 
 
 class PlayBlock extends React.Component {
@@ -98,21 +98,26 @@ class PlayBlock extends React.Component {
             _tooltip = null;
 
         if (IsAuthRequired && !authorized) {
-            _tooltip = 'Для просмотра этой лекции необходимо авторизоваться на сайте'
+            _tooltip = TooltipTitles.locked
         } else {
-            _tooltip = isThisLessonPlaying ? (paused ? (isFinished ? "С начала" : "Смотреть") : 'Пауза') : (isFinished ? "С начала" : "Смотреть");
+            _tooltip = isThisLessonPlaying ?
+                (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
+                :
+                (isFinished ? TooltipTitles.replay : TooltipTitles.play);
         }
 
         return _tooltip;
     }
 
     render() {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
             _radius = 97.75;
 
-        let {playingLesson, paused, lesson, extClass} = this.props,
+        let {playingLesson, paused, lesson, extClass, authorized} = this.props,
             _id = lesson.Id,
+            {IsAuthRequired} = lesson,
+            _lessonLocked = (IsAuthRequired && !authorized),
             _totalDuration = lesson.Duration,
             _duration = lesson.DurationFmt,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
@@ -137,14 +142,19 @@ class PlayBlock extends React.Component {
             <div className={"play-block" + (extClass ? ' ' + extClass : '')}>
                 <div className="play-block__image-wrapper"
                      style={{backgroundImage: "url(" + '/data/' + this.props.cover + ")"}}/>
-                <div className="play-block__loader">
-                    <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
-                         version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
-                                strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
-                                strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
-                    </svg>
-                </div>
+                {
+                    !_lessonLocked ?
+                        <div className="play-block__loader">
+                            <svg className="svg-loader" width="200" height="200" viewBox="0 0 200 200"
+                                 version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                <circle className="bar" id="bar01" r={_radius} cx="50%" cy="50%" fill="transparent"
+                                        strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                        strokeDashoffset={_offset} style={{strokeWidth: '6px'}}/>
+                            </svg>
+                        </div>
+                        :
+                        null
+                }
                 {
                     (_isThisLessonPlaying)
                         ?

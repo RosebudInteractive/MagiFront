@@ -90,15 +90,18 @@ class LessonPlayBlockSmall extends React.Component {
         return _button;
     }
 
-    _getTooltip(isFinished){
-        let {lesson, authorized} = this.props,
+    _getTooltip(isThisLessonPlaying, isFinished){
+        let {lesson , authorized, paused} = this.props,
             {IsAuthRequired} = lesson,
             _tooltip = null;
 
         if (IsAuthRequired && !authorized) {
             _tooltip = TooltipTitles.locked
         } else {
-            _tooltip = isFinished ? TooltipTitles.replay : TooltipTitles.play
+            _tooltip = isThisLessonPlaying ?
+                (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
+                :
+                (isFinished ? TooltipTitles.replay : TooltipTitles.play);
         }
 
         return _tooltip;
@@ -108,8 +111,10 @@ class LessonPlayBlockSmall extends React.Component {
         const _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
-        let {lesson, playingLesson, paused,} = this.props,
+        let {lesson, playingLesson, paused, authorized} = this.props,
             {Id: id, Duration: _totalDuration, } = lesson,
+            {IsAuthRequired} = lesson,
+            _lessonLocked = (IsAuthRequired && !authorized),
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
@@ -127,14 +132,20 @@ class LessonPlayBlockSmall extends React.Component {
         }
 
         return <div className='sublesson__play-block__wrapper'>
-            <div className="play-block-small">
-                <svg className="svg-loader small" width="200" height="200" viewBox="0 0 200 200"
-                     version="1.1" xmlns="http://www.w3.org/2000/svg">
-                    <circle className="bar" id="bar01" r={_radius} cx="100" cy="100" fill="transparent"
-                            strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
-                            strokeDashoffset={_offset} style={{strokeWidth: '18px'}}/>
-                </svg>
-            </div>
+            {
+                !_lessonLocked ?
+                    <div className="play-block-small">
+                        <svg className="svg-loader small" width="200" height="200" viewBox="0 0 200 200"
+                             version="1.1" xmlns="http://www.w3.org/2000/svg">
+                            <circle className="bar" id="bar01" r={_radius} cx="100" cy="100" fill="transparent"
+                                    strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
+                                    strokeDashoffset={_offset} style={{strokeWidth: '18px'}}/>
+                        </svg>
+                    </div>
+                    :
+                    null
+            }
+
             {
                 _isThisLessonPlaying
                     ?
@@ -150,7 +161,7 @@ class LessonPlayBlockSmall extends React.Component {
                     :
                     this._getSmallButton(_isThisLessonPlaying, _isFinished)
             }
-            <span className="lecture__tooltip">{this._getTooltip(_isFinished)}</span>
+            <span className="lecture__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</span>
         </div>
     }
 }

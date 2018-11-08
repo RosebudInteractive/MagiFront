@@ -6245,11 +6245,32 @@ ul.user-tooltip {
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
     font-size: 0; }
+  .course-module .lecture__btn,
+  .transcript-page._nested .lecture__btn,
+  .lecture-info__extras-list .lecture__btn,
+  .lectures-list__item-header .lecture__btn,
+  .play-block.play-block--big .play-block__btn{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; }
+  /*.lecture-info__extras-list .lecture__btn{*/
+    /*width: 83px;*/
+    /*height: 83px;*/
+    /*border-radius: 50%; }*/
+  .course-module .lecture__btn svg,
+  .transcript-page._nested .lecture__btn svg,
+  .lecture-info__extras-list .lecture__btn svg,
+  .lectures-list__item-header .lecture__btn svg,
+  .play-block.play-block--big .play-block__btn svg{
+    margin-left: auto;
+    margin-right: auto; }
     .lecture__btn:hover + .play-block__tooltip,
+    .play-block__btn:hover + .play-block__tooltip,
+    .play-btn-small:hover .play-block__tooltip,
     .lecture__btn:hover + .lecture__tooltip{
       display: inline-block;
       opacity: 1;
-      z-index: 2; }
+      z-index: 10; }
     .lecture__btn svg {
       display: block;
       width: 40px;
@@ -6699,7 +6720,8 @@ ul.user-tooltip {
     transform: translate(-50%, -50%);
     margin-left: 5px;
     font-size: 0; }
-    .play-block__btn:hover + .play-block__tooltip {
+    .play-block__btn:hover + .play-block__tooltip,
+    .play-btn-small:hover .play-block__tooltip {
       opacity: 1;
       z-index: 1; }
     .play-block__btn svg {
@@ -7267,7 +7289,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     .lectures-list__item:hover .play-block {
       z-index: 10 }
     .lectures-list__item .play-block {
-      z-index: 1 }
+      z-index: 0 }
     .lectures-list__item.active:hover .lectures-list__item-title span {
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
     .lectures-list__item:before {
@@ -7297,7 +7319,7 @@ body[data-page="fullpage-player"] .lectures-menu {
       position: relative; }
       .lectures-list__item.active .lectures-list__item-header > * {
       position: relative;
-      z-index: 1; }
+      z-index: 0; }
     .lectures-list__item.active:hover .lectures-list__item-header > * {
       position: relative;
       z-index: 10; }
@@ -7544,6 +7566,8 @@ body[data-page="fullpage-player"] .lectures-menu {
   background-color: rgba(255, 255, 255, 0);
   border: 1px solid #c8684c;
   border-radius: 50%; }
+  .play-btn-small:hover {
+    box-shadow: 0 3px 12px rgba(200, 104, 76, 0.3); }
   .play-btn-small svg {
     position: absolute;
     top: 50%;
@@ -7562,8 +7586,11 @@ body[data-page="fullpage-player"] .lectures-menu {
   .play-btn-small.paused svg{
     margin-left: 0;}
   .play-btn-small_locked{
+    box-shadow: none  ;
     background-color: rgba(165, 165, 165, 0.8) !important;
     border: none !important; }
+  .play-btn-small_locked:hover {
+    box-shadow: none !important; }
 
 .link-to-transcript {
   position: absolute;
@@ -14165,22 +14192,36 @@ ul.lectures-tab {
       margin-left: 20px;
       width: 30px;
       height: 30px; } }
+  .lecture-info__extras-list .sublesson__play-block__wrapper {
+    -webkit-box-ordinal-group: 3;
+    -webkit-order: 2;
+    -moz-box-ordinal-group: 3;
+    -ms-flex-order: 2;
+    order: 2;
+    margin: 0;
+    display: none; }
 
-  .sublesson__play-block__wrapper  .play-block-small {
+  @media (max-width: 899px) {
+    .lecture-info__extras-list .sublesson__play-block__wrapper {
+      display: block; } }
+
+  .sublesson__play-block__wrapper .play-block-small {
     position: absolute;
     width: 36px;
     height: 36px; }
   @media (max-width: 899px) {
-  .sublesson__play-block__wrapper  .play-block-small {
+  .sublesson__play-block__wrapper .play-block-small {
       width: 30px;
       height: 30px; } }
 
-  .sublesson__play-block__wrapper  .extras-list__play-btn {
+  .sublesson__play-block__wrapper .extras-list__play-btn {
     margin-left: 0;
     position: absolute;
     display: block;
-    border-width: 1px;
-  }
+    border-width: 1px; }
+
+  .lecture-info__extras-list .sublesson__play-block__wrapper .extras-list__play-btn.mobile {
+    margin: 0; }
 
   .sublesson__play-block__wrapper .extras-list__play-btn svg {
     position: absolute;
@@ -15854,7 +15895,8 @@ ul.lectures-tab {
 .extras-list__play-btn:focus {
   outline: none; }
 .extras-list__play-btn:hover {
-  opacity: 0.7; }
+  opacity: 1;
+  box-shadow: 0 3px 12px rgba(200, 104, 76, 0.3); }
 .extras-list__play-btn:hover + .lecture__tooltip{
   display: inline-block;
   opacity: 1;
