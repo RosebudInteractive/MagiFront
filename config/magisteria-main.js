@@ -117,7 +117,7 @@ module.exports = {
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
-            subject: "Registration on \"Magisteria.Ru\".",
+            subject: "Регистрация на \"Magisteria.Ru\".",
             sender: pk.mail.userReg.sender,
             options: {
                 disableUrlAccess: false,
@@ -133,7 +133,7 @@ module.exports = {
         pwdRecovery: {
             type: "smtp",
             template: "./templates/mail/pwd-recovery.tmpl",
-            subject: "Password recovery on \"Magisteria.Ru\".",
+            subject: "Восстановление пароля на \"Magisteria.Ru\".",
             sender: pk.mail.pwdRecovery.sender,
             options: {
                 disableUrlAccess: false,
