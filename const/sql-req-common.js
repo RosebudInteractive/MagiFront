@@ -8,5 +8,19 @@ module.exports = {
     AUTHORS_BY_ID_MYSQL_PUBLIC_REQ:
         "select a.`Id`, l.`FirstName`, l.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` from `Author` a\n" +
         "  join`AuthorLng` l on l.`AuthorId` = a.`Id`\n" +
-        "where a.`Id` in (<%= authors %>)"
+        "where a.`Id` in (<%= authors %>)",
+    CHECK_IF_CAN_DEL_LESSON_MSSQL:
+        "select l.[Id] from [Lesson] l\n" +
+        "  join[LessonCourse] lc on lc.[LessonId] = l.[Id]\n" +
+        "  join [EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+        "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
+        "  join [EpisodeLng] eln on e.[Id] = eln.[EpisodeId]\n" +
+        "where(l.[Id] = <%= id %>) and((lc.[State] = 'R') or(eln.[State] = 'R'))",
+    CHECK_IF_CAN_DEL_LESSON_MYSQL:
+        "select l.`Id` from `Lesson` l\n" +
+        "  join`LessonCourse` lc on lc.`LessonId` = l.`Id`\n" +
+        "  join `EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+        "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
+        "  join `EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
+        "where(l.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))"
 };

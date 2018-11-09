@@ -2,11 +2,16 @@ const _ = require('lodash');
 const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
-const { ACCOUNT_ID, AUTHORS_BY_ID_MSSQL_PUBLIC_REQ, AUTHORS_BY_ID_MYSQL_PUBLIC_REQ } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const {
+    ACCOUNT_ID,
+    AUTHORS_BY_ID_MSSQL_PUBLIC_REQ,
+    AUTHORS_BY_ID_MYSQL_PUBLIC_REQ,
+    CHECK_IF_CAN_DEL_LESSON_MSSQL,
+    CHECK_IF_CAN_DEL_LESSON_MYSQL } = require('../const/sql-req-common');
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -661,6 +666,16 @@ const GET_LESSON_FOR_PRERENDER_BY_URL_MYSQL =
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where lc.`State` = 'R' and c.`State` = 'P' and l.`URL` = '<%= lesson_url %>' and c.`URL` = '<%= course_url %>'";
+
+const CHECK_IF_CAN_DEL_EPI_MSSQL =
+    "select e.[Id] from [Episode] e\n" +
+    "  join[EpisodeLng] eln on e.[Id] = eln.[EpisodeId]\n" +
+    "where (e.[Id] = <%= id %>) and (eln.[State] = 'R')";
+
+const CHECK_IF_CAN_DEL_EPI_MYSQL =
+    "select e.`Id` from `Episode` e\n" +
+    "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
+    "where (e.`Id` = <%= id %>) and (eln.`State` = 'R')";
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
 
@@ -1824,15 +1839,27 @@ const DbLesson = class DbLesson extends DbObject {
                             .then(() => {
                                 if (lsn_to_delete.length > 0)
                                     return Utils.seqExec(lsn_to_delete, (id) => {
-                                        let mysql_script = [];
-                                        LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
-                                            mysql_script.push(_.template(elem)({ id: id }));
-                                        });
-                                        let mssql_script = [];
-                                        LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
-                                            mssql_script.push(_.template(elem)({ id: id }));
-                                        });
-                                        return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                        return $data.execSql({
+                                            dialect: {
+                                                mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
+                                                mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
+                                            }
+                                        }, {})
+                                            .then((result) => {
+                                                if (result && result.detail && (result.detail.length > 0))
+                                                    throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
+                                            })
+                                            .then(() => {
+                                                let mysql_script = [];
+                                                LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                    mysql_script.push(_.template(elem)({ id: id }));
+                                                });
+                                                let mssql_script = [];
+                                                LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                    mssql_script.push(_.template(elem)({ id: id }));
+                                                });
+                                                return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                            });
                                     });
                             });
                    })
@@ -2341,16 +2368,28 @@ const DbLesson = class DbLesson extends DbObject {
                                 let rc = Promise.resolve();
                                 if (elem.deleted && elem.isOwner) {
                                     let id = elem.ownObj.id();
-                                    urls_to_delete.push("/" + course_url + "/" + elem.ownObj.uRL() + "/");
-                                    let mysql_script = [];
-                                    LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
-                                        mysql_script.push(_.template(elem)({ id: id }));
-                                    });
-                                    let mssql_script = [];
-                                    LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
-                                        mssql_script.push(_.template(elem)({ id: id }));
-                                    });
-                                    rc = DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                    rc= $data.execSql({
+                                        dialect: {
+                                            mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
+                                            mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
+                                        }
+                                    }, {})
+                                        .then((result) => {
+                                            if (result && result.detail && (result.detail.length > 0))
+                                                throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
+                                        })
+                                        .then(() => {
+                                            urls_to_delete.push("/" + course_url + "/" + elem.ownObj.uRL() + "/");
+                                            let mysql_script = [];
+                                            LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                mysql_script.push(_.template(elem)({ id: id }));
+                                            });
+                                            let mssql_script = [];
+                                            LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                mssql_script.push(_.template(elem)({ id: id }));
+                                            });
+                                            return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                        });
                                 }
                                 return rc;
                             });
@@ -2361,15 +2400,27 @@ const DbLesson = class DbLesson extends DbObject {
                                 let rc = Promise.resolve();
                                 if (elem.deleted && elem.isOwner) {
                                     let id = elem.ownObj.id();
-                                    let mysql_script = [];
-                                    EPISODE_MYSQL_DELETE_SCRIPT.forEach((elem) => {
-                                        mysql_script.push(_.template(elem)({ id: id }));
-                                    });
-                                    let mssql_script = [];
-                                    EPISODE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
-                                        mssql_script.push(_.template(elem)({ id: id }));
-                                    });
-                                    rc = DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                    rc = $data.execSql({
+                                        dialect: {
+                                            mysql: _.template(CHECK_IF_CAN_DEL_EPI_MSSQL)({ id: id }),
+                                            mssql: _.template(CHECK_IF_CAN_DEL_EPI_MSSQL)({ id: id })
+                                        }
+                                    }, {})
+                                        .then((result) => {
+                                            if (result && result.detail && (result.detail.length > 0))
+                                                throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete episode (Id: "${id}") which is "READY".`);
+                                        })
+                                        .then(() => {
+                                            let mysql_script = [];
+                                            EPISODE_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                mysql_script.push(_.template(elem)({ id: id }));
+                                            });
+                                            let mssql_script = [];
+                                            EPISODE_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                                mssql_script.push(_.template(elem)({ id: id }));
+                                            });
+                                            return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                        });
                                 }
                                 return rc;
                             });
