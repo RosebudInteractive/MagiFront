@@ -58,8 +58,7 @@ class Menu extends React.Component {
                 (extClass ? ' ' + extClass : '')
 
         return (
-            <div
-                className={_menuClassName}>
+            <div className={_menuClassName}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
                 <ListBlock total={_total}
                            courseUrl={_courseUrl}
@@ -69,6 +68,7 @@ class Menu extends React.Component {
                     <svg width="60" height="53" dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                 </button>
                 <Navigation isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes}/>
+                <div className='lectures-menu__gradient-block'/>
             </div>
         )
     }

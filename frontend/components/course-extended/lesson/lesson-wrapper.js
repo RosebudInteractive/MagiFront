@@ -76,7 +76,7 @@ export class LessonFull extends React.Component {
                                 <svg width="14" height="23"
                                      dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks(lessonUrl) ? _redFlag : _flag}}/>
                             </button>
-                            <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title}</Link></h3>
+                            <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title + '.'}</Link></h3>
                             <p className="lecture-full__descr">
                                 {' ' + this.props.descr + ' '}
                                 {needShowAuthors ? <p className="lecture-full__author">{lesson.authorName}</p> : null}
