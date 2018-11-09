@@ -316,6 +316,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             let lesson_obj = null;
             let ep_lesson_collection = null;
             let ep_lesson_obj = null;
+            let ep_lng_obj = null;
             let episode_number;
             let isSupp;
 
@@ -369,7 +370,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                         let lng_collection = collection.get(0).getDataRoot("EpisodeLng").getCol("DataElements");
                         if (lng_collection.count() != 1)
                             throw new Error("Episode (Id = " + id + ") has inconsistent \"LNG\" part.");
-                        
+                        ep_lng_obj = lng_collection.get(0);
+
                         duration = lng_collection.get(0).duration();
                         duration = typeof (duration) === "number" ? duration : 0;
 
@@ -379,6 +381,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                         let episode_obj = collection.get(0);
                         if (episode_obj.lessonId() === lesson_id) {
                             // We need to remove whole episode here    
+                            if (ep_lng_obj.state() === "R")
+                                throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete "READY" episode (Id: "${id}").`);                            
                             collection._del(episode_obj);
                             hasDeleted = true;
                         }

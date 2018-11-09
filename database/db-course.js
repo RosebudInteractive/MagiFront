@@ -9,7 +9,9 @@ const {
     ACCOUNT_ID,
     LANGUAGE_ID,
     AUTHORS_BY_ID_MSSQL_PUBLIC_REQ,
-    AUTHORS_BY_ID_MYSQL_PUBLIC_REQ
+    AUTHORS_BY_ID_MYSQL_PUBLIC_REQ,
+    CHECK_IF_CAN_DEL_LESSON_MSSQL,
+    CHECK_IF_CAN_DEL_LESSON_MYSQL
 } = require('../const/sql-req-common');
 
 const _ = require('lodash');
@@ -376,6 +378,24 @@ const GETCOURSE_LESSONS_URLS_MYSQL =
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where c.`Id` = <%= id %>";
+
+const CHECKIF_CAN_DEL_MSSQL =
+    "select c.[Id] from [Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  join[EpisodeLng] eln on e.[Id] = eln.[EpisodeId]\n" +
+    "where(c.[Id] = <%= id %>) and((lc.[State] = 'R') or(eln.[State] = 'R'))";
+
+const CHECKIF_CAN_DEL_MYSQL =
+    "select c.`Id` from `Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
+    "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
 let { LessonsService } = require('./db-lesson');
@@ -1022,7 +1042,21 @@ const DbCourse = class DbCourse extends DbObject {
                             throw new Error("Course (Id = " + id + ") doesn't exist.");
                         course_obj = collection.get(0);
                         course_url = course_obj.uRL();
+                        if (course_obj.state()==="P")
+                            throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete published course (Id: "${id}").`);                            
                         return result.edit()
+                    })
+                    .then(() => {
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(CHECKIF_CAN_DEL_MYSQL)({ id: id }),
+                                mssql: _.template(CHECKIF_CAN_DEL_MSSQL)({ id: id })
+                            }
+                        }, {})
+                            .then((result) => {
+                                if (result && result.detail && (result.detail.length > 0))
+                                    throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete course (Id: "${id}") which has "READY" lessons or episodes.`);                            
+                            });
                     })
                     .then(() => {
                         return $data.execSql({
@@ -1374,16 +1408,28 @@ const DbCourse = class DbCourse extends DbObject {
                             let lesson_ids = [];
                             let lesson_del_func = (elem) => {
                                 let id = elem.lessonId();
-                                lesson_ids.push(id);
-                                let mysql_script = [];
-                                LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
-                                    mysql_script.push(_.template(elem)({ id: id }));
-                                });
-                                let mssql_script = [];
-                                LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
-                                    mssql_script.push(_.template(elem)({ id: id }));
-                                });
-                                return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                return $data.execSql({
+                                    dialect: {
+                                        mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
+                                        mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
+                                    }
+                                }, {})
+                                    .then((result) => {
+                                        if (result && result.detail && (result.detail.length > 0))
+                                            throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
+                                    })
+                                    .then(() => {
+                                        lesson_ids.push(id);
+                                        let mysql_script = [];
+                                        LESSON_MYSQL_DELETE_SCRIPT.forEach((elem) => {
+                                            mysql_script.push(_.template(elem)({ id: id }));
+                                        });
+                                        let mssql_script = [];
+                                        LESSON_MSSQL_DELETE_SCRIPT.forEach((elem) => {
+                                            mssql_script.push(_.template(elem)({ id: id }));
+                                        });
+                                        return DbUtils.execSqlScript(mysql_script, mssql_script, opts);
+                                    });
                             };
                             return Utils.seqExec(lsn_child_deleted, lesson_del_func)
                                 .then(() => {
