@@ -1,5 +1,5 @@
 import React from 'react';
-import LectureWrapper from './lecture-wrapper';
+import LectureWrapper from './lessons/lecture-wrapper';
 import PropTypes from 'prop-types';
 
 export default class CourseModuleBody extends React.Component {

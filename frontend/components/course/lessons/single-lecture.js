@@ -1,33 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 import {Link} from 'react-router-dom';
-import PlayBlock from './play-block'
+import PlayBlock from '../play-block'
 
-export default class Wrapper extends React.Component {
-
-    static propTypes = {
-        courseUrl: PropTypes.string.isRequired,
-        lessons: PropTypes.array.isRequired,
-        isMobile: PropTypes.bool.isRequired,
-    };
-
-    render() {
-        let {lessons, isMobile} = this.props;
-
-        return (
-            <div className='lectures-wrapper'>
-                {
-                    isMobile ?
-                        <LecturesList lessons={lessons} courseUrl={this.props.courseUrl}/>
-                        :
-                        <SingleLecture lesson={lessons[0]} courseUrl={this.props.courseUrl}/>
-                }
-            </div>
-        )
-    }
-}
-
-class SingleLecture extends React.Component {
+export default class SingleLecture extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object.isRequired,
@@ -72,21 +48,3 @@ class SingleLecture extends React.Component {
         )
     }
 }
-
-class LecturesList extends React.Component {
-
-    static propTypes = {
-        lessons: PropTypes.array.isRequired,
-        courseUrl: PropTypes.string.isRequired,
-    }
-
-    render() {
-        return this.props.lessons.map((item, index) => {
-            return <SingleLecture lesson={item} key={index} courseUrl={this.props.courseUrl}/>
-        })
-    }
-}
-
-Wrapper.propTypes = {
-    lessons: PropTypes.array.isRequired,
-};

@@ -4526,7 +4526,7 @@ li.fancybox-thumbs-loading {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    padding: 3px 36px;
+    padding: 2px 36px;
     max-width: 0;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 20px;
@@ -5046,7 +5046,8 @@ ul.user-tooltip {
       -moz-box-direction: normal;
       -ms-flex-direction: column;
       flex-direction: column; } }
-  .course-module a.course-module__read-more {
+  .course-module .course-module__read-more {
+    cursor: pointer;
     display: none;
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 13px;
@@ -5054,20 +5055,20 @@ ul.user-tooltip {
     color: #2f2f2f;
     border-bottom: 1px solid rgba(200, 104, 76, 0.2);
     margin-bottom: 29px; }
-    .course-module a.course-module__read-more .less {
+    .course-module .course-module__read-more .less {
       display: none; }
-    .course-module a.course-module__read-more .icon {
+    .course-module .course-module__read-more .icon {
       padding-left: 4px; }
-    .course-module a.course-module__read-more.opened .less {
+    .course-module .course-module__read-more.opened .less {
       display: -webkit-box;
       display: -webkit-flex;
       display: -moz-box;
       display: -ms-flexbox;
       display: flex; }
-    .course-module a.course-module__read-more.opened .more {
+    .course-module .course-module__read-more.opened .more {
       display: none; }
     @media (max-width: 639px) {
-      .course-module a.course-module__read-more {
+      .course-module .course-module__read-more {
         display: inline-block;
         vertical-align: top; } }
   .course-module__button-row {
@@ -5516,7 +5517,7 @@ ul.user-tooltip {
     width: 59px;
     height: 59px;
     overflow: hidden; }
-    @media (max-width: 1279px) {
+    @media (max-width: 899px) {
       .course-module__info-col-img {
         display: none; } }
     .course-module__info-col-img img {
@@ -5572,7 +5573,12 @@ ul.user-tooltip {
     .course-module__course-descr .cur {
       font-style: italic; }
     .course-module__course-descr a {
-      color: #c8684c; }
+      color: #c8684c;
+      border-bottom: 1px solid rgba(200, 104, 76, 0);
+      -webkit-transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease; }
+    .course-module__course-descr a:hover {
+      border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
   .course-module--extended {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -8277,12 +8283,18 @@ body[data-page="fullpage-player"] .lectures-menu {
   display: -ms-flexbox;
   display: flex; }
   .social-block--dark .social-btn {
-    border: 1px solid rgba(47, 47, 74, 0.2); }
+    margin-bottom: 0; }
   .social-block--dark .social-btn__icon svg {
     fill: rgba(47, 47, 47, 0.6); }
   .social-block--dark .social-btn__actions {
     color: rgba(47, 47, 47, 0.6); }
-  .social-block--dark .social-btn._active:last-child {
+  /*.social-block--dark .social-btn._active:last-child {*/
+    /*border-right: 1px solid rgba(47, 47, 74, 0.2); }*/
+  .social-button-wrapper {
+    margin-bottom: 7px;
+    border: 1px solid rgba(47, 47, 74, 0.2);
+    border-right: none; }
+  .social-block--dark .social-button-wrapper:last-child {
     border-right: 1px solid rgba(47, 47, 74, 0.2); }
 
 .social-btn {
@@ -10161,6 +10173,7 @@ ul.lectures-tab {
       .lecture-full__play-block {
         padding-left: 0; }
         .lecture-full__play-block .play-block {
+          margin-left: 20px;
           padding-top: 0;
           width: 126px;
           height: 126px;
@@ -10239,6 +10252,9 @@ ul.lectures-tab {
         left: auto;
         right: 0;
         top: 8px; } }
+    @media (max-width: 639px) {
+      .lecture-full__fav {
+        top: -130px; } }
   .lecture-full__descr {
     margin: 0;
     display: inline; }
@@ -15887,8 +15903,9 @@ ul.lectures-tab {
 .extras-list li .counter,
 .extras-list li .inner-counter {
   display: inline;
-  margin-right: 4px;
   color: #c8684c; }
+.extras-list li .inner-counter {
+  margin-right: 4px; }
 .extras-list li .duration {
   margin-left: 4px;
   font-size: 14px;
@@ -15896,8 +15913,13 @@ ul.lectures-tab {
   color: rgba(47, 47, 47, 0.6); }
 .extras-list__item {
   display: inline;
-    margin-right: auto;
-  color: #2f2f2f; }
+  margin-right: auto;
+  color: #2f2f2f;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease;}
+.extras-list__item:hover {
+  opacity: 0.6;
+}
 .extras-list__play-btn {
   padding: 0;
   background-color: rgba(255, 255, 255, 0);
@@ -16941,6 +16963,7 @@ ul.lectures-tab {
         padding-right: 0;
         width: 100%; } }
   .lectures-menu._plain-menu .lectures-list-wrapper {
+    margin-top: 1px;
     min-height: -webkit-calc(100vh - 53px);
     min-height: calc(100vh - 53px); }
   @media (max-width: 767px) {

@@ -9,7 +9,6 @@ import LessonFrame from '../lesson-frame';
 import $ from 'jquery'
 import {isLandscape} from "./tools";
 
-
 function _getHeight() {
     return $(window).innerHeight();
 }

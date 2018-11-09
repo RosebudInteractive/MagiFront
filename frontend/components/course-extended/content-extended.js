@@ -9,6 +9,18 @@ import {
 } from 'react-share';
 
 class Content extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            expanded: false
+        }
+    }
+
+    _switchExpanded() {
+        this.setState({
+            expanded: !this.state.expanded
+        })
+    }
 
     render() {
         if (!this.props.course) {
@@ -20,8 +32,12 @@ class Content extends React.Component {
         return (
             <div className="course-module__info-block">
                 <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                <Description descr={_descr}/>
+                <Description descr={_descr} isFull={this.state.expanded}/>
                 {/*<BookCard/>*/}
+                <div className={"course-module__read-more" + (this.state.expanded ? ' opened' : '')}>
+                    <span className="more" onClick={::this._switchExpanded}>Читать полное описание <span className="icon">↓</span></span>
+                    <span className="less" onClick={::this._switchExpanded}>Cкрыть описание <span className="icon">↑</span></span>
+                </div>
             </div>
         );
     }
@@ -50,7 +66,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="24" height="24" dangerouslySetInnerHTML={{__html: _fb}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.facebook ? counter.facebook : 0}</span>
                     </FacebookShareButton>
                 </div>
                 <div className='social-button-wrapper'>
@@ -58,7 +75,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="26" height="15" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.vkontakte ? counter.vkontakte : 0}</span>
                     </VKShareButton>
                 </div>
                 <div className='social-button-wrapper'>
@@ -66,7 +84,8 @@ class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="14" height="24" dangerouslySetInnerHTML={{__html: _ok}}/>
                         </div>
-                        <span className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
+                        <span
+                            className="social-btn__actions">{counter && counter.odnoklassniki ? counter.odnoklassniki : 0}</span>
                     </OKShareButton>
                 </div>
             </div>
@@ -75,11 +94,13 @@ class SocialBlock extends React.Component {
 }
 
 class Description extends React.Component {
-    createMarkup() { return {__html: this.props.descr}; }
+    createMarkup() {
+        return {__html: this.props.descr};
+    }
 
     render() {
         return (
-            <div className="course-module__course-descr">
+            <div className={"course-module__course-descr" + (this.props.isFull ? ' full' : '')}>
                 <p dangerouslySetInnerHTML={this.createMarkup()}/>
             </div>
         )
@@ -93,16 +114,19 @@ class BookCard extends React.Component {
         return (
             <div className="book-card _desktop hidden">
                 <div className="book-card__inner">
-                    <div className="book-card__image" style={{visibility:'hidden'}}>
+                    <div className="book-card__image" style={{visibility: 'hidden'}}>
                         <img src="/assets/images/book02.png" width={145} height={222} alt=""/>
                     </div>
-                    <div className="book-card__info"  hidden={true}>
+                    <div className="book-card__info" hidden={true}>
                         <h3 className="book-card__title">Обними меня крепче </h3>
                         <p className="book-card__author">Сью Джонсон</p>
                         <a href="#" className="btn btn--gray book-card__btn">
                             <span>Купить книгу <span className="price">350p.</span></span>
                         </a>
-                        <p className="book-card__descr">Когда люди слышат, что я соблюдаю распорядок, каждый день пишу, посвящаю время иностранному языку, работаю над крупным проектом, а через день хожу в спортзал, их изумляет моя дисциплина. Но на самом деле это всего лишь привычки, которые наделяют меня суперспособностями.</p>
+                        <p className="book-card__descr">Когда люди слышат, что я соблюдаю распорядок, каждый день пишу,
+                            посвящаю время иностранному языку, работаю над крупным проектом, а через день хожу в
+                            спортзал, их изумляет моя дисциплина. Но на самом деле это всего лишь привычки, которые
+                            наделяют меня суперспособностями.</p>
                     </div>
                 </div>
             </div>

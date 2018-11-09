@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom'
+import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
 
 export default class Info extends React.Component {
 
@@ -18,23 +19,8 @@ export default class Info extends React.Component {
             return category.Name
         }).join('\n');
 
-        let _author = this.props.authors[0];
-
-        let _portrait = _author ? (
-            _author.PortraitMeta ?
-                (
-                    _author.PortraitMeta.icon ?
-                        _author.PortraitMeta.icon :
-                        (
-                            _author.PortraitMeta.content ?
-                                _author.PortraitMeta.content :
-                                null
-                        )
-                ) : null
-            ) : null;
-
-
-        _portrait = '/data/' + (_portrait ? (_author.PortraitMeta.path + _portrait) : _author.Portrait);
+        let _author = this.props.authors[0],
+            _portrait = getAuthorPortraitPath(_author, ImageSize.small);
 
         return (
             <div className='course-module__info'>

@@ -172,9 +172,11 @@ class App extends Component {
         let _header = $('.page-header._fixed');
         if (_header && _header.length > 0) {
             if (_bellowScreen) {
-                _header.css("-webkit-transition", "-webkit-transform 0.2s ease").css("transition", "-webkit-transform 0.2s ease")
+                _header.css("-webkit-transition", "all 0.2s ease")
+                _header.css("transition", "all 0.2s ease")
             } else {
-                _header.css("-webkit-transition", "-webkit-transform 0.4s ease").css("transition", "-webkit-transform 0.4s ease")
+                _header.css("-webkit-transition", "all 0.4s ease")
+                _header.css("transition", "all 0.4s ease")
             }
         }
 
