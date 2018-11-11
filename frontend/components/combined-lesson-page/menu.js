@@ -282,7 +282,7 @@ class Navigation extends React.Component {
                                 :
                                 <li className="section-nav-list__item" onClick={::this._onRecommendedClick}>
                                     <a href="#recommend" className="section-nav-list__item-head js-scroll-link"
-                                       onClick={::this._onLinkMockClick}>Литература</a>
+                                       onClick={::this._onLinkMockClick}>Источники</a>
                                 </li>
                         }
 

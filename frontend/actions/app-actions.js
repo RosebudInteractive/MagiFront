@@ -30,7 +30,7 @@ export const switchToSmallPlayer = () => {
     return (dispatch, getState) => {
         let _playerState = getState().player
 
-        if (!_playerState.paused) {
+        if (!_playerState.paused || _playerState.starting) {
             dispatch({
                 type: SWITCH_TO_SMALL_PLAYER,
                 payload: null
