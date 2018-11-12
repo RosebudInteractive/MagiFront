@@ -220,6 +220,10 @@ class Frame extends Component {
             return null
         }
 
+        const _invisibleStyle = {
+            opacity: 0,
+            zIndex: -100,
+        }
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
             _contents = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#contents"/>',
@@ -232,8 +236,8 @@ class Frame extends Component {
         let { visible, starting, paused, contentArray, canNotPlay} = this.props;
 
         return (
-            <div style={visible ? null : {display: 'none'}}>
-                <div className="player-frame__poster" style={_isFinished || canNotPlay ? {display: 'none'} : null}>
+            <div style={visible ? null : _invisibleStyle}>
+                <div className="player-frame__poster" style={_isFinished || canNotPlay ? _invisibleStyle : null}>
                     <div className='ws-container' id={'player' + _id}>
                     </div>
                 </div>

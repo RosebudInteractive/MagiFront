@@ -42,7 +42,7 @@ export const scroll = () => {
     }
 }
 
-class TranscriptLessonPage extends React.Component {
+class CombineLessonPage extends React.Component {
     constructor(props) {
         super(props);
 
@@ -238,6 +238,7 @@ class TranscriptLessonPage extends React.Component {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
+            this.props.playerStartActions.cancelStarting(this._getLesson().Id);
         }
 
         if (this.state.redirectToPlayer) {
@@ -312,7 +313,7 @@ class TranscriptLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {lessonText, lessonUrl, playingLesson, isMobileApp,} = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded,} = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
@@ -324,7 +325,7 @@ class TranscriptLessonPage extends React.Component {
             <MobileLessonWrapper lesson={lesson}
                                  courseUrl={this.props.courseUrl}
                                  lessonUrl={lesson.URL}
-                                 isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                 isPlayer={(_playingLessonUrl || _lessonInPlayer) && !lessonEnded}
                                  audios={_audios}
                                  history={this.props.history}
                                  isMain={this._isMainLesson()}
@@ -338,7 +339,7 @@ class TranscriptLessonPage extends React.Component {
                                   active={lesson.Id}
                                   courseUrl={this.props.courseUrl}
                                   lessonUrl={lesson.URL}
-                                  isPlayer={_playingLessonUrl || _lessonInPlayer}
+                                  isPlayer={(_playingLessonUrl || _lessonInPlayer) && !lessonEnded}
                                   audios={_audios}
                                   history={this.props.history}
                                   isMain={this._isMainLesson()}
@@ -568,6 +569,7 @@ function mapStateToProps(state, ownProps) {
 
         playInfo: state.lessonPlayInfo.playInfo,
         playingLesson: state.player.playingLesson,
+        lessonEnded: state.player.ended,
         galleryIsOpen: state.app.galleryIsOpen,
 
         facebookAppID: state.app.facebookAppID,
@@ -585,4 +587,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TranscriptLessonPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CombineLessonPage);

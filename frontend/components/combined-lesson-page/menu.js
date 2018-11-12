@@ -177,6 +177,7 @@ class Navigation extends React.Component {
                     <a href={"#" + _id} className="section-nav-sublist__link"
                        onClick={(e) => {
                            e.preventDefault();
+                           this._closeMenu();
 
                            let position = $("#" + _id).offset().top - 75;
 
@@ -187,6 +188,18 @@ class Navigation extends React.Component {
                 </li>
             })
         })
+    }
+
+    _closeMenu() {
+        let _isMobile = window.innerWidth <= 899
+
+        if (_isMobile) {
+            this.setState({
+                expanded: false
+            })
+        } else {
+            this.setState({showToc: false})
+        }
     }
 
     _switchToc(e) {

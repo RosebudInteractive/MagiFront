@@ -25,15 +25,15 @@ export default class Info extends React.Component {
         return (
             <div className='course-module__info'>
                 <div className='course-module__info-col'>
-                    {
-                        this.props.showPhoto && !_multipleAuthors && _portrait ?
-                            <div className='course-module__info-col-img'>
-                                <img src={_portrait} width="59" height="59" alt=""/>
-                            </div>
-                            :
-                                null
+                    {/*{*/}
+                        {/*this.props.showPhoto && !_multipleAuthors && _portrait ?*/}
+                            {/*<div className='course-module__info-col-img'>*/}
+                                {/*<img src={_portrait} width="59" height="59" alt=""/>*/}
+                            {/*</div>*/}
+                            {/*:*/}
+                                {/*null*/}
 
-                    }
+                    {/*}*/}
                     <p className='course-module__info-col-header'>{_multipleAuthors ? 'Авторы' : 'Автор'}</p>
                     <p className='course-module__info-col-descr'>{_authors}</p>
                 </div>
