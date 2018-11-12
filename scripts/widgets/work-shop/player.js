@@ -591,6 +591,10 @@ export default class CWSPlayer extends CWSBase {
         }
     }
 
+    clearSource() {
+        // this.audio.data.src = ''
+    }
+
     play() {
         return new Promise((resolve) => {
             if (!this._audioState.audio) {

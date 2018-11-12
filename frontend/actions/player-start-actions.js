@@ -10,12 +10,20 @@ import {
     PLAYER_PREINIT_AUDIOS,
     PLAYER_START_REPLAY,
     PLAYER_CLEAR_AUDIOS,
+    PLAYER_CANCEL_START,
 } from '../constants/player'
 
 export const startPlayLesson = (lesson) => {
     return {
         type: PLAYER_START_PLAY_LESSON,
         payload: lesson
+    }
+};
+
+export const cancelStarting = (lessonId) => {
+    return {
+        type: PLAYER_CANCEL_START,
+        payload: lessonId
     }
 };
 
