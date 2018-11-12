@@ -126,14 +126,16 @@ class App extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (this.props.ownProps.location.pathname !== nextProps.ownProps.location.pathname) {
-            if (nextProps.playInfo) {
-                let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
-                if (nextProps.ownProps.location.pathname !== _targetUrl) {
-                    this.props.appActions.switchToSmallPlayer()
-                    // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
-                    // this.props.playerStartActions.clearAudios()
-                }
+        let _thisLocation = this.props.ownProps.location.pathname,
+            _nextLocation = nextProps.ownProps.location.pathname,
+            _needCheckPlayer = _thisLocation !== _nextLocation;
+
+        if (_needCheckPlayer && nextProps.playInfo) {
+            let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
+            if (nextProps.ownProps.location.pathname !== _targetUrl) {
+                this.props.appActions.switchToSmallPlayer()
+                // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
+                // this.props.playerStartActions.clearAudios()
             }
         }
 
@@ -204,7 +206,8 @@ class App extends Component {
         return (
             <Switch>
                 <Route exact path={_homePath} component={CoursePage}/>
-                <Route exact path={_homePath + 'razdel/:filter'} render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>
+                <Route exact path={_homePath + 'razdel/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>

@@ -11,10 +11,11 @@ import {
     PLAYER_START_SET_RATE,
     PLAYER_SET_SMALL_VIEWPORT,
     PLAYER_SET_FULL_VIEWPORT,
-    PLAYER_CLEAR_FULL_VIEWPORT,
+    PLAYER_CLEAR_FULL_VIEWPORT, PLAYER_CANCEL_START,
 } from '../constants/player'
 
 import {
+    CLEAR_LESSON_PLAY_INFO,
     GET_LESSON_PLAY_INFO_REQUEST,
     SET_LESSON_PLAY_INFO_LOADED,
 } from '../constants/lesson'
@@ -24,6 +25,7 @@ import {
     SWITCH_TO_FULL_PLAYER,
     DUMMY_SWITCH_TO_SMALL_PLAYER,
 } from '../constants/app'
+
 import * as storageActions from "../actions/lesson-info-storage-actions";
 
 const playerMiddleware = store => next => action => {
@@ -146,8 +148,25 @@ const playerMiddleware = store => next => action => {
 
         case SWITCH_TO_SMALL_PLAYER: {
             let _player = Player.getInstance();
+
             if (_player) {
                 _player.switchToSmall()
+            }
+            return next(action)
+        }
+
+        case PLAYER_CANCEL_START: {
+            let _playerState = store.getState().player,
+                _isStarting = _playerState ? _playerState.starting : false;
+
+            if (_isStarting) {
+                Player.cancelStarting(action.payload)
+                store.dispatch({
+                    type: CLEAR_LESSON_PLAY_INFO,
+                    payload: null,
+                })
+
+
             }
             return next(action)
         }

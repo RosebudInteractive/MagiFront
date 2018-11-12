@@ -28,6 +28,8 @@ window.Utils = Utils;
 let fullViewPort = null,
     smallViewPort = null;
 
+let _cancelStartLessonId = 0;
+
 class NestedPlayer {
 
     constructor(playingData, initState) {
@@ -263,6 +265,18 @@ class NestedPlayer {
         this.player.setVolume(value);
         // store.dispatch(playerActions.setVolume(value))
         // store.dispatch(playerActions.setVolume(this.audioState.volume))
+    }
+
+    _cancelStarting(){
+        if (this.player) {
+            this.player.pause();
+            this.player = null;
+        }
+
+        this._fullPlayer.destroy();
+
+        this._fullPlayer = null;
+        this._smallPlayer = null;
     }
 
     switchToSmall() {
@@ -523,10 +537,21 @@ export const getInstance = () => {
 }
 
 export const loadPlayInfo = (data, initState) => {
-    if (!_instance) {
-        _instance = new NestedPlayer(data, initState)
-    } else {
-        _instance._loadOtherLesson(data, initState)
+    if (!_cancelStartLessonId) {
+        if (!_instance) {
+            _instance = new NestedPlayer(data, initState)
+        } else {
+            _instance._loadOtherLesson(data, initState)
+        }
+    }
+
+    _cancelStartLessonId = 0;
+}
+
+export const cancelStarting = (lessonId) => {
+    _cancelStartLessonId = lessonId;
+    if (_instance) {
+        _instance._cancelStarting()
     }
 }
 
@@ -545,6 +570,8 @@ export const setFullViewPort = (div) => {
 }
 
 export const clearPlayInfo = () => {
+    _cancelStartLessonId = 0;
+    
     if (_instance) {
         _instance.clearPlayInfo()
     }

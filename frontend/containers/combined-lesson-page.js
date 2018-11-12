@@ -174,6 +174,7 @@ class TranscriptLessonPage extends React.Component {
     componentWillUnmount() {
         this._removeEventListeners();
         this.props.lessonActions.clearLesson();
+        this.props.playerStartActions.cancelStarting(this._getLesson().Id);
         this._removeMetaTags();
     }
 
