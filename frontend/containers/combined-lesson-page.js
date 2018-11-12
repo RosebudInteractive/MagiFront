@@ -42,7 +42,7 @@ export const scroll = () => {
     }
 }
 
-class TranscriptLessonPage extends React.Component {
+class CombineLessonPage extends React.Component {
     constructor(props) {
         super(props);
 
@@ -238,6 +238,7 @@ class TranscriptLessonPage extends React.Component {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
+            this.props.playerStartActions.cancelStarting(this._getLesson().Id);
         }
 
         if (this.state.redirectToPlayer) {
@@ -585,4 +586,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TranscriptLessonPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CombineLessonPage);

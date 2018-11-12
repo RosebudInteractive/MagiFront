@@ -18,6 +18,7 @@ import {
     PLAYER_START_PLAY_LESSON,
     PLAYER_CAN_NOT_START_PLAY_LESSON,
     PLAYER_SET_PROGRESS_PERCENT,
+    PLAYER_CANCEL_START,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -25,6 +26,7 @@ import * as tools from '../tools/time-tools'
 import {
     SET_LESSON_PLAY_INFO_LOADED,
     GET_LESSON_PLAY_INFO_REQUEST,
+    CLEAR_LESSON_PLAY_INFO,
 } from '../constants/lesson'
 
 const initialState = {
@@ -168,6 +170,10 @@ export default function player(state = initialState, action) {
 
         case HIDE_SPEED_TOOLTIP: {
             return {...state, showSpeedTooltip: false}
+        }
+
+        case CLEAR_LESSON_PLAY_INFO: {
+            return {...state, starting: false, playingLesson: null}
         }
 
         default:
