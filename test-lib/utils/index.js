@@ -3,7 +3,7 @@ const request = require('request');
 const { HttpMessage, HttpCode } = require('../../const/http-codes');
 const { HttpError } = require('../../errors/http-error');
 
-exports.login = (host, userName, password) => {
+exports.login = (host, userName, password, isFullUserInfo) => {
     return new Promise((resolve, reject) => {
         request.post(
             {
@@ -17,7 +17,7 @@ exports.login = (host, userName, password) => {
                     else {
                         if (response.statusCode === HttpCode.OK) {
                             if (body.token)
-                                resolve(body.token)
+                                resolve(isFullUserInfo ? body : body.token)
                             else
                                 reject(new Error(`Authorithation failed for "${userName}": An empty JWT.`));
                         }
