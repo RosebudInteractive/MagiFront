@@ -110,7 +110,7 @@ exports.PrerenderInit = (app) => {
             .set('beforeRender', function (req, done) {
                 // do whatever you need to do
                 let userAgent = req.headers['user-agent'];
-                console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
+                // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
                 if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
                     req.forceRender = true;
                     done(null, null);
