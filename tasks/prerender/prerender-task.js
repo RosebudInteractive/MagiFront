@@ -48,7 +48,7 @@ exports.PrerenderTask = class PrerenderTask extends Task {
             this._totLinks++;
             if (!this._links[cacheKey]) {
                 let now = new Date();
-                let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) <= this._prerenderSettings.maxAgeSec);
+                let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) >= this._prerenderSettings.maxAgeSec);
                 if ((!this._prerenderSettings.maxLinksLimit) ||
                     (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
                     this._renderedLinks++;
