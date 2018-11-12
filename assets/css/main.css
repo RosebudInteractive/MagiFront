@@ -5375,8 +5375,11 @@ ul.user-tooltip {
   @media (max-width: 899px) {
     .course-module--extended .favourites {
       left: -4px; } }
+  .course-module__body {
+    padding-top: 14px; }
     @media (max-width: 899px) {
     .course-module__body {
+      padding-top: 0;
       width: 177%; } }
   @media (max-width: 767px) {
     .course-module__body {
@@ -6287,6 +6290,12 @@ ul.user-tooltip {
       fill-opacity: 0.8;
       -webkit-transition: all .2s ease-in-out;
       transition: all .2s ease-in-out; }
+    ._player.overflow .lectures-list .lecture__btn svg{
+      -webkit-transition: all .2s ease-in-out;
+      transition: all .2s ease-in-out; }
+    ._player .lectures-list .lecture__btn svg{
+      -webkit-transition: none;
+      transition: none; }
     .lecture__btn:hover svg {
       fill-opacity: 1;}
   .lecture__btn.paused {
@@ -6314,11 +6323,11 @@ ul.user-tooltip {
         font-size: 15px;
         line-height: 19px; } }
     .lecture__descr h3 {
-      margin: 0 0 2px 0;
+      margin: 0;
       font-family: "Fira Sans", Arial, sans-serif;
       font-weight: 700;
       font-size: 17px;
-      line-height: 24px; }
+      line-height: 21px; }
     .lecture__descr a h3 {
       color: #000000 }
       @media (max-width: 899px) {

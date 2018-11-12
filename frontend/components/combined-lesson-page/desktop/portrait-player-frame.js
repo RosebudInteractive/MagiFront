@@ -194,7 +194,13 @@ class PlayerFrame extends Component {
                 backgroundImage : "url(" + '/data/' + this.props.lesson.Cover + ")",
                 backgroundSize :  "cover",
                 backgroundPosition : "top center",
-            };
+            },
+            _invisibleStyle = {
+                opacity: 0,
+                zIndex: -100,
+                display: "flex",
+            }
+
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false;
@@ -202,7 +208,7 @@ class PlayerFrame extends Component {
         let {visible, starting, paused, contentArray, canNotPlay, } = this.props;
 
         return (
-            <div style={visible ? null : {display: 'none'}}>
+            <div style={visible ? null : _invisibleStyle}>
                 <div className="player-frame__poster" style={_isFinished || canNotPlay ? _coverStyle : null}>
                     <div className='ws-container' id={'player' + _id} style={_isFinished || canNotPlay? {visibility: 'hidden'} : null}>
                     </div>
