@@ -29,8 +29,13 @@ class GalleryWrapper extends React.Component {
             pagination: {
                 el: '.swiper-pagination',
                 type: 'progressbar',
+                // type: 'fraction',
             },
             slidesPerView: 'auto',
+            scrollbar: {
+                el: '.swiper-scrollbar',
+                // draggable: true,
+            },
             on: {
                 resize: () => {
                     _gallerySlider.update();

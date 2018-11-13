@@ -42,14 +42,16 @@ export default class Item extends React.Component {
                 <div className="history-item__info-block">
                     <h3 className="history-item__title">
                         <Link to={'/category/' + item.courseUrl}>
-                            <span className="history-item__title-text"><span
-                                className="label">Курс:</span>{' ' + item.courseName}</span>
+                            <span className="history-item__title-text">
+                                <span className="label">{'Курс: '}</span>
+                                <span className="history-item__title-text__text">{item.courseName}</span>
+                            </span>
                         </Link>
                     </h3>
                     <h4 className="history-item__lecture">
                         <Link to={'/' + item.courseUrl + '/' + item.URL}>
-                            <span className="num">{item.Number + '.'}</span>
-                            <span className="text">{' ' + item.Name}</span>
+                            <span className="history-item__lecture__num">{item.Number + '. '}</span>
+                            <span className="history-item__lecture__text">{item.Name}</span>
                         </Link>
                     </h4>
                     <Link to={'/autor/' + item.authorUrl}>

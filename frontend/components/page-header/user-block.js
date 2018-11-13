@@ -41,15 +41,11 @@ class UserBlock extends React.Component {
     }
 
     _onHistoryClick() {
-        // this._redirectToHistory = true;
-        // this.forceUpdate()
         this.props.pageHeaderActions.hideMenu()
         $('body').removeClass('overflow');
     }
 
     _onProfileClick() {
-        // this._redirectToProfile = true;
-        // this.forceUpdate()
         this.props.pageHeaderActions.hideMenu()
         $('body').removeClass('overflow');
     }
@@ -77,10 +73,13 @@ class UserBlock extends React.Component {
                     this.props.showUserBlock ?
                         <ul className="user-tooltip">
                             <li>
-                                <Link to={'/history'} onClick={::this._onHistoryClick}>История</Link>
+                                <Link to={'/profile'} onClick={::this._onProfileClick}>Настройки</Link>
                             </li>
                             <li>
-                                <Link to={'/profile'} onClick={::this._onProfileClick}>Настройки</Link>
+                                <Link to={'/favorites'} onClick={::this._onProfileClick}>Закладки</Link>
+                            </li>
+                            <li>
+                                <Link to={'/history'} onClick={::this._onHistoryClick}>История</Link>
                             </li>
                             <li>
                                 <div className="logout-btn" style={_style}

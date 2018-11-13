@@ -21,6 +21,7 @@ import {userAuthSelector, whoAmI} from "../ducks/auth";
 import {getAppOptions,} from "../ducks/app";
 import {bindActionCreators} from "redux";
 import Toolbar from "../components/app/toolbar";
+import * as appActions from '../actions/app-actions'
 
 class App extends Component {
 
@@ -32,6 +33,7 @@ class App extends Component {
     componentWillReceiveProps(nextProps) {
         if (this.props.location.pathname !== nextProps.location.pathname) {
             this.props.whoAmI();
+
         }
     }
 
@@ -126,7 +128,8 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         whoAmI: bindActionCreators(whoAmI, dispatch),
-        getAppOptions: bindActionCreators(getAppOptions, dispatch)
+        getAppOptions: bindActionCreators(getAppOptions, dispatch),
+        appActions: bindActionCreators(appActions, dispatch),
     }
 }
 
