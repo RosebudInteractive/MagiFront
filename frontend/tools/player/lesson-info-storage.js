@@ -193,23 +193,23 @@ export default class LessonInfoStorage {
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
             this._internalCalcDelta(_currentPosition, undefined);
-            console.log('delta : ' + this._delta)
 
-            let _dt = this._delta,
-                _rate = _state.player.rate;
+            let _rate = _state.player.rate,
+                _dt = Math.round((this._delta / _rate)  * 100) / 100;
 
-            // this._dtStart = undefined;
             this._delta = 0;
 
             let _obj = {pos: _pos, dt: _dt}
 
-            if (_value && (_value.isFinished !== undefined)) {
-                _obj.isFinished = _value.isFinished
+
+            if (_value && _value.isFinished) {
+                _obj.isFinished = true
             }
 
             if (_rate !== 1) {
                 _obj.r = _rate
             }
+            console.log('delta : ' + JSON.stringify(_obj))
             lsn[_playingLessonId] = _obj;
         }
 
