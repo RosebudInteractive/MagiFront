@@ -84,8 +84,9 @@ const LessonInfoStorageMiddleware = store => next => action => {
                 }
 
                 if (Math.abs(_newPosition - _currentPosition) > 1) {
+                    LessonInfoStorage.calcDelta(_currentPosition, _newPosition)
                     LessonInfoStorage.saveChanges()
-                    LessonInfoStorage.setDeltaStart(_newPosition)
+                    // LessonInfoStorage.setDeltaStart(_newPosition)
                 } else {
                     LessonInfoStorage.setDeltaStart(_currentPosition)
                     LessonInfoStorage.hasChangedPosition();
