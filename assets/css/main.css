@@ -350,7 +350,8 @@ body {
       min-width: 320px; } }
   body.overflow {
     height: 100%;
-    overflow: hidden; }
+    overflow: hidden;
+    position: fixed; }
 
 .size-info {
   position: fixed;
@@ -6498,6 +6499,8 @@ ul.user-tooltip {
       transition: transform 0.2s ease, -webkit-transform 0.2s ease;
       z-index: 100; }
       .opened .menu-mobile {
+        -webkit-overflow-scrolling: touch;
+        overflow-scrolling: touch;
         -webkit-transform: translateX(0);
         -ms-transform: translateX(0);
         transform: translateX(0); } }
@@ -14834,6 +14837,8 @@ ul.lectures-tab {
         position: static; } }
 
 .popup._registration{
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
   top: -200vh;
   opacity: 1;
   bottom: auto;
@@ -14857,7 +14862,7 @@ ul.lectures-tab {
   background-repeat: no-repeat;
   background-position: center top 44px;
   overflow: auto; }
-  @media (max-width: 899px) {
+  @media (max-height: 799px) {
     ._registration {
       background-position: center top -93px; }
       ._registration .popup-close {
@@ -14972,9 +14977,12 @@ ul.lectures-tab {
   padding-top: 217px;
   width: 320px;
   overflow: hidden; }
-  @media (max-width: 899px) {
+  @media (max-height: 799px) {
     .register-block-wrapper {
       padding-top: 82px; } }
+  @media (max-height: 666px) {
+    .register-block-wrapper {
+      padding-top: 72px; } }
   .register-block-wrapper__label {
     display: block;
     margin: 32px 0 -12px 0;
@@ -14984,6 +14992,9 @@ ul.lectures-tab {
     font-size: 20px;
     line-height: 24px;
     color: #fff; }
+  @media (max-height: 666px) {
+    .register-block-wrapper {
+      margin-top: 12px; } }
   .register-block-wrapper__note {
     margin: 38px 0 37px 0;
     text-align: center;
@@ -15069,6 +15080,9 @@ ul.lectures-tab {
 
 .register-form {
   margin-top: 27px; }
+  @media (max-height: 666px) {
+    .register-block-wrapper {
+      padding-top: 17px; } }
   .register-form__field-wrapper {
     margin-bottom: 16px;
     width: 100%; }
@@ -15113,7 +15127,8 @@ ul.lectures-tab {
     display: -moz-box;
     display: -ms-flexbox;
     display: flex;
-    margin-top: 29px; }
+    margin-top: 29px;
+    margin-bottom: 29px; }
   .register-form__enter {
     -webkit-box-flex: 1;
     -webkit-flex: 1 1 auto;

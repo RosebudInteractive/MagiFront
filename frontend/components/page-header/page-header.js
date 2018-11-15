@@ -31,6 +31,7 @@ class Header extends React.Component {
 
         if ((this._width < 900) && !widthLessThan900()) {
             this.props.appActions.hideUserBlock()
+            this._hideUserMenu()
         }
 
         this._width = window.innerWidth;
@@ -38,11 +39,21 @@ class Header extends React.Component {
 
     _onClickMenuTrigger() {
         if (this.props.pageHeaderState.showMenu) {
-            this.props.pageHeaderActions.hideMenu()
-            $('body').removeClass('overflow');
+            this._hideUserMenu()
         } else {
-            this.props.pageHeaderActions.showMenu()
-            $('body').addClass('overflow');
+            this._showUserMenu()
+        }
+    }
+
+    _showUserMenu() {
+        this.props.pageHeaderActions.showMenu()
+        $('body').addClass('overflow');
+    }
+
+    _hideUserMenu() {
+        this.props.pageHeaderActions.hideMenu()
+        if (!this.props.showSignInForm) {
+            $('body').removeClass('overflow');
         }
     }
 
@@ -119,6 +130,7 @@ function mapStateToProps(state, ownProps) {
         authorized: !!state.user.user,
         isMobileApp: state.app.isMobileApp,
         showUserBlock: state.app.showUserBlock,
+        showSignInForm: state.app.showSignInForm,
         ownProps,
     }
 }

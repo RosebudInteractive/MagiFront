@@ -13,6 +13,20 @@ class UserBlock extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this._resizeHandler = () => {
+            if (!widthLessThan900() && this.props.showUserBlock) {
+                this.props.appActions.hideUserBlock()
+            }
+        }
+    }
+
+    componentDidMount() {
+        // $(window).on('resize', this._resizeHandler)
+    }
+
+    componentWillUnmount() {
+        // $(window).unbind('resize', this._resizeHandler)
     }
 
     _onClick() {
@@ -23,11 +37,8 @@ class UserBlock extends React.Component {
         }
     }
 
-    // componentDidUpdate() {
-    //     if ((window.innerWidth < 900) && !this.props.showUserBlock) {
-    //         this.props.appActions.showUserBlock()
-    //     }
-    // }
+    componentDidUpdate() {
+    }
 
     _onLogout() {
         this.props.userActions.logout()
