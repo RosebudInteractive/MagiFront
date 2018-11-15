@@ -14849,18 +14849,12 @@ ul.lectures-tab {
 }
 .popup._registration.opened {
   position: fixed;
-  transform: translateY(200vh);
-}
+  transform: translateY(200vh); }
 
 ._registration {
   position: fixed;
   padding-bottom: 50px;
   background-color: #2f2f2f;
-  background-image: url("../images/logo-big.png");
-  -webkit-background-size: 276px auto;
-  background-size: 276px auto;
-  background-repeat: no-repeat;
-  background-position: center top 44px;
   overflow: auto; }
   @media (max-height: 799px) {
     ._registration {
@@ -14974,15 +14968,15 @@ ul.lectures-tab {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 0 24px;
-  padding-top: 217px;
   width: 320px;
   overflow: hidden; }
-  @media (max-height: 799px) {
+  @media (max-width: 899px) {
     .register-block-wrapper {
-      padding-top: 82px; } }
-  @media (max-height: 666px) {
+       padding-top: 36px; } }
+  @media (max-height: 767px) {
     .register-block-wrapper {
-      padding-top: 72px; } }
+      padding-top: 17px;
+      margin-top: 12px; } }
   .register-block-wrapper__label {
     display: block;
     margin: 32px 0 -12px 0;
@@ -14992,9 +14986,6 @@ ul.lectures-tab {
     font-size: 20px;
     line-height: 24px;
     color: #fff; }
-  @media (max-height: 666px) {
-    .register-block-wrapper {
-      margin-top: 12px; } }
   .register-block-wrapper__note {
     margin: 38px 0 37px 0;
     text-align: center;
@@ -15002,6 +14993,19 @@ ul.lectures-tab {
     font-size: 17px;
     line-height: 21px;
     color: #fff; }
+
+.register-block-wrapper__logo{
+  -webkit-background-size: 276px auto;
+  background-size: 276px auto;
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-image: url(../images/logo-big.png);
+  height: 173px;
+  margin-top: 20px; }
+@media (max-height: 767px) {
+  .register-block-wrapper__logo {
+    margin-top: 36px; } }
+
 
 .register-block {
   display: -webkit-box;
@@ -15080,9 +15084,6 @@ ul.lectures-tab {
 
 .register-form {
   margin-top: 27px; }
-  @media (max-height: 666px) {
-    .register-block-wrapper {
-      padding-top: 17px; } }
   .register-form__field-wrapper {
     margin-bottom: 16px;
     width: 100%; }
