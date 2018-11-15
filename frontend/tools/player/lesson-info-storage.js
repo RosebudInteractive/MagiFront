@@ -117,8 +117,13 @@ export default class LessonInfoStorage {
     }
 
     _internalCalcDelta(currentPosition, newPosition) {
-        this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
-        this._dtStart = newPosition;
+        if (this._dtStart !== undefined) {
+            this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
+            this._dtStart = newPosition;
+        } else {
+            console.log('delta newPos: ' + newPosition + ' currPos: ' + currentPosition)
+            this._dtStart = (newPosition !== undefined) ? newPosition : currentPosition
+        }
     }
 
     _saveForce() {
