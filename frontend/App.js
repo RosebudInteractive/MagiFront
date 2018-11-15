@@ -128,16 +128,21 @@ class App extends Component {
     componentWillReceiveProps(nextProps) {
         let _thisLocation = this.props.ownProps.location.pathname,
             _nextLocation = nextProps.ownProps.location.pathname,
-            _needCheckPlayer = _thisLocation !== _nextLocation;
+            _isNewLocation = _thisLocation !== _nextLocation;
 
-        if (_needCheckPlayer && nextProps.playInfo) {
-            let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
-            if (nextProps.ownProps.location.pathname !== _targetUrl) {
-                this.props.appActions.switchToSmallPlayer()
-                // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
-                // this.props.playerStartActions.clearAudios()
+        if (_isNewLocation) {
+            this.props.appActions.hideUserBlock()
+
+            if (nextProps.playInfo) {
+                let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
+                if (nextProps.ownProps.location.pathname !== _targetUrl) {
+                    this.props.appActions.switchToSmallPlayer()
+                    // todo : Очистку аудио надо убрать, когда действительно будет переключение на маленький плеер
+                    // this.props.playerStartActions.clearAudios()
+                }
             }
         }
+
 
         if ((!this.props.showFeedbackWindow && !this.props.showFeedbackResultMessage) && (nextProps.showFeedbackWindow || nextProps.showFeedbackResultMessage)) {
             $('body').addClass('modal-open')

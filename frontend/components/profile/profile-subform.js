@@ -66,7 +66,7 @@ class ProfileSubForm extends React.Component {
                   onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                 <div className="form__row">
                     <Field name="name" component={ProfileEditor} id={"username"} type={"text"}
-                           label={"Представьтесь"} wrapperClass={"form__field-wrapper"}/>
+                           label={"Имя"} wrapperClass={"form__field-wrapper"}/>
                     <Field name="email" component={ProfileEditor} id={"email2"} type={"email"}
                            label={"E-mail"} disabled={true} wrapperClass={"form__field-wrapper"}/>
                     <div className="form__link-wrapper">

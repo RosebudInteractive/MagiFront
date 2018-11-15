@@ -571,7 +571,7 @@ export const setFullViewPort = (div) => {
 
 export const clearPlayInfo = () => {
     _cancelStartLessonId = 0;
-    
+
     if (_instance) {
         _instance.clearPlayInfo()
     }
