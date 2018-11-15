@@ -16,6 +16,7 @@ export default class LessonInfoStorage {
         this._localTimer = null;
         this._positionTimer = null;
         this._dtStart = undefined;
+        this._delta = 0;
 
         return this
     }
@@ -49,6 +50,10 @@ export default class LessonInfoStorage {
 
     static saveChanges() {
         this.getInstance()._saveForce();
+    }
+
+    static calcDelta(currentPosition, newPosition) {
+        this.getInstance()._internalCalcDelta(currentPosition, newPosition)
     }
 
     static setDeltaStart(value) {
@@ -109,6 +114,11 @@ export default class LessonInfoStorage {
                 this._positionTimer = setTimeout(::this._savePositionToDB, syncTimeout.position * 1000)
             }
         }
+    }
+
+    _internalCalcDelta(currentPosition, newPosition) {
+        this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
+        this._dtStart = newPosition;
     }
 
     _saveForce() {
@@ -182,20 +192,24 @@ export default class LessonInfoStorage {
                 _lessonsMap = _state.lessonInfoStorage.lessons,
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
-            let _dt = Math.round((_currentPosition - this._dtStart) * 100) / 100,
-                _rate = _state.player.rate;
+            this._internalCalcDelta(_currentPosition, undefined);
 
-            this._dtStart = undefined;
+            let _rate = _state.player.rate,
+                _dt = Math.round((this._delta / _rate)  * 100) / 100;
+
+            this._delta = 0;
 
             let _obj = {pos: _pos, dt: _dt}
 
-            if (_value && (_value.isFinished !== undefined)) {
-                _obj.isFinished = _value.isFinished
+
+            if (_value && _value.isFinished) {
+                _obj.isFinished = true
             }
 
             if (_rate !== 1) {
                 _obj.r = _rate
             }
+            console.log('delta : ' + JSON.stringify(_obj))
             lsn[_playingLessonId] = _obj;
         }
 
