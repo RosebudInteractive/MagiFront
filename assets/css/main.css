@@ -8856,7 +8856,7 @@ body[data-page="fullpage-player"] .lectures-menu {
   .social-block-vertical._left {
     position: absolute;
     right: auto;
-    left: 0;
+    left: 9px;
     top: 0;
     -webkit-transform: none;
     -ms-transform: none;
