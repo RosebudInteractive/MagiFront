@@ -117,8 +117,13 @@ export default class LessonInfoStorage {
     }
 
     _internalCalcDelta(currentPosition, newPosition) {
-        this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
-        this._dtStart = newPosition;
+        if (this._dtStart !== undefined) {
+            this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
+            this._dtStart = newPosition;
+        } else {
+            console.log('delta newPos: ' + newPosition + ' currPos: ' + currentPosition)
+            this._dtStart = (newPosition !== undefined) ? newPosition : currentPosition
+        }
     }
 
     _saveForce() {
@@ -195,7 +200,7 @@ export default class LessonInfoStorage {
             this._internalCalcDelta(_currentPosition, undefined);
 
             let _rate = _state.player.rate,
-                _dt = Math.round((this._delta / _rate)  * 100) / 100;
+                _dt = this._delta;
 
             this._delta = 0;
 

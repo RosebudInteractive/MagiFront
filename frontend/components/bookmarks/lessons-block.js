@@ -88,7 +88,7 @@ class LessonsBlock extends React.Component {
 
         return (
             <div className={"profile-block__tab" + (this.props.active ? " active" : "")}>
-                <div className="history-list">
+                <div className="bookmarks__lessons-list">
                     {this._getList()}
                     {
                         ((bookmarks.size > 0) && (this._visibleCount < bookmarks.size))

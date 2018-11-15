@@ -8,8 +8,13 @@ import {AUTHORIZATION_STATE} from '../constants/user'
 import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
+import $ from "jquery";
 
 class AuthPopup extends React.Component {
+
+    constructor(props) {
+        super(props);
+    }
 
     static propTypes = {
         visible: PropTypes.bool,
@@ -18,6 +23,18 @@ class AuthPopup extends React.Component {
     static defaultProps = {
         visible: false
     };
+
+    componentDidUpdate(prevProps) {
+        if ((!prevProps.visible) && (this.props.visible)) {
+            $('body').addClass('overflow');
+        }
+
+        if ((prevProps.visible) && (!this.props.visible)) {
+            if ($(window).innerWidth() > 899) {
+                $('body').removeClass('overflow');
+            }
+        }
+    }
 
     render() {
         let {visible} = this.props;
