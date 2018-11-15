@@ -29,12 +29,12 @@ export default class Item extends React.Component {
         let _authors = item.authors.map((author) => {
             return (<Link to={'/autor/' + author.URL} className="fav-card__info-link _author">{author.FirstName + ' ' + author.LastName}</Link>);
         });
-        _authors = <div>{_authors}</div>
+        // _authors = <div>{_authors}</div>
 
         let _categories = item.categories.map((category) => {
-            return (<Link to={'#'} className="fav-card__info-link _tag">{category.Name}</Link>);
+            return (<div className="fav-card__info-link _tag">{category.Name}</div>);
         });
-        _categories = <div>{_categories}</div>
+        // _categories = <div>{_categories}</div>
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
             _image = '<image preserveAspectRatio="xMidYMid slice" xlink:href="' +  _cover + '" width="563" height="514"/>';
@@ -59,16 +59,16 @@ export default class Item extends React.Component {
                     </div>
                 </div>
                 <div className="fav-card__body">
-                    <Link to={'/category/' + item.URL} className="fav-card__col">
-                        <div className="btn btn--rounded fav-card__link">
+                    <div className="fav-card__col">
+                        <Link to={'/category/' + item.URL} className="btn btn--rounded fav-card__link">
                             Подробнее о курсе
-                        </div>
-                    </Link>
-                    <Link to={'/category/' + item.URL} className="fav-card__col">
-                        <div className={"fav-card__image-block " + item.Mask}>
+                        </Link>
+                    </div>
+                    <div className="fav-card__col">
+                        <Link to={'/category/' + item.URL} className={"fav-card__image-block " + item.Mask}>
                             <svg viewBox="0 0 563 514" width="563" height="514" dangerouslySetInnerHTML={{__html: _image}}/>
-                        </div>
-                    </Link>
+                        </Link>
+                    </div>
                 </div>
             </div>
         )
