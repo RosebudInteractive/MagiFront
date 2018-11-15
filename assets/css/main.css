@@ -14850,13 +14850,16 @@ ul.lectures-tab {
 .popup._registration.opened {
   position: fixed;
   transform: translateY(200vh); }
+.popup._registration.no-transition {
+  -webkit-transition: none;
+  transition: none; }
 
 ._registration {
   position: fixed;
   padding-bottom: 50px;
   background-color: #2f2f2f;
   overflow: auto; }
-  @media (max-height: 799px) {
+  @media (max-width: 899px) {
     ._registration {
       background-position: center top -93px; }
       ._registration .popup-close {
@@ -14926,18 +14929,18 @@ ul.lectures-tab {
   position: absolute;
   top: 20px;
   left: 26px; }
-  @media (max-width: 899px) {
-    .sign-in-block {
-      display: -webkit-box;
-      display: -webkit-flex;
-      display: -moz-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -webkit-align-items: center;
-      -moz-box-align: center;
-      -ms-flex-align: center;
-      align-items: center; } }
+  /*@media (max-width: 899px) {*/
+    /*.sign-in-block {*/
+      /*display: -webkit-box;*/
+      /*display: -webkit-flex;*/
+      /*display: -moz-box;*/
+      /*display: -ms-flexbox;*/
+      /*display: flex;*/
+      /*-webkit-box-align: center;*/
+      /*-webkit-align-items: center;*/
+      /*-moz-box-align: center;*/
+      /*-ms-flex-align: center;*/
+      /*align-items: center; } }*/
   .sign-in-block__label {
     margin: 0 0 8px 0;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -14973,10 +14976,6 @@ ul.lectures-tab {
   @media (max-width: 899px) {
     .register-block-wrapper {
        padding-top: 36px; } }
-  @media (max-height: 767px) {
-    .register-block-wrapper {
-      padding-top: 17px;
-      margin-top: 12px; } }
   .register-block-wrapper__label {
     display: block;
     margin: 32px 0 -12px 0;
@@ -15001,10 +15000,10 @@ ul.lectures-tab {
   background-position: center top;
   background-image: url(../images/logo-big.png);
   height: 173px;
-  margin-top: 20px; }
-@media (max-height: 767px) {
+  margin-top: 43px; }
+@media (max-width: 899px) {
   .register-block-wrapper__logo {
-    margin-top: 36px; } }
+    margin-top: -93px; } }
 
 
 .register-block {
@@ -15023,7 +15022,7 @@ ul.lectures-tab {
   justify-content: space-between;
   padding-top: 15px; }
   .register-block__title {
-    margin: 0 0 19px 0;
+    margin: 9px 0 13px 0;
     width: 100%;
     text-align: center;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -15129,7 +15128,7 @@ ul.lectures-tab {
     display: -ms-flexbox;
     display: flex;
     margin-top: 29px;
-    margin-bottom: 29px; }
+    margin-bottom: 81px; }
   .register-form__enter {
     -webkit-box-flex: 1;
     -webkit-flex: 1 1 auto;
