@@ -20,6 +20,7 @@ exports.LessonPositionsBase = class LessonPositionsBase {
 
     setLessonPositions(userId, pos) {
         return new Promise((resolve) => {
+            // console.error(`### ${userId}: ${JSON.stringify(pos)}`);
             resolve(
                 this._getAllPos(userId)
                     .then((currPos) => {
