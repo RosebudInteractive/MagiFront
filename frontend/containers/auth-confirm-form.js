@@ -21,8 +21,9 @@ class AuthConfirmForm extends React.Component {
         let _text = error ? <p>{'При активации произошла ошибка'} <br/>{error}</p> : <p>{'Активация прошла успешно'}</p>
 
         return (
-            <div className="popup js-popup _registration opened">
+            <div className="popup js-popup _registration opened no-transition">
                 <div className="register-block-wrapper">
+                    <div className='register-block-wrapper__logo'/>
                     <div className="success-message">
                         <p className="success-message__text">{_text}</p>
                     </div>

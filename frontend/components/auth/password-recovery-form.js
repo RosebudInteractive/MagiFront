@@ -57,6 +57,7 @@ class PwdRecoveryForm extends React.Component {
 
         return (
             <div className="register-block-wrapper">
+                <div className='register-block-wrapper__logo'/>
                 <p className="register-block-wrapper__label">Восстановление пароля</p>
                 <p className="register-block-wrapper__note">{'Мы пришлем инструкции на ' + (email ? (' почту ' + email) : 'указанный адрес.')}</p>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>

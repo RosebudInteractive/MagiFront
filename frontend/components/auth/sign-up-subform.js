@@ -92,6 +92,7 @@ let SignUpForm = class SignUpForm extends React.Component {
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
+                <div className='register-block-wrapper__logo'/>
                 {
                     this.state.screen === screens.email
                         ?
