@@ -70,6 +70,7 @@ class ProfileBlock extends React.Component {
                             <div className={"settings-block__screen current"}>
                                 <ProfilePasswordSubForm onSubmit={changePassword}
                                                         onSwitchToProfile={::this._switchToProfile}
+                                                        onSubmitSuccess={::this._switchToProfile}
                                                         serverError={error}/>
                             </div>
                             :
