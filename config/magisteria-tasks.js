@@ -26,12 +26,12 @@ module.exports = {
             module: "./mailing",
             type: "scheduled-task",
             disabled: false,
-            // schedule: "0 35 5 * * mon", // run at 5:35 on monday
-            schedule: "33 11 10,19 * * *", // run twice a day
+            schedule: "0 35 7 * * mon", // run at 7:35 on monday
+            // schedule: "33 11 10,19 * * *", // run twice a day
             options: {
                 host: "https://magisteria.ru",
                 period: "week",
-                sender: "test@magisteria.ru",
+                sender: "sys@magisteria.ru",
                 senderName: "Magisteria.ru",
                 mailList: "Магистерия",
                 infoRecipients: "alexander.f.sokolov@gmail.com, sokolov-af@yandex.ru",
@@ -46,7 +46,7 @@ module.exports = {
             schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
             options: {
                 renderCache: {
-                    host: "https://magisteria.ru:444"
+                    host: "https://magisteria.ru"
                 },
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"],
@@ -81,7 +81,7 @@ module.exports = {
             module: "./sn-counters",
             type: "scheduled-task",
             disabled: false,
-            schedule: "0 33 19 * * *", // run at 19:33
+            schedule: "0 33 23 * * *", // run at 23:33
             options: {
                 baseUrl: "https://magisteria.ru",
                 snets: ["facebook", "vkontakte", "odnoklassniki"],
@@ -131,7 +131,7 @@ module.exports = {
                         firstTranscriptDate: "2018-06-07"
                     },
                     page: {
-                        firstAboutDate: "2018-06-05"
+                        firstAboutDate: "2018-11-15"
                     }
                 }
             }
@@ -143,7 +143,7 @@ module.exports = {
     proxyServer: {
         protocol: 'https',
         address: 'magisteria.ru',
-        port: 444
+        port: null
     },
     server: {
         protocol: 'http',
@@ -158,7 +158,7 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 3 * 24 * 60 * 60,
             maxDevSec: 3 * 24 * 60 * 60,
-            targetHost: "https://magisteria.ru:444",
+            targetHost: "https://magisteria.ru",
             url: 'http://127.0.0.1:8000'
         }
     },

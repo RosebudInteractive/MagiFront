@@ -92,13 +92,14 @@ let SignUpForm = class SignUpForm extends React.Component {
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
+                <div className='register-block-wrapper__logo'/>
                 {
                     this.state.screen === screens.email
                         ?
-                        <div>
-                            <ButtonsBlock/>
-                            <span className="register-block-wrapper__label">или</span>
-                            <div className="form register-form">
+                        [
+                            <ButtonsBlock/>,
+                            <span className="register-block-wrapper__label">или</span>,
+                            <div className="form register-form">,
                                 <Field name="login" component={LoginEdit}/>
                                 <div className="register-form__buttons">
                                     <SignUpButton disabled={invalid || !this.props.login || loading}
@@ -106,7 +107,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                                                   onClick={::this._showPasswordScreen}/>
                                 </div>
                             </div>
-                        </div>
+                        ]
                         :
                         <div className="form register-form">
                             <Field name="login" component={LoginEdit} hidden={true}/>

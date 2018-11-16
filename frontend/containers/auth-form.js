@@ -8,8 +8,17 @@ import {AUTHORIZATION_STATE} from '../constants/user'
 import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
+import $ from "jquery";
 
 class AuthPopup extends React.Component {
+
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            noTransition: false
+        }
+    }
 
     static propTypes = {
         visible: PropTypes.bool,
@@ -19,12 +28,45 @@ class AuthPopup extends React.Component {
         visible: false
     };
 
+    componentDidUpdate(prevProps) {
+        if ((!prevProps.visible) && (this.props.visible)) {
+            $('body').addClass('overflow');
+            setTimeout(() => {
+                this.setState({
+                    noTransition: true
+                })
+            }, 700)
+        }
+
+        if ((prevProps.visible) && (!this.props.visible)) {
+            if ($(window).innerWidth() > 899) {
+                $('body').removeClass('overflow');
+            }
+
+            if (this.state.noTransition) {
+                this.setState({
+                    noTransition: false
+                })
+            }
+        }
+    }
+
+    _close() {
+        if (this.state.noTransition) {
+            this.setState({
+                noTransition: false
+            })
+        }
+
+        this.props.userActions.closeSignInForm()
+    }
+
     render() {
         let {visible} = this.props;
 
         return (
-            <div className={"popup js-popup _registration" + (visible ? " opened" : "")}>
-                <button className="popup-close js-popup-close" onClick={::this.props.userActions.closeSignInForm}>Закрыть</button>
+            <div className={"popup js-popup _registration" + (visible ? " opened" : "") + (this.state.noTransition ? ' no-transition' : '')}>
+                <button className="popup-close js-popup-close" onClick={::this._close}>Закрыть</button>
                 <div className="sign-in-block">
                     {
                         this.props.authorizationState === AUTHORIZATION_STATE.START_SIGN_IN ?

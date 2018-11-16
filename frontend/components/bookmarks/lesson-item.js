@@ -24,22 +24,21 @@ export default class Item extends React.Component {
         let {item, isFavorite} = this.props;
 
         return (
-            <div className="history-item">
-                <div className="history-item__date-block">
+            <div className="bookmarks__lesson-item">
+                <div className="bookmarks__lesson-item__icons-block">
                     <span className={"favorites" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
-                    {/*<span className={"fav" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>*/}
                         <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ?_redFlag : _flag}}/>
                     </span>
                     {
                         item.isSubLesson ?
-                            <span className="history-item__icon">
+                            <span className="icons-block__sublesson_icon">
                                 <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _ep}}/>
                             </span>
                             :
                             null
                     }
                 </div>
-                <div className="history-item__info-block">
+                <div className="bookmarks__lesson-item__info-block">
                     <h3 className="history-item__title">
                         <Link to={'/category/' + item.courseUrl}>
                             <span className="history-item__title-text">
@@ -58,7 +57,7 @@ export default class Item extends React.Component {
                         <p className="history-item__author">{item.authorName}</p>
                     </Link>
                 </div>
-                <LessonPlayBlockSmall lesson={item}/>
+                <LessonPlayBlockSmall lesson={item} wrapperClass={'bookmarks__lesson-item__play-block'}/>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 'use strict';
-const N_INSTANCES = 1;
+const N_INSTANCES = 4;
 const BASE_PORT = 3001;
 
 let app = {

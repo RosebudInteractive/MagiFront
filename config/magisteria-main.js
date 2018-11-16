@@ -9,7 +9,7 @@ module.exports = {
     proxyServer: {
         protocol: 'https',
         address: 'magisteria.ru',
-        port: 444
+        port: null
     },
     server: {
         protocol: 'http',

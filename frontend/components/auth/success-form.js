@@ -53,6 +53,7 @@ class AuthConfirmForm extends React.Component {
         return (
 
             <div className="register-block-wrapper">
+                <div className='register-block-wrapper__logo'/>
                 <div className="success-message">
                     <p className="success-message__text">{'Мы отправили письмо с дальнешими инструкциями на почту' + (email ? (' ' + email) : '')}</p>
                     /* eslint-disable no-undef */

@@ -50,7 +50,8 @@ module.exports = {
     redisSession: {
         enabled: false,
         prefix: 'ses:',
-        scanCount: 100
+        scanCount: 100,
+        maxAge: 4 * 24 * 3600 * 1000 // 4 days
     },
     trace: {
         sqlTrace: false,

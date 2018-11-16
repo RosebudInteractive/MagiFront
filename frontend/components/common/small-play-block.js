@@ -131,7 +131,7 @@ class LessonPlayBlockSmall extends React.Component {
         }
 
         return (
-            <div className='history-item__play-block'>
+            <div className={this.props.wrapperClass ? this.props.wrapperClass : 'history-item__play-block'}>
                 <span className="play-block-small__duration">{duration}</span>
                 { !_lessonLocked ?
                     <div className="play-block-small">

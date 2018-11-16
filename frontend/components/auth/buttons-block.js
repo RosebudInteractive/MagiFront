@@ -27,14 +27,14 @@ class ButtonsBlock extends React.Component {
             }
 
             <Link to={'/api/googlelogin'} target={"_blank"}
-                  className="btn btn--white register-block__btn register-block__btn--fullwidth">
+                  className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _google}}/>
                         </span>
                 <span className="text">Google</span>
             </Link>
             <Link to={'/api/vklogin'} target={"_blank"}
-                  className="btn btn--white register-block__btn register-block__btn--fullwidth">
+                  className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </span>
