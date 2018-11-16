@@ -32,7 +32,8 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 14 * 24 * 60 * 60,
             maxDevSec: 7 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000'
+            url: 'http://127.0.0.1:8000',
+            logEnabled: false
         },
         siteHost: defer(function () {
             return this.server.protocol + '://' +

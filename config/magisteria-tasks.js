@@ -159,7 +159,8 @@ module.exports = {
             expInSec: 3 * 24 * 60 * 60,
             maxDevSec: 3 * 24 * 60 * 60,
             targetHost: "https://magisteria.ru",
-            url: 'http://127.0.0.1:8000'
+            url: 'http://127.0.0.1:8000',
+            logEnabled: false
         }
     },
     dbProvider: 'mysql',
