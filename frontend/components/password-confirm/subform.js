@@ -64,6 +64,7 @@ class PasswordConfirmSubform extends React.Component {
 
         return (
             <div className="register-block-wrapper">
+                <div className='register-block-wrapper__logo'/>
                 <span className="register-block-wrapper__label">{user ? user.DisplayName : ''}</span>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="password1" component={PasswordEdit} id={'password1'}/>

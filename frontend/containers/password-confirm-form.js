@@ -19,14 +19,17 @@ class PasswordConfirmForm extends React.Component {
     }
 
     render() {
-        return (
+        let {fetching, activationKey} = this.props;
+
+        return fetching ?
+            <div className="popup js-popup _registration opened"/>
+            :
             <div className="popup js-popup _registration opened">
                 <Link to={'/'}>
                     <button className="popup-close js-popup-close">Закрыть</button>
                 </Link>
-                <Wrapper activationKey={this.props.activationKey}/>
+                <Wrapper activationKey={activationKey}/>
             </div>
-        )
     }
 }
 
@@ -34,7 +37,8 @@ function mapStateToProps(state, ownProps) {
     return {
         error: state.user.error,
         user: state.user.user,
-        activationKey: ownProps.match.params.activationKey
+        activationKey: ownProps.match.params.activationKey,
+        fetching: state.app.fetching,
     }
 }
 

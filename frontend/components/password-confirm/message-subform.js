@@ -16,6 +16,7 @@ class MessageSubform extends React.Component {
         return (
             <div className="popup js-popup _registration opened">
                 <div className="register-block-wrapper">
+                    <div className='register-block-wrapper__logo'/>
                     <div className="success-message">
                         <p className="success-message__text">{_text}</p>
                     </div>

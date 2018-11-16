@@ -13,6 +13,7 @@ import {
     HIDE_SIZE_INFO,
     OPEN_GALLERY,
     CLOSE_GALLERY,
+    GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
     GET_APP_OPTIONS_FAIL,
 } from '../constants/app'
@@ -36,6 +37,7 @@ const initialState = {
     facebookAppID: '',
     reCapture: '',
     sendPulseScript: null,
+    fetching: false,
 };
 
 export default function app(state = initialState, action) {
@@ -123,6 +125,10 @@ export default function app(state = initialState, action) {
             return {...state, galleryIsOpen: false}
         }
 
+        case GET_APP_OPTIONS_REQUEST: {
+            return { ...state, fetching: true }
+        }
+
         case GET_APP_OPTIONS_SUCCESS: {
             let _sendPulse = (action.payload.scriptPath && action.payload.scriptPath.sendPulse) ?
                 action.payload.scriptPath.sendPulse : null;
@@ -132,11 +138,12 @@ export default function app(state = initialState, action) {
                 facebookAppID: action.payload.appId.fb,
                 reCapture: action.payload.siteKey.reCapture,
                 sendPulseScript: _sendPulse,
+                fetching: false,
             }
         }
 
         case GET_APP_OPTIONS_FAIL: {
-            return {...state, facebookAppID: ''}
+            return {...state, facebookAppID: '', fetching: false}
         }
 
         default:

@@ -37,18 +37,21 @@ class Captcha extends React.Component {
     };
 
     render() {
-        return (
+        let {reCapture} = this.props
+
+        return reCapture ?
             <Recaptcha
                 ref={e => recaptchaInstance = e}
                 render="explicit"
                 sitekey={this.props.reCapture}
-                verifyCallback ={::this._verifyCallback}
+                verifyCallback={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
                 theme="dark"
                 onloadCallback={::this._onLoadCallback}
                 hl={'ru'}
             />
-        );
+            :
+            null;
     }
 }
 
