@@ -221,8 +221,11 @@ class App extends Component {
                 <Route path={_homePath + 'favorites/courses'} component={BookmarksPage}/>
                 <Route path={_homePath + 'favorites/lessons'} component={BookmarksPage}/>
                 <Route path={_homePath + 'recovery/:activationKey'} component={PasswordConfirmForm}/>
+                <Route path={_homePath + 'category/:url/:garbage'} component={NotFound}/>
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
+                <Route path={_homePath + 'autor/:url/:garbage'} component={NotFound}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
+                <Route path={_homePath + ':courseUrl/:lessonUrl/:garbage'} component={NotFound}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path="*" component={NotFound}/>
