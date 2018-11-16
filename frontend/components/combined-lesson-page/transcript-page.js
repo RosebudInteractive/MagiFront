@@ -130,11 +130,15 @@ class TextBlock extends React.Component {
 
         _content = _content.trim();
 
-        let _array = _content.split(/<p>(.*?)<\/p>/gim);
+        let _array = _content.split(/<p>(.*?)(<\/p>)?/gim);
         let _isToc = true;
 
         _array.forEach((item) => {
             let _paragraph = item;
+
+            if (!_paragraph) {
+                return
+            }
 
             _paragraph.trim();
             if (_paragraph.length === 0) {
