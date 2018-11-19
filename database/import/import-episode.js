@@ -553,6 +553,7 @@ exports.ImportEpisode = class ImportEpisode {
                             if (isInParagraph)
                                 html += `</p>`;
                             html += `<p>${prg.html}`
+                            isInParagraph = true;
                         }
                         else
                             html += prg.html;
