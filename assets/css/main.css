@@ -5508,7 +5508,11 @@ ul.user-tooltip {
     white-space: pre-line;
     display: inline-block;
     margin-right: 4px;
-  }
+    border-bottom: 1px solid rgba(255, 255, 255, 0);
+    -webkit-transition: border-color 0.3s ease;
+    transition: border-color 0.3s ease; }
+  .course-module__info-col-descr a:hover{
+    border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
   .course-module__title-wrapper {
     padding-left: 8.333333%;
     padding-top: 65px;
@@ -10884,8 +10888,8 @@ ul.lectures-tab {
         padding-right: 0;
         line-height: 31px; } }
     .course-announce__title a {
-      color: #2f2f2f; }.course-announce__caption
-    .course-announce__title a:hover  {
+      color: #2f2f2f; }
+    .course-announce__caption:hover {
       border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
     .course-announce__caption {
       border-bottom: 1px solid rgba(255, 255, 255, 0);

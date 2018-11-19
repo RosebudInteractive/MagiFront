@@ -244,22 +244,14 @@ class App extends Component {
 
     render() {
         let {
-            sendPulseScript,
+            // sendPulseScript,
             showSignInForm,
             showSizeInfo,
             showFeedbackWindow,
             showFeedbackResultMessage
         } = this.props;
 
-        return [
-
-            sendPulseScript ?
-                <MetaTags>
-                    <script charSet="UTF-8" src={sendPulseScript} async/>
-                </MetaTags>
-                :
-                null,
-            <div className="App global-wrapper" onScroll={this._handleScroll}>
+        return <div className="App global-wrapper" onScroll={this._handleScroll}>
                 <PageHeader visible={this.state.showHeader}/>
                 <SmallPlayer/>
                 {this._getMainDiv()}
@@ -269,9 +261,16 @@ class App extends Component {
                 {showFeedbackWindow ? <FeedbackMessageBox/> : null}
                 {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
             </div>
-        ]
+
     }
 }
+
+// sendPulseScript ?
+//     <MetaTags>
+//         <script charSet="UTF-8" src={sendPulseScript} async/>
+//     </MetaTags>
+//     :
+//     null,
 
 function mapStateToProps(state, ownProps) {
     return {

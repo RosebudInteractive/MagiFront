@@ -105,9 +105,9 @@ class Course extends React.Component {
         return (
             <div className="course-announce">
                 <div className="course-announce__col">
-                    <div className={'course-announce__image ' + course.Mask}>
+                    <Link to={'/category/' + course.URL} className={'course-announce__image ' + course.Mask}>
                         <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
-                    </div>
+                    </Link>
                 </div>
                 <div className="course-announce__col">
                     <h3 className="course-announce__title">
