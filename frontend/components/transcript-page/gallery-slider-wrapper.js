@@ -106,8 +106,7 @@ class GalleryWrapper extends React.Component {
                 <div className="gallery-slide__image">
                     <img src={'/data/' + _fileName}/>
                 </div>
-                <p className="gallery-slide__caption"><span
-                    className="number">{_number + '.'}</span>{item.Name}<br/>{item.Description}</p>
+                <p className="gallery-slide__caption">{item.Name}<br/>{item.Description}</p>
             </Link>
         })
     }

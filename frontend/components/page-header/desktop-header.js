@@ -19,9 +19,13 @@ class DesktopHeaderRow extends React.Component {
         onBookmarkClick: PropTypes.func,
     }
 
+    constructor(props) {
+        super(props)
+    }
+
     render() {
         return (
-            <div className="page-header__wrapper menu-mobile">
+            <div className={"page-header__wrapper menu-mobile"}>
                 <Logo/>
                 <Navigator {...this.props}/>
                 <Languages/>
@@ -120,10 +124,10 @@ class Languages extends React.Component {
                                 <a href="#" data-lang="Рус">Русский</a>
                             </li>
                             {/*<li>*/}
-                                {/*<a href="#" data-lang="En">English</a>*/}
+                            {/*<a href="#" data-lang="En">English</a>*/}
                             {/*</li>*/}
                             {/*<li>*/}
-                                {/*<a href="#" data-lang="Es">Espaniol</a>*/}
+                            {/*<a href="#" data-lang="Es">Espaniol</a>*/}
                             {/*</li>*/}
                         </ul>
                         :

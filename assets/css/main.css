@@ -4277,7 +4277,8 @@ li.fancybox-thumbs-loading {
       @media (max-width: 767px) {
         .navigation ul li {
           display: none; }
-          .navigation ul li.current {
+          .navigation ul li.current,
+          .navigation ul li.favorites {
             display: block; } }
       .navigation ul li:hover {
         opacity: 0.8; }
@@ -5044,7 +5045,7 @@ ul.user-tooltip {
       min-height: 685px; } }
   @media (max-width: 899px) {
     .course-module {
-      /*border-bottom: none;*/
+      border-bottom: none;
       /*min-height: 700px;*/
       min-height: 685px; } }
   @media (max-width: 639px) {
@@ -6482,6 +6483,7 @@ ul.user-tooltip {
   @media (max-width: 899px) {
     .menu-mobile {
       position: fixed;
+      opacity: 0;
       top: 64px;
       bottom: 0;
       left: 0;
@@ -6504,7 +6506,10 @@ ul.user-tooltip {
       transition: transform 0.2s ease;
       transition: transform 0.2s ease, -webkit-transform 0.2s ease;
       z-index: 100; }
+    .menu-mobile.visible{
+      opacity: 1; }
       .opened .menu-mobile {
+        opacity: 1;
         -webkit-overflow-scrolling: touch;
         overflow-scrolling: touch;
         -webkit-transform: translateX(0);
@@ -14202,8 +14207,8 @@ ul.lectures-tab {
   /*@media (max-width: 639px) {*/
     /*.bookmarks-page .history-item__info-block {*/
       /*padding-left: 30px; }*/
-    .history-item__date-block .favorites {
-      right: auto; } }
+    /*.history-item__date-block .favorites {*/
+      /*right: auto; } }*/
   .history-item__play-block .play-block-small {
     position: absolute;
   }
@@ -15966,6 +15971,11 @@ ul.lectures-tab {
             -ms-transform: none;
             transform: none; } }
     .gallery-slider-wrapper .gallery-slide__caption {
+      -webkit-line-clamp: 4;
+      max-height: 52px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
       position: absolute;
       bottom: 20px;
       left: 0;
@@ -16389,6 +16399,7 @@ ul.lectures-tab {
     width: 100%;
   }
   .lesson-player.added .player-frame__poster{
+    margin-top: 2px;
     position: relative;
     transform: none;
     left: 0;
@@ -16416,7 +16427,7 @@ ul.lectures-tab {
   }
 @media (max-width: 599px) {
   .lesson-player .player-frame__poster-text {
-    bottom: 80px;
+    bottom: 65px;
   }
 }
   .player-frame__poster-title,
@@ -16430,7 +16441,7 @@ ul.lectures-tab {
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
-      display: -webkit-box;
+      display: -webkit-inline-box;
       -webkit-box-orient: vertical;
     }
     .lesson-player .player-frame__poster-title {
