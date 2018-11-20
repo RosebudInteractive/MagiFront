@@ -6,9 +6,10 @@ const { HttpCode } = require("../const/http-codes");
 
 let uploadPath = config.get('uploadPath');
 let dataUrl = config.get('dataUrl');
+let oldDataUrl = config.get('oldDataUrl');
 
 exports.setupProtectedStatic = (app) => {
-    app.use(dataUrl, (req, res, next) => {
+    let dataProcessor = (req, res, next) => {
         let { name, ext } = path.parse(decodeURIComponent(req.url))
         if (false && (ext === ".mp3")) {
             console.log("=== DATA REQUEST ===");
@@ -39,5 +40,7 @@ exports.setupProtectedStatic = (app) => {
             .catch((err) => {
                 next(err);
             });
-    });
+    };
+    app.use(dataUrl, dataProcessor);
+    app.use(oldDataUrl, dataProcessor);
 }
