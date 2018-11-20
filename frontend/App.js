@@ -125,7 +125,7 @@ class App extends Component {
         this.props.playerActions.startInit()
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps, nextState) {
         let _thisLocation = this.props.ownProps.location.pathname,
             _nextLocation = nextProps.ownProps.location.pathname,
             _isNewLocation = _thisLocation !== _nextLocation;
@@ -154,6 +154,14 @@ class App extends Component {
 
         if ((this.props.location.search !== '?play') && (nextProps.location.search === '?play')) {
             scroll()
+        }
+
+
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!this.state.showHeader && prevState.showHeader) {
+            this.props.appActions.hideUserBlock()
         }
     }
 

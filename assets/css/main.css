@@ -4277,7 +4277,8 @@ li.fancybox-thumbs-loading {
       @media (max-width: 767px) {
         .navigation ul li {
           display: none; }
-          .navigation ul li.current {
+          .navigation ul li.current,
+          .navigation ul li.favorites {
             display: block; } }
       .navigation ul li:hover {
         opacity: 0.8; }
@@ -6482,6 +6483,7 @@ ul.user-tooltip {
   @media (max-width: 899px) {
     .menu-mobile {
       position: fixed;
+      opacity: 0;
       top: 64px;
       bottom: 0;
       left: 0;
@@ -6504,7 +6506,10 @@ ul.user-tooltip {
       transition: transform 0.2s ease;
       transition: transform 0.2s ease, -webkit-transform 0.2s ease;
       z-index: 100; }
+    .menu-mobile.visible{
+      opacity: 1; }
       .opened .menu-mobile {
+        opacity: 1;
         -webkit-overflow-scrolling: touch;
         overflow-scrolling: touch;
         -webkit-transform: translateX(0);
