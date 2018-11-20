@@ -14202,8 +14202,8 @@ ul.lectures-tab {
   /*@media (max-width: 639px) {*/
     /*.bookmarks-page .history-item__info-block {*/
       /*padding-left: 30px; }*/
-    .history-item__date-block .favorites {
-      right: auto; } }
+    /*.history-item__date-block .favorites {*/
+      /*right: auto; } }*/
   .history-item__play-block .play-block-small {
     position: absolute;
   }
