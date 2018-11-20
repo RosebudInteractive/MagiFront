@@ -2402,7 +2402,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     let id = elem.ownObj.id();
                                     rc = $data.execSql({
                                         dialect: {
-                                            mysql: _.template(CHECK_IF_CAN_DEL_EPI_MSSQL)({ id: id }),
+                                            mysql: _.template(CHECK_IF_CAN_DEL_EPI_MYSQL)({ id: id }),
                                             mssql: _.template(CHECK_IF_CAN_DEL_EPI_MSSQL)({ id: id })
                                         }
                                     }, {})

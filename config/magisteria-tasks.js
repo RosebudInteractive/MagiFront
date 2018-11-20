@@ -26,7 +26,7 @@ module.exports = {
             module: "./mailing",
             type: "scheduled-task",
             disabled: false,
-            schedule: "0 35 7 * * mon", // run at 7:35 on monday
+            schedule: "0 57 9 * * mon", // run at 9:57 on monday
             // schedule: "33 11 10,19 * * *", // run twice a day
             options: {
                 host: "https://magisteria.ru",
