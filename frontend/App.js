@@ -125,7 +125,7 @@ class App extends Component {
         this.props.playerActions.startInit()
     }
 
-    componentWillReceiveProps(nextProps, nextState) {
+    componentWillReceiveProps(nextProps) {
         let _thisLocation = this.props.ownProps.location.pathname,
             _nextLocation = nextProps.ownProps.location.pathname,
             _isNewLocation = _thisLocation !== _nextLocation;

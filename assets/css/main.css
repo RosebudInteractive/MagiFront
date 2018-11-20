@@ -5045,7 +5045,7 @@ ul.user-tooltip {
       min-height: 685px; } }
   @media (max-width: 899px) {
     .course-module {
-      /*border-bottom: none;*/
+      border-bottom: none;
       /*min-height: 700px;*/
       min-height: 685px; } }
   @media (max-width: 639px) {
@@ -15971,6 +15971,11 @@ ul.lectures-tab {
             -ms-transform: none;
             transform: none; } }
     .gallery-slider-wrapper .gallery-slide__caption {
+      -webkit-line-clamp: 4;
+      max-height: 52px;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
       position: absolute;
       bottom: 20px;
       left: 0;
@@ -16394,6 +16399,7 @@ ul.lectures-tab {
     width: 100%;
   }
   .lesson-player.added .player-frame__poster{
+    margin-top: 2px;
     position: relative;
     transform: none;
     left: 0;
