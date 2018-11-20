@@ -205,7 +205,7 @@ function getCourse(id, isOld, baseUrl, baseDir) {
     });
 }
 
-exports.UploadFiles = {
+exports.DownloadFiles = {
     getCourse: getCourse,
     getLesson: getLesson
 };
