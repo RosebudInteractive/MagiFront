@@ -16430,7 +16430,7 @@ ul.lectures-tab {
       line-height: 16px;
       overflow: hidden;
       text-overflow: ellipsis;
-      display: -webkit-box;
+      display: -webkit-inline-box;
       -webkit-box-orient: vertical;
     }
     .lesson-player .player-frame__poster-title {
