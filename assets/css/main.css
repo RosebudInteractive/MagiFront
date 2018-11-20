@@ -16427,7 +16427,7 @@ ul.lectures-tab {
   }
 @media (max-width: 599px) {
   .lesson-player .player-frame__poster-text {
-    bottom: 80px;
+    bottom: 65px;
   }
 }
   .player-frame__poster-title,
