@@ -175,12 +175,19 @@ export default class NativeAppPlayer {
 
     _sendMessageToApp(props) {
         props['playerId'] = this._id
-        if (this._debug || _isAndroid) {
+        if (this._debug) {
             window.postMessage(
                 JSON.stringify(props),
                 '*'
             )
             console.log(JSON.stringify(props))
+        } else if ( _isAndroid) {
+            setTimeout(() => {
+                window.postMessage(
+                    JSON.stringify(props),
+                    '*'
+                )
+            }, 100)
         } else {
             window.postMessage(
                 JSON.stringify(props)
