@@ -51,19 +51,18 @@ export default class NativeAppPlayer {
         this._timeChanged = false;
         this._setPositionOnPlay = false;
 
-
-        let gOldOnError = window.onerror;
-
-        window.onerror = (errorMsg, url, lineNumber) => {
-            this._sendErrorMessageToApp(errorMsg)
-
-            if (gOldOnError) {
-                return gOldOnError(errorMsg, url, lineNumber);
-            }
-
-
-            return false;
-        }
+        // let gOldOnError = window.onerror;
+        //
+        // window.onerror = (errorMsg, url, lineNumber) => {
+        //     this._sendErrorMessageToApp(errorMsg)
+        //
+        //     if (gOldOnError) {
+        //         return gOldOnError(errorMsg, url, lineNumber);
+        //     }
+        //
+        //
+        //     return false;
+        // }
     }
 
     setData(data) {
