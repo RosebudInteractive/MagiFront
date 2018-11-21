@@ -101,13 +101,13 @@ class GalleryWrapper extends React.Component {
 
             let _fileName = getImagePath(item, ImageSize.medium)
 
-            return <Link to={"gallery" + _numberWithLeadZero} data-src={"#gallery" + _numberWithLeadZero}
+            return <div data-src={"#gallery" + _numberWithLeadZero}
                          data-fancybox="gallery-group" className="gallery-slide swiper-slide" key={index}>
                 <div className="gallery-slide__image">
                     <img src={'/data/' + _fileName}/>
                 </div>
                 <p className="gallery-slide__caption">{item.Name}<br/>{item.Description}</p>
-            </Link>
+            </div>
         })
     }
 
