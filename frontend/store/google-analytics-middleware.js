@@ -11,7 +11,6 @@ const GoogleAnalyticsMiddleware = store => next => action => {
         case APP_CHANGE_PAGE: {
             let _pathPrefix = window.location.protocol + '//' + window.location.host;
 
-            // window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
                 'event': 'Pageview',
                 'url': _pathPrefix + action.payload
