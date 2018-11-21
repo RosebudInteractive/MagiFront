@@ -271,7 +271,7 @@ export default class NativeAppPlayer {
             },
             onError: (e) => {
                 this._sendErrorMessageToApp(
-                    'player error' + JSON.stringify(e)
+                    'player error: ' + JSON.stringify(e.target.error)
                 )
             },
             onCanPlay: () => {
