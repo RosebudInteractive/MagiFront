@@ -5,6 +5,7 @@ module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     dataUrl: '/data',
+    oldDataUrl: '/wp-content/uploads',
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
