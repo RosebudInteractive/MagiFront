@@ -273,6 +273,7 @@ export default class NativeAppPlayer {
                 this._sendErrorMessageToApp(
                     'player error: ' + JSON.stringify(e.target.error)
                 )
+                Sentry.captureException(e);
             },
             onCanPlay: () => {
                 if (!this._started) {
