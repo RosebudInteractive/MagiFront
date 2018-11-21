@@ -132,6 +132,7 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.hideUserBlock()
+            this.props.appActions.changePage(_nextLocation);
 
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;

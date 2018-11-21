@@ -51,19 +51,18 @@ export default class NativeAppPlayer {
         this._timeChanged = false;
         this._setPositionOnPlay = false;
 
-
-        let gOldOnError = window.onerror;
-
-        window.onerror = (errorMsg, url, lineNumber) => {
-            this._sendErrorMessageToApp(errorMsg)
-
-            if (gOldOnError) {
-                return gOldOnError(errorMsg, url, lineNumber);
-            }
-
-
-            return false;
-        }
+        // let gOldOnError = window.onerror;
+        //
+        // window.onerror = (errorMsg, url, lineNumber) => {
+        //     this._sendErrorMessageToApp(errorMsg)
+        //
+        //     if (gOldOnError) {
+        //         return gOldOnError(errorMsg, url, lineNumber);
+        //     }
+        //
+        //
+        //     return false;
+        // }
     }
 
     setData(data) {
@@ -175,12 +174,19 @@ export default class NativeAppPlayer {
 
     _sendMessageToApp(props) {
         props['playerId'] = this._id
-        if (this._debug || _isAndroid) {
+        if (this._debug) {
             window.postMessage(
                 JSON.stringify(props),
                 '*'
             )
             console.log(JSON.stringify(props))
+        } else if ( _isAndroid) {
+            setTimeout(() => {
+                window.postMessage(
+                    JSON.stringify(props),
+                    '*'
+                )
+            }, 0)
         } else {
             window.postMessage(
                 JSON.stringify(props)
