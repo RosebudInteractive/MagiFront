@@ -132,6 +132,7 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.hideUserBlock()
+            this.props.appActions.changePage(_nextLocation);
 
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
@@ -154,6 +155,14 @@ class App extends Component {
 
         if ((this.props.location.search !== '?play') && (nextProps.location.search === '?play')) {
             scroll()
+        }
+
+
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!this.state.showHeader && prevState.showHeader) {
+            this.props.appActions.hideUserBlock()
         }
     }
 

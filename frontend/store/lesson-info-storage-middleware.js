@@ -44,11 +44,9 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case WHO_AM_I_SUCCESS: {
             let _state = store.getState();
             let _oldUser = _state.user.user;
-            console.log(_state)
             let result = next(action)
             _state = store.getState();
             let _newUser = _state.user.user;
-            console.log(_state)
 
             if ((!_oldUser && _newUser) || (_oldUser.Id !== _newUser.Id)) {
                 LessonInfoStorage.clear();
