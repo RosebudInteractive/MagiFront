@@ -47,9 +47,11 @@ export default class CWSResourceLoader {
         }
     }
 
-    constructor() {
+    constructor(options) {
         this._position = 0;
         this._state = this._getInitialState();
+        this._options = options;
+
 
         /*
         {
@@ -549,6 +551,7 @@ export default class CWSResourceLoader {
                     fail: function (err) {
                         delete that._state.loading[id];
                         console.error(err);
+                        this._broadcastError(err)
                     }
                 });
             } else {
@@ -596,8 +599,9 @@ export default class CWSResourceLoader {
                 audio.load();
             }, 500);
 
-            audio.onerror = function () {
+            audio.onerror = () => {
                 console.error("resource loader: " + JSON.stringify(audio.error));
+                this._broadcastError({src: audio.src, message: audio.error.message})
             }
 
             this._state.loadedData.audios[id] = {
@@ -619,6 +623,11 @@ export default class CWSResourceLoader {
         this._state = this._getInitialState();
     }
 
+    _broadcastError(err) {
+        if (this._options.onError) {
+            this._options.onError(err)
+        }
+    }
 }
 
 window.preinitAudio = CWSResourceLoader.preinitAudio
