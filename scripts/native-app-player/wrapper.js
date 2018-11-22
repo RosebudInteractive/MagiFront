@@ -51,7 +51,18 @@ export default class NativeAppPlayer {
         this._timeChanged = false;
         this._setPositionOnPlay = false;
 
-        navigator.onLine;
+
+        let gOldOnError = window.onerror;
+
+        window.onerror = (errorMsg, url, lineNumber) => {
+            this._sendErrorMessageToApp('unhandled exception: ' + errorMsg)
+
+            if (gOldOnError) {
+                return gOldOnError(errorMsg, url, lineNumber);
+            }
+
+            return false;
+        }
     }
 
     setData(data, playerId) {
