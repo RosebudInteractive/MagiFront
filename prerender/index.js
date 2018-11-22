@@ -13,6 +13,8 @@ const DFLT_MAX_DEV = 14 * 24 * 60 * 60; // 7 days
 
 let additionalBots = [
     "yandex",
+    "odklbot",
+    "telegrambot",
     SEO.FORCE_RENDER_USER_AGENT,
     SEO.BOT_USER_AGENT
 ];

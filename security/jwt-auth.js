@@ -15,7 +15,11 @@ class AuthJWT {
         const JwtStrategy = passportJWT.Strategy;
 
         const jwtOptions = {}
-        jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
+        // jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
+        jwtOptions.jwtFromRequest = ExtractJwt.fromExtractors([
+            ExtractJwt.fromAuthHeaderWithScheme('JWT'),
+            ExtractJwt.fromUrlQueryParameter('token')
+        ]);
         jwtOptions.secretOrKey = config.get('authentication.secret');
         
         this._usersCache = UsersCache();
@@ -106,12 +110,12 @@ exports.AuthenticateJWT = (app, isAuthRequired, accessRights) => {
         if (req.jwtResult)
             return processAuth(req.user, isAuthRequired, accessRights, res, next, req.jwtResult.info);
         req.jwtResult = { isSuccess: false };
-        let token = req.headers["authorization"];
+        let token = req.headers["authorization"] || (req.query["token"] ? ("JWT " + req.query["token"]) : null);
         if (token)
             passport.authenticate('jwt', function (err, user, info) {
-                req.jwtResult.info = info;
+                req.jwtResult.info = { message: info && info.message ? info.message : JSON.stringify(info) };
                 if (err & isAuthRequired) { return next(err); }
-                if ((!user) && isAuthRequired) { return res.status(HttpCode.ERR_UNAUTH).json(info); }
+                if ((!user) && isAuthRequired) { return res.status(HttpCode.ERR_UNAUTH).json(req.jwtResult.info); }
                 if (!err && user)
                     authJWT.checkToken(token)
                         .then((result) => {

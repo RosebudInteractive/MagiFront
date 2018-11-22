@@ -19,6 +19,8 @@ const STATUS_ACTIVE = 1;
 const STATUS_PENDING = 2;
 
 const SubsExtPeriod = config.has("billing.subsExtPeriod") ? config.get("billing.subsExtPeriod") : null;
+const TokenExpTime = config.has("authentication.tokenExpTime") ? config.get("authentication.tokenExpTime") : TOKEN_EXP_TIME;
+const TokenUpdTime = config.has("authentication.tokenUpdTime") ? config.get("authentication.tokenUpdTime") : TOKEN_UPD_TIME;
 
 const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
 const CONV_USER_DATA_FN = (rawUser) => {
@@ -90,8 +92,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         let options = opts || {};
         this._loginField = options.loginField || LOGIN_FIELD;
         this._userFields = options.userFields || USER_FIELDS;
-        this._tokenExpTime = options.tokenExpTime ? options.tokenExpTime : TOKEN_EXP_TIME;
-        this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TOKEN_UPD_TIME;
+        this._tokenExpTime = options.tokenExpTime ? options.tokenExpTime : TokenExpTime;
+        this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TokenUpdTime;
         this._userUpdTime = options.userUpdTime ? options.userUpdTime : USER_UPD_TIME;
         this._convUserDataFn = typeof (options.convUserDataFn) === "function" ? options.convUserDataFn : CONV_USER_DATA_FN;
         this._afterUserCreateEvent = null;
