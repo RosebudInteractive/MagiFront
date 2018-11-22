@@ -30,7 +30,7 @@ export default class NativeAppPlayer {
         if (this._div && this._div.length) {
 
             this._playerName = 'magisteriaPlayer';
-            this._id = (new Date).getTime();
+            this._id = null;
             window[this._playerName] = this;
 
             this._sendMessageToApp({
@@ -50,22 +50,9 @@ export default class NativeAppPlayer {
         this._currentTime = 0;
         this._timeChanged = false;
         this._setPositionOnPlay = false;
-
-        // let gOldOnError = window.onerror;
-        //
-        // window.onerror = (errorMsg, url, lineNumber) => {
-        //     this._sendErrorMessageToApp(errorMsg)
-        //
-        //     if (gOldOnError) {
-        //         return gOldOnError(errorMsg, url, lineNumber);
-        //     }
-        //
-        //
-        //     return false;
-        // }
     }
 
-    setData(data) {
+    setData(data, playerId) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
@@ -81,9 +68,9 @@ export default class NativeAppPlayer {
                 this._player.pause();
                 this._player.destroy();
                 this._player = null;
-                this._id = (new Date).getTime()
             }
 
+            this._id = playerId || (new Date).getTime()
             this._player = new Player(this._div, this._getPlayerOptions())
             this._player.render();
             this._player.setData(data);
@@ -174,6 +161,7 @@ export default class NativeAppPlayer {
 
     _sendMessageToApp(props) {
         props['playerId'] = this._id
+        props.host = window.location.href
         if (this._debug) {
             window.postMessage(
                 JSON.stringify(props),
@@ -205,7 +193,7 @@ export default class NativeAppPlayer {
     _getPlayerOptions() {
         return {
             designMode: false,
-            loader: new Loader(),
+            loader: new Loader(this._getLoaderOptions()),
             onCurrentTimeChanged: (audioState, isRealTimeChanged) => {
                 if (!isRealTimeChanged) return
 
@@ -229,16 +217,22 @@ export default class NativeAppPlayer {
                     _nativeAppDataUuid: data,
                 })
             },
-            onElementPlay: () => {
+            onElementPlay: (fileName) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetShowed',
+                    data: {
+                        fileName,
+                    },
                 })
             },
-            onElementStop: () => {
+            onElementStop: (fileName) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetRemoved',
+                    data: {
+                        fileName,
+                    },
                 })
             },
             onChangeTitles: (titles) => {
@@ -271,7 +265,7 @@ export default class NativeAppPlayer {
             },
             onError: (e) => {
                 this._sendErrorMessageToApp(
-                    'player error: ' + JSON.stringify(e.target.error)
+                    'player error: ' + JSON.stringify(e.target.error.message)
                 )
                 Sentry.captureException(e);
             },
@@ -305,5 +299,16 @@ export default class NativeAppPlayer {
                 }
             },
         };
+    }
+
+    _getLoaderOptions() {
+        return {
+            onError: (err) => {
+                this._sendErrorMessageToApp(
+                    'loader error: ' + JSON.stringify(err)
+                )
+                Sentry.captureException(err);
+            }
+        }
     }
 }

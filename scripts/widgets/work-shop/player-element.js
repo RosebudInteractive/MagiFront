@@ -101,7 +101,7 @@ export default class CWSPlayerElement extends CWSBase {
             this.stop();
         }, _timeInterval);
 
-        this._broadcastPlay();
+        this._broadcastPlay(this.Data.asset.file);
     }
 
     stop() {
@@ -122,7 +122,7 @@ export default class CWSPlayerElement extends CWSBase {
             interval: 0,
         };
 
-        this._broadcastStop()
+        this._broadcastStop(this.Data.asset.file)
     }
 
     _hide(item) {
@@ -241,13 +241,13 @@ export default class CWSPlayerElement extends CWSBase {
         this._options.onStop = options.onStop;
     }
 
-    _broadcastPlay() {
+    _broadcastPlay(fileName) {
         if (this._options.onPlay)
-            this._options.onPlay();
+            this._options.onPlay(fileName);
     }
 
-    _broadcastStop() {
+    _broadcastStop(fileName) {
         if (this._options.onStop)
-            this._options.onStop();
+            this._options.onStop(fileName);
     }
 }
