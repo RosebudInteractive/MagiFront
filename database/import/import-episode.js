@@ -10,7 +10,7 @@ const writeFileAsync = promisify(fs.writeFile);
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
-const { ParserWordXML } = require('./parser-word-xml');
+const { ParserWordXML, ParserConst } = require('./parser-word-xml');
 const { EpisodesService } = require("../db-episode");
 
 const NUM_COLS = 3;
@@ -610,7 +610,7 @@ exports.ImportEpisode = class ImportEpisode {
         // Foot notes processing
         //
         if (docData.FootNotes && (docData.FootNotes.used.length > 0)) {
-            text += "\r\n\-------------------\r\n";
+            text += ParserConst.Text_LF + "-------------------" + ParserConst.Text_LF;
             html += "<p>&nbsp;</p>";
             listType = null;
             docData.FootNotes.used.forEach((note) => {
