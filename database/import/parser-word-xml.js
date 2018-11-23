@@ -11,6 +11,12 @@ const writeFileAsync = promisify(fs.writeFile);
 const { Import } = require('../../const/common');
 const { XMLParserBase } = require('../../utils/xml-parser-base');
 
+const ParserConst = {
+    Text_LF: "\n",
+    Html_LF: "<br>"
+};
+
+exports.ParserConst = ParserConst;
 exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
     constructor() { super(); }
 
@@ -23,6 +29,9 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
         return new Promise((resolve, reject) => {
             let opts = _.cloneDeep(options || {});
             let json = convert.xml2js(docXml);
+
+            // fs.writeFileSync('./tmp-debug.json', convert.xml2json(docXml, { compact: false, spaces: 4 }), 'utf8');
+
             opts.Numbering = this._parseNumbering(this._findFirst("w:numbering", json), opts);
             opts.Refs = this._parseRefs(json, opts);
             opts.FootNotes = this._parseFootNotes(this._findFirst("w:footnotes", json), opts);
@@ -210,6 +219,10 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                                 result.html += " ";
                             }
                             break;
+                        case "w:br":
+                            result.text += ParserConst.Text_LF;
+                            result.html += ParserConst.Html_LF;
+                            break;
                         default:
                             if (options && options.errors)
                                 options.errors.push(`(${options.rowNum},${options.cellNum}) _parseText: Unhandled element "${elem.name}".`);
@@ -376,6 +389,12 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                 result.text = result.text.replace(Import.PARAGRAPH_MERGE_SYMBOL, "");
                 result.html = result.html.replace(Import.PARAGRAPH_MERGE_SYMBOL, "");
             }
+            else {
+                if ((result.text.length === 0) && (result.html.length === 0)) {
+                    result.html = ParserConst.Html_LF;
+                    result.text = ParserConst.Text_LF;
+                }
+            }
         }
         return result;
     }
@@ -389,7 +408,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                     switch (elem.name) {
                         case "w:p":
                             let paragraph = this._parseParagraph(elem, options);
-                            result.content.text += "\r\n" + paragraph.text;
+                            result.content.text += ParserConst.Text_LF + paragraph.text;
                             result.content.paragraphs.push(paragraph);
                             break;
                         default:
@@ -447,7 +466,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
                                             options.rowNum = 0;
                                         }
                                         let paragraph = this._parseParagraph(elem, options);
-                                        fnote.content.text += "\r\n" + (i ? paragraph.text : (`[${fnote.id}] ` + paragraph.text));
+                                        fnote.content.text += ParserConst.Text_LF + (i ? paragraph.text : (`[${fnote.id}] ` + paragraph.text));
                                         fnote.content.paragraphs.push(paragraph);
                                         break;
                                     default:
