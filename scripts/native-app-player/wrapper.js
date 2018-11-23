@@ -65,7 +65,7 @@ export default class NativeAppPlayer {
         }
     }
 
-    setData(data, playerId) {
+    setData({ data, playerId }) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
