@@ -108,9 +108,24 @@ export default class NativeAppPlayer {
             .then(() => {
                 this._ended = false;
 
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'startPlay 0',
+                })
+
                 if (option && (option.position !== undefined)) {
                     this._setPositionOnPlay = true;
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'start set position',
+                        data: option.position
+                    })
                     this._player.setPosition(option.position)
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'end set position',
+                        data: option.position
+                    })
                 }
             })
             .catch((e) => {
