@@ -120,7 +120,7 @@ class SocialLink extends React.Component {
         const _logo = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#' + logo + '"/>';
 
         return (
-            <a href={href} className="social-link">
+            <a href={href} target="_blank" className="social-link">
                 <span className="social-link__icon">
                     <svg width={icoWidth} height={icoHeight} dangerouslySetInnerHTML={{__html: _logo}}/>
                 </span>

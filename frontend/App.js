@@ -45,6 +45,15 @@ import Platform from 'platform';
 
 Polifyll.registry();
 
+// $(document).ready(()=> {
+//     setInterval(()=>{
+//         var event= { 'event': 'Pageview' };
+//         console.log(this)
+//         dataLayer.push(event);
+//         console.log("dataLayer.push: ", event);
+//     },2000);
+// })
+
 let _homePath = '/';
 const _globalScrollDelta = 80;
 
@@ -132,7 +141,6 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.hideUserBlock()
-            this.props.appActions.changePage(_nextLocation);
 
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
@@ -163,6 +171,14 @@ class App extends Component {
     componentDidUpdate(prevProps, prevState) {
         if (!this.state.showHeader && prevState.showHeader) {
             this.props.appActions.hideUserBlock()
+        }
+
+        let _thisLocation = this.props.ownProps.location.pathname,
+            _prevLocation = prevProps.ownProps.location.pathname,
+            _isNewLocation = _thisLocation !== _prevLocation;
+
+        if (_isNewLocation) {
+            this.props.appActions.changePage(_thisLocation);
         }
     }
 
