@@ -30,7 +30,7 @@ exports.ParserWordXML = class ParserWordXML extends XMLParserBase {
             let opts = _.cloneDeep(options || {});
             let json = convert.xml2js(docXml);
 
-            fs.writeFileSync('./tmp-debug.json', convert.xml2json(docXml, { compact: false, spaces: 4 }), 'utf8');
+            // fs.writeFileSync('./tmp-debug.json', convert.xml2json(docXml, { compact: false, spaces: 4 }), 'utf8');
 
             opts.Numbering = this._parseNumbering(this._findFirst("w:numbering", json), opts);
             opts.Refs = this._parseRefs(json, opts);
