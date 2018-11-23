@@ -404,6 +404,15 @@ export default class CWSPlayer extends CWSBase {
             .on('playing', () => {
                 this._broadcastPlaying()
             })
+            .on('abort', () => {
+                this._broadcastAbort()
+            })
+            .on('stalled', () => {
+                this._broadcastStalled()
+            })
+            .on('suspend', () => {
+                this._broadcastSuspend()
+            })
     }
 
     _calcBuffered(player) {
@@ -568,6 +577,24 @@ export default class CWSPlayer extends CWSBase {
     _broadcastPlaying() {
         if (this._options.onPlaying) {
             this._options.onPlaying()
+        }
+    }
+
+    _broadcastAbort() {
+        if (this._options.onAbort) {
+            this._options.onAbort()
+        }
+    }
+
+    _broadcastStalled() {
+        if (this._options.onStalled) {
+            this._options.onStalled()
+        }
+    }
+
+    _broadcastSuspend() {
+        if (this._options.onSuspend) {
+            this._options.onSuspend()
         }
     }
 

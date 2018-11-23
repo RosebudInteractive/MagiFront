@@ -333,6 +333,24 @@ export default class NativeAppPlayer {
                     })
                 }
             },
+            onAbort: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'ABORT',
+                })
+            },
+            onStalled: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'STALLED',
+                })
+            },
+            onSuspend: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'Suspend',
+                })
+            }
         };
     }
 
