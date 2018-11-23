@@ -181,7 +181,7 @@ export default class NativeAppPlayer {
                 '*'
             )
             console.log(JSON.stringify(props))
-        } else if (_isAndroid) {
+        } else if ( _isAndroid) {
             setTimeout(() => {
                 window.postMessage(
                     JSON.stringify(props),
@@ -189,11 +189,9 @@ export default class NativeAppPlayer {
                 )
             }, 0)
         } else {
-            setTimeout(() => {
-                window.postMessage(
-                    JSON.stringify(props)
-                )
-            }, 0)
+            window.postMessage(
+                JSON.stringify(props)
+            )
         }
     }
 
