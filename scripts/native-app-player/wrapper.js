@@ -142,6 +142,13 @@ export default class NativeAppPlayer {
 
     _setCurrentTime(value) {
         let _delta = value.globalTime - this._currentTime;
+
+        this._sendMessageToApp({
+            eventType: 'magisteriaPlayer',
+            eventName: 'playerMessage',
+            data: {value}
+        })
+
         if ((_delta > 0.5) || (_delta < 0)) {
 
             this._currentTime = value.globalTime;
