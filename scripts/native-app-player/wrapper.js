@@ -146,7 +146,7 @@ export default class NativeAppPlayer {
         this._sendMessageToApp({
             eventType: 'magisteriaPlayer',
             eventName: 'playerMessage',
-            data: {value}
+            data: {_delta}
         })
 
         if ((_delta > 0.5) || (_delta < 0)) {
