@@ -305,12 +305,12 @@ export default class NativeAppPlayer {
                 // Sentry.captureException(e);
             },
             onCanPlay: () => {
-                if (!this._started) {
+                // if (!this._started) {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerCanPlay',
                     })
-                }
+                // }
             },
             onBuffered: (value) => {
                 this._sendMessageToApp({
