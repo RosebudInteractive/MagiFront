@@ -3,7 +3,7 @@ const request = require('request');
 const fs = require('fs');
 const { URL } = require('url');
 const path = require('path');
-const { getTimeStr } = require('../utils');
+const { buildLogString } = require('../utils');
 
 function getFile(url, fileName) {
     return new Promise(resolve => {
@@ -11,30 +11,30 @@ function getFile(url, fileName) {
             let statusCode;
             let length;
             let stTime = new Date();
-            console.log(`${getTimeStr()} +++ Started: "${url}"`);
+            console.log(buildLogString(`+++ Started: "${url}"`));
             let inpStream = request(url)
                 .on('response', response => {
                     statusCode = response.statusCode;
                     length = response.headers['content-length'] ? parseInt(response.headers['content-length']) : -1;
                     if (statusCode !== 200) {
-                        console.error(`${getTimeStr()} ### HTTP Error: "${url}": StatusCode = ${statusCode}.`);
-                        console.log(`${getTimeStr()} ### HTTP Error: "${url}": StatusCode = ${statusCode}.`);
+                        console.error(buildLogString(`### HTTP Error: "${url}": StatusCode = ${statusCode}.`));
+                        console.log(buildLogString(`### HTTP Error: "${url}": StatusCode = ${statusCode}.`));
                     }
                 })
                 .on('error', (err) => {
-                    console.error(`${getTimeStr()} ### REQUEST Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
-                    console.log(`${getTimeStr()} ### REQUEST Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
+                    console.error(buildLogString(`### REQUEST Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
+                    console.log(buildLogString(`### REQUEST Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
                     resolve({ isErr: true, result: err });
                 });
             let outStream = fs.createWriteStream(fileName)
                 .on('error', (err) => {
-                    console.error(`${getTimeStr()} ### WRITE Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
-                    console.log(`${getTimeStr()} ### WRITE Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
+                    console.error(buildLogString(`### WRITE Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
+                    console.log(buildLogString(`### WRITE Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
                     resolve({ isErr: true, result: err });
                 })
                 .on('close', () => {
                     let time = ((new Date()) - stTime) / 1000;
-                    console.log(`${getTimeStr()} --- Finished: "${url}", size: ${(length / 1024 / 1024).toFixed(3)}Mb, time: ${time.toFixed(3)}s.`);
+                    console.log(buildLogString(`--- Finished: "${url}", size: ${(length / 1024 / 1024).toFixed(3)}Mb, time: ${time.toFixed(3)}s.`));
                     resolve({
                         isErr: false,
                         result: {
@@ -49,8 +49,8 @@ function getFile(url, fileName) {
             inpStream.pipe(outStream);
         }
         catch (err) {
-            console.error(`${getTimeStr()} ### Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
-            console.log(`${getTimeStr()} ### Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`);
+            console.error(buildLogString(`### Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
+            console.log(buildLogString(`### Error: "${url}": "${err.message ? err.message : JSON.stringify(err, null, 2)}".`));
             resolve({ isErr: true, result: err });
         }
     });

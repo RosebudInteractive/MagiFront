@@ -8,7 +8,7 @@ const { DbEngineInit } = require("../database/dbengine-init");
 
 new DbEngineInit(magisteryConfig);
 const { DbUtils } = require('../database/db-utils');
-const { getTimeStr } = require('../utils');
+const { buildLogString, getTimeStr } = require('../utils');
 
 let activeTasks = {};
 let dfmt = { h: "h ", m: "m ", s: "s", ms: true };
@@ -45,7 +45,7 @@ if (config.has("tasks")) {
     if (tasks.length > 0) {
         for (let i = 0; i < tasks.length; i++) {
             if (tasks[i].disabled) {
-                console.warn(`${getTimeStr()} ===> WARNING: Task [${i}]: "${tasks[i].name}" is disabled.`);
+                console.warn(buildLogString(`===> WARNING: Task [${i}]: "${tasks[i].name}" is disabled.`));
                 continue;
             }
             let getTaskProcessor = require(tasks[i].module);
@@ -64,14 +64,14 @@ if (config.has("tasks")) {
                                         taskDsc.isRunning = true;
                                         delete taskDsc.error;
                                         taskDsc.lastStart = startDt;
-                                        console.log(`${getTimeStr(startDt)} ===> "${taskName}" started (scheduled at ${getTimeStr(fireDate)}).`);
+                                        console.log(buildLogString(`===> "${taskName}" started (scheduled at ${getTimeStr(fireDate)}).`, startDt));
                                         taskRun(fireDate)
                                             .then(() => {
                                                 let finDt = new Date();
                                                 taskDsc.isRunning = false;
                                                 taskDsc.lastFinish = finDt;
                                                 let dt = (finDt - startDt) / 1000;
-                                                console.log(`${getTimeStr(finDt)} <=== "${taskName}" finished. ${getStatStr(taskDsc, dt, dfmt)}.`);
+                                                console.log(buildLogString(`<=== "${taskName}" finished. ${getStatStr(taskDsc, dt, dfmt)}.`, finDt));
                                             })
                                             .catch((err) => {
                                                 let finDt = new Date();
@@ -79,21 +79,21 @@ if (config.has("tasks")) {
                                                 taskDsc.lastFinish = finDt;
                                                 taskDsc.error = err;
                                                 let dt = (finDt - startDt) / 1000;
-                                                console.error(`${getTimeStr(finDt)} #### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt, true)}. Error: ${err}`);
+                                                console.error(buildLogString(`#### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt, true)}. Error: ${err}`), finDt);
                                             });
                                     }
                                     else
-                                        console.error(`${getTimeStr()} #### Task "${taskDsc.taskName}" (id=${taskId}) is already running. Ignored.`);
+                                        console.error(buildLogString(`#### Task "${taskDsc.taskName}" (id=${taskId}) is already running. Ignored.`));
                                 }
                                 else
-                                    console.error(`${getTimeStr()} ===> Task id=${taskId} doesn't exist. Ignored.`);
+                                    console.error(buildLogString(`===> Task id=${taskId} doesn't exist. Ignored.`));
                             });
                             activeTasks[taskId] = {
                                 taskName: taskName,
                                 task: task,
                                 isRunning: false,
                             };
-                            console.log(`${getTimeStr()} ===> Task "${tasks[i].name}" has been scheduled.`);
+                            console.log(buildLogString(`===> Task "${tasks[i].name}" has been scheduled.`));
                         }
                         else
                             throw new Error(`Missing schedule of task [${i}]: "${tasks[i].name}".`);

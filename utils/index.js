@@ -6,6 +6,11 @@ function getTimeStr(ts) {
     return `${now.toLocaleString()} ${tZ_str}`;
 }
 
+function buildLogString(message, ts) {
+    return `[${getTimeStr(ts)}] ${message}`;
+}
+
 module.exports = {
-    getTimeStr: getTimeStr
+    getTimeStr: getTimeStr,
+    buildLogString: buildLogString
 };
