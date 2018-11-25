@@ -330,6 +330,10 @@ export default class NativeAppPlayer {
                 })
             },
             onBuffered: (value) => {
+                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
+                    this.play()
+                }
+
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffered',
