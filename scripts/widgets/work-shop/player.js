@@ -313,6 +313,9 @@ export default class CWSPlayer extends CWSBase {
                 }
                 that._broadcastCanPlay(that);
             })
+            .on("canplaythrough", () => {
+                this._broadcastCanPlayThrough()
+            })
             .on("loadeddata", function () {
                 // console.log('loadeddata : ', this.src)
                 that._onAudioLoadedHandler(this);
@@ -527,6 +530,12 @@ export default class CWSPlayer extends CWSBase {
     _broadcastCanPlay(e) {
         if (this._options.onCanPlay) {
             this._options.onCanPlay(e)
+        }
+    }
+
+    _broadcastCanPlayThrough() {
+        if (this._options.onCanPlayThrough) {
+            this._options.onCanPlayThrough()
         }
     }
 

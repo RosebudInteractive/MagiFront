@@ -7,6 +7,11 @@ import Platform from 'platform';
 
 // Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
 
+const internalState = {
+    playing: 'playing',
+    paused: 'paused',
+}
+
 let Utils = {};
 
 let _isAndroid = Platform.os.family === "Android"
@@ -46,6 +51,7 @@ export default class NativeAppPlayer {
             })
         }
 
+        this._internalState = internalState.paused;
         this._ended = false;
         this._currentTime = 0;
         this._timeChanged = false;
@@ -65,7 +71,7 @@ export default class NativeAppPlayer {
         }
     }
 
-    setData({ data, playerId }) {
+    setData({data, playerId}) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
@@ -106,6 +112,7 @@ export default class NativeAppPlayer {
 
         this._player.play()
             .then(() => {
+                this._internalState = internalState.playing;
                 this._ended = false;
 
                 this._sendMessageToApp({
@@ -138,6 +145,8 @@ export default class NativeAppPlayer {
     }
 
     pause(options) {
+        this._internalState = internalState.paused;
+
         if (options && (options.playerId === this._id) && this._player) {
             this._player.pause();
         }
@@ -157,12 +166,6 @@ export default class NativeAppPlayer {
 
     _setCurrentTime(value) {
         let _delta = value.globalTime - this._currentTime;
-
-        this._sendMessageToApp({
-            eventType: 'magisteriaPlayer',
-            eventName: 'playerMessage',
-            data: {_delta}
-        })
 
         if ((_delta > 0.5) || (_delta < 0)) {
 
@@ -203,7 +206,7 @@ export default class NativeAppPlayer {
                 '*'
             )
             console.log(JSON.stringify(props))
-        } else if ( _isAndroid) {
+        } else if (_isAndroid) {
             setTimeout(() => {
                 window.postMessage(
                     JSON.stringify(props),
@@ -305,12 +308,26 @@ export default class NativeAppPlayer {
                 // Sentry.captureException(e);
             },
             onCanPlay: () => {
-                // if (!this._started) {
+                if (!this._started) {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerCanPlay',
                     })
-                // }
+                }
+
+                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
+                    this.play()
+                }
+            },
+            onCanPlayThrough: () => {
+                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
+                    this.play()
+                }
+
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'playerCanPlayThrough',
+                })
             },
             onBuffered: (value) => {
                 this._sendMessageToApp({
