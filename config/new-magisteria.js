@@ -24,12 +24,13 @@ module.exports = {
             redisPrefix: "pg:",
             expInSec: 14 * 24 * 60 * 60,
             maxDevSec: 14 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000'
+            url: 'http://127.0.0.1:8000',
+            logRequest: true
         },
     },
     admin: {
-        logFileUpload: false,
-        logModif: false
+        logFileUpload: true,
+        logModif: true
     },
     dbProvider: 'mysql',
     session: {
