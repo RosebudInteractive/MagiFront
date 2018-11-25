@@ -369,9 +369,15 @@ export default class NativeAppPlayer {
                 })
             },
             onSuspend: () => {
+                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
+                    this.play()
+                }
+
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'Suspend',
+                    state: this._internalState,
+                    paused: this._player._audioState.audio.paused,
                 })
             }
         };
