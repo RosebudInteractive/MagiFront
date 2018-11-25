@@ -6,7 +6,7 @@ const config = require('config');
 const { PrerenderCache } = require('./prerender-cache');
 const { SEO } = require('../const/common');
 const { HttpCode } = require('../const/http-codes');
-const { getTimeStr } = require('../utils');
+const { buildLogString } = require('../utils');
 
 const DFLT_EXPIRATION = 14 * 24 * 60 * 60; // 14 days
 const DFLT_MAX_DEV = 14 * 24 * 60 * 60; // 7 days
@@ -115,7 +115,7 @@ exports.PrerenderInit = (app) => {
                 // do whatever you need to do
                 let userAgent = req.headers['user-agent'];
                 if (logEnabled)
-                    console.log(`[${getTimeStr()}] Prerender: url:"${req.url}", userAgent:"${userAgent}"`);
+                    console.log(buildLogString(`Prerender: url:"${req.url}", userAgent:"${userAgent}"`));
                 // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
                 if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
                     req.forceRender = true;
@@ -126,7 +126,7 @@ exports.PrerenderInit = (app) => {
                         .then((res) => {
                             done(null, res);
                         }).catch((err) => {
-                            console.error(`[${getTimeStr()}] prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`);
+                            console.error(buildLogString(`prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`));
                             done(null, null);
                         });
             })

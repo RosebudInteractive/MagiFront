@@ -2,7 +2,7 @@ const _ = require('lodash');
 const config = require('config');
 const request = require('request');
 const uuidv4 = require('uuid/v4');
-const { getTimeStr } = require('../../utils');
+const { buildLogString } = require('../../utils');
 const { HttpCode } = require("../../const/http-codes");
 const { Payment } = require('./payment');
 const { Accounting } = require('../../const/accounting');
@@ -35,7 +35,7 @@ class YandexKassa extends Payment {
                                 res.send(data);
                             })
                             .catch(err => {
-                                console.error(`[${getTimeStr()}] ### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`);
+                                console.error(buildLogString(`### YandexKassa Callback ERROR: ${err && err.message ? err.message : JSON.stringify(err, null, 2)}`));
                                 res.send({});
                             })
                     else
