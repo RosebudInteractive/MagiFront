@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
@@ -6,6 +7,8 @@ const { ACCOUNT_ID } = require('../const/sql-req-common');
 let { LessonsService } = require('./db-lesson');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const LESSON_REQ_TREE = {
     expr: {
@@ -422,7 +425,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             });
                    })
                     .then(() => {
-                        console.log("Episode deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Episode deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -679,7 +683,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             });
                     })
                     .then(() => {
-                        console.log("Episode updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Episode updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -864,7 +869,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                             });    
                     })
                     .then(() => {
-                        console.log("Episode added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Episode added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

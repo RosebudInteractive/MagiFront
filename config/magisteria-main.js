@@ -25,8 +25,12 @@ module.exports = {
             expInSec: 3 * 24 * 60 * 60,
             maxDevSec: 3 * 24 * 60 * 60,
             url: 'http://127.0.0.1:8000',
-            logEnabled: false
+            logRequest: false
         },
+    },
+    admin: {
+        logFileUpload: false,
+        logModif: false
     },
     dbProvider: 'mysql',
     session: {

@@ -27,6 +27,10 @@ module.exports = {
             url: 'http://127.0.0.1:8000'
         },
     },
+    admin: {
+        logFileUpload: false,
+        logModif: false
+    },
     dbProvider: 'mysql',
     session: {
         name: 'magisteria.sid',

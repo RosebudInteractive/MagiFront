@@ -1,9 +1,12 @@
 const _ = require('lodash');
+const config = require('config');
 const { DbObject } = require('./db-object');
 const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const AUTHOR_REQ_TREE = {
     expr: {
@@ -430,7 +433,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Author deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Author deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -491,7 +495,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                             });
                     })
                     .then(() => {
-                        console.log("Author updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Author updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -559,7 +564,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Author added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Author added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

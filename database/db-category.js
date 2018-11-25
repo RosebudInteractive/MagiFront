@@ -1,6 +1,9 @@
 const _ = require('lodash');
+const config = require('config');
 const { DbObject } = require('./db-object');
 const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const CATEGORY_REQ_TREE = {
     expr: {
@@ -98,7 +101,8 @@ const DbCategory = class DbCategory extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Category deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Category deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -143,7 +147,8 @@ const DbCategory = class DbCategory extends DbObject {
                         return ctg_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Category updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Category updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -198,7 +203,8 @@ const DbCategory = class DbCategory extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Category added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Category added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

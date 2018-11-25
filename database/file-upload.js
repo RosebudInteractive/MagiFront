@@ -3,6 +3,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const formidable = require('formidable');
 const { DbUtils } = require('./db-utils');
 const { Import } = require('../const/common');
+const { getTimeStr, buildLogString } = require('../utils');
 
 const path = require('path');
 const config = require('config');
@@ -18,6 +19,7 @@ const sharp = require('sharp');
 //console.log(sharp.format);
 
 const audioMeta = require('music-metadata');
+const logFileUpload = config.has("admin.logFileUpload") ? config.get("admin.logFileUpload") : false;
 
 const std_sizes = [
     { lbl: "s", sz: 360 },
@@ -373,7 +375,8 @@ exports.FileUpload = {
                                 return fileProcessFn(file.realName ? file.realName : file.name,
                                     file.type, file.size, form.uploadDir, dir_suffix, res_files, all_files, file.info);
                             });
-                            console.info("### Uploaded File: " + JSON.stringify(file.toJSON()));
+                            if (logFileUpload)
+                                console.info(buildLogString(`### Uploaded File: ${JSON.stringify(file.toJSON())}`));
                         }
                         else {
                             if (file)
