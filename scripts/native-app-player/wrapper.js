@@ -338,6 +338,8 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffered',
                     value: value,
+                    state: this._internalState,
+                    paused: this._player._audioState.audio.paused,
                 })
             },
             onWaiting: () => {
