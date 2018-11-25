@@ -45,7 +45,7 @@ let listener = (event) => {
             let _id = $('#lecture-id').val();
             getData(_id)
                 .then((data) => {
-                    window.magisteriaPlayer.setData({data, playerId: 'test-1234'})
+                    window.magisteriaPlayer.setData({data, playerId: 'test-1234', position: 10})
                 })
                 .catch((err) => {
                     console.error(err);

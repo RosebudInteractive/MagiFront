@@ -7,11 +7,6 @@ import Platform from 'platform';
 
 // Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
 
-const internalState = {
-    playing: 'playing',
-    paused: 'paused',
-}
-
 let Utils = {};
 
 let _isAndroid = Platform.os.family === "Android"
@@ -51,7 +46,11 @@ export default class NativeAppPlayer {
             })
         }
 
-        this._internalState = internalState.paused;
+        this.state = {
+            needSeek: false,
+            seekToPosition: 0,
+
+        };
         this._ended = false;
         this._currentTime = 0;
         this._timeChanged = false;
@@ -71,7 +70,7 @@ export default class NativeAppPlayer {
         }
     }
 
-    setData({data, playerId}) {
+    setData({data, playerId, position}) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
@@ -88,6 +87,9 @@ export default class NativeAppPlayer {
                 this._player.destroy();
                 this._player = null;
             }
+
+            this.state.needSeek = !!position;
+            this.state.seekToPosition = position;
 
             this._id = playerId || (new Date).getTime()
             this._player = new Player(this._div, this._getPlayerOptions())
@@ -112,27 +114,11 @@ export default class NativeAppPlayer {
 
         this._player.play()
             .then(() => {
-                this._internalState = internalState.playing;
                 this._ended = false;
-
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'startPlay 0',
-                })
 
                 if (option && (option.position !== undefined)) {
                     this._setPositionOnPlay = true;
-                    this._sendMessageToApp({
-                        eventType: 'magisteriaPlayer',
-                        eventName: 'start set position',
-                        data: option.position
-                    })
                     this._player.setPosition(option.position)
-                    this._sendMessageToApp({
-                        eventType: 'magisteriaPlayer',
-                        eventName: 'end set position',
-                        data: option.position
-                    })
                 }
             })
             .catch((e) => {
@@ -145,8 +131,6 @@ export default class NativeAppPlayer {
     }
 
     pause(options) {
-        this._internalState = internalState.paused;
-
         if (options && (options.playerId === this._id) && this._player) {
             this._player.pause();
         }
@@ -238,6 +222,11 @@ export default class NativeAppPlayer {
                 this._setCurrentTime(audioState)
             },
             onSetPosition: (audioState) => {
+                if (this.state.needSeek) {
+                    this.state.needSeek = false;
+                    this.state.seekToPosition = 0;
+                }
+
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'onSeeked',
@@ -308,38 +297,34 @@ export default class NativeAppPlayer {
                 // Sentry.captureException(e);
             },
             onCanPlay: () => {
-                if (!this._started) {
+                if (this.state.needSeek) {
+                    this._player.setPosition(this.state.seekToPosition)
+                }
+
+                if (!this._started && !this.state.needSeek) {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerCanPlay',
                     })
                 }
-
-                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
-                    this.play()
-                }
             },
             onCanPlayThrough: () => {
-                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
-                    this.play()
+                if (this.state.needSeek) {
+                    this._player.setPosition(this.state.seekToPosition)
                 }
 
-                this._sendMessageToApp({
-                    eventType: 'magisteriaPlayer',
-                    eventName: 'playerCanPlayThrough',
-                })
+                if (!this._started && !this.state.needSeek) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerCanPlay',
+                    })
+                }
             },
             onBuffered: (value) => {
-                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
-                    this.play()
-                }
-
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'playerBuffered',
                     value: value,
-                    state: this._internalState,
-                    paused: this._player._audioState.audio.paused,
                 })
             },
             onWaiting: () => {
@@ -369,15 +354,9 @@ export default class NativeAppPlayer {
                 })
             },
             onSuspend: () => {
-                if ((this._internalState === internalState.playing) && this._player._audioState.audio.paused) {
-                    this.play()
-                }
-
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'Suspend',
-                    state: this._internalState,
-                    paused: this._player._audioState.audio.paused,
                 })
             }
         };
