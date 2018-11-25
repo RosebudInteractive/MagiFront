@@ -1,5 +1,9 @@
 const { DbObject } = require('./db-object');
 const _ = require('lodash');
+const config = require('config');
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
+
 const LANGUAGE_REQ_TREE = {
     expr: {
         model: {
@@ -83,7 +87,8 @@ const DbLanguage = class DbLanguage extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Language deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Language deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -121,7 +126,8 @@ const DbLanguage = class DbLanguage extends DbObject {
                         return lng_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Language updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Language updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -162,7 +168,8 @@ const DbLanguage = class DbLanguage extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Language added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Language added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

@@ -13,6 +13,8 @@ const {
     CHECK_IF_CAN_DEL_LESSON_MSSQL,
     CHECK_IF_CAN_DEL_LESSON_MYSQL
 } = require('../const/sql-req-common');
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const _ = require('lodash');
 
@@ -1095,7 +1097,8 @@ const DbCourse = class DbCourse extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Course deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Course deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -1446,7 +1449,8 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                     })
                     .then(() => {
-                        console.log("Course updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Course updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -1583,7 +1587,8 @@ const DbCourse = class DbCourse extends DbObject {
                         return root_obj.save(opts);
                     })
                     .then(() => {
-                        console.log("Course added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Course added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

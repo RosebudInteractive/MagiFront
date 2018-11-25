@@ -107,14 +107,14 @@ exports.PrerenderInit = (app) => {
         let prerenderCache = PrerenderCache();
         let expInSec = config.has("server.prerender.expInSec") ? config.get("server.prerender.expInSec") : DFLT_EXPIRATION;
         let maxDevSec = config.has("server.prerender.maxDevSec") ? config.get("server.prerender.maxDevSec") : DFLT_MAX_DEV;
-        let logEnabled = config.has("server.prerender.logEnabled") ? config.get("server.prerender.logEnabled") : false;
+        let logRequest = config.has("server.prerender.logRequest") ? config.get("server.prerender.logRequest") : false;
 
         prerender
             .set('crawlerUserAgents', crawlerUserAgents)
             .set('beforeRender', function (req, done) {
                 // do whatever you need to do
                 let userAgent = req.headers['user-agent'];
-                if (logEnabled)
+                if (logRequest)
                     console.log(buildLogString(`Prerender: url:"${req.url}", userAgent:"${userAgent}"`));
                 // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
                 if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
