@@ -19,6 +19,7 @@ const dfltPrerenderSettings =
     path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
     maxLinksLimit: 0,
     maxAgeSec: 365 * 24 * 60 * 60, // max link age
+    minTimeToExpInSec: 60 * 60,// render if TTL < minTimeToExpInSec
     renderDelay: 10* 1000 // render request delay in ms
 };
 
@@ -46,25 +47,27 @@ exports.PrerenderTask = class PrerenderTask extends Task {
             let key = link.pathname;
             let cacheKey = this._prerenderCache.getKey(key);
             this._totLinks++;
-            if (!this._links[cacheKey]) {
-                let now = new Date();
-                let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) >= this._prerenderSettings.maxAgeSec);
-                if ((!this._prerenderSettings.maxLinksLimit) ||
-                    (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
-                    this._renderedLinks++;
-                    if (isOutDated)
-                        this._outdatedLinks++;
-                    rc = this._delay(this._lastReqTime ? (this._prerenderSettings.renderDelay - (now - this._lastReqTime)) : 0)
-                        .then(() => {
-                            this._lastReqTime = new Date();
-                            return this._prerenderCache.prerender(key, isOutDated);
-                        });
-                }
-            }
-            else {
-                this._alreadyCached++;
-                delete this._links[cacheKey];
-            }
+            rc = this._prerenderCache.ttl(key)
+                .then(result => {
+                    if ((result >= 0) && (result < this._prerenderSettings.minTimeToExpInSec)) {
+                        let now = new Date();
+                        let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) >= this._prerenderSettings.maxAgeSec);
+                        if ((!this._prerenderSettings.maxLinksLimit) ||
+                            (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
+                            this._renderedLinks++;
+                            if (isOutDated)
+                                this._outdatedLinks++;
+                            return this._delay(this._lastReqTime ? (this._prerenderSettings.renderDelay - (now - this._lastReqTime)) : 0)
+                                .then(() => {
+                                    this._lastReqTime = new Date();
+                                    return this._prerenderCache.prerender(key, isOutDated);
+                                });
+                        }
+                    }
+                    else
+                        this._alreadyCached++;
+                    delete this._links[cacheKey];
+                });
             resolve(rc);
         })
     }

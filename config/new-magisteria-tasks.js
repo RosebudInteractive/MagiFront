@@ -45,8 +45,9 @@ module.exports = {
             options: {
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"],
-                maxLinksLimit: 100,
+                maxLinksLimit: 500,
                 maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                minTimeToExpInSec: 6 * 60 * 60, // render if TTL < minTimeToExpInSec
                 renderDelay: 10 * 1000 // render request delay in ms
             }
         },
@@ -149,8 +150,8 @@ module.exports = {
             usePrerender: false,
             useRedis: true,
             redisPrefix: "pg:",
-            expInSec: 14 * 24 * 60 * 60,
-            maxDevSec: 14 * 24 * 60 * 60,
+            expInSec: 1 * 24 * 60 * 60,
+            maxDevSec: 1 * 24 * 60 * 60,
             url: 'http://127.0.0.1:8000'
         }
     },

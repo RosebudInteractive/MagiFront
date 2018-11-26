@@ -22,8 +22,8 @@ module.exports = {
             usePrerender: true,
             useRedis: true,
             redisPrefix: "pg:",
-            expInSec: 3 * 24 * 60 * 60,
-            maxDevSec: 3 * 24 * 60 * 60,
+            expInSec: 1 * 24 * 60 * 60,
+            maxDevSec: 1 * 24 * 60 * 60,
             url: 'http://127.0.0.1:8000',
             logRequest: false
         },

@@ -140,13 +140,55 @@ let PrerenderCache = class {
             });
     }
 
-    get(key) {
+    ttl(key, inMsec) {
         return new Promise((resolve, reject) => {
-            let rc;
+            let rc = null;
             let id = this.getKey(key);
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
-                    return connection.getAsync(id);
+                    return (inMsec ? connection.pttlAsync(id) : connection.ttlAsync(id))
+                        .then(result => {
+                            return result >= 0 ? result : (result === -2 ? 0 : result);
+                        });
+                });
+            }
+            else
+                rc = this._cache[id] ? -1 : 0;
+            resolve(rc);
+        });
+    }
+
+    get(key, options) {
+        return new Promise((resolve, reject) => {
+            let rc;
+            let id = this.getKey(key);
+            let opts = options || {};
+            let value;
+            if (this._isRedis) {
+                rc = ConnectionWrapper((connection) => {
+                    return connection.getAsync(id)
+                        .then(result => {
+                            let res = value = result;
+                            if (value)
+                                if (opts.withTtl || opts.withPttl) {
+                                    if (opts.withTtl)
+                                        res = connection.ttlAsync(id)
+                                    else
+                                        res = connection.pttlAsync(id);
+                                    res = res.then(result => {
+                                        if (result === -2) {
+                                            return null;
+                                        }
+                                        else {
+                                            return {
+                                                value: value,
+                                                time: result === -1 ? null : result
+                                            };
+                                        }
+                                    });
+                                }
+                            return res;
+                        });
                 });
             }
             else
