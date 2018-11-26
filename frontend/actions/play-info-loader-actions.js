@@ -19,6 +19,8 @@ export const getLessonPlayInfo = (lesson) => {
             .then(data => {
                 data.lessonUrl = lesson.URL;
                 data.courseUrl = lesson.courseUrl;
+                data.courseName = lesson.Course.Name;
+                data.authorName = lesson.Author.FirstName + ' ' + lesson.Author.LastName;
                 data.Number = lesson.Number;
                 data.Name = lesson.Name;
                 dispatch({
