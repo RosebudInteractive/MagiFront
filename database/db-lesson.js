@@ -1972,7 +1972,7 @@ const DbLesson = class DbLesson extends DbObject {
 
                         root_ch = course_obj.getDataRoot("LessonCourse");
                         ch_collection = root_ch.getCol("DataElements");
-                        for (let i = 0; i < ch_collection.count(); i++){
+                        for (let i = 0; i < ch_collection.count(); i++) {
                             if (ch_collection.get(i).lessonId() === id) {
                                 ls_course_obj = ch_collection.get(i);
                                 break;
@@ -2003,7 +2003,7 @@ const DbLesson = class DbLesson extends DbObject {
                             for (let i = 0; i < ch_collection.count(); i++) {
                                 let obj = ch_collection.get(i);
                                 if (obj.parentId() === lc_parent_id)
-                                ch_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
+                                    ch_list[obj.lessonId()] = { deleted: true, isOwner: false, obj: obj };
                             }
 
                             for (let i = 0; i < ch_own_collection.count(); i++) {
@@ -2195,9 +2195,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["FreeExpDate"]) !== "undefined")
                             lsn_obj.freeExpDate(inpFields["FreeExpDate"]);
                         if (lsn_obj.isSubsRequired())
-                            lsn_obj.isAuthRequired(true);    
-                        if (typeof (inpFields["State"]) !== "undefined")
-                            lsn_lng_obj.state(inpFields["State"]);
+                            lsn_obj.isAuthRequired(true);
                         if (typeof (inpFields["Name"]) !== "undefined")
                             lsn_lng_obj.name(inpFields["Name"]);
                         if (typeof (inpFields["ShortDescription"]) !== "undefined")
@@ -2211,13 +2209,28 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             lsn_lng_obj.snDescription(inpFields["SnDescription"]);
 
+                        let prevState = ls_course_obj.state();
+                        let currDate = new Date();
+                        currDate = (new Date(currDate.getFullYear(), currDate.getMonth(), currDate.getDate())) - 0;
+
                         if (typeof (inpFields["State"]) !== "undefined") {
+                            lsn_lng_obj.state(inpFields["State"]);
                             ls_course_obj.state(inpFields["State"]);
-                            if (lsn_obj.id() === course_id)
-                                lsn_lng_obj.state(inpFields["State"]);
                         }
-                        if (typeof (inpFields["ReadyDate"]) !== "undefined")
-                            ls_course_obj.readyDate(inpFields["ReadyDate"]);
+                        let currState = ls_course_obj.state();
+                        if (typeof (inpFields["ReadyDate"]) !== "undefined") {
+                            let olgReadyDate = ls_course_obj.readyDate() - 0;
+                            let newReadyDate = ls_course_obj.readyDate(inpFields["ReadyDate"]) - 0;
+                            if (currState === "R") {
+                                if (currState !== prevState) {
+                                    if (newReadyDate !== currDate)
+                                        throw new Error(`Publish date should be equal to CURRENT date for "READY" lesson.`);
+                                }
+                                else
+                                    if (olgReadyDate !== newReadyDate)
+                                        throw new Error(`Can't change "READY" lesson publish date.`);
+                            }
+                        }
                         
                         for (let key in ch_list)
                             if (ch_list[key].deleted) {
