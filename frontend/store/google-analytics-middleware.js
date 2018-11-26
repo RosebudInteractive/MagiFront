@@ -16,8 +16,28 @@ const GoogleAnalyticsMiddleware = store => next => action => {
         }
 
         case PLAYER_PLAYED: {
+            let _state = store.getState(),
+                _authorName,
+                _courseName,
+                _lessonName,
+                _totalDuration;
+
+            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            if (_isPlayingLessonExists) {
+                _totalDuration = _state.player.totalDuration
+                _authorName = _state.lessonPlayInfo.playInfo.authorName
+                _courseName = _state.lessonPlayInfo.playInfo.courseName
+                _lessonName = _state.lessonPlayInfo.playInfo.Name
+            }
+
             if (window.dataLayer) {
-                window.dataLayer.push({'event': 'play'});
+                window.dataLayer.push({
+                    'event': 'play',
+                    'dimension1': _lessonName,
+                    'dimension2': _courseName,
+                    'dimension3': _authorName,
+                    'metric3': _totalDuration
+                });
             }
             return next(action)
         }
@@ -29,17 +49,17 @@ const GoogleAnalyticsMiddleware = store => next => action => {
             if (_isPlayingLessonExists) {
                 let _totalDuration = _state.player.totalDuration,
                     _newPosition = action.payload,
-                    _percent = Math.round(_newPosition * 100/_totalDuration);
+                    _percent = Math.round(_newPosition * 100 / _totalDuration)
 
                 if ((_percent >= 10) && (_percent < 25)) {
                     store.dispatch(setProgressPercent(10))
-                } else if ((_percent >=25) && (_percent < 50)) {
+                } else if ((_percent >= 25) && (_percent < 50)) {
                     store.dispatch(setProgressPercent(25))
-                } else if ((_percent >=50) && (_percent < 75)) {
+                } else if ((_percent >= 50) && (_percent < 75)) {
                     store.dispatch(setProgressPercent(50))
-                } else if ((_percent >=75) && (_percent < 90)) {
+                } else if ((_percent >= 75) && (_percent < 90)) {
                     store.dispatch(setProgressPercent(90))
-                } else if (_percent >=90){
+                } else if (_percent >= 90) {
                     store.dispatch(setProgressPercent(90))
                 }
             }
@@ -49,14 +69,32 @@ const GoogleAnalyticsMiddleware = store => next => action => {
 
         case PLAYER_SET_PROGRESS_PERCENT: {
             let _state = store.getState(),
-                _oldValue = _state.player.progressPercent;
+                _oldValue = _state.player.progressPercent,
+                _authorName,
+                _courseName,
+                _lessonName,
+                _totalDuration;
+
+            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            if (_isPlayingLessonExists) {
+                _totalDuration = _state.player.totalDuration
+                _authorName = _state.lessonPlayInfo.playInfo.authorName
+                _courseName = _state.lessonPlayInfo.playInfo.courseName
+                _lessonName = _state.lessonPlayInfo.playInfo.Name
+            }
 
             let result = next(action),
                 _newValue = action.payload;
 
             if (_oldValue !== _newValue) {
                 if (window.dataLayer) {
-                    window.dataLayer.push({'event': 'play_' + _newValue});
+                    window.dataLayer.push({
+                        'event': 'play_' + _newValue,
+                        'dimension1': _lessonName,
+                        'dimension2': _courseName,
+                        'dimension3': _authorName,
+                        'metric3': _totalDuration
+                    });
                 }
             }
 
