@@ -9,20 +9,20 @@ const GoogleAnalyticsMiddleware = store => next => action => {
     switch (action.type) {
 
         case APP_CHANGE_PAGE: {
-            // let _pathPrefix = window.location.protocol + '//' + window.location.host;
+            let _pathPrefix = window.location.protocol + '//' + window.location.host;
 
-            // window.dataLayer.push({
-            //     'event': 'Pageview',
-            //     'url': _pathPrefix + action.payload
-            // });
+            window.dataLayer.push({
+                'event': 'Pageview',
+                'url': _pathPrefix + action.payload
+            });
 
             return next(action)
         }
 
         case SIGN_UP_SUCCESS: {
-            // if (window.dataLayer) {
-            //     window.dataLayer.push({'event': 'reg'});
-            // }
+            if (window.dataLayer) {
+                window.dataLayer.push({'event': 'reg'});
+            }
 
             return next(action)
         }
