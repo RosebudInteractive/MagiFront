@@ -6,6 +6,9 @@ const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { getTimeStr, buildLogString } = require('../utils');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
+
 const {
     ACCOUNT_ID,
     AUTHORS_BY_ID_MSSQL_PUBLIC_REQ,
@@ -1864,7 +1867,8 @@ const DbLesson = class DbLesson extends DbObject {
                             });
                    })
                     .then(() => {
-                        console.log("Lesson deleted: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Lesson deleted: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -2430,7 +2434,8 @@ const DbLesson = class DbLesson extends DbObject {
                             return this._updateLessonDuration(id, opts);
                     })
                     .then(() => {
-                        console.log("Lesson updated: Id=" + id + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Lesson updated: Id="${id}".`));
                         return { result: "OK" };
                     })
                     .finally((isErr, res) => {
@@ -2734,7 +2739,8 @@ const DbLesson = class DbLesson extends DbObject {
                             });
                     })
                     .then(() => {
-                        console.log("Lesson added: Id=" + newId + ".");
+                        if (logModif)
+                            console.log(buildLogString(`Lesson added: Id="${newId}".`));
                         return { id: newId };
                     })
                     .finally((isErr, res) => {

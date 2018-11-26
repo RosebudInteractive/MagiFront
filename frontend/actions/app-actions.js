@@ -17,7 +17,15 @@ import {
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
     GET_APP_OPTIONS_FAIL,
+    APP_CHANGE_PAGE
 } from '../constants/app'
+
+export const changePage = (url) => {
+    return {
+        type: APP_CHANGE_PAGE,
+        payload: url
+    }
+}
 
 export const switchSizeTo = (size) => {
     return {

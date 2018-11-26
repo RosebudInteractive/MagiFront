@@ -18,7 +18,7 @@ export default class ProjectPage extends React.Component {
                                 <h2 className="project-info__name">Андрей Борейко</h2>
                                 <p className="project-info__position">Главный редактор</p>
                                 <div className="project-info__image">
-                                    <img src="data/2016/08/unnamed-2-768x768.jpg" width="479" height="459" alt=""/>
+                                    <img src="/data/2016/08/unnamed-2-768x768.jpg" width="479" height="459" alt=""/>
                                 </div>
                             </div>
                         </div>

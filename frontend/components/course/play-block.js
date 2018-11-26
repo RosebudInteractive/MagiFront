@@ -81,7 +81,7 @@ class PlayBlock extends React.Component {
     render() {
         const _radius = 97.25;
 
-        let {id, totalDuration, isAuthRequired, authorized,} = this.props,
+        let {id, totalDuration, isAuthRequired, authorized, cover} = this.props,
             _lessonLocked = (isAuthRequired && !authorized),
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
@@ -91,6 +91,7 @@ class PlayBlock extends React.Component {
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
 
+        const _imgStyle = {backgroundImage: "url(" + cover + ")"}
 
         if (this._redirect) {
             this._redirect = false;
@@ -99,9 +100,7 @@ class PlayBlock extends React.Component {
 
         return (
             <div className='lecture__play-block'>
-                <div className="lecture__image-wrapper">
-                    <img src={this.props.cover} width="126" height="126" alt=""/>
-                </div>
+                <div className="lecture__image-wrapper" style={_imgStyle}/>
                 {
                     !_lessonLocked ?
                         <div className="lecture__loader" id="cont" data-pct="100">

@@ -33,7 +33,7 @@ class CourseLessons extends React.Component {
                 <LessonWrapper
                     id={lesson.Id}
                     title={lesson.Name}
-                    url={'../' + this.props.courseUrl + '/' + lesson.URL}
+                    url={'/' + this.props.courseUrl + '/' + lesson.URL}
                     courseUrl={this.props.courseUrl}
                     lessonUrl={lesson.URL}
                     descr={lesson.ShortDescription}

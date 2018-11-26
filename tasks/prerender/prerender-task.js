@@ -11,7 +11,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { Task } = require('../lib/task');
 const { PrerenderCache } = require('../../prerender/prerender-cache');
 const { XMLParserBase } = require('../../utils/xml-parser-base');
-const { getTimeStr } = require('../../utils');
+const { buildLogString } = require('../../utils');
 
 const dfltMapFiles = ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"];
 const dfltPrerenderSettings =
@@ -135,7 +135,7 @@ exports.PrerenderTask = class PrerenderTask extends Task {
                 let outTxt = this._prerenderSettings.maxAgeSec ? (', outdated: ' + this._outdatedLinks + " > " +
                     Math.round(this._prerenderSettings.maxAgeSec / 24 / 60 / 60) + " day(s)") : '';
                 let limitTxt = this._prerenderSettings.maxLinksLimit ? (', limit: ' + this._prerenderSettings.maxLinksLimit) : '';
-                console.log(`${getTimeStr()} Total links: ${this._totLinks}${outTxt}, already cached: ${this._alreadyCached}, rendered ${this._renderedLinks}${limitTxt}.`);
+                console.log(buildLogString(`Total links: ${this._totLinks}${outTxt}, already cached: ${this._alreadyCached}, rendered ${this._renderedLinks}${limitTxt}.`));
             });
     }
 }

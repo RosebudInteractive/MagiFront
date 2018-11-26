@@ -6,13 +6,15 @@ const config = require('config');
 const { PrerenderCache } = require('./prerender-cache');
 const { SEO } = require('../const/common');
 const { HttpCode } = require('../const/http-codes');
-const { getTimeStr } = require('../utils');
+const { buildLogString } = require('../utils');
 
 const DFLT_EXPIRATION = 14 * 24 * 60 * 60; // 14 days
 const DFLT_MAX_DEV = 14 * 24 * 60 * 60; // 7 days
 
 let additionalBots = [
     "yandex",
+    "odklbot",
+    "telegrambot",
     SEO.FORCE_RENDER_USER_AGENT,
     SEO.BOT_USER_AGENT
 ];
@@ -105,15 +107,15 @@ exports.PrerenderInit = (app) => {
         let prerenderCache = PrerenderCache();
         let expInSec = config.has("server.prerender.expInSec") ? config.get("server.prerender.expInSec") : DFLT_EXPIRATION;
         let maxDevSec = config.has("server.prerender.maxDevSec") ? config.get("server.prerender.maxDevSec") : DFLT_MAX_DEV;
-        let logEnabled = config.has("server.prerender.logEnabled") ? config.get("server.prerender.logEnabled") : false;
+        let logRequest = config.has("server.prerender.logRequest") ? config.get("server.prerender.logRequest") : false;
 
         prerender
             .set('crawlerUserAgents', crawlerUserAgents)
             .set('beforeRender', function (req, done) {
                 // do whatever you need to do
                 let userAgent = req.headers['user-agent'];
-                if (logEnabled)
-                    console.log(`[${getTimeStr()}] Prerender: url:"${req.url}", userAgent:"${userAgent}"`);
+                if (logRequest)
+                    console.log(buildLogString(`Prerender: url:"${req.url}", userAgent:"${userAgent}"`));
                 // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
                 if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
                     req.forceRender = true;
@@ -124,7 +126,7 @@ exports.PrerenderInit = (app) => {
                         .then((res) => {
                             done(null, res);
                         }).catch((err) => {
-                            console.error(`[${getTimeStr()}] prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`);
+                            console.error(buildLogString(`prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`));
                             done(null, null);
                         });
             })

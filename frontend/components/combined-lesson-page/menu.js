@@ -226,7 +226,7 @@ class Navigation extends React.Component {
     }
 
     _onRecommendedClick() {
-        let scrollTarget = $('#recommend').offset().top;
+        let scrollTarget = $('#recommend').offset().top - 10;
 
         $("body, html").animate({
             scrollTop: scrollTarget

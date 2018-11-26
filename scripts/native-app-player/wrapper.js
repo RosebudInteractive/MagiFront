@@ -3,8 +3,13 @@ import Loader from "work-shop/resource-loader";
 import 'jquery-ui/jquery-ui';
 import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
+import Platform from 'platform';
+
+Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
 
 let Utils = {};
+
+let _isAndroid = Platform.os.family === "Android"
 
 Utils.guid = function () {
 
@@ -176,6 +181,13 @@ export default class NativeAppPlayer {
                 '*'
             )
             console.log(JSON.stringify(props))
+        } else if ( _isAndroid) {
+            setTimeout(() => {
+                window.postMessage(
+                    JSON.stringify(props),
+                    '*'
+                )
+            }, 0)
         } else {
             window.postMessage(
                 JSON.stringify(props)

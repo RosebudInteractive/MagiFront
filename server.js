@@ -24,6 +24,7 @@ const { DbEngineInit } = require("./database/dbengine-init");
 new DbEngineInit(magisteryConfig);
 const config = require('config');
 const { PrerenderInit } = require('./prerender');
+const { getTimeStr, buildLogString } = require('./utils');
 
 //bld.initDatabase()
 Promise.resolve()
@@ -199,8 +200,8 @@ Promise.resolve()
             if (error) {
                 console.error(error)
             } else {
-                console.info("==> 🌎  Listening on port %s. Open up %s://%s:%s/ in your browser.",
-                    port, config.server.protocol, address === '0.0.0.0' ? 'localhost' : address, port);
+                console.info("[%s] ==> Listening on port %s. Open up %s://%s:%s/ in your browser.",
+                    getTimeStr(), port, config.server.protocol, address === '0.0.0.0' ? 'localhost' : address, port);
             }
         });
     }, (err) => {
