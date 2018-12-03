@@ -57,7 +57,7 @@ module.exports = {
         enabled: false,
         prefix: 'ses:',
         scanCount: 100,
-        maxAge: 4 * 24 * 3600 * 1000 // 4 days
+        maxAge: 20 * 24 * 3600 * 1000 // 20 days
     },
     trace: {
         sqlTrace: false,
