@@ -1,7 +1,10 @@
 'use strict';
 process.env["NODE_CONFIG_DIR"] = "../config/";
 const config = require('config');
+const crypto = require('crypto');
 const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
 const { magisteryConfig } = require("../etc/config")
 const { buildLogString, getTimeStr } = require('../utils');
 const { DbEngineInit } = require("../database/dbengine-init");
@@ -14,29 +17,20 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
-let resMan = null;
-let dataObjectEngine = null;
-
-function newVersion(schema) {
-    schema.getModel("Parameters")
-        .addField("StrNew", { type: "string", allowNull: true });
-
-    schema.addModel("NewTable", "fc6ddbe4-efa8-4c27-8cb0-ae97ebb03484", "RootNewTable", "fbc95e9e-8e90-40f8-aa02-55ae42587166")
-        .addField("ChequeId", { type: "dataRef", model: "Cheque", refAction: "parentRestrict", allowNull: false });
-
-    schema.getModel("NewTable")
-        .inherit("NewTableDesc", "d38bf8ef-8a08-4de3-8ca3-dcd8111bc308", "RootNewTableDesc", "589ca53c-c4af-4f72-b371-59cbaccc04c6")
-        .addField("Val", { type: "int", allowNull: false });
-}
-
 class Upgrader{
 
-    constructor(options) {
+    constructor(fname, options) {
+        if(!fname)
+            throw new Error(`Argument "fname" is missing.`);
+        this._buildInfo = JSON.parse(fs.readFileSync(fname, { encoding: "utf8" }));
+        this._baseDir = path.parse(path.resolve(fname)).dir;
         let opts = options || {};
         if (!(this._resMan = opts.resMan))
             throw new Error(`Argument "resMan" is missing.`);
         if (!(this._dataObjectEngine = opts.dataObjectEngine))
             throw new Error(`Argument "dataObjectEngine" is missing.`);
+        this._providerId = this._dataObjectEngine.getProviderId();
+        this._models = {};
     }
 
     async _fillTypeModel(aNewModels) {
@@ -111,47 +105,78 @@ class Upgrader{
         return newModels;
     }
 
-    async createNewBuild(newModels, updModels) {
+    async _createNewBuild(newModels, updModels) {
         await this._resMan.createNewBuild();
         console.log(`New build has been created.`);
     }
 
-    async upgrade() {
-        await this._dataObjectEngine.whenIsReady();
+    _getFilePath(fn) {
+        return path.isAbsolute(fn) ? fn : path.resolve(path.join(this._baseDir, fn));
+    }
 
-        console.log(buildLogString(`READY!`));
-        let schema = this._dataObjectEngine.getSchema();
+    _getBuild(buildInfo, buildNum) {
+        return buildInfo.builds && buildInfo.builds[buildNum] ? buildInfo.builds[buildNum] : null;
+    }
 
-        this._dataObjectEngine.saveSchemaToFile("../../upgrader-test/before");
+    async _runScript(buildInfo, buildNum, scriptTag) {
+        let curBuild = this._getBuild(buildInfo, buildNum);
+        let scriptFile = curBuild[scriptTag];
+        if (scriptFile) {
+            if (typeof (scriptFile) !== "string") {
+                scriptFile = scriptFile[this._providerId];
+                if (typeof (scriptFile) !== "string")
+                    throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]": ` +
+                        `Invalif or missing script "${scriptTag}" for provider "${this._providerId}".`);
+            }
+            scriptFile = this._getFilePath(scriptFile);
+            await this._dataObjectEngine.getQuery().execDbScript({}, scriptFile);
+        }
+    }
 
-        let models = {};
-        schema.models().forEach(model => {
-            if ((!model.isTypeModel()) && (!model.isVirtual()))
-                models[model.name()] = {
-                    model: model,
-                    checkSum: JSON.stringify(model.serialize(model, true))
-                };
-        });
+    async _processBuild(schema, buildInfo, buildNum) {
 
-        newVersion(schema);
+        let curBuild = this._getBuild(buildInfo, buildNum);
+        if (!curBuild)
+            throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]" doesn't exist.`);
+
+        await this._runScript(buildInfo, buildNum, "script_before");
+
+        if (typeof (curBuild.upgrader)!=="string")
+            throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]": ` +
+                `Invalid or missing upgrade module: "${curBuild.upgrader}"`);
+        let modulePath = this._getFilePath(curBuild.upgrader);
+
+        const { upgradeDb } = require(modulePath);
+        if (typeof (upgradeDb) !== "function")
+            throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]": ` +
+                `Module "${modulePath}" doesn't implement "upgradeDb" method`);
+
+        upgradeDb(schema);
         schema.checkSchema();
 
         let newModels = [];
         let updModels = [];
         schema.models().forEach(model => {
             if ((!model.isTypeModel()) && (!model.isVirtual())) {
-                let modelRec = models[model.name()];
+                let modelRec = this._models[model.name()];
+                let md5sum = crypto.createHash('md5');
+                md5sum.update(JSON.stringify(model.serialize(model, true)));
+                let checkSum = md5sum.digest('hex');
                 if (modelRec) {
-                    let checkSum = JSON.stringify(model.serialize(model, true));
-                    if (checkSum !== modelRec.checkSum)
+                    if (checkSum !== modelRec.checkSum) {
                         updModels.push(model);
+                        modelRec.checkSum = checkSum;
+                    }
                 }
-                else
+                else {
+                    this._models[model.name()] = {
+                        model: model,
+                        checkSum: checkSum
+                    };
                     newModels.push(model);
+                }
             }
         });
-
-        this._dataObjectEngine.saveSchemaToFile("../../upgrader-test/after");
 
         let errs = [];
         newModels.concat(updModels).forEach(model => {
@@ -162,13 +187,37 @@ class Upgrader{
 
         newModels = await this._fillTypeModel(newModels);
         console.log(newModels);
-        await this.createNewBuild(newModels, updModels);
+        await this._createNewBuild(newModels, updModels);
+        await this._runScript(buildInfo, buildNum, "script_upgrade");
+        await this._runScript(buildInfo, buildNum, "script_after");
+    }
+    
+    async upgrade() {
+        await this._dataObjectEngine.whenIsReady();
+
+        console.log(buildLogString(`READY!`));
+        let schema = this._dataObjectEngine.getSchema();
+
+        schema.models().forEach(model => {
+            if ((!model.isTypeModel()) && (!model.isVirtual())) {
+                let md5sum = crypto.createHash('md5');
+                md5sum.update(JSON.stringify(model.serialize(model, true)));
+                let checkSum = md5sum.digest('hex');
+                this._models[model.name()] = {
+                    model: model,
+                    checkSum: checkSum
+                };
+            };
+        });
+
+        await this._processBuild(schema, this._buildInfo, 2);
     }
 }
 
 async function start () {
     try {
-        let upgrader = new Upgrader({ resMan: dbInitObject.resMan, dataObjectEngine: dbInitObject.dataObjectEngine });
+        let fn = config.upgrader && config.upgrader.upgraderFile ? config.upgrader.upgraderFile : null;
+        let upgrader = new Upgrader(fn, { resMan: dbInitObject.resMan, dataObjectEngine: dbInitObject.dataObjectEngine });
         await upgrader.upgrade();
         console.log(buildLogString(`Upgrade has successfully finished.`));
         process.exit(0);
@@ -178,4 +227,5 @@ async function start () {
         process.exit(1);
     }
 };
+
 start();

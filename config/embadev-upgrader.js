@@ -36,6 +36,9 @@ let options = {
         sqlTrace: false,
         importFileTrace: false
     },
+    upgrader: {
+        upgraderFile: "./test-builds/db-upgrade.json"
+    },
     connections: {
         redis: {
             host: "dragonegg",
