@@ -92,13 +92,9 @@ class TextBlock extends React.Component {
         }
 
         if ((_div.length === 0) && (episode.Transcript)) {
-            let _firstLetter = episode.Transcript.slice(0, 1);
-            let _content = episode.Transcript.slice(1);
-
             _div.push(<div>
                 <p className='text-intro'>
-                    <span className="first-letter">{_firstLetter}</span>
-                    <div dangerouslySetInnerHTML={{__html: _content}}/>
+                    <div dangerouslySetInnerHTML={{__html: episode.Transcript}}/>
                 </p>
             </div>)
         }
@@ -148,13 +144,9 @@ class TextBlock extends React.Component {
             _paragraph = _paragraph.replace(/<b><u>ts(.*?)<\/u><\/b>/gim, '');
 
             if (_isFirstParagraph) {
-                let _firstLetter = _paragraph.slice(0, 1);
-                _paragraph = _paragraph.slice(1);
-
                 _div.push(<div id={_toc ? 'toc' + _toc.Id : null}>
                     <h2 key={_toc ? _toc.Id : 'undefined'}>{data.tocName}</h2>
                     <p className='text-intro'>
-                        <span className="first-letter">{_firstLetter}</span>
                         <div dangerouslySetInnerHTML={{__html: _paragraph}}/>
                     </p>
                 </div>)
@@ -258,7 +250,7 @@ class Refs extends React.Component {
     render() {
         return (
             <div className="literature-sources" id="recommend">
-                <h3 className="literature-sources__title">Источники</h3>
+                <h3 className="literature-sources__title">Литература</h3>
                 <ol className="sources-list">
                     {this._getList()}
                 </ol>

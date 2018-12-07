@@ -603,9 +603,9 @@ const LESSONS_ALL_MSSQL_REQ =
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join [Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join [LessonLng] ll on ll.[LessonId] = l.[Id] and ll.[LanguageId] = cl.[LanguageId]\n" +
-    "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
-    "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
-    "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
+    "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
+    "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
+    "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "where c.[URL] = '<%= courseUrl %>'\n" +
     "order by lc.[ParentId], lc.[Number], el.[Number]";
 
@@ -618,9 +618,9 @@ const LESSONS_ALL_MYSQL_REQ =
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join `Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join `LessonLng` ll on ll.`LessonId` = l.`Id` and ll.`LanguageId` = cl.`LanguageId`\n" +
-    "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
-    "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
-    "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
+    "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
+    "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
+    "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "where c.`URL` = '<%= courseUrl %>'\n" +
     "order by lc.`ParentId`, lc.`Number`, el.`Number`";
 
@@ -980,7 +980,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         }
                                     }
                                 };
-                                lsn.Audios.push(elem.Audio);
+                                if (elem.Audio)
+                                    lsn.Audios.push(elem.Audio);
                             })
                             let authors = "";
                             isFirst = true;
