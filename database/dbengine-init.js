@@ -5,6 +5,19 @@ const config = require('config');
 const USER_MODEL_NAME = "User";
 
 exports.DbEngineInit = class DbEngineInit {
+
+    get dataMan() {
+        return this._dataMan;    
+    }
+
+    get resMan() {
+        return this._dataMan ? this._dataMan._getResMan() : null;
+    }
+
+    get dataObjectEngine() {
+        return this._dataMan ? this._dataMan._getDataObjectEngine() : null;
+    }
+
     constructor(options) {
 
         var debugFlag = false;
@@ -294,7 +307,7 @@ exports.DbEngineInit = class DbEngineInit {
         const { getSchemaGenFunc } = require('./mag-models');
         UCCELLO_CONFIG.dataman.schemaGen = getSchemaGenFunc(uccelloDir);
         UCCELLO_CONFIG.dataman.createTypeData = true;
-        new Dataman(router, rpc, memDbController, $constructors);
+        this._dataMan = new Dataman(router, rpc, memDbController, $constructors);
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
         global.$dbUser = new DbUser(USER_MODEL_NAME, { saltRounds: config.authentication.saltRounds });
 
