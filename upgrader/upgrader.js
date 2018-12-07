@@ -17,6 +17,9 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
+const RES_TYPE_MODEL = "SysResType";
+const META_MODEL_GUID = "183f6fb9-9f17-4955-a22c-4f03c4273413";
+
 class Upgrader{
 
     constructor(fname, options) {
@@ -31,6 +34,57 @@ class Upgrader{
             throw new Error(`Argument "dataObjectEngine" is missing.`);
         this._providerId = this._dataObjectEngine.getProviderId();
         this._models = {};
+    }
+
+    async _getMetaTypeInfo() {
+
+        let options = { dbRoots: [] };
+        let root_obj;
+        let db = $memDataBase;
+
+        return await Utils.editDataWrapper(() => {
+            return new MemDbPromise(db, (resolve, reject) => {
+                var predicate = new Predicate(db, {});
+                predicate
+                    .addCondition({ field: "ResTypeGuid", op: "=", value: META_MODEL_GUID });
+                let exp =
+                {
+                    expr: {
+                        model: {
+                            name: RES_TYPE_MODEL,
+                        },
+                        predicate: predicate.serialize(true)
+                    }
+                };
+                db._deleteRoot(predicate.getRoot());
+                resolve(db.getData(Utils.guid(), null, null, exp, {}));
+            })
+                .then((result) => {
+                    if (result && result.guids && (result.guids.length === 1)) {
+                        root_obj = db.getObj(result.guids[0]);
+                        if (!root_obj)
+                            throw new Error("Object doesn't exist: " + result.guids[0]);
+                    }
+                    else
+                        throw new Error("Invalid result of \"getData\": " + JSON.stringify(result));
+
+                    options.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() != 1)
+                        throw new Error("Resource Type (ResTypeGuid = " + META_MODEL_GUID + ") doesn't exist.");
+
+                    let resType = collection.get(0);
+                    return {
+                        Id: resType.id(),
+                        Code: resType.code(),
+                        Name: resType.name(),
+                        ClassName: resType.get("ClassName"),
+                        ResTypeGuid: resType.resTypeGuid(),
+                        Description: resType.description()
+                    };
+                })
+        }, options);
     }
 
     async _fillTypeModel(aNewModels) {
@@ -106,8 +160,29 @@ class Upgrader{
     }
 
     async _createNewBuild(newModels, updModels) {
+        let { Id: resTypeId } = await this._getMetaTypeInfo();
         await this._resMan.createNewBuild();
-        console.log(`New build has been created.`);
+        for (let i = 0; i < newModels.length; i++){
+            let model = newModels[i];
+            let resGuid = model.getGuidRes();
+            let reBody = JSON.stringify(model.serialize(model, true));
+            let resInfo = {
+                name: model.name(),
+                code: model.name().toUpperCase(),
+                description: `Мета информация ${model.name()}.`,
+                resGuid: resGuid,
+                resTypeId: resTypeId
+            }
+            await this._resMan.createNewResource(resInfo);
+            await this._resMan.newResourceVersion(resGuid, reBody);
+        }
+        for (let i = 0; i < updModels.length; i++) {
+            let model = updModels[i];
+            let resGuid = model.getGuidRes();
+            let reBody = JSON.stringify(model.serialize(model, true));
+            await this._resMan.newResourceVersion(resGuid, reBody);
+        }
+        await this._resMan.commitBuild();
     }
 
     _getFilePath(fn) {
@@ -138,8 +213,6 @@ class Upgrader{
         let curBuild = this._getBuild(buildInfo, buildNum);
         if (!curBuild)
             throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]" doesn't exist.`);
-
-        await this._runScript(buildInfo, buildNum, "script_before");
 
         if (typeof (curBuild.upgrader)!=="string")
             throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]": ` +
@@ -185,8 +258,8 @@ class Upgrader{
         if (errs.length > 0)
             throw new Error(errs[0].message);
 
-        newModels = await this._fillTypeModel(newModels);
-        console.log(newModels);
+        await this._runScript(buildInfo, buildNum, "script_before");
+        newModels = await this._fillTypeModel(newModels); // sorted newModels
         await this._createNewBuild(newModels, updModels);
         await this._runScript(buildInfo, buildNum, "script_upgrade");
         await this._runScript(buildInfo, buildNum, "script_after");
@@ -210,16 +283,34 @@ class Upgrader{
             };
         });
 
-        await this._processBuild(schema, this._buildInfo, 2);
+        let verInfo = await this._resMan.getVersionInfo();
+        let builds = Object.keys(this._buildInfo.builds).map((elem => { return parseInt(elem) })).sort();
+        if (verInfo.product.Code !== this._buildInfo.product)
+            throw new Error(`Current product code "${verInfo.product.Code}" doesn't match upgraded product code "${this._buildInfo.product}".`);
+        if (verInfo.version.Code !== this._buildInfo.version)
+            throw new Error(`Current version code "${verInfo.version.Code}" doesn't match upgraded version code "${this._buildInfo.version}".`);
+        let nextBuildNum = verInfo.build.BuildNum + 1;
+        let i = builds.indexOf(nextBuildNum);
+        if (i >= 0)
+            for (; i < builds.length; nextBuildNum++ , i++) {
+                if (builds[i] !== nextBuildNum)
+                    throw new Error(`Missing build number: "${nextBuildNum}".`);
+                let startTime = new Date();
+                console.log(buildLogString(`Start upgrading to "${verInfo.product.Code}" v.${verInfo.version.Code} build ${nextBuildNum}.`));
+                await this._processBuild(schema, this._buildInfo, builds[i]);
+                console.log(buildLogString(`Finished: "${verInfo.product.Code}" ` +
+                    `v.${verInfo.version.Code} build ${nextBuildNum}. Time: ${(((new Date) - startTime) / 1000).toFixed(3)} sec.`));
+            };
     }
 }
 
 async function start () {
     try {
+        let startTime = new Date();
         let fn = config.upgrader && config.upgrader.upgraderFile ? config.upgrader.upgraderFile : null;
         let upgrader = new Upgrader(fn, { resMan: dbInitObject.resMan, dataObjectEngine: dbInitObject.dataObjectEngine });
         await upgrader.upgrade();
-        console.log(buildLogString(`Upgrade has successfully finished.`));
+        console.log(buildLogString(`Upgrade has successfully finished. Total time: ${(((new Date) - startTime) / 1000).toFixed(3)} sec.`));
         process.exit(0);
     }
     catch (error) {
