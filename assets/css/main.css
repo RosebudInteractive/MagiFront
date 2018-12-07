@@ -5599,6 +5599,10 @@ ul.user-tooltip {
       padding-right: 16.666666%;
       font-size: 20px;
       line-height: 26px; }
+    .course-module__course-descr > * span {
+      font-size: 20px !important;
+      font-family: "PT Serif", serif !important;
+    }
       @media (max-width: 899px) {
         .course-module__course-descr p {
           font-size: 15px;
@@ -5611,6 +5615,14 @@ ul.user-tooltip {
       -webkit-transition: border-color 0.3s ease;
       transition: border-color 0.3s ease; }
     .course-module__course-descr a:hover {
+      border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
+    .course-module__course-descr a > *  {
+      color: #c8684c !important;
+      border-bottom: 1px solid rgba(200, 104, 76, 0) !important;
+      text-decoration-line: none !important;
+      -webkit-transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease; }
+    .course-module__course-descr > * a:hover {
       border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
   .course-module--extended {
     -webkit-box-orient: vertical;
@@ -9148,7 +9160,7 @@ body[data-page="fullpage-player"] .lectures-menu {
         line-height: 19px; }
         .text-intro p br {
           display: none; } }
-  .text-intro .first-letter {
+  .text-intro .first-letter, .text-intro:first-letter {
     float: left;
     width: auto;
     margin-right: 7px;
@@ -9158,7 +9170,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     line-height: 58px;
     color: #c8684c; }
     @media (max-width: 1023px) {
-      .text-intro .first-letter {
+      .text-intro .first-letter, .text-intro:first-letter {
         margin-top: 3px;
         font-size: 43px;
         line-height: 35px; } }
