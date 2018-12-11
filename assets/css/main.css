@@ -5345,6 +5345,7 @@ ul.user-tooltip {
       .course-module__label {
         padding-left: 30px; } }
   .course-module .favourites {
+    cursor: pointer;
     position: absolute;
     top: 4px;
     left: -38px;
@@ -5368,9 +5369,9 @@ ul.user-tooltip {
   .course-module .favourites.active:hover {
    opacity: 0.7;
   }
-      @media (max-width: 1899px) {
+
       .course-module .favourites {
-          top: 10px; } }
+          top: 10px; }
       @media (max-width: 1279px) {
       .course-module .favourites {
           top: 8px; } }

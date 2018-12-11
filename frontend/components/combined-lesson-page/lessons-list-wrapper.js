@@ -7,7 +7,7 @@ import PlayBlock from './play-block'
 import SubLessonPlayBlock from './subLesson-play-block'
 
 import * as lessonActions from '../../actions/lesson-actions';
-import {ImageSize, getCoverPath} from '../../tools/page-tools'
+import {ImageSize, getCoverPath, OverflowHandler} from '../../tools/page-tools'
 import $ from 'jquery'
 
 class LessonsListWrapper extends React.Component {
@@ -38,9 +38,16 @@ class LessonsListWrapper extends React.Component {
         });
     }
 
+    componentWillReceiveProps(nextProps){
+        if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
+            OverflowHandler.rememberScrollPos()
+        }
+    }
+
     componentDidUpdate(prevProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
-            $('body').addClass('overflow');
+            // $('body').addClass('overflow');
+            OverflowHandler.turnOn()
 
             let _control = $("#lesson-" + this.props.active);
             if (_control.length > 0) {
@@ -58,12 +65,13 @@ class LessonsListWrapper extends React.Component {
         }
 
         if ((prevProps.isLessonMenuOpened) && (!this.props.isLessonMenuOpened)) {
-            $('body').removeClass('overflow');
+            // $('body').removeClass('overflow');
+            OverflowHandler.turnOff()
         }
     }
 
     componentWillUnmount() {
-        $('body').removeClass('overflow');
+        OverflowHandler.turnOff()
     }
 
     render() {
