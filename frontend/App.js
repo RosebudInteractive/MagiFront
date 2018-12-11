@@ -45,15 +45,6 @@ import Platform from 'platform';
 
 Polifyll.registry();
 
-// $(document).ready(()=> {
-//     setInterval(()=>{
-//         var event= { 'event': 'Pageview' };
-//         console.log(this)
-//         dataLayer.push(event);
-//         console.log("dataLayer.push: ", event);
-//     },2000);
-// })
-
 let _homePath = '/';
 const _globalScrollDelta = 80;
 

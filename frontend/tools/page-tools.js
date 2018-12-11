@@ -1,3 +1,5 @@
+import $ from "jquery";
+
 export const Size = {
     xxl: {width: 1900, name: 'xxl-size'},
     xl: {width: 1400, name: 'xl-size'},
@@ -147,6 +149,52 @@ export const TooltipTitles = {
     replay : 'С начала',
     pause: 'Пауза',
 }
+
+let _isOverflowEnable = false,
+    _scrollPos = 0;
+
+export class OverflowHandler {
+    static get enable() {
+        return _isOverflowEnable
+    }
+
+    static get scrollPos() {
+        return _scrollPos
+    }
+
+    static rememberScrollPos() {
+        _scrollPos = getScrollPage()
+    }
+
+    static turnOn() {
+        $('body').addClass('overflow');
+        _isOverflowEnable = true;
+    }
+
+    static turnOff() {
+        if (_isOverflowEnable || $('body').hasClass('overflow')) {
+            _scrollPos = 0;
+            $('body').removeClass('overflow');
+            _isOverflowEnable = false;
+        }
+    }
+}
+
+let getScrollPage = () => {
+    let _docScrollTop = 0;
+
+    if (document.documentElement && document.documentElement !== null) {
+        _docScrollTop = document.documentElement.scrollTop;
+    }
+
+    return window.pageYOffset || _docScrollTop;
+};
+
+window.$overflowHandler = OverflowHandler;
+
+
+
+
 
 
 

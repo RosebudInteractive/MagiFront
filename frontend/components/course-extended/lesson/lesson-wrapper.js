@@ -64,7 +64,9 @@ export class LessonFull extends React.Component {
         let {lesson, lessonUrl, needShowAuthors} = this.props;
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
+
+        let _title = this.props.title.match(/[-.?!)(,:]$/g) ? this.props.title : (this.props.title + '.');
 
         return (
             <li className="lecture-full">
@@ -76,7 +78,7 @@ export class LessonFull extends React.Component {
                                 <svg width="14" height="23"
                                      dangerouslySetInnerHTML={{__html: this._isLessonInBookmarks(lessonUrl) ? _redFlag : _flag}}/>
                             </button>
-                            <h3 className="lecture-full__title"><Link to={this.props.url}>{this.props.title + '.'}</Link></h3>
+                            <h3 className="lecture-full__title"><Link to={this.props.url}>{_title}</Link></h3>
                             <p className="lecture-full__descr">
                                 {' ' + this.props.descr + ' '}
                                 {needShowAuthors ? <p className="lecture-full__author">{lesson.authorName}</p> : null}

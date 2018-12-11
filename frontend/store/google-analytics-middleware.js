@@ -3,6 +3,7 @@ import {PLAYER_PLAYED, PLAYER_SET_CURRENT_TIME, PLAYER_SET_PROGRESS_PERCENT} fro
 import {APP_CHANGE_PAGE} from "../constants/app";
 
 import {setProgressPercent} from "../actions/player-actions";
+import {MAIL_SUBSCRIBE_SUCCESS} from "../ducks/message";
 
 const GoogleAnalyticsMiddleware = store => next => action => {
 
@@ -22,6 +23,14 @@ const GoogleAnalyticsMiddleware = store => next => action => {
         case SIGN_UP_SUCCESS: {
             if (window.dataLayer) {
                 window.dataLayer.push({'event': 'reg'});
+            }
+
+            return next(action)
+        }
+
+        case MAIL_SUBSCRIBE_SUCCESS: {
+            if (window.dataLayer) {
+                window.dataLayer.push({'event': 'subscribe'});
             }
 
             return next(action)
@@ -70,9 +79,11 @@ const GoogleAnalyticsMiddleware = store => next => action => {
                 } else if ((_percent >= 50) && (_percent < 75)) {
                     store.dispatch(setProgressPercent(50))
                 } else if ((_percent >= 75) && (_percent < 90)) {
+                    store.dispatch(setProgressPercent(75))
+                } else if ((_percent >= 90) && (_percent <= 97)) {
                     store.dispatch(setProgressPercent(90))
-                } else if (_percent >= 90) {
-                    store.dispatch(setProgressPercent(90))
+                } else if (_percent > 97) {
+                    store.dispatch(setProgressPercent(100))
                 }
             }
 
