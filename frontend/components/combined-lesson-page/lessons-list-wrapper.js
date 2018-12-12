@@ -46,7 +46,6 @@ class LessonsListWrapper extends React.Component {
 
     componentDidUpdate(prevProps) {
         if ((!prevProps.isLessonMenuOpened) && (this.props.isLessonMenuOpened)) {
-            // $('body').addClass('overflow');
             OverflowHandler.turnOn()
 
             let _control = $("#lesson-" + this.props.active);
@@ -65,7 +64,6 @@ class LessonsListWrapper extends React.Component {
         }
 
         if ((prevProps.isLessonMenuOpened) && (!this.props.isLessonMenuOpened)) {
-            // $('body').removeClass('overflow');
             OverflowHandler.turnOff()
         }
     }

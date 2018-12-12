@@ -16,6 +16,7 @@ import * as playerActions from '../../../actions/player-actions'
 import * as playerStartActions from '../../../actions/player-start-actions'
 
 import FadeTimer from '../fade-timer';
+import {showFeedbackWindowSelector} from "../../../ducks/message";
 
 $.fn.isInViewport = function() {
     let _this = $(this);
@@ -50,6 +51,13 @@ class Frame extends Component {
 
         this._onDocumentReady = () => {
             this._applyViewPort()
+        }
+
+        this._whitespacePressHandler = (e) => {
+            if (e.which === 32) {
+                this._onPause()
+                e.preventDefault();
+            }
         }
 
         this._resizeHandler = () => {
@@ -107,12 +115,7 @@ class Frame extends Component {
             this.setState({fullScreen: _isFullScreen})
         });
 
-        $(window).keydown((e) => {
-            if (e.which === 32) {
-                this._onPause()
-                e.preventDefault();
-            }
-        })
+        $(window).bind('keydown', this._whitespacePressHandler)
 
         _player.on('mousemove', () => {
             this._fadeTimer.restart()
@@ -120,6 +123,15 @@ class Frame extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        if (!prevProps.showFeedbackWindow && this.props.showFeedbackWindow) {
+            $(window).unbind('keydown', this._whitespacePressHandler)
+        }
+
+        if (prevProps.showFeedbackWindow && !this.props.showFeedbackWindow) {
+            $(window).bind('keydown', this._whitespacePressHandler)
+        }
+
+
         if (!prevProps.visible && this.props.visible) {
             this._applyViewPort()
         } else {
@@ -308,6 +320,7 @@ function mapStateToProps(state) {
         showSpeedTooltip: state.player.showSpeedTooltip,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
         lessonInfoStorage: state.lessonInfoStorage,
+        showFeedbackWindow: showFeedbackWindowSelector(state),
     }
 }
 

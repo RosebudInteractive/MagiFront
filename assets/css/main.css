@@ -11198,6 +11198,13 @@ ul.lectures-tab {
   .project-info__text .sans-serif {
     font-family: "Fira Sans", Arial, sans-serif; }
 
+  .project-info__text__first-paragraph {
+    display: inline-block;
+  }
+  .project-info__text__first-paragraph:first-letter {
+    visibility: hidden;
+  }
+
 .authors__inner {
   display: -webkit-box;
   display: -webkit-flex;

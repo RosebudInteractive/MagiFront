@@ -9,6 +9,7 @@ import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
 import $ from "jquery";
+import {OverflowHandler} from "../tools/page-tools";
 
 class AuthPopup extends React.Component {
 
@@ -30,7 +31,9 @@ class AuthPopup extends React.Component {
 
     componentDidUpdate(prevProps) {
         if ((!prevProps.visible) && (this.props.visible)) {
-            $('body').addClass('overflow');
+            OverflowHandler.rememberScrollPos();
+            OverflowHandler.turnOff();
+            // $('body').addClass('overflow');
             setTimeout(() => {
                 this.setState({
                     noTransition: true
@@ -40,7 +43,8 @@ class AuthPopup extends React.Component {
 
         if ((prevProps.visible) && (!this.props.visible)) {
             if ($(window).innerWidth() > 899) {
-                $('body').removeClass('overflow');
+                OverflowHandler.turnOff();
+                // $('body').removeClass('overflow');
             }
 
             if (this.state.noTransition) {

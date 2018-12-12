@@ -9,7 +9,7 @@ import TranscriptMenu from '../combined-lesson-page/lesson-transcript-menu';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import * as appActions from "../../actions/app-actions";
-import {pages, widthLessThan900} from "../../tools/page-tools";
+import {OverflowHandler, pages, widthLessThan900} from "../../tools/page-tools";
 import $ from "jquery";
 
 class Header extends React.Component {
@@ -47,13 +47,16 @@ class Header extends React.Component {
 
     _showUserMenu() {
         this.props.pageHeaderActions.showMenu()
-        $('body').addClass('overflow');
+        OverflowHandler.rememberScrollPos();
+        OverflowHandler.turnOn();
+        // $('body').addClass('overflow');
     }
 
     _hideUserMenu() {
         this.props.pageHeaderActions.hideMenu()
         if (!this.props.showSignInForm) {
-            $('body').removeClass('overflow');
+            OverflowHandler.turnOff();
+            // $('body').removeClass('overflow');
         }
     }
 

@@ -10,7 +10,7 @@ import * as playerActions from "../../actions/player-actions";
 
 import LessonsListWrapper from './lessons-list-wrapper';
 import $ from "jquery";
-import {getLessonNumber} from "../../tools/page-tools";
+import {getLessonNumber, OverflowHandler} from "../../tools/page-tools";
 
 
 class Menu extends React.Component {
@@ -248,7 +248,8 @@ class Navigation extends React.Component {
             _menu =  _isMobile ? $('.section-nav__list') : $('.section-nav-sublist');
 
         if (_isMobile && !this.state.expanded) {
-            $('body').removeClass('overflow');
+            OverflowHandler.turnOff();
+            // $('body').removeClass('overflow');
             _menu.removeClass('scroll');
             return
         }
@@ -257,10 +258,13 @@ class Navigation extends React.Component {
             _menuBottom = _menuTop + _menu.height();
 
         if (_menuBottom > window.innerHeight) {
-            $('body').addClass('overflow');
+            OverflowHandler.rememberScrollPos();
+            OverflowHandler.turnOn();
+            // $('body').addClass('overflow');
             _menu.addClass('scroll');
         } else {
-            $('body').removeClass('overflow');
+            OverflowHandler.turnOff();
+            // $('body').removeClass('overflow');
             _menu.removeClass('scroll');
         }
     }

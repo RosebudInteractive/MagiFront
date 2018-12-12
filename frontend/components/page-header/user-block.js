@@ -7,7 +7,7 @@ import * as appActions from '../../actions/app-actions'
 import {Link} from 'react-router-dom';
 import $ from "jquery";
 import * as pageHeaderActions from "../../actions/page-header-actions";
-import {widthLessThan900} from "../../tools/page-tools";
+import {OverflowHandler, widthLessThan900} from "../../tools/page-tools";
 
 class UserBlock extends React.Component {
 
@@ -44,7 +44,7 @@ class UserBlock extends React.Component {
         this.props.userActions.logout()
 
         this.props.pageHeaderActions.hideMenu()
-        $('body').removeClass('overflow');
+        OverflowHandler.turnOff();
 
         if (this.props.showUserBlock && (!widthLessThan900())) {
             this.props.appActions.hideUserBlock()
@@ -53,12 +53,12 @@ class UserBlock extends React.Component {
 
     _onHistoryClick() {
         this.props.pageHeaderActions.hideMenu()
-        $('body').removeClass('overflow');
+        OverflowHandler.turnOff();
     }
 
     _onProfileClick() {
         this.props.pageHeaderActions.hideMenu()
-        $('body').removeClass('overflow');
+        OverflowHandler.turnOff();
     }
 
     render() {
