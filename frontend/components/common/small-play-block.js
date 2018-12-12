@@ -123,7 +123,7 @@ class LessonPlayBlockSmall extends React.Component {
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius,
-            _duration = showRestTime ? getTimeFmt(_totalDuration - _currentTime) : duration;
+            _duration = (showRestTime && !_isFinished) ? getTimeFmt(_totalDuration - _currentTime) : duration;
 
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === id;
