@@ -12,7 +12,7 @@ import {
 } from '../constants/filters'
 
 import 'whatwg-fetch';
-import {getMonthBetween} from "../tools/time-tools";
+import {getMonthBetween, getSeason, getSeasonBetween} from "../tools/time-tools";
 
 export const getCourses = () => {
     return (dispatch) => {
@@ -180,21 +180,24 @@ const handleCourse = (data) => {
 
             let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null;
             if (_readyDate) {
-                let _monthDelta = getMonthBetween(Date.now(), _readyDate);
+                let _now = new Date(),
+                    _monthDelta = getMonthBetween(_now, _readyDate);
 
                 lesson.readyYear = _readyDate.getFullYear();
 
                 if (_monthDelta > 9) {
                     lesson.readyMonth = '';
                 } else {
-                    lesson.readyMonth = Months[_readyDate.getMonth()];
+                    if (getSeasonBetween(_now, _readyDate) > 1) {
+                        lesson.readyMonth = getSeason(_readyDate);
+                        if (_readyDate.getMonth() === 11) {
+                            lesson.readyYear++
+                        }
+                    } else {
+                        lesson.readyMonth = Months[_readyDate.getMonth()];
+                    }
                 }
             }
-
-
-
-            lesson.readyYear = _readyDate ? _readyDate.getFullYear() : '';
-            lesson.readyMonth = _readyDate ? Months[_readyDate.getMonth()] : '';
         });
 
         data.lessonCount = _lessonCount;

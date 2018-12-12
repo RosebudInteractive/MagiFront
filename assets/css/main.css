@@ -11168,9 +11168,11 @@ ul.lectures-tab {
       order: 3; } }
 
 .project-info__text-block {
-  padding-top: 242px; }
+  padding-top: 216px; }
   @media (max-width: 899px) {
     .project-info__text-block {
+      position: relative;
+      top: -19px;
       padding-top: 0;
       padding-bottom: 20px; } }
 
@@ -11187,9 +11189,12 @@ ul.lectures-tab {
       font-size: 15px;
       line-height: 19px; } }
   .project-info__text .letter {
-    padding-left: 48px; }
+    padding-left: 48px;
+    position: relative;
+    top: 26px; }
     @media (max-width: 899px) {
       .project-info__text .letter {
+        top: 19px;
         padding-left: 0; } }
     .project-info__text .letter svg {
       display: inline-block;
@@ -11199,8 +11204,11 @@ ul.lectures-tab {
     font-family: "Fira Sans", Arial, sans-serif; }
 
   .project-info__text__first-paragraph {
-    display: inline-block;
-  }
+    text-indent: 132px;
+    display: inline-block;  }
+  @media (max-width: 899px) {
+    .project-info__text__first-paragraph {
+      text-indent: 87px; } }
   .project-info__text__first-paragraph:first-letter {
     visibility: hidden;
   }
