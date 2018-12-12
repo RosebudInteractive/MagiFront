@@ -287,11 +287,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         }).bind(this), options);
     }
 
-    createUser(password, data) {
+    createUser(password, userData) {
         let options = { dbRoots: [] };
         let root_obj;
         let user = null;
         let PData = { "roles": { "p": 1 }, "isAdmin": false };
+        let data = _.cloneDeep(userData);
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -337,7 +338,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     data.PData = data.PData || PData;
                     PData = data.PData;
                     data.PData = JSON.stringify(data.PData);
-
+                    if (typeof (data.SubsAutoPay) === "undefined")
+                        data.SubsAutoPay = true;
                     let fields = data;
 
                     return $dbUser.getPwdHash(password)
@@ -638,6 +640,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             RegDate: new Date(),
                             Status: STATUS_ACTIVE,
                             IsOld: false,
+                            SubsAutoPay: true,
                             PData: JSON.stringify({ isAdmin: false, roles: { s: 1 } }) // Role: "subscriber"
                         };
                     

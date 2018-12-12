@@ -115,6 +115,20 @@ function setupUsers(app) {
                 });
     });
 
+    app.get('/api/users/subs-info', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getSubsInfo(req.user.Id)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
     app.get('/api/users', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })

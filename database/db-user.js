@@ -5,6 +5,8 @@ const { DbObject } = require('./db-object');
 const { UsersCache } = require('../security/users-cache');
 const { PositionsService } = require('../services/lesson-positions');
 const { Intervals } = require('../const/common');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
@@ -186,6 +188,16 @@ const GET_CATEGORIES_BY_COURSE_IDS_MYSQL =
     "  join`CourseCategory` cc on cc.`CategoryId` = c.`Id`\n" +
     "where cc.`CourseId` in (<%= courseIds %>)";
 
+const GET_SUBS_INFO_MSSQL =
+    "select u.[SysParentId] as [Id], u.[SubsAutoPayId], u.[SubsExpDate], u.[SubsAutoPay], c.[ChequeData] from [User] u\n" +
+    "  left join[Cheque] c on c.[Id] = u.[SubsAutoPayId]\n" +
+    "where u.[SysParentId] = <%= id %>";
+
+const GET_SUBS_INFO_MYSQL =
+    "select u.`SysParentId` as `Id`, u.`SubsAutoPayId`, u.`SubsExpDate`, u.`SubsAutoPay`, c.`ChequeData` from `User` u\n" +
+    "  left join`Cheque` c on c.`Id` = u.`SubsAutoPayId`\n" +
+    "where u.`SysParentId` = <%= id %>";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 1;
 
@@ -205,6 +217,33 @@ const DbUser = class DbUser extends DbObject {
         return new Promise((resolve, reject) => {
             resolve({ DisplayName: user.DisplayName, Email: user.Email });
         });
+    }
+
+    getSubsInfo(userId) {
+        return new Promise(resolve => {
+            let rc = $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_SUBS_INFO_MYSQL)({ id: userId }),
+                    mssql: _.template(GET_SUBS_INFO_MSSQL)({ id: userId })
+                }
+            }, {});
+            resolve(rc);
+        })
+            .then(result => {
+                if (result && result.detail && (result.detail.length === 1)) {
+                    let row = result.detail[0];
+                    let res = { Id: row.Id, PayId: row.SubsAutoPayId, SubsExpDate: row.SubsExpDate, SubsExpDate: row.SubsExpDate, Payment: null };
+                    if (row.ChequeData) {
+                        let payment = JSON.parse(row.ChequeData);
+                        if (payment.payment_method)
+                            res.Payment = payment.payment_method;
+                    }
+                    return res;
+                }
+                else
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find user '" + userId + "'.");
+               
+            })
     }
 
     getHistory(id, lessonFilter) {

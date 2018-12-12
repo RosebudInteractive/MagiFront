@@ -165,7 +165,7 @@ class Upgrader{
         for (let i = 0; i < newModels.length; i++){
             let model = newModels[i];
             let resGuid = model.getGuidRes();
-            let reBody = JSON.stringify(model.serialize(model, true));
+            let reBody = JSON.stringify(model.serialize(true));
             let resInfo = {
                 name: model.name(),
                 code: model.name().toUpperCase(),
@@ -179,7 +179,7 @@ class Upgrader{
         for (let i = 0; i < updModels.length; i++) {
             let model = updModels[i];
             let resGuid = model.getGuidRes();
-            let reBody = JSON.stringify(model.serialize(model, true));
+            let reBody = JSON.stringify(model.serialize(true));
             await this._resMan.newResourceVersion(resGuid, reBody);
         }
         await this._resMan.commitBuild();
@@ -233,7 +233,7 @@ class Upgrader{
             if ((!model.isTypeModel()) && (!model.isVirtual())) {
                 let modelRec = this._models[model.name()];
                 let md5sum = crypto.createHash('md5');
-                md5sum.update(JSON.stringify(model.serialize(model, true)));
+                md5sum.update(JSON.stringify(model.serialize(true)));
                 let checkSum = md5sum.digest('hex');
                 if (modelRec) {
                     if (checkSum !== modelRec.checkSum) {
@@ -274,7 +274,7 @@ class Upgrader{
         schema.models().forEach(model => {
             if ((!model.isTypeModel()) && (!model.isVirtual())) {
                 let md5sum = crypto.createHash('md5');
-                md5sum.update(JSON.stringify(model.serialize(model, true)));
+                md5sum.update(JSON.stringify(model.serialize(true)));
                 let checkSum = md5sum.digest('hex');
                 this._models[model.name()] = {
                     model: model,
