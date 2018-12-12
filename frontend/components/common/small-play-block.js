@@ -112,10 +112,10 @@ class LessonPlayBlockSmall extends React.Component {
         const _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
-        let {lesson, playingLesson, paused, authorized} = this.props,
+        let {lesson, playingLesson, paused, authorized, showRestTime} = this.props,
             {IsAuthRequired} = lesson,
             _lessonLocked = (IsAuthRequired && !authorized),
-            {Id: id, Duration: _totalDuration, DurationFmt: duration, showRestTime} = lesson,
+            {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
