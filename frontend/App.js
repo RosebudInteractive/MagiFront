@@ -42,6 +42,7 @@ import NotFound from './components/not-found'
 import SizeInfo from './components/size-info'
 
 import Platform from 'platform';
+import BillingWrapper from "./components/messages/billing-wrapper";
 
 Polifyll.registry();
 
@@ -276,6 +277,7 @@ class App extends Component {
                 {showSizeInfo ? <SizeInfo/> : null}
                 {showFeedbackWindow ? <FeedbackMessageBox/> : null}
                 {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
+                <BillingWrapper/>
             </div>
 
     }

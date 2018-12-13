@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class SignInForm extends React.Component {
+export default class SubscriptionForm extends React.Component {
 
     constructor(props) {
         super(props)
@@ -20,10 +20,6 @@ class SignInForm extends React.Component {
     }
 
     render() {
-        const {invalid, serverError, loading} = this.props;
-        const _errorText = serverError &&
-            <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
-
         return (
             <div className="billing-steps__item js-billing-step active">
                 <div className="modal__header">
@@ -84,7 +80,3 @@ class SignInForm extends React.Component {
     }
 }
 
-export default reduxForm({
-    form: 'SignInForm',
-    validate
-})(SignInForm);

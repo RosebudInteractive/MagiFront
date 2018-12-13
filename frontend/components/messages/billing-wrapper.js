@@ -1,6 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
+// import {bindActionCreators} from 'redux';
 
 import {
     showBillingWindowSelector,
@@ -11,8 +11,9 @@ import {
 
 import Subscription from './billing-subscription'
 import Payment from './billing-payments'
+import $ from "jquery";
 
-class AuthWrapper extends React.Component {
+class BillingWrapper extends React.Component {
 
     componentDidUpdate(prevProps) {
         if (!prevProps.showBillingWindow && this.props.showBillingWindow) {
@@ -25,18 +26,18 @@ class AuthWrapper extends React.Component {
     }
 
     _onShow() {
-
+        $('body').addClass('modal-open')
     }
 
     _onHide() {
-
+        $('body').removeClass('modal-open')
     }
 
     _getStep() {
-        let {billingStep : step, loading, error, userActions} = this.props;
+        let {billingStep: step, loading,} = this.props;
 
-        return (step === BillingStep.subscription) && <Subscription loading={loading} onSubmit={::userActions.login} serverError={error} onStartRecovery={::userActions.switchToRecoveryPassword}/> ||
-            (step === BillingStep.payment) && <Payment loading={loading} onSubmit={::userActions.signUp} serverError={error}/> ||
+        return (step === BillingStep.subscription) && <Subscription/> ||
+            (step === BillingStep.payment) && <Payment loading={loading}/> ||
             null
     }
 
@@ -44,9 +45,11 @@ class AuthWrapper extends React.Component {
         let {showBillingWindow} = this.props;
 
         return showBillingWindow ?
-            <div className="modal _billing billing-steps is-opened" id="billing">
-                <button type="button" className="modal__close js-modal-close" data-target="billing">Закрыть</button>
-                {this._getStep()}
+            <div className="modal-overlay modal-wrapper js-modal-wrapper is-opened" data-name="billing">
+                <div className="modal _billing billing-steps is-opened" id="billing">
+                    <button type="button" className="modal__close js-modal-close" data-target="billing">Закрыть</button>
+                    {this._getStep()}
+                </div>
             </div>
             :
             null
@@ -65,8 +68,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        userActions: bindActionCreators(userActions, dispatch),
+        // userActions: bindActionCreators(userActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuthWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(BillingWrapper);

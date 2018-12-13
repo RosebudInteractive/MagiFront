@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
 import FiltersRow from './mobile-filters';
+import SubscriptionButton from './subscription-button';
 
 import {pages} from "../../tools/page-tools";
 import * as userActions from '../../actions/user-actions'
@@ -31,6 +32,7 @@ class DesktopHeaderRow extends React.Component {
                 <Languages/>
                 <FiltersRow/>
                 <Search/>
+                <SubscriptionButton isMobile={false}/>
                 {
                     this.props.authorized ?
                         <UserBlock/>
