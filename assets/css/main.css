@@ -7399,10 +7399,16 @@ body[data-page="fullpage-player"] .lectures-menu {
       font-size: 23px;
       line-height: 41px; }
       @media (max-width: 599px) {
-        .lectures-list__item:before {
+        .lectures-list__item.lectures-list__item:before {
           font-size: 19px;
           line-height: 22px;
           top: 25px; } }
+    .lectures-list__item--old:before {
+      font-size: 17px;
+      line-height: 35px; }
+      @media (max-width: 599px) {
+        .lectures-list__item--old:before {
+          line-height: 26px; } }
     .lectures-list__item:after {
       content: "";
       position: absolute;
