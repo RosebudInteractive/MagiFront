@@ -538,6 +538,7 @@ class GalleryButtons extends React.Component {
                 <button className="gallery-trigger js-gallery-trigger" type="button">
                     <span className="visually-hidden">Галерея</span>
                     <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
+                    <span className="text">Галерея</span>
                 </button>
                 <button className="swiper-button-prev swiper-button-disabled" type="button">
                     <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>

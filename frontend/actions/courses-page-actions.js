@@ -197,6 +197,9 @@ const handleCourse = (data) => {
                         lesson.readyMonth = Months[_readyDate.getMonth()];
                     }
                 }
+            } else {
+                lesson.readyYear = ''
+                lesson.readyMonth = ''
             }
         });
 

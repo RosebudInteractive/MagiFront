@@ -9,6 +9,21 @@ export const getTimeFmt = (time) => {
         ss.toString().padStart(2, '0')
 };
 
+export const getDaysBetween = (date1, date2) => {
+    //Get 1 day in milliseconds
+    let one_day=1000*60*60*24;
+
+    // Convert both dates to milliseconds
+    let date1_ms = date1.getTime();
+    let date2_ms = date2.getTime();
+
+    // Calculate the difference in milliseconds
+    let difference_ms = date2_ms - date1_ms;
+
+    // Convert back to days and return
+    return Math.round(difference_ms/one_day);
+}
+
 export const getMonthBetween = (date1, date2) => {
     let _year1 = date1.getFullYear(),
         _year2 = date2.getFullYear(),
