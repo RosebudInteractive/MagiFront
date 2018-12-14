@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {pages} from "../../tools/page-tools";
+import SubscriptionButton from "./subscription-button";
 
 class MobileHeader extends React.Component {
 
@@ -25,6 +26,7 @@ class MobileHeader extends React.Component {
                 <Link to={'/'} className="logo-mobile">
                     <svg width="70" height="38" dangerouslySetInnerHTML={{__html: _logo}}/>
                 </Link>
+
                 <nav className="navigation navigation-mobile">
                     <ul>
                         <li className={this.props.currentPage.name === pages.courses.name ? "current" : ''}>
@@ -44,6 +46,7 @@ class MobileHeader extends React.Component {
                         }
                     </ul>
                 </nav>
+                <SubscriptionButton isMobile={true}/>
             </div>
         )
     }
