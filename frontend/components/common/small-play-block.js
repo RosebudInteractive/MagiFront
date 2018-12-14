@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
 import {TooltipTitles} from "../../tools/page-tools";
+import {getTimeFmt} from "../../tools/time-tools";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -16,6 +17,7 @@ class LessonPlayBlockSmall extends React.Component {
         lessonUrl: PropTypes.string,
         audios: PropTypes.array,
         lesson: PropTypes.object,
+        showRestTime : PropTypes.bool,
     };
 
     constructor(props) {
@@ -110,7 +112,7 @@ class LessonPlayBlockSmall extends React.Component {
         const _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
-        let {lesson, playingLesson, paused, authorized} = this.props,
+        let {lesson, playingLesson, paused, authorized, showRestTime} = this.props,
             {IsAuthRequired} = lesson,
             _lessonLocked = (IsAuthRequired && !authorized),
             {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
@@ -120,7 +122,8 @@ class LessonPlayBlockSmall extends React.Component {
             _playedPart = (_totalDuration && !_isFinished) ? ((_currentTime) / _totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
-            _offset = 2 * 3.14 * 0.25 * _radius;
+            _offset = 2 * 3.14 * 0.25 * _radius,
+            _duration = (showRestTime && !_isFinished) ? getTimeFmt(_totalDuration - _currentTime) : duration;
 
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === id;
@@ -132,7 +135,7 @@ class LessonPlayBlockSmall extends React.Component {
 
         return (
             <div className={this.props.wrapperClass ? this.props.wrapperClass : 'history-item__play-block'}>
-                <span className="play-block-small__duration">{duration}</span>
+                <span className="play-block-small__duration">{_duration}</span>
                 { !_lessonLocked ?
                     <div className="play-block-small">
                         <svg className="svg-loader small" width="200" height="200" viewBox="0 0 200 200"

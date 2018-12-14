@@ -49,7 +49,7 @@ export default class Item extends React.Component {
                 </div>
                 <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
                                       courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
-                                      totalDuration={item.Duration} lesson={item}/>
+                                      totalDuration={item.Duration} lesson={item} showRestTime={true}/>
             </div>
         )
     }
