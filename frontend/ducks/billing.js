@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import {GET_AUTHOR_ERROR, GET_AUTHOR_REQUEST, GET_AUTHOR_SUCCESS, SET_NOT_FOUND} from "./author";
 
 
 /**
@@ -14,6 +15,11 @@ const prefix = `${appName}/${moduleName}`
 export const SHOW_BILLING_WINDOW = `${prefix}/SHOW_BILLING_WINDOW`
 export const HIDE_BILLING_WINDOW = `${prefix}/HIDE_BILLING_WINDOW`
 export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
+export const SWITCH_TO_PAYMENT = `${prefix}/SWITCH_TO_PAYMENT`
+export const SWITCH_TO_SUBSCRIPTION = `${prefix}/SWITCH_TO_SUBSCRIPTION`
+export const GET_SUBSCRIPTION_TYPES_START = `${prefix}/GET_SUBSCRIPTION_TYPES_START`
+export const GET_SUBSCRIPTION_TYPES_SUCCESS = `${prefix}/GET_SUBSCRIPTION_TYPES_SUCCESS`
+export const GET_SUBSCRIPTION_TYPES_ERROR = `${prefix}/GET_SUBSCRIPTION_TYPES_ERROR`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
 
@@ -28,6 +34,7 @@ export const BillingStep = {
 export const ReducerRecord = Record({
     showBillingWindow: false,
     step: BillingStep.subscription,
+    types: null,
     fetching: false,
     error: null
 })
@@ -36,7 +43,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-        // case MAIL_SUBSCRIBE_START:
+        case GET_SUBSCRIPTION_TYPES_START:
         case SEND_PAYMENT_START:
             return state
                 .set('error', null)
@@ -48,17 +55,17 @@ export default function reducer(state = new ReducerRecord(), action) {
         //         .set('showFeedbackWindow', false)
         //         .set('showFeedbackResultMessage', true)
         //
-        // case MAIL_SUBSCRIBE_SUCCESS:
-        //     return state
-        //         .set('fetching', false)
+        case GET_SUBSCRIPTION_TYPES_SUCCESS:
+            return state
+                .set('fetching', false)
 
         // case MAIL_SUBSCRIBE_ERROR:
-        // case SEND_FEEDBACK_ERROR:
-        //     return state
-        //         .set('fetching', false)
-        //         .set('error', payload.error)
-        //         .set('showFeedbackWindow', false)
-        //         .set('showFeedbackResultMessage', true)
+        case GET_SUBSCRIPTION_TYPES_ERROR:
+            return state
+                .set('fetching', false)
+                .set('error', payload.error)
+                .set('showFeedbackWindow', false)
+                .set('showFeedbackResultMessage', true)
 
         case SHOW_BILLING_WINDOW:
             return state
@@ -68,7 +75,15 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case HIDE_BILLING_WINDOW:
             return state
-                .set('showFeedbackWindow', false)
+                .set('showBillingWindow', false)
+
+        case SWITCH_TO_PAYMENT:
+            return state
+                .set('step', BillingStep.payment)
+
+        case SWITCH_TO_SUBSCRIPTION:
+            return state
+                .set('step', BillingStep.subscription)
 
         default:
             return state
@@ -88,6 +103,32 @@ export const loadingSelector = createSelector(stateSelector, state => state.fetc
 /**
  * Action Creators
  * */
+export function getSubscriptionTypes() {
+    return (dispatch) => {
+        dispatch({
+            type: GET_SUBSCRIPTION_TYPES_START,
+            payload: null
+        });
+
+        fetch("/api/products?Codes=SUBS1M,SUBS3M,SUBS1Y&Detail=true", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleData(data);
+                dispatch({
+                    type: GET_SUBSCRIPTION_TYPES_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((err) => {
+                dispatch({
+                    type: GET_SUBSCRIPTION_TYPES_ERROR,
+                    payload: err
+                });
+            });
+    }
+}
+
 // export const sendFeedback = (values) => {
 //     return (dispatch) => {
 //         dispatch({
@@ -120,6 +161,8 @@ export const loadingSelector = createSelector(stateSelector, state => state.fetc
 //     }
 // }
 
+//api/products?Codes=SUBS1M,SUBS3M,SUBS1Y&Detail=true
+
 export const showBillingWindow = () => {
     return {
         type: SHOW_BILLING_WINDOW,
@@ -130,6 +173,13 @@ export const showBillingWindow = () => {
 export const hideBillingWindow = () => {
     return {
         type: HIDE_BILLING_WINDOW,
+        payload: null
+    }
+}
+
+export const switchToPayment = () => {
+    return {
+        type: SWITCH_TO_PAYMENT,
         payload: null
     }
 }

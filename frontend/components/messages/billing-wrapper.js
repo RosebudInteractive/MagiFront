@@ -1,12 +1,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
-// import {bindActionCreators} from 'redux';
+import {bindActionCreators} from 'redux';
 
 import {
     showBillingWindowSelector,
     billingStepSelector,
     loadingSelector,
     BillingStep,
+    hideBillingWindow
 } from "../../ducks/billing";
 
 import Subscription from './billing-subscription'
@@ -41,13 +42,17 @@ class BillingWrapper extends React.Component {
             null
     }
 
+    _onCloseClick() {
+        this.props.close()
+    }
+
     render() {
         let {showBillingWindow} = this.props;
 
         return showBillingWindow ?
             <div className="modal-overlay modal-wrapper js-modal-wrapper is-opened" data-name="billing">
                 <div className="modal _billing billing-steps is-opened" id="billing">
-                    <button type="button" className="modal__close js-modal-close" data-target="billing">Закрыть</button>
+                    <button type="button" className="modal__close js-modal-close" data-target="billing" onClick={::this._onCloseClick}>Закрыть</button>
                     {this._getStep()}
                 </div>
             </div>
@@ -68,7 +73,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        // userActions: bindActionCreators(userActions, dispatch),
+        close: bindActionCreators(hideBillingWindow, dispatch),
     }
 }
 
