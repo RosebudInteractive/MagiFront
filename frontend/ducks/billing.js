@@ -20,6 +20,7 @@ export const SWITCH_TO_SUBSCRIPTION = `${prefix}/SWITCH_TO_SUBSCRIPTION`
 export const GET_SUBSCRIPTION_TYPES_START = `${prefix}/GET_SUBSCRIPTION_TYPES_START`
 export const GET_SUBSCRIPTION_TYPES_SUCCESS = `${prefix}/GET_SUBSCRIPTION_TYPES_SUCCESS`
 export const GET_SUBSCRIPTION_TYPES_ERROR = `${prefix}/GET_SUBSCRIPTION_TYPES_ERROR`
+export const SET_SUBSCRIPTION_TYPE = `${prefix}/SET_SUBSCRIPTION_TYPE`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
 
@@ -35,6 +36,7 @@ export const ReducerRecord = Record({
     showBillingWindow: false,
     step: BillingStep.subscription,
     types: null,
+    selectedType: null,
     fetching: false,
     error: null
 })
@@ -49,17 +51,11 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('error', null)
                 .set('fetching', true)
 
-        // case SEND_FEEDBACK_SUCCESS:
-        //     return state
-        //         .set('fetching', false)
-        //         .set('showFeedbackWindow', false)
-        //         .set('showFeedbackResultMessage', true)
-        //
         case GET_SUBSCRIPTION_TYPES_SUCCESS:
             return state
                 .set('fetching', false)
+                .set('types', payload)
 
-        // case MAIL_SUBSCRIBE_ERROR:
         case GET_SUBSCRIPTION_TYPES_ERROR:
             return state
                 .set('fetching', false)
@@ -85,6 +81,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('step', BillingStep.subscription)
 
+        case SET_SUBSCRIPTION_TYPE:
+            return state
+                .set('selectedType', payload)
+
         default:
             return state
     }
@@ -97,8 +97,10 @@ export default function reducer(state = new ReducerRecord(), action) {
 export const stateSelector = state => state[moduleName]
 export const showBillingWindowSelector = createSelector(stateSelector, state => state.showBillingWindow)
 export const billingStepSelector = createSelector(stateSelector, state => state.step)
-export const errorMessageSelector = createSelector(stateSelector, state => state.error)
+export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
+export const typesSelector = createSelector(stateSelector, state => state.types)
+export const selectedTypeSelector = createSelector(stateSelector, state => state.selectedType)
 
 /**
  * Action Creators
@@ -114,7 +116,6 @@ export function getSubscriptionTypes() {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                // handleData(data);
                 dispatch({
                     type: GET_SUBSCRIPTION_TYPES_SUCCESS,
                     payload: data
@@ -129,39 +130,38 @@ export function getSubscriptionTypes() {
     }
 }
 
-// export const sendFeedback = (values) => {
-//     return (dispatch) => {
-//         dispatch({
-//             type: SEND_FEEDBACK_START,
-//             payload: null
-//         });
-//
-//         fetch('/api/feedback', {
-//             method: 'POST',
-//             headers: {
-//                 "Content-type": "application/json"
-//             },
-//             body: JSON.stringify(values),
-//             credentials: 'include'
-//         })
-//             .then(checkStatus)
-//             .then(parseJSON)
-//             .then(() => {
-//                 dispatch({
-//                     type: SEND_FEEDBACK_SUCCESS,
-//                     payload: null
-//                 });
-//             })
-//             .catch((error) => {
-//                 dispatch({
-//                     type: SEND_FEEDBACK_ERROR,
-//                     payload: {error}
-//                 });
-//             });
-//     }
-// }
+export const sendPayment= (values) => {
+    return (dispatch) => {
+        dispatch({
+            type: SEND_PAYMENT_START,
+            payload: null
+        });
 
-//api/products?Codes=SUBS1M,SUBS3M,SUBS1Y&Detail=true
+        fetch('/api/payments', {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(() => {
+                dispatch({
+                    type: SEND_PAYMENT_SUCCESS,
+                    payload: null
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SEND_PAYMENT_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
 
 export const showBillingWindow = () => {
     return {
@@ -181,6 +181,20 @@ export const switchToPayment = () => {
     return {
         type: SWITCH_TO_PAYMENT,
         payload: null
+    }
+}
+
+export const switchToSubscription = () => {
+    return {
+        type: SWITCH_TO_SUBSCRIPTION,
+        payload: null
+    }
+}
+
+export const setSubscriptionType = (item) => {
+    return {
+        type: SET_SUBSCRIPTION_TYPE,
+        payload: item
     }
 }
 

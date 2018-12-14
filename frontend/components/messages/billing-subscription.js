@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import {
     getSubscriptionTypes,
     switchToPayment,
+    setSubscriptionType,
     loadingSelector,
+    errorSelector,
+    typesSelector,
 } from "../../ducks/billing";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
@@ -30,8 +33,55 @@ class SubscriptionForm extends React.Component {
 
     }
 
-    _getSubscribes() {
-        return
+    _getDescription(data) {
+        let _itemsName = (data.units === 'y') ? (
+                data.duration === 1 ? 'год' : data.duration < 5 ? 'года' : 'лет'
+            )
+            : (
+                data.duration === 1 ? 'месяц' : 'месяца'
+            )
+
+        return <p className="subscription-item__headline">
+            Подписка
+            <span className="js-duration">
+                {' на '}
+                <span className="duration">
+                    {data.duration}
+                </span>
+                {' ' + _itemsName + '  '}
+            </span>
+        </p>
+    }
+
+    _getSubscriptionList() {
+        return this.props.subscriptionList ?
+            this.props.subscriptionList.map((item, index) => {
+                let _monthCount = (item.ExtFields.units === 'y') ? item.ExtFields.duration * 12 : item.ExtFields.duration,
+                    _price = Math.round(item.Price / _monthCount);
+
+                return <li className="subscription-item" key={index}>
+                    {this._getDescription(item.ExtFields)}
+                    <p className="subscription-item__descr">При разовой оплате <span
+                        className="emph">{item.Price + '₽'}</span></p>
+                    <div className="subscription-item__price-block">
+                        <div className="subscription-item__price">
+                            <span className="amount">{_price}</span>
+                            <span className="currency">₽</span>
+                            <span className="period">/ месяц</span>
+                        </div>
+                        <div className="btn btn--rounded subscription-item__btn js-subscribe" onClick={() => {this._setSubscriptionType(item)}}>
+                            Оформить
+                        </div>
+                    </div>
+                </li>
+            })
+            :
+            null
+    }
+
+    _setSubscriptionType(item) {
+        this.props.setSubscriptionType(item)
+        this.props.switchToPayment()
     }
 
     render() {
@@ -47,53 +97,7 @@ class SubscriptionForm extends React.Component {
                     </div>
                     <div className="modal__body subscriptions-list">
                         <ul>
-                            <li className="subscription-item">
-                                <p className="subscription-item__headline">Подписка <span
-                                    className="js-duration">   </span>
-                                </p>
-                                <p className="subscription-item__descr">Можно отменить в любой момент.</p>
-                                <div className="subscription-item__price-block">
-                                    <div className="subscription-item__price">
-                                        <span className="amount">250</span>
-                                        <span className="currency">₽</span>
-                                        <span className="period">/ месяц</span>
-                                    </div>
-                                    <a href="#"
-                                       className="btn btn--rounded subscription-item__btn js-subscribe">Оформить</a>
-                                </div>
-                            </li>
-                            <li className="subscription-item">
-                                <p className="subscription-item__headline">Подписка <span
-                                    className="js-duration">на   <span
-                                    className="duration">3</span> месяца  </span></p>
-                                <p className="subscription-item__descr">При разовой оплате <span
-                                    className="emph">550₽</span></p>
-                                <div className="subscription-item__price-block">
-                                    <div className="subscription-item__price">
-                                        <span className="amount">183</span>
-                                        <span className="currency">₽</span>
-                                        <span className="period">/ месяц</span>
-                                    </div>
-                                    <a href="#"
-                                       className="btn btn--rounded subscription-item__btn js-subscribe">Оформить</a>
-                                </div>
-                            </li>
-                            <li className="subscription-item">
-                                <p className="subscription-item__headline">Подписка <span
-                                    className="js-duration">на   <span
-                                    className="duration">12</span> месяцев  </span></p>
-                                <p className="subscription-item__descr">При разовой оплате <span
-                                    className="emph">1&nbsp;750₽</span></p>
-                                <div className="subscription-item__price-block">
-                                    <div className="subscription-item__price">
-                                        <span className="amount">145</span>
-                                        <span className="currency">₽</span>
-                                        <span className="period">/ месяц</span>
-                                    </div>
-                                    <a href="#"
-                                       className="btn btn--rounded subscription-item__btn js-subscribe">Оформить</a>
-                                </div>
-                            </li>
+                            {this._getSubscriptionList()}
                         </ul>
                     </div>
                 </div>
@@ -106,8 +110,8 @@ class SubscriptionForm extends React.Component {
 function mapStateToProps(state) {
     return {
         loading: loadingSelector(state),
-
-        error: state.user.error,
+        subscriptionList: typesSelector(state),
+        error: errorSelector(state),
     }
 }
 
@@ -115,6 +119,7 @@ function mapDispatchToProps(dispatch) {
     return {
         getSubscriptionTypes: bindActionCreators(getSubscriptionTypes, dispatch),
         switchToPayment: bindActionCreators(switchToPayment, dispatch),
+        setSubscriptionType: bindActionCreators(setSubscriptionType, dispatch),
     }
 }
 
