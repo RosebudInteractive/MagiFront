@@ -1,6 +1,9 @@
 const path = require('path');
 const defer = require('config/defer').deferConfig;
 
+const SESSION_MAX_AGE = 20 * 24 * 3600 * 1000; // 20 days
+const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 hour
+
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
@@ -53,14 +56,18 @@ module.exports = {
         resave: false,
         saveUninitialized: false,
         cookie: {
-            maxAge: 20 * 24 * 3600 * 1000 // 20 days
+            maxAge: SESSION_MAX_AGE
+        },
+        appSettings: {
+            updPeriod: SESSION_UPD_TIME
         }
     },
     redisSession: {
         enabled: false,
         prefix: 'ses:',
         scanCount: 100,
-        maxAge: 20 * 24 * 3600 * 1000 // 20 days
+        maxAge: SESSION_MAX_AGE,
+        updPeriod: SESSION_UPD_TIME
     },
     trace: {
         sqlTrace: false,

@@ -40,6 +40,8 @@ const { buildLogString } = require('../utils');
 const { FileUpload } = require("../database/file-upload");
 const { ImportEpisode, ImportEpisodeParams } = require('../database/import');
 
+const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 Hour
+
 function errorHandler(err, req, res, next) {
     let errStr = err.message ? err.message : err.toString();
     let error = null;
@@ -56,7 +58,10 @@ function errorHandler(err, req, res, next) {
 function setupAPI(express, app) {
     var path = require('path');
 
-    let sessionOpts = _.cloneDeep(config.session)
+    let sessionOpts = _.cloneDeep(config.session);
+    const updPeriod = sessionOpts.appSettings && sessionOpts.appSettings.updPeriod ? sessionOpts.appSettings.updPeriod : SESSION_UPD_TIME;
+    delete sessionOpts.appSettings;
+
     if (config.proxyServer.protocol === 'https') {
         app.set("trust proxy", 1); // trust first proxy (we are behind NGINX)
         if (!sessionOpts.cookie)
@@ -80,6 +85,23 @@ function setupAPI(express, app) {
         passportSession: passport.session()
     };
 
+    if (sessionOpts.cookie && (typeof (sessionOpts.cookie.maxAge) === "number")) {
+        sessionMiddleware.rollSession = (req, res, next) => {
+            if (req.user) {
+                if (req.session && req.session.cookie
+                    && (typeof (req.session.cookie.maxAge) === "number")) {
+                    if ((sessionOpts.cookie.maxAge - req.session.cookie.maxAge) >= updPeriod) {
+                        if (typeof (req.session.rollingId) === "undefined")
+                            req.session.rollingId = 0;
+                        req.session.rollingId++; // We should change session data to renew cookie on the client side
+                        req.session.cookie.maxAge = sessionOpts.cookie.maxAge;
+                    }
+                };
+            }
+            next();
+        }
+    };
+
     let publicEnabled = config.has("server.publicEnabled") && (config.server.publicEnabled === true) ? true : false;
     let adminEnabled = config.has("server.adminEnabled") && (config.server.adminEnabled === true) ? true : false;
     app.use("/api", (req, res, next) => {
@@ -98,12 +120,16 @@ function setupAPI(express, app) {
     app.use("/api", sessionMiddleware.express);
     app.use("/api", sessionMiddleware.passportInit);
     app.use("/api", sessionMiddleware.passportSession);   
+    if (sessionMiddleware.rollSession)
+        app.use("/api", sessionMiddleware.rollSession);   
 
     app.use("/api", methodOverride()); // поддержка put и delete
 
     app.use("/data", sessionMiddleware.express);
     app.use("/data", sessionMiddleware.passportInit);
     app.use("/data", sessionMiddleware.passportSession);
+    if (sessionMiddleware.rollSession)
+        app.use("/data", sessionMiddleware.rollSession);   
 
     let useJWT = config.has('authentication.useJWT') ? config.authentication.useJWT : false;
     AuthLocalInit(app);
