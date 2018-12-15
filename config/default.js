@@ -51,7 +51,10 @@ module.exports = {
         name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 20 * 24 * 3600 * 1000 // 20 days
+        }
     },
     redisSession: {
         enabled: false,
