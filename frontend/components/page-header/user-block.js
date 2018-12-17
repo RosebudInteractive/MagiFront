@@ -5,7 +5,6 @@ import {bindActionCreators} from 'redux';
 import * as userActions from '../../actions/user-actions'
 import * as appActions from '../../actions/app-actions'
 import {Link} from 'react-router-dom';
-import $ from "jquery";
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import {OverflowHandler, widthLessThan900} from "../../tools/page-tools";
 

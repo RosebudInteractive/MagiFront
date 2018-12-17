@@ -4,6 +4,7 @@ import {showBillingWindow} from "../../ducks/billing";
 import {bindActionCreators} from "redux";
 import {getDaysBetween} from "../../tools/time-tools";
 import PropTypes from "prop-types";
+import * as userActions from "../../actions/user-actions";
 
 class SubscriptionButton extends React.Component {
 
@@ -22,6 +23,10 @@ class SubscriptionButton extends React.Component {
     }
 
     _onClick() {
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
+        }
+
         this.props.showBillingWindow()
     }
 
@@ -50,6 +55,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         showBillingWindow: bindActionCreators(showBillingWindow, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
     }
 }
 

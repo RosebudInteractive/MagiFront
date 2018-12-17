@@ -42,6 +42,10 @@ class BillingWrapper extends React.Component {
         if (prevProps.showBillingWindow && !this.props.showBillingWindow) {
             this._onHide()
         }
+
+        if (prevProps.showSignInForm && !this.props.showSignInForm && !this.props.authorized) {
+            this._onCloseClick()
+        }
     }
 
     _onShow() {
@@ -87,9 +91,9 @@ class BillingWrapper extends React.Component {
     }
 
     render() {
-        let {showBillingWindow, enabledBilling} = this.props;
+        let {showBillingWindow, enabledBilling, showSignInForm} = this.props;
 
-        return (showBillingWindow && enabledBilling) ?
+        return (showBillingWindow && enabledBilling && !showSignInForm) ?
             <div
                 className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
@@ -106,6 +110,7 @@ class BillingWrapper extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        showSignInForm: state.app.showSignInForm,
         showBillingWindow: showBillingWindowSelector(state),
         billingStep: billingStepSelector(state),
         loading: loadingSelector(state),
