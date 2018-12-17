@@ -175,7 +175,7 @@ function setupAPI(express, app) {
     app.get('/api/options', function (req, res, next) {
         Promise.resolve()
             .then(() => {
-                let options = { appId: {}, siteKey: {}, scriptPath: {} };
+                let options = { appId: {}, siteKey: {}, scriptPath: {}, billing: {} };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
@@ -184,6 +184,8 @@ function setupAPI(express, app) {
                     (config.server.pushNotifications === true) &&
                     config.has('mail.sendPulse.scriptPath'))
                     options.scriptPath.sendPulse = config.mail.sendPulse.scriptPath;
+                if (config.has('billing.billing_test') && (config.billing.billing_test === true))
+                    options.billing.billing_test = true;
                 res.send(options);
             })
             .catch(err => {
