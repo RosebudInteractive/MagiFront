@@ -94,6 +94,7 @@ module.exports = {
         module: "./yandex-kassa",
         enabled: false,
         debug: false,
+        billing_test: true,
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",
