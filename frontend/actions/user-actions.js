@@ -118,6 +118,8 @@ export const whoAmI = () => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: WHO_AM_I_SUCCESS,
                     payload: data
@@ -151,6 +153,8 @@ export const login = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: SIGN_IN_SUCCESS,
                     payload: data
@@ -198,6 +202,8 @@ export const signUp = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: SIGN_UP_SUCCESS,
                     payload: data
@@ -228,6 +234,8 @@ export const recoveryPassword = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: RECOVERY_PASSWORD_SUCCESS,
                     payload: data
@@ -259,6 +267,8 @@ export const getActivationUser = (key) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: GET_ACTIVATION_USER_SUCCESS,
                     payload: data
@@ -285,6 +295,8 @@ export const sendActivationKey = (key) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: ACTIVATION_SUCCESS,
                     payload: data
@@ -317,6 +329,8 @@ export const sendNewPassword = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
+                handleUserData(data);
+
                 dispatch({
                     type: SEND_NEW_PASSWORD_SUCCESS,
                     payload: data
@@ -422,3 +436,16 @@ const checkStatus = (response) => {
 const parseJSON = (response) => {
     return response.json()
 };
+
+
+const handleUserData = (data) => {
+    if (data.SubsExpDate) {
+        data.SubsExpDate = new Date(data.SubsExpDate)
+    }
+
+    if (data.SubsExpDateExt) {
+        data.SubsExpDateExt = new Date(data.SubsExpDateExt)
+    }
+
+    return data;
+}
