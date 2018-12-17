@@ -1,7 +1,14 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {errorSelector, selectedTypeSelector, sendPayment, switchToSubscription} from "../../ducks/billing";
+import {
+    loadingSelector,
+    errorSelector,
+    selectedTypeSelector,
+    sendPayment,
+    switchToSubscription,
+    isRedirectActiveSelector
+} from "../../ducks/billing";
 
 class PaymentForm extends React.Component {
 
@@ -76,7 +83,7 @@ class PaymentForm extends React.Component {
     }
 
     _isSendingEnable() {
-        return !!this.state.selectedMethod
+        return !!this.state.selectedMethod || this.props.loading || this.props.needRedirect
     }
 
     render() {
@@ -196,7 +203,9 @@ class PaymentForm extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        loading: loadingSelector(state),
         selectedSubscription: selectedTypeSelector(state),
+        needRedirect: isRedirectActiveSelector(state),
         error: errorSelector(state),
         user: state.user.user,
     }

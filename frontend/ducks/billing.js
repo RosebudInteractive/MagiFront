@@ -40,6 +40,7 @@ export const ReducerRecord = Record({
     types: null,
     selectedType: null,
     fetching: false,
+    processing: false,
     redirect: new Redirect(),
     error: null
 })
@@ -88,10 +89,15 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('selectedType', payload)
 
+        // case SEND_PAYMENT_START:
+        //     return state
+        //         .set('processing', true)
+
         case SEND_PAYMENT_SUCCESS:
             return state
                 .setIn(['redirect', 'url'], payload)
                 .setIn(['redirect', 'active'], true)
+                .set('fetching', false)
 
         case REDIRECT_COMPLETE:
             return state

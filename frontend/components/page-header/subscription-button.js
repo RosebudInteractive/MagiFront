@@ -12,11 +12,13 @@ class SubscriptionButton extends React.Component {
     }
 
     _getButtonVisible() {
-        let {user, authorized} = this.props;
+        let {user, authorized, enabledBilling,} = this.props;
 
-        return !authorized || (
-            !user.SubsExpDateExt || (getDaysBetween(new Date(), user.SubsExpDateExt) > 7)
-        )
+        return enabledBilling &&
+            (!authorized || (
+                    !user.SubsExpDateExt || (getDaysBetween(new Date(), user.SubsExpDateExt) > 7)
+                )
+            )
     }
 
     _onClick() {
@@ -25,7 +27,7 @@ class SubscriptionButton extends React.Component {
 
     render() {
         let _className = this.props.isMobile ? 'page-header__btn page-header__btn--mobile btn btn--brown js-modal' :
-                'page-header__btn btn btn--brown js-modal'
+            'page-header__btn btn btn--brown js-modal'
 
 
         return this._getButtonVisible() ?
@@ -41,6 +43,7 @@ function mapStateToProps(state) {
     return {
         authorized: !!state.user.user,
         user: state.user.user,
+        enabledBilling: state.app.enabledBilling,
     }
 }
 

@@ -9,7 +9,8 @@ import {
     isRedirectActiveSelector,
     BillingStep,
     hideBillingWindow,
-    redirectComplete, isRedirectUrlSelector
+    redirectComplete,
+    isRedirectUrlSelector
 } from "../../ducks/billing";
 
 import Subscription from './billing-subscription'
@@ -86,9 +87,9 @@ class BillingWrapper extends React.Component {
     }
 
     render() {
-        let {showBillingWindow} = this.props;
+        let {showBillingWindow, enabledBilling} = this.props;
 
-        return showBillingWindow ?
+        return (showBillingWindow && enabledBilling) ?
             <div
                 className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
@@ -111,6 +112,7 @@ function mapStateToProps(state) {
         needRedirect: isRedirectActiveSelector(state),
         redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
+        enabledBilling: state.app.enabledBilling,
 
         error: state.user.error,
     }
