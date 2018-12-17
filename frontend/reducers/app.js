@@ -138,7 +138,7 @@ export default function app(state = initialState, action) {
 
             return {
                 ...state,
-                buildingTest: _buildingTest,
+                billingTest: _buildingTest,
                 facebookAppID: payload.appId.fb,
                 reCapture: payload.siteKey.reCapture,
                 sendPulseScript: _sendPulse,

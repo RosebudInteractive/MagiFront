@@ -109,10 +109,10 @@ class PaymentForm extends React.Component {
                                 <span>Банковская карта</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/visa.png" width="25" height="25" alt=""/>
+                                        <img src="/assets/images/visa.png" width="25" height="25" alt=""/>
                                     </div>
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/mastercard.png" width="19" height="18" alt=""/>
+                                        <img src="/assets/images/mastercard.png" width="19" height="18" alt=""/>
                                     </div>
                                 </div>
                             </label>
@@ -124,7 +124,7 @@ class PaymentForm extends React.Component {
                                 <span>Яндекс Деньги</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/yad.png" width="15" height="19" alt=""/>
+                                        <img src="/assets/images/yad.png" width="15" height="19" alt=""/>
                                     </div>
                                 </div>
                             </label>
@@ -136,7 +136,7 @@ class PaymentForm extends React.Component {
                                 <span>Сбербанк онлайн</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/sber.png" width="18" height="18" alt=""/>
+                                        <img src="/assets/images/sber.png" width="18" height="18" alt=""/>
                                     </div>
                                 </div>
                             </label>
@@ -148,7 +148,7 @@ class PaymentForm extends React.Component {
                                 <span>Альфа-клик</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/alfa.png" width="12" height="18" alt=""/>
+                                        <img src="/assets/images/alfa.png" width="12" height="18" alt=""/>
                                     </div>
                                 </div>
                             </label>
@@ -160,7 +160,7 @@ class PaymentForm extends React.Component {
                                 <span>QIWI Кошелек</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/qiwi.png" width="16" height="16" alt=""/>
+                                        <img src="/assets/images/qiwi.png" width="16" height="16" alt=""/>
                                     </div>
                                 </div>
                             </label>
@@ -172,7 +172,7 @@ class PaymentForm extends React.Component {
                                 <span>Webmoney</span>
                                 <div className="payment-method__icons">
                                     <div className="payment-method__icon">
-                                        <img src="assets/images/webmoney.png" width="19" height="18" alt=""/>
+                                        <img src="/assets/images/webmoney.png" width="19" height="18" alt=""/>
                                     </div>
                                 </div>
                             </label>
