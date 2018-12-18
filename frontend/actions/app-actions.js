@@ -17,7 +17,7 @@ import {
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
     GET_APP_OPTIONS_FAIL,
-    APP_CHANGE_PAGE
+    APP_CHANGE_PAGE, ENABLE_BILLING, DISABLE_BILLING
 } from '../constants/app'
 
 export const changePage = (url) => {
@@ -135,6 +135,20 @@ export const closeGallery = () => {
         payload: null
     }
 };
+
+export const enableBilling = () => {
+    return {
+        type: ENABLE_BILLING,
+        payload: null
+    }
+}
+
+export const disableBilling = () => {
+    return {
+        type: DISABLE_BILLING,
+        payload: null
+    }
+}
 
 export const getAppOptions = () => {
     return (dispatch) => {
