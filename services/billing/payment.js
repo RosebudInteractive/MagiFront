@@ -541,6 +541,8 @@ exports.Payment = class Payment extends DbObject {
         let newId;
         let dbOptsInt;
         let chequeTypeId;
+        let refundInvoiceId;
+        let isRefund = false;
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -551,6 +553,7 @@ exports.Payment = class Payment extends DbObject {
                 chequeTypeId = data.Payment ? Accounting.ChequeType.Payment : Accounting.ChequeType.Refund;
 
                 if (data.Refund) {
+                    isRefund = true;
                     if (!data.Refund.payment_id)
                         throw new Error(`Missing argument "payment_id" of "Refund" object.`);
                     rc = this._getCheque(data.Refund.payment_id, dbOpts)
@@ -559,11 +562,11 @@ exports.Payment = class Payment extends DbObject {
                             memDbOptions.dbRoots.push(parent_root); // Remember DbRoot to delete it finally in editDataWrapper
                             let collection = parent_root.getCol("DataElements");
                             if (collection.count() !== 1)
-                                throw new Error(`Cheque ("payment_id" = "${id}") doesn't exist.`);
+                                throw new Error(`Cheque ("payment_id" = "${data.Refund.payment_id}") doesn't exist.`);
                             parentCheque = collection.get(0);
                             data.Refund.payment_id = parentCheque.chequeNum();
                             if (parentCheque.stateId() !== Accounting.ChequeState.Succeeded)
-                                throw new Error(`To create refund cheque "${id}" should be in "Succeeded" state.`);
+                                throw new Error(`To create refund cheque "${parentCheque.id()}" should be in "Succeeded" state.`);
                             if (parentCheque.invoiceId()) {
                                 let inv = { ParentId: parentCheque.invoiceId(), InvoiceTypeId: Accounting.InvoiceType.Refund };
                                 if (data.Invoice && data.Invoice.Items)
@@ -579,8 +582,11 @@ exports.Payment = class Payment extends DbObject {
                 resolve(rc);
             })
                 .then(invoice => {
-                    if (invoice && invoice.data && (invoice.data.length === 1))
+                    if (invoice && invoice.data && (invoice.data.length === 1)) {
                         invoiceData = invoice.data[0];
+                        if (isRefund)
+                            refundInvoiceId = invoiceData.Id;
+                    }
                     return this._getObjById(-1, null, dbOpts);
                 })
                 .then(result => {
@@ -619,12 +625,25 @@ exports.Payment = class Payment extends DbObject {
                 })
         }, memDbOptions)
             .then(result => {
+                let rc;
                 if (result.isError) {
-                    result.result.newId = newId;
-                    throw result.result;
+                    rc = Promise.resolve()
+                        .then(() => {
+                            if (refundInvoiceId)
+                                return InvoiceService().rollbackRefund(refundInvoiceId)
+                                    .catch(err => {
+                                        console.error(`Error in "InvoiceService().rollbackRefund" call: ` +
+                                            `${err && err.message ? err.message : JSON.stringify(err)}`);
+                                    });
+                        })
+                        .then(() => {
+                            result.result.newId = newId;
+                            throw result.result;
+                        });
                 }
-                let rc = opts.fullResult ? result.result : (result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
-                    (opts.debug ? result.result : { result: "OK" }));
+                else
+                    rc = opts.fullResult ? result.result : (result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
+                        (opts.debug ? result.result : { result: "OK" }));
                 return rc;
             });
     }
