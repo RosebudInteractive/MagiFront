@@ -437,7 +437,7 @@ exports.Payment = class Payment extends DbObject {
                         return InvoiceService().get(chequeObj.invoiceId(), { dbOptions: dbOpts });
                     })
                     .then(invoice => {
-                        invoiceData = invoice.data;
+                        invoiceData = invoice.data && (invoice.data.length === 1) ? invoice.data[0] : null;
                     });
             }
             rci = rci
@@ -561,6 +561,7 @@ exports.Payment = class Payment extends DbObject {
                             if (collection.count() !== 1)
                                 throw new Error(`Cheque ("payment_id" = "${id}") doesn't exist.`);
                             parentCheque = collection.get(0);
+                            data.Refund.payment_id = parentCheque.chequeNum();
                             if (parentCheque.stateId() !== Accounting.ChequeState.Succeeded)
                                 throw new Error(`To create refund cheque "${id}" should be in "Succeeded" state.`);
                             if (parentCheque.invoiceId()) {
@@ -578,8 +579,8 @@ exports.Payment = class Payment extends DbObject {
                 resolve(rc);
             })
                 .then(invoice => {
-                    if (invoice && invoice.data)
-                        invoiceData = invoice.data;
+                    if (invoice && invoice.data && (invoice.data.length === 1))
+                        invoiceData = invoice.data[0];
                     return this._getObjById(-1, null, dbOpts);
                 })
                 .then(result => {

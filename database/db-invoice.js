@@ -22,14 +22,33 @@ const INVOICE_REQ_TREE = {
     }
 };
 
+const convertToInt = (val) => {
+    let rc;
+    switch (typeof (val)) {
+        case "string":
+            rc = parseInt(val);
+            break;
+        case "number":
+            rc = val;
+            break;
+    };
+    return rc;
+}
+
 const GET_INVOICE_MSSQL =
     "select i.[Id], i.[UserId], i.[ParentId], i.[InvoiceTypeId], i.[StateId], i.[CurrencyId], c.[Code] as [CCode], i.[ChequeId], i.[Name],\n" +
     "  i.[Description], i.[InvoiceNum], i.[InvoiceDate], i.[Sum], i.[RefundSum], it.[Id] as [ItemId], it.[ProductId],\n" +
     "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
     "from[Invoice] i\n" +
     "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
-    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]\n" +
-    "where i.[Id] = <%= id %>";
+    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
+    "order by i.[InvoiceDate], i.[Id]";
+
+const GET_INVOICE_FILTER_MSSQL = {
+    id: { field: "id", cond: "i.[Id] = <%= id %>" },
+    state_id: { field: "state_id", cond: "i.[StateId] = <%= state_id %>", conv: convertToInt },
+    user_id: { field: "user_id", cond: "i.[UserId] = <%= user_id %>", conv: convertToInt }
+};
 
 const GET_INVOICE_MYSQL =
     "select i.`Id`, i.`UserId`, i.`ParentId`, i.`InvoiceTypeId`, i.`StateId`, i.`CurrencyId`, c.`Code` as `CCode`, i.`ChequeId`, i.`Name`,\n" +
@@ -37,8 +56,14 @@ const GET_INVOICE_MYSQL =
     "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
     "from`Invoice` i\n" +
     "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
-    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`\n" +
-    "where i.`Id` = <%= id %>";
+    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
+    "order by i.`InvoiceDate`, i.`Id`";
+
+const GET_INVOICE_FILTER_MYSQL = {
+    id: { field: "id", cond: "i.`Id` = <%= id %>" },
+    state_id: { field: "state_id", cond: "i.`StateId` = <%= state_id %>", conv: convertToInt },
+    user_id: { field: "user_id", cond: "i.`UserId` = <%= user_id %>", conv: convertToInt }
+};
 
 const DbInvoice = class DbInvoice extends DbObject {
 
@@ -53,25 +78,58 @@ const DbInvoice = class DbInvoice extends DbObject {
 
     get(id, options) {
         let opts = options || {};
+        let filter = options && options.filter ? _.cloneDeep(options.filter) : {};
         let dbOpts = opts.dbOptions || {};
+        let filter_mysql = "";
+        let filter_mssql = "";
         return new Promise(resolve => {
-            resolve(
-                $data.execSql({
-                    dialect: {
-                        mysql: _.template(GET_INVOICE_MYSQL)({ id: id }),
-                        mssql: _.template(GET_INVOICE_MSSQL)({ id: id })
-                    }
-                }, dbOpts)
-            );
+            let ncond_mysql = 0;
+            let ncond_mssql = 0;
+            if ((typeof (id) === "number") && (id > 0) && (!isNaN(id)))
+                filter.id = id;
+            for (let key in filter) {
+                if (GET_INVOICE_FILTER_MYSQL[key]) {
+                    if (!ncond_mysql)
+                        filter_mysql = "\nwhere "
+                    else
+                        filter_mysql += "\n  and ";
+                    ncond_mysql++;
+                    let data = {}
+                    let conv = GET_INVOICE_FILTER_MYSQL[key].conv;
+                    data[GET_INVOICE_FILTER_MYSQL[key].field] = conv ? conv(filter[key]) : filter[key];
+                    filter_mysql += "(" + _.template(GET_INVOICE_FILTER_MYSQL[key].cond)(data) + ")";
+                }
+                if (GET_INVOICE_FILTER_MSSQL[key]) {
+                    if (!ncond_mssql)
+                        filter_mssql = "\nwhere "
+                    else
+                        filter_mssql += "\n  and ";
+                    ncond_mssql++;
+                    let data = {}
+                    let conv = GET_INVOICE_FILTER_MSSQL[key].conv;
+                    data[GET_INVOICE_FILTER_MSSQL[key].field] = conv ? conv(filter[key]) : filter[key];
+                    filter_mssql += "(" + _.template(GET_INVOICE_FILTER_MSSQL[key].cond)(data) + ")";
+                }
+            }
+            let rc = $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_INVOICE_MYSQL)({ filter: filter_mysql }),
+                    mssql: _.template(GET_INVOICE_MSSQL)({ filter: filter_mssql })
+                }
+            }, dbOpts);
+            resolve(rc);
         })
             .then(result => {
                 let inv = { data: null };
                 if (result && result.detail && (result.detail.length > 0)) {
-                    let invoice = inv.data = {};
-                    let isFirst = true;
+                    inv.data = [];
+                    let invoice;
+                    let currId = -1;
                     result.detail.forEach(elem => {
-                        if (isFirst) {
-                            isFirst = false;
+                        if (currId !== elem.Id) {
+                            currId = elem.Id;
+                            invoice = {};
+                            inv.data.push(invoice);
                             invoice.Id = elem.Id;
                             invoice.UserId = elem.UserId;
                             invoice.ParentId = elem.ParentId;
