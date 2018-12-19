@@ -232,7 +232,13 @@ const DbUser = class DbUser extends DbObject {
             .then(result => {
                 if (result && result.detail && (result.detail.length === 1)) {
                     let row = result.detail[0];
-                    let res = { Id: row.Id, PayId: row.SubsAutoPayId, SubsExpDate: row.SubsExpDate, SubsExpDate: row.SubsExpDate, Payment: null };
+                    let res = {
+                        Id: row.Id,
+                        SubsAutoPay: row.SubsAutoPay ? true : false,
+                        SubsExpDate: row.SubsExpDate,
+                        SubsExpDate: row.SubsExpDate,
+                        Payment: null
+                    };
                     if (row.ChequeData) {
                         let payment = JSON.parse(row.ChequeData);
                         if (payment.payment_method)

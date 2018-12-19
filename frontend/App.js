@@ -233,6 +233,7 @@ class App extends Component {
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>
+                <Route path={_homePath + 'subscription'} component={ProfilePage}/>
                 <Route path={_homePath + 'history'} component={ProfilePage}/>
                 <Route path={_homePath + 'favorites'} component={BookmarksPage}/>
                 <Route path={_homePath + 'favorites/courses'} component={BookmarksPage}/>

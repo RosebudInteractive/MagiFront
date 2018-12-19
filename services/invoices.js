@@ -5,7 +5,7 @@ function setupInvoices(app) {
 
     app.get('/api/invoices/:id', (req, res, next) => {
         InvoiceService()
-            .get(parseInt(req.params.id), req.query)
+            .get(parseInt(req.params.id), { filter: req.query })
             .then(rows => {
                 res.send(rows);
             })

@@ -1,6 +1,9 @@
 const path = require('path');
 const defer = require('config/defer').deferConfig;
 
+const SESSION_MAX_AGE = 20 * 24 * 3600 * 1000; // 20 days
+const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 hour
+
 module.exports = {
     root: process.cwd(),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
@@ -51,13 +54,20 @@ module.exports = {
         name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        cookie: {
+            maxAge: SESSION_MAX_AGE
+        },
+        appSettings: {
+            updPeriod: SESSION_UPD_TIME
+        }
     },
     redisSession: {
         enabled: false,
         prefix: 'ses:',
         scanCount: 100,
-        maxAge: 20 * 24 * 3600 * 1000 // 20 days
+        maxAge: SESSION_MAX_AGE,
+        updPeriod: SESSION_UPD_TIME
     },
     trace: {
         sqlTrace: false,
@@ -84,6 +94,7 @@ module.exports = {
         module: "./yandex-kassa",
         enabled: false,
         debug: false,
+        billing_test: true,
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",

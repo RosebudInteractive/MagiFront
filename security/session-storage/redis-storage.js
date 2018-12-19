@@ -230,9 +230,10 @@ module.exports = function (session) {
                 return conn.pttlAsync(psid);
             })
                 .then((time) => {
+                    ttl = ttl < time ? ttl : time;
                     let result = time >= 0;
                     if (result)
-                        result = (store.maxAge - time) >= store.updPeriod;
+                        result = (store.maxAge - ttl) >= store.updPeriod;
                     if (result)
                         result = conn.pexpireAsync(psid, store.maxAge);
                     return result;

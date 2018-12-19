@@ -15,7 +15,7 @@ import {
     CLOSE_GALLERY,
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
-    GET_APP_OPTIONS_FAIL,
+    GET_APP_OPTIONS_FAIL, ENABLE_BILLING, DISABLE_BILLING,
 } from '../constants/app'
 
 import {
@@ -37,12 +37,16 @@ const initialState = {
     facebookAppID: '',
     reCapture: '',
     sendPulseScript: null,
+    billingTest: false,
+    enabledBilling: false,
     fetching: false,
 };
 
 export default function app(state = initialState, action) {
+    const {type, payload} = action
 
-    switch (action.type) {
+
+    switch (type) {
 
         case SHOW_USER_BLOCK:
             return {...state, showUserBlock: true};
@@ -56,9 +60,8 @@ export default function app(state = initialState, action) {
         }
 
 
-
         case SWITCH_SIZE_TO:
-            return {...state, size: action.payload};
+            return {...state, size: payload};
 
         case SWITCH_TO_SMALL_PLAYER:
             // if (state.showSmallPlayer !== action.payload) {
@@ -69,21 +72,21 @@ export default function app(state = initialState, action) {
             return state
 
         case SWITCH_TO_FULL_PLAYER:
-            if (state.showSmallPlayer !== action.payload) {
+            if (state.showSmallPlayer !== payload) {
                 return {...state, showSmallPlayer: false};
             } else {
                 return state
             }
 
         case SHOW_LESSON_MENU:
-            if (state.isLessonMenuOpened !== action.payload) {
+            if (state.isLessonMenuOpened !== payload) {
                 return {...state, isLessonMenuOpened: true};
             } else {
                 return state
             }
 
         case HIDE_LESSON_MENU:
-            if (state.isLessonMenuOpened !== action.payload) {
+            if (state.isLessonMenuOpened !== payload) {
                 return {...state, isLessonMenuOpened: false};
             } else {
                 return state
@@ -126,17 +129,18 @@ export default function app(state = initialState, action) {
         }
 
         case GET_APP_OPTIONS_REQUEST: {
-            return { ...state, fetching: true }
+            return {...state, fetching: true}
         }
 
         case GET_APP_OPTIONS_SUCCESS: {
-            let _sendPulse = (action.payload.scriptPath && action.payload.scriptPath.sendPulse) ?
-                action.payload.scriptPath.sendPulse : null;
+            let _sendPulse = (payload.scriptPath && payload.scriptPath.sendPulse) ? payload.scriptPath.sendPulse : null,
+                _buildingTest = (payload.billing && payload.billing.billing_test) ? payload.billing.billing_test : false;
 
             return {
                 ...state,
-                facebookAppID: action.payload.appId.fb,
-                reCapture: action.payload.siteKey.reCapture,
+                billingTest: _buildingTest,
+                facebookAppID: payload.appId.fb,
+                reCapture: payload.siteKey.reCapture,
                 sendPulseScript: _sendPulse,
                 fetching: false,
             }
@@ -144,6 +148,14 @@ export default function app(state = initialState, action) {
 
         case GET_APP_OPTIONS_FAIL: {
             return {...state, facebookAppID: '', fetching: false}
+        }
+
+        case ENABLE_BILLING: {
+            return {...state, enabledBilling: true}
+        }
+
+        case DISABLE_BILLING: {
+            return {...state, enabledBilling: false}
         }
 
         default:

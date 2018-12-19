@@ -50,7 +50,8 @@ exports.SetupRoute = (app) => {
                 paymentObject.insert(req.body, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
                     .then(result => {
                         if (result && result.confirmationUrl)
-                            res.redirect(result.confirmationUrl)
+                            // res.redirect(result.confirmationUrl)
+                            res.send({ result: "OK", confirmationUrl: result.confirmationUrl })
                         else
                             res.send({ result: "OK", paymentData: result });
                     })

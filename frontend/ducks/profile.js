@@ -4,7 +4,7 @@ import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record, Set, List} from 'immutable'
 import 'whatwg-fetch';
-import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import {checkStatus, mockFetch, parseJSON} from "../tools/fetch-tools";
 import {
     SIGN_IN_SUCCESS,
     LOGOUT_SUCCESS,
@@ -52,6 +52,18 @@ export const REMOVE_LESSON_FROM_BOOKMARKS_START = `${prefix}/REMOVE_LESSON_FROM_
 export const REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS`
 export const REMOVE_LESSON_FROM_BOOKMARKS_ERROR = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_ERROR`
 
+export const GET_TRANSACTIONS_START = `${prefix}/GET_TRANSACTIONS_START`
+export const GET_TRANSACTIONS_SUCCESS = `${prefix}/GET_TRANSACTIONS_SUCCESS`
+export const GET_TRANSACTIONS_ERROR = `${prefix}/GET_TRANSACTIONS_ERROR`
+
+export const GET_SUBS_INFO_START = `${prefix}/GET_SUBS_INFO_START`
+export const GET_SUBS_INFO_SUCCESS = `${prefix}/GET_SUBS_INFO_SUCCESS`
+export const GET_SUBS_INFO_ERROR = `${prefix}/GET_SUBS_INFO_ERROR`
+
+export const SWITCH_AUTOPAY_START = `${prefix}/SWITCH_AUTOPAY_START`
+export const SWITCH_AUTOPAY_SUCCESS = `${prefix}/SWITCH_AUTOPAY_SUCCESS`
+export const SWITCH_AUTOPAY_ERROR = `${prefix}/SWITCH_AUTOPAY_ERROR`
+
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 
 /**
@@ -60,10 +72,13 @@ export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 export const ReducerRecord = Record({
     user: null,
     history: [],
+    transactions: new List(),
     bookmarks: new Set(),
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
+    subsInfo: null,
     loading: false,
+    loadingSubsInfo: false,
     loadingBookmarks: false,
     loadingUserBookmarks: false,
     error: null
@@ -74,8 +89,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case GET_USER_INFO_REQUEST:
-            // case CHANGE_PASSWORD_START:
-            // case GET_HISTORY_REQUEST:
+        // case CHANGE_PASSWORD_START:
+        case GET_HISTORY_REQUEST:
             return state
                 .set('error', null)
                 .set('loading', true)
@@ -91,6 +106,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_USER_INFO_ERROR:
         case GET_HISTORY_ERROR:
+        case GET_TRANSACTIONS_ERROR:
         case CHANGE_PASSWORD_ERROR:
             return state
                 .set('loading', false)
@@ -98,7 +114,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_HISTORY_SUCCESS:
             return state
-            // .set('loading', false)
+                .set('loading', false)
                 .set('history', payload)
 
         case CHANGE_PASSWORD_SUCCESS:
@@ -153,30 +169,21 @@ export default function reducer(state = new ReducerRecord(), action) {
         case REMOVE_COURSE_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload))
-        // .update('courseBookmarks', courseBookmarks => {
-        //     let _index = courseBookmarks.findIndex((course) => {
-        //         return course.URL === payload
-        //     })
-        //
-        //     return (_index >= 0) ?
-        //         courseBookmarks.splice(_index, 1)
-        //         :
-        //         courseBookmarks
-        //     })
 
         case REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS:
             return state
                 .update('bookmarks', bookmarks => bookmarks.delete(payload.courseUrl + '/' + payload.lessonUrl))
-        // .update('lessonBookmarks', lessonBookmarks => {
-        //     let _index = lessonBookmarks.findIndex((lesson) => {
-        //         return (lesson.URL === payload.lessonUrl) && (lesson.courseUrl === payload.courseUrl)
-        //     })
-        //
-        //     return (_index >= 0) ?
-        //         lessonBookmarks.splice(_index, 1)
-        //         :
-        //         lessonBookmarks
-        // })
+
+        case GET_TRANSACTIONS_START:
+            return state
+                .set('error', null)
+                .set('loading', true)
+                .update('transactions', transactions => transactions.clear())
+
+        case GET_TRANSACTIONS_SUCCESS:
+            return state
+                .set('loading', false)
+                .update('transactions', transactions => transactions.concat(payload))
 
         default:
             return state
@@ -199,6 +206,8 @@ export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadingBookmarksSelector = createSelector(stateSelector, state => state.loadingBookmarks)
 export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
+
+export const transactionsSelector = createSelector(stateSelector, state => state.transactions)
 
 /**
  * Action Creators
@@ -302,6 +311,59 @@ export function getUserBookmarksFull() {
             .catch((error) => {
                 dispatch({
                     type: GET_BOOKMARKS_EXT_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export function getTransactionHistory() {
+    return (dispatch) => {
+        dispatch({
+            type: GET_TRANSACTIONS_START,
+            payload: null
+        });
+
+        // fetch("/api/users/bookmark-ext", {credentials: 'include'})
+        mockFetch(mockData)
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                // handleBookmarksData(data);
+
+                dispatch({
+                    type: GET_TRANSACTIONS_SUCCESS,
+                    payload: data.data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: GET_TRANSACTIONS_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const getSubscriptionInfo = () => {
+    return (dispatch) => {
+        dispatch({
+            type: GET_SUBS_INFO_START,
+            payload: null
+        });
+
+        fetch("/api/users/subs-info", {credentials: 'include'})
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: GET_SUBS_INFO_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: GET_SUBS_INFO_ERROR,
                     payload: {error}
                 });
             });
@@ -476,6 +538,13 @@ export const clearError = () => {
     };
 }
 
+export const switchAutoPay = () => {
+    return {
+        type: CLEAR_ERROR,
+        payload: null
+    };
+}
+
 const handleData = (data) => {
     if (data.Courses) {
         data.Courses.forEach(course => handleCourse(course))
@@ -635,3 +704,86 @@ const Months = [
     'Ноябрь',
     'Декабрь',
 ];
+
+let mockData = {
+    "data": [
+        {
+            "Id": 20,
+            "UserId": 9459,
+            "ParentId": null,
+            "InvoiceTypeId": 1,
+            "StateId": 3,
+            "CurrencyId": 1,
+            "CurrencyCode": "RUB",
+            "ChequeId": 20,
+            "Name": "Заказ №20/9459",
+            "Description": null,
+            "InvoiceNum": "20/9459",
+            "InvoiceDate": "2018-12-17T18:45:23.455Z",
+            "Sum": 200,
+            "RefundSum": 200,
+            "Items": [
+                {
+                    "Id": 20,
+                    "ProductId": 3,
+                    "VATTypeId": 1,
+                    "Code": "SUBS1M",
+                    "Name": "Подписка на 1 мес.",
+                    "VATRate": 18,
+                    "Price": 200,
+                    "Qty": 1,
+                    "RefundQty": 1,
+                    "ExtFields": {
+                        "prodType": 1,
+                        "prod": {
+                            "units": "m",
+                            "duration": 1
+                        },
+                        "vat": {
+                            "yandexKassaCode": 4
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Id": 23,
+            "UserId": 9459,
+            "ParentId": 20,
+            "InvoiceTypeId": 2,
+            "StateId": 3,
+            "CurrencyId": 1,
+            "CurrencyCode": "RUB",
+            "ChequeId": 22,
+            "Name": "Возврат №23/9459",
+            "Description": null,
+            "InvoiceNum": "23/9459",
+            "InvoiceDate": "2018-12-18T19:38:04.265Z",
+            "Sum": 200,
+            "RefundSum": 0,
+            "Items": [
+                {
+                    "Id": 22,
+                    "ProductId": 3,
+                    "VATTypeId": 1,
+                    "Code": "SUBS1M",
+                    "Name": "Подписка на 1 мес.",
+                    "VATRate": 18,
+                    "Price": 200,
+                    "Qty": 1,
+                    "RefundQty": 0,
+                    "ExtFields": {
+                        "prodType": 1,
+                        "prod": {
+                            "units": "m",
+                            "duration": 1
+                        },
+                        "vat": {
+                            "yandexKassaCode": 4
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

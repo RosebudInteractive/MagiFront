@@ -69,6 +69,7 @@ let options = {
         module: "./yandex-kassa",
         enabled: true,
         debug: true,
+        billing_test: true,
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",

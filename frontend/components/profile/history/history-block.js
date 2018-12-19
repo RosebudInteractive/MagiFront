@@ -1,9 +1,9 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {userHistorySelector, loadingSelector, getUserHistory} from '../../ducks/profile'
+import {userHistorySelector, loadingSelector, getUserHistory} from '../../../ducks/profile'
 import {bindActionCreators} from "redux";
-import * as storageActions from "../../actions/lesson-info-storage-actions";
+import * as storageActions from "../../../actions/lesson-info-storage-actions";
 import Item from "./history-item";
 
 const _pagingSize = 10;
@@ -35,8 +35,13 @@ class HistoryBlock extends React.Component {
     }
 
     _getList() {
-        let {history} = this.props,
+        let {history, loading} = this.props,
             _result = [];
+
+        if (loading) {
+            return null
+        }
+
 
         for (let i = 0; i < this._visibleCount; i++) {
             _result.push(<Item item={history[i]} key={i}/>)

@@ -80,8 +80,13 @@ class SubscriptionForm extends React.Component {
     }
 
     _setSubscriptionType(item) {
+        let {billingTest, user} = this.props,
+            _disablePayment = billingTest && (!!user && user.PData && (!user.PData.isAdmin) && user.PData.roles.billing_test)
         this.props.setSubscriptionType(item)
-        this.props.switchToPayment()
+
+        if (!_disablePayment) {
+            this.props.switchToPayment()
+        }
     }
 
     render() {
@@ -112,6 +117,9 @@ function mapStateToProps(state) {
         loading: loadingSelector(state),
         subscriptionList: typesSelector(state),
         error: errorSelector(state),
+        billingTest : state.app.billingTest,
+        user: state.user.user,
+
     }
 }
 
@@ -124,25 +132,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubscriptionForm);
-
-/*
-
-{
-    "RedirectUrl: "/yahoo/fjhf",
-    "Payment":{
-        "save_payment_method": true,
-            "payment_method_data": {
-            "type": "yandex_money"
-        }
-    },
-    "Invoice":{
-        "UserId":1,
-            "InvoiceTypeId":1,
-            "Items": [
-            {"ProductId":3,"Price":235}
-        ]
-    }
-}
-
-*/
 

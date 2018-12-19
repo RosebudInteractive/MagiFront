@@ -22,14 +22,33 @@ const INVOICE_REQ_TREE = {
     }
 };
 
+const convertToInt = (val) => {
+    let rc;
+    switch (typeof (val)) {
+        case "string":
+            rc = parseInt(val);
+            break;
+        case "number":
+            rc = val;
+            break;
+    };
+    return rc;
+}
+
 const GET_INVOICE_MSSQL =
     "select i.[Id], i.[UserId], i.[ParentId], i.[InvoiceTypeId], i.[StateId], i.[CurrencyId], c.[Code] as [CCode], i.[ChequeId], i.[Name],\n" +
     "  i.[Description], i.[InvoiceNum], i.[InvoiceDate], i.[Sum], i.[RefundSum], it.[Id] as [ItemId], it.[ProductId],\n" +
     "  it.[VATTypeId], it.[Code], it.[Name] as [ItemName], it.[VATRate], it.[Price], it.[Qty], it.[RefundQty], it.[ExtFields]\n" +
     "from[Invoice] i\n" +
     "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
-    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]\n" +
-    "where i.[Id] = <%= id %>";
+    "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
+    "order by i.[InvoiceDate], i.[Id]";
+
+const GET_INVOICE_FILTER_MSSQL = {
+    id: { field: "id", cond: "i.[Id] = <%= id %>" },
+    state_id: { field: "state_id", cond: "i.[StateId] = <%= state_id %>", conv: convertToInt },
+    user_id: { field: "user_id", cond: "i.[UserId] = <%= user_id %>", conv: convertToInt }
+};
 
 const GET_INVOICE_MYSQL =
     "select i.`Id`, i.`UserId`, i.`ParentId`, i.`InvoiceTypeId`, i.`StateId`, i.`CurrencyId`, c.`Code` as `CCode`, i.`ChequeId`, i.`Name`,\n" +
@@ -37,8 +56,14 @@ const GET_INVOICE_MYSQL =
     "  it.`VATTypeId`, it.`Code`, it.`Name` as `ItemName`, it.`VATRate`, it.`Price`, it.`Qty`, it.`RefundQty`, it.`ExtFields`\n" +
     "from`Invoice` i\n" +
     "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
-    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`\n" +
-    "where i.`Id` = <%= id %>";
+    "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
+    "order by i.`InvoiceDate`, i.`Id`";
+
+const GET_INVOICE_FILTER_MYSQL = {
+    id: { field: "id", cond: "i.`Id` = <%= id %>" },
+    state_id: { field: "state_id", cond: "i.`StateId` = <%= state_id %>", conv: convertToInt },
+    user_id: { field: "user_id", cond: "i.`UserId` = <%= user_id %>", conv: convertToInt }
+};
 
 const DbInvoice = class DbInvoice extends DbObject {
 
@@ -53,25 +78,58 @@ const DbInvoice = class DbInvoice extends DbObject {
 
     get(id, options) {
         let opts = options || {};
+        let filter = options && options.filter ? _.cloneDeep(options.filter) : {};
         let dbOpts = opts.dbOptions || {};
+        let filter_mysql = "";
+        let filter_mssql = "";
         return new Promise(resolve => {
-            resolve(
-                $data.execSql({
-                    dialect: {
-                        mysql: _.template(GET_INVOICE_MYSQL)({ id: id }),
-                        mssql: _.template(GET_INVOICE_MSSQL)({ id: id })
-                    }
-                }, dbOpts)
-            );
+            let ncond_mysql = 0;
+            let ncond_mssql = 0;
+            if ((typeof (id) === "number") && (id > 0) && (!isNaN(id)))
+                filter.id = id;
+            for (let key in filter) {
+                if (GET_INVOICE_FILTER_MYSQL[key]) {
+                    if (!ncond_mysql)
+                        filter_mysql = "\nwhere "
+                    else
+                        filter_mysql += "\n  and ";
+                    ncond_mysql++;
+                    let data = {}
+                    let conv = GET_INVOICE_FILTER_MYSQL[key].conv;
+                    data[GET_INVOICE_FILTER_MYSQL[key].field] = conv ? conv(filter[key]) : filter[key];
+                    filter_mysql += "(" + _.template(GET_INVOICE_FILTER_MYSQL[key].cond)(data) + ")";
+                }
+                if (GET_INVOICE_FILTER_MSSQL[key]) {
+                    if (!ncond_mssql)
+                        filter_mssql = "\nwhere "
+                    else
+                        filter_mssql += "\n  and ";
+                    ncond_mssql++;
+                    let data = {}
+                    let conv = GET_INVOICE_FILTER_MSSQL[key].conv;
+                    data[GET_INVOICE_FILTER_MSSQL[key].field] = conv ? conv(filter[key]) : filter[key];
+                    filter_mssql += "(" + _.template(GET_INVOICE_FILTER_MSSQL[key].cond)(data) + ")";
+                }
+            }
+            let rc = $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_INVOICE_MYSQL)({ filter: filter_mysql }),
+                    mssql: _.template(GET_INVOICE_MSSQL)({ filter: filter_mssql })
+                }
+            }, dbOpts);
+            resolve(rc);
         })
             .then(result => {
                 let inv = { data: null };
                 if (result && result.detail && (result.detail.length > 0)) {
-                    let invoice = inv.data = {};
-                    let isFirst = true;
+                    inv.data = [];
+                    let invoice;
+                    let currId = -1;
                     result.detail.forEach(elem => {
-                        if (isFirst) {
-                            isFirst = false;
+                        if (currId !== elem.Id) {
+                            currId = elem.Id;
+                            invoice = {};
+                            inv.data.push(invoice);
                             invoice.Id = elem.Id;
                             invoice.UserId = elem.UserId;
                             invoice.ParentId = elem.ParentId;
@@ -569,6 +627,91 @@ const DbInvoice = class DbInvoice extends DbObject {
                 })
                 .then(() => {
                     return { result: "OK", id: newId };
+                })
+        }, memDbOptions);
+    }
+
+    rollbackRefund(id, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let root_parent = null;
+        let invoiceObj = null;
+        let invId;
+        let root_item = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, null, dbOpts));
+            })
+                .then((result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() !== 1)
+                        throw new Error("Invoice (Id = " + id + ") doesn't exist.");
+                    invoiceObj = collection.get(0);
+                    invId = invoiceObj.id();
+                    root_item = invoiceObj.getDataRoot("InvoiceItem");
+                    return root_obj.edit();
+                })
+                .then(() => {
+                    if (invoiceObj.invoiceTypeId() !== Accounting.InvoiceType.Refund)
+                        throw new Error("Invoice (Id = " + invId + ") isn't of \"Refund\" type.");
+                    if (!invoiceObj.parentId())
+                        throw new Error(`Field "ParenId" is missing.`);
+                    if (invoiceObj.stateId() !== Accounting.InvoiceState.Draft)
+                        throw new Error(`Invoice "${invoiceObj.name()}" should be in "\Draft\" state.`);
+                    let parentInvoice = null;
+                    let parent_item_collection = null;
+                    let item_collection = root_item.getCol("DataElements");
+                    return this._getObjById(invoiceObj.parentId(), null, dbOpts)
+                        .then(result => {
+                            root_parent = result;
+                            memDbOptions.dbRoots.push(root_parent); // Remember DbRoot to delete it finally in editDataWrapper
+                            let collection = root_parent.getCol("DataElements");
+                            if (collection.count() !== 1)
+                                throw new Error("Invoice (Id = " + invoiceObj.parentId() + ") doesn't exist.");
+                            parentInvoice = collection.get(0);
+                            parent_item_collection = parentInvoice.getDataRoot("InvoiceItem").getCol("DataElements");
+                            return root_parent.edit();
+                        })
+                        .then(() => {
+                            if (parentInvoice.stateId() !== Accounting.InvoiceState.Paid)
+                                throw new Error(`Invoice "${parentInvoice.name()}" should be payed.`);
+
+                            if (invoiceObj.sum() > parentInvoice.refundSum())
+                                throw new Error(`Invalid \"RefundSum\" in "${parentInvoice.name()}" or \"Sum\" in "${invoiceObj.name()}".`);
+                            parentInvoice.refundSum(parentInvoice.refundSum() - invoiceObj.sum());
+
+                            let item_list = {};
+                            let item_array = [];
+                            for (let i = 0; i < parent_item_collection.count(); i++) {
+                                let itm = parent_item_collection.get(i);
+                                let qty = itm.refundQty();
+                                if (qty > 0)
+                                    item_list[itm.id()] = itm;
+                            }
+                            for (let i = 0; i < item_collection.count(); i++) {
+                                let itm = item_collection.get(i);
+                                let obj = item_list[itm.parentId()];
+                                if (!obj)
+                                    throw new Error(`Missing item "Id=${itm.parentId()}" in "${parentInvoice.name()}".`);
+
+                                let qty = obj.refundQty()-itm.qty();
+                                if (qty >= 0)
+                                    obj.refundQty(qty)
+                                else
+                                    throw new Error(`Invalid \"RefundQty\" - item "Id=${itm.parentId()}" in "${parentInvoice.name()}".`);
+                            }
+                        })
+                })
+                .then(() => {
+                    return root_parent.save(dbOpts);
+                })
+                .then(() => {
+                    return { result: "OK", id: invId };
                 })
         }, memDbOptions);
     }

@@ -50,6 +50,8 @@ class AuthGoogle {
             app.use(config.snets.google.callBack, sessionMiddleware.express);
             app.use(config.snets.google.callBack, sessionMiddleware.passportInit);
             app.use(config.snets.google.callBack, sessionMiddleware.passportSession);
+            if (sessionMiddleware.rollSession)
+                app.use(config.snets.google.callBack, sessionMiddleware.rollSession);   
         }
 
         app.get('/api/googlelogin', passport.authenticate('google', config.snets.google.passportOptions));

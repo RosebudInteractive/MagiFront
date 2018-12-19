@@ -21,6 +21,7 @@ export const GET_SUBSCRIPTION_TYPES_ERROR = `${prefix}/GET_SUBSCRIPTION_TYPES_ER
 export const SET_SUBSCRIPTION_TYPE = `${prefix}/SET_SUBSCRIPTION_TYPE`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
+export const REDIRECT_COMPLETE = `${prefix}/REDIRECT_COMPLETE`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -30,12 +31,16 @@ export const BillingStep = {
 /**
  * Reducer
  * */
+const Redirect = Record({url: '', active: false})
+
 export const ReducerRecord = Record({
     showBillingWindow: false,
     step: BillingStep.subscription,
     types: null,
     selectedType: null,
     fetching: false,
+    processing: false,
+    redirect: new Redirect(),
     error: null
 })
 
@@ -83,6 +88,21 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('selectedType', payload)
 
+        // case SEND_PAYMENT_START:
+        //     return state
+        //         .set('processing', true)
+
+        case SEND_PAYMENT_SUCCESS:
+            return state
+                .setIn(['redirect', 'url'], payload)
+                .setIn(['redirect', 'active'], true)
+                .set('fetching', false)
+
+        case REDIRECT_COMPLETE:
+            return state
+                .setIn(['redirect', 'url'], '')
+                .setIn(['redirect', 'active'], false)
+
         default:
             return state
     }
@@ -99,6 +119,18 @@ export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
 export const typesSelector = createSelector(stateSelector, state => state.types)
 export const selectedTypeSelector = createSelector(stateSelector, state => state.selectedType)
+export const redirectSelector = createSelector(stateSelector, state => state.redirect)
+export const isRedirectActiveSelector = createSelector(redirectSelector,
+    (redirect) => {
+        if (!redirect) {
+            return false
+        } else {
+            return redirect.get('active')
+        }
+    })
+export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => {
+    return redirect ? redirect.get('url') : ''
+})
 
 /**
  * Action Creators
@@ -146,10 +178,10 @@ export const sendPayment = (values) => {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(() => {
+            .then((data) => {
                 dispatch({
                     type: SEND_PAYMENT_SUCCESS,
-                    payload: null
+                    payload: data.confirmationUrl
                 });
             })
             .catch((error) => {
@@ -194,6 +226,13 @@ export const setSubscriptionType = (item) => {
     return {
         type: SET_SUBSCRIPTION_TYPE,
         payload: item
+    }
+}
+
+export const redirectComplete = () => {
+    return {
+        type: REDIRECT_COMPLETE,
+        payload: null
     }
 }
 

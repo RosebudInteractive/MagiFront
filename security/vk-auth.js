@@ -64,6 +64,8 @@ class AuthVK {
             app.use(config.snets.vk.callBack, sessionMiddleware.express);
             app.use(config.snets.vk.callBack, sessionMiddleware.passportInit);
             app.use(config.snets.vk.callBack, sessionMiddleware.passportSession);   
+            if (sessionMiddleware.rollSession)
+                app.use(config.snets.vk.callBack, sessionMiddleware.rollSession);   
         }
 
         app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
