@@ -3,8 +3,6 @@ import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
-import {GET_AUTHOR_ERROR, GET_AUTHOR_REQUEST, GET_AUTHOR_SUCCESS, SET_NOT_FOUND} from "./author";
-
 
 /**
  * Constants
@@ -105,7 +103,7 @@ export const selectedTypeSelector = createSelector(stateSelector, state => state
 /**
  * Action Creators
  * */
-export function getSubscriptionTypes() {
+export const getSubscriptionTypes = () => {
     return (dispatch) => {
         dispatch({
             type: GET_SUBSCRIPTION_TYPES_START,
@@ -130,7 +128,7 @@ export function getSubscriptionTypes() {
     }
 }
 
-export const sendPayment= (values) => {
+export const sendPayment = (values) => {
     return (dispatch) => {
         dispatch({
             type: SEND_PAYMENT_START,
@@ -143,7 +141,8 @@ export const sendPayment= (values) => {
                 "Content-type": "application/json"
             },
             body: JSON.stringify(values),
-            credentials: 'include'
+            credentials: 'include',
+            redirect: 'manual'
         })
             .then(checkStatus)
             .then(parseJSON)

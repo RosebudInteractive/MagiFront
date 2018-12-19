@@ -70,6 +70,36 @@ export const getSeason = (date) => {
     return Seasons[_getSeasonIndex(date)]
 }
 
+
+export const parseReadyDate = (date) => {
+    let result = {
+        readyYear : '',
+        readyMonth : ''
+    }
+
+    if (date) {
+        let _now = new Date(),
+            _monthDelta = getMonthBetween(_now, date);
+
+        result.readyYear = date.getFullYear();
+
+        if (_monthDelta > 9) {
+            result.readyMonth = '';
+        } else {
+            if (getSeasonBetween(_now, date) > 1) {
+                result.readyMonth = getSeason(date);
+                if (date.getMonth() === 11) {
+                    result.readyYear++
+                }
+            } else {
+                result.readyMonth = Months[_readyDate.getMonth()];
+            }
+        }
+    }
+
+    return result
+}
+
 const Seasons = [
     'Зима',
     'Весна',
