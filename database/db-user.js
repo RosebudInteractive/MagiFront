@@ -237,6 +237,7 @@ const DbUser = class DbUser extends DbObject {
                     let res = {
                         Id: row.Id,
                         SubsAutoPay: row.SubsAutoPay ? true : false,
+                        SubsAutoPayId: row.SubsAutoPayId,
                         SubsExpDate: row.SubsExpDate,
                         SubsExpDate: row.SubsExpDate,
                         Payment: null,
