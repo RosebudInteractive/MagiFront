@@ -18524,6 +18524,7 @@ ul.lectures-tab {
         padding-bottom: 17px;
         font-size: 15px; } }
     .subscription-form__label::before {
+      cursor: pointer;
       content: "";
       position: absolute;
       right: 0;
@@ -18538,6 +18539,7 @@ ul.lectures-tab {
         .subscription-form__label::before {
           top: -3px; } }
     .subscription-form__label::after {
+      cursor: pointer;
       content: "";
       position: absolute;
       top: 4px;

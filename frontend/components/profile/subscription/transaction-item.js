@@ -26,11 +26,15 @@ export default class Item extends React.Component {
         let {item} = this.props;
 
         return (
-            <li className="subscription-history__item">
-                <p className="subscription-history__transaction">{this._getName()}<span
-                    className="subscription-history__date">{this._getDate()}</span></p>
-                <p className="subscription-history__total">{item.Sum + '₽'}</p>
-            </li>
+            item
+                ?
+                <li className="subscription-history__item">
+                    <p className="subscription-history__transaction">{this._getName()}<span
+                        className="subscription-history__date">{this._getDate()}</span></p>
+                    <p className="subscription-history__total">{item.Sum + '₽'}</p>
+                </li>
+                :
+                null
         )
     }
 }

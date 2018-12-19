@@ -1,7 +1,12 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {transactionsSelector, loadingSelector, getTransactionHistory} from '../../../ducks/profile'
+import {
+    transactionsSelector,
+    loadingSelector,
+    getTransactionHistory,
+    getSubscriptionInfo,
+} from '../../../ducks/profile'
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../../actions/lesson-info-storage-actions";
 import Item from "./transaction-item";
@@ -25,6 +30,7 @@ class SubscriptionBlock extends React.Component {
     componentWillMount() {
         this.props.storageActions.refreshState();
         this.props.getTransactionHistory();
+        this.props.getSubscriptionInfo()
     }
 
     componentDidMount() {
@@ -40,7 +46,7 @@ class SubscriptionBlock extends React.Component {
         let {transactions, loading} = this.props,
             _result = [];
 
-        if (loading) {
+        if (loading || transactions.size === 0) {
             return null
         }
 
@@ -103,6 +109,7 @@ function mapDispatchToProps(dispatch) {
     return {
         storageActions: bindActionCreators(storageActions, dispatch),
         getTransactionHistory: bindActionCreators(getTransactionHistory, dispatch),
+        getSubscriptionInfo: bindActionCreators(getSubscriptionInfo, dispatch),
     }
 }
 

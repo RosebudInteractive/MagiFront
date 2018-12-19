@@ -10,12 +10,15 @@ export const getTimeFmt = (time) => {
 };
 
 export const getDaysBetween = (date1, date2) => {
+    let _date1 = isDate(date1) ? date1 : new Date(date1),
+        _date2 = isDate(date2) ? date2 : new Date(date2);
+
     //Get 1 day in milliseconds
     let one_day=1000*60*60*24;
 
     // Convert both dates to milliseconds
-    let date1_ms = date1.getTime();
-    let date2_ms = date2.getTime();
+    let date1_ms = _date1.getTime();
+    let date2_ms = _date2.getTime();
 
     // Calculate the difference in milliseconds
     let difference_ms = date2_ms - date1_ms;
@@ -95,6 +98,36 @@ const _getSeasonIndex = (date) => {
 
 export const getSeason = (date) => {
     return Seasons[_getSeasonIndex(date)]
+}
+
+
+export const parseReadyDate = (date) => {
+    let result = {
+        readyYear : '',
+        readyMonth : ''
+    }
+
+    if (date) {
+        let _now = new Date(),
+            _monthDelta = getMonthBetween(_now, date);
+
+        result.readyYear = date.getFullYear();
+
+        if (_monthDelta > 9) {
+            result.readyMonth = '';
+        } else {
+            if (getSeasonBetween(_now, date) > 1) {
+                result.readyMonth = getSeason(date);
+                if (date.getMonth() === 11) {
+                    result.readyYear++
+                }
+            } else {
+                result.readyMonth = Months[_readyDate.getMonth()];
+            }
+        }
+    }
+
+    return result
 }
 
 const Months = [

@@ -4,7 +4,6 @@ import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 
-
 /**
  * Constants
  * */
@@ -136,7 +135,7 @@ export const isRedirectUrlSelector = createSelector(redirectSelector, redirect =
 /**
  * Action Creators
  * */
-export function getSubscriptionTypes() {
+export const getSubscriptionTypes = () => {
     return (dispatch) => {
         dispatch({
             type: GET_SUBSCRIPTION_TYPES_START,
@@ -174,7 +173,8 @@ export const sendPayment = (values) => {
                 "Content-type": "application/json"
             },
             body: JSON.stringify(values),
-            credentials: 'include'
+            credentials: 'include',
+            redirect: 'manual'
         })
             .then(checkStatus)
             .then(parseJSON)

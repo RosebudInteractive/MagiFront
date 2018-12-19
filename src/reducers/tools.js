@@ -47,7 +47,11 @@ export const removeObject = (array, objectId) => {
     let _modified = false;
 
     let _index = array.findIndex((item) => {
-        return item.id === objectId
+        if (typeof item === "number")  {
+            return item === objectId
+        } else {
+            return item.id === objectId
+        }
     });
     if (_index > -1) {
         _modified = true;
@@ -76,7 +80,9 @@ export const removeObject = (array, objectId) => {
 
 export const setObjectsRank = (array) => {
     array.forEach((item, index) => {
-        item.Number = index + 1
+        if (typeof item === "object") {
+            item.Number = index + 1
+        }
     })
 };
 
