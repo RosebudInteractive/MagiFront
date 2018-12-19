@@ -9,8 +9,9 @@ import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
 import * as userActions from "../actions/user-actions";
 
-import HistoryBlock from '../components/profile/history-block'
-import ProfileBlock from '../components/profile/profile-block'
+import SubscriptionBlock from '../components/profile/subscription/subscription-block'
+import HistoryBlock from '../components/profile/history/history-block'
+import ProfileBlock from '../components/profile/settings/profile-block'
 
 import {pages} from '../tools/page-tools';
 
@@ -22,8 +23,9 @@ class ProfilePage extends React.Component {
         this._redirect = false
 
         this.state = {
+            showSubscription: false,
             showHistory: false,
-            showProfile: false
+            showProfile: false,
         };
     }
 
@@ -46,14 +48,30 @@ class ProfilePage extends React.Component {
             this.forceUpdate();
         }
 
-        this.setState({
-            showHistory: nextProps.page === '/history',
-            showProfile: nextProps.page === '/profile'
-        })
+        let _showSubscription = nextProps.page === '/subscription',
+            _showHistory = nextProps.page === '/history',
+            _showProfile = nextProps.page === '/profile',
+            _needUpdateState = (this.state.showSubscription !== _showSubscription) ||
+                (this.state.showHistory !== _showHistory) ||
+                (this.state.showProfile !== _showProfile)
+
+        if (_needUpdateState) {
+            this.setState({
+                showSubscription: nextProps.page === '/subscription',
+                showHistory: nextProps.page === '/history',
+                showProfile: nextProps.page === '/profile'
+            })
+        }
+
+
     }
 
     componentDidUpdate() {
         document.title = 'Магистерия: Личный кабинет';
+    }
+
+    _openSubscription() {
+        this.props.history.replace('/subscription')
     }
 
     _openHistory() {
@@ -65,7 +83,7 @@ class ProfilePage extends React.Component {
     }
 
     render() {
-        let {profile, loading} = this.props;
+        let {profile} = this.props;
 
         if (this._redirect) {
             this._redirect = false;
@@ -75,37 +93,41 @@ class ProfilePage extends React.Component {
         return (
             <div>
                 {
-                    loading ?
-                        <p>Загрузка...</p>
-                        :
-                        profile ?
-                            <div className="profile-page" style={{paddingTop: 95}}>
-                                <div className="profile-block js-tabs">
-                                    <header className="profile-block__header">
-                                        <div className="profile-block__header-col">
-                                            <div className="profile-block__name">{profile.DisplayName}</div>
-                                        </div>
-                                        <div className="profile-block__header-col">
-                                            <div className="profile-block__tab-controls">
-                                                <ul>
-                                                    <li className={"profile-block__tab-control" + (this.state.showHistory ? " active" : "")}
-                                                        onClick={::this._openHistory}>
-                                                        <span className="text">История</span>
-                                                    </li>
-                                                    <li className={"profile-block__tab-control" + (this.state.showProfile ? " active" : "")}
-                                                        onClick={::this._openProfile}>
-                                                        <span className="text">Настройки</span>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </header>
-                                    <div className="profile-block__body">
-                                        <HistoryBlock active={this.state.showHistory}/>
-                                        <ProfileBlock active={this.state.showProfile}/>
+                    profile ?
+                        <div className="profile-page" style={{paddingTop: 95}}>
+                            <div className="profile-block js-tabs">
+                                <header className="profile-block__header">
+                                    <div className="profile-block__header-col">
+                                        <div className="profile-block__name">{profile.DisplayName}</div>
                                     </div>
+                                    <div className="profile-block__header-col">
+                                        <div className="profile-block__tab-controls">
+                                            <ul>
+                                                <li className={"profile-block__tab-control" + (this.state.showSubscription ? " active" : "")}
+                                                    onClick={::this._openSubscription}>
+                                                    <span className="text">Подписка</span>
+                                                </li>
+                                                <li className={"profile-block__tab-control" + (this.state.showHistory ? " active" : "")}
+                                                    onClick={::this._openHistory}>
+                                                    <span className="text">История</span>
+                                                </li>
+                                                <li className={"profile-block__tab-control" + (this.state.showProfile ? " active" : "")}
+                                                    onClick={::this._openProfile}>
+                                                    <span className="text">Настройки</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </header>
+                                <div className="profile-block__body">
+                                    <SubscriptionBlock active={this.state.showSubscription}/>
+                                    <HistoryBlock active={this.state.showHistory}/>
+                                    <ProfileBlock active={this.state.showProfile}/>
                                 </div>
-                            </div> : null
+                            </div>
+                        </div>
+                        :
+                        null
                 }
             </div>
         )

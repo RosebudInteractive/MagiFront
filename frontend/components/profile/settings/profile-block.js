@@ -1,11 +1,10 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {userSelector, errorSelector, changePassword, clearError} from '../../ducks/profile'
+import {userSelector, errorSelector, changePassword, clearError} from '../../../ducks/profile'
 import ProfileSubForm from './profile-subform'
 import ProfilePasswordSubForm from './profile-password-subform'
 import {bindActionCreators} from "redux";
-
 
 class ProfileBlock extends React.Component {
 
