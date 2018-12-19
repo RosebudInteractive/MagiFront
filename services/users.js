@@ -1,7 +1,22 @@
 const { HttpCode } = require("../const/http-codes");
 const { UsersService } = require('../database/db-user');
+const { InvoiceService } = require('../database/db-invoice');
 
 function setupUsers(app) {
+
+    app.get('/api/users/invoice', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            InvoiceService()
+                .get(null, { filter: { user_id: req.user.Id, state_id: 3 } })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
 
     app.get('/api/users/bookmark', (req, res, next) => {
         if (!req.user)
