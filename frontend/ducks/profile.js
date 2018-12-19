@@ -2,7 +2,7 @@
 // import {eventChannel} from 'redux-saga'
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Record, Set, List} from 'immutable'
+import {Record, Set, List,} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, mockFetch, parseJSON} from "../tools/fetch-tools";
 import {
@@ -69,6 +69,14 @@ export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 /**
  * Reducer
  * */
+const SubscriptionInfo = Record({
+    Id: null,
+    Payment: null,
+    SubsAutoPay: false,
+    SubsExpDate: null,
+    Error: null,
+})
+
 export const ReducerRecord = Record({
     user: null,
     history: [],
@@ -76,7 +84,7 @@ export const ReducerRecord = Record({
     bookmarks: new Set(),
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
-    subsInfo: null,
+    subsInfo: new SubscriptionInfo(),
     loading: false,
     loadingSubsInfo: false,
     loadingBookmarks: false,
@@ -185,6 +193,21 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .update('transactions', transactions => transactions.concat(payload))
 
+        case GET_SUBS_INFO_START:
+            return state
+                .set('loadingSubsInfo', true)
+                .update('subsInfo', subsInfo => subsInfo.clear())
+
+        case GET_SUBS_INFO_SUCCESS:
+            return state
+                .update('subsInfo', subsInfo => subsInfo.merge(payload))
+                .set('loadingSubsInfo', false)
+
+        case GET_SUBS_INFO_ERROR:
+            return state
+                .set('loadingSubsInfo', false)
+                .set('error', payload.error.message)
+
         default:
             return state
     }
@@ -205,9 +228,11 @@ export const getLessonBookmarks = createSelector(stateSelector, state => state.l
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadingBookmarksSelector = createSelector(stateSelector, state => state.loadingBookmarks)
-export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
+export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingSubsInfo)
+export const loadingSubsInfoSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
 
 export const transactionsSelector = createSelector(stateSelector, state => state.transactions)
+export const subscriptionInfoSelector = createSelector(stateSelector, state => state.subsInfo)
 
 /**
  * Action Creators
@@ -325,7 +350,7 @@ export function getTransactionHistory() {
         });
 
         // fetch("/api/users/bookmark-ext", {credentials: 'include'})
-        mockFetch(mockData)
+        mockFetch(mockTransactions)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -352,7 +377,8 @@ export const getSubscriptionInfo = () => {
             payload: null
         });
 
-        fetch("/api/users/subs-info", {credentials: 'include'})
+        // fetch("/api/users/subs-info", {credentials: 'include'})
+        mockFetch(mockSubsInfo)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -705,7 +731,7 @@ const Months = [
     'Декабрь',
 ];
 
-let mockData = {
+let mockTransactions = {
     "data": [
         {
             "Id": 20,
@@ -786,4 +812,11 @@ let mockData = {
             ]
         }
     ]
+}
+
+let mockSubsInfo = {
+    Id: 7973,
+    Payment: {},
+    SubsAutoPay: true,
+    SubsExpDate: "2019-12-17T18:45:23.455Z",
 }
