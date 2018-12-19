@@ -531,8 +531,7 @@ export const switchAutoPay = (values) => {
             payload: null
         });
 
-        values.alter = true;
-        let _newValue = values.SubsAutoPay
+        let _newValue = values.alter.SubsAutoPay
 
         fetch("api/users", {
             method: 'PUT',

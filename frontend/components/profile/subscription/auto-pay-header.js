@@ -9,7 +9,9 @@ class AutoPayHeader extends React.Component {
 
     _switchAutoPay(event) {
         const data = new FormData(event.target);
-        data.SubsAutoPay = !this.props.info.get('SubsAutoPay')
+        data.alter = {
+            SubsAutoPay : !this.props.info.get('SubsAutoPay')
+        }
         this.props.switchAutoPay(data)
     }
 
