@@ -42,7 +42,7 @@ const GET_INVOICE_MSSQL =
     "from[Invoice] i\n" +
     "  join[Currency] c on c.[Id] = i.[CurrencyId]\n" +
     "  left join[InvoiceItem] it on it.[InvoiceId] = i.[Id]<%= filter %>\n" +
-    "order by i.[InvoiceDate], i.[Id]";
+    "order by i.[InvoiceDate] desc, i.[Id]";
 
 const GET_INVOICE_FILTER_MSSQL = {
     id: { field: "id", cond: "i.[Id] = <%= id %>" },
@@ -57,7 +57,7 @@ const GET_INVOICE_MYSQL =
     "from`Invoice` i\n" +
     "  join`Currency` c on c.`Id` = i.`CurrencyId`\n" +
     "  left join`InvoiceItem` it on it.`InvoiceId` = i.`Id`<%= filter %>\n" +
-    "order by i.`InvoiceDate`, i.`Id`";
+    "order by i.`InvoiceDate` desc, i.`Id`";
 
 const GET_INVOICE_FILTER_MYSQL = {
     id: { field: "id", cond: "i.`Id` = <%= id %>" },

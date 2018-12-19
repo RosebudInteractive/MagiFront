@@ -189,13 +189,15 @@ const GET_CATEGORIES_BY_COURSE_IDS_MYSQL =
     "where cc.`CourseId` in (<%= courseIds %>)";
 
 const GET_SUBS_INFO_MSSQL =
-    "select u.[SysParentId] as [Id], u.[SubsAutoPayId], u.[SubsExpDate], u.[SubsAutoPay], c.[ChequeData] from [User] u\n" +
+    "select u.[SysParentId] as [Id], u.[SubsAutoPayId], u.[SubsExpDate], u.[SubsAutoPay], c.[ChequeData], a.[Error] from [User] u\n" +
     "  left join[Cheque] c on c.[Id] = u.[SubsAutoPayId]\n" +
+    "  left join[AutoSubscription] a on a.[UserId] = u.[SysParentId] and a.[SubsExpDate] = u.[SubsExpDate]\n" +
     "where u.[SysParentId] = <%= id %>";
 
 const GET_SUBS_INFO_MYSQL =
-    "select u.`SysParentId` as `Id`, u.`SubsAutoPayId`, u.`SubsExpDate`, u.`SubsAutoPay`, c.`ChequeData` from `User` u\n" +
+    "select u.`SysParentId` as `Id`, u.`SubsAutoPayId`, u.`SubsExpDate`, u.`SubsAutoPay`, c.`ChequeData`, a.`Error` from `User` u\n" +
     "  left join`Cheque` c on c.`Id` = u.`SubsAutoPayId`\n" +
+    "  left join`AutoSubscription` a on a.`UserId` = u.`SysParentId` and a.`SubsExpDate` = u.`SubsExpDate`\n" +
     "where u.`SysParentId` = <%= id %>";
 
 const MAX_LESSONS_REQ_NUM = 15;
@@ -237,12 +239,21 @@ const DbUser = class DbUser extends DbObject {
                         SubsAutoPay: row.SubsAutoPay ? true : false,
                         SubsExpDate: row.SubsExpDate,
                         SubsExpDate: row.SubsExpDate,
-                        Payment: null
+                        Payment: null,
+                        Error: null
                     };
                     if (row.ChequeData) {
                         let payment = JSON.parse(row.ChequeData);
                         if (payment.payment_method)
                             res.Payment = payment.payment_method;
+                    }
+                    if (row.Error) {
+                        let err = row.Error;
+                        try {
+                            err = JSON.parse(err);
+                        }
+                        catch (e) { }
+                        res.Error = err;
                     }
                     return res;
                 }
