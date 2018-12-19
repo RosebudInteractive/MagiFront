@@ -46,7 +46,7 @@ class SubscriptionBlock extends React.Component {
         let {transactions, loading} = this.props,
             _result = [];
 
-        if (loading) {
+        if (loading || transactions.size === 0) {
             return null
         }
 

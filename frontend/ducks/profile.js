@@ -208,6 +208,10 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loadingSubsInfo', false)
                 .set('error', payload.error.message)
 
+        case SWITCH_AUTOPAY_SUCCESS:
+            return state
+                .setIn(['subsInfo', 'SubsAutoPay'], payload)
+
         default:
             return state
     }
@@ -349,8 +353,8 @@ export function getTransactionHistory() {
             payload: null
         });
 
-        // fetch("/api/users/bookmark-ext", {credentials: 'include'})
-        mockFetch(mockTransactions)
+        fetch("/api/users/invoice", {credentials: 'include'})
+        // mockFetch(mockTransactions)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -377,8 +381,8 @@ export const getSubscriptionInfo = () => {
             payload: null
         });
 
-        // fetch("/api/users/subs-info", {credentials: 'include'})
-        mockFetch(mockSubsInfo)
+        fetch("/api/users/subs-info", {credentials: 'include'})
+        // mockFetch(mockSubsInfo)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -520,6 +524,49 @@ export function removeLessonFromBookmarks(courseUrl, lessonUrl) {
     }
 }
 
+export const switchAutoPay = (values) => {
+    return (dispatch) => {
+        dispatch({
+            type: SWITCH_AUTOPAY_START,
+            payload: null
+        });
+
+        values.alter = true;
+        let _newValue = values.SubsAutoPay
+
+        fetch("api/users", {
+            method: 'PUT',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(values),
+            credentials: 'include'
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(() => {
+                dispatch({
+                    type: SWITCH_AUTOPAY_SUCCESS,
+                    payload: _newValue
+                });
+
+            })
+            .catch((error) => {
+                dispatch({
+                    type: SWITCH_AUTOPAY_ERROR,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+export const clearError = () => {
+    return {
+        type: CLEAR_ERROR,
+        payload: null
+    };
+}
+
 export const changePassword = (values) => {
     return (dispatch) => {
         dispatch({
@@ -555,20 +602,6 @@ export const changePassword = (values) => {
                 });
             });
     }
-}
-
-export const clearError = () => {
-    return {
-        type: CLEAR_ERROR,
-        payload: null
-    };
-}
-
-export const switchAutoPay = () => {
-    return {
-        type: CLEAR_ERROR,
-        payload: null
-    };
 }
 
 const handleData = (data) => {
@@ -816,7 +849,20 @@ let mockTransactions = {
 
 let mockSubsInfo = {
     Id: 7973,
-    Payment: {},
-    SubsAutoPay: true,
+    Payment: {
+        type: "bank_card",
+        id: "23ac20e6-000f-5000-a000-1c7308d8d202",
+        saved: true,
+        card: {
+            first6: "555555",
+            last4: "4444",
+            expiry_month: "12",
+            expiry_year: "2025",
+            card_type: "MasterCard"
+        },
+        title: "Bank card *4444"
+    },
+    Error: {message: 'error'},
+    SubsAutoPay: false,
     SubsExpDate: "2019-12-17T18:45:23.455Z",
 }
