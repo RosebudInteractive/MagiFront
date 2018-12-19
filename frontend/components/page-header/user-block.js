@@ -83,6 +83,9 @@ class UserBlock extends React.Component {
                     this.props.showUserBlock ?
                         <ul className="user-tooltip">
                             <li>
+                                <Link to={'/subscription'} onClick={::this._onProfileClick}>Подписка</Link>
+                            </li>
+                            <li>
                                 <Link to={'/profile'} onClick={::this._onProfileClick}>Настройки</Link>
                             </li>
                             <li>

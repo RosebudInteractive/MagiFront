@@ -33,7 +33,7 @@ export const getMonthBetween = (date1, date2) => {
     return Math.abs((_year2 - _year1) * 12 + (_month2 - _month1));
 }
 
-export  const getSeasonBetween = (date1, date2) => {
+export const getSeasonBetween = (date1, date2) => {
     let _month1 = date1.getMonth(),
         _month2 = date2.getMonth(),
         _year1 = (_month1 === 11) ? (date1.getFullYear() + 1) : date1.getFullYear(),
@@ -42,6 +42,33 @@ export  const getSeasonBetween = (date1, date2) => {
         _season2 = _getSeasonIndex(date2);
 
     return Math.abs((_year2 - _year1) * 4 + (_season2 - _season1));
+}
+
+export const getHistoryFormatDate = (date) => {
+    let _date = isDate(date) ? date : new Date(date),
+
+        _year = _date.getFullYear(),
+        _month = _date.getMonth(),
+        _day = _date.getDate(),
+        _hours = _date.getHours(),
+        _minutes = _date.getMinutes();
+
+    let _today = new Date(),
+        _todayYear = _today.getFullYear(),
+        _todayMonth = _today.getMonth(),
+        _todayDay = _today.getDate();
+
+    let _isLastVisitToday = (_year === _todayYear) && (_month === _todayMonth) && (_day === _todayDay);
+
+    return {
+        date: _date,
+        day: _isLastVisitToday ? "Сегодня" : _day + ' ' + Months[_month] + ' ' + _year,
+        time: _hours + ':' + _minutes
+    }
+}
+
+const isDate = (value) => {
+    return value instanceof Date && !isNaN(value.valueOf())
 }
 
 const _getSeasonIndex = (date) => {
@@ -69,6 +96,21 @@ const _getSeasonIndex = (date) => {
 export const getSeason = (date) => {
     return Seasons[_getSeasonIndex(date)]
 }
+
+const Months = [
+    'Январь',
+    'Февраль',
+    'Март',
+    'Апрель',
+    'Май',
+    'Июнь',
+    'Июль',
+    'Август',
+    'Сентябрь',
+    'Октябрь',
+    'Ноябрь',
+    'Декабрь',
+];
 
 const Seasons = [
     'Зима',
