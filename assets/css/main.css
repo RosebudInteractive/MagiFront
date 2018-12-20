@@ -5045,7 +5045,7 @@ ul.user-tooltip {
       min-height: 685px; } }
   @media (max-width: 899px) {
     .course-module {
-      border-bottom: none;
+      /*border-bottom: none;*/
       /*min-height: 700px;*/
       min-height: 685px; } }
   @media (max-width: 639px) {
@@ -9043,7 +9043,7 @@ body[data-page="fullpage-player"] .lectures-menu {
         font-size: 20px;
         line-height: 26px; } }
   .text-block h3 {
-    margin: 0 0 15px 0;
+    margin: 0 0 30px 0;
     font-family: "Fira Sans", Arial, sans-serif;
     font-weight: 400;
     font-size: 30px;
