@@ -535,9 +535,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
                     user = collection.get(0);
                     let rc = Promise.resolve();
+                    let editableFields = user_data.allowedToEdit ? user_data.allowedToEdit : ALLOWED_TO_EDIT;
                     if (user_data.alter) {
                         for (let key in user_data.alter){
-                            if (ALLOWED_TO_EDIT[key]) {
+                            if (editableFields[key]) {
                                 user[this._genGetterName(key)](user_data.alter[key]);
                             }
                         };
