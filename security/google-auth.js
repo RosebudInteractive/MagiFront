@@ -6,17 +6,19 @@ const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { StdLoginProcessor, DestroySession } = require('./local-auth');
 
+const GOOGLE_USER_INFO = "https://www.googleapis.com/oauth2/v3/userinfo"; // https://developers.google.com/identity/protocols/OpenIDConnect
 class AuthGoogle {
 
     constructor(app, sessionMiddleware) {
         const GoogleStrategy = passportGoogle.Strategy;
         const GoogleOptions =
-            {
-                clientID: config.snets.google.appId,
-                clientSecret: config.snets.google.appSecret,
-                callbackURL: config.proxyServer.siteHost + config.snets.google.callBack,
-                passReqToCallback: true
-            };
+        {
+            clientID: config.snets.google.appId,
+            clientSecret: config.snets.google.appSecret,
+            callbackURL: config.proxyServer.siteHost + config.snets.google.callBack,
+            passReqToCallback: true,
+            userProfileURL: GOOGLE_USER_INFO
+        };
 
         this._usersCache = UsersCache();
 
