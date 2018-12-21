@@ -42,7 +42,7 @@ import NotFound from './components/not-found'
 import SizeInfo from './components/size-info'
 
 import Platform from 'platform';
-import BillingWrapper from "./components/messages/billing-wrapper";
+import BillingWrapper from "./components/messages/billing/billing-wrapper";
 
 Polifyll.registry();
 

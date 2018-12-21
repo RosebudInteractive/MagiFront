@@ -11,7 +11,7 @@ import {
     hideBillingWindow,
     redirectComplete,
     isRedirectUrlSelector
-} from "../../ducks/billing";
+} from "../../../ducks/billing";
 
 import Subscription from './billing-subscription'
 import Payment from './billing-payments'

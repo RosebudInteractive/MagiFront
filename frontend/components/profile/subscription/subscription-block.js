@@ -87,8 +87,11 @@ class SubscriptionBlock extends React.Component {
                     <div className="subscription-info__wrapper">
                         <AutoPayHeader/>
                         <StatusHeader/>
-                        {this._getList()}
-                        {this._getButton()}
+                        <div class="subscription-history">
+                            <h2>История платежей</h2>
+                            {this._getList()}
+                            {this._getButton()}
+                        </div>
                     </div>
 
 

@@ -72,6 +72,7 @@ export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 const SubscriptionInfo = Record({
     Id: null,
     Payment: null,
+    SubsAutoPayId: null,
     SubsAutoPay: false,
     SubsExpDate: null,
     Error: null,
