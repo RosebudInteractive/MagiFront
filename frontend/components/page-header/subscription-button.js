@@ -17,7 +17,7 @@ class SubscriptionButton extends React.Component {
 
         return enabledBilling &&
             (!authorized || (
-                    !user.SubsExpDateExt || (getDaysBetween(new Date(), user.SubsExpDateExt) > 7)
+                    !user.SubsExpDateExt || (getDaysBetween(new Date(), user.SubsExpDateExt) < 7)
                 )
             )
     }
