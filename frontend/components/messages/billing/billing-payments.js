@@ -21,7 +21,7 @@ class PaymentForm extends React.Component {
             selectedMethod: null,
             showStoredMethod: false,
             showSaveMethodButton: false,
-            savePayment: false,
+            savePayment: true,
         };
     }
 
