@@ -7,7 +7,7 @@ import {
     loadingSelector,
     errorSelector,
     typesSelector,
-} from "../../ducks/billing";
+} from "../../../ducks/billing";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 

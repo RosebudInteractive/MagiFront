@@ -66,7 +66,7 @@ export const getHistoryFormatDate = (date) => {
     return {
         date: _date,
         day: _isLastVisitToday ? "Сегодня" : _day + ' ' + Months[_month] + ' ' + _year,
-        time: _hours + ':' + _minutes
+        time: _hours + ':' + _minutes.toString().padStart(2, '0')
     }
 }
 

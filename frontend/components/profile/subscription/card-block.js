@@ -7,6 +7,7 @@ class CardBlock extends React.Component {
 
     static propTypes = {
         showError: PropTypes.bool,
+        parent: PropTypes.string,
     };
 
     _visible() {
@@ -81,7 +82,7 @@ class CardBlock extends React.Component {
     render() {
         return (this._visible()
             ?
-            <div className={"subscription-form__card-block card-block" + (this.props.showError ? " _error" : "")}>
+            <div className={this.props.parent + " card-block" + (this.props.showError ? " _error" : "")}>
                 {this._getCardHeader()}
                 {
                     this.props.showError && (this.props.info.get('Error') !== null)

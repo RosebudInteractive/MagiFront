@@ -23,7 +23,7 @@ class StatusHeader extends React.Component {
                 <div className="subscription-info__header">
                     <p className="subscription-info__period">Подписка неактивна</p>
                     <form action="#" method="post" className="subscription-form">
-                        <CardBlock showError={true}/>
+                        <CardBlock parent="subscription-form__card-block" showError={true}/>
                         <div className="subscription-form__actions _inactive">
                             <div className="btn btn--brown subscription-form__btn"
                                  onClick={::this.props.showBillingWindow}>Оплатить подписку
