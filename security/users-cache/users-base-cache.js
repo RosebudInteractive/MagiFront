@@ -42,7 +42,7 @@ const CONV_USER_DATA_FN = (rawUser) => {
 const ALLOWED_TO_EDIT = {
     "Name": true,
     "DisplayName": true,
-    // "SubsExpDate": true,
+    "SubsExpDate": true,
     "SubsAutoPay": true,
     "SubsAutoPayId": true,
     "SubsProductId": true
