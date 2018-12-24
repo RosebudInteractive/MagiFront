@@ -92,11 +92,19 @@ export default function reducer(state = new ReducerRecord(), action) {
         //     return state
         //         .set('processing', true)
 
-        case SEND_PAYMENT_SUCCESS:
-            return state
-                .setIn(['redirect', 'url'], payload)
-                .setIn(['redirect', 'active'], true)
+        case SEND_PAYMENT_SUCCESS: {
+            let _state = state
                 .set('fetching', false)
+                .set('showBillingWindow', false);
+
+            if (payload) {
+                _state = _state
+                    .setIn(['redirect', 'url'], payload)
+                    .setIn(['redirect', 'active'], true)
+            }
+
+            return _state
+        }
 
         case REDIRECT_COMPLETE:
             return state
@@ -120,17 +128,8 @@ export const loadingSelector = createSelector(stateSelector, state => state.fetc
 export const typesSelector = createSelector(stateSelector, state => state.types)
 export const selectedTypeSelector = createSelector(stateSelector, state => state.selectedType)
 export const redirectSelector = createSelector(stateSelector, state => state.redirect)
-export const isRedirectActiveSelector = createSelector(redirectSelector,
-    (redirect) => {
-        if (!redirect) {
-            return false
-        } else {
-            return redirect.get('active')
-        }
-    })
-export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => {
-    return redirect ? redirect.get('url') : ''
-})
+export const isRedirectActiveSelector = createSelector(redirectSelector, redirect => redirect.get('active'))
+export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
 
 /**
  * Action Creators

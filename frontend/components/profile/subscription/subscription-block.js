@@ -89,7 +89,9 @@ class SubscriptionBlock extends React.Component {
                         <StatusHeader/>
                         <div className="subscription-history">
                             <h2>История платежей</h2>
-                            {this._getList()}
+                            <ul>
+                                {this._getList()}
+                            </ul>
                             {this._getButton()}
                         </div>
                     </div>
