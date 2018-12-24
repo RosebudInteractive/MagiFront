@@ -16222,10 +16222,10 @@ ul.lectures-tab {
     opacity: 0;
     -webkit-transition: opacity 0.3s ease;
     transition: opacity 0.3s ease; }
-    /*@media (max-width: 599px) {*/
-      /*._player .gallery-controls {*/
-        /*right: 10px;*/
-        /*left: auto; } }*/
+    @media (max-width: 599px) {
+      ._player .gallery-controls {
+        right: 10px;
+        left: auto; } }
   .gallery-controls.visible {
     opacity: 1; }
   .gallery-controls .swiper-button-prev svg {
@@ -18842,6 +18842,9 @@ ul.lectures-tab {
       display: block;
       width: 100%;
       height: auto; }
+    .card-block__type img {
+      display: block;
+      margin: 0 0 2px auto; }
   .card-block._error {
     border-color: #E02F37; }
     .card-block._error .card-block__error {
