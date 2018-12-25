@@ -1,43 +1,14 @@
 const path = require('path');
 
-let proxyServer = {
-    protocol: 'http',
-    address: '0.0.0.0',
-    port: 3000
-};
-
-if (process.env.EMBA_TEST_HOST === "dragonegg") {
-    proxyServer = {
-        protocol: 'https',
-        address: '172.16.0.12',
-        port: null
-    }
-}
-
 let options = {
     root: process.cwd(),
-    uploadPath: path.join(process.cwd(), path.sep, '../../uploads', path.sep),
-    dataUrl: '/data',
-    proxyServer: proxyServer,
-    server: {
-        protocol: 'http',
-        address: '0.0.0.0',
-        port: 3000,
-        prerender: {
-            usePrerender: false,
-            useRedis: true,
-            redisPrefix: "pg:",
-            expInSec: 14 * 24 * 60 * 60,
-            url: 'http://127.0.0.1:8000'
-        }
-    },
     dbProvider: 'mssql',
     trace: {
         sqlTrace: false,
         importFileTrace: false
     },
     upgrader: {
-        upgraderFile: "./test-builds/db-upgrade.json"
+        // upgraderFile: "./release-builds/db-upgrade.json"
     },
     connections: {
         redis: {

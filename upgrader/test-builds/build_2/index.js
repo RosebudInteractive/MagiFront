@@ -1,6 +1,6 @@
 'use strict';
 
-exports.upgradeDb = (schema) => {
+exports.upgradeDb = async (schema) => {
     schema.getModel("Parameters")
         .addField("StrNew", { type: "string", allowNull: true });
 
