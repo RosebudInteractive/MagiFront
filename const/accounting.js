@@ -6,6 +6,11 @@ exports.Accounting = {
     DfltCurrencyId: 1,
     DfltCurrencyCode: "RUB",
     SubsProdType: 1,
+    ProductReqParams: {
+        TypeCode: "SUBS",
+        Detail: "true",
+        Discontinued: "0"
+    },
     InvoiceType: {
         Purchase: 1,
         Refund: 2

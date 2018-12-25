@@ -172,10 +172,12 @@ function setupAPI(express, app) {
     //
     // Common API options
     //
+    const { Accounting: { ProductReqParams } } = require("../const/accounting");
+
     app.get('/api/options', function (req, res, next) {
         Promise.resolve()
             .then(() => {
-                let options = { appId: {}, siteKey: {}, scriptPath: {}, billing: {} };
+                let options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams } };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
@@ -186,6 +188,8 @@ function setupAPI(express, app) {
                     options.scriptPath.sendPulse = config.mail.sendPulse.scriptPath;
                 if (config.has('billing.billing_test') && (config.billing.billing_test === true))
                     options.billing.billing_test = true;
+                if (config.has('billing.productReqParams'))
+                    options.billing.productReqParams = config.billing.productReqParams;
                 res.send(options);
             })
             .catch(err => {

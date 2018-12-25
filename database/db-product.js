@@ -17,7 +17,7 @@ const PRODUCT_REQ_TREE = {
 const GET_PROD_MSSQL =
     "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields], p.[ProductTypeId]\n" +
     "from[Product] p\n" +
-    "where p.[<%= field %>] <%= cond %>";
+    "where (<%= alias %>.[<%= field %>] <%= cond %>)<%= discontinued %>";
 
 const GET_PROD_DETAIL_MSSQL =
     "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
@@ -31,10 +31,10 @@ const GET_PROD_DETAIL_MSSQL =
     "  join[Currency] c on c.[Id] = pl.[CurrencyId]\n" +
     "  join[VATType] vt on vt.[Id] = p.[VATTypeId]\n" +
     "  join[VATRate] vr on vr.[VATTypeId] = vt.[Id]\n" +
-    "where(p.[<%= field %>] <%= cond %>) and(pl.[Code] = '<%= priceList %>') and(pr.FirstDate <= convert(datetime, '<%= dt %>')\n" +
+    "where(<%= alias %>.[<%= field %>] <%= cond %>) and(pl.[Code] = '<%= priceList %>') and(pr.FirstDate <= convert(datetime, '<%= dt %>')\n" +
     "  and((pr.LastDate > convert(datetime, '<%= dt %>')) or(pr.LastDate is NULL)))\n" +
     "  and(vr.FirstDate <= convert(datetime, '<%= dt %>')\n" +
-    "  and((vr.LastDate > convert(datetime, '<%= dt %>')) or(vr.LastDate is NULL)))";
+    "  and((vr.LastDate > convert(datetime, '<%= dt %>')) or(vr.LastDate is NULL)))<%= discontinued %>";
 
 const GET_PROD_DETAIL_MYSQL =
     "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
@@ -48,15 +48,15 @@ const GET_PROD_DETAIL_MYSQL =
     "  join`Currency` c on c.`Id` = pl.`CurrencyId`\n" +
     "  join`VATType` vt on vt.`Id` = p.`VATTypeId`\n" +
     "  join`VATRate` vr on vr.`VATTypeId` = vt.`Id`\n" +
-    "where(p.`<%= field %>` <%= cond %>) and(pl.`Code` = '<%= priceList %>') and(pr.FirstDate <= '<%= dt %>'\n" +
+    "where(<%= alias %>.`<%= field %>` <%= cond %>) and(pl.`Code` = '<%= priceList %>') and(pr.FirstDate <= '<%= dt %>'\n" +
     "  and((pr.LastDate > '<%= dt %>') or(pr.LastDate is NULL)))\n" +
     "  and(vr.FirstDate <= '<%= dt %>'\n" +
-    "  and((vr.LastDate > '<%= dt %>') or(vr.LastDate is NULL)))";
+    "  and((vr.LastDate > '<%= dt %>') or(vr.LastDate is NULL)))<%= discontinued %>";
 
 const GET_PROD_MYSQL =
     "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`, p.`ProductTypeId`\n" +
     "from`Product` p\n" +
-    "where p.`<%= field %>` <%= cond %>";
+    "where (<%= alias %>.`<%= field %>` <%= cond %>)<%= discontinued %>";
 
 
 const DEFAUL_PRICE_LIST_CODE = "MAIN";
@@ -81,6 +81,8 @@ const DbProduct = class DbProduct extends DbObject {
             let ids;
             let codes;
             let field = "Id";
+            let alias = "p";
+            let discontinued = "";
             let cond;
             let priceList = opts.PriceList ? opts.PriceList : DEFAUL_PRICE_LIST_CODE;
             if ((opts.Detail === "true") || (opts.Detail === true)) {
@@ -142,21 +144,38 @@ const DbProduct = class DbProduct extends DbObject {
                                 codes = opts.Codes;
                             }
                             cond = `in (${codes.join()})`;
-                        };
+                        }
+                        else
+                            if (opts.TypeCode) {
+                                if (dt) {
+                                    alias = "pt";
+                                    field = "Code";
+                                    cond = `= '${opts.TypeCode}'`;
+                                }
+                            }
+            if (opts.Discontinued) {
+                let val = opts.Discontinued;
+                discontinued = " and (p.Discontinued = " +
+                    (((val === "true") || (val === true) || (val === "1") || (val === 1)) ? "1" : "0") + ")";
+            }
+
             if (!cond)
                 throw new Error(`Invalid parameters: Missing "Id" or "Code" or "Ids" or "Codes".`);
 
+            let params = dt ?
+                { discontinued: discontinued, alias: alias, field: field, cond: cond, priceList: priceList, dt: this._dateToString(dt) } :
+                { discontinued: discontinued, alias: alias, field: field, cond: cond };
             let sql = dt ?
                 {
                     dialect: {
-                        mysql: _.template(GET_PROD_DETAIL_MYSQL)({ field: field, cond: cond, priceList: priceList, dt: this._dateToString(dt) }),
-                        mssql: _.template(GET_PROD_DETAIL_MSSQL)({ field: field, cond: cond, priceList: priceList, dt: this._dateToString(dt) })
+                        mysql: _.template(GET_PROD_DETAIL_MYSQL)(params),
+                        mssql: _.template(GET_PROD_DETAIL_MSSQL)(params)
                     }
                 } :
                 {
                     dialect: {
-                        mysql: _.template(GET_PROD_MYSQL)({ field: field, cond: cond }),
-                        mssql: _.template(GET_PROD_MSSQL)({ field: field, cond: cond })
+                        mysql: _.template(GET_PROD_MYSQL)(params),
+                        mssql: _.template(GET_PROD_MSSQL)(params)
                     }
                 };
 

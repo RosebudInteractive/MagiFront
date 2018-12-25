@@ -101,6 +101,11 @@ module.exports = {
             secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
             callBack: "/api/yandex-kassa/callback",
             returnUrl: "/"
+        },
+        productReqParams: {
+            TypeCode: "SUBS",
+            Detail: "true",
+            Discontinued: "0"
         }
     },
     authentication: {
