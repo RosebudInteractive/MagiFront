@@ -12,8 +12,13 @@ import 'jquery-ui/jquery-ui.structure.min.css';
 let listener = (event) => {
     let _data = event.data;
     if (_data) {
-        _data = JSON.parse(_data);
-        $('.debug_console').append("<div class='debug_message'>" + _data.playerId + ' : ' + _data.eventName + "</div>")
+        try {
+            _data = JSON.parse(_data);
+            $('.debug_console').append("<div class='debug_message'>" + _data.playerId + ' : ' + _data.eventName + "</div>")
+        } catch (e) {
+            console.error(e.message);
+        }
+
     }
 }
 

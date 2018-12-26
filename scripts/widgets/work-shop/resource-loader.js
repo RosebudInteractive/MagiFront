@@ -394,14 +394,14 @@ export default class CWSResourceLoader {
 
     _alreadyInAudioQueue(id) {
         for (let i = 0; i < this._state.loadAudioQueue.length; i++) {
-            if (this._state.loadAudioQueue[i] == id) return true;
+            if (this._state.loadAudioQueue[i] === id) return true;
         }
 
         return false;
     }
 
     _pushToQueue(toTop, ids) {
-        if (ids.length == 0) return;
+        if (ids.length === 0) return;
 
         for (let i = 0; i < ids.length; i++) {
             if (toTop) this._state.loadQueue.unshift(ids[i]);
@@ -498,11 +498,11 @@ export default class CWSResourceLoader {
     }
 
     _loadFromQueue() {
-        if (this._state.loadQueue.length == 0) return;
+        if (this._state.loadQueue.length === 0) return;
         (function (that) {
             let id = that._state.loadQueue.shift();
             while (that._alreadyLoadedAsset(id)) {
-                if (that._state.loadQueue.length == 0) {
+                if (that._state.loadQueue.length === 0) {
                     return;
                 }
                 id = that._state.loadQueue.shift();
@@ -548,10 +548,9 @@ export default class CWSResourceLoader {
                         that._state.loadedData.assets[id] = loaded;
                         delete that._state.loading[id];
                     },
-                    fail: function (err) {
+                    error: () => {
                         delete that._state.loading[id];
-                        console.error(err);
-                        this._broadcastError(err)
+                        that._broadcastAssetMissing(url)
                     }
                 });
             } else {
@@ -600,8 +599,11 @@ export default class CWSResourceLoader {
             }, 500);
 
             audio.onerror = () => {
-                console.error("resource loader: " + JSON.stringify(audio.error));
-                this._broadcastError({src: audio.src, message: audio.error.message})
+                this._broadcastError({
+                    src: audio.src,
+                    message: audio.error.message ? audio.error.message : 'unknown',
+                    code : audio.error.code !== undefined ? audio.error.code : 'unknown'
+                })
             }
 
             this._state.loadedData.audios[id] = {
@@ -626,6 +628,12 @@ export default class CWSResourceLoader {
     _broadcastError(err) {
         if (this._options.onError) {
             this._options.onError(err)
+        }
+    }
+
+    _broadcastAssetMissing(data) {
+        if (this._options.onAssetMissing) {
+            this._options.onAssetMissing(data)
         }
     }
 }

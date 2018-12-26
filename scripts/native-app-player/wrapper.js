@@ -369,7 +369,15 @@ export default class NativeAppPlayer {
                     'loader error: ' + JSON.stringify(err)
                 )
                 // Sentry.captureException(err);
+            },
+            onAssetMissing: (data) => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'assetMissing',
+                    value: data,
+                })
             }
+
         }
     }
 }

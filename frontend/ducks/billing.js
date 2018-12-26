@@ -141,7 +141,7 @@ export const getSubscriptionTypes = () => {
             payload: null
         });
 
-        fetch("/api/products?Codes=SUBS1M,SUBS3M,SUBS1Y&Detail=true", {credentials: 'include'})
+        fetch("/api/products?Codes=SUBS3M,SUBS6M,SUBS1Y&Detail=true", {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
