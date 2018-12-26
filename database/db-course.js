@@ -79,12 +79,12 @@ const COURSE_UPD_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description] from [Course] c\n" +
+    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description` from `Course` c\n" +
+    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from `Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -259,7 +259,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
-    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
+    "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -306,7 +306,7 @@ const COURSE_SHARE_COUNTERS_MSSQL_REQ =
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
-    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
+    "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -763,6 +763,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Description: elem.Description,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsSubsRequired: false,
+                                        ExtLinks: elem.ExtLinks,
                                         Authors: [],
                                         Categories: [],
                                         Lessons: [],
@@ -1309,6 +1310,8 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.name(inpFields["Name"]);
                         if (typeof (inpFields["Description"]) !== "undefined")
                             crs_lng_obj.description(inpFields["Description"]);
+                        if (typeof (inpFields["ExtLinks"]) !== "undefined")
+                            crs_lng_obj.extLinks(inpFields["ExtLinks"]);
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -1544,6 +1547,8 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["Name"] = inpFields["Name"];
                         if (typeof (inpFields["Description"]) !== "undefined")
                             fields["Description"] = inpFields["Description"];
+                        if (typeof (inpFields["ExtLinks"]) !== "undefined")
+                            fields["ExtLinks"] = inpFields["ExtLinks"];
 
                         return root_lng.newObject({
                             fields: fields
