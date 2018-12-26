@@ -600,8 +600,11 @@ export default class CWSResourceLoader {
             }, 500);
 
             audio.onerror = () => {
-                console.error("resource loader: " + JSON.stringify(audio.error));
-                this._broadcastError({src: audio.src, message: audio.error.message})
+                this._broadcastError({
+                    src: audio.src,
+                    message: audio.error.message ? audio.error.message : 'unknown',
+                    code : audio.error.code !== undefined ? audio.error.code : 'unknown'
+                })
             }
 
             this._state.loadedData.audios[id] = {
