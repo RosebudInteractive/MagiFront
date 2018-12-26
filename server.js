@@ -21,14 +21,32 @@ let bld = new DatabaseBuilder(magisteryConfig)
 
 let log = require('./logger/log')(module);
 const { DbEngineInit } = require("./database/dbengine-init");
-new DbEngineInit(magisteryConfig);
+let dbInit = new DbEngineInit(magisteryConfig);
 const config = require('config');
 const { PrerenderInit } = require('./prerender');
 const { getTimeStr, buildLogString } = require('./utils');
 
+const PRODUCT_CODE = "ProtoOne";
+const VERSION_CODE = "1.0.0.1";
+const BUILD_NUM = 2;
+
 //bld.initDatabase()
 Promise.resolve()
     .then(() => {
+
+        dbInit.resMan.getVersionInfo()
+            .then(verInfo => {
+                if ((verInfo.product.Code !== PRODUCT_CODE) || (verInfo.version.Code !== VERSION_CODE)
+                    || (verInfo.build.BuildNum !== BUILD_NUM)) {
+                    console.error(buildLogString(`### Current DB version: "${verInfo.product.Code}" v.${verInfo.version.Code} build ${verInfo.build.BuildNum}.`));
+                    console.error(buildLogString(`### Required DB version: "${PRODUCT_CODE}" v.${VERSION_CODE} build ${BUILD_NUM}.`));
+                    console.error(buildLogString(`### ERROR: Current DB version doesn't correspond required one.`));
+                    process.exit(2);
+                }
+                else
+                    console.log(buildLogString(`Current DB version: "${verInfo.product.Code}" v.${verInfo.version.Code} build ${verInfo.build.BuildNum}.`));
+            });
+        
         // log.info("Init Db succeded!")
 
         // Prepare http server

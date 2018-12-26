@@ -7,6 +7,7 @@ class CardBlock extends React.Component {
 
     static propTypes = {
         showError: PropTypes.bool,
+        parent: PropTypes.string,
     };
 
     _visible() {
@@ -20,17 +21,23 @@ class CardBlock extends React.Component {
             _payment = info.get('Payment');
 
         switch (_payment.get('type')) {
-            case 'bank_card' :
+            case 'bank_card' : {
+                let _start = _payment.getIn(['card', 'first6']);
+                _start =  [_start.slice(0, 4), ' ', _start.slice(4)].join('');
+
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
-                           value={_payment.getIn(['card', 'first6']) + ' **** **** ' + _payment.getIn(['card', 'last4'])}
+                           defaultValue={_start + '** **** ' + _payment.getIn(['card', 'last4'])}
                            readOnly=""/>
                 </div>
+            }
+
+
 
             case 'yandex_money' :
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
-                           value={_payment.get('account_number')}
+                           defaultValue={_payment.get('account_number')}
                            readOnly=""/>
                 </div>
 
@@ -54,7 +61,7 @@ class CardBlock extends React.Component {
                 _exprDate += _year;
 
                 return <div className="card-block__footer">
-                    <input type="text" className="card-block__valid-through" id="cardvalid" value={_exprDate}
+                    <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue={_exprDate}
                            readOnly=""/>
                     <div className="card-block__type">
                         <svg width="32" height="10" dangerouslySetInnerHTML={{__html: _visa}}/>
@@ -65,7 +72,7 @@ class CardBlock extends React.Component {
 
             case 'yandex_money' :
                 return <div className="card-block__footer">
-                    <input type="text" className="card-block__valid-through" id="cardvalid" value=""
+                    <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue=""
                            readOnly=""/>
                     <div className="card-block__type">
                         <svg width="32" height="10" dangerouslySetInnerHTML={{__html: _visa}}/>
@@ -81,7 +88,7 @@ class CardBlock extends React.Component {
     render() {
         return (this._visible()
             ?
-            <div className={"subscription-form__card-block card-block" + (this.props.showError ? " _error" : "")}>
+            <div className={this.props.parent + " card-block" + (this.props.showError ? " _error" : "")}>
                 {this._getCardHeader()}
                 {
                     this.props.showError && (this.props.info.get('Error') !== null)

@@ -13,7 +13,7 @@ import Item from "./transaction-item";
 import AutoPayHeader from "./auto-pay-header";
 import StatusHeader from "./status-header";
 
-const _pagingSize = 20;
+const _pagingSize = 3;
 
 class SubscriptionBlock extends React.Component {
 
@@ -87,8 +87,13 @@ class SubscriptionBlock extends React.Component {
                     <div className="subscription-info__wrapper">
                         <AutoPayHeader/>
                         <StatusHeader/>
-                        {this._getList()}
-                        {this._getButton()}
+                        <div className="subscription-history">
+                            <h2>История платежей</h2>
+                            <ul>
+                                {this._getList()}
+                            </ul>
+                            {this._getButton()}
+                        </div>
                     </div>
 
 

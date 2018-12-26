@@ -1,6 +1,15 @@
+const _ = require('lodash');
 const { HttpCode } = require("../const/http-codes");
 const { UsersService } = require('../database/db-user');
 const { InvoiceService } = require('../database/db-invoice');
+
+const ALLOWED_TO_EDIT = {
+    "Name": true,
+    "DisplayName": true,
+    "SubsAutoPay": true,
+    "SubsAutoPayId": true,
+    "SubsProductId": true
+}
 
 function setupUsers(app) {
 
@@ -161,7 +170,8 @@ function setupUsers(app) {
     app.put('/api/users', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else
+        else {
+            req.body.allowedToEdit = _.cloneDeep(ALLOWED_TO_EDIT);
             UsersService()
                 .update(req.user.Id, req.body, { userId: req.user.Id })
                 .then(rows => {
@@ -170,6 +180,7 @@ function setupUsers(app) {
                 .catch(err => {
                     next(err);
                 });
+        }
     });
 
 }

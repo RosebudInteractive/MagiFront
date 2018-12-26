@@ -19,6 +19,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const RES_TYPE_MODEL = "SysResType";
 const META_MODEL_GUID = "183f6fb9-9f17-4955-a22c-4f03c4273413";
+const FILE_NAME = "./release-builds/db-upgrade.json";
 
 class Upgrader{
 
@@ -224,7 +225,7 @@ class Upgrader{
             throw new Error(`Build "${buildInfo.product}.${buildInfo.version}.[${buildNum}]": ` +
                 `Module "${modulePath}" doesn't implement "upgradeDb" method`);
 
-        upgradeDb(schema);
+        await upgradeDb(schema);
         schema.checkSchema();
 
         let newModels = [];
@@ -307,7 +308,7 @@ class Upgrader{
 async function start () {
     try {
         let startTime = new Date();
-        let fn = config.upgrader && config.upgrader.upgraderFile ? config.upgrader.upgraderFile : null;
+        let fn = config.upgrader && config.upgrader.upgraderFile ? config.upgrader.upgraderFile : FILE_NAME;
         let upgrader = new Upgrader(fn, { resMan: dbInitObject.resMan, dataObjectEngine: dbInitObject.dataObjectEngine });
         await upgrader.upgrade();
         console.log(buildLogString(`Upgrade has successfully finished. Total time: ${(((new Date) - startTime) / 1000).toFixed(3)} sec.`));

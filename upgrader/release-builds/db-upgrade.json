@@ -1,0 +1,15 @@
+{
+    "product": "ProtoOne",
+    "version": "1.0.0.1",
+    "builds": {
+        "2": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_2/upgrade_2_mssql.sql",
+                "mysql": "./build_2/upgrade_2_mysql.sql"
+            },
+            "upgrader": "./build_2"
+        }
+    }
+}
