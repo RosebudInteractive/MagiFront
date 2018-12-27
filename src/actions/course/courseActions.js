@@ -9,6 +9,7 @@ import {
     SAVE_COURSE_START,
     SAVE_COURSE_SUCCESS,
     SAVE_COURSE_FAIL,
+    SET_COURSE_EXT_LINKS,
 } from '../../constants/course/singleCourse'
 
 import {
@@ -25,6 +26,7 @@ import {
 
 import 'whatwg-fetch';
 import {parseJSON, handleJsonError, checkStatus} from '../../tools/fetch-tools';
+import {convertLinksToString} from "../../tools/link-tools";
 
 export const create = () => {
     return (dispatch) => {
@@ -182,9 +184,17 @@ export const getCourseAuthors = (courseId) => {
     }
 };
 
+export const setExtLinks = (value) => {
+    return {
+        type: SET_COURSE_EXT_LINKS,
+        payload: value
+    }
+}
+
 const handleCourse = (course) => {
     course.id = course.Id;
     course.Mask = course.Mask ? course.Mask : '_mask01';
+    course.extLinksValues = convertLinksToString(course.ExtLinks)
 
     course.Lessons.forEach((lesson) => {
         lesson.id = lesson.Id

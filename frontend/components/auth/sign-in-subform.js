@@ -4,6 +4,7 @@ import {reduxForm, Field} from 'redux-form';
 import Captcha from './captcha'
 import ButtonsBlock from './buttons-block'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
+import Warning from "./warning";
 
 const validate = values => {
     const errors = {}
@@ -81,6 +82,7 @@ class SignInForm extends React.Component {
                     <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'}
                                  onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
+                <Warning/>
             </div>
         )
     }

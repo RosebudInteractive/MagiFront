@@ -15159,6 +15159,26 @@ ul.lectures-tab {
   .register-block-wrapper__logo {
     margin-top: -93px; } }
 
+.register-block-wrapper__warning {
+  font-family: "Fira Sans", Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  line-height: normal;
+  font-size: 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 81px; }
+
+.register-block-wrapper__warning a {
+  color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0);
+  -webkit-transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease; }
+
+.register-block-wrapper__warning a:hover {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8); }
+
+
 
 .register-block {
   display: -webkit-box;
@@ -15282,7 +15302,7 @@ ul.lectures-tab {
     display: -ms-flexbox;
     display: flex;
     margin-top: 29px;
-    margin-bottom: 81px; }
+    margin-bottom: 25px; }
   .register-form__enter {
     -webkit-box-flex: 1;
     -webkit-flex: 1 1 auto;

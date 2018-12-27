@@ -6,6 +6,7 @@ import Captcha from './captcha'
 import {connect} from 'react-redux'
 import PasswordValidator from 'password-validator';
 import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton} from './editors'
+import Warning from "./warning";
 
 let schema = new PasswordValidator();
 schema
@@ -123,6 +124,7 @@ let SignUpForm = class SignUpForm extends React.Component {
                             </div>
                         </div>
                 }
+                <Warning/>
             </form>
         )
 

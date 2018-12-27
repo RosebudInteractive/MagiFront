@@ -9,7 +9,9 @@ import {
     SAVE_COURSE_START,
     SAVE_COURSE_SUCCESS,
     SAVE_COURSE_FAIL,
+    SET_COURSE_EXT_LINKS,
 } from '../../constants/course/singleCourse'
+import {convertLinksToString} from "../../tools/link-tools";
 
 const initialState = {
     initial: null,
@@ -70,6 +72,7 @@ export default function singleCourse(state = initialState, action) {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
             state.current.Id = _id;
+            state.current.extLinksValues = convertLinksToString(state.current.ExtLinks);
 
             return {
                 ...state,
@@ -104,6 +107,12 @@ export default function singleCourse(state = initialState, action) {
                 current: Object.assign({}, state.initial),
                 hasChanges: false,
             };
+        }
+
+        case SET_COURSE_EXT_LINKS: {
+            state.current.ExtLinks = action.payload;
+
+            return state
         }
 
         default:
