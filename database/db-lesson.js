@@ -136,7 +136,7 @@ const LESSON_UPD_TREE = {
 
 const LESSON_MSSQL_ID_REQ =
     "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
-    "  ll.[SnPost], ll.[SnName], ll.[SnDescription],\n" +
+    "  ll.[SnPost], ll.[SnName], ll.[SnDescription], ll.[ExtLinks],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
     "  join [LessonLng] ll on l.[Id] = ll.[LessonId]\n" +
@@ -168,7 +168,7 @@ const LESSON_MSSQL_CHLD_REQ =
 
 const LESSON_MYSQL_ID_REQ =
     "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
-    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`,\n" +
+    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`, ll.`ExtLinks`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
     "  join `LessonLng` ll on l.`Id` = ll.`LessonId`\n" +
@@ -297,7 +297,7 @@ const LESSON_MSSQL_REQ =
 const LESSON_MSSQL_REQ_V2 =
     "select lc.[Id] as [ParentId], lc.[CourseId], c.[URL] as [CURL], cl.[LanguageId], cl.[Name] as [CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
     "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
-    "  ll.[SnPost], ll.[SnName], ll.[SnDescription],\n" +
+    "  ll.[SnPost], ll.[SnName], ll.[SnDescription], ll.[ExtLinks],\n" +
     "  al.[FirstName], al.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] as [AURL]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -467,7 +467,7 @@ const LESSON_MYSQL_REQ =
 const LESSON_MYSQL_REQ_V2 =
     "select lc.`Id` as `ParentId`, lc.`CourseId`, c.`URL` as `CURL`, cl.`LanguageId`, cl.`Name` as `CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
     "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
-    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`,\n" +
+    "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`, ll.`ExtLinks`,\n" +
     "  al.`FirstName`, al.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` as `AURL`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -1298,24 +1298,26 @@ const DbLesson = class DbLesson extends DbObject {
         let courseUrl;
         let condMSSQL;
         let condMYSQL;
-        let isInt;
+        let isInt = false;
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
             let id = course_url;
-            isInt = (typeof (id) === "number");
-            if(isInt && isNaN(id))
-                throw new Error(`Invalid argument "lesson_url": ${url}.`);
-            if (!isInt)
-                if (typeof (id) === "string") {
-                    let res = id.match(/[0-9]*/);
-                    if (res && (id.length > 0) && (res[0].length === id.length)) {
-                        id = parseInt(id);
-                        isInt = true;
+            if (lesson_url === null) {
+                isInt = (typeof (id) === "number");
+                if (isInt && isNaN(id))
+                    throw new Error(`Invalid argument "course_url": ${url}.`);
+                if (!isInt)
+                    if (typeof (id) === "string") {
+                        let res = id.match(/[0-9]*/);
+                        if (res && (id.length > 0) && (res[0].length === id.length)) {
+                            id = parseInt(id);
+                            isInt = true;
+                        }
                     }
-                }
-                else
-                    throw new Error(`Invalid argument "lesson_url": ${url}.`);
+                    else
+                        throw new Error(`Invalid argument "course_url": ${url}.`);
+            }
 
             condMSSQL = isInt ? _.template(PARENT_MSSQL_COND_ID)({ id: id })
                 : _.template(PARENT_MSSQL_COND_URL)({ course_url: course_url, lesson_url: lesson_url })
@@ -1391,6 +1393,7 @@ const DbLesson = class DbLesson extends DbObject {
                             };
                             data.Number = elem.Number;
                             data.ShortDescription = elem.ShortDescription;
+                            data.ExtLinks = elem.ExtLinks;
                             if (data.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                 data.FreeExpDate = elem.FreeExpDate;
                         }
@@ -2209,6 +2212,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_lng_obj.snName(inpFields["SnName"]);
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             lsn_lng_obj.snDescription(inpFields["SnDescription"]);
+                        if (typeof (inpFields["ExtLinks"]) !== "undefined")
+                            lsn_lng_obj.extLinks(inpFields["ExtLinks"]);
 
                         let prevState = ls_course_obj.state();
                         let currDate = new Date();
@@ -2575,6 +2580,8 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["SnName"] = inpFields["SnName"];
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             fields["SnDescription"] = inpFields["SnDescription"];
+                        if (typeof (inpFields["ExtLinks"]) !== "undefined")
+                            fields["ExtLinks"] = inpFields["ExtLinks"];
 
                         return root_lng.newObject({
                             fields: fields
