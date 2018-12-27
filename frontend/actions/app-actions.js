@@ -17,7 +17,7 @@ import {
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
     GET_APP_OPTIONS_FAIL,
-    APP_CHANGE_PAGE, ENABLE_BILLING, DISABLE_BILLING
+    APP_CHANGE_PAGE, ENABLE_BILLING, DISABLE_BILLING, GET_COOKIES_CONFIRMATION, CONFIRM_COOKIES
 } from '../constants/app'
 
 export const changePage = (url) => {
@@ -174,6 +174,22 @@ export const getAppOptions = () => {
             });
     }
 };
+
+export const getCookiesConfimation = () => {
+    return {
+        type: GET_COOKIES_CONFIRMATION,
+        payload: localStorage.getItem('magisteria_cookies_confirm')
+    }
+}
+
+export const confirmCookies = () => {
+    localStorage.setItem('magisteria_cookies_confirm', true)
+
+    return {
+        type: CONFIRM_COOKIES,
+        payload: null
+    }
+}
 
 const checkStatus = (response) => {
     if (response.status >= 200 && response.status < 300) {

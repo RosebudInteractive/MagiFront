@@ -15,7 +15,11 @@ import {
     CLOSE_GALLERY,
     GET_APP_OPTIONS_REQUEST,
     GET_APP_OPTIONS_SUCCESS,
-    GET_APP_OPTIONS_FAIL, ENABLE_BILLING, DISABLE_BILLING,
+    GET_APP_OPTIONS_FAIL,
+    ENABLE_BILLING,
+    DISABLE_BILLING,
+    GET_COOKIES_CONFIRMATION,
+    CONFIRM_COOKIES,
 } from '../constants/app'
 
 import {
@@ -40,6 +44,7 @@ const initialState = {
     billingTest: false,
     enabledBilling: false,
     fetching: false,
+    cookiesConfirmed: false,
 };
 
 export default function app(state = initialState, action) {
@@ -156,6 +161,14 @@ export default function app(state = initialState, action) {
 
         case DISABLE_BILLING: {
             return {...state, enabledBilling: false}
+        }
+
+        case GET_COOKIES_CONFIRMATION: {
+            return {...state, cookiesConfirmed: (action.payload !== undefined) ? action.payload : false}
+        }
+
+        case CONFIRM_COOKIES: {
+            return {...state, cookiesConfirmed: true}
         }
 
         default:
