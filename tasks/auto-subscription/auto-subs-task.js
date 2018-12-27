@@ -23,7 +23,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_SUBS_MSSQL =
     "select u.[SysParentId] as [Id], u.[Email], u.[DisplayName], u.[SubsAutoPay], u.[SubsExpDate], u.[SubsAutoPayId], u.[SubsProductId],\n" +
-    "  c.[ChequeNum], c.[ChequeData], p.[Name], p.[ExtFields], pr.[Price], cr.[Symbol], c.[ReceiptEmail], c.[ReceiptPhone]\n" +
+    "  c.[ChequeNum], c.[Sum], c.[ChequeData], p.[Name], p.[ExtFields], pr.[Price], cr.[Symbol], c.[ReceiptEmail], c.[ReceiptPhone]\n" +
     "from[User] u\n" +
     "  join[Cheque] c on c.[Id] = u.[SubsAutoPayId]\n" +
     "  join[Product] p on p.[Id] = u.[SubsProductId]\n" +
@@ -38,7 +38,7 @@ const GET_SUBS_MSSQL =
 
 const GET_SUBS_MYSQL =
     "select u.`SysParentId` as `Id`, u.`Email`, u.`DisplayName`, u.`SubsAutoPay`, u.`SubsExpDate`, u.`SubsAutoPayId`, u.`SubsProductId`,\n" +
-    "  c.`ChequeNum`, c.`ChequeData`, p.`Name`, p.`ExtFields`, pr.`Price`, cr.`Symbol`, c.`ReceiptEmail`, c.`ReceiptPhone`\n" +
+    "  c.`ChequeNum`, c.`Sum`, c.`ChequeData`, p.`Name`, p.`ExtFields`, pr.`Price`, cr.`Symbol`, c.`ReceiptEmail`, c.`ReceiptPhone`\n" +
     "from`User` u\n" +
     "  join`Cheque` c on c.`Id` = u.`SubsAutoPayId`\n" +
     "  join`Product` p on p.`Id` = u.`SubsProductId`\n" +
@@ -200,7 +200,7 @@ exports.AutoSubsTask = class AutoSubsTask extends Task {
                                 InvoiceTypeId: 1,
                                 Name: "Автоподписка от " + (new Date()).toISOString(),
                                 Items: [
-                                    { ProductId: elem.SubsProductId }
+                                    { ProductId: elem.SubsProductId, Price: elem.Sum } // Use "Sum" of saved cheque as a subscription price
                                 ]
                             }
                         }
