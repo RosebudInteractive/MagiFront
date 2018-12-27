@@ -8,8 +8,9 @@ import {
     SAVE_LESSON_SUCCESS,
     CLEAR_LESSON,
     SET_OG_IMAGE_RESOURCE_ID,
-    SET_TWITTER_IMAGE_RESOURCE_ID, LOAD_PARENT_LESSON_SUCCESS,
+    SET_TWITTER_IMAGE_RESOURCE_ID, LOAD_PARENT_LESSON_SUCCESS, SET_LESSON_EXT_LINKS,
 } from '../../constants/lesson/singleLesson'
+import {convertLinksToString} from "../../tools/link-tools";
 
 const initialState = {
     initial: null,
@@ -117,6 +118,7 @@ export default function singleLesson(state = initialState, action) {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
             state.current.Id = _id;
+            state.current.extLinksValues = convertLinksToString(state.current.ExtLinks);
 
             let _newInitialLesson = Object.assign({}, state.current);
 
@@ -181,6 +183,12 @@ export default function singleLesson(state = initialState, action) {
 
         case SET_TWITTER_IMAGE_RESOURCE_ID: {
             return {...state, twitterImageResourceId: action.payload, hasChanges: true }
+        }
+
+        case SET_LESSON_EXT_LINKS: {
+            state.current.ExtLinks = action.payload;
+
+            return state
         }
 
         default:

@@ -20,6 +20,7 @@ import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {EDIT_MODE_INSERT} from "../constants/Common";
+import {convertLinksToString, getExtLinks} from "../tools/link-tools";
 
 class CourseEditor extends ObjectEditor {
 
@@ -77,6 +78,8 @@ class CourseEditor extends ObjectEditor {
     }
 
     _save(value) {
+        this.props.courseActions.setExtLinks(getExtLinks(value.extLinksValues))
+
         let _obj = {
             id: value.id,
             Id: value.id,
@@ -91,6 +94,7 @@ class CourseEditor extends ObjectEditor {
             Authors: [],
             Categories: [],
             Lessons: [],
+            ExtLinks: getExtLinks(value.extLinksValues)
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
@@ -593,6 +597,14 @@ class CourseEditor extends ObjectEditor {
                 height: 200,
                 width: 500,
                 name: "Description",
+            },
+            {
+                view: "textarea",
+                id: "ext-links-values",
+                name: "extLinksValues",
+                label: "Ссылки на другие ресурсы",
+                labelWidth: labelWidth,
+                height: 200,
             },
         ];
     }

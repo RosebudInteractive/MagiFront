@@ -32,7 +32,7 @@ class AuthPopup extends React.Component {
     componentDidUpdate(prevProps) {
         if ((!prevProps.visible) && (this.props.visible)) {
             OverflowHandler.rememberScrollPos();
-            OverflowHandler.turnOff();
+            OverflowHandler.turnOn();
             // $('body').addClass('overflow');
             setTimeout(() => {
                 this.setState({

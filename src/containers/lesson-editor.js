@@ -30,6 +30,7 @@ import ResourceForm from "../components/resource-form";
 import MultiResourceForm from "../components/multi-resource-form";
 import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
+import {getExtLinks} from "../tools/link-tools";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -227,6 +228,8 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _save(value) {
+        this.props.lessonActions.setExtLinks(getExtLinks(value.extLinksValues))
+
         let _obj = {
             id: value.id,
             CourseId: this.props.courseId,
@@ -1143,6 +1146,14 @@ export class LessonEditor extends ObjectEditor {
                     }
 
                 ]
+            },
+            {
+                view: "textarea",
+                id: "ext-links-values",
+                name: "extLinksValues",
+                label: "Ссылки на другие ресурсы",
+                labelWidth: labelWidth,
+                height: 200,
             },
         ];
     }

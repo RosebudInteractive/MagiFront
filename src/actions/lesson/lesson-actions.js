@@ -12,7 +12,10 @@ import {
     GET_LESSON_RESOURCES_FAIL,
 
     SAVE_LESSON_SUCCESS,
-    CLEAR_LESSON, SET_OG_IMAGE_RESOURCE_ID, SET_TWITTER_IMAGE_RESOURCE_ID,
+    CLEAR_LESSON,
+    SET_OG_IMAGE_RESOURCE_ID,
+    SET_TWITTER_IMAGE_RESOURCE_ID,
+    SET_LESSON_EXT_LINKS,
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -25,6 +28,7 @@ import {
 
 import 'whatwg-fetch';
 import {handleJsonError, checkStatus, parseJSON} from '../../tools/fetch-tools';
+import {convertLinksToString} from "../../tools/link-tools";
 
 export const getResources = (lessonId) => {
     return (dispatch) => {
@@ -188,6 +192,13 @@ export const setTwitterImage = (resourceId) => {
     }
 };
 
+export const setExtLinks = (value) => {
+    return {
+        type: SET_LESSON_EXT_LINKS,
+        payload: value
+    }
+}
+
 const handleLesson = (lesson) => {
     lesson.id = lesson.Id;
     lesson.mainEpisodes = [];
@@ -255,6 +266,7 @@ const handleLesson = (lesson) => {
     // if (lesson.CoverMeta) {
     //     lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
     // }
+    lesson.extLinksValues = convertLinksToString(lesson.ExtLinks)
 };
 
 const handleLessonResources = (resources) => {
