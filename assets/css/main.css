@@ -15570,10 +15570,6 @@ ul.lectures-tab {
     .balloon-wrapper_message__body {
       font-size: 11px; } }
 
-  @media (max-width: 414px) {
-    .balloon-wrapper_message__body {
-      font-size: 9px; } }
-
   .balloon-wrapper_message__body a {
     color: #c8684c;
     border-bottom: 1px solid rgba(255, 255, 255, 0);
