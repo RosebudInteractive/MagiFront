@@ -186,7 +186,9 @@ export const getCookiesConfimation = () => {
 }
 
 export const confirmCookies = () => {
-    $.cookie('magisteria_cookies_confirm', true)
+    let _date = new Date(new Date().setFullYear(new Date().getFullYear() + 10))
+
+    $.cookie('magisteria_cookies_confirm', true, { expires: _date })
 
     return {
         type: CONFIRM_COOKIES,
