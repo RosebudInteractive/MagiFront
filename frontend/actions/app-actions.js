@@ -20,6 +20,9 @@ import {
     APP_CHANGE_PAGE, ENABLE_BILLING, DISABLE_BILLING, GET_COOKIES_CONFIRMATION, CONFIRM_COOKIES
 } from '../constants/app'
 
+import $ from 'jquery'
+import 'jquery.cookie'
+
 export const changePage = (url) => {
     return {
         type: APP_CHANGE_PAGE,
@@ -178,12 +181,12 @@ export const getAppOptions = () => {
 export const getCookiesConfimation = () => {
     return {
         type: GET_COOKIES_CONFIRMATION,
-        payload: localStorage.getItem('magisteria_cookies_confirm')
+        payload: $.cookie('magisteria_cookies_confirm')
     }
 }
 
 export const confirmCookies = () => {
-    localStorage.setItem('magisteria_cookies_confirm', true)
+    $.cookie('magisteria_cookies_confirm', true)
 
     return {
         type: CONFIRM_COOKIES,

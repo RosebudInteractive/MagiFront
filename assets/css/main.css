@@ -15170,13 +15170,13 @@ ul.lectures-tab {
   margin-bottom: 81px; }
 
 .register-block-wrapper__warning a {
-  color: rgba(255, 255, 255, 0.8);
+  color: #c8684c;
   border-bottom: 1px solid rgba(255, 255, 255, 0);
   -webkit-transition: border-color 0.3s ease;
   transition: border-color 0.3s ease; }
 
 .register-block-wrapper__warning a:hover {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.8); }
+  border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
 
 
 
@@ -15521,7 +15521,6 @@ ul.lectures-tab {
     pointer-events: initial;
     z-index: 10000;
     position: fixed;
-    top: 0;
     bottom: 0;
     left: 0;
     right: -40px;
@@ -15535,45 +15534,15 @@ ul.lectures-tab {
     -moz-box-pack: center;
     -ms-flex-pack: center;
     justify-content: center;
-    padding: 6px 0;
+    /*padding: 6px;*/
     -webkit-transition: opacity .3s ease-in-out;
     transition: opacity .3s ease-in-out;
-    max-height: 85px; }
-    @media (max-width: 1399px) {
-      .balloon-wrapper {
-        max-height: 85px; } }
-    @media (max-width: 1279px) {
-      .balloon-wrapper {
-        max-height: 100px; } }
-    @media (max-width: 899px) {
-      .balloon-wrapper {
-        max-height: 120px; } }
-    @media (max-width: 767px) {
-      .balloon-wrapper {
-        max-height: 140px; } }
-    @media (max-width: 639px) {
-      .balloon-wrapper {
-        max-height: 160px; } }
-    @media (max-width: 519px) {
-      .balloon-wrapper {
-        max-height: 180px; } }
-    @media (max-width: 469px) {
-      .balloon-wrapper {
-        max-height: 260px; } }
-    @media (max-width: 419px) {
-      .balloon-wrapper {
-        max-height: 240px; } }
-    @media (max-width: 400px) {
-      .balloon-wrapper {
-        max-height: 300px; } }
-    @media (max-width: 343px) {
-      .balloon-wrapper {
-        max-height: 350px; } }
+    max-height: 350px; }
 
 
   .balloon-wrapper_message{
-    margin-right: 30px;
-    margin-left: 30px;
+    margin-right: 20px;
+    margin-left: 20px;
     display: flex;
     flex-direction: row;
     position: relative;
@@ -15595,7 +15564,15 @@ ul.lectures-tab {
     font-size: 14px;
     color: #FFFFFF;
     margin: 0;
-    padding: 25px 20px 25px 42px;}
+    padding: 25px 0 25px 42px;}
+
+  @media (max-width: 599px) {
+    .balloon-wrapper_message__body {
+      font-size: 11px; } }
+
+  @media (max-width: 414px) {
+    .balloon-wrapper_message__body {
+      font-size: 9px; } }
 
   .balloon-wrapper_message__body a {
     color: #c8684c;
@@ -15610,18 +15587,14 @@ ul.lectures-tab {
   .balloon-wrapper__close {
     padding-left: 30px;
     padding-right: 42px;
-    margin-top: 18px;
+    margin-top: 25px;
     border: none;
     outline: none;
     position: relative;
-    width: 48px;
-    height: 48px;
+    width: 24px;
+    height: 24px;
     font-size: 0;
     background-color: #2F2F2F; }
-
-  @media (max-width: 1399px) {
-    .balloon-wrapper__close {
-      margin-top: 28px; } }
 
   .balloon-wrapper__close:before, .balloon-wrapper__close:after {
     content: "";
