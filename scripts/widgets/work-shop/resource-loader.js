@@ -209,7 +209,7 @@ export default class CWSResourceLoader {
             let beg = new Date();
             let result = this._getFromLoaded(ids);
             if (!result.success) {
-                console.warn("resource loader: begin to waiting for resource download " + JSON.stringify(ids));
+                // console.warn("resource loader: begin to waiting for resource download " + JSON.stringify(ids));
                 let int = setInterval(() => {
                     result = this._getFromLoaded(ids);
                     if (result.success) {
@@ -554,7 +554,7 @@ export default class CWSResourceLoader {
                     }
                 });
             } else {
-                console.warn("resource loader: asset not found. id = " + id);
+                // console.warn("resource loader: asset not found. id = " + id);
             }
         })(this);
     }
@@ -594,7 +594,7 @@ export default class CWSResourceLoader {
 
             setTimeout(() => {
                 audio.src = url;
-                console.log('load : ', audio.src);
+                // console.log('load : ', audio.src);
                 audio.load();
             }, 500);
 

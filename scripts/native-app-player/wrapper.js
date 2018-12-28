@@ -122,7 +122,7 @@ export default class NativeAppPlayer {
                 }
             })
             .catch((e) => {
-                console.log(e)
+                // console.log(e)
 
                 this._sendErrorMessageToApp(
                     e.message
@@ -189,7 +189,7 @@ export default class NativeAppPlayer {
                 JSON.stringify(props),
                 '*'
             )
-            console.log(JSON.stringify(props))
+            // console.log(JSON.stringify(props))
         } else if (_isAndroid) {
             setTimeout(() => {
                 window.postMessage(
@@ -274,7 +274,7 @@ export default class NativeAppPlayer {
                 })
             },
             onChangeContent: function (content) {
-                console.log(content);
+                // console.log(content);
             },
             onPaused: () => {
                 this._sendMessageToApp({

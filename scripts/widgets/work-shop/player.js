@@ -265,7 +265,7 @@ export default class CWSPlayer extends CWSBase {
                 }
             } catch (e) {
                 this._addDevErr(e.message)
-                console.log(e)
+                // console.log(e)
             }
 
         }
@@ -884,11 +884,11 @@ export default class CWSPlayer extends CWSBase {
                     })
                     .catch((err) => {
                         this._addDevErr('setPosition error ' + err.message)
-                        console.error('setPosition', err)
+                        // console.error('setPosition', err)
                         this._options.loader.enableChangePosition();
                         if (!this._audioState.stopped)
                             this._audioState.audio.play();
-                        console.error(err);
+                        // console.error(err);
                     });
             } else {
                 this._options.loader.setPosition(position);
