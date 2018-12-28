@@ -16,7 +16,8 @@ class CookiesMessage extends React.Component {
                             'Продолжая работу с сайтом, вы соглашаетесь на сбор и использование cookie-файлов и другой ' +
                             'информации в соответствии с '}
                             <Link to={'/doc/privacy.pdf'} target="_blank">Политикой в отношении обработки персональных
-                                данных.</Link>
+                                данных</Link>
+                            {'.'}
                         </p>
                         <button type="button" className="balloon-wrapper__close" onClick={::this.props.confirm}>Закрыть
                         </button>
