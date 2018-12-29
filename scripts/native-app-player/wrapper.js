@@ -200,7 +200,7 @@ export default class NativeAppPlayer {
         } else {
             setTimeout(() => {
                 window.postMessage(
-                    JSON.stringify(props)
+                    JSON.stringify(props), '*'
                 )
             }, 0)
         }
