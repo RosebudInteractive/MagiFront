@@ -255,6 +255,7 @@ export class LessonEditor extends ObjectEditor {
             SnName: value.SnName,
             SnDescription: value.SnDescription,
             SnPost: value.SnPost,
+            ExtLinks: getExtLinks(value.extLinksValues),
         };
 
         let {
