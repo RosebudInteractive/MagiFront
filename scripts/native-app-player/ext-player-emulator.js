@@ -58,7 +58,7 @@ export default class PlayerEmulator {
         this._view.onChangePosition(value)
         $('.current-time_label').text(value)
 
-        if (value >= this._totalDuration) {
+        if (value >= (this._totalDuration / 1000)) {
             this._view.onEnd()
             clearInterval(this._timer)
         }

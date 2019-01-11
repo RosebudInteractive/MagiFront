@@ -386,4 +386,8 @@ export default class NativeAppPlayer {
     onChangePosition(position) {
         this._player.onChangePosition(position)
     }
+
+    onEnd() {
+        this._player.onEnd()
+    }
 }
