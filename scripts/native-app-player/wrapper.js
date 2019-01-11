@@ -6,7 +6,7 @@ import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
 import Platform from 'platform';
 
-Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
+// Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
 
 let Utils = {};
 

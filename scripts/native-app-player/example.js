@@ -135,11 +135,3 @@ let listener = (event) => {
 
     });
 })(jQuery)
-
-let _startTimer = () => {
-    setInterval(() => {
-        window.magisteriaPlayer.onChangePosition(_currentTime / 1000);
-        console.log(_currentTime / 1000);
-        _currentTime += 100 * (+$('#rate').val());
-    }, 100)
-}
