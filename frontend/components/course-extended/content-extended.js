@@ -1,6 +1,5 @@
 import React from 'react';
 import {connect} from 'react-redux';
-// import * as svg from '../../tools/svg-paths';
 import {
     FacebookShareButton,
     TwitterShareButton,
@@ -12,7 +11,7 @@ class Content extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            expanded: false
+            expanded: true
         }
     }
 
@@ -34,10 +33,11 @@ class Content extends React.Component {
                 <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                 <Description descr={_descr} isFull={this.state.expanded}/>
                 {/*<BookCard/>*/}
-                <div className={"course-module__read-more" + (this.state.expanded ? ' opened' : '')}>
-                    <span className="more" onClick={::this._switchExpanded}>Читать полное описание <span className="icon">↓</span></span>
-                    <span className="less" onClick={::this._switchExpanded}>Cкрыть описание <span className="icon">↑</span></span>
-                </div>
+                {/*<div className={"course-module__read-more" + (this.state.expanded ? ' opened' : '')}>*/}
+                    {/*<span className="more" onClick={::this._switchExpanded}>Читать полное описание <span className="icon">↓</span></span>*/}
+                    {/*<span className="less" onClick={::this._switchExpanded}>Cкрыть описание <span className="icon">↑</span></span>*/}
+                {/*</div>*/}
+
             </div>
         );
     }
@@ -109,7 +109,6 @@ class Description extends React.Component {
 
 class BookCard extends React.Component {
     // todo : Пока скрыто, но надо сделать с разбитем на desktop и mobile версии
-
     render() {
         return (
             <div className="book-card _desktop hidden">
