@@ -30,7 +30,8 @@ import ResourceForm from "../components/resource-form";
 import MultiResourceForm from "../components/multi-resource-form";
 import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
-import {getExtLinks} from "../tools/link-tools";
+import {checkExtLinks, getExtLinks} from "../tools/link-tools";
+import * as appActions from "../actions/app-actions";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -228,6 +229,14 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _save(value) {
+        let _checkResult = checkExtLinks(value.extLinksValues)
+
+        if (_checkResult && _checkResult.length) {
+            let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
+            this.props.appActions.showErrorDialog(_message)
+            return
+        }
+
         this.props.lessonActions.setExtLinks(getExtLinks(value.extLinksValues))
 
         let _obj = {
@@ -1219,6 +1228,7 @@ function mapStateToProps(state, ownProps) {
 
 function mapDispatchToProps(dispatch) {
     return {
+        appActions: bindActionCreators(appActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
         lessonMainEpisodesActions: bindActionCreators(lessonMainEpisodesActions, dispatch),
         lessonCommonRefsActions: bindActionCreators(lessonCommonRefsActions, dispatch),

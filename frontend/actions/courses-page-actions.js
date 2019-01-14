@@ -155,6 +155,10 @@ const handleCourse = (data) => {
             data.CoverMeta = JSON.parse(data.CoverMeta)
         }
 
+        if (data.ExtLinks) {
+            data.ExtLinks = JSON.parse(data.ExtLinks)
+        }
+
         data.Mask = data.Mask ? data.Mask : '_mask01';
 
         data.Authors.forEach((author) => {

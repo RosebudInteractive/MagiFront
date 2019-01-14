@@ -156,7 +156,12 @@ const parseJSON = (response) => {
 
 const handleData = (data) => {
     let _lesson = data;
+
     _lesson.courseUrl = data.Course.URL;
+    if (_lesson.ExtLinks) {
+        _lesson.ExtLinks = JSON.parse(_lesson.ExtLinks)
+    }
+
     let _parentNumber = _lesson.Number;
     _lesson.Childs.forEach((lesson) => {
         lesson.courseUrl = data.Course.URL;

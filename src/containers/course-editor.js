@@ -20,7 +20,7 @@ import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {EDIT_MODE_INSERT} from "../constants/Common";
-import {convertLinksToString, getExtLinks} from "../tools/link-tools";
+import {checkExtLinks, convertLinksToString, getExtLinks} from "../tools/link-tools";
 
 class CourseEditor extends ObjectEditor {
 
@@ -78,6 +78,14 @@ class CourseEditor extends ObjectEditor {
     }
 
     _save(value) {
+        let _checkResult = checkExtLinks(value.extLinksValues)
+
+        if (_checkResult && _checkResult.length) {
+            let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
+            this.props.appActions.showErrorDialog(_message)
+            return
+        }
+
         this.props.courseActions.setExtLinks(getExtLinks(value.extLinksValues))
 
         let _obj = {

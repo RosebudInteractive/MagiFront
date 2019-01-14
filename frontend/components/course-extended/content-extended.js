@@ -6,6 +6,7 @@ import {
     VKShareButton,
     OKShareButton,
 } from 'react-share';
+import CourseAggregators from "./course-aggregators";
 
 class Content extends React.Component {
     constructor(props) {
@@ -31,7 +32,7 @@ class Content extends React.Component {
         return (
             <div className="course-module__info-block">
                 <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                <Description descr={_descr} isFull={this.state.expanded}/>
+                <Description descr={_descr} isFull={this.state.expanded} extLinks={this.props.course.ExtLinks}/>
                 {/*<BookCard/>*/}
                 {/*<div className={"course-module__read-more" + (this.state.expanded ? ' opened' : '')}>*/}
                     {/*<span className="more" onClick={::this._switchExpanded}>Читать полное описание <span className="icon">↓</span></span>*/}
@@ -102,6 +103,7 @@ class Description extends React.Component {
         return (
             <div className={"course-module__course-descr" + (this.props.isFull ? ' full' : '')}>
                 <p dangerouslySetInnerHTML={this.createMarkup()}/>
+                <CourseAggregators extLinks={this.props.extLinks}/>
             </div>
         )
     }
