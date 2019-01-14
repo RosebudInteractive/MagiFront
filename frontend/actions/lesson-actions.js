@@ -16,6 +16,7 @@ import {
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
+import {parseReadyDate} from "../tools/time-tools";
 
 export const clearLesson = () => {
     return {
@@ -172,9 +173,11 @@ const handleData = (data) => {
 const handleLessons = (data) => {
     try {
         data.Lessons.forEach((lesson) => {
-            let _readyDate = new Date(lesson.ReadyDate);
-            lesson.readyYear = _readyDate.getFullYear();
-            lesson.readyMonth = Months[_readyDate.getMonth()];
+            let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null,
+                _parsedDate = parseReadyDate(_readyDate);
+
+            lesson.readyMonth = _parsedDate.readyMonth;
+            lesson.readyYear = _parsedDate.readyYear;
 
             if (lesson.CoverMeta) {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
