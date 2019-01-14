@@ -8,12 +8,9 @@ import Platform from 'platform';
 import CWSPlayerElementImage from "work-shop/player-element-image";
 import CWSPlayerElementText from "work-shop/player-element-text";
 
-// define(
-//     ["./ws-base", './player-element', './resource-loader', 'text!./templates/work-shop.html'],
-//     function (CWSBase, CPlayerElement, Loader, tpl) {
 const ratioX = 16, ratioY = 9;
 
-var _counter = 0;
+let _counter = 0;
 
 export default class CWSPlayer extends CWSBase {
     constructor(container, options, audioOptions) {
@@ -123,7 +120,6 @@ export default class CWSPlayer extends CWSBase {
                 });
 
         }
-
     }
 
     _setEvents() {
@@ -381,11 +377,7 @@ export default class CWSPlayer extends CWSBase {
 
             })
             .on("play", function () {
-                // console.log('play : ', this.src)
-                that._addDevInfo('play event')
-                that._audioState.stopped = false;
-                that._audioState.requestAnimationFrameID = requestAnimationFrame(::that._proccessAnimationFrame);
-                that._broadcastStarted();
+                that._onPlay()
             })
             .on("error", function (e) {
                 // console.log('canplay error')
@@ -416,6 +408,12 @@ export default class CWSPlayer extends CWSBase {
             .on('suspend', () => {
                 this._broadcastSuspend()
             })
+    }
+
+    _onPlay() {
+        this._audioState.stopped = false;
+        this._audioState.requestAnimationFrameID = requestAnimationFrame(::this._proccessAnimationFrame);
+        this._broadcastStarted();
     }
 
     _calcBuffered(player) {
@@ -1115,7 +1113,6 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _getElementOptions(elData) {
-        let that = this;
         return {
             data: elData,
             designMode: this._options.designMode,
