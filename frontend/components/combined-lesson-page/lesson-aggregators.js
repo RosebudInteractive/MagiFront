@@ -10,9 +10,11 @@ export default class LessonAggregators extends React.Component {
 
     render() {
         return this.props.extLinks ?
-            <div className='lesson-aggregators'>
-                <div className="aggregator-list_title">Лекция на других ресурсах</div>
-                <Aggregators extLinks={this.props.extLinks}/>
+            <div className="lecture-info__wrapper">
+                <div className='lesson-aggregators'>
+                    <div className="aggregator-list_title">Лекция на других ресурсах</div>
+                    <Aggregators extLinks={this.props.extLinks}/>
+                </div>
             </div>
             :
             null

@@ -43,6 +43,7 @@ const initialState = {
     sendPulseScript: null,
     billingTest: false,
     enabledBilling: false,
+    billingParams: null,
     fetching: false,
     cookiesConfirmed: false,
 };
@@ -139,7 +140,8 @@ export default function app(state = initialState, action) {
 
         case GET_APP_OPTIONS_SUCCESS: {
             let _sendPulse = (payload.scriptPath && payload.scriptPath.sendPulse) ? payload.scriptPath.sendPulse : null,
-                _buildingTest = (payload.billing && payload.billing.billing_test) ? payload.billing.billing_test : false;
+                _buildingTest = (payload.billing && payload.billing.billing_test) ? payload.billing.billing_test : false,
+                _billingParams = (payload.billing && payload.billing.productReqParams) ? Object.assign({}, payload.billing.productReqParams) : null;
 
             return {
                 ...state,
@@ -147,6 +149,7 @@ export default function app(state = initialState, action) {
                 facebookAppID: payload.appId.fb,
                 reCapture: payload.siteKey.reCapture,
                 sendPulseScript: _sendPulse,
+                billingParams: _billingParams,
                 fetching: false,
             }
         }
