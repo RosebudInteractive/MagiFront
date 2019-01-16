@@ -91,6 +91,7 @@ let dfltRssSettings = {
     },
     'rss': {
         enabled: false,
+        title: "Магистерия RSS",
         description: "Аудио лекции",
         language: "ru-RU",
         updatePeriod: "hourly",
