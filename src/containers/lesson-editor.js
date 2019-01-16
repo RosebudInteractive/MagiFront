@@ -1213,10 +1213,6 @@ function mapStateToProps(state, ownProps) {
         state.lessonCommonRefs.hasChanges ||
         state.lessonRecommendedRefs.hasChanges,
 
-        hasError: state.commonDlg.hasError,
-        message: state.commonDlg.message,
-        errorDlgShown: state.commonDlg.errorDlgShown,
-
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),

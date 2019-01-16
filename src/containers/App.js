@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 
 import {Switch, Route, withRouter, Link,} from 'react-router-dom'
 
-import Menu from "../components/Menu"
+import Menu from "../components/menu"
 import Home from "../components/Home"
 import Authors from "./Authors"
 import AuthorForm from './authorEditor';
@@ -55,7 +55,7 @@ class App extends Component {
                                     <div>Magisteria</div>
                                 </div>
                             </Link>
-                            <Menu history={this.props.history}/>
+                            <Menu history={this.props.history} location={this.props.location}/>
                         </div>
                     </div>
                     <div className="right">

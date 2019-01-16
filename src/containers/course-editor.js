@@ -648,10 +648,6 @@ function mapStateToProps(state, ownProps) {
         state.courseCategories.hasChanges ||
         state.courseLessons.hasChanges,
 
-        hasError: state.commonDlg.hasError,
-        message: state.commonDlg.message,
-        errorDlgShown: state.commonDlg.errorDlgShown,
-
         courseId: Number(ownProps.match.params.id),
         fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching
     }

@@ -6,8 +6,8 @@ import * as coursesActions from "../actions/coursesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
-import YesNoDialog from "../components/YesNoDialog";
-import ErrorDialog from '../components/ErrorDialog';
+import YesNoDialog from "../components/dialog/yes-no-dialog";
+import ErrorDialog from '../components/dialog/error-dialog';
 import $ from "jquery";
 
 class Coureses extends React.Component {

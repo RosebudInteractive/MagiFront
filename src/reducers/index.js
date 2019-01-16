@@ -3,7 +3,6 @@ import { routerReducer } from 'react-router-redux';
 
 import page from "./page"
 import user from "./user"
-import menu from "./menu"
 import commonDlg from './commonDlg';
 import episodes from "./episodes";
 import author from './author';
@@ -43,7 +42,6 @@ import { reducer as formReducer } from 'redux-form'
 export default combineReducers({
     page,
     user,
-    menu,
     commonDlg,
     author,
     episodes,

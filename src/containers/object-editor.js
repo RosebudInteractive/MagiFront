@@ -1,5 +1,5 @@
 import React from 'react'
-import ErrorDialog from '../components/ErrorDialog';
+import ErrorDialog from '../components/dialog/error-dialog';
 import {Prompt} from 'react-router-dom';
 
 import {
@@ -163,19 +163,12 @@ export default class ObjectEditor extends React.Component {
                         :
                         <div>
                             <Prompt when={this._needShowPrompt()}
-                                    message='Есть несохраненные данные. Перейти без сохранения?'/>
+                                    message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                             <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
                             {this._getWebixForm()}
                         </div>
                 }
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                        />
-                        :
-                        ""
-                }
+                <ErrorDialog/>
                 {this._getExtDialogs()}
             </div>
         )

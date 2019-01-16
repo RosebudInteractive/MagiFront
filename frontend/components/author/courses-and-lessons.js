@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 
 import {authorSelector} from '../../ducks/author'
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
-import LessonFull from "../common/lecture-full-wrapper";
+import LessonFull from "../common/lecture-full-list-item";
 
 class CoursesBlock extends React.Component {
 

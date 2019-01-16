@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
 import * as languagesActions from "../actions/languages-actions";
-import ErrorDialog from './ErrorDialog';
+import ErrorDialog from './dialog/error-dialog';
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';

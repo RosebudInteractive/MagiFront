@@ -1,7 +1,8 @@
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
-let ExtractTextPlugin = require ('extract-text-webpack-plugin');
+let ExtractTextPlugin = require('extract-text-webpack-plugin');
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // require('webpack-jquery-ui');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
@@ -138,7 +139,6 @@ const _devConfig = {
     ],
     module: {
         rules: [
-
             {
                 loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
                 include: [
@@ -152,6 +152,15 @@ const _devConfig = {
                     path.resolve(__dirname, 'scripts/widgets/player.js'),
                 ],
                 test: /\.js$/
+            },
+            {
+                test: /\.sass$/,
+                use: [
+                    // fallback to style-loader in development
+                    'style-loader',
+                    "css-loader",
+                    "sass-loader"
+                ]
             },
             {
                 test: /\.css$/,
@@ -194,7 +203,9 @@ const _devConfig = {
             "template": path.resolve(__dirname, 'scripts/lib/template'),
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
             'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
-            'script-lib': path.resolve(__dirname, 'scripts/lib')
+            'script-lib': path.resolve(__dirname, 'scripts/lib'),
+            'ducks': path.resolve(__dirname, 'frontend/ducks'),
+            'actions': path.resolve(__dirname, 'frontend/actions'),
         }
     },
     resolveLoader: {
