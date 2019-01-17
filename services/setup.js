@@ -26,6 +26,7 @@ const { setupCategories } = require('./categories');
 const { setupCourses } = require('./courses');
 const { setupLanguages } = require('./languages');
 const { setupLessons } = require('./lessons');
+const { setupParameters } = require('./parameters');
 const { setupProducts } = require('./products');
 const { setupInvoices } = require('./invoices');
 const { setupProtectedStatic } = require('./protected-static');
@@ -168,16 +169,19 @@ function setupAPI(express, app) {
     setupCourses(app);
     setupLanguages(app);
     setupLessons(app);
+    setupParameters(app);
 
     //
     // Common API options
     //
     const { Accounting: { ProductReqParams } } = require("../const/accounting");
+    let { ParametersService } = require('../database/db-parameter');
 
     app.get('/api/options', function (req, res, next) {
+        let options;
         Promise.resolve()
             .then(() => {
-                let options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams } };
+                options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams } };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
@@ -190,6 +194,10 @@ function setupAPI(express, app) {
                     options.billing.billing_test = true;
                 if (config.has('billing.productReqParams'))
                     options.billing.productReqParams = config.billing.productReqParams;
+                return ParametersService().getAllParameters(true)
+                    .then(params => { options.parameters = params })
+            })
+            .then(() => {
                 res.send(options);
             })
             .catch(err => {
