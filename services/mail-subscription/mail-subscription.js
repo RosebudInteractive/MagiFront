@@ -1,6 +1,7 @@
 'use strict';
 const config = require('config');
-const sendpulse = require("sendpulse-api");
+// const sendpulse = require("sendpulse-api");
+const sendpulse = require("./sp-magisteria"); // Patched version of "sendpulse-api".
 
 exports.MailSubscription = class MailSubscription {
     constructor() {
