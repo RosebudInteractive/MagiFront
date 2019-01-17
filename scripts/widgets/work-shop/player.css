@@ -118,3 +118,13 @@
 .ws-player-element.focused:hover .ws-maximize {
   display: block;
 }
+.player-type_radio {
+  color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: lighter;
+}
+.current-time_label {
+  color: #fff;
+}
+.player-body {font-family: sans-serif;}

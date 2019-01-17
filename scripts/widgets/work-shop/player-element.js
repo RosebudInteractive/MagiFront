@@ -90,16 +90,17 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.stopped = false;
 
         this._playState.rate = this._playState.rate || 1;
-        let rate = this._playState.rate;
         this._getItem();
-        let data = this._options.data;
         this._playState.startedAt = new Date();
 
-        let _timeInterval = (data.content.duration - this._playState.position) * 1000 / rate
-
-        this._playState.interval = setTimeout(() => {
-            this.stop();
-        }, _timeInterval);
+        // Закомментировано 11.01.19 потому что таймаут срабатывал неправильно при изменении rate
+        // И ВООБЩЕ НЕ ПОНЯТНО ЗАЧЕМ НУЖНО ГАСИТЬ ТАКИМ ОБРАЗОМ ЭЛЕМЕНТ, если он гасится в player.js _playElements
+        // let rate = this._playState.rate;
+        // let data = this._options.data;
+        // let _timeInterval = (data.content.duration - this._playState.position) * 1000 / rate
+        // this._playState.interval = setTimeout(() => {
+        //     this.stop();
+        // }, _timeInterval);
 
         this._broadcastPlay(this.Data.asset.file);
     }
@@ -140,8 +141,7 @@ export default class CWSPlayerElement extends CWSBase {
         }
 
         let now = new Date();
-        let position =
-            this._playState.position + (now - this._playState.startedAt) / 1000 * rate;
+        let position = this._playState.position + (now - this._playState.startedAt) / 1000 * rate;
         this._playState.position = position;
         this._playState.stopped = true;
     }
@@ -222,8 +222,10 @@ export default class CWSPlayerElement extends CWSBase {
         this._playState.position = position - this.Start;
 
         if (this._playState.stopped) return;
-        clearTimeout(this._playState.interval);
-        this._playState.interval = null;
+        if (this._playState.interval) {
+            clearTimeout(this._playState.interval);
+            this._playState.interval = null;
+        }
         this._playState.stopped = true;
         this.play();
     }

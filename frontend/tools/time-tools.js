@@ -122,7 +122,7 @@ export const parseReadyDate = (date) => {
                     result.readyYear++
                 }
             } else {
-                result.readyMonth = Months[_readyDate.getMonth()];
+                result.readyMonth = Months[date.getMonth()];
             }
         }
     }

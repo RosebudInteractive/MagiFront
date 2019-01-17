@@ -7,7 +7,6 @@ const availableLinks = {
     'zvukislov.ru': 'zvukislov',
 }
 
-
 export class ExtLinkObject {
     constructor(url) {
         try {

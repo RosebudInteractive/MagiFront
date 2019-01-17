@@ -79,12 +79,12 @@ const COURSE_UPD_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
+    "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from `Course` c\n" +
+    "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from `Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -202,7 +202,7 @@ const COURSE_LESSONS_MYSQL =
     "select `Id`, `ParentId` from `Lesson` where `CourseId` = <%= id %>";
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select c.[Id], l.[Id] as[LessonId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
@@ -230,7 +230,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "order by cc.[CourseId]";
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select c.`Id`, l.`Id` as`LessonId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
@@ -258,7 +258,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "order by cc.`CourseId`";
 
 const COURSE_MSSQL_PUBLIC_REQ =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -305,7 +305,7 @@ const COURSE_SHARE_COUNTERS_MSSQL_REQ =
     "where[CourseId] = <%= courseId %>";
     
 const COURSE_MYSQL_PUBLIC_REQ =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -593,6 +593,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             Name: elem.Name,
                                             URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
+                                            OneLesson: elem.OneLesson ? true : false,
                                             Authors: [],
                                             Categories: [],
                                             Lessons: []
@@ -757,6 +758,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         LanguageId: elem.LanguageId,
                                         Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
                                         CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                        OneLesson: elem.OneLesson ? true : false,
                                         Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
@@ -966,8 +968,10 @@ const DbCourse = class DbCourse extends DbObject {
                     }
                 }, {})
                     .then((result) => {
-                        if (result && result.detail && (result.detail.length === 1))
+                        if (result && result.detail && (result.detail.length === 1)) {
                             course = result.detail[0];
+                            course.OneLesson = course.OneLesson ? true : false;
+                        }
                         return $data.execSql({
                             dialect: {
                                 mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ id: id }),
@@ -1170,6 +1174,7 @@ const DbCourse = class DbCourse extends DbObject {
             let new_url;
             let languageId;
             let req;
+            let isOneLessonCourse;
 
             if (opts.byUrl && (typeof (opts.byUrl) === "string"))
                 req = this._getObjects(COURSE_REQ_TREE, { field: "URL", op: "=", value: opts.byUrl })
@@ -1303,7 +1308,8 @@ const DbCourse = class DbCourse extends DbObject {
                         crs_obj.oneLesson(false);
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             crs_obj.oneLesson(inpFields["OneLesson"]);
-                        
+                        isOneLessonCourse = crs_obj.oneLesson(false);
+
                         if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1353,6 +1359,9 @@ const DbCourse = class DbCourse extends DbObject {
                                 ls_collection._del(lc_deleted[key]);
                             }
                         }
+                        let courseLessonNum = ls_own_collection.length - lsn_deleted.length;
+                        if (isOneLessonCourse && (courseLessonNum !== 1))
+                            throw new Error(`Single lesson course must have exactly one lesson.`);
                     })
                     .then(() => {
                         if (auth_new && (auth_new.length > 0)) {
@@ -1443,7 +1452,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 })
                                 .then(() => {
                                     return Utils.seqExec(lesson_ids, (id) => {
-                                        return LessonsService().clearCache(id, true)
+                                        return LessonsService().clearCache(id, true, opts)
                                             .then((links) => {
                                                 Array.prototype.push.apply(urls_to_delete, links);
                                             });
@@ -1500,6 +1509,7 @@ const DbCourse = class DbCourse extends DbObject {
             let new_obj = null;
             let inpFields = data || {};
             let languageId;
+            let isOneLessonCourse;
             resolve(
                 this._getObjById(-1)
                     .then((result) => {
@@ -1528,6 +1538,7 @@ const DbCourse = class DbCourse extends DbObject {
                         fields["OneLesson"] = false;
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             fields["OneLesson"] = inpFields["OneLesson"];
+                        isOneLessonCourse = fields["OneLesson"];
                         if (!languageId)
                             throw new Erorr("Field \"LanguageId\" is required.");
                         return root_obj.newObject({
@@ -1577,6 +1588,8 @@ const DbCourse = class DbCourse extends DbObject {
                     .then(() => {
                         let root_lsn = new_obj.getDataRoot("LessonCourse");
                         if (inpFields.Lessons && (inpFields.Lessons.length > 0)) {
+                            if (isOneLessonCourse && (inpFields.Lessons.length !== 1))
+                                throw new Error(`Single lesson course must have exactly one lesson.`);
                             let Number = 1;
                             return Utils.seqExec(inpFields.Lessons, (elem) => {
                                 let fields = { LessonId: elem.LessonId, State: elem.State, Number: Number++ };

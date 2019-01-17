@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import $ from 'jquery'
 
 /**
  * Constants
@@ -135,13 +136,17 @@ export const isRedirectUrlSelector = createSelector(redirectSelector, redirect =
  * Action Creators
  * */
 export const getSubscriptionTypes = () => {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         dispatch({
             type: GET_SUBSCRIPTION_TYPES_START,
             payload: null
         });
 
-        fetch("/api/products?Codes=SUBS3M,SUBS6M,SUBS1Y&Detail=true", {credentials: 'include'})
+        let _state = getState().app,
+            _str = $.param(_state.billingParams),
+            _url = '/api/products' + (_str ? '?' + _str : '');
+
+        fetch(_url, {credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

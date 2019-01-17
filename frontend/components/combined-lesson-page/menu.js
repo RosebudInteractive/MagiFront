@@ -259,8 +259,9 @@ class Navigation extends React.Component {
 
         if (_menuBottom > window.innerHeight) {
             OverflowHandler.rememberScrollPos();
-            OverflowHandler.turnOn();
-            // $('body').addClass('overflow');
+            if (this.state.expanded) {
+                OverflowHandler.turnOn();
+            }
             _menu.addClass('scroll');
         } else {
             OverflowHandler.turnOff();

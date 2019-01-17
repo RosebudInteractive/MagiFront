@@ -694,8 +694,9 @@ const DbLesson = class DbLesson extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
-    clearCache(id, isListOnly) {
+    clearCache(id, isListOnly, options) {
         let key = id;
+        let opts = options || {};
         return new Promise((resolve) => {
             let rc = [key];
             if (typeof (key) === "number") {
@@ -704,7 +705,7 @@ const DbLesson = class DbLesson extends DbObject {
                         mysql: _.template(GET_LESSON_URL_MYSQL)({ id: id }),
                         mssql: _.template(GET_LESSON_URL_MSSQL)({ id: id })
                     }
-                }, {})
+                }, opts)
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let res = [];
@@ -2510,6 +2511,12 @@ const DbLesson = class DbLesson extends DbObject {
                             throw new Error("Course (Id = " + course_id + ") doesn't exist.");
                         course_obj = collection.get(0);
 
+                        let root_lsn = course_obj.getDataRoot("LessonCourse");
+                        collection = root_lsn.getCol("DataElements");
+
+                        if (course_obj.oneLesson() && (!hasParent) && (collection.count() > 0))
+                            throw new Error(`Single lesson course must have exactly one lesson.`);
+                        
                         return course_obj.edit();
                     })
                     .then(() => {

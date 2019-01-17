@@ -12,7 +12,7 @@ import {
 } from '../constants/filters'
 
 import 'whatwg-fetch';
-import {getMonthBetween, getSeason, getSeasonBetween} from "../tools/time-tools";
+import {parseReadyDate} from "../tools/time-tools";
 
 export const getCourses = () => {
     return (dispatch) => {
@@ -182,29 +182,11 @@ const handleCourse = (data) => {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
 
-            let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null;
-            if (_readyDate) {
-                let _now = new Date(),
-                    _monthDelta = getMonthBetween(_now, _readyDate);
+            let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null,
+                _parsedDate = parseReadyDate(_readyDate);
 
-                lesson.readyYear = _readyDate.getFullYear();
-
-                if (_monthDelta > 9) {
-                    lesson.readyMonth = '';
-                } else {
-                    if (getSeasonBetween(_now, _readyDate) > 1) {
-                        lesson.readyMonth = getSeason(_readyDate);
-                        if (_readyDate.getMonth() === 11) {
-                            lesson.readyYear++
-                        }
-                    } else {
-                        lesson.readyMonth = Months[_readyDate.getMonth()];
-                    }
-                }
-            } else {
-                lesson.readyYear = ''
-                lesson.readyMonth = ''
-            }
+            lesson.readyMonth = _parsedDate.readyMonth;
+            lesson.readyYear = _parsedDate.readyYear;
         });
 
         data.lessonCount = _lessonCount;
@@ -214,18 +196,3 @@ const handleCourse = (data) => {
         console.error('ERR: ' + err.message);
     }
 };
-
-const Months = [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь',
-];
