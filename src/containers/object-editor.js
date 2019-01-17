@@ -1,6 +1,7 @@
 import React from 'react'
 import ErrorDialog from '../components/dialog/error-dialog';
 import {Prompt} from 'react-router-dom';
+import BottomControls from '../components/bottom-contols'
 
 import {
     EDIT_MODE_INSERT,
@@ -146,8 +147,6 @@ export default class ObjectEditor extends React.Component {
     render() {
         const {
             fetching,
-            message,
-            errorDlgShown,
         } = this.props;
 
         if (fetching) {
@@ -166,6 +165,7 @@ export default class ObjectEditor extends React.Component {
                                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                             <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
                             {this._getWebixForm()}
+                            <BottomControls editor={this}/>
                         </div>
                 }
                 <ErrorDialog/>
@@ -241,7 +241,7 @@ export default class ObjectEditor extends React.Component {
         _elems.push(
             {
                 view: "button",
-                name: 'btnOk',
+                name: 'btnBack',
                 value: '<<< Назад',
                 align: 'center',
                 click: () => {
