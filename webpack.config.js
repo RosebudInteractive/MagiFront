@@ -204,6 +204,7 @@ const _devConfig = {
             "work-shop": path.resolve(__dirname, 'scripts/widgets/work-shop'),
             'jquery-ui': path.resolve(__dirname, 'scripts/lib/jquery-ui'),
             'script-lib': path.resolve(__dirname, 'scripts/lib'),
+            'adm-ducks': path.resolve(__dirname, 'src/ducks'),
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
             'actions': path.resolve(__dirname, 'frontend/actions'),
         }

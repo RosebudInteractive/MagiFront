@@ -14,11 +14,15 @@ export const GET_OPTIONS_START = `${prefix}/GET_OPTIONS_START`
 export const GET_OPTIONS_SUCCESS = `${prefix}/GET_OPTIONS_SUCCESS`
 export const GET_OPTIONS_FAIL = `${prefix}/GET_OPTIONS_FAIL`
 
+export const DISABLE_BUTTONS = `${prefix}/DISABLE_BUTTONS`
+export const ENABLE_BUTTONS = `${prefix}/ENABLE_BUTTONS`
+
 /**
  * Reducer
  * */
 export const ReducerRecord = Record({
     reCapture: '',
+    enableButtons: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -33,6 +37,14 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('reCapture', '')
 
+        case DISABLE_BUTTONS:
+            return state
+                .set('enableButtons', false)
+
+        case ENABLE_BUTTONS:
+            return state
+                .set('enableButtons', true)
+
         default:
             return state
     }
@@ -44,6 +56,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
+export const enableButtonsSelector = createSelector(stateSelector, state => state.enableButtons)
 
 /**
  * Action Creators
@@ -70,6 +83,20 @@ export const getAppOptions = () => {
                     payload: err
                 });
             });
+    }
+}
+
+export const disableButtons = () => {
+    return {
+        type: DISABLE_BUTTONS,
+        payload: null
+    }
+}
+
+export const enableButtons = () => {
+    return {
+        type: ENABLE_BUTTONS,
+        payload: null
     }
 }
 

@@ -62,6 +62,10 @@ export default class ObjectEditor extends React.Component {
         return this.props.ownProps ? this.props.ownProps.location.pathname : '';
     }
 
+    get form() {
+        return window.$$('editor-form')
+    }
+
     _initEditMode() {
         this.editMode = EDIT_MODE_EDIT;
         this.objectActions.get(this.objectId);

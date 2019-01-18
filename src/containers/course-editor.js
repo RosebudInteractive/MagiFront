@@ -20,7 +20,8 @@ import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {EDIT_MODE_INSERT} from "../constants/Common";
-import {checkExtLinks, convertLinksToString, getExtLinks} from "../tools/link-tools";
+import {checkExtLinks, getExtLinks} from "../tools/link-tools";
+import {disableButtons, enableButtons,} from "adm-ducks/app";
 
 class CourseEditor extends ObjectEditor {
 
@@ -564,17 +565,18 @@ class CourseEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
+                                that.props.enableButtons()
                             },
                             onFileUploadError: () => {
                                 that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                             },
                         }
                     },
@@ -665,6 +667,9 @@ function mapDispatchToProps(dispatch) {
         categoriesActions: bindActionCreators(categoriesActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
         coursesActions: bindActionCreators(coursesActions, dispatch),
+
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
     }
 }
 
