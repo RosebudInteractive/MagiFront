@@ -465,9 +465,9 @@ exports.getSchemaGenFunc = function (uccelloDir) {
 
         metaDataMgr.addModel("Parameters", "f86c2a57-90b8-4b17-8179-15e4669032ee", "RootParameters", "36f9ca75-93e1-4d81-972f-cab145e4c0b9")
             .addField("ParentId", { type: "dataRef", model: "Parameters", refAction: "parentRestrict", allowNull: true })
-            .addField("ParentInt", { type: "int", allowNull: false })
+            .addField("ParentInt", { type: "int", allowNull: false }) // Should be calculated on the server side as ParentInt = coalesce(ParentId, 0)
             .addField("Key", { type: "string", length: 100, allowNull: false })
-            .addField("Tp", { type: "int", allowNull: false })
+            .addField("Tp", { type: "int", allowNull: false }) // 0- string, 1- int, 2- float, 3- datetime, 4 - html string
             .addField("StrVal", { type: "string", allowNull: true })
             .addField("IntVal", { type: "int", allowNull: true })
             .addField("FloatVal", { type: "float", allowNull: true })

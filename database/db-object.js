@@ -1,11 +1,20 @@
 const config = require('config');
+const _ = require('lodash');
+const { CacheableObject } = require('../utils/cache-base');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
-exports.DbObject = class DbObject {
+exports.DbObject = class DbObject extends CacheableObject {
 
     constructor(options) {
+        let opts = _.cloneDeep(options || {});
+        let optsCache = opts.cache ? opts.cache : {};
+        if (!optsCache.redis) {
+            if (config.has("connections.redis"))
+                optsCache.redis = _.cloneDeep(config.connections.redis);
+        }
+        super(optsCache);
         this._db = $memDataBase;
         this._absDataUrl = config.proxyServer.siteHost + config.dataUrl + "/";
         this._absCourseUrl = config.proxyServer.siteHost + config.courseUrl + "/";
