@@ -20,6 +20,7 @@ import ObjectEditor, {labelWidth,} from './object-editor';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import EpisodeTocForm from "../components/episode-toc-form";
 import EpisodeResourceForm from "../components/episode-content-form";
+import {disableButtons, enableButtons} from "adm-ducks/app";
 
 class EpisodeEditor extends ObjectEditor {
 
@@ -464,14 +465,15 @@ class EpisodeEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 window.$$('file-name').setValue(response[0].file);
+                                that.props.enableButtons()
                             },
                             onFileUploadError: () => {
                                 that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                             },
                         }
                     },
@@ -608,6 +610,8 @@ function mapDispatchToProps(dispatch) {
         episodeContentActions: bindActionCreators(episodeContentActions, dispatch),
         contentActions: bindActionCreators(contentActions, dispatch),
         workShopActions: bindActionCreators(workShopActions, dispatch),
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
     }
 }
 

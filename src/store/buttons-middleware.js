@@ -17,13 +17,13 @@ const ButtonsMiddleware = store => next => action => {
         case SAVE_COURSE_SUCCESS:
         case SAVE_COURSE_FAIL:
         case CHANGE_COURSE_DATA: {
-            enableButtons()
+            store.dispatch(enableButtons())
             return next(action)
         }
 
         case GET_SINGLE_COURSE_REQUEST:
         case SAVE_COURSE_START: {
-            disableButtons()
+            store.dispatch(disableButtons())
             return next(action)
         }
 

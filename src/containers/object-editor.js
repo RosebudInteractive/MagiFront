@@ -149,9 +149,7 @@ export default class ObjectEditor extends React.Component {
     }
 
     render() {
-        const {
-            fetching,
-        } = this.props;
+        const {fetching, hasChanges,} = this.props;
 
         if (fetching) {
             this._dataLoaded = false;
@@ -169,7 +167,7 @@ export default class ObjectEditor extends React.Component {
                                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                             <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
                             {this._getWebixForm()}
-                            <BottomControls editor={this}/>
+                            <BottomControls editor={this} hasChanges={hasChanges} onAccept={::this._save} onCancel={::this._cancel}/>
                         </div>
                 }
                 <ErrorDialog/>
@@ -179,6 +177,9 @@ export default class ObjectEditor extends React.Component {
     }
 
     _notifyDataLoaded() {
+        if (!this._dataLoaded && this.handleChangeDataOnWebixForm) {
+            this.handleChangeDataOnWebixForm()
+        }
         this._dataLoaded = true;
     }
 
@@ -227,19 +228,12 @@ export default class ObjectEditor extends React.Component {
                 },
                 onValues: function () {
                     that._notifyDataLoaded();
-
-                    (that._hasChanges() && !that.props.fetching) ?
-                        this.elements.btnCancel.enable() : this.elements.btnCancel.disable();
-
-                    (that._hasChanges() && that._enableApplyChanges() && !that.props.fetching) ?
-                        this.elements.btnOk.enable() : this.elements.btnOk.disable();
                 },
             },
         }
     }
 
     _getElements() {
-        let that = this;
         let _elems = [];
 
         _elems.push(
@@ -255,41 +249,6 @@ export default class ObjectEditor extends React.Component {
         );
 
         _elems.push(...this._getExtElements());
-
-        _elems.push(
-            {
-                cols: [
-                    {},
-                    {},
-                    {
-                        view: "button", value: "ОК", name: 'btnOk', id: 'btnOk',
-                        click: function () {
-                            if (this.getFormView().validate()) {
-                                let _obj = this.getFormView().getValues();
-
-                                let _uploader = window.$$('file-uploader');
-                                if (_uploader) {
-                                    let _id = window.$$('file-uploader').files.data.order[0];
-                                    let _file = window.$$('file-uploader').files.getItem(_id);
-                                    if (_file) {
-                                        _obj.fileInfo = _file[0];
-                                    }
-                                }
-
-                                that._save(_obj);
-                            }
-                        }
-                    },
-                    {
-                        view: "button", value: "Отмена", name: 'btnCancel', id: 'btnCancel',
-                        click: function () {
-                            this.getFormView().clearValidation();
-                            that._cancel();
-                        }
-                    }
-                ]
-            }
-        );
 
         return _elems;
     }

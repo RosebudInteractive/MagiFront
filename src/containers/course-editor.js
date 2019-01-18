@@ -54,6 +54,12 @@ class CourseEditor extends ObjectEditor {
         this.mask = course ? course.Mask : null;
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.hasChanges) {
+            this.handleChangeDataOnWebixForm()
+        }
+    }
+
     getObject() {
         return this.props.course
     }
@@ -616,6 +622,13 @@ class CourseEditor extends ObjectEditor {
                 labelWidth: labelWidth,
                 height: 200,
             },
+            {
+                view: "checkbox",
+                id: 'one-lesson-checkbox',
+                label: "Курс с одиночной лекцией",
+                name: 'OneLesson',
+                labelWidth: labelWidth,
+            },
         ];
     }
 
@@ -623,6 +636,16 @@ class CourseEditor extends ObjectEditor {
         let _enable = super._enableApplyChanges();
 
         return _enable && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
+    }
+
+    handleChangeDataOnWebixForm() {
+        let _data = this.form.getValues()
+        if (_data.Lessons.length <= 1) {
+            window.$$('one-lesson-checkbox').enable()
+        } else {
+            window.$$('one-lesson-checkbox').disable()
+        }
+
     }
 }
 
