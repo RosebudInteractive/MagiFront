@@ -515,6 +515,10 @@ html,
     margin-left: 0.5em;
 }
 
+.tabs .dlg-btn-bar {
+    padding: 0 5px 0 5px;
+}
+
 .app .dlg .dlg-message {
     padding: 1em 1em 0 1em;
     font-size: 16px;

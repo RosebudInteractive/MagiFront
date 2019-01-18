@@ -32,6 +32,7 @@ import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import * as appActions from "../actions/app-actions";
+import {disableButtons, enableButtons} from "adm-ducks/app";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -962,16 +963,18 @@ export class LessonEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
+                                that.props.enableButtons()
                             },
                             onFileUploadError: (file, response) => {
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                                 console.log(file, response)
                             }
 
@@ -1235,6 +1238,8 @@ function mapDispatchToProps(dispatch) {
         lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
         resourcesActions: bindActionCreators(resourcesActions, dispatch),
         parentLessonActions: bindActionCreators(parentLessonActions, dispatch),
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
     }
 }
 

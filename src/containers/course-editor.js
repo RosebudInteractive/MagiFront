@@ -109,7 +109,8 @@ class CourseEditor extends ObjectEditor {
             Authors: [],
             Categories: [],
             Lessons: [],
-            ExtLinks: getExtLinks(value.extLinksValues)
+            ExtLinks: getExtLinks(value.extLinksValues),
+            OneLesson: value.OneLesson ? true : false,
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
@@ -310,12 +311,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     _getWebixForm() {
-        const {
-            courseLessons,
-            selectedAuthor,
-            selectedCategory,
-            selectedLesson,
-        } = this.props;
+        const { courseLessons, selectedAuthor, selectedCategory, selectedLesson, } = this.props;
 
         let _data = this.getObject();
         return [
@@ -346,7 +342,7 @@ class CourseEditor extends ObjectEditor {
                     <TabContent for="tab3">
                         <CourseLessons data={courseLessons}
                                        selectAction={::this._selectLesson}
-                                       createAction={::this._createLesson}
+                                       createAction={this._canCreateLesson() ? ::this._createLesson : null}
                                        removeAction={::this._removeLessonFromCourse}
                                        editAction={::this._editLesson}
                                        moveUpAction={::this._moveUpLesson}
@@ -358,6 +354,15 @@ class CourseEditor extends ObjectEditor {
                 </div>
             </Tabs>
         ]
+    }
+
+    _canCreateLesson() {
+        let _data = this.getObject()
+
+        return (_data && _data.OneLesson) ?
+            (_data.Lessons && this.props.courseLessons.length < 1)
+            :
+            true
     }
 
     _getMasks() {
@@ -639,8 +644,9 @@ class CourseEditor extends ObjectEditor {
     }
 
     handleChangeDataOnWebixForm() {
-        let _data = this.form.getValues()
-        if (_data.Lessons.length <= 1) {
+        if (!window.$$('one-lesson-checkbox')) return
+
+        if (this.props.courseLessons.length <= 1) {
             window.$$('one-lesson-checkbox').enable()
         } else {
             window.$$('one-lesson-checkbox').disable()
