@@ -23,10 +23,19 @@ const PARAMETERS_ALL_MSSQL_REQ =
 const PARAMETERS_ALL_MYSQL_REQ =
     "select `Id`, `ParentId`, `ParentInt`, `Key`, `Tp`, `StrVal`, `IntVal`, `FloatVal`, `DateVal` from `Parameters`";
 
+const PARAMETER_CACHE_PREFIX = "param:";
+const CACHE_ALL_ID = "all";
+const CACHE_ALL_PUB_ID = "all_pub";
+const CACHE_ALL_TTL_IN_SEC = 60 * 60; //1 hour
+
 const DbParameter = class DbParameter extends DbObject {
 
     constructor(options) {
-        super(options);
+        let opts = _.cloneDeep(options || {});
+        opts.cache = opts.cache ? opts.cache : {};
+        if (!opts.cache.prefix)
+            opts.cache.prefix = PARAMETER_CACHE_PREFIX;
+        super(opts);
     }
 
     _getObjById(id, expression, options) {
@@ -58,31 +67,39 @@ const DbParameter = class DbParameter extends DbObject {
 
     getAllParameters(isPublic) {
         let parameters = isPublic ? {} : [];
-        return new Promise(resolve => {
-            resolve(
-                $data.execSql({
-                    dialect: {
-                        mysql: _.template(PARAMETERS_ALL_MYSQL_REQ)(),
-                        mssql: _.template(PARAMETERS_ALL_MSSQL_REQ)()
-                    }
-                }, {})
-                    .then((result) => {
-                        if (result && result.detail && (result.detail.length > 0)) {
-                            result.detail.forEach(elem => {
-                                if (isPublic) {
-                                    parameters[elem.Key] = elem[this._getValueField(elem)];
+        let cacheId = isPublic ? CACHE_ALL_PUB_ID : CACHE_ALL_ID;
+        return this.cacheGet(cacheId)
+            .then(val => {
+                if (val)
+                    return JSON.parse(val)
+                else
+                    return new Promise(resolve => {
+                        resolve(
+                            $data.execSql({
+                                dialect: {
+                                    mysql: _.template(PARAMETERS_ALL_MYSQL_REQ)(),
+                                    mssql: _.template(PARAMETERS_ALL_MSSQL_REQ)()
                                 }
-                                else {
-                                    let param = { Id: elem.Id, Key: elem.Key, Tp: elem.Tp };
-                                    param.Value = elem[this._getValueField(elem)];
-                                    parameters.push(param);
-                                }
-                            })
-                        }
-                        return parameters;
+                            }, {})
+                        )
                     })
-            );
-        })
+                        .then((result) => {
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                result.detail.forEach(elem => {
+                                    if (isPublic) {
+                                        parameters[elem.Key] = elem[this._getValueField(elem)];
+                                    }
+                                    else {
+                                        let param = { Id: elem.Id, Key: elem.Key, Tp: elem.Tp };
+                                        param.Value = elem[this._getValueField(elem)];
+                                        parameters.push(param);
+                                    }
+                                })
+                            }
+                            return this.cacheSet(cacheId, JSON.stringify(parameters), { ttlInSec: CACHE_ALL_TTL_IN_SEC });
+                        })
+                        .then(() => { return parameters})
+            });
     }
 
     update(data, options) {
@@ -102,7 +119,7 @@ const DbParameter = class DbParameter extends DbObject {
                     root_obj = result;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                     paramCollection = root_obj.getCol("DataElements");
-                    for (let i = 0; i < paramCollection.count(); i++){
+                    for (let i = 0; i < paramCollection.count(); i++) {
                         let param = paramCollection.get(i);
                         paramList[param.id()] = param;
                     }
@@ -136,9 +153,13 @@ const DbParameter = class DbParameter extends DbObject {
                 .then(() => {
                     return root_obj.save(dbOpts);
                 })
-                .then(() => {
-                    return { result: "OK" };
+                .then((result) => {
+                    if (result && result.detail && (result.detail.length > 0)) {
+                        return this.cacheDel(CACHE_ALL_PUB_ID)
+                            .then(() => { return this.cacheDel(CACHE_ALL_ID) });
+                    }
                 })
+                .then(() => { return { result: "OK" } })
         }, memDbOptions);
     }
 };
