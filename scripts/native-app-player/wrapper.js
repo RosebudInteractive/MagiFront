@@ -72,11 +72,15 @@ export default class NativeAppPlayer {
         }
     }
 
-    setData({data, playerId, position}) {
+    setData({data, playerId, position, externalPlayer}) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
             this._currentTime = 0;
+
+            if (externalPlayer !== undefined) {
+                this._externalPlayer = externalPlayer
+            }
 
             let _audios = data.episodes.map((item) => {
                 return item.audio.file
@@ -93,12 +97,18 @@ export default class NativeAppPlayer {
             }
 
             this.state.needSeek = !!position;
-            this.state.seekToPosition = position;
+            this.state.seekToPosition = +position;
 
             this._id = playerId || (new Date).getTime()
             this._player = this._externalPlayer ? new ExternalPlayer(this._div, this._getPlayerOptions()) :  new Player(this._div, this._getPlayerOptions())
             this._player.render();
             this._player.setData(data);
+
+            if (this._externalPlayer && this.state.needSeek) {
+                this._player.onChangePosition(this.state.seekToPosition)
+                this.state.needSeek = false;
+                this.state.seekToPosition = 0;
+            }
         }
     }
 
