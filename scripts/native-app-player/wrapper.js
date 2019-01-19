@@ -32,7 +32,7 @@ export default class NativeAppPlayer {
 
             this._playerName = 'magisteriaPlayer';
             this._externalPlayer = !!options.externalPlayer;
-            this._id = (new Date).getTime();
+            this._id = null;
             window[this._playerName] = this;
 
             this._sendMessageToApp({
@@ -48,6 +48,11 @@ export default class NativeAppPlayer {
             })
         }
 
+        this.state = {
+            needSeek: false,
+            seekToPosition: 0,
+
+        };
         this._ended = false;
         this._currentTime = 0;
         this._timeChanged = false;
@@ -57,18 +62,17 @@ export default class NativeAppPlayer {
         let gOldOnError = window.onerror;
 
         window.onerror = (errorMsg, url, lineNumber) => {
-            this._sendErrorMessageToApp(errorMsg)
+            this._sendErrorMessageToApp('unhandled exception: ' + errorMsg)
 
             if (gOldOnError) {
                 return gOldOnError(errorMsg, url, lineNumber);
             }
 
-
             return false;
         }
     }
 
-    setData(data) {
+    setData({data, playerId, position}) {
         if (data) {
             this._started = false;
             this._timeChanged = false;
@@ -86,9 +90,12 @@ export default class NativeAppPlayer {
                 this._player.pause();
                 this._player.destroy();
                 this._player = null;
-                this._id = (new Date).getTime()
             }
 
+            this.state.needSeek = !!position;
+            this.state.seekToPosition = position;
+
+            this._id = playerId || (new Date).getTime()
             this._player = this._externalPlayer ? new ExternalPlayer(this._div, this._getPlayerOptions()) :  new Player(this._div, this._getPlayerOptions())
             this._player.render();
             this._player.setData(data);
@@ -119,7 +126,7 @@ export default class NativeAppPlayer {
                 }
             })
             .catch((e) => {
-                console.log(e)
+                // console.log(e)
 
                 this._sendErrorMessageToApp(
                     e.message
@@ -179,13 +186,14 @@ export default class NativeAppPlayer {
 
     _sendMessageToApp(props) {
         props['playerId'] = this._id
+        props.host = window.location.href
         if (this._debug) {
             window.postMessage(
                 JSON.stringify(props),
                 '*'
             )
-            console.log(JSON.stringify(props))
-        } else if ( _isAndroid) {
+            // console.log(JSON.stringify(props))
+        } else if (_isAndroid) {
             setTimeout(() => {
                 window.postMessage(
                     JSON.stringify(props),
@@ -210,13 +218,18 @@ export default class NativeAppPlayer {
     _getPlayerOptions() {
         return {
             designMode: false,
-            loader: new Loader(),
+            loader: new Loader(this._getLoaderOptions()),
             onCurrentTimeChanged: (audioState, isRealTimeChanged) => {
                 if (!isRealTimeChanged) return
 
                 this._setCurrentTime(audioState)
             },
             onSetPosition: (audioState) => {
+                if (this.state.needSeek) {
+                    this.state.needSeek = false;
+                    this.state.seekToPosition = 0;
+                }
+
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'onSeeked',
@@ -234,16 +247,22 @@ export default class NativeAppPlayer {
                     _nativeAppDataUuid: data,
                 })
             },
-            onElementPlay: () => {
+            onElementPlay: (fileName) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetShowed',
+                    data: {
+                        fileName,
+                    },
                 })
             },
-            onElementStop: () => {
+            onElementStop: (fileName) => {
                 this._sendMessageToApp({
                     eventType: 'magisteriaPlayer',
                     eventName: 'assetRemoved',
+                    data: {
+                        fileName,
+                    },
                 })
             },
             onChangeTitles: (titles) => {
@@ -256,7 +275,7 @@ export default class NativeAppPlayer {
                 })
             },
             onChangeContent: function (content) {
-                console.log(content);
+                // console.log(content);
             },
             onPaused: () => {
                 this._sendMessageToApp({
@@ -276,11 +295,27 @@ export default class NativeAppPlayer {
             },
             onError: (e) => {
                 this._sendErrorMessageToApp(
-                    e.message
+                    'player error: ' + JSON.stringify(e.target.error.message)
                 )
             },
             onCanPlay: () => {
-                if (!this._started) {
+                if (this.state.needSeek) {
+                    this._player.setPosition(this.state.seekToPosition)
+                }
+
+                if (!this._started && !this.state.needSeek) {
+                    this._sendMessageToApp({
+                        eventType: 'magisteriaPlayer',
+                        eventName: 'playerCanPlay',
+                    })
+                }
+            },
+            onCanPlayThrough: () => {
+                if (this.state.needSeek) {
+                    this._player.setPosition(this.state.seekToPosition)
+                }
+
+                if (!this._started && !this.state.needSeek) {
                     this._sendMessageToApp({
                         eventType: 'magisteriaPlayer',
                         eventName: 'playerCanPlay',
@@ -308,7 +343,44 @@ export default class NativeAppPlayer {
                     })
                 }
             },
+            onAbort: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'ABORT',
+                })
+            },
+            onStalled: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'STALLED',
+                })
+            },
+            onSuspend: () => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'Suspend',
+                })
+            }
         };
+    }
+
+    _getLoaderOptions() {
+        return {
+            onError: (err) => {
+                this._sendErrorMessageToApp(
+                    'loader error: ' + JSON.stringify(err)
+                )
+                // Sentry.captureException(err);
+            },
+            onAssetMissing: (data) => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'assetMissing',
+                    value: data,
+                })
+            }
+
+        }
     }
 
     onChangePosition(position) {
