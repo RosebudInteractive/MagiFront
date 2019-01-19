@@ -10,6 +10,6 @@ import 'jquery-ui/jquery-ui.structure.min.css';
 
 (function ($) {
     $(document).ready(function () {
-        new AppPlayer();
+        new AppPlayer({externalPlayer: true});
     });
 })(jQuery)
