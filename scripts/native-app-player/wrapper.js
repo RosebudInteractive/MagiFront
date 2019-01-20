@@ -393,7 +393,11 @@ export default class NativeAppPlayer {
         }
     }
 
-    onChangePosition(position) {
+    onChangePosition({ playerId, position }) {
+        if (!this._player || playerId !== this._id) {
+          return
+        }
+
         this._player.onChangePosition(position)
     }
 
