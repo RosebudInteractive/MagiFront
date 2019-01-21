@@ -11,22 +11,16 @@ export default class LessonFullWrapper extends React.Component {
         courseUrl: PropTypes.string,
         needShowAuthors: PropTypes.bool,
         lesson: PropTypes.object,
+        isSingleLesson: PropTypes.bool,
+    };
+
+    static defaultProps = {
+        needShowAuthors: false,
+        isSingleLesson: false,
     };
 
     render() {
         let {lesson, courseUrl} = this.props,
-            _lesson = {
-                id: lesson.id,
-                title: lesson.Name,
-                lessonUrl: lesson.URL,
-                descr: lesson.ShortDescription,
-                duration: lesson.DurationFmt,
-                totalDuration: lesson.Duration,
-                refs: lesson.NRefBooks,
-                books: lesson.NBooks,
-                audios: lesson.Audios,
-                isAuthRequired: lesson.IsAuthRequired,
-            },
             _cover = getCoverPath(lesson, ImageSize.small)
 
         return (

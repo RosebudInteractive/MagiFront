@@ -3,21 +3,20 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 
-import CourseModuleLazyload from '../components/course/course-module-lazyload'
+// import CourseModuleLazyload from '../components/course/course-module-lazyload'
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 
 import * as tools from '../tools/page-tools';
-// import {forceCheck} from 'react-lazyload';
-import CourseModule from "../components/course/course-module";
+// import CourseModule from "../components/course/course-module";
+import CourseWrapper from '../components/course/item-wrapper/index';
 import {filtersSelector, isEmptyFilterSelector, loadingSelector, selectedFilterSelector, applyExternalFilter} from "../ducks/filters";
 
 class CoursesPage extends React.Component {
     constructor(props) {
         super(props);
-        this._isMobile = tools.isMobile.bind(this);
         this._needRedirectToCourses = false;
     }
 
@@ -74,11 +73,7 @@ class CoursesPage extends React.Component {
             return (
                 _inFilter
                     ?
-                    isEmptyFilter
-                        ?
-                        <CourseModuleLazyload course={course} key={index} isMobile={this._isMobile()}/>
-                        :
-                        <CourseModule course={course} key={index} isMobile={this._isMobile()}/>
+                    <CourseWrapper course={course} lazyload={isEmptyFilter} key={index}/>
                     :
                     null
             )
