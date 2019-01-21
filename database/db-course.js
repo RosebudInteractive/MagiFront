@@ -1308,7 +1308,7 @@ const DbCourse = class DbCourse extends DbObject {
                         crs_obj.oneLesson(false);
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             crs_obj.oneLesson(inpFields["OneLesson"]);
-                        isOneLessonCourse = crs_obj.oneLesson(false);
+                        isOneLessonCourse = crs_obj.oneLesson();
 
                         if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
@@ -1359,8 +1359,8 @@ const DbCourse = class DbCourse extends DbObject {
                                 ls_collection._del(lc_deleted[key]);
                             }
                         }
-                        let courseLessonNum = ls_own_collection.length - lsn_deleted.length;
-                        if (isOneLessonCourse && (courseLessonNum !== 1))
+                        let courseLessonNum = ls_own_collection.length - Object.keys(lsn_deleted).length;
+                        if (isOneLessonCourse && (crs_obj.state() === 'P') && (courseLessonNum !== 1))
                             throw new Error(`Single lesson course must have exactly one lesson.`);
                     })
                     .then(() => {
@@ -1510,6 +1510,7 @@ const DbCourse = class DbCourse extends DbObject {
             let inpFields = data || {};
             let languageId;
             let isOneLessonCourse;
+            let isNotDraft = false;
             resolve(
                 this._getObjById(-1)
                     .then((result) => {
@@ -1526,8 +1527,10 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["Cover"] = inpFields["Cover"];
                         if (typeof (inpFields["CoverMeta"]) !== "undefined")
                             fields["CoverMeta"] = inpFields["CoverMeta"];
+                        fields["State"] = "D";
                         if (typeof (inpFields["State"]) !== "undefined")
                             fields["State"] = inpFields["State"];
+                        isNotDraft = fields["State"] !== "D";
                         if (typeof (inpFields["LanguageId"]) !== "undefined")
                             languageId = fields["LanguageId"] = inpFields["LanguageId"];
                         if (typeof (inpFields["URL"]) !== "undefined") {
@@ -1587,9 +1590,10 @@ const DbCourse = class DbCourse extends DbObject {
                     })
                     .then(() => {
                         let root_lsn = new_obj.getDataRoot("LessonCourse");
-                        if (inpFields.Lessons && (inpFields.Lessons.length > 0)) {
-                            if (isOneLessonCourse && (inpFields.Lessons.length !== 1))
-                                throw new Error(`Single lesson course must have exactly one lesson.`);
+                        let lsnNum = (inpFields.Lessons && (inpFields.Lessons.length > 0)) ? inpFields.Lessons.length : 0;
+                        if (isNotDraft && isOneLessonCourse && (lsnNum !== 1))
+                            throw new Error(`Single lesson course must have exactly one lesson.`);
+                        if (lsnNum > 0) {
                             let Number = 1;
                             return Utils.seqExec(inpFields.Lessons, (elem) => {
                                 let fields = { LessonId: elem.LessonId, State: elem.State, Number: Number++ };

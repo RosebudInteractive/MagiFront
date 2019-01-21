@@ -177,9 +177,9 @@ class Frame extends Component {
     _removeListeners() {
         $('.js-player').unbind('mouseup');
         $('.js-player').unbind('mousemove');
-        $(document).off('keydown');
         $(document).unbind('ready', this._onDocumentReady);
         $(window).unbind('resize scroll', this._resizeHandler);
+        $(window).unbind('keydown', this._whitespacePressHandler)
     }
 
     _openContent() {

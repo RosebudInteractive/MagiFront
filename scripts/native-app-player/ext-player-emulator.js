@@ -12,11 +12,15 @@ export default class PlayerEmulator {
         this._totalDuration = 0;
     }
 
-    setData(data) {
+    setData(obj) {
         this._clearTimer()
 
-        this._view.setData(data)
-        data.episodes.forEach((episode) => {
+        this._view.setData(obj)
+        if (obj.position) {
+            this._currentTime = obj.position * 1000
+        }
+        
+        obj.data.episodes.forEach((episode) => {
             this._totalDuration += episode.audio.info.length
         })
 
@@ -58,7 +62,7 @@ export default class PlayerEmulator {
         this._view.onChangePosition(value)
         $('.current-time_label').text(value)
 
-        if (value >= this._totalDuration) {
+        if (value >= (this._totalDuration / 1000)) {
             this._view.onEnd()
             clearInterval(this._timer)
         }
