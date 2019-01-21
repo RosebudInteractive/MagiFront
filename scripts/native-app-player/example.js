@@ -71,10 +71,11 @@ let listener = (event) => {
             let _id = $('#lecture-id').val();
             getData(_id)
                 .then((data) => {
+                    let _obj = {data: data, position: $('#init_position').val(), externalPlayer: _externalPlayer}
                     if (_externalPlayer) {
-                        _extPlayer.setData(data)
+                        _extPlayer.setData(_obj)
                     } else {
-                        window.magisteriaPlayer.setData(data)
+                        window.magisteriaPlayer.setData(_obj)
                     }
                 })
                 .catch((err) => {
