@@ -54,7 +54,7 @@ class CourseEditor extends ObjectEditor {
         this.mask = course ? course.Mask : null;
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate() {
         if (this.props.hasChanges) {
             this.handleChangeDataOnWebixForm()
         }
