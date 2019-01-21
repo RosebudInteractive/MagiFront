@@ -27,6 +27,7 @@ export default function singleCourse(state = initialState, action) {
         case CREATE_NEW_COURSE: {
             let _newObject = {
                 State: 'D',
+                Mask: '_mask01'
             };
 
             return {
@@ -65,7 +66,7 @@ export default function singleCourse(state = initialState, action) {
             };
 
         case SAVE_COURSE_START : {
-            return {...state, fetching: true,}
+            return {...state, fetching: false,}
         }
 
         case SAVE_COURSE_SUCCESS : {

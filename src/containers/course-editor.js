@@ -58,6 +58,8 @@ class CourseEditor extends ObjectEditor {
         if (this.props.hasChanges) {
             this.handleChangeDataOnWebixForm()
         }
+
+        super.componentDidUpdate(prevProps)
     }
 
     getObject() {
