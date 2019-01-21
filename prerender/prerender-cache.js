@@ -3,6 +3,7 @@ const _ = require('lodash');
 const config = require('config');
 const request = require('request');
 const { RedisConnections, ConnectionWrapper } = require('../database/providers/redis/redis-connections');
+const { CacheableObject } = require('../utils/cache-base');
 const { SEO } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
@@ -12,26 +13,35 @@ const SCAN_PAGE_SIZE = 100;
 const DFLT_RENDER_MAX_COUNT = 5;
 const DFLT_RENDER_DELAY = 10 * 1000; // 10sec
 
-let PrerenderCache = class {
+let PrerenderCache = class PrerenderCache extends CacheableObject {
     constructor(options) {
-        let opts = options || {};
-        this._cache = {};
-        this._prefix = config.has("server.prerender.redisPrefix") ? config.get("server.prerender.redisPrefix") : KEY_PREFIX;
-        this._isRedis = config.get("server.prerender.useRedis");
+        let opts = _.cloneDeep(options || {});
+        opts.prefix = config.has("server.prerender.redisPrefix") ? config.get("server.prerender.redisPrefix") : KEY_PREFIX;
+        let isRedis = config.get("server.prerender.useRedis");
+        if (!isRedis)
+            delete opts.redis
+        else {
+            if (!opts.redis) {
+                if (config.has("connections.redis"))
+                    opts.redis = _.cloneDeep(config.connections.redis);
+            }
+        }
+        super(opts);
         let targetHost = config.has("server.prerender.targetHost") ? config.server.prerender.targetHost : null;
         this._renderHost = opts.host ? opts.host : (targetHost ? targetHost : config.proxyServer.siteHost);
-        if (this._isRedis) {
-            RedisConnections(opts.redis);
-        }
     }
 
-    getKey(key) {
+    cacheGetKey(key) {
         if ((!key) || (typeof (key) !== "string"))
-            throw new Error("PrerenderCache::getKey; Key is missing or invalid!");
+            throw new Error("PrerenderCache::cacheGetKey: Key is missing or invalid!");
         let rc = key;
         if ((rc.length === 0) || (rc[rc.length - 1] !== "/"))
             rc += "/";
         return this._prefix + rc;
+    }
+
+    getKey(key) {
+        return this.cacheGetKey(key);
     }
 
     getList(mode) {
@@ -63,7 +73,7 @@ let PrerenderCache = class {
                 });
             }
             else {
-                if (mode!=="all")
+                if (mode !== "all")
                     throw new Error(`PrerenderCache::getList: Invalid parameter "mode": "${JSON.stringify(mode)}". Only "all" is allowed.`)
                 rc = Object.keys(this._cache);
             }
@@ -141,125 +151,23 @@ let PrerenderCache = class {
     }
 
     ttl(key, inMsec) {
-        return new Promise((resolve, reject) => {
-            let rc = null;
-            let id = this.getKey(key);
-            if (this._isRedis) {
-                rc = ConnectionWrapper((connection) => {
-                    return (inMsec ? connection.pttlAsync(id) : connection.ttlAsync(id))
-                        .then(result => {
-                            return result >= 0 ? result : (result === -2 ? 0 : result);
-                        });
-                });
-            }
-            else
-                rc = this._cache[id] ? -1 : 0;
-            resolve(rc);
-        });
+        return this.cacheTtl(key, inMsec);
     }
 
     get(key, options) {
-        return new Promise((resolve, reject) => {
-            let rc;
-            let id = this.getKey(key);
-            let opts = options || {};
-            let value;
-            if (this._isRedis) {
-                rc = ConnectionWrapper((connection) => {
-                    return connection.getAsync(id)
-                        .then(result => {
-                            let res = value = result;
-                            if (value)
-                                if (opts.withTtl || opts.withPttl) {
-                                    if (opts.withTtl)
-                                        res = connection.ttlAsync(id)
-                                    else
-                                        res = connection.pttlAsync(id);
-                                    res = res.then(result => {
-                                        if (result === -2) {
-                                            return null;
-                                        }
-                                        else {
-                                            return {
-                                                value: value,
-                                                time: result === -1 ? null : result
-                                            };
-                                        }
-                                    });
-                                }
-                            return res;
-                        });
-                });
-            }
-            else
-                rc = this._cache[id];
-            resolve(rc);
-        });
+        return this.cacheGet(key, options);
     }
 
     set(key, data, ttlInSec) {
-        return new Promise((resolve, reject) => {
-            let rc;
-            let id = this.getKey(key);
-            if (this._isRedis) {
-                rc = ConnectionWrapper((connection) => {
-                    let args = [id, data];
-                    if ((typeof (ttlInSec) === "number") && (ttlInSec > 0)) {
-                        args.push("EX");
-                        args.push(ttlInSec);
-                    }
-                    return connection.setAsync(args);
-                });
-            }
-            else
-                this._cache[id] = data;
-            resolve(rc);
-        });
+        return this.cacheSet(key, data, { ttlInSec: ttlInSec });
     }
 
     del(key, isInternal) {
-        return new Promise((resolve, reject) => {
-            let rc;
-            let id = isInternal ? key : this.getKey(key);
-            if (this._isRedis) {
-                rc = ConnectionWrapper((connection) => {
-                    return connection.delAsync(id);
-                    // return connection.unlinkAsync(id);// Available since Redis 4.0
-                });
-            }
-            else
-                delete this._cache[id];
-            resolve(rc);
-        });
+        return this.cacheDel(key, isInternal);
     }
 
     rename(old_key, new_key, withError) {
-        return new Promise((resolve, reject) => {
-            let rc;
-            let old_id = this.getKey(old_key);
-            let new_id = this.getKey(new_key);
-            if (this._isRedis) {
-                rc = ConnectionWrapper((connection) => {
-                    return connection.renameAsync(old_id, new_id);
-                })
-                    .then((result) => {
-                        return ({ isErr: false, result: result });
-                    })
-                    .catch((err) => {
-                        if (withError)
-                            throw err;
-                        return ({ isErr: true, result: err });
-                    });
-            }
-            else {
-                let val = this._cache[old_id];
-                if (typeof (val) !== "undefined") {
-                    delete this._cache[old_id];
-                    this._cache[new_id] = val;
-                }
-            }
-            resolve(rc);
-        });
+        return this.cacheRename(old_key, new_key, withError);
     }
 }
 

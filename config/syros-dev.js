@@ -105,15 +105,7 @@ module.exports = {
         }
     },
     connections: {
-        redis: {
-            host: "localhost",
-            port: 6379,
-            pool: {
-                max: 5,
-                min: 0,
-                idle: 10000
-            }
-        },
+        redis: null,
         mssql: {
             host: 'localhost',
             port: 1435,

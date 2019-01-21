@@ -206,6 +206,10 @@
     /*height: 200px;*/
 }
 
+.tabs .dlg-btn-bar {
+    padding: 5px 0 5px 0;
+}
+
 /*.tabs-1 .tabContent: {}*/
 
 .tool-btn {
