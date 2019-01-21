@@ -37,13 +37,14 @@ let options = {
             name: "Mailing",
             module: "./mailing",
             type: "scheduled-task",
-            disabled: true,
+            disabled: false,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 host: "https://new.magisteria.ru",
                 first_date: "2018-3-1",
-                period: "week",
+                last_date: "2018-3-8",
+                period: "raw",
                 sender: "test@magisteria.ru",
                 senderName: "Magisteria.ru",
                 mailList: "Магистерия",
@@ -55,7 +56,7 @@ let options = {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
