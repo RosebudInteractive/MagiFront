@@ -24,7 +24,7 @@ export default class Item extends React.Component {
         let {item, isFavorite} = this.props;
 
         return (
-            <div className="bookmarks__lesson-item">
+            <div className={"bookmarks__lesson-item" + (item.singleLessonInCourse ? ' _single' : '')}>
                 <div className="bookmarks__lesson-item__icons-block">
                     <span className={"favorites" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
                         <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ?_redFlag : _flag}}/>

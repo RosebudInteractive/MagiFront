@@ -49,13 +49,15 @@ class Menu extends React.Component {
 
         let {course, lessons, isLessonMenuOpened, isMobileApp, extClass} = this.props,
             _courseTitle = course ? course.Name : '',
+            _singleLesson = course ? !!course.OneLesson : false,
             _courseUrl = course ? course.URL : '',
             _total = lessons.object.length,
             _type = this._getMenuType(),
             _menuClassName = "lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
                 (isLessonMenuOpened ? ' opened' : '') +
                 (isMobileApp ? ' mobile' : ' desktop') +
-                (extClass ? ' ' + extClass : '')
+                (extClass ? ' ' + extClass : '') +
+                (_singleLesson ? ' ' + '_single' : '')
 
         return (
             <div className={_menuClassName}>
