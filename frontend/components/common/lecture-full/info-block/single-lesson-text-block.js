@@ -8,15 +8,17 @@ export default class SingleLessonTextBlock extends React.Component {
     static propTypes = {
         courseUrl: PropTypes.string,
         lesson: PropTypes.object,
+        needShowAuthors: PropTypes.bool,
     };
 
     render() {
-        let {lesson, courseUrl, } = this.props,
+        let {lesson, courseUrl, needShowAuthors} = this.props,
             _linkUrl = '/' + courseUrl + '/' + lesson.URL,
             _title = lesson.Name.match(/[-.?!)(,:]$/g) ? lesson.Name : (lesson.Name + '.'),
-            _authorName = lesson.author.FirstName + ' ' + lesson.author.LastName,
-            _authorUrl = '/autor/' + lesson.author.URL,
-            _category = lesson.category.Name;
+
+            _authorName = needShowAuthors ? (lesson.author.FirstName + ' ' + lesson.author.LastName) : null,
+            _authorUrl = needShowAuthors ? ('/autor/' + lesson.author.URL) : null,
+            _category = needShowAuthors ? lesson.category.Name : null
 
         return (
             <div className="lecture-full__text-block">
@@ -29,9 +31,19 @@ export default class SingleLessonTextBlock extends React.Component {
                 </h3>
                 <p className="lecture-full__descr">
                     {' ' + lesson.ShortDescription + ' '}
-                    <span className="lecture-full_stats">
-                        <span className="cathegory">{_category}</span> /<span className="author"><Link to={_authorUrl}>{_authorName}</Link></span>
-                    </span>
+                    {
+                        needShowAuthors ?
+                            <span className="lecture-full_stats">
+                                <span className="cathegory">{_category}</span> /
+                                <span className="author">
+                                    <Link to={_authorUrl}>{_authorName}</Link>
+                                </span>
+                            </span>
+                            :
+                            null
+
+                    }
+
                 </p>
             </div>
         )

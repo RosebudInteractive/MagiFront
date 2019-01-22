@@ -23,21 +23,26 @@ export default class InfoBlock extends React.Component {
         let {lesson, courseUrl, needShowAuthors, isSingleLesson} = this.props;
 
         return (
-                <div className="lecture-full__info-block">
-                    { isSingleLesson ?
-                        <SingleLessonTextBlock courseUrl={courseUrl} lesson={lesson}/>
-                        :
-                        <TextBlock needShowAuthors={needShowAuthors}
-                                   title={lesson.Name}
-                                   authorName={lesson.authorName}
-                                   descr={lesson.ShortDescription}
-                                   lessonUrl={lesson.URL}
-                                   courseUrl={courseUrl}/>
-                    }
+            <div className="lecture-full__info-block">
+                {isSingleLesson ?
+                    <SingleLessonTextBlock courseUrl={courseUrl} lesson={lesson} needShowAuthors={needShowAuthors}/>
+                    :
+                    <TextBlock needShowAuthors={needShowAuthors}
+                               title={lesson.Name}
+                               authorName={lesson.authorName}
+                               descr={lesson.ShortDescription}
+                               lessonUrl={lesson.URL}
+                               courseUrl={courseUrl}/>
+                }
+                {!isSingleLesson ?
                     <Extras subLessons={lesson.Lessons}
                             parentNumber={lesson.Number}
                             courseUrl={courseUrl}/>
-                </div>
+                    :
+                    null
+                }
+
+            </div>
         )
     }
 }

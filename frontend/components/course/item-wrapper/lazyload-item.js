@@ -21,7 +21,7 @@ export default class Item extends React.Component {
         let {course, isMobile} = this.props;
 
         return course.OneLesson ?
-            <SingleLesson course={course} />
+            <SingleLesson course={course} needShowAuthors={true} />
             :
             <CourseModule course={course} isMobile={isMobile} />
     }
