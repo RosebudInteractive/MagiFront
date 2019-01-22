@@ -56,6 +56,15 @@ const _prodConfig = {
                 test: /\.js$/
             },
             {
+                test: /\.sass$/,
+                use: [
+                    // fallback to style-loader in development
+                    'style-loader',
+                    "css-loader",
+                    "sass-loader"
+                ]
+            },
+            {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
