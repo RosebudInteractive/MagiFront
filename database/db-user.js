@@ -9,7 +9,7 @@ const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 
 const GET_HISTORY_MSSQL =
-    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
+    "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
@@ -35,7 +35,7 @@ const GET_HISTORY_MSSQL =
     "order by c.[Id], lc.[ParentId], lc.[Number], el.[Number]";
 
 const GET_HISTORY_MYSQL =
-    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
+    "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
@@ -107,7 +107,7 @@ const GET_COURSE_IDS_BKM_MSSQL =
     "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
-    "select c.[Id], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
+    "select c.[Id], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
@@ -171,7 +171,7 @@ const GET_COURSE_IDS_BKM_MYSQL =
     "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
-    "select c.`Id`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
+    "select c.`Id`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
@@ -324,6 +324,7 @@ const DbUser = class DbUser extends DbObject {
                                                 Color: elem.Color,
                                                 Name: elem.Name,
                                                 URL: elem.URL,
+                                                OneLesson: elem.OneLesson ? true : false
                                             };
                                             history.Courses[elem.Id] = course;
                                         };
@@ -489,6 +490,7 @@ const DbUser = class DbUser extends DbObject {
                                             CoverMeta: elem.CoverMeta,
                                             Mask: elem.Mask,
                                             Order: courseBoookmarkOrder[elem.Id],
+                                            OneLesson: elem.OneLesson ? true : false,
                                             Authors: [],
                                             Categories: []
                                         };
