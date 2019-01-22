@@ -21,7 +21,7 @@ const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_LESSONS_MSSQL =
-    "select lc.[ReadyDate], l.[Id], cl.[Name] as [CourseName], c.[URL] as [CourseURL], pl.[Number] as [ParentNumber],\n" +
+    "select lc.[ReadyDate], l.[Id], cl.[Name] as [CourseName], c.[URL] as [CourseURL], c.[OneLesson], pl.[Number] as [ParentNumber],\n" +
     "  lc.[Number], ll.[Name], l.[URL], ll.[ShortDescription], l.[Cover] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -35,7 +35,7 @@ const GET_LESSONS_MSSQL =
     "order by lc.[ReadyDate] desc, l.[Id] desc";
 
 const GET_LESSONS_MYSQL =
-    "select lc.`ReadyDate`, l.`Id`, cl.`Name` as `CourseName`, c.`URL` as `CourseURL`, pl.`Number` as `ParentNumber`,\n" +
+    "select lc.`ReadyDate`, l.`Id`, cl.`Name` as `CourseName`, c.`URL` as `CourseURL`, c.`OneLesson`, pl.`Number` as `ParentNumber`,\n" +
     "  lc.`Number`, ll.`Name`, l.`URL`, ll.`ShortDescription`, l.`Cover` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -122,6 +122,20 @@ exports.MailingTask = class MailingTask extends Task {
                         first_date.setDate(last_date.getDate() - 7);
                     }
                     break;
+                case "raw":
+                    if (this._settings.first_date) {
+                        first_date = new Date(this._settings.first_date);
+                    }
+                    else
+                        throw new Error(`Missing "first_date".`);
+                    if (this._settings.last_date) {
+                        last_date = new Date(this._settings.last_date);
+                    }
+                    else
+                        throw new Error(`Missing "last_date".`);
+                    if (last_date <= first_date)
+                        throw new Error(`Invalid date range: [${first_date}..${last_date}].`);
+                    break;
                 default:
                     throw new Error(`Invalid mailing period "${this._settings.period}".`);
             }
@@ -170,36 +184,45 @@ exports.MailingTask = class MailingTask extends Task {
         let imgDir;
         options.letter = { ids: [] };
         let letterTmpl;
+        let lessonTmpl;
+        let lessonNumberBlockTmpl;
+        let courseBlockTmpl;
 
         return new Promise(resolve => {
             imgDir = path.join(config.uploadPath, this._settings.imgDir);
             resolve(this._forceDir(imgDir));
         })
-            .then(() => {
-                return readFileAsync("./mailing/templates/letter.tmpl", "utf8")
-                    .then((result) => { letterTmpl = result });
+            .then(async () => {
+                letterTmpl = await readFileAsync("./mailing/templates/letter.tmpl", "utf8");
+                lessonTmpl = await readFileAsync("./mailing/templates/lesson-item.tmpl", "utf8");
+                lessonNumberBlockTmpl = await readFileAsync("./mailing/templates/lesson-number-block.tmpl", "utf8");
+                courseBlockTmpl = await readFileAsync("./mailing/templates/course-block.tmpl", "utf8");
             })
             .then(() => {
                 let lessons_body = "";
-                return readFileAsync("./mailing/templates/lesson-item.tmpl", "utf8")
-                    .then(lessonTmpl => {
-                        return Utils.seqExec(options.data, (lesson) => {
-                            return this._makePicture(lesson, imgDir)
-                                .then(imgFile => {
-                                    let lsn = _.template(lessonTmpl)({
+                return Utils.seqExec(options.data, (lesson) => {
+                    return this._makePicture(lesson, imgDir)
+                        .then(imgFile => {
+                            let course_block = lesson.OneLesson ? "" :
+                                _.template(courseBlockTmpl)(
+                                    {
                                         course_url: this._settings.baseUrl + "/category/" + lesson.CourseURL,
-                                        course_title: lesson.CourseName,
-                                        lesson_number: (lesson.ParentNumber ? (lesson.ParentNumber + "." + lesson.Number) : lesson.Number) + ".",
-                                        lesson_url: this._settings.baseUrl + "/" + lesson.CourseURL + "/" + lesson.URL,
-                                        lesson_title: lesson.Name,
-                                        lesson_short_description: lesson.ShortDescription,
-                                        lesson_img_url: this._settings.baseUrl + this._settings.imgUrl + imgFile
+                                        course_title: lesson.CourseName
                                     });
-                                    lessons_body += lsn;
-                                    options.letter.ids.push(lesson.Id);
-                                });
+                            let lesson_number = (lesson.ParentNumber ? (lesson.ParentNumber + "." + lesson.Number) : lesson.Number) + ".";
+                            let lesson_number_block = lesson.OneLesson ? "" : _.template(lessonNumberBlockTmpl)({ lesson_number: lesson_number });
+                            let lsn = _.template(lessonTmpl)({
+                                course_block: course_block,
+                                lesson_number_block: lesson_number_block,
+                                lesson_url: this._settings.baseUrl + "/" + lesson.CourseURL + "/" + lesson.URL,
+                                lesson_title: lesson.Name,
+                                lesson_short_description: lesson.ShortDescription,
+                                lesson_img_url: this._settings.baseUrl + this._settings.imgUrl + imgFile
+                            });
+                            lessons_body += lsn;
+                            options.letter.ids.push(lesson.Id);
                         });
-                    })
+                })
                     .then(() => {
                         options.letter.body = _.template(letterTmpl)({
                             root_url: this._settings.baseUrl,
