@@ -10,6 +10,15 @@
                 "mysql": "./build_2/upgrade_2_mysql.sql"
             },
             "upgrader": "./build_2"
+        },
+        "3": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_3/upgrade_3_mssql.sql",
+                "mysql": "./build_3/upgrade_3_mysql.sql"
+            },
+            "upgrader": "./build_3"
         }
     }
 }
