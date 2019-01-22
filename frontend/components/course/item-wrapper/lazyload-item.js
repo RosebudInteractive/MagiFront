@@ -1,7 +1,7 @@
 import React from 'react'
 import {lazyload} from 'react-lazyload';
 import PropTypes from "prop-types";
-import SingleLesson from "../../single-lesson/common/wrapper";
+import SingleLesson from "../single-lesson-course-module";
 import CourseModule from "../course-module";
 
 @lazyload({

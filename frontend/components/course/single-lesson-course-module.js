@@ -1,8 +1,8 @@
 import React from 'react'
-import LessonFullWrapper from "../../common/lecture-full/wrapper";
+import LessonFullWrapper from "../common/lecture-full/wrapper";
 import PropTypes from "prop-types";
 
-export default class Wrapper extends React.Component {
+export default class SingleLessonCourseModule extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,

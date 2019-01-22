@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from "prop-types";
-import SingleCourseLesson from "../../single-lesson/common/wrapper";
+import SingleCourseLesson from "../single-lesson-course-module";
 import CourseModule from "../course-module";
 
 export default class Item extends React.Component {

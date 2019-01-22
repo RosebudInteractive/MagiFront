@@ -23,8 +23,8 @@ export default class Wrapper extends React.Component {
 
         return lazyload
             ?
-            <LazyItem course={course} isMobile={this._isMobile()}/>
+            <LazyItem course={course} isMobile={this._isMobile()} key={course.Id}/>
             :
-            <NotLazyItem course={course} isMobile={this._isMobile()}/>
+            <NotLazyItem course={course} isMobile={this._isMobile()} key={course.Id}/>
     }
 }

@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 import InfoBlock from './info-block';
 import {ImageSize, getCoverPath} from '../../tools/page-tools';
 
-export default class CourseModuleLazyload extends React.Component {
+export default class CourseModule extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,

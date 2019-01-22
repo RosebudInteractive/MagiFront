@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import SingleLesson from '../single-lesson/common/wrapper'
+import LessonFullWrapper from "../common/lecture-full/wrapper";
 
 export default class Lessons extends React.Component {
 
@@ -47,14 +47,10 @@ export default class Lessons extends React.Component {
 
         courses.forEach((course, index) => {
             if (course.OneLesson) {
-                if (!course.Lessons || !course.Lessons.length) {
-                    let _lesson = this._findLesson(course.Id)
+                let _lesson = this._findLesson(course.Id)
 
-                    course.Lessons = [_lesson];
-                }
-
-                if (course.Lessons.length > 0) {
-                    _result.push(<SingleLesson course={course} needShowAuthors={false} key={index}/>)
+                if (_lesson) {
+                    _result.push(<Lesson course={course} needShowAuthors={false} lesson={_lesson} key={index}/>)
                 }
             }
         })
@@ -71,5 +67,23 @@ export default class Lessons extends React.Component {
             })
             :
             null
+    }
+}
+
+
+class Lesson extends React.Component {
+
+    static propTypes = {
+        course: PropTypes.object,
+        lesson: PropTypes.object,
+        needShowAuthors: PropTypes.bool,
+    };
+
+    render() {
+        let {course, lesson, needShowAuthors} = this.props;
+
+        return <div className="lecture-full">
+            <LessonFullWrapper courseUrl={course.URL} lesson={lesson} isSingleLesson={true} needShowAuthors={needShowAuthors}/>
+        </div>
     }
 }

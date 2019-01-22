@@ -10836,6 +10836,9 @@ ul.lectures-tab {
     .author-block .course-announce__image svg {
       max-width: 320px;
       max-height: 380px; } }
+.author-block .lecture-full__title .label,
+.author-block .lecture-full:before{
+  display: none }
 
 .author-block__inner {
   display: -webkit-box;
