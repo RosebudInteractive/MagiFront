@@ -25,10 +25,12 @@ import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import {
     disableButtons,
     enableButtons,
+} from "adm-ducks/app";
+import {
     fixedCourseIdSelector,
     getParameters,
-    setFixedObject,
-} from "adm-ducks/app";
+    setFixedCourse,
+} from "adm-ducks/params";
 import { getFormValues, isValid, isDirty, } from 'redux-form'
 
 class CourseEditor extends ObjectEditor {
@@ -103,7 +105,7 @@ class CourseEditor extends ObjectEditor {
 
     _save(value) {
         if (!this.props.fixFormValid) {return}
-        this.props.setFixedObject({courseId: value.id, ...this.props.fixFormValues})
+        this.props.setFixedCourse({courseId: value.id, ...this.props.fixFormValues})
 
         let _checkResult = checkExtLinks(value.extLinksValues)
 
@@ -710,7 +712,6 @@ function mapStateToProps(state, ownProps) {
         fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
         fixFormValues: getFormValues('FixingBlock')(state),
         fixFormValid: isValid('FixingBlock')(state),
-        fixedCourseId: fixedCourseIdSelector(state),
     }
 }
 
@@ -730,7 +731,7 @@ function mapDispatchToProps(dispatch) {
         disableButtons: bindActionCreators(disableButtons, dispatch),
         enableButtons: bindActionCreators(enableButtons, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
-        setFixedObject: bindActionCreators(setFixedObject, dispatch),
+        setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
     }
 }
 

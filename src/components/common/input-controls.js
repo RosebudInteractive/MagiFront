@@ -12,8 +12,12 @@ class Editor extends React.Component {
         extClass: PropTypes.string
     };
 
+    _checked() {
+        return this.props.input.value
+    }
+
     render() {
-        const {input, meta: {error, touched}, id, type, label, placeholder, disabled, hidden, extClass, defaultChecked} = this.props;
+        const {input, meta: {error, touched}, id, type, label, placeholder, disabled, hidden, extClass,} = this.props;
         const _errorText = touched && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
@@ -23,9 +27,9 @@ class Editor extends React.Component {
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
                 <label htmlFor={id} className="field-label">{label}</label>
                 {disabled ?
-                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} defaultChecked={defaultChecked} disabled/>
+                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} checked={this._checked()} disabled/>
                     :
-                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} defaultChecked={defaultChecked}/>
+                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} checked={this._checked()}/>
                 }
                 {_errorText}
             </div>
@@ -38,9 +42,13 @@ export class CheckBox extends Editor {
         label: PropTypes.string,
     }
 
-    render() {
-        // const {input,} = this.props;
+    componentDidUpdate(prevProps) {
+        if (prevProps.defaultValue !== this.props.defaultValue) {
+            this.props.input.onChange(this.props.defaultValue)
+        }
+    }
 
+    render() {
         return <Editor type={'checkbox'} {...this.props} extClass={'field-checkbox'}/>;
     }
 }

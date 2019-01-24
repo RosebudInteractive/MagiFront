@@ -8,7 +8,7 @@ export default class TextArea extends React.Component {
         super(props)
 
         this.state = {
-            descr: ''
+            descr: props.defaultValue
         }
 
         this._handlePaste = (e) => {
@@ -28,6 +28,13 @@ export default class TextArea extends React.Component {
 
     componentDidMount() {
         $('.field-textarea').bind('paste', this._handlePaste)
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.defaultValue !== this.props.defaultValue) {
+            this.props.input.onChange(this.props.defaultValue)
+            this.setState({descr: this.props.defaultValue})
+        }
     }
 
     componentWillUnmount() {

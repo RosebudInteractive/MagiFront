@@ -34,12 +34,19 @@ class FixingBlock extends React.Component {
         this.props.reset();
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.fixed !== this.props.fixed) {
+            this.setState({showDescription: this.props.fixed})
+        }
+    }
+
     render() {
         return <div className="form-wrapper non-webix-form">
             <form className="fix-control-form">
-                <Field name="active" label={this.props.label}
-                       component={CheckBox} onChange={::this._changeActive} defaultChecked={this.props.fixed}/>
-                <Field name="description" label='Описание' component={TextArea} hidden={!this.state.showDescription} onBlur={::this.props.validate}/>
+                <Field component={CheckBox} name="active" label={this.props.label}
+                       onChange={::this._changeActive} checked={this.props.fixed} defaultValue={this.props.fixed}/>
+                <Field name="description" label='Описание' component={TextArea} hidden={!this.state.showDescription}
+                       onBlur={::this.props.validate} defaultValue={this.props.descr}/>
             </form>
         </div>
     }

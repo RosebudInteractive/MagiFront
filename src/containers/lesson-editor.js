@@ -32,8 +32,13 @@ import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import * as appActions from "../actions/app-actions";
-import {disableButtons, enableButtons, getParameters} from "adm-ducks/app";
+import {disableButtons, enableButtons,} from "adm-ducks/app";
+import {
+    getParameters,
+    setFixedLesson,
+} from "adm-ducks/params";
 import FixControl from "../components/lesson-editor/fix-lesson-wrapper";
+import {getFormValues, isDirty, isValid} from "redux-form";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -235,6 +240,9 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _save(value) {
+        if (!this.props.fixFormValid) {return}
+        this.props.setFixedLesson({lessonId: value.id, ...this.props.fixFormValues})
+
         let _checkResult = checkExtLinks(value.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
@@ -1220,12 +1228,16 @@ function mapStateToProps(state, ownProps) {
             state.lessonResources.hasChanges ||
             state.lessonMainEpisodes.hasChanges ||
             state.lessonCommonRefs.hasChanges ||
-            state.lessonRecommendedRefs.hasChanges,
+            state.lessonRecommendedRefs.hasChanges ||
+            isDirty('FixingBlock')(state),
 
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching,
+
+        fixFormValues: getFormValues('FixingBlock')(state),
+        fixFormValid: isValid('FixingBlock')(state),
 
         ownProps: ownProps,
     }
@@ -1247,6 +1259,7 @@ function mapDispatchToProps(dispatch) {
         disableButtons: bindActionCreators(disableButtons, dispatch),
         enableButtons: bindActionCreators(enableButtons, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
+        setFixedLesson: bindActionCreators(setFixedLesson, dispatch),
     }
 }
 
