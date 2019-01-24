@@ -2,6 +2,7 @@ import React from 'react'
 import ErrorDialog from '../components/dialog/error-dialog';
 import {Prompt} from 'react-router-dom';
 import BottomControls from '../components/bottom-contols'
+// import $ from 'jquery'
 
 import {
     EDIT_MODE_INSERT,
@@ -89,14 +90,20 @@ export default class ObjectEditor extends React.Component {
         }
 
         this._onUpdate();
+
+        let _nonWebixForm = $('.non-webix-form');
+
+        if (_nonWebixForm.length > 0) {
+            let _width = $('.webix_form').width()
+            _nonWebixForm.width(_width)
+        }
+
+        if ($('.field-wrapper').length > 0) {
+            $('.field-wrapper').width($('.webix_control').width())
+        }
     }
 
     componentDidMount() {
-        // if (this.objectId > 0) {
-        //     this._initEditMode()
-        // } else {
-        //     this._initInsertMode()
-        // }
     }
 
     _onUpdate() {
@@ -165,15 +172,23 @@ export default class ObjectEditor extends React.Component {
                         <div>
                             <Prompt when={this._needShowPrompt()}
                                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
-                            <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
+                            <div className="control-wrapper">
+                                <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
+                                {this._getNonWebixForm()}
+                            </div>
                             {this._getWebixForm()}
-                            <BottomControls editor={this} hasChanges={hasChanges} onAccept={::this._save} onCancel={::this._cancel}/>
+                            <BottomControls editor={this} hasChanges={hasChanges} onAccept={::this._save}
+                                            onCancel={::this._cancel}/>
                         </div>
                 }
                 <ErrorDialog/>
                 {this._getExtDialogs()}
             </div>
         )
+    }
+
+    _getNonWebixForm() {
+        return null
     }
 
     _notifyDataLoaded() {
@@ -218,7 +233,7 @@ export default class ObjectEditor extends React.Component {
             id: 'editor-form',
             minWidth: 500,
             maxWidth: 1000,
-            borderless:true,
+            borderless: true,
             autowidth: true,
             css: "editor-form",
             elements: that._getElements(),

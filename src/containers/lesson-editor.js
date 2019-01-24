@@ -32,7 +32,8 @@ import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import * as appActions from "../actions/app-actions";
-import {disableButtons, enableButtons} from "adm-ducks/app";
+import {disableButtons, enableButtons, getParameters} from "adm-ducks/app";
+import FixControl from "../components/lesson-editor/fix-lesson-wrapper";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -100,6 +101,10 @@ export class LessonEditor extends ObjectEditor {
     }
 
     componentDidMount() {
+        super.componentDidMount();
+
+        this.props.getParameters()
+
         let _editor = $('.webix_view .webix_layout_line');
 
         _editor.on('paste', (e) => {
@@ -562,7 +567,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _createResource() {
-        this.props.resourcesActions.create({ShowInGalery : !(this._needSetOgImage || this._needSetTwitterImage)})
+        this.props.resourcesActions.create({ShowInGalery: !(this._needSetOgImage || this._needSetTwitterImage)})
     }
 
     _multiUpload() {
@@ -663,9 +668,6 @@ export class LessonEditor extends ObjectEditor {
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
                     <TabLink to="tab1">Эпизоды</TabLink>
-                    {/*{*/}
-                    {/*!this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''*/}
-                    {/*}*/}
                     {this._getAdditionalTab()}
 
                     <TabLink to="tab3">Список литературы</TabLink>
@@ -695,8 +697,6 @@ export class LessonEditor extends ObjectEditor {
                                           createAction={::this._newSubLesson}
                                           editAction={::this._editSubLesson}
                                           removeAction={subLessonsActions.remove}
-                            // moveUpAction={::this._moveSubLessonUp}
-                            // moveDownAction={::this._moveSubLessonDown}
                                           editMode={this.editMode}
                                           selected={selectedSubLesson}
                                           data={subLessons}
@@ -743,6 +743,12 @@ export class LessonEditor extends ObjectEditor {
                 </div>
             </Tabs>
         ]
+    }
+
+    _getNonWebixForm() {
+        let _data = this.getObject();
+
+        return <FixControl lesson={_data}/>
     }
 
     _getExtDialogs() {
@@ -1210,11 +1216,11 @@ function mapStateToProps(state, ownProps) {
         resourceEditMode: state.resources.editMode,
 
         hasChanges: state.singleLesson.hasChanges ||
-        state.subLessons.hasChanges ||
-        state.lessonResources.hasChanges ||
-        state.lessonMainEpisodes.hasChanges ||
-        state.lessonCommonRefs.hasChanges ||
-        state.lessonRecommendedRefs.hasChanges,
+            state.subLessons.hasChanges ||
+            state.lessonResources.hasChanges ||
+            state.lessonMainEpisodes.hasChanges ||
+            state.lessonCommonRefs.hasChanges ||
+            state.lessonRecommendedRefs.hasChanges,
 
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
@@ -1240,6 +1246,7 @@ function mapDispatchToProps(dispatch) {
         parentLessonActions: bindActionCreators(parentLessonActions, dispatch),
         disableButtons: bindActionCreators(disableButtons, dispatch),
         enableButtons: bindActionCreators(enableButtons, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
     }
 }
 

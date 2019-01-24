@@ -1,36 +1,59 @@
 import React from 'react'
 import {reduxForm, Field} from 'redux-form'
+import {CheckBox} from '../input-controls'
+import TextArea from '../text-area'
+import PropTypes from 'prop-types'
+import '../form.sass'
 
 const validate = values => {
     const errors = {}
 
-    // if (!values.login) {
-    //     errors.login = 'Required'
-    // } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
-    //     errors.login = 'Invalid email address'
-    // }
-    // if (!values.password) {
-    //     errors.password = 'Required'
-    // }
+    if (values.active && !values.description) {
+        errors.description = 'Значение не может быть пустым'
+    }
+
     return errors
 }
 
-class FixingBlock extends React.Component{
+class FixingBlock extends React.Component {
+
+    static propTypes = {
+        fixed: PropTypes.bool,
+        label: PropTypes.string,
+        descr: PropTypes.string,
+    }
 
     constructor(props) {
         super(props)
         this.state = {
-            showTextBlock: null
+            showDescription: this.props.fixed
         }
     }
 
+    componentWillUnmount() {
+        this.props.reset();
+    }
+
     render() {
+        return <div className="form-wrapper non-webix-form">
+            <form className="fix-control-form">
+                <Field name="active" label={this.props.label}
+                       component={CheckBox} onChange={::this._changeActive} defaultChecked={this.props.fixed}/>
+                <Field name="description" label='Описание' component={TextArea} hidden={!this.state.showDescription} onBlur={::this.props.validate}/>
+            </form>
+        </div>
+    }
+
+    _changeActive(event) {
+        if (event.target) {
+            this.setState({showDescription: event.target.checked})
+        }
 
     }
 }
 
 export default reduxForm({
     form: 'FixingBlock',
-    validate
+    validate,
 })(FixingBlock);
 
