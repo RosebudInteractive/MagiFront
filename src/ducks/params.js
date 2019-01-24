@@ -150,7 +150,7 @@ export const setFixedCourse = (data) => {
 
         let _courseParam = _state['params'].parameters.get('fixedCourseId'),
             _courseId = _state['params'].parameters.getIn(['fixedCourseId', 'Value']),
-            _lessonId = _state['app'].parameters.getIn(['fixedLessonId', 'Value']),
+            _lessonId = _state['params'].parameters.getIn(['fixedLessonId', 'Value']),
             _descrParam = _state['params'].parameters.get('fixedObjDescr'),
             _descr = _state['params'].parameters.getIn(['fixedObjDescr', 'Value'])
 

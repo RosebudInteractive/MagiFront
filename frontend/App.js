@@ -25,6 +25,7 @@ import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks} from "./ducks/profile";
+import {getParameters} from "./ducks/params";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 
@@ -114,6 +115,7 @@ class App extends Component {
 
         this.props.appActions.getAppOptions()
         this.props.appActions.getCookiesConfimation()
+        this.props.getParameters()
     }
 
     componentDidMount() {
@@ -322,6 +324,7 @@ function mapDispatchToProps(dispatch) {
         playerActions: bindActionCreators(playerActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
     }
 }
 

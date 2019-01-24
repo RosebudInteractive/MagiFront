@@ -27,7 +27,6 @@ import {
     enableButtons,
 } from "adm-ducks/app";
 import {
-    fixedCourseIdSelector,
     getParameters,
     setFixedCourse,
 } from "adm-ducks/params";
