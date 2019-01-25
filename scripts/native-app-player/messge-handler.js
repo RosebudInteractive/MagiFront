@@ -20,7 +20,7 @@ class MessageHandler {
                     JSON.stringify(data),
                     '*'
                 )
-            }, 0)
+            }, 1)
             return true
         } else {
             return false
