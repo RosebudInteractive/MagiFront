@@ -1,5 +1,5 @@
 import {LessonEditor} from './lesson-editor';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import * as singleLessonActions from "../actions/lesson/lesson-actions";
 import * as lessonMainEpisodesActions from '../actions/lesson/lessonMainEpisodesActions'
 import * as lessonCommonRefsActions from '../actions/lesson/lessonCommonRefsActions'
@@ -17,8 +17,9 @@ import {labelWidth,} from './object-editor';
 import {bindActionCreators} from 'redux';
 import {disableButtons, enableButtons} from "adm-ducks/app";
 import {getParameters, setFixedLesson} from "adm-ducks/params";
+import {getFormValues, isDirty, isValid} from "redux-form";
 
-class SubLessonEditor extends LessonEditor{
+class SubLessonEditor extends LessonEditor {
     _getEditRout() {
         return '/sub-lessons/edit/';
     }
@@ -43,7 +44,7 @@ class SubLessonEditor extends LessonEditor{
         }
     }
 
-    _getAdditionalTab(){
+    _getAdditionalTab() {
         return ''
     }
 
@@ -118,11 +119,12 @@ function mapStateToProps(state, ownProps) {
         resourceEditMode: state.resources.editMode,
 
         hasChanges: state.singleLesson.hasChanges ||
-        state.subLessons.hasChanges ||
-        state.lessonResources.hasChanges ||
-        state.lessonMainEpisodes.hasChanges ||
-        state.lessonCommonRefs.hasChanges ||
-        state.lessonRecommendedRefs.hasChanges,
+            state.subLessons.hasChanges ||
+            state.lessonResources.hasChanges ||
+            state.lessonMainEpisodes.hasChanges ||
+            state.lessonCommonRefs.hasChanges ||
+            state.lessonRecommendedRefs.hasChanges ||
+            isDirty('FixingBlock')(state),
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
@@ -132,6 +134,9 @@ function mapStateToProps(state, ownProps) {
         courseId: Number(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching,
+
+        fixFormValues: getFormValues('FixingBlock')(state),
+        fixFormValid: isValid('FixingBlock')(state),
 
         ownProps: ownProps,
     }
