@@ -32,9 +32,9 @@ class Wrapper extends React.Component {
                     <div className="course-module__header">
                         <h1 className="course-module__title">
                             <span className="favourites">В закладки</span>
-                            <a href="#">
+                            <Link to={'/' + course.URL}>
                                 <p className="course-module__label">Курс:</p> <span>{course.Name}</span>
-                            </a>
+                            </Link>
                         </h1>
                         <div className="course-module__info">
                             <div className="course-module__stats">

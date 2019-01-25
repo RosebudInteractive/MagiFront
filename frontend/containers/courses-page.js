@@ -10,6 +10,7 @@ import * as storageActions from '../actions/lesson-info-storage-actions';
 import * as tools from '../tools/page-tools';
 import CourseWrapper from '../components/course/item-wrapper';
 import FixCourseWrapper from '../components/fixed/course/wrapper';
+import FixLessonWrapper from '../components/fixed/lesson/wrapper';
 import {
     filtersSelector,
     isEmptyFilterSelector,
@@ -17,7 +18,7 @@ import {
     selectedFilterSelector,
     applyExternalFilter
 } from "../ducks/filters";
-import {fixedCourseIdSelector} from "../ducks/params";
+import {fixedCourseIdSelector, fixedLessonIdSelector} from "../ducks/params";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -59,7 +60,7 @@ class CoursesPage extends React.Component {
 
     _getCoursesBundles() {
 
-        let {isEmptyFilter, selectedFilter, fixedCourseId} = this.props,
+        let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId} = this.props,
             _courses = this.props.courses.items,
             _result = [];
 
@@ -80,6 +81,18 @@ class CoursesPage extends React.Component {
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
                 } else {
+                    if (fixedLessonId) {
+                        let _lesson = course.Lessons.find((lesson) => {
+                            return lesson.Id === fixedLessonId
+                        })
+
+                        if (_lesson) {
+                            _lesson.author = course.AuthorsObj.find(author => author.Id === _lesson.AuthorId)
+                            _lesson.category = course.CategoriesObj
+                            _result.unshift(<FixLessonWrapper lesson={_lesson} courseUrl={course.URL}/>)
+                        }
+                    }
+
                     _result.push(<CourseWrapper course={course} lazyload={isEmptyFilter} key={index}/>)
                 }
 
@@ -122,6 +135,7 @@ function mapStateToProps(state, ownProps) {
         showFiltersForm: state.pageHeader.showFiltersForm,
         externalFilter: ownProps.match.params.filter,
         fixedCourseId: fixedCourseIdSelector(state),
+        fixedLessonId: fixedLessonIdSelector(state),
         ownProps,
     }
 }

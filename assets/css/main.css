@@ -5383,6 +5383,13 @@ ul.user-tooltip {
       color: #2f2f2f; }
     .course-module__stats span {
       color: rgba(47, 47, 47, 0.6); }
+    .course-module__stats .author-name a {
+      color: rgba(47, 47, 47, 0.6);
+      border-bottom: 1px solid rgba(255, 255, 255, 0);
+      -webkit-transition: border-color 0.3s ease;
+      transition: border-color 0.3s ease; }
+    .course-module__stats .author-name a:hover {
+      border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
   .course-module__description-block {
     padding-top: 62px;
     padding-bottom: 3px;
@@ -18475,7 +18482,7 @@ ul.lectures-tab {
 
 .video-block {
   position: relative;
-  padding-top: 43.75%; }
+  padding-top: 43.75%;}
   @media (max-width: 1023px) {
     .video-block {
       padding-top: 56.25%; } }
@@ -18488,6 +18495,8 @@ ul.lectures-tab {
       order: -1;
       margin-top: 20px; } }
   .video-block video {
+    background-size: cover;
+    background-position: center;
     position: absolute;
     top: 0;
     left: 0;

@@ -59,7 +59,15 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_FIXED_COURSE:
             return state
                 .set('needSave', true)
-                .updateIn(['parameters', 'fixedCourseId'], fixedCourseId => fixedCourseId.merge(payload))
+                .update('parameters', (params) => {
+                    if (params.has('fixedCourseId')) {
+                        return params.update('fixedCourseId', fixedCourseId => fixedCourseId.merge(payload))
+                    } else {
+                        let _obj = {}
+                        _obj[payload.Key] = payload
+                        return params.merge(_obj)
+                    }
+                })
 
         case CLEAR_FIXED_COURSE:
             return state
@@ -69,7 +77,15 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_FIXED_OBJECT_DESCR:
             return state
                 .set('needSave', true)
-                .updateIn(['parameters', 'fixedObjDescr'], fixedObjDescr => fixedObjDescr.merge(payload))
+                .update('parameters', (params) => {
+                    if (params.has('fixedObjDescr')) {
+                        return params.update('fixedObjDescr', fixedObjDescr => fixedObjDescr.merge(payload))
+                    } else {
+                        let _obj = {}
+                        _obj[payload.Key] = payload
+                        return params.merge(_obj)
+                    }
+                })
 
         case SET_FIXED_LESSON:
             return state
@@ -175,16 +191,6 @@ export const setFixedCourse = (data) => {
 
 
             _setFixedDescr(_descrParam, data, dispatch);
-            // let _newDescrParam = _descr ? _descrParam.toJS() : {};
-            //
-            // _newDescrParam.Key = 'fixedObjDescr';
-            // _newDescrParam.Tp = 0;
-            // _newDescrParam.Value = data.active ? data.description : null
-            //
-            // dispatch({
-            //     type: SET_FIXED_OBJECT_DESCR,
-            //     payload: _newDescrParam
-            // });
         }
     }
 }
@@ -220,22 +226,12 @@ export const setFixedLesson = (data) => {
 
 
             _setFixedDescr(_descrParam, data, dispatch);
-            // let _newDescrParam = _descr ? _descrParam.toJS() : {};
-            //
-            // _newDescrParam.Key = 'fixedObjDescr';
-            // _newDescrParam.Tp = 0;
-            // _newDescrParam.Value = data.active ? data.description : null
-            //
-            // dispatch({
-            //     type: SET_FIXED_OBJECT_DESCR,
-            //     payload: _newDescrParam
-            // });
         }
     }
 }
 
 const _setFixedDescr = (param, data, dispatch) => {
-    let _newParam = param.get('Value') ? param.toJS() : {};
+    let _newParam = (param && param.get('Value')) ? param.toJS() : {};
 
     _newParam.Key = 'fixedObjDescr';
     _newParam.Tp = 0;

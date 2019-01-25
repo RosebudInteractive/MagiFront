@@ -1,31 +1,101 @@
 import React from 'react';
 import PropTypes from 'prop-types'
+import {bindActionCreators} from "redux";
+import * as playerStartActions from "actions/player-start-actions";
+import * as userActions from "actions/user-actions";
+import * as storageActions from "actions/lesson-info-storage-actions";
+import {connect} from "react-redux";
+import {Redirect} from "react-router";
 
-export default class PlayerBlock extends React.Component {
+class PlayerBlock extends React.Component {
 
     static propTypes = {
         poster: PropTypes.string,
         visibleButton: PropTypes.bool,
+        lessonId: PropTypes.number,
+        isAuthRequired: PropTypes.bool,
+        audios: PropTypes.array,
+        courseUrl: PropTypes.string,
+        lessonUrl: PropTypes.string,
     }
 
     render() {
-        let {poster, visibleButton} = this.props;
+        let {poster} = this.props;
+
+        const _coverStyle = {
+            backgroundImage: "url(" + poster + ")",
+        }
+
+        if (this._redirect) {
+            this._redirect = false;
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+        }
 
         return (
             <div className="video-block">
-                <video src="#" poster={poster}/>
-                {
-                    visibleButton ?
-                        <button className="video-block__btn" type="button" onClick={::this._onClickPlay}/>
-                        :
-                        null
-                }
-
+                <video src="#" style={_coverStyle}/>
+                {this._getButton()}
             </div>
         )
     }
 
-    _onClickPlay() {
+    _play() {
+        this.props.playerStartActions.preinitAudios(this.props.audios);
+        this._redirect = true;
+        this.forceUpdate()
+        this.props.playerStartActions.startPlay(this.props.lessonId)
+    }
 
+    _unlock() {
+        this.props.userActions.showSignInForm();
+    }
+
+    _getButton() {
+        if (!this.props.visibleButton) { return null }
+
+        let {lessonId, isAuthRequired, authorized} = this.props,
+            _lessonInfo = this.props.lessonInfoStorage.lessons.get(lessonId),
+            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
+            _button = null;
+
+
+        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
+            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
+            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+
+        if (isAuthRequired && !authorized) {
+            _button = <button className="play-block__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+            </button>
+        } else {
+            _button = <button className="play-block__btn" onClick={::this._play}>
+                {_isFinished
+                    ?
+                    <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                    :
+                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                }
+            </button>
+        }
+
+        return _button;
     }
 }
+
+
+function mapStateToProps(state) {
+    return {
+        lessonInfoStorage: state.lessonInfoStorage,
+        authorized: !!state.user.user,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
+        storageActions: bindActionCreators(storageActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlayerBlock);

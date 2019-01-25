@@ -15,6 +15,8 @@ import * as parentLessonActions from '../actions/lesson/parent-lesson-actions';
 import {labelWidth,} from './object-editor';
 
 import {bindActionCreators} from 'redux';
+import {disableButtons, enableButtons} from "adm-ducks/app";
+import {getParameters, setFixedLesson} from "adm-ducks/params";
 
 class SubLessonEditor extends LessonEditor{
     _getEditRout() {
@@ -147,6 +149,10 @@ function mapDispatchToProps(dispatch) {
         lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
         resourcesActions: bindActionCreators(resourcesActions, dispatch),
         parentLessonActions: bindActionCreators(parentLessonActions, dispatch),
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
+        setFixedLesson: bindActionCreators(setFixedLesson, dispatch),
     }
 }
 
