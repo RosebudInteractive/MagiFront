@@ -18,9 +18,19 @@ import {connect} from 'react-redux';
 import {CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
 import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
+import FixControl from '../components/course-editor/fix-course-wrapper';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {EDIT_MODE_INSERT} from "../constants/Common";
-import {checkExtLinks, convertLinksToString, getExtLinks} from "../tools/link-tools";
+import {checkExtLinks, getExtLinks} from "../tools/link-tools";
+import {
+    disableButtons,
+    enableButtons,
+} from "adm-ducks/app";
+import {
+    getParameters,
+    setFixedCourse,
+} from "adm-ducks/params";
+import { getFormValues, isValid, isDirty, } from 'redux-form'
 
 class CourseEditor extends ObjectEditor {
 
@@ -35,6 +45,13 @@ class CourseEditor extends ObjectEditor {
         authorsActions.getAuthors();
         categoriesActions.getCategories();
         languagesActions.getLanguages();
+
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        this.props.getParameters()
     }
 
     componentWillReceiveProps(next) {
@@ -51,6 +68,14 @@ class CourseEditor extends ObjectEditor {
         this.cover = course ? course.Cover : null;
         this.coverMeta = course ? course.CoverMeta : null;
         this.mask = course ? course.Mask : null;
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.hasChanges) {
+            this.handleChangeDataOnWebixForm()
+        }
+
+        super.componentDidUpdate(prevProps)
     }
 
     getObject() {
@@ -78,6 +103,9 @@ class CourseEditor extends ObjectEditor {
     }
 
     _save(value) {
+        if (!this.props.fixFormValid) {return}
+        this.props.setFixedCourse({courseId: value.id, ...this.props.fixFormValues})
+
         let _checkResult = checkExtLinks(value.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
@@ -102,7 +130,8 @@ class CourseEditor extends ObjectEditor {
             Authors: [],
             Categories: [],
             Lessons: [],
-            ExtLinks: getExtLinks(value.extLinksValues)
+            ExtLinks: getExtLinks(value.extLinksValues),
+            OneLesson: !!value.OneLesson,
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
@@ -129,7 +158,7 @@ class CourseEditor extends ObjectEditor {
         return {
             // path: _meta ? ('/data/' + (_meta.content.m ? (_meta.path +  _meta.content.m) : this.cover)) : null,
             path: _meta ? '/data/' + this.cover : null,
-            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width) : 0
         };
     }
 
@@ -303,12 +332,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     _getWebixForm() {
-        const {
-            courseLessons,
-            selectedAuthor,
-            selectedCategory,
-            selectedLesson,
-        } = this.props;
+        const {courseLessons, selectedAuthor, selectedCategory, selectedLesson,} = this.props;
 
         let _data = this.getObject();
         return [
@@ -339,7 +363,7 @@ class CourseEditor extends ObjectEditor {
                     <TabContent for="tab3">
                         <CourseLessons data={courseLessons}
                                        selectAction={::this._selectLesson}
-                                       createAction={::this._createLesson}
+                                       createAction={this._canCreateLesson() ? ::this._createLesson : null}
                                        removeAction={::this._removeLessonFromCourse}
                                        editAction={::this._editLesson}
                                        moveUpAction={::this._moveUpLesson}
@@ -353,9 +377,24 @@ class CourseEditor extends ObjectEditor {
         ]
     }
 
+    _getNonWebixForm() {
+        let _data = this.getObject();
+
+        return <FixControl course={_data}/>
+    }
+
+    _canCreateLesson() {
+        let _data = this.getObject()
+
+        return (_data && _data.OneLesson) ?
+            (_data.Lessons && this.props.courseLessons.length < 1)
+            :
+            true
+    }
+
     _getMasks() {
         let _masks = [];
-        for (let i=1; i <= 12; i++) {
+        for (let i = 1; i <= 12; i++) {
             _masks.push({id: '_mask' + i.toString().padStart(2, '0'), value: 'Маска ' + i})
         }
 
@@ -501,7 +540,7 @@ class CourseEditor extends ObjectEditor {
                                 datatype: 'image',
                                 id: 'cover_template',
                                 template: (obj) => {
-                                    return '<div class="cover ' + obj.mask + '" width="'+ obj.width +'px"' + ' height="'+ obj.height +'px">' +
+                                    return '<div class="cover ' + obj.mask + '" width="' + obj.width + 'px"' + ' height="' + obj.height + 'px">' +
                                         '<svg viewBox="0 0 574 503" width="574" height="503">' +
                                         '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + obj.src + '" width="574" height="503"/>' +
                                         '</svg>' +
@@ -516,7 +555,7 @@ class CourseEditor extends ObjectEditor {
                                         object.mask = that.mask;
                                         let _width = window.$$('cover_template').config.width,
                                             _height = 334;
-                                            // _height = _width * _coverInfo.heightRatio;
+                                        // _height = _width * _coverInfo.heightRatio;
 
                                         object.width = _width;
                                         object.height = _height;
@@ -564,17 +603,18 @@ class CourseEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
+                                that.props.enableButtons()
                             },
                             onFileUploadError: () => {
                                 that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                             },
                         }
                     },
@@ -614,6 +654,13 @@ class CourseEditor extends ObjectEditor {
                 labelWidth: labelWidth,
                 height: 200,
             },
+            {
+                view: "checkbox",
+                id: 'one-lesson-checkbox',
+                label: "Курс с одиночной лекцией",
+                name: 'OneLesson',
+                labelWidth: labelWidth,
+            },
         ];
     }
 
@@ -621,6 +668,17 @@ class CourseEditor extends ObjectEditor {
         let _enable = super._enableApplyChanges();
 
         return _enable && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
+    }
+
+    handleChangeDataOnWebixForm() {
+        if (!window.$$('one-lesson-checkbox')) return
+
+        if (this.props.courseLessons.length <= 1) {
+            window.$$('one-lesson-checkbox').enable()
+        } else {
+            window.$$('one-lesson-checkbox').disable()
+        }
+
     }
 }
 
@@ -643,17 +701,16 @@ function mapStateToProps(state, ownProps) {
         languages: state.languages.languages,
         showAddAuthorDialog: state.courseAuthors.showAddDialog,
         showAddCategoryDialog: state.courseCategories.showAddDialog,
+        // fixFormHasChanges: isDirty('FixingBlock')(state),
         hasChanges: state.singleCourse.hasChanges ||
-        state.courseAuthors.hasChanges ||
-        state.courseCategories.hasChanges ||
-        state.courseLessons.hasChanges,
-
-        hasError: state.commonDlg.hasError,
-        message: state.commonDlg.message,
-        errorDlgShown: state.commonDlg.errorDlgShown,
+            state.courseAuthors.hasChanges ||
+            state.courseCategories.hasChanges ||
+            state.courseLessons.hasChanges || isDirty('FixingBlock')(state),
 
         courseId: Number(ownProps.match.params.id),
-        fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching
+        fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
+        fixFormValues: getFormValues('FixingBlock')(state),
+        fixFormValid: isValid('FixingBlock')(state),
     }
 }
 
@@ -669,6 +726,11 @@ function mapDispatchToProps(dispatch) {
         categoriesActions: bindActionCreators(categoriesActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
         coursesActions: bindActionCreators(coursesActions, dispatch),
+
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
+        setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
     }
 }
 

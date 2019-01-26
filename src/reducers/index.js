@@ -3,7 +3,6 @@ import { routerReducer } from 'react-router-redux';
 
 import page from "./page"
 import user from "./user"
-import menu from "./menu"
 import commonDlg from './commonDlg';
 import episodes from "./episodes";
 import author from './author';
@@ -38,12 +37,12 @@ import content from './content';
 import workShop from './work-shop'
 import appReducer, {moduleName as appModule} from '../ducks/app'
 import authReducer, {moduleName as authModule} from '../ducks/auth'
+import paramsReducer, {moduleName as paramsModule} from '../ducks/params'
 import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
     page,
     user,
-    menu,
     commonDlg,
     author,
     episodes,
@@ -74,6 +73,7 @@ export default combineReducers({
     workShop,
     [appModule]: appReducer,
     [authModule]: authReducer,
+    [paramsModule]: paramsReducer,
     routing: routerReducer,
     form: formReducer,
 })

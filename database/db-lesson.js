@@ -346,7 +346,7 @@ const PARENT_MSSQL_REQ =
 
 const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
-    "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
+    "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -516,7 +516,7 @@ const PARENT_MYSQL_REQ =
 
 const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
-    "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
+    "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -1349,7 +1349,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
-                                URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL
+                                URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL,
+                                OneLesson: elem.OneLesson ? true : false
                             };
                         }
                         else

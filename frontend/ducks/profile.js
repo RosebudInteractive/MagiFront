@@ -9,6 +9,7 @@ import {
     SIGN_IN_SUCCESS,
     LOGOUT_SUCCESS,
 } from "../constants/user";
+import {parseReadyDate} from "../tools/time-tools";
 
 /**
  * Constants
@@ -634,9 +635,11 @@ const handleCourse = (data) => {
 };
 
 const handleLesson = (lesson) => {
-    let _readyDate = new Date(lesson.ReadyDate);
-    lesson.readyYear = _readyDate.getFullYear();
-    lesson.readyMonth = Months[_readyDate.getMonth()];
+    let _readyDate = lesson.ReadyDate ? new Date(lesson.ReadyDate) : null,
+        _parsedDate = parseReadyDate(_readyDate);
+
+    lesson.readyMonth = _parsedDate.readyMonth;
+    lesson.readyYear = _parsedDate.readyYear;
 
     if (lesson.CoverMeta) {
         lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
@@ -726,6 +729,7 @@ const handleBookmarksData = (data) => {
 
             lesson.courseUrl = _course ? _course.URL : null;
             lesson.courseName = _course ? _course.Name : null;
+            lesson.singleLessonInCourse = _course ? _course.OneLesson : false;
 
             let _author = data.Authors[lesson.AuthorId];
 

@@ -19,6 +19,7 @@ import playerScreenReducer, {moduleName as playerScreenModule} from '../ducks/pl
 import messageReducer, {moduleName as messageModule} from '../ducks/message'
 import filtersReducer, {moduleName as filtersModule} from '../ducks/filters'
 import billingReducer, {moduleName as billingModule} from '../ducks/billing'
+import paramsReducer, {moduleName as paramsModule} from '../ducks/params'
 
 export default combineReducers({
 
@@ -40,6 +41,7 @@ export default combineReducers({
     [messageModule]: messageReducer,
     [filtersModule]: filtersReducer,
     [billingModule]: billingReducer,
+    [paramsModule]: paramsReducer,
     routing: routerReducer,
     form: formReducer,
 })

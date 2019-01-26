@@ -8,7 +8,7 @@ import { connect } from 'react-redux'
 
 import PropTypes from 'prop-types'
 import Webix from '../components/Webix';
-import YesNoDialog from "../components/YesNoDialog"
+import YesNoDialog from "../components/dialog/yes-no-dialog"
 import EpisodesForm from "./EpisodeForm"
 import * as episodesActions from "../actions/EpisodesActions"
 import { EDIT_MODE_EDIT, EDIT_MODE_INSERT } from "../constants/Common"

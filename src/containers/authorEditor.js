@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import {EDIT_MODE_INSERT} from "../constants/Common";
 
 import ObjectEditor, {labelWidth, } from './object-editor';
+import {disableButtons, enableButtons,} from "adm-ducks/app";
 
 class AuthorEditor extends ObjectEditor {
 
@@ -217,17 +218,18 @@ class AuthorEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 let _portraitMeta = JSON.stringify(response[0].info);
                                 window.$$('portrait-file').setValue(response[0].file);
                                 window.$$('portrait-meta').setValue(_portraitMeta);
                                 window.$$('cover_template').refresh();
+                                that.props.enableButtons()
                             },
                             onFileUploadError: () => {
                                 that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                             },
                         }
                     },
@@ -262,6 +264,8 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return {
         authorActions: bindActionCreators(authorActions, dispatch),
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
     }
 }
 

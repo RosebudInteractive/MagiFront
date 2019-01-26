@@ -32,6 +32,13 @@ import SnImageSelectForm from "../components/lesson-sn-image-form";
 import $ from 'jquery';
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import * as appActions from "../actions/app-actions";
+import {disableButtons, enableButtons,} from "adm-ducks/app";
+import {
+    getParameters,
+    setFixedLesson,
+} from "adm-ducks/params";
+import FixControl from "../components/lesson-editor/fix-lesson-wrapper";
+import {getFormValues, isDirty, isValid} from "redux-form";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -99,6 +106,10 @@ export class LessonEditor extends ObjectEditor {
     }
 
     componentDidMount() {
+        super.componentDidMount();
+
+        this.props.getParameters()
+
         let _editor = $('.webix_view .webix_layout_line');
 
         _editor.on('paste', (e) => {
@@ -229,6 +240,9 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _save(value) {
+        if (!this.props.fixFormValid) {return}
+        this.props.setFixedLesson({lessonId: value.id, ...this.props.fixFormValues})
+
         let _checkResult = checkExtLinks(value.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
@@ -561,7 +575,7 @@ export class LessonEditor extends ObjectEditor {
     }
 
     _createResource() {
-        this.props.resourcesActions.create({ShowInGalery : !(this._needSetOgImage || this._needSetTwitterImage)})
+        this.props.resourcesActions.create({ShowInGalery: !(this._needSetOgImage || this._needSetTwitterImage)})
     }
 
     _multiUpload() {
@@ -662,9 +676,6 @@ export class LessonEditor extends ObjectEditor {
             <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
                 <div className="tab-links">
                     <TabLink to="tab1">Эпизоды</TabLink>
-                    {/*{*/}
-                    {/*!this.isSubLesson ? <TabLink to="tab2">Дополнительные лекции</TabLink> : ''*/}
-                    {/*}*/}
                     {this._getAdditionalTab()}
 
                     <TabLink to="tab3">Список литературы</TabLink>
@@ -694,8 +705,6 @@ export class LessonEditor extends ObjectEditor {
                                           createAction={::this._newSubLesson}
                                           editAction={::this._editSubLesson}
                                           removeAction={subLessonsActions.remove}
-                            // moveUpAction={::this._moveSubLessonUp}
-                            // moveDownAction={::this._moveSubLessonDown}
                                           editMode={this.editMode}
                                           selected={selectedSubLesson}
                                           data={subLessons}
@@ -742,6 +751,12 @@ export class LessonEditor extends ObjectEditor {
                 </div>
             </Tabs>
         ]
+    }
+
+    _getNonWebixForm() {
+        let _data = this.getObject();
+
+        return <FixControl lesson={_data}/>
     }
 
     _getExtDialogs() {
@@ -962,16 +977,18 @@ export class LessonEditor extends ObjectEditor {
                                     return false;
                                 }
 
-                                window.$$('btnOk').disable();
-                                window.$$('btnCancel').disable();
+                                that.props.disableButtons()
                             },
                             onUploadComplete: (response) => {
                                 let _coverMeta = JSON.stringify(response[0].info);
                                 window.$$('cover-file').setValue(response[0].file);
                                 window.$$('cover-meta').setValue(_coverMeta);
                                 window.$$('cover_template').refresh();
+                                that.props.enableButtons()
                             },
                             onFileUploadError: (file, response) => {
+                                that.props.appActions.showErrorDialog('При загрузке файла произошла ошибка')
+                                that.props.enableButtons()
                                 console.log(file, response)
                             }
 
@@ -1207,20 +1224,20 @@ function mapStateToProps(state, ownProps) {
         resourceEditMode: state.resources.editMode,
 
         hasChanges: state.singleLesson.hasChanges ||
-        state.subLessons.hasChanges ||
-        state.lessonResources.hasChanges ||
-        state.lessonMainEpisodes.hasChanges ||
-        state.lessonCommonRefs.hasChanges ||
-        state.lessonRecommendedRefs.hasChanges,
-
-        hasError: state.commonDlg.hasError,
-        message: state.commonDlg.message,
-        errorDlgShown: state.commonDlg.errorDlgShown,
+            state.subLessons.hasChanges ||
+            state.lessonResources.hasChanges ||
+            state.lessonMainEpisodes.hasChanges ||
+            state.lessonCommonRefs.hasChanges ||
+            state.lessonRecommendedRefs.hasChanges ||
+            isDirty('FixingBlock')(state),
 
         lessonId: Number(ownProps.match.params.id),
         courseId: Number(ownProps.match.params.courseId),
         subLessonId: Number(ownProps.match.params.subLessonId),
         fetching: state.courseAuthors.fetching || state.singleLesson.fetching || state.singleCourse.fetching,
+
+        fixFormValues: getFormValues('FixingBlock')(state),
+        fixFormValid: isValid('FixingBlock')(state),
 
         ownProps: ownProps,
     }
@@ -1239,6 +1256,10 @@ function mapDispatchToProps(dispatch) {
         lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
         resourcesActions: bindActionCreators(resourcesActions, dispatch),
         parentLessonActions: bindActionCreators(parentLessonActions, dispatch),
+        disableButtons: bindActionCreators(disableButtons, dispatch),
+        enableButtons: bindActionCreators(enableButtons, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
+        setFixedLesson: bindActionCreators(setFixedLesson, dispatch),
     }
 }
 

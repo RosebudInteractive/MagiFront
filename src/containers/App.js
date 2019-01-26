@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 
 import {Switch, Route, withRouter, Link,} from 'react-router-dom'
 
-import Menu from "../components/Menu"
+import Menu from "../components/menu"
 import Home from "../components/Home"
 import Authors from "./Authors"
 import AuthorForm from './authorEditor';
@@ -22,6 +22,7 @@ import {getAppOptions,} from "../ducks/app";
 import {bindActionCreators} from "redux";
 import Toolbar from "../components/app/toolbar";
 import * as appActions from '../actions/app-actions'
+import './app.sass'
 
 class App extends Component {
 
@@ -47,7 +48,7 @@ class App extends Component {
         return [<WorkShop/>,
             !isUserAuthorized ? <SignInForm/> : null,
             isUserAuthorized ?
-                <div className="app" style={_isNeedHideAdm ? _hideStyle : null}>
+                <div className="app adm" style={_isNeedHideAdm ? _hideStyle : null}>
                     <div className="left bar-bgcolor">
                         <div className="toolbar top-bar-size">
                             <Link to={'/'}>
@@ -55,7 +56,7 @@ class App extends Component {
                                     <div>Magisteria</div>
                                 </div>
                             </Link>
-                            <Menu history={this.props.history}/>
+                            <Menu history={this.props.history} location={this.props.location}/>
                         </div>
                     </div>
                     <div className="right">

@@ -6,7 +6,7 @@ import * as lessonActions from '../actions/lesson/lesson-actions'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 // import {EDIT_MODE_EDIT} from '../constants/Common';
-import ErrorDialog from './ErrorDialog';
+import ErrorDialog from './dialog/error-dialog';
 
 class EpisodeResourceForm extends React.Component {
 

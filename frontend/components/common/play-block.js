@@ -12,11 +12,14 @@ import {TooltipTitles} from "../../tools/page-tools";
 class PlayBlock extends React.Component {
 
     static propTypes = {
+        id: PropTypes.number,
         cover: PropTypes.string,
         courseUrl: PropTypes.string,
         lessonUrl: PropTypes.string,
         audios: PropTypes.array,
         isAuthRequired: PropTypes.bool,
+        duration: PropTypes.string,
+        totalDuration: PropTypes.number,
     }
 
     _play() {

@@ -6,8 +6,8 @@ import * as categoriesActions from "../actions/categoriesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
-import YesNoDialog from "../components/YesNoDialog";
-import ErrorDialog from '../components/ErrorDialog';
+import YesNoDialog from "../components/dialog/yes-no-dialog";
+import ErrorDialog from '../components/dialog/error-dialog';
 
 class Categories extends React.Component {
     componentDidMount(){

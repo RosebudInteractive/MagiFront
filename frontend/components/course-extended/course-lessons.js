@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
-import LessonWrapper from "./lesson/lesson-wrapper";
+import LessonFull from "../common/lecture-full-list-item";
 import LessonPreview from './lesson/lesson-preview';
-import {ImageSize, getCoverPath} from '../../tools/page-tools'
 
 class CourseLessons extends React.Component {
 
@@ -25,29 +24,11 @@ class CourseLessons extends React.Component {
             _needShowAuthors = (course.Authors && course.Authors.length > 1);
 
         return course.Lessons.map((lesson, index) => {
-            let _cover = getCoverPath(lesson, ImageSize.small)
 
             lesson.authorName = _needShowAuthors ? this._getAuthor(lesson.AuthorId) : '';
 
             return lesson.State === 'R' ?
-                <LessonWrapper
-                    id={lesson.Id}
-                    title={lesson.Name}
-                    url={'/' + this.props.courseUrl + '/' + lesson.URL}
-                    courseUrl={this.props.courseUrl}
-                    lessonUrl={lesson.URL}
-                    descr={lesson.ShortDescription}
-                    cover={_cover}
-                    duration={lesson.DurationFmt}
-                    totalDuration={lesson.Duration}
-                    subLessons={lesson.Lessons}
-                    refs={lesson.NRefBooks}
-                    books={lesson.NBooks}
-                    audios={lesson.Audios}
-                    isAuthRequired={lesson.IsAuthRequired}
-                    lesson={lesson}
-                    key={index}
-                    needShowAuthors={_needShowAuthors}/>
+                <LessonFull lesson={lesson} courseUrl={this.props.courseUrl} needShowAuthors={_needShowAuthors}/>
                 :
                 <LessonPreview
                     title={lesson.Name}

@@ -25,6 +25,7 @@ import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks} from "./ducks/profile";
+import {getParameters} from "./ducks/params";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 
@@ -56,12 +57,15 @@ class App extends Component {
 
         super(props);
         this.state = {
-            direction: '',
+            // direction: '',
             lastScrollPos: 0,
             showHeader: true,
-            width: 0,
-            height: 0,
+            // width: 0,
+            // height: 0,
         };
+
+        this._lastScrollPos = 0;
+
         this._handleScroll = this._handleScroll.bind(this);
 
         let _isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone");
@@ -111,6 +115,7 @@ class App extends Component {
 
         this.props.appActions.getAppOptions()
         this.props.appActions.getCookiesConfimation()
+        this.props.getParameters()
     }
 
     componentDidMount() {
@@ -206,23 +211,26 @@ class App extends Component {
             }
         }
 
-        if ((event.target.scrollingElement.scrollTop < _scrollDelta) && (!this.state.showHeader)) {
+        let _newScrollTop = event.target.scrollingElement.scrollTop
+
+        if ((_newScrollTop < _scrollDelta) && (!this.state.showHeader)) {
             this.setState({showHeader: true})
         }
 
-
-        if ((event.target.scrollingElement.scrollTop > 0) && (this.state.lastScrollPos > event.target.scrollingElement.scrollTop)) {
-            this.setState({
-                direction: 'top',
-                showHeader: true,
-                lastScrollPos: event.target.scrollingElement.scrollTop
-            });
-        } else if (this.state.lastScrollPos < event.target.scrollingElement.scrollTop) {
-            this.setState({
-                direction: 'bottom',
-                showHeader: false,
-                lastScrollPos: event.target.scrollingElement.scrollTop
-            });
+        if ((_newScrollTop > 0) && (this._lastScrollPos > _newScrollTop)) {
+            this._lastScrollPos = _newScrollTop
+            if (!this.state.showHeader) {
+                this.setState({
+                    showHeader: true,
+                });
+            }
+        } else if (this._lastScrollPos < _newScrollTop) {
+            this._lastScrollPos = _newScrollTop
+            if (this.state.showHeader) {
+                this.setState({
+                    showHeader: false,
+                });
+            }
         }
     }
 
@@ -316,6 +324,7 @@ function mapDispatchToProps(dispatch) {
         playerActions: bindActionCreators(playerActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
     }
 }
 

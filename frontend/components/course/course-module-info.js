@@ -4,6 +4,12 @@ import {Link} from 'react-router-dom'
 
 export default class Info extends React.Component {
 
+    static propTypes = {
+        authors: PropTypes.array.isRequired,
+        categories: PropTypes.array.isRequired,
+        showPhoto: PropTypes.bool,
+    };
+
     render() {
         let _multipleAuthors = this.props.authors.length > 1;
         let _multipleCategories = this.props.categories.length > 1;
@@ -13,8 +19,6 @@ export default class Info extends React.Component {
             _authorName += (index !== array.length - 1) ? ',' : '';
             return (<Link to={'/autor/' + author.URL} key={index}>{_authorName}</Link>);
         });
-
-        // _authors = (_authors.length > 1) ? <div>{_authors[0]},<br/> {_authors[1]}</div> : _authors
 
         const _categories = this.props.categories.map((category) => {
             return category.Name
@@ -34,9 +38,3 @@ export default class Info extends React.Component {
         );
     }
 }
-
-Info.propTypes = {
-    authors: PropTypes.array.isRequired,
-    categories: PropTypes.array.isRequired,
-    showPhoto: PropTypes.bool,
-};

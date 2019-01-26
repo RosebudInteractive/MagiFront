@@ -5,6 +5,8 @@ import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
 import workShopMiddleware from '../middlewares/work-shop-middleware'
 import history from '../history'
+import ButtonsMiddleware from '../middlewares/buttons-middleware'
+import ParamsMiddleware from '../middlewares/params-middleware'
 
 export const store = configureStore();
 
@@ -18,7 +20,9 @@ function configureStore(initialState) {
         compose(
             applyMiddleware(thunk, logger),
             applyMiddleware(routerMiddl),
-            applyMiddleware(workShopMiddleware)
+            applyMiddleware(workShopMiddleware),
+            applyMiddleware(ButtonsMiddleware),
+            applyMiddleware(ParamsMiddleware),
         )
     );
 

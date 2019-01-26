@@ -136,15 +136,13 @@ export default class GridControl extends Component {
 
     render() {
         const {data} = this.props;
-        return <div>
-            {/*{message}*/}
+        return [
             <div className="dlg-btn-bar">
                 {this._configButtons()}
-            </div>
-            {/*<div className="tab-scroll-box">*/}
+            </div>,
             <Webix ui={::this.getUI()} data={data}/>
-            {/*</div>*/}
-        </div>
+        ]
+
     }
 
     _getColumns() {
