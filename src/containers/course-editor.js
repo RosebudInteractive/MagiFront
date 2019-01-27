@@ -18,10 +18,19 @@ import {connect} from 'react-redux';
 import {CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
 import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
+import FixControl from '../components/course-editor/fix-course-wrapper';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import {EDIT_MODE_INSERT} from "../constants/Common";
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
-import {disableButtons, enableButtons,} from "adm-ducks/app";
+import {
+    disableButtons,
+    enableButtons,
+} from "adm-ducks/app";
+import {
+    getParameters,
+    setFixedCourse,
+} from "adm-ducks/params";
+import { getFormValues, isValid, isDirty, } from 'redux-form'
 
 class CourseEditor extends ObjectEditor {
 
@@ -36,6 +45,13 @@ class CourseEditor extends ObjectEditor {
         authorsActions.getAuthors();
         categoriesActions.getCategories();
         languagesActions.getLanguages();
+
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        this.props.getParameters()
     }
 
     componentWillReceiveProps(next) {
@@ -87,6 +103,9 @@ class CourseEditor extends ObjectEditor {
     }
 
     _save(value) {
+        if (!this.props.fixFormValid) {return}
+        this.props.setFixedCourse({courseId: value.id, ...this.props.fixFormValues})
+
         let _checkResult = checkExtLinks(value.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
@@ -112,7 +131,7 @@ class CourseEditor extends ObjectEditor {
             Categories: [],
             Lessons: [],
             ExtLinks: getExtLinks(value.extLinksValues),
-            OneLesson: value.OneLesson ? true : false,
+            OneLesson: !!value.OneLesson,
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
@@ -139,7 +158,7 @@ class CourseEditor extends ObjectEditor {
         return {
             // path: _meta ? ('/data/' + (_meta.content.m ? (_meta.path +  _meta.content.m) : this.cover)) : null,
             path: _meta ? '/data/' + this.cover : null,
-            heightRatio: _meta ? (_meta.size.height / _meta.size.width ) : 0
+            heightRatio: _meta ? (_meta.size.height / _meta.size.width) : 0
         };
     }
 
@@ -313,7 +332,7 @@ class CourseEditor extends ObjectEditor {
     }
 
     _getWebixForm() {
-        const { courseLessons, selectedAuthor, selectedCategory, selectedLesson, } = this.props;
+        const {courseLessons, selectedAuthor, selectedCategory, selectedLesson,} = this.props;
 
         let _data = this.getObject();
         return [
@@ -358,6 +377,12 @@ class CourseEditor extends ObjectEditor {
         ]
     }
 
+    _getNonWebixForm() {
+        let _data = this.getObject();
+
+        return <FixControl course={_data}/>
+    }
+
     _canCreateLesson() {
         let _data = this.getObject()
 
@@ -369,7 +394,7 @@ class CourseEditor extends ObjectEditor {
 
     _getMasks() {
         let _masks = [];
-        for (let i=1; i <= 12; i++) {
+        for (let i = 1; i <= 12; i++) {
             _masks.push({id: '_mask' + i.toString().padStart(2, '0'), value: 'Маска ' + i})
         }
 
@@ -515,7 +540,7 @@ class CourseEditor extends ObjectEditor {
                                 datatype: 'image',
                                 id: 'cover_template',
                                 template: (obj) => {
-                                    return '<div class="cover ' + obj.mask + '" width="'+ obj.width +'px"' + ' height="'+ obj.height +'px">' +
+                                    return '<div class="cover ' + obj.mask + '" width="' + obj.width + 'px"' + ' height="' + obj.height + 'px">' +
                                         '<svg viewBox="0 0 574 503" width="574" height="503">' +
                                         '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + obj.src + '" width="574" height="503"/>' +
                                         '</svg>' +
@@ -530,7 +555,7 @@ class CourseEditor extends ObjectEditor {
                                         object.mask = that.mask;
                                         let _width = window.$$('cover_template').config.width,
                                             _height = 334;
-                                            // _height = _width * _coverInfo.heightRatio;
+                                        // _height = _width * _coverInfo.heightRatio;
 
                                         object.width = _width;
                                         object.height = _height;
@@ -676,13 +701,16 @@ function mapStateToProps(state, ownProps) {
         languages: state.languages.languages,
         showAddAuthorDialog: state.courseAuthors.showAddDialog,
         showAddCategoryDialog: state.courseCategories.showAddDialog,
+        // fixFormHasChanges: isDirty('FixingBlock')(state),
         hasChanges: state.singleCourse.hasChanges ||
-        state.courseAuthors.hasChanges ||
-        state.courseCategories.hasChanges ||
-        state.courseLessons.hasChanges,
+            state.courseAuthors.hasChanges ||
+            state.courseCategories.hasChanges ||
+            state.courseLessons.hasChanges || isDirty('FixingBlock')(state),
 
         courseId: Number(ownProps.match.params.id),
-        fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching
+        fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
+        fixFormValues: getFormValues('FixingBlock')(state),
+        fixFormValid: isValid('FixingBlock')(state),
     }
 }
 
@@ -701,6 +729,8 @@ function mapDispatchToProps(dispatch) {
 
         disableButtons: bindActionCreators(disableButtons, dispatch),
         enableButtons: bindActionCreators(enableButtons, dispatch),
+        getParameters: bindActionCreators(getParameters, dispatch),
+        setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
     }
 }
 

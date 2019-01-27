@@ -1,6 +1,6 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Record,} from 'immutable'
+import {Map, Record,} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 

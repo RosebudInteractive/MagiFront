@@ -114,6 +114,7 @@
     "sendpulse-api": "^1.0.3",
     "sharp": "^0.19.0",
     "sitemap": "^1.13.0",
+    "src": "^1.1.2",
     "swiper": "^4.3.3",
     "template": "^0.17.5",
     "text-loader": "0.0.1",

@@ -5,7 +5,8 @@ import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
 import workShopMiddleware from '../middlewares/work-shop-middleware'
 import history from '../history'
-import ButtonsMiddleware from './buttons-middleware'
+import ButtonsMiddleware from '../middlewares/buttons-middleware'
+import ParamsMiddleware from '../middlewares/params-middleware'
 
 export const store = configureStore();
 
@@ -20,7 +21,8 @@ function configureStore(initialState) {
             applyMiddleware(thunk, logger),
             applyMiddleware(routerMiddl),
             applyMiddleware(workShopMiddleware),
-            applyMiddleware(ButtonsMiddleware)
+            applyMiddleware(ButtonsMiddleware),
+            applyMiddleware(ParamsMiddleware),
         )
     );
 

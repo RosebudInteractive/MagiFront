@@ -501,7 +501,8 @@ html,
     text-align: right;
 }
 
-.webix_editors_wrapper{
+.control-wrapper{
+/*.webix_editors_wrapper{*/
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -525,8 +526,8 @@ html,
     /*padding-left: 8px;*/
 /*}*/
 
-.course_editor .webix_editors_wrapper,
-.lesson_editor .webix_editors_wrapper,
+.course_editor .control-wrapper,
+.lesson_editor .control-wrapper,
 .episode_editor .webix_editors_wrapper {
     max-height: calc(55vh - 60px);
 }

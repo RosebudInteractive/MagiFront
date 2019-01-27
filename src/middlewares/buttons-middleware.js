@@ -7,7 +7,13 @@ import {
     SAVE_COURSE_FAIL,
     CHANGE_COURSE_DATA,
 } from "../constants/course/singleCourse";
-import {disableButtons, enableButtons} from "adm-ducks/app";
+import {
+    disableButtons,
+    enableButtons,
+    SAVE_PARAMETERS_FAIL,
+    SAVE_PARAMETERS_START,
+    SAVE_PARAMETERS_SUCCESS
+} from "adm-ducks/app";
 
 const ButtonsMiddleware = store => next => action => {
 
@@ -16,13 +22,16 @@ const ButtonsMiddleware = store => next => action => {
         case GET_SINGLE_COURSE_FAIL:
         case SAVE_COURSE_SUCCESS:
         case SAVE_COURSE_FAIL:
-        case CHANGE_COURSE_DATA: {
+        case CHANGE_COURSE_DATA:
+        case SAVE_PARAMETERS_SUCCESS:
+        case SAVE_PARAMETERS_FAIL: {
             store.dispatch(enableButtons())
             return next(action)
         }
 
         case GET_SINGLE_COURSE_REQUEST:
-        case SAVE_COURSE_START: {
+        case SAVE_COURSE_START:
+        case SAVE_PARAMETERS_START: {
             store.dispatch(disableButtons())
             return next(action)
         }
