@@ -548,7 +548,8 @@ export default class CWSResourceLoader {
                         that._state.loadedData.assets[id] = loaded;
                         delete that._state.loading[id];
                     },
-                    error: () => {
+                    error: (e) => {
+                        console.log('getAsset ajax error: url, e', url, e)
                         delete that._state.loading[id];
                         that._broadcastAssetMissing(url)
                     }
