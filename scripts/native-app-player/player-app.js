@@ -8,7 +8,7 @@ import '../../css/general-player.css'
 import 'jquery-ui/jquery-ui.min.css';
 import 'jquery-ui/jquery-ui.structure.min.css';
 
-Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
+// Sentry.init({ dsn: 'https://4fb18e49474641faaeb712d2329f1549@sentry.io/1326933' });
 
 (function ($) {
     $(document).ready(function () {
