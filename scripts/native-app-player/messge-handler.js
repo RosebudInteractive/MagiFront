@@ -14,7 +14,7 @@ class MessageHandler {
 
     _trySend(data) {
       if( !this.isPostMessageLoaded ) {
-          this.isPostMessageLoaded = /ReactNative/.test( window.postMessage.toString() )
+          this.isPostMessageLoaded = /ReactNative|__REACT_WEB_VIEW_BRIDGE/.test( window.postMessage.toString() )
       }
 
       if( this.isPostMessageLoaded ) {
