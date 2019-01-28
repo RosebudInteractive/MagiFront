@@ -170,6 +170,8 @@ export const setFixedCourse = (data) => {
             _descrParam = _state['params'].parameters.get('fixedObjDescr'),
             _descr = _state['params'].parameters.getIn(['fixedObjDescr', 'Value'])
 
+        // let _needSave = (!_courseId && data.active)
+
         if (!_courseId || (data.courseId === _courseId) || !data.active || (data.description !== _descr)) {
 
             let _newCourseParam = _courseId ? _courseParam.toJS() : {};
