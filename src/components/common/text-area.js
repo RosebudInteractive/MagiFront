@@ -15,14 +15,16 @@ export default class TextArea extends React.Component {
             e.preventDefault();
             e.stopPropagation();
 
-            let text = (e.originalEvent || e).clipboardData.getData('text/html');
-            text = normalizeHtml(text)
+            let _html = (e.originalEvent || e).clipboardData.getData('text/html'),
+                _text = (e.originalEvent || e).clipboardData.getData('text/plain')
+
+            let _descr = _html ? normalizeHtml(_html) : _text
 
             const activeElem = document.activeElement;
 
             if (!activeElem) return false;
 
-            this.setState({descr: text});
+            this.setState({descr: _descr});
         }
     }
 

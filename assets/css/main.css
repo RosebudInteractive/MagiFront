@@ -5113,7 +5113,6 @@ ul.user-tooltip {
   @media (max-width: 1023px) {
     .course-module._small .favourites {
       top: 6px; } }
-
     @media (max-width: 639px) {
       .course-module._small {
         padding-bottom: 15px; } }
@@ -18568,6 +18567,13 @@ ul.lectures-tab {
       border-style: solid;
       border-width: 45px 0 45px 102px;
       border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #fff; }
+    .video-block .play-block__btn svg {
+      width: 102px; }
+    @media (max-width: 1023px) {
+      .video-block .play-block__btn svg {
+        width: 51px;
+        height: 45px; } }
+
 
 .modal-form {
   margin: 0 auto; }

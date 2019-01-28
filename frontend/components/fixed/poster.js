@@ -73,7 +73,7 @@ class PlayerBlock extends React.Component {
                     ?
                     <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
                     :
-                    <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                    <svg width="102" height="90" dangerouslySetInnerHTML={{__html: _play}}/>
                 }
             </button>
         }
