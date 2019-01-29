@@ -5,6 +5,7 @@ class MessageHandler {
     constructor() {
         this._messages = [];
         this._interval = null;
+        this.isPostчMessageLoaded = false
     }
 
     sendMessageToApp(data) {
@@ -12,15 +13,18 @@ class MessageHandler {
     }
 
     _trySend(data) {
-        Promise.resolve().then(() => {
-            window.postMessage(
-                JSON.stringify(data)
-            )
-        }).catch((e) => {
-            console.log('postMessage err', e)
+      if( !this.isPostMessageLoaded ) {
+          this.isPostMessageLoaded = /ReactNative|__REACT_WEB_VIEW_BRIDGE/.test( window.postMessage.toString() )
+      }
 
-            this._addMessageToQueue(data)
-        })
+      if( this.isPostMessageLoaded ) {
+          window.postMessage(
+              JSON.stringify(data)
+          )
+          return
+      }
+
+      this._addMessageToQueue(data)
     }
 
     _addMessageToQueue(data) {
