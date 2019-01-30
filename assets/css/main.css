@@ -8504,6 +8504,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       -webkit-font-feature-settings: 'onum' on;
       -moz-font-feature-settings: 'onum' on;
       font-feature-settings: 'onum' on; }
+    ._single .lecture-frame__title .number {
+      visibility: hidden; }
       @media (max-width: 899px) {
         .lecture-frame__title .number {
           /*padding-left: 48px;*/
@@ -9407,6 +9409,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       -moz-font-feature-settings: 'onum';
       -webkit-font-feature-settings: 'onum';
       font-feature-settings: 'onum' on; }
+    ._single .text-block__headline .number {
+      visibility: hidden; }
       @media (max-width: 899px) {
         .text-block__headline .number {
           margin-left: 0;
