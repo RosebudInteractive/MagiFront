@@ -5107,11 +5107,17 @@ ul.user-tooltip {
       padding-bottom: 13px; } }
   .course-module._small {
     min-height: 0; }
+  .course-module._small .favourites {
+    top: 8px;
+    border: none; }
+  @media (max-width: 1023px) {
+    .course-module._small .favourites {
+      top: 6px; } }
     @media (max-width: 639px) {
       .course-module._small {
         padding-bottom: 15px; } }
     .course-module._small .course-module__header {
-      min-height: 145px; }
+      min-height: 0; }
       @media (max-width: 1279px) {
         .course-module._small .course-module__header {
           padding-right: 40px; } }
@@ -5122,7 +5128,12 @@ ul.user-tooltip {
         .course-module._small .course-module__header {
           padding-right: 0; } }
     .course-module._small .course-module__title {
-      margin-bottom: 25px; }
+      position: relative;
+      margin: 0 0 25px 0;
+      font-weight: 400;
+      font-size: 40px;
+      line-height: 44px;
+      letter-spacing: -0.02em; }
       @media (max-width: 1279px) {
         .course-module._small .course-module__title br {
           display: none; } }
@@ -5131,6 +5142,9 @@ ul.user-tooltip {
           margin-bottom: 13px;
           font-size: 25px;
           line-height: 31px; } }
+      @media (max-width: 1023px) {
+        .course-module._small .course-module__title span{
+          margin-left: 0; } }
       @media (max-width: 639px) {
         .course-module._small .course-module__title {
           letter-spacing: -0.7px; } }
@@ -5140,20 +5154,26 @@ ul.user-tooltip {
     @media (max-width: 1023px) {
       .course-module._small .course-module__label {
         padding-left: 26px; } }
+    .course-module._small .course-module__info-block {
+      padding-top: 53px; }
     @media (max-width: 1023px) {
       .course-module._small .course-module__info-block {
         padding-left: 44px;
+        padding-top: 41px;
         width: 49%; } }
     @media (max-width: 639px) {
       .course-module._small .course-module__info-block {
         padding-left: 16px;
         padding-right: 16px;
         padding-bottom: 0;
-        padding-top: 37px;
+        padding-top: 29px;
         width: 100%; } }
-    @media (max-width: 639px) {
-      .course-module._small .course-module__info {
-        margin-bottom: 0; } }
+    .course-module._small .course-module__info {
+      margin-bottom: 0; }
+    .course-module._small .course-module__description-block {
+      padding-bottom: 30px; }
+    .course-module._small .course-module__description-block p {
+      margin: 0; }
   .course-module a.course-module__read-more {
     display: none;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -5502,7 +5522,7 @@ ul.user-tooltip {
   .course-module .favourites {
     cursor: pointer;
     position: absolute;
-    top: 4px;
+    top: 10px;
     left: -38px;
     width: 14px;
     height: 23px;
@@ -5512,7 +5532,8 @@ ul.user-tooltip {
     -webkit-background-size: contain;
     background-size: contain;
     background-position: center;
-    opacity: 0.2; }
+    opacity: 0.2;
+    border: none;}
   .course-module .favourites.active {
     background-image: url("../images/svg/flag-red.svg");
     opacity: 1;
@@ -5522,21 +5543,17 @@ ul.user-tooltip {
     outline: none;
   }
   .course-module .favourites.active:hover {
-   opacity: 0.7;
-  }
-
-      .course-module .favourites {
-          top: 10px; }
-      @media (max-width: 1279px) {
-      .course-module .favourites {
-          top: 8px; } }
-      @media (max-width: 1023px) {
-      .course-module .favourites {
-          left: -51px; } }
-      @media (max-width: 899px) {
-      .course-module .favourites {
-          left: -15px;
-          top: 2px; } }
+   opacity: 0.7; }
+  @media (max-width: 1279px) {
+  .course-module .favourites {
+      top: 8px; } }
+  @media (max-width: 1023px) {
+  .course-module .favourites {
+      left: -51px; } }
+  @media (max-width: 899px) {
+  .course-module .favourites {
+      left: -15px;
+      top: 2px; } }
   .course-module--extended .favourites {
     left: -27px; }
   @media (max-width: 1279px) {
@@ -6742,6 +6759,20 @@ ul.user-tooltip {
   @media (max-width: 899px) {
     .courses {
       padding-top: 64px; } }
+  @media (max-width: 639px) {
+    .courses {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      -moz-box-orient: vertical;
+      -moz-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column; } }
   .courses .scrollmagic-pin-spacer {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
@@ -8473,6 +8504,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       -webkit-font-feature-settings: 'onum' on;
       -moz-font-feature-settings: 'onum' on;
       font-feature-settings: 'onum' on; }
+    ._single .lecture-frame__title .number {
+      visibility: hidden; }
       @media (max-width: 899px) {
         .lecture-frame__title .number {
           /*padding-left: 48px;*/
@@ -9376,6 +9409,8 @@ body[data-page="fullpage-player"] .lectures-menu {
       -moz-font-feature-settings: 'onum';
       -webkit-font-feature-settings: 'onum';
       font-feature-settings: 'onum' on; }
+    ._single .text-block__headline .number {
+      visibility: hidden; }
       @media (max-width: 899px) {
         .text-block__headline .number {
           margin-left: 0;
@@ -18482,7 +18517,8 @@ ul.lectures-tab {
 
 .video-block {
   position: relative;
-  padding-top: 43.75%;}
+  padding-top: 43.75%;
+  cursor: pointer; }
   @media (max-width: 1023px) {
     .video-block {
       padding-top: 56.25%; } }
@@ -18494,6 +18530,8 @@ ul.lectures-tab {
       -ms-flex-order: -1;
       order: -1;
       margin-top: 20px; } }
+  .video-block:hover .play-block__btn svg {
+    fill-opacity: 1; }
   .video-block video {
     background-size: cover;
     background-position: center;
@@ -18553,6 +18591,13 @@ ul.lectures-tab {
       border-style: solid;
       border-width: 45px 0 45px 102px;
       border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #fff; }
+    .video-block .play-block__btn svg {
+      width: 102px; }
+    @media (max-width: 1023px) {
+      .video-block .play-block__btn svg {
+        width: 51px;
+        height: 45px; } }
+
 
 .modal-form {
   margin: 0 auto; }

@@ -24,6 +24,7 @@ export default class Wrapper extends React.Component {
         courseUrl: PropTypes.string,
         isMain: PropTypes.bool,
         isPlayer: PropTypes.bool,
+        singleLesson: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -74,13 +75,12 @@ export default class Wrapper extends React.Component {
     }
 
     render() {
-        let {isPlayer} = this.props,
+        let {isPlayer, singleLesson} = this.props,
             _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
 
         const _coverStyle = {}
 
         if (!isPlayer) {
-            // _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, .2) 0%, rgb(28, 27, 23, .4) 30%, rgb(28, 27, 23, .8) 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
             _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, .5) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")";
         }
 
@@ -88,11 +88,12 @@ export default class Wrapper extends React.Component {
             _coverStyle.height = this.state.wrapperHeight;
         }
 
+        let _sectionClassName = 'lecture-wrapper lesson-player js-player mobile' + (singleLesson ? ' _single' : '')
+
         return (
             <section
-                className='lecture-wrapper lesson-player js-player mobile'
-                id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}
-                style={_coverStyle}>
+                className={_sectionClassName} style={_coverStyle}
+                id={isPlayer ? 'player-' + this.props.lesson.Id : 'lesson-' + this.props.lesson.Id}>
                 <div className={_subwrapperClassName}>
                     <PlayerFrame {...this.props}
                                  visible={isPlayer}/>

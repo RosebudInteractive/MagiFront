@@ -42,12 +42,6 @@ export class CheckBox extends Editor {
         label: PropTypes.string,
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.defaultValue !== this.props.defaultValue) {
-            this.props.input.onChange(this.props.defaultValue)
-        }
-    }
-
     render() {
         return <Editor type={'checkbox'} {...this.props} extClass={'field-checkbox'}/>;
     }

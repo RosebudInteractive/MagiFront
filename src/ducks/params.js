@@ -34,7 +34,6 @@ export const ReducerRecord = Record({
 
 })
 
-
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
@@ -170,10 +169,12 @@ export const setFixedCourse = (data) => {
             _descrParam = _state['params'].parameters.get('fixedObjDescr'),
             _descr = _state['params'].parameters.getIn(['fixedObjDescr', 'Value'])
 
-        // let _needSave = (!_courseId && data.active)
+        let _needSave = (
+            (!_courseId && data.active) ||
+            ((_courseId === data.courseId) && ((data.description !== _descr) || !data.active))
+        )
 
-        if (!_courseId || (data.courseId === _courseId) || !data.active || (data.description !== _descr)) {
-
+        if (_needSave) {
             let _newCourseParam = _courseId ? _courseParam.toJS() : {};
             _newCourseParam.Key = 'fixedCourseId';
             _newCourseParam.Tp = 1;
@@ -207,8 +208,13 @@ export const setFixedLesson = (data) => {
             _descrParam = _state['params'].parameters.get('fixedObjDescr'),
             _descr = _state['params'].parameters.getIn(['fixedObjDescr', 'Value'])
 
-        if (!_lessonId || (data.lessonId === _lessonId) || !data.active || (data.description !== _descr)) {
+        let _needSave = (
+            (!_lessonId && data.active) ||
+            (_lessonId && (_lessonId !== data.lessonId)) ||
+            ((_lessonId === data.lessonId) && ((data.description !== _descr) || !data.active))
+        )
 
+        if (_needSave) {
             let _newLessonParam = _lessonId ? _lessonParam.toJS() : {};
             _newLessonParam.Key = 'fixedLessonId';
             _newLessonParam.Tp = 1;

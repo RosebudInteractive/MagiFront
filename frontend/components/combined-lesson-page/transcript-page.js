@@ -16,6 +16,7 @@ export default class TranscriptPage extends React.Component {
         isNeedHideGallery: PropTypes.bool,
         isNeedHideRefs: PropTypes.bool,
         lesson: PropTypes.object,
+        singleLesson: PropTypes.bool,
     };
 
     render() {
@@ -212,21 +213,27 @@ class TextBlock extends React.Component {
     }
 
     render() {
-        let {lesson, isNeedHideRefs} = this.props,
+        let {lesson, isNeedHideRefs, singleLesson} = this.props,
             _cover = getCoverPath(lesson, ImageSize.icon);
 
         let _number = getLessonNumber(lesson);
         _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
 
+        let _transcriptClassName = "transcript-page _nested" + (singleLesson ? ' _single' : '')
+
         return (
-            <div className="transcript-page _nested" id="transcript">
+            <div className={_transcriptClassName} id="transcript">
                 <section className="text-block js-social-start">
                     <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
-                        <div className='text-block__headline'><span
-                            className="number">{_number}</span>{lesson.Name}</div>
+                        <div className='text-block__headline'>
+                            <span className="number">
+                                {_number}
+                            </span>
+                            {lesson.Name}
+                        </div>
                         {this._getText()}
                         {isNeedHideRefs ? null : <Refs {...this.props}/>}
                     </div>

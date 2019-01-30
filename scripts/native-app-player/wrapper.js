@@ -4,7 +4,7 @@ import Loader from "work-shop/resource-loader";
 import 'jquery-ui/jquery-ui';
 import 'script-lib/binary-transport.js';
 import 'script-lib/mouseheld.js'
-import {sendMessage} from "./messge-handler";
+import {sendMessage} from "./message-handler";
 
 let Utils = {};
 
