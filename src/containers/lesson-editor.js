@@ -756,7 +756,7 @@ export class LessonEditor extends ObjectEditor {
     _getNonWebixForm() {
         let _data = this.getObject();
 
-        return <FixControl lesson={_data}/>
+        return <FixControl lesson={_data} />
     }
 
     _getExtDialogs() {
