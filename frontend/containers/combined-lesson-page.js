@@ -314,7 +314,7 @@ class CombineLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded,} = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course} = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
@@ -332,6 +332,7 @@ class CombineLessonPage extends React.Component {
                                  isMain={this._isMainLesson()}
                                  shareUrl={this._getShareUrl()}
                                  counter={lesson.ShareCounters}
+                                 singleLesson={course.OneLesson}
             />
             :
             <DesktopLessonWrapper lesson={lesson}
@@ -346,6 +347,7 @@ class CombineLessonPage extends React.Component {
                                   isMain={this._isMainLesson()}
                                   shareUrl={this._getShareUrl()}
                                   counter={lesson.ShareCounters}
+                                  singleLesson={course.OneLesson}
             />
     }
 
@@ -459,6 +461,7 @@ class CombineLessonPage extends React.Component {
             authorized,
             isMobileApp,
             notFound,
+            course,
         } = this.props;
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
@@ -500,7 +503,8 @@ class CombineLessonPage extends React.Component {
                                             courseUrl={this.props.courseUrl}
                                             lessonUrl={this.props.lessonUrl}
                                             shareUrl={this._getShareUrl()}
-                                            counter={_lesson.ShareCounters}/>
+                                            counter={_lesson.ShareCounters}
+                                            singleLesson={course.OneLesson} />
                         ]
                         :
                         null

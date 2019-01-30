@@ -4,7 +4,10 @@ import PlayerBlock from "../poster";
 import {getCoverPath} from "../../../tools/page-tools";
 import PropTypes from 'prop-types'
 import {Link} from "react-router-dom";
-import {fixedObjDescrSelector} from '../../../ducks/params'
+import {fixedObjDescrSelector} from 'ducks/params'
+import {addCourseToBookmarks, getUserBookmarks, removeCourseFromBookmarks, userBookmarksSelector} from "ducks/profile";
+import {bindActionCreators} from "redux";
+import * as userActions from "actions/user-actions";
 
 class Wrapper extends React.Component {
 
@@ -31,15 +34,16 @@ class Wrapper extends React.Component {
                 <div className="course-module__info-block">
                     <div className="course-module__header">
                         <h1 className="course-module__title">
-                            <span className="favourites">В закладки</span>
-                            <Link to={'/' + course.URL}>
+
+                            <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
+                            <Link to={'/category/' + course.URL}>
                                 <p className="course-module__label">Курс:</p> <span>{course.Name}</span>
                             </Link>
                         </h1>
                         <div className="course-module__info">
                             <div className="course-module__stats">
                                 <b className="category">{_categories}</b>
-                                /
+                                {" / "}
                                 <span className="author-name">{_authors}</span>
                             </div>
                         </div>
@@ -49,7 +53,7 @@ class Wrapper extends React.Component {
                     <p dangerouslySetInnerHTML={this.createMarkup()}/>
                 </div>
             </div>,
-            <PlayerBlock poster={_coverPath} visibleButton={false} />
+            <PlayerBlock poster={_coverPath} courseUrl={course.URL} visibleButton={false} />
 
         ]
     }
@@ -57,12 +61,41 @@ class Wrapper extends React.Component {
     createMarkup() {
         return {__html: this.props.fixedObjDescr};
     }
+
+    _favoritesClick() {
+        if (!this.props.authorized) {
+            this.props.userActions.showSignInForm();
+        } else {
+            if (this._isCourseInBookmarks()) {
+                this.props.removeCourseFromBookmarks(this.props.course.URL)
+            } else {
+                this.props.addCourseToBookmarks(this.props.course.URL)
+            }
+        }
+    }
+
+    _isCourseInBookmarks() {
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
+            return item === this.props.course.URL
+        })
+    }
 }
 
 function mapStateToProps(state) {
     return {
-        fixedObjDescr: fixedObjDescrSelector(state)
+        fixedObjDescr: fixedObjDescrSelector(state),
+        bookmarks: userBookmarksSelector(state),
+        authorized: !!state.user.user,
     }
 }
 
-export default connect(mapStateToProps,)(Wrapper);
+function mapDispatchToProps(dispatch) {
+    return {
+        getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
+        addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
+        removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Wrapper);

@@ -8,10 +8,11 @@ class Wrapper extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+        canFix: PropTypes.bool,
     }
 
     render() {
-        let {course, fixedCourseId, descr, fetching,} = this.props,
+        let {course, fixedCourseId, descr, fetching, canFix} = this.props,
             _fixed = (course && (course.id === fixedCourseId)),
             _descr = _fixed ? descr : '';
 
@@ -20,7 +21,7 @@ class Wrapper extends React.Component {
                 fetching ?
                     null
                     :
-                    <FixControl label={'Зафиксировать курс'} fixed={_fixed} descr={_descr}/>
+                    <FixControl label={'Зафиксировать курс'} fixed={canFix && _fixed} descr={_descr} canFix={canFix}/>
             }
         </div>
     }
