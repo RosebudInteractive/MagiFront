@@ -45,7 +45,6 @@ class CourseEditor extends ObjectEditor {
         authorsActions.getAuthors();
         categoriesActions.getCategories();
         languagesActions.getLanguages();
-
     }
 
     componentDidMount() {
@@ -380,7 +379,7 @@ class CourseEditor extends ObjectEditor {
     _getNonWebixForm() {
         let _data = this.getObject();
 
-        return <FixControl course={_data}/>
+        return <FixControl course={_data} canFix={this._canFixCourse()}/>
     }
 
     _canCreateLesson() {
@@ -390,6 +389,12 @@ class CourseEditor extends ObjectEditor {
             (_data.Lessons && this.props.courseLessons.length < 1)
             :
             true
+    }
+
+    _canFixCourse() {
+        let _data = this.getObject()
+
+        return ((_data && !_data.OneLesson) || (window.$$('one-lesson-checkbox') && !window.$$('one-lesson-checkbox').getValue()))
     }
 
     _getMasks() {

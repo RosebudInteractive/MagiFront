@@ -34,7 +34,6 @@ export const ReducerRecord = Record({
 
 })
 
-
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 

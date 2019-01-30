@@ -53,7 +53,7 @@ class Wrapper extends React.Component {
                     <p dangerouslySetInnerHTML={this.createMarkup()}/>
                 </div>
             </div>,
-            <PlayerBlock poster={_coverPath} visibleButton={false} />
+            <PlayerBlock poster={_coverPath} courseUrl={course.URL} visibleButton={false} />
 
         ]
     }

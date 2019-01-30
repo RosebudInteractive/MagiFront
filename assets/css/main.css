@@ -5117,7 +5117,7 @@ ul.user-tooltip {
       .course-module._small {
         padding-bottom: 15px; } }
     .course-module._small .course-module__header {
-      min-height: 145px; }
+      min-height: 0; }
       @media (max-width: 1279px) {
         .course-module._small .course-module__header {
           padding-right: 40px; } }
@@ -5166,11 +5166,14 @@ ul.user-tooltip {
         padding-left: 16px;
         padding-right: 16px;
         padding-bottom: 0;
-        padding-top: 37px;
+        padding-top: 29px;
         width: 100%; } }
-    @media (max-width: 639px) {
-      .course-module._small .course-module__info {
-        margin-bottom: 0; } }
+    .course-module._small .course-module__info {
+      margin-bottom: 0; }
+    .course-module._small .course-module__description-block {
+      padding-bottom: 30px; }
+    .course-module._small .course-module__description-block p {
+      margin: 0; }
   .course-module a.course-module__read-more {
     display: none;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -6756,6 +6759,20 @@ ul.user-tooltip {
   @media (max-width: 899px) {
     .courses {
       padding-top: 64px; } }
+  @media (max-width: 639px) {
+    .courses {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -moz-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-flex-direction: column;
+      -moz-box-orient: vertical;
+      -moz-box-direction: normal;
+      -ms-flex-direction: column;
+      flex-direction: column; } }
   .courses .scrollmagic-pin-spacer {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
@@ -18496,7 +18513,8 @@ ul.lectures-tab {
 
 .video-block {
   position: relative;
-  padding-top: 43.75%;}
+  padding-top: 43.75%;
+  cursor: pointer; }
   @media (max-width: 1023px) {
     .video-block {
       padding-top: 56.25%; } }
@@ -18508,6 +18526,8 @@ ul.lectures-tab {
       -ms-flex-order: -1;
       order: -1;
       margin-top: 20px; } }
+  .video-block:hover .play-block__btn svg {
+    fill-opacity: 1; }
   .video-block video {
     background-size: cover;
     background-position: center;

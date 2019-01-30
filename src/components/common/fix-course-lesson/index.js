@@ -21,6 +21,7 @@ class FixingBlock extends React.Component {
         fixed: PropTypes.bool,
         label: PropTypes.string,
         descr: PropTypes.string,
+        canFix: PropTypes.bool,
     }
 
     constructor(props) {
@@ -30,11 +31,20 @@ class FixingBlock extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.props.initialize({active: this.props.fixed, description: this.props.descr});
+    }
+
     componentWillUnmount() {
         this.props.reset();
     }
 
     componentDidUpdate(prevProps) {
+        if ((prevProps.fixed !== this.props.fixed) || (prevProps.descr !== this.props.descr)){
+            this.props.destroy();
+            this.props.initialize({active: this.props.fixed, description: this.props.descr});
+        }
+
         if (prevProps.fixed !== this.props.fixed) {
             this.setState({showDescription: this.props.fixed})
         }
@@ -44,7 +54,7 @@ class FixingBlock extends React.Component {
         return <div className="form-wrapper non-webix-form">
             <form className="fix-control-form">
                 <Field component={CheckBox} name="active" label={this.props.label}
-                       onChange={::this._changeActive} checked={this.props.fixed} defaultValue={this.props.fixed}/>
+                       onChange={::this._changeActive} checked={this.props.fixed} disabled={!this.props.canFix}/>
                 <Field name="description" label='Описание' component={TextArea} hidden={!this.state.showDescription}
                        onBlur={::this.props.validate} defaultValue={this.props.descr}/>
             </form>

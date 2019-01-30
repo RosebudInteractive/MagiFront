@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types'
+import {Link} from "react-router-dom";
 import {bindActionCreators} from "redux";
 import * as playerStartActions from "actions/player-start-actions";
 import * as userActions from "actions/user-actions";
@@ -20,12 +21,6 @@ class PlayerBlock extends React.Component {
     }
 
     render() {
-        let {poster} = this.props;
-
-        const _coverStyle = {
-            backgroundImage: "url(" + poster + ")",
-        }
-
         if (this._redirect) {
             this._redirect = false;
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
@@ -33,10 +28,26 @@ class PlayerBlock extends React.Component {
 
         return (
             <div className="video-block">
-                <video src="#" style={_coverStyle}/>
+                {this._getPoster()}
                 {this._getButton()}
             </div>
         )
+    }
+
+    _getPoster() {
+        let {poster, courseUrl, lessonUrl, isAuthRequired, authorized} = this.props;
+
+        const _coverStyle = {
+            backgroundImage: "url(" + poster + ")",
+        }
+
+        if (!lessonUrl) {
+            return <Link to={'/category/' + courseUrl}>
+                <video src="#" style={_coverStyle}/>
+            </Link>
+        } else {
+            return <video src="#" style={_coverStyle} onClick={(isAuthRequired && !authorized) ? ::this._unlock : ::this._play}/>
+        }
     }
 
     _play() {
