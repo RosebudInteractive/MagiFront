@@ -25,6 +25,7 @@ export default class Wrapper extends React.Component {
         isMain: PropTypes.bool,
         active: PropTypes.string,
         isPlayer: PropTypes.bool,
+        singleLesson: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -67,7 +68,7 @@ export default class Wrapper extends React.Component {
     }
 
     _getLandscapeLayout() {
-        let {lesson, isPlayer} = this.props,
+        let {lesson, isPlayer, singleLesson} = this.props,
             _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id,
             _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
 
@@ -75,8 +76,10 @@ export default class Wrapper extends React.Component {
             backgroundImage: "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + this.props.lesson.Cover + ")",
         }
 
+        let _sectionClassName = 'lesson-wrapper js-player desktop' + (singleLesson ? ' _single' : '')
+
         return (
-            <div className='lesson-wrapper js-player desktop'>
+            <div className={_sectionClassName}>
                 <div className='lecture-wrapper' id={_divId} style={_coverStyle}>
                     <Menu {...this.props} current={lesson.Number}
                           id={'lesson-menu-' + lesson.Id} extClass={'landscape'}/>
@@ -94,7 +97,7 @@ export default class Wrapper extends React.Component {
     }
 
     _getPortraitLayout() {
-        let {lesson, isPlayer} = this.props,
+        let {lesson, isPlayer, singleLesson} = this.props,
             _divId = isPlayer ? 'player-' + lesson.Id : 'lesson-' + lesson.Id,
             _subwrapperClassName = 'lesson-sub-wrapper' + (isPlayer ? '' : ' cover')
 
@@ -104,8 +107,10 @@ export default class Wrapper extends React.Component {
             _coverStyle.backgroundImage = "radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%), url(" + '/data/' + lesson.Cover + ")";
         }
 
+        let _sectionClassName = 'lecture-wrapper lesson-player js-player desktop' + (singleLesson ? ' _single' : '')
+
         return (
-            <section className='lecture-wrapper lesson-player js-player desktop' id={_divId} style={_coverStyle}>
+            <section className={_sectionClassName} id={_divId} style={_coverStyle}>
                 <div className={_subwrapperClassName}>
                     <PortraitPlayerFrame {...this.props}
                                          visible={this.props.isPlayer}/>
