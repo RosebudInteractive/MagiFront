@@ -24,6 +24,10 @@ class FixingBlock extends React.Component {
         canFix: PropTypes.bool,
     }
 
+    static defaultProps = {
+        canFix: true,
+    }
+
     constructor(props) {
         super(props)
         this.state = {
