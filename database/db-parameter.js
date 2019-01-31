@@ -60,7 +60,7 @@ const DbParameter = class DbParameter extends DbObject {
                 rc = "DateVal";
                 break;
             default:
-                throw new Error(`Unknown parameter "${param.Key}" type: ${param.Tp}.`);
+                throw new Error(`DbParameter::_getValueField: Unknown parameter "${elem.Key}" type: ${elem.Tp}.`);
         };
         return rc;
     }
