@@ -242,7 +242,7 @@ const _setFixedDescr = (param, data, dispatch) => {
     let _newParam = (param && param.get('Value')) ? param.toJS() : {};
 
     _newParam.Key = 'fixedObjDescr';
-    _newParam.Tp = 0;
+    _newParam.Tp = 4;
     _newParam.Value = data.active ? data.description : null
 
     dispatch({
