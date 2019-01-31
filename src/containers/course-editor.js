@@ -30,7 +30,7 @@ import {
     getParameters,
     setFixedCourse,
 } from "adm-ducks/params";
-import { getFormValues, isValid, isDirty, } from 'redux-form'
+import { getFormValues, isValid, isDirty, reset} from 'redux-form'
 
 class CourseEditor extends ObjectEditor {
 
@@ -138,6 +138,12 @@ class CourseEditor extends ObjectEditor {
         this._fillLessons(_obj.Lessons);
 
         super._save(_obj);
+    }
+
+    _cancel() {
+        super._cancel()
+
+        this.props.resetReduxForm('FixingBlock')
     }
 
     get coverMeta() {
@@ -736,6 +742,7 @@ function mapDispatchToProps(dispatch) {
         enableButtons: bindActionCreators(enableButtons, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
         setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
+        resetReduxForm: bindActionCreators(reset, dispatch),
     }
 }
 
