@@ -25,12 +25,13 @@ module.exports = {
             expInSec: 1 * 24 * 60 * 60,
             maxDevSec: 1 * 24 * 60 * 60,
             targetHost: "https://magisteria.ru",
-            url: 'http://127.0.0.1:8000'
+            url: 'http://127.0.0.1:8000',
+            logRequest: false
         },
     },
     admin: {
-        logFileUpload: false,
-        logModif: false
+        logFileUpload: true,
+        logModif: true
     },
     dbProvider: 'mysql',
     session: {
@@ -52,7 +53,7 @@ module.exports = {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',
-        histTTL: 30 * 24 * 60 * 60, // 30 days
+        histTTL: 10 * 24 * 60 * 60, // 10 days
         maxIdle: 10 * 60, // 10 min
         maxInterval: 1 * 60 * 60 // 1 hour
     },

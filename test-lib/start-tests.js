@@ -19,7 +19,7 @@ if (false)
             console.log(err);
         });
 
-if (false)
+if (true)
     SetPosition.setPositionTest(1000)
         .then(result => {
             // console.log(`Result: ${JSON.stringify(result)}`);
@@ -115,7 +115,7 @@ if (false)
             console.log(err);
         });
 
-if (true)
+if (false)
     UploadFile.uploadFileTest(3)
         .then(result => {
             // console.log(`Result: ${JSON.stringify(result)}`);

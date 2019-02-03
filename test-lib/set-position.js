@@ -42,12 +42,22 @@ function _setPosition(token, ts, lessonId, pos, dt) {
 }
 
 let users = [
-    { login: "test@magisteria.ru", password: "admin" },
+    { login: "adm@magisteria.ru", password: "admin" },
     { login: "sokolov@rosebud.ru", password: "12345" },
     { login: "staloverov@rosebud.ru", password: "12345" }
 ];
 
-// Rate: 311.3406 op/sec, ops: 60000, time: 192.715 sec.
+// ===================================================================
+// Output: Rate: 311.3406 op/sec, ops: 60000, time: 192.715 sec.
+// Server: new.magisteria.ru, ? node instance
+// ===================================================================
+// Output: Rate: 277.1913 op/sec, ops: 60000, time: 216.457 sec.
+// Date: 2019-02-03
+// SHA-1: 3e2459951ce4f7f57c1570cdd9493978b757ad1e
+// Comment: Listening history collection in Cache & DB.
+// Server: new.magisteria.ru, 1 node instance
+// ===================================================================
+
 let ranges = [
     { min: 1, max: 10 },
     { min: 11, max: 20 },
