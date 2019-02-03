@@ -1,5 +1,6 @@
 import React from 'react'
-import {reduxForm, Field} from 'redux-form'
+import {connect} from "react-redux";
+import {reduxForm, Field, formValueSelector,} from 'redux-form'
 import {CheckBox} from '../input-controls'
 import TextArea from '../text-area'
 import PropTypes from 'prop-types'
@@ -28,13 +29,6 @@ class FixingBlock extends React.Component {
         canFix: true,
     }
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            showDescription: this.props.fixed
-        }
-    }
-
     componentDidMount() {
         this.props.initialize({active: this.props.fixed, description: this.props.descr});
     }
@@ -48,33 +42,36 @@ class FixingBlock extends React.Component {
             this.props.destroy();
             this.props.initialize({active: this.props.fixed, description: this.props.descr});
         }
-
-        if (prevProps.fixed !== this.props.fixed) {
-            this.setState({showDescription: this.props.fixed})
-        }
     }
 
     render() {
         return <div className="form-wrapper non-webix-form">
             <form className="fix-control-form">
                 <Field component={CheckBox} name="active" label={this.props.label}
-                       onChange={::this._changeActive} checked={this.props.fixed} disabled={!this.props.canFix}/>
-                <Field name="description" label='Описание' component={TextArea} hidden={!this.state.showDescription}
+                       checked={this.props.fixed} disabled={!this.props.canFix}/>
+                <Field name="description" label='Описание' component={TextArea} hidden={!this.props.activeFix}
                        onBlur={::this.props.validate} defaultValue={this.props.descr}/>
             </form>
         </div>
     }
-
-    _changeActive(event) {
-        if (event.target) {
-            this.setState({showDescription: event.target.checked})
-        }
-
-    }
 }
 
-export default reduxForm({
+let FixingBlockWrapper = reduxForm({
     form: 'FixingBlock',
     validate,
 })(FixingBlock);
+
+const selector = formValueSelector('FixingBlock')
+
+FixingBlockWrapper = connect(state => {
+    const activeFix = selector(state, 'active')
+    const descriptionFix = selector(state, 'description')
+
+    return {
+        activeFix,
+        descriptionFix,
+    }
+})(FixingBlockWrapper)
+
+export default FixingBlockWrapper
 

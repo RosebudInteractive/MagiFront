@@ -38,7 +38,7 @@ import {
     setFixedLesson,
 } from "adm-ducks/params";
 import FixControl from "../components/lesson-editor/fix-lesson-wrapper";
-import {getFormValues, isDirty, isValid} from "redux-form";
+import {getFormValues, isDirty, isValid, reset} from "redux-form";
 
 export class LessonEditor extends ObjectEditor {
 
@@ -237,6 +237,12 @@ export class LessonEditor extends ObjectEditor {
             path: _meta ? ('/data/' + (_meta.content.s ? (_meta.path + _meta.content.s) : this.cover)) : null,
             heightRatio: _meta ? (_meta.size.height / _meta.size.width) : 0
         };
+    }
+
+    _cancel() {
+        super._cancel()
+
+        this.props.resetReduxForm('FixingBlock')
     }
 
     _save(value) {
@@ -1260,6 +1266,7 @@ function mapDispatchToProps(dispatch) {
         enableButtons: bindActionCreators(enableButtons, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
         setFixedLesson: bindActionCreators(setFixedLesson, dispatch),
+        resetReduxForm: bindActionCreators(reset, dispatch),
     }
 }
 

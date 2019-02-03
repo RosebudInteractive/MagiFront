@@ -3,6 +3,7 @@ import {createSelector} from 'reselect'
 import {Map, Record,} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import {SHOW_ERROR_DIALOG} from "../constants/Common";
 
 /**
  * Constants
@@ -106,7 +107,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case SAVE_PARAMETERS_SUCCESS:
             return state
-                .setIn(['parameters', 'needSave'], false)
+                .set('needSave', false)
 
         default:
             return state
@@ -155,6 +156,11 @@ export const getParameters = () => {
                     type: GET_PARAMETERS_FAIL,
                     payload: err
                 });
+
+                dispatch({
+                    type: SHOW_ERROR_DIALOG,
+                    payload: err.message
+                })
             });
     }
 }
@@ -242,7 +248,7 @@ const _setFixedDescr = (param, data, dispatch) => {
     let _newParam = (param && param.get('Value')) ? param.toJS() : {};
 
     _newParam.Key = 'fixedObjDescr';
-    _newParam.Tp = 0;
+    _newParam.Tp = 4;
     _newParam.Value = data.active ? data.description : null
 
     dispatch({
@@ -287,6 +293,11 @@ export const saveParameters = () => {
                         type: SAVE_PARAMETERS_FAIL,
                         payload: err
                     });
+
+                    dispatch({
+                        type: SHOW_ERROR_DIALOG,
+                        payload: err.message
+                    })
                 });
         }
 
