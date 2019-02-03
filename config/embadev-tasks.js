@@ -19,6 +19,17 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Listening history import",
+            module: "./lsn-history",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                maxInsertNum: 2,
+                logStat: true
+            }
+        },
+        {
             name: "Auto Subscription",
             module: "./auto-subscription",
             type: "scheduled-task",
@@ -37,7 +48,7 @@ let options = {
             name: "Mailing",
             module: "./mailing",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             // schedule: "0 35 5 * * mon", // run at 5:35 on monday
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
@@ -162,7 +173,11 @@ let options = {
     },
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
-        keyPrefix: 'lpos:uid:'
+        keyPrefix: 'lpos:uid:',
+        keyHistPrefix: 'lhist:',
+        histTTL: 1 * 24 * 60 * 60, // 1 day
+        maxIdle: 1 * 60, // 1 min
+        maxInterval: 5 * 60 // 3 min
     },
     authentication: {
         enabled: true,

@@ -10,7 +10,13 @@ let positions = null;
 let positionsService = () => {
     let initPositions = () => {
         let result = null;
-        let options = { keyPrefix: config.lessonPositions.keyPrefix };
+        let options = {
+            keyPrefix: config.lessonPositions.keyPrefix,
+            keyHistPrefix: config.lessonPositions.keyHistPrefix,
+            histTTL: config.lessonPositions.histTTL,
+            maxIdle: config.lessonPositions.maxIdle,
+            maxInterval: config.lessonPositions.maxInterval
+        };
         switch (config.lessonPositions.storage) {
 
             case "local":
@@ -45,5 +51,17 @@ exports.SetupRoute = (app) => {
         }
         else
             res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
+    });
+    app.post("/api/adm/lsnpos", (req, res, next) => {
+        if (req.body && req.body.userId)
+            positionsService().setLessonPositions(req.body.userId, req.body)
+            .then((result) => {
+                res.send(result);
+            })
+            .catch((err) => {
+                next(err);
+            })
+        else
+            res.status(HttpCode.ERR_BAD_REQ).json({ message: "Missing \"userId\" field." });
     });
 };

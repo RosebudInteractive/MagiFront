@@ -42,7 +42,11 @@ let options = {
     },
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
-        keyPrefix: 'lpos:uid:'
+        keyPrefix: 'lpos:uid:',
+        keyHistPrefix: 'lhist:',
+        histTTL: 30 * 24 * 60 * 60, // 30 days
+        maxIdle: 10 * 60, // 10 min
+        maxInterval: 1 * 60 * 60 // 1 hour
     },
     authentication: {
         enabled: true,

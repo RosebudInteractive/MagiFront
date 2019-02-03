@@ -31,7 +31,7 @@ exports.CacheableObject = class CacheableObject {
             }
             else {
                 if (filter !== "*")
-                    throw new Error(`CacheBase::getKeyList: Invalid parameter "filter": "${JSON.stringify(filter)}". Only "*" is allowed.`)
+                    throw new Error(`CacheBase::cacheGetKeyList: Invalid parameter "filter": "${JSON.stringify(filter)}". Only "*" is allowed.`)
                 rc = Object.keys(this._cache);
             }
             resolve(rc);
@@ -40,7 +40,10 @@ exports.CacheableObject = class CacheableObject {
 
     cacheDelKeyList(filter) {
         let res = [];
-        return this.getKeyList(filter)
+        return new Promise(resolve => {
+            let rc = Array.isArray(filter) ? filter : this.cacheGetKeyList(filter);
+            resolve(rc);
+        })
             .then(list => {
                 return Utils.seqExec(list, (elem) => {
                     return this.cacheDel(elem, true)
@@ -73,50 +76,51 @@ exports.CacheableObject = class CacheableObject {
     cacheGet(key, options) {
         return new Promise(resolve => {
             let rc;
-            let id = this.cacheGetKey(key);
             let opts = options || {};
+            let id = opts.isInternal ? key : this.cacheGetKey(key);
             let value;
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
                     return connection.getAsync(id)
                         .then(result => {
-                            let res = value = result;
-                            if (value)
-                                if (opts.withTtl || opts.withPttl) {
-                                    if (opts.withTtl)
-                                        res = connection.ttlAsync(id)
-                                    else
-                                        res = connection.pttlAsync(id);
-                                    res = res.then(result => {
-                                        if (result === -2) {
-                                            return null;
-                                        }
-                                        else {
-                                            return {
-                                                value: value,
-                                                time: result === -1 ? null : result
-                                            };
-                                        }
-                                    });
-                                }
+                            let res = result;
+                            if (res)
+                                res = value = opts.json ? JSON.parse(res) : res;
+                            if (opts.withTtl || opts.withPttl) {
+                                if (opts.withTtl)
+                                    res = connection.ttlAsync(id)
+                                else
+                                    res = connection.pttlAsync(id);
+                                res = res.then(result => {
+                                    if (result === -2) {
+                                        return null;
+                                    }
+                                    else {
+                                        return {
+                                            value: value,
+                                            time: result === -1 ? null : result
+                                        };
+                                    }
+                                });
+                            }
                             return res;
                         });
                 });
             }
             else
-                rc = this._cache[id];
+                rc = opts.json ? JSON.parse(this._cache[id]) : this._cache[id];
             resolve(rc);
         });
     }
 
     cacheSet(key, data, options) {
-        let opts = options || {};
         return new Promise(resolve => {
             let rc;
-            let id = this.cacheGetKey(key);
+            let opts = options || {};
+            let id = opts.isInternal ? key : this.cacheGetKey(key);
             if (this._isRedis) {
                 rc = ConnectionWrapper((connection) => {
-                    let args = [id, data];
+                    let args = [id, opts.json ? JSON.stringify(data) : data];
                     if ((typeof (opts.ttlInMSec) === "number") && (opts.ttlInMSec > 0)) {
                         args.push("PX");
                         args.push(opts.ttlInMSec);
@@ -130,7 +134,7 @@ exports.CacheableObject = class CacheableObject {
                 });
             }
             else
-                this._cache[id] = data;
+                this._cache[id] = opts.json ? JSON.stringify(data) : data;
             resolve(rc);
         });
     }
@@ -175,6 +179,46 @@ exports.CacheableObject = class CacheableObject {
                     delete this._cache[old_id];
                     this._cache[new_id] = val;
                 }
+            }
+            resolve(rc);
+        });
+    }
+
+    cacheHgetAll(key, options) {
+        return new Promise(resolve => {
+            let rc = {};
+            let opts = options || {};
+            let id = opts.isInternal ? key : this.cacheGetKey(key);
+            if (this._isRedis) {
+                rc = ConnectionWrapper(((connection) => {
+                    return connection.hgetAllAsync(id)
+                        .then((result) => {
+                            let res = {};
+                            if (result)
+                                for (let id in result) {
+                                    let data = opts.json ? JSON.parse(result[id]) : result[id];
+                                    res[id] = data;
+                                };
+                            return res;
+                        });
+                }).bind(this));
+            }
+            resolve(rc);
+        });
+    }
+
+    cacheHset(hKey, key, data, options) {
+        return new Promise(resolve => {
+            let rc = {};
+            let opts = options || {};
+            let id = opts.isInternal ? hKey : this.cacheGetKey(hKey);
+            if (this._isRedis) {
+                rc = ConnectionWrapper(((connection) => {
+                    return connection.hsetAsync(id, key, opts.json ? JSON.stringify(data) : data)
+                        .then(result => {
+                            return;
+                        });
+                }).bind(this));
             }
             resolve(rc);
         });

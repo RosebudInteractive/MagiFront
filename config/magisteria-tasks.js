@@ -8,6 +8,17 @@ const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitema
 module.exports = {
     tasks: [
         {
+            name: "Listening history import",
+            module: "./lsn-history",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 33 1 * * *", // run at 01:33
+            options: {
+                maxInsertNum: 10,
+                logStat: true
+            }
+        },
+        {
             name: "Auto Subscription",
             module: "./auto-subscription",
             type: "scheduled-task",
@@ -171,7 +182,11 @@ module.exports = {
     },
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
-        keyPrefix: 'lpos:uid:'
+        keyPrefix: 'lpos:uid:',
+        keyHistPrefix: 'lhist:',
+        histTTL: 10 * 24 * 60 * 60, // 10 days
+        maxIdle: 10 * 60, // 10 min
+        maxInterval: 1 * 60 * 60 // 1 hour
     },
     billing: {
         module: "../../services/billing/yandex-kassa",

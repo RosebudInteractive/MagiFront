@@ -23,6 +23,14 @@ const LessonPositionsMem = class LessonPositionsMem extends LessonPositionsBase 
             resolve();
         });
     }
+
+    _getHist(userId, lsnId, ts) {
+        return Promise.resolve();
+    }
+
+    _setHist(userId, lsnId, ts, data, ttl) {
+        return Promise.resolve();
+    }
 };
 
 let lessonPositionsMem = null;

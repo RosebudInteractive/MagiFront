@@ -58,7 +58,11 @@ let options = {
     },
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
-        keyPrefix: 'lpos:uid:'
+        keyPrefix: 'lpos:uid:',
+        keyHistPrefix: 'lhist:',
+        histTTL: 1 * 24 * 60 * 60, // 1 day
+        maxIdle: 1 * 60, // 1 min
+        maxInterval: 5 * 60 // 3 min
     },
     debug: {
         routes: {

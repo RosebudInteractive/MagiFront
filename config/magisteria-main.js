@@ -50,7 +50,11 @@ module.exports = {
     },
     lessonPositions: {
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
-        keyPrefix: 'lpos:uid:'
+        keyPrefix: 'lpos:uid:',
+        keyHistPrefix: 'lhist:',
+        histTTL: 10 * 24 * 60 * 60, // 10 days
+        maxIdle: 10 * 60, // 10 min
+        maxInterval: 1 * 60 * 60 // 1 hour
     },
     debug: {
         routes: {
@@ -102,7 +106,7 @@ module.exports = {
             template: "./templates/mail/feedback.tmpl",
             subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
             sender: pk.mail.feedback.sender,
-            recipients: 'alexander.f.sokolov@gmail.com,ivan@magisteria.ru',
+            recipients: 'alexander.f.sokolov@gmail.com,ivan@magisteria.ru,adm@magisteria.ru',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",

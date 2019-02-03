@@ -1,7 +1,7 @@
 'use strict'
+const config = require('config');
+const { LessonPos } = require('../../const/lesson-pos');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
-
-const KEY_PREFIX = "lpos:user:";
 
 exports.LessonPositionsBase = class LessonPositionsBase {
 
@@ -9,9 +9,34 @@ exports.LessonPositionsBase = class LessonPositionsBase {
         return this._keyPrefix;
     }
 
+    get keyHistPrefix() {
+        return this._keyHistPrefix;
+    }
+
+    get maxIdle() {
+        return this._maxIdle;
+    }
+
+    get histTTL() {
+        return this._histTTL;
+    }
+
+    get maxInterval() {
+        return this._maxInterval;
+    }
+
     constructor(options) {
         let opts = options || {};
-        this._keyPrefix = opts.keyPrefix ? opts.keyPrefix : KEY_PREFIX;
+        let prefix = config.has("lessonPositions.keyPrefix") ? config.lessonPositions.keyPrefix : null;
+        this._keyPrefix = opts.keyPrefix ? opts.keyPrefix : (prefix ? prefix : LessonPos.KEY_PREFIX);
+        let hist_prefix = config.has("lessonPositions.keyHistPrefix") ? config.lessonPositions.keyHistPrefix : null;
+        this._keyHistPrefix = opts.keyHistPrefix ? opts.keyHistPrefix : (hist_prefix ? hist_prefix : LessonPos.KEY_HIST_PREFIX);
+        let maxIdle = config.has("lessonPositions.maxIdle") ? config.lessonPositions.maxIdle : null;
+        this._maxIdle = opts.maxIdle ? opts.maxIdle : (maxIdle ? maxIdle : LessonPos.MAX_IDLE_INTERVAL);
+        let histTTL = config.has("lessonPositions.histTTL") ? config.lessonPositions.histTTL : null;
+        this._histTTL = opts.histTTL ? opts.histTTL : (histTTL ? histTTL : LessonPos.HIST_TTL);
+        let maxInterval = config.has("lessonPositions.maxInterval") ? config.lessonPositions.maxInterval : null;
+        this._maxInterval = opts.maxInterval ? opts.maxInterval : (maxInterval ? maxInterval : LessonPos.MAX_INTERVAL);
     }
 
     getAllLessonPositions(userId) {
@@ -32,14 +57,15 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                         let lessons = positions.lsn ? positions.lsn : {};
                         resData.ts = ts;
                         let newPos = [];
+                        let currTime = (new Date()) - 0;
 
                         for (let lsnId in lessons) {
                             let cpos = currPos[lsnId];
-                            let t = 0;
-                            let ut = 0;
+                            let ts_start = 0;
+                            let ts = 0;
                             if (cpos) {
-                                t = cpos.t ? cpos.t : 0;
-                                ut = cpos.ut ? cpos.ut : 0;
+                                ts_start = cpos.ts_start ? cpos.ts_start : ts_start;
+                                ts = cpos.ts ? cpos.ts : ts;
                                 if (cpos.ts > resData.ts)
                                     resData.ts = cpos.ts;
                                 delete currPos[lsnId];
@@ -48,7 +74,11 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                             if (lpos.pos || lpos.isFinished) {
                                 let dt = lpos.dt ? lpos.dt : 0;
                                 let r = lpos.r ? lpos.r : 1;
-                                let pos = { id: lsnId, data: { t: t + dt, ut: ut + (dt / r) } };
+                                if ((!ts_start) || (!ts) || (((currTime - ts) / 1000) > this.maxIdle)
+                                    || (((currTime - ts_start) / 1000) > this.maxInterval))
+                                    ts_start = currTime;
+                                ts = currTime;
+                                let pos = { id: lsnId, data: { ts_start: ts_start, ts: ts }, hist: { t: dt, ut: (dt / r), ts: ts } };
                                 if (lpos.isFinished)
                                     pos.data.isFinished = true
                                 else
@@ -71,8 +101,17 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                         
                         if (newPos.length > 0) {
                             result = Utils.seqExec(newPos, (elem) => {
-                                elem.data.ts = (new Date()) - 0;
-                                return this._setPos(userId, elem);
+                                return this._getHist(userId, elem.id, elem.data.ts_start)
+                                    .then(histRes => {
+                                        if (histRes) {
+                                            elem.hist.t += histRes.t ? histRes.t : 0;
+                                            elem.hist.ut += histRes.ut ? histRes.ut : 0;
+                                        }
+                                        return this._setHist(userId, elem.id, elem.data.ts_start, elem.hist, this.histTTL)
+                                    })
+                                    .then(() => {
+                                        return this._setPos(userId, elem);
+                                    });
                             })
                                 .then(() => {
                                     return resData;
@@ -90,5 +129,13 @@ exports.LessonPositionsBase = class LessonPositionsBase {
 
     _setPos(userId, pos) {
         return Promise.reject(new Error("LessonPositionsBase::_getAllPos: Not implemented."));
+    }
+
+    _getHist(userId, lsnId, ts) {
+        return Promise.reject(new Error("LessonPositionsBase::_getHist: Not implemented."));
+    }
+
+    _setHist(userId, lsnId, ts, data, ttl) {
+        return Promise.reject(new Error("LessonPositionsBase::_setHist: Not implemented."));
     }
 }

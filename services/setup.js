@@ -34,6 +34,7 @@ const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
 const { setupPrerender } = require('../prerender');
+const { setupCache } = require('./cache');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
 const { SetupRoute: setupFeedback } = require('./feedback');
 const { SetupRoute: setupBilling } = require('./billing');
@@ -154,6 +155,7 @@ function setupAPI(express, app) {
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
 
     setupPrerender(app);
+    setupCache(app);
     setupBilling(app);
     setupMailSubscription(app);
     setupFeedback(app);
