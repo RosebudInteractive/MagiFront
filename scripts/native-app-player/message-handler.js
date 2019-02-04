@@ -1,11 +1,13 @@
-const INTERVAL_TIMEOUT = 100;
+const INTERVAL_TIMEOUT = 100
+const REACT_NATIVE_INTERFACE = 'ReactNativeWebView'
+
 
 class MessageHandler {
 
     constructor() {
         this._messages = [];
         this._interval = null;
-        this.isPostMessageLoaded = false
+        this.isReactNativeInterfaceLoaded = false
     }
 
     sendMessageToApp(data) {
@@ -13,12 +15,12 @@ class MessageHandler {
     }
 
     _trySend(data) {
-        if( !this.isPostMessageLoaded ) {
-            this.isPostMessageLoaded = /ReactNative|__REACT_WEB_VIEW_BRIDGE/.test( window.postMessage.toString() )
+        if( !this.isReactNativeInterfaceLoaded ) {
+            this.isReactNativeInterfaceLoaded = window[REACT_NATIVE_INTERFACE] != null && window[REACT_NATIVE_INTERFACE].postMessage != null
         }
 
-        if( this.isPostMessageLoaded ) {
-            window.postMessage(
+        if( this.isReactNativeInterfaceLoaded ) {
+            window[REACT_NATIVE_INTERFACE].postMessage(
                 JSON.stringify(data)
             )
             return
