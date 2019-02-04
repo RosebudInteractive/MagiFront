@@ -16,7 +16,7 @@ class MessageHandler {
 
     _trySend(data) {
         if( !this.isReactNativeInterfaceLoaded ) {
-            this.isReactNativeInterfaceLoaded = window[REACT_NATIVE_INTERFACE] != null
+            this.isReactNativeInterfaceLoaded = window[REACT_NATIVE_INTERFACE] != null && window[REACT_NATIVE_INTERFACE].postMessage != null
         }
 
         if( this.isReactNativeInterfaceLoaded ) {
