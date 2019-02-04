@@ -179,11 +179,16 @@ function setupAPI(express, app) {
     const { Accounting: { ProductReqParams } } = require("../const/accounting");
     let { ParametersService } = require('../database/db-parameter');
 
+    /*
+        lessonPositions: {
+        debug: false,
+
+    */
     app.get('/api/options', function (req, res, next) {
         let options;
         Promise.resolve()
             .then(() => {
-                options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams } };
+                options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams }, debug: {} };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
                 if (config.has('authentication.reCapture.siteKey'))
@@ -196,6 +201,8 @@ function setupAPI(express, app) {
                     options.billing.billing_test = true;
                 if (config.has('billing.productReqParams'))
                     options.billing.productReqParams = config.billing.productReqParams;
+                if (config.has('lessonPositions.debug'))
+                    options.debug.lsnPositions = config.lessonPositions.debug;
                 return ParametersService().getAllParameters(true)
                     .then(params => { options.parameters = params })
             })

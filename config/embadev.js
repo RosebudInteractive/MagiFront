@@ -57,6 +57,7 @@ let options = {
         scanCount: 100
     },
     lessonPositions: {
+        debug: true,
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',

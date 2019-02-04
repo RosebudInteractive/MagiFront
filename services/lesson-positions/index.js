@@ -39,6 +39,63 @@ let positionsService = () => {
 exports.PositionsService = positionsService;
 
 exports.SetupRoute = (app) => {
+ 
+    app.get("/api/lsnposdbg", (req, res, next) => {
+        let isAuth = false;
+        let errAuthMsg = "Not authorized.";
+        if (req.user) {
+            let userId = (req.query && req.query.userId) ? parseInt(req.query.userId) : null;
+            errAuthMsg = `Invalid or missing parameter "userId": "${req.query.userId}" vs "${req.user.Id}"`;
+            if (userId === req.user.Id) {
+                isAuth = true;
+                let isParamsOK = false;
+                let errMsg;
+                let data = { lsn: {} };
+                try {
+                    let ts = (req.query && req.query.ts) ? parseInt(req.query.ts) : null;
+                    if (typeof (ts) !== "number")
+                        throw new Error(`Invalid or missing parameter "ts": "${req.query.ts}"`);
+                    data.ts = ts;
+                    let lessonId = (req.query && req.query.lessonId) ? parseInt(req.query.lessonId) : null;
+                    if (lessonId && (typeof (lessonId) !== "number"))
+                        throw new Error(`Invalid parameter "lessonId": "${req.query.lessonId}"`);
+                    let pos = (req.query && req.query.pos) ? parseFloat(req.query.pos) : null;
+                    if (typeof (pos) !== "number")
+                        throw new Error(`Invalid or missing parameter "pos": "${req.query.pos}"`);
+                    let dt = (req.query && req.query.dt) ? parseFloat(req.query.dt) : null;
+                    if (typeof (dt) !== "number")
+                        throw new Error(`Invalid or missing parameter "dt": "${req.query.dt}"`);
+                    let r = (req.query && req.query.r) ? parseFloat(req.query.r) : null;
+                    if (r && (typeof (r) !== "number"))
+                        throw new Error(`Invalid parameter "r": "${req.query.r}"`);
+                    if (lessonId) {
+                        let lsn = data.lsn[lessonId] = {};
+                        lsn.pos = pos;
+                        lsn.dt = dt;
+                        if (r)
+                            lsn.r = r;
+                    }
+                    isParamsOK = true;
+                }
+                catch (err) {
+                    errMsg = err.message;
+                }
+                if (isParamsOK)
+                    positionsService().setLessonPositions(userId, data)
+                        .then((result) => {
+                            res.send(result);
+                        })
+                        .catch((err) => {
+                            next(err);
+                        })
+                else
+                    res.status(HttpCode.ERR_BAD_REQ).json({ message: errMsg });
+            }
+        }
+        if (!isAuth)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: errAuthMsg });
+    });
+
     app.post("/api/lsnpos", (req, res, next) => {
         if (req.user) {
             positionsService().setLessonPositions(req.user.Id, req.body)
@@ -52,6 +109,7 @@ exports.SetupRoute = (app) => {
         else
             res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
     });
+
     app.post("/api/adm/lsnpos", (req, res, next) => {
         if (req.body && req.body.userId)
             positionsService().setLessonPositions(req.body.userId, req.body)

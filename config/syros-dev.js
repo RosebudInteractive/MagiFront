@@ -46,6 +46,7 @@ module.exports = {
         scanCount: 100
     },
     lessonPositions: {
+        debug: true,
         storage: 'local',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',

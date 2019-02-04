@@ -49,6 +49,7 @@ module.exports = {
         importFileTrace: false
     },
     lessonPositions: {
+        debug: false,
         storage: 'redis',// 'redis' or 'local' (not applicable for cluster mode)
         keyPrefix: 'lpos:uid:',
         keyHistPrefix: 'lhist:',
