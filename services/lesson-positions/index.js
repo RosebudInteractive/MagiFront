@@ -53,20 +53,20 @@ exports.SetupRoute = (app) => {
                 let data = { lsn: {} };
                 try {
                     let ts = (req.query && req.query.ts) ? parseInt(req.query.ts) : null;
-                    if (typeof (ts) !== "number")
+                    if ((typeof (ts) !== "number") || isNaN(ts))
                         throw new Error(`Invalid or missing parameter "ts": "${req.query.ts}"`);
                     data.ts = ts;
                     let lessonId = (req.query && req.query.lessonId) ? parseInt(req.query.lessonId) : null;
-                    if (lessonId && (typeof (lessonId) !== "number"))
+                    if (lessonId && ((typeof (lessonId) !== "number") || isNaN(lessonId)))
                         throw new Error(`Invalid parameter "lessonId": "${req.query.lessonId}"`);
                     let pos = (req.query && req.query.pos) ? parseFloat(req.query.pos) : null;
-                    if (typeof (pos) !== "number")
+                    if (lessonId && ((typeof (pos) !== "number") || isNaN(pos)))
                         throw new Error(`Invalid or missing parameter "pos": "${req.query.pos}"`);
                     let dt = (req.query && req.query.dt) ? parseFloat(req.query.dt) : null;
-                    if (typeof (dt) !== "number")
+                    if (lessonId && ((typeof (dt) !== "number") || isNaN(dt)))
                         throw new Error(`Invalid or missing parameter "dt": "${req.query.dt}"`);
                     let r = (req.query && req.query.r) ? parseFloat(req.query.r) : null;
-                    if (r && (typeof (r) !== "number"))
+                    if (r && ((typeof (r) !== "number") || isNaN(r)))
                         throw new Error(`Invalid parameter "r": "${req.query.r}"`);
                     if (lessonId) {
                         let lsn = data.lsn[lessonId] = {};
