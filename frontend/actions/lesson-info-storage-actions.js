@@ -1,23 +1,24 @@
 import {
-    LESSON_INFO_STORAGE_SET_INIT_STATE,
-    LESSON_INFO_STORAGE_SET_CURRENT_TIME,
-    LESSON_INFO_STORAGE_SET_VOLUME,
-    LESSON_INFO_STORAGE_SET_MUTE_STATE,
+    LESSON_INFO_STORAGE_CLEAR_INIT_STATE,
+    LESSON_INFO_STORAGE_LOAD_FROM_DB_FAIL,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_START,
     LESSON_INFO_STORAGE_LOAD_FROM_DB_SUCCESS,
-    LESSON_INFO_STORAGE_LOAD_FROM_DB_FAIL,
-    LESSON_INFO_STORAGE_UPDATE_DB_START,
-    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
-    LESSON_INFO_STORAGE_UPDATE_DB_FAIL,
-    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+    LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
     LESSON_INFO_STORAGE_REFRESH_DB_START,
     LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
-    LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
-    LESSON_INFO_STORAGE_CLEAR_INIT_STATE,
     LESSON_INFO_STORAGE_RESTORE_LESSON,
+    LESSON_INFO_STORAGE_SET_CURRENT_TIME,
+    LESSON_INFO_STORAGE_SET_INIT_STATE,
+    LESSON_INFO_STORAGE_SET_LESSON_ENDED,
+    LESSON_INFO_STORAGE_SET_MUTE_STATE,
+    LESSON_INFO_STORAGE_SET_VOLUME,
+    LESSON_INFO_STORAGE_UPDATE_DB_FAIL,
+    LESSON_INFO_STORAGE_UPDATE_DB_START,
+    LESSON_INFO_STORAGE_UPDATE_DB_SUCCESS,
 } from '../constants/lesson-info-storage'
 
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import $ from "jquery";
 
 export const setInitialState = (data) => {
     return {
@@ -107,19 +108,27 @@ export const updateDbState = (data) => {
             payload: null
         });
 
-        let _ts = getState().lessonInfoStorage.ts,
-            _obj = Object.assign({}, data);
+        let _obj = Object.assign({}, data);
 
-        _obj.ts = _ts;
+        _obj.ts = getState().lessonInfoStorage.ts;
 
-        fetch("/api/lsnpos", {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(_obj),
-            credentials: 'include'
-        })
+        let _state = getState().app,
+            _isDebug = _state.debug && _state.debug.lsnPositions,
+            _path = (_isDebug) ? _getDebugLsnPosPath(getState(), _obj) : '/api/lsnpos',
+            _method = (_state.debug && _state.debug.lsnPositions) ? 'GET' : 'POST',
+            _init = {
+                method: _method,
+                headers: {
+                    "Content-type": "application/json"
+                },
+                credentials: 'include'
+            }
+
+        if (!_isDebug) {
+            _init.body = JSON.stringify(_obj);
+        }
+
+        fetch(_path, _init)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -135,6 +144,32 @@ export const updateDbState = (data) => {
                 });
             });
     }
+}
+
+const _getDebugLsnPosPath = (state, params) => {
+    let _params = {
+        userId: state.user.user.Id,
+        ts: params.ts,
+    }
+
+    let _lessonId = Object.keys(params.lsn)[0];
+    if (_lessonId) {
+        _params.lessonId = _lessonId
+
+        if (params.lsn[_lessonId].pos) {
+            _params.pos = params.lsn[_lessonId].pos
+        }
+
+        if (params.lsn[_lessonId].dt) {
+            _params.dt = params.lsn[_lessonId].dt
+        }
+
+        if (params.lsn[_lessonId].r) {
+            _params.r = params.lsn[_lessonId].r
+        }
+    }
+
+    return '/api/lsnposdbg?' + $.param(_params)
 }
 
 export const refreshState = () => {
