@@ -72,6 +72,8 @@ class App extends Component {
         if (_isMobile) {
             this.props.appActions.setAppTypeMobile()
         }
+
+        this.props.appActions.getAppOptions()
     }
 
     get width() {
@@ -113,7 +115,6 @@ class App extends Component {
             // this.props.getUserBookmarks()
         }
 
-        this.props.appActions.getAppOptions()
         this.props.appActions.getCookiesConfimation()
         this.props.getParameters()
     }

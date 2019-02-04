@@ -70,20 +70,15 @@ export const setLessonEnded = (data) => {
 }
 
 export const loadInitialStateFromDB = (ts) => {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         dispatch({
             type: LESSON_INFO_STORAGE_LOAD_FROM_DB_START,
             payload: ts
         });
 
-        fetch("/api/lsnpos", {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify({ts: ts}),
-            credentials: 'include'
-        })
+        let _fetch = _getFetchObject(getState(), {ts: ts});
+
+        fetch(_fetch.input, _fetch.init)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -109,26 +104,11 @@ export const updateDbState = (data) => {
         });
 
         let _obj = Object.assign({}, data);
-
         _obj.ts = getState().lessonInfoStorage.ts;
 
-        let _state = getState().app,
-            _isDebug = _state.debug && _state.debug.lsnPositions,
-            _path = (_isDebug) ? _getDebugLsnPosPath(getState(), _obj) : '/api/lsnpos',
-            _method = (_state.debug && _state.debug.lsnPositions) ? 'GET' : 'POST',
-            _init = {
-                method: _method,
-                headers: {
-                    "Content-type": "application/json"
-                },
-                credentials: 'include'
-            }
+        let _fetch = _getFetchObject(getState(), _obj);
 
-        if (!_isDebug) {
-            _init.body = JSON.stringify(_obj);
-        }
-
-        fetch(_path, _init)
+        fetch(_fetch.input, _fetch.init)
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -146,13 +126,65 @@ export const updateDbState = (data) => {
     }
 }
 
+export const refreshState = () => {
+    return (dispatch, getState) => {
+        let _state = getState();
+
+        if (!_state.user.user) { return }
+
+        dispatch({
+            type: LESSON_INFO_STORAGE_REFRESH_DB_START,
+            payload: null
+        });
+
+        let _ts = getState().lessonInfoStorage.ts;
+        let _fetch = _getFetchObject(getState(), {ts: _ts});
+
+        fetch(_fetch.input, _fetch.init)
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(data => {
+                dispatch({
+                    type: LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
+                    payload: data
+                });
+            })
+            .catch((error) => {
+                dispatch({
+                    type: LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
+                    payload: {error}
+                });
+            });
+    }
+}
+
+const _getFetchObject = (state, params) => {
+    let _state = state.app,
+        _isDebug = _state.debug && _state.debug.lsnPositions,
+        _input = (_isDebug) ? _getDebugLsnPosPath(state, params) : '/api/lsnpos',
+        _method = (_isDebug) ? 'GET' : 'POST',
+        _init = {
+            method: _method,
+            headers: {
+                "Content-type": "application/json"
+            },
+            credentials: 'include'
+        }
+
+    if (!_isDebug) {
+        _init.body = JSON.stringify(params);
+    }
+
+    return {input: _input, init: _init}
+}
+
 const _getDebugLsnPosPath = (state, params) => {
     let _params = {
         userId: state.user.user.Id,
         ts: params.ts,
     }
 
-    let _lessonId = Object.keys(params.lsn)[0];
+    let _lessonId = (params && params.lsn && typeof (params.lsn) === 'object') ? Object.keys(params.lsn)[0] : null;
     if (_lessonId) {
         _params.lessonId = _lessonId
 
@@ -172,41 +204,3 @@ const _getDebugLsnPosPath = (state, params) => {
     return '/api/lsnposdbg?' + $.param(_params)
 }
 
-export const refreshState = () => {
-    return (dispatch, getState) => {
-        let _state = getState();
-
-        if (!_state.user.user) { return }
-
-        dispatch({
-            type: LESSON_INFO_STORAGE_REFRESH_DB_START,
-            payload: null
-        });
-
-        let _ts = getState().lessonInfoStorage.ts;
-
-
-        fetch("/api/lsnpos", {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify({ts: _ts}),
-            credentials: 'include'
-        })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                dispatch({
-                    type: LESSON_INFO_STORAGE_REFRESH_DB_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: LESSON_INFO_STORAGE_REFRESH_DB_FAIL,
-                    payload: {error}
-                });
-            });
-    }
-}
