@@ -9553,11 +9553,11 @@ body[data-page="fullpage-player"] .lectures-menu {
       text-align: right;
       font-family: "Fira Sans", Arial, sans-serif;
       font-size: 14px;
-      line-height: 23px;
+      /*line-height: 23px;*/
       color: rgba(47, 47, 47, 0.6); }
-      @media (max-width: 1024px) {
-        .sources-list li:before {
-          top: -3px; } }
+      /*@media (max-width: 1024px) {*/
+        /*.sources-list li:before {*/
+          /*top: -3px; } }*/
     .sources-list li a {
       color: #2f2f2f;
       border-bottom: 1px solid rgba(255, 255, 255, 0);
