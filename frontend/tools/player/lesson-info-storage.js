@@ -15,7 +15,8 @@ export default class LessonInfoStorage {
         this._isUserAuthorized = !!store.getState().user.user;
         this._localTimer = null;
         this._positionTimer = null;
-        this._dtStart = undefined;
+        this._startsMap = new Map();
+        // this._dtStart = undefined;
         this._delta = 0;
 
         return this
@@ -52,17 +53,22 @@ export default class LessonInfoStorage {
         this.getInstance()._saveForce();
     }
 
-    static calcDelta(currentPosition, newPosition) {
-        this.getInstance()._internalCalcDelta(currentPosition, newPosition)
+    static calcDelta(currentPosition, newPosition, id) {
+        this.getInstance()._internalCalcDelta(currentPosition, newPosition, id)
     }
 
-    static setDeltaStart(value) {
+    static setDeltaStart(value, id) {
         let _instance = this.getInstance();
         if (_instance._isUserAuthorized) {
-            if (_instance._dtStart === undefined) {
-                _instance._dtStart = value;
+            let _dtStart = _instance._getDtStartForLesson(id)
+            if (_dtStart === undefined) {
+                _instance._setDtStartForLesson(id, value)
             }
         }
+    }
+
+    static clearDeltaStart(id) {
+        _instance._setDtStartForLesson(id, undefined)
     }
 
     loadLessonsPositions() {
@@ -116,13 +122,24 @@ export default class LessonInfoStorage {
         }
     }
 
-    _internalCalcDelta(currentPosition, newPosition) {
-        if (this._dtStart !== undefined) {
-            this._delta += Math.round((currentPosition - this._dtStart) * 100) / 100;
-            this._dtStart = newPosition;
+    _getDtStartForLesson(id) {
+        return this._startsMap.has(id) ? this._startsMap.get(id) : undefined
+    }
+
+    _setDtStartForLesson(id, value) {
+        this._startsMap.set(id, value)
+    }
+
+    _internalCalcDelta(currentPosition, newPosition, id) {
+        let _dtStart = this._getDtStartForLesson(id)
+
+        if (_dtStart !== undefined) {
+            this._delta += Math.round((currentPosition - _dtStart) * 100) / 100;
+            this._setDtStartForLesson(id, newPosition);
         } else {
             console.log('delta newPos: ' + newPosition + ' currPos: ' + currentPosition)
-            this._dtStart = (newPosition !== undefined) ? newPosition : currentPosition
+            let _newValue = (newPosition !== undefined) ? newPosition : currentPosition
+            this._setDtStartForLesson(id, _newValue)
         }
     }
 
@@ -197,7 +214,7 @@ export default class LessonInfoStorage {
                 _lessonsMap = _state.lessonInfoStorage.lessons,
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 
-            this._internalCalcDelta(_currentPosition, undefined);
+            this._internalCalcDelta(_currentPosition, undefined, _playingLessonId);
 
             let _rate = _state.player.rate,
                 _dt = this._delta;

@@ -22,6 +22,7 @@ import {
 import LessonInfoStorage from '../tools/player/lesson-info-storage'
 
 import * as storageActions from '../actions/lesson-info-storage-actions';
+import {GET_LESSON_PLAY_INFO_REQUEST} from "../constants/lesson";
 
 const LessonInfoStorageMiddleware = store => next => action => {
 
@@ -30,6 +31,11 @@ const LessonInfoStorageMiddleware = store => next => action => {
             let result = next(action)
             LessonInfoStorage.init()
             return result
+        }
+
+        case GET_LESSON_PLAY_INFO_REQUEST: {
+            LessonInfoStorage.clearDeltaStart(action.payload)
+            return next(action)
         }
 
 
@@ -82,11 +88,11 @@ const LessonInfoStorageMiddleware = store => next => action => {
                 }
 
                 if (Math.abs(_newPosition - _currentPosition) > 1) {
-                    LessonInfoStorage.calcDelta(_currentPosition, _newPosition)
+                    LessonInfoStorage.calcDelta(_currentPosition, _newPosition, _id)
                     LessonInfoStorage.saveChanges()
                     // LessonInfoStorage.setDeltaStart(_newPosition)
                 } else {
-                    LessonInfoStorage.setDeltaStart(_currentPosition)
+                    LessonInfoStorage.setDeltaStart(_currentPosition, _id)
                     LessonInfoStorage.hasChangedPosition();
                 }
             }
@@ -120,6 +126,7 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
                 store.dispatch(storageActions.setLessonEnded({id: _id}))
                 LessonInfoStorage.saveChanges()
+                LessonInfoStorage.clearDeltaStart(_id)
             }
 
             return next(action)

@@ -194,6 +194,9 @@ const _getDebugLsnPosPath = (state, params) => {
 
         if (params.lsn[_lessonId].dt) {
             _params.dt = params.lsn[_lessonId].dt
+            if (_params.dt < 0) {
+                console.error(`lsnpos : negative value [${_params.dt}]`)
+            }
         }
 
         if (params.lsn[_lessonId].r) {
@@ -201,6 +204,9 @@ const _getDebugLsnPosPath = (state, params) => {
         }
     }
 
+    _params.ver = '2.0'
+
+    // console.log(`lsnpos ${$.param(_params)}`)
     return '/api/lsnposdbg?' + $.param(_params)
 }
 
