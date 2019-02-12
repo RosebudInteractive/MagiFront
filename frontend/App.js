@@ -28,8 +28,7 @@ import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 import {loadVersion} from "ducks/version"
 
-
-import * as Polifyll from './tools/polyfill';
+import * as Polyfill from './tools/polyfill';
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
@@ -45,9 +44,7 @@ import Platform from 'platform';
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import './version.json'
-
-Polifyll.registry();
+Polyfill.registry();
 
 let _homePath = '/';
 const _globalScrollDelta = 80;

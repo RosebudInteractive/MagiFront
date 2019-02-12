@@ -1,7 +1,7 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record, } from 'immutable'
-import {checkStatus, readResponseBody} from "../tools/fetch-tools";
+import {checkStatus, parseJSON} from "../tools/fetch-tools";
 
 /**
  * Constants
@@ -67,11 +67,9 @@ export const loadVersion = () => {
             payload: null
         });
 
-        fetch('/static/version.js')
+        fetch('/static/version.json')
             .then(checkStatus)
-            .then(response => {
-                readResponseBody(response)
-            })
+            .then(parseJSON)
             .then(data => {
                 dispatch({
                     type: LOAD_SUCCESS,
@@ -94,7 +92,9 @@ export const checkVersion = () => {
             payload: null
         });
 
-        import('../version.json')
+        fetch('/static/version.json')
+            .then(checkStatus)
+            .then(parseJSON)
             .then((data) => {
                 dispatch({
                     type: CHECK_SUCCESS,

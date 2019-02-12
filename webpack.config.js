@@ -2,6 +2,7 @@ let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 // const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // require('webpack-jquery-ui');
 
@@ -12,7 +13,6 @@ const _prodConfig = {
         "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
         adm: './src/index',
-        version: './frontend/version',
         'player-main': './scripts/player-main',
         'player-app': './scripts/native-app-player/player-app',
         'player-app-test': './scripts/native-app-player/example',
@@ -38,7 +38,8 @@ const _prodConfig = {
                 warnings: false,
                 drop_console: true
             }
-        })
+        }),
+        new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
     module: {
         rules: [
@@ -125,7 +126,6 @@ const _devConfig = {
         'babel-polyfill': 'babel-polyfill',
         main: './frontend/index',
         adm: './src/index',
-        version: './frontend/version',
         'player-main': './scripts/player-main',
         'player-app': './scripts/native-app-player/player-app',
         'player-app-test': './scripts/native-app-player/example',
@@ -150,9 +150,7 @@ const _devConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
-        // new ExtractTextPlugin('version.json', {
-        //     allChunks: true
-        // }),
+        new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}]),
     ],
     module: {
         rules: [
