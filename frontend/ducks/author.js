@@ -1,13 +1,8 @@
-// import {all, takeEvery, take, put, apply, call} from 'redux-saga/effects'
-// import {eventChannel} from 'redux-saga'
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
-
-
-// import {replace} from 'react-router-redux'
 
 /**
  * Constants

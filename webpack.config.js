@@ -12,6 +12,7 @@ const _prodConfig = {
         "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
         adm: './src/index',
+        version: './frontend/version',
         'player-main': './scripts/player-main',
         'player-app': './scripts/native-app-player/player-app',
         'player-app-test': './scripts/native-app-player/example',
@@ -124,6 +125,7 @@ const _devConfig = {
         'babel-polyfill': 'babel-polyfill',
         main: './frontend/index',
         adm: './src/index',
+        version: './frontend/version',
         'player-main': './scripts/player-main',
         'player-app': './scripts/native-app-player/player-app',
         'player-app-test': './scripts/native-app-player/example',
@@ -148,6 +150,9 @@ const _devConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
+        // new ExtractTextPlugin('version.json', {
+        //     allChunks: true
+        // }),
     ],
     module: {
         rules: [
@@ -164,6 +169,14 @@ const _devConfig = {
                     path.resolve(__dirname, 'scripts/widgets/player.js'),
                 ],
                 test: /\.js$/
+            },
+            {
+                loader: 'json-loader',
+                test: /\.json$/,
+                // use: ExtractTextPlugin.extract({
+                //     fallback: "style-loader",
+                    // use: "json-loader"
+                // })
             },
             {
                 test: /\.sass$/,

@@ -13,13 +13,14 @@ import app from './app';
 import player from './player';
 import user from './user'
 import lessonInfoStorage from './lesson-info-storage';
-import authorReducer, {moduleName as authorModule} from '../ducks/author'
-import profileReducer, {moduleName as profileModule} from '../ducks/profile'
-import playerScreenReducer, {moduleName as playerScreenModule} from '../ducks/player-screen'
-import messageReducer, {moduleName as messageModule} from '../ducks/message'
-import filtersReducer, {moduleName as filtersModule} from '../ducks/filters'
-import billingReducer, {moduleName as billingModule} from '../ducks/billing'
-import paramsReducer, {moduleName as paramsModule} from '../ducks/params'
+import authorReducer, {moduleName as authorModule} from 'ducks/author'
+import profileReducer, {moduleName as profileModule} from 'ducks/profile'
+import playerScreenReducer, {moduleName as playerScreenModule} from 'ducks/player-screen'
+import messageReducer, {moduleName as messageModule} from 'ducks/message'
+import filtersReducer, {moduleName as filtersModule} from 'ducks/filters'
+import billingReducer, {moduleName as billingModule} from 'ducks/billing'
+import paramsReducer, {moduleName as paramsModule} from 'ducks/params'
+import versionReducer, {moduleName as versionModule} from 'ducks/version'
 
 export default combineReducers({
 
@@ -42,6 +43,7 @@ export default combineReducers({
     [filtersModule]: filtersReducer,
     [billingModule]: billingReducer,
     [paramsModule]: paramsReducer,
+    [versionModule]: versionReducer,
     routing: routerReducer,
     form: formReducer,
 })
