@@ -20,7 +20,7 @@ const VersionMiddleware = store => next => action => {
             let result = next(action),
                 _newVersion = store.getState().version.get('main')
 
-            console.log(`fire: version ${_oldVersion} / ${_newVersion}`)
+            // console.log(`fire: version ${_oldVersion} / ${_newVersion}`)
             if (_newVersion !== _oldVersion) {
                 window.location.reload()
             }
