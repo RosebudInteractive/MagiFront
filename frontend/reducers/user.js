@@ -83,7 +83,7 @@ export default function app(state = initialState, action) {
             return {...state, loading: false, user: Object.assign({}, payload)}
 
         case RECOVERY_PASSWORD_SUCCESS:
-            return {...state, loading: false, user: null}
+            return {...state, loading: false, user: Object.assign({}, payload)}
 
         case LOGOUT_SUCCESS:
             return {...state, loading: false, user: null}

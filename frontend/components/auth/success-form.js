@@ -56,14 +56,12 @@ class AuthConfirmForm extends React.Component {
                 <div className='register-block-wrapper__logo'/>
                 <div className="success-message">
                     <p className="success-message__text">{'Мы отправили письмо с дальнешими инструкциями на почту' + (email ? (' ' + email) : '')}</p>
-                    /* eslint-disable no-undef */
                     {
                         NODE_ENV === 'development' ?
                             <a href={_link} className="success-message__check-link">Открыть тестовое письмо</a>
                             :
                             null
                     }
-                    /* eslint-enable no-undef */
                     {
                         this.props.enableCountdown ?
                             <div>
