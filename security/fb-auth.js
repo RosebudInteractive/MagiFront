@@ -6,6 +6,7 @@ const passportFacebook = require('passport-facebook');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { StdLoginProcessor, DestroySession } = require('./local-auth');
+const { GenTokenFunc } = require('./jwt-auth');
 
 class AuthFB {
 
@@ -78,6 +79,7 @@ class AuthFB {
         }
 
         app.get('/api/fblogin', passport.authenticate('facebook', config.snets.facebook.passportOptions));
+        app.get('/api/app-fblogin', StdLoginProcessor('facebook', false, null, GenTokenFunc));
         let processor = (!config.snets.facebook.redirectURL) ? StdLoginProcessor('facebook') :
             StdLoginProcessor('facebook', false, config.snets.facebook.redirectURL);
         app.get(config.snets.facebook.callBack, processor);

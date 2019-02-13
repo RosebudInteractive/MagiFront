@@ -1,5 +1,6 @@
 'use strict'
 const { URL, URLSearchParams } = require('url');
+const _ = require('lodash');
 const config = require('config');
 const passport = require('passport');
 const passportLocal = require('passport-local');
@@ -12,6 +13,7 @@ const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
 const { recaptcha } = require('./recaptcha');
 const { AccessRigths } = require('./access-rights');
+const { Activation } = require('../const/activation');
 const serialize = require('./serialize');
 
 let usersCache = null;
@@ -113,7 +115,8 @@ class AuthLocal {
         });
 
         app.get("/api/recovery/:email", (req, res) => {
-            UserPwdRecovery({ key: { Email: req.params.email } }, this._usersCache)
+            let fromApp = (req.query && req.query.app && ((req.query.app === "true" || (req.query.app === "1")))) ? true : false;
+            UserPwdRecovery({ key: { Email: req.params.email } }, this._usersCache, fromApp)
                 .then((user) => {
                     res.json(user);
                 })
@@ -128,7 +131,14 @@ class AuthLocal {
                 let password = req.body.password;
                 this._usersCache.userPwdRecovery({ key: { ActivationKey: activationKey }, Password: password })
                     .then((user) => {
-                        StdLogin(req, res, user, { message: "User Password Recovery: Unknown error." });
+                        let fromApp = activationKey.substr(activationKey.length - Activation.APP_SUFIX.length) === Activation.APP_SUFIX;
+                        if (fromApp) {
+                            let url = new URL(config.authentication.appLoginUrl);
+                            url.searchParams.append('login', user.Email);
+                            res.json({ redirectUrl: url.href });
+                        }
+                        else
+                            StdLogin(req, res, user, { message: "User Password Recovery: Unknown error." });
                     })
                     .catch((err) => {
                         res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
@@ -183,14 +193,17 @@ class AuthLocal {
 };
 
 let buildRedirectUrl = (redirectUrl, errMsg) => {
-    let path = errMsg ? redirectUrl.error : redirectUrl.success;
-    const url = new URL(config.proxyServer.siteHost + path);
-    if(errMsg)
-        url.searchParams.append('message', errMsg);
+    let url = (redirectUrl instanceof URL) ? redirectUrl : null;
+    if (!url){
+        let path = errMsg ? redirectUrl.error : redirectUrl.success;
+        url = new URL(config.proxyServer.siteHost + path);
+        if (errMsg)
+            url.searchParams.append('message', errMsg);
+    }
     return url.href;
 };
 
-let StdLogin = (req, res, user, info, redirectUrl) => {
+let StdLogin = (req, res, user, info, redirectUrl, genTokenFunc) => {
     if (!user) {
         AuthLocal.destroySession(req)
             .then(() => {
@@ -206,8 +219,23 @@ let StdLogin = (req, res, user, info, redirectUrl) => {
                     res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
             });
     }
-    else
-        req.logIn(user, (err) => {
+    else {
+        let loginFunc = req.logIn.bind(req);
+        if (typeof (genTokenFunc) === "function") {
+            loginFunc = (user, cb) => {
+                genTokenFunc(user)
+                    .then(token => {
+                        req.user = user;
+                        if (cb)
+                            cb(null, token);
+                    })
+                    .catch(err => {
+                        if (cb)
+                            cb(err);
+                    });
+            }
+        }
+        function cb(err, token) {
             if (err) {
                 let msg = err instanceof Error ? err.message : err.toString();
                 if (redirectUrl)
@@ -218,9 +246,15 @@ let StdLogin = (req, res, user, info, redirectUrl) => {
             else
                 if (redirectUrl)
                     res.redirect(buildRedirectUrl(redirectUrl))
-                else
-                    res.json(usersCache.userToClientJSON(user));
-        });
+                else {
+                    let userData = usersCache.userToClientJSON(user);
+                    if (token)
+                        userData = { user: userData, token: token };
+                    res.json(userData);
+                }
+        }
+        loginFunc(user, cb);
+    }
 }
 
 let chechRecapture = (hasCapture, req, res, processor) => {
@@ -240,7 +274,7 @@ let chechRecapture = (hasCapture, req, res, processor) => {
         });
 }
 
-let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
+let StdLoginProcessor = (strategy, hasCapture, redirectUrl, genTokenFunc) => {
     return (req, res, next) => {
         chechRecapture(hasCapture, req, res, () => {
             passport.authenticate(strategy, (err, user, info) => {
@@ -270,7 +304,7 @@ let StdLoginProcessor = (strategy, hasCapture, redirectUrl) => {
                         });
                 }
                 else
-                    StdLogin(req, res, user, null, redirectUrl);
+                    StdLogin(req, res, user, null, redirectUrl, genTokenFunc);
             })(req, res, next);
         })
     }
@@ -288,6 +322,7 @@ exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession;
 exports.StdLoginProcessor = StdLoginProcessor;
+exports.StdLogin = StdLogin;
 exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {
     AuthLocalInit(app);
     return (req, res, next) => {

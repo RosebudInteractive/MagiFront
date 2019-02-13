@@ -6,69 +6,103 @@ const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { AccessRights } = require('./access-rights');
-const { DestroySession } = require('./local-auth');
+const { StdLogin, DestroySession } = require('./local-auth');
+const { UserRegister } = require("./user-register");
 
 class AuthJWT {
 
-    constructor(app) {
-        const ExtractJwt = passportJWT.ExtractJwt;
-        const JwtStrategy = passportJWT.Strategy;
+    static genTokenFunc(user) {
+        return new Promise(resolve => {
+            let payload = { id: user.Id };
+            let token = jwt.sign(payload, getAuthJWTInit()._jwtOptions.secretOrKey);
+            let rc = getAuthJWTInit()._usersCache.checkToken("JWT " + token, true)
+                .then(() => { return token });
+            resolve(rc);
+        });
+    }
 
-        const jwtOptions = {}
-        // jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
-        jwtOptions.jwtFromRequest = ExtractJwt.fromExtractors([
+    constructor() {
+        const ExtractJwt = passportJWT.ExtractJwt;
+
+        this._jwtOptions = {}
+        // this._jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme('JWT');
+        this._jwtOptions.jwtFromRequest = ExtractJwt.fromExtractors([
             ExtractJwt.fromAuthHeaderWithScheme('JWT'),
             ExtractJwt.fromUrlQueryParameter('token')
         ]);
-        jwtOptions.secretOrKey = config.get('authentication.secret');
+        this._jwtOptions.secretOrKey = config.get('authentication.secret');
         
         this._usersCache = UsersCache();
-        
-        const strategy = new JwtStrategy(jwtOptions,
-            ((jwt_payload, next) => {
-                // console.log('payload received', jwt_payload);
-                var user = this._usersCache.getUserInfoById(jwt_payload.id)
-                    .then((result) => {
-                        next(null, result ? result : false);
-                    })
-                    .catch((err) => {
-                        next(err);
-                    });
-            }).bind(this));
+    }
+    
+    init(app){
+        if (!this._initFlag) {
+            this._initFlag = true;
 
-        passport.use(strategy);
-
-        app.post("/api/jwtlogin",
-            ((req, res) => {
-                if (req.body && req.body.login && req.body.password) {
-                    let login = req.body.login;
-                    let password = req.body.password;
-                    let promise = Promise.resolve();
-                    promise.
-                        then(() => {
-                            return DestroySession(req);
-                        })
-                        .then(() => {
-                            return this._usersCache.authUser(login, password);
-                        })
-                        .then((user) => {
-                            let payload = { id: user.Id };
-                            let token = jwt.sign(payload, jwtOptions.secretOrKey);
-                            this._usersCache.checkToken("JWT " + token, true)
-                                .then((result) => {
-                                    res.json({ user: this._usersCache.userToClientJSON(user), token: token });
-                                })
-                                .catch((err) => {
-                                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
-                                });
+            const JwtStrategy = passportJWT.Strategy;
+            const strategy = new JwtStrategy(this._jwtOptions,
+                ((jwt_payload, next) => {
+                    // console.log('payload received', jwt_payload);
+                    var user = this._usersCache.getUserInfoById(jwt_payload.id)
+                        .then((result) => {
+                            next(null, result ? result : false);
                         })
                         .catch((err) => {
-                            res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
+                            next(err);
                         });
-                }
-                else
-                    res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
-            }).bind(this));
+                }).bind(this));
+
+            passport.use(strategy);
+
+            app.post("/api/app-register", (req, res) => {
+                new Promise(resolve => {
+                    let data =
+                    {
+                        Login: req.body.login,
+                        Name: (req.body.name && (req.body.name.trim().length > 0)) ? req.body.name.trim() : req.body.login
+                    };
+                    let password = req.body.password;
+                    let rc = UserRegister(password, data, this._usersCache)
+                        .then((user) => {
+                            StdLogin(req, res, user, { message: "User Register: Unknown error." }, null, AuthJWT.genTokenFunc);
+                        });
+                    resolve(rc);
+                })
+                    .catch((err) => {
+                        res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                    });
+            });
+
+            app.post("/api/jwtlogin",
+                ((req, res) => {
+                    if (req.body && req.body.login && req.body.password) {
+                        let login = req.body.login;
+                        let password = req.body.password;
+                        let promise = Promise.resolve();
+                        promise.
+                            then(() => {
+                                return DestroySession(req);
+                            })
+                            .then(() => {
+                                return this._usersCache.authUser(login, password);
+                            })
+                            .then((user) => {
+                                AuthJWT.genTokenFunc(user)
+                                    .then(token => {
+                                        res.json({ user: this._usersCache.userToClientJSON(user), token: token });
+                                    })
+                                    .catch((err) => {
+                                        res.status(HttpCode.ERR_INTERNAL).json({ message: err.toString() });
+                                    });
+                            })
+                            .catch((err) => {
+                                res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
+                            });
+                    }
+                    else
+                        res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
+                }).bind(this));
+        }
     }
 
     checkToken(token) {
@@ -79,9 +113,15 @@ class AuthJWT {
 const isFeatureEnabled = config.get('authentication.enabled');
 let authJWT = null;
 
+let getAuthJWTInit = () => {
+    if (!authJWT)
+        authJWT = new AuthJWT();
+    return authJWT;
+};
+
 let AuthJWTInit = (app) => {
-    if ((!authJWT) && isFeatureEnabled)
-        authJWT = new AuthJWT(app);
+    if (isFeatureEnabled)
+        getAuthJWTInit().init(app);
 };
 
 let processAuth = (user, isAuthRequired, accessRights, res, next, info) => {
@@ -100,7 +140,7 @@ let processAuth = (user, isAuthRequired, accessRights, res, next, info) => {
 }
 
 exports.AuthJWTInit = AuthJWTInit;
-
+exports.GenTokenFunc = AuthJWT.genTokenFunc;
 exports.AuthenticateJWT = (app, isAuthRequired, accessRights) => {
     AuthJWTInit(app);
     return (req, res, next) => {
