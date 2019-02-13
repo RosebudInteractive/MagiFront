@@ -1,10 +1,8 @@
-// import './App.css';
-
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 import {Switch, Route, withRouter} from 'react-router-dom'
-import MetaTags from 'react-meta-tags';
+// import MetaTags from 'react-meta-tags';
 
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
@@ -28,9 +26,9 @@ import {getUserBookmarks} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
+import {loadVersion} from "ducks/version"
 
-
-import * as Polifyll from './tools/polyfill';
+import * as Polyfill from './tools/polyfill';
 
 import $ from 'jquery'
 import SmallPlayer from "./containers/small-player";
@@ -46,7 +44,7 @@ import Platform from 'platform';
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-Polifyll.registry();
+Polyfill.registry();
 
 let _homePath = '/';
 const _globalScrollDelta = 80;
@@ -117,6 +115,7 @@ class App extends Component {
 
         this.props.appActions.getCookiesConfimation()
         this.props.getParameters()
+        this.props.loadVersion()
     }
 
     componentDidMount() {
@@ -326,6 +325,7 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
+        loadVersion: bindActionCreators(loadVersion, dispatch),
     }
 }
 
