@@ -4089,6 +4089,7 @@ li.fancybox-thumbs-loading {
           margin-bottom: 37px;}}
   @media (max-width: 899px) {
       .transcript-page._nested {
+        border-top: 1px solid rgba(47, 47, 74, 0.2);
         padding-top: 5px; } }
 
 
@@ -6224,14 +6225,20 @@ ul.user-tooltip {
   list-style: none;
   display: flex; }
 .lesson-aggregators .aggregator-list{
+  padding: 11px 0 12px 0;
   box-sizing: border-box;
   border: none;
   width: 75%; }
 
 @media (max-width: 899px) {
   .lesson-aggregators .aggregator-list{
+    padding: 0;
     border-top: 1px solid rgba(47, 47, 74, 0.2);
-    width: 100%; } }
+    border-bottom: 1px solid rgba(47, 47, 74, 0.2);
+    width: 100%; }
+
+  .single .lesson-aggregators .aggregator-list{
+    border-bottom: none; } }
 .aggregator-list__item{
   position: relative;
   width: 25%;
@@ -6245,9 +6252,14 @@ ul.user-tooltip {
   top: 50%;
   left: 50%; }
 .aggregator-list__item a:hover{
+  /*filter: none;*/
   border: none; }
 .lesson-aggregators .aggregator-list__item{
   width: 103px }
+@media (max-width: 899px) {
+  .lesson-aggregators .aggregator-list__item{
+    max-width: none;
+    width: 25% } }
 
 
 .lectures-wrapper {
@@ -17920,8 +17932,7 @@ ul.lectures-tab {
 @media (max-width: 899px) {
   .lecture-info {
     padding-top: 30px;
-    padding-bottom: 30px;
-    border-bottom: 1px solid rgba(47, 47, 74, 0.2); } }
+    padding-bottom: 30px; } }
 
 @media (max-width: 767px) {
   .lecture-info {

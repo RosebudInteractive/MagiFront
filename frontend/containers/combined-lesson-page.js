@@ -466,7 +466,8 @@ class CombineLessonPage extends React.Component {
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
             _lesson = lesson ? this._getLesson() : null,
-            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized);
+            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized),
+            _hasChild = _lesson && _lesson.Childs && (_lesson.Childs.length > 0)
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
@@ -491,7 +492,7 @@ class CombineLessonPage extends React.Component {
                             _isNeedHideGallery ? null : <GalleryButtons/>,
                             lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                             this._getLessonsBundles(),
-                            <LessonAggregators extLinks={_lesson.ExtLinks}/>,
+                            <LessonAggregators extLinks={_lesson.ExtLinks} singleBlock={!_hasChild}/>,
                             <LessonInfo lesson={_lesson}/>,
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}
