@@ -5,6 +5,7 @@ const passportVKontakte = require('passport-vkontakte');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { StdLoginProcessor, DestroySession } = require('./local-auth');
+const { GenTokenFunc } = require('./jwt-auth');
 
 class AuthVK {
 
@@ -69,6 +70,7 @@ class AuthVK {
         }
 
         app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
+        app.get('/api/app-vklogin', StdLoginProcessor('vkontakte', false, null, GenTokenFunc));
         let processor = (!config.snets.vk.redirectURL) ? StdLoginProcessor('vkontakte') :
             StdLoginProcessor('vkontakte', false, config.snets.vk.redirectURL);
         app.get(config.snets.vk.callBack, processor);

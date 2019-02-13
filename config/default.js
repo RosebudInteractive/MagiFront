@@ -118,12 +118,13 @@ module.exports = {
         useJWT: false,
         useCapture: true,
         saltRounds: 10,
+        appLoginUrl: "magisteria://signin",
         activationRoute: "/activation-confirm",
         recoveryRoute: "/recovery",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
-        tokenExpTime: 4 * 24 * 3600 * 1000,
-        tokenUpdTime: 1 * 3600 * 1000,
+        tokenExpTime: SESSION_MAX_AGE,
+        tokenUpdTime: SESSION_UPD_TIME,
         reCapture: {
             siteKey: "6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t",
             secretKey: "6LfobE8UAAAAAOIpLL4jothsvn8IgogqdkM8ie0r"

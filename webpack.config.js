@@ -2,6 +2,7 @@ let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 // const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // require('webpack-jquery-ui');
 
@@ -37,7 +38,8 @@ const _prodConfig = {
                 warnings: false,
                 drop_console: true
             }
-        })
+        }),
+        new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
     module: {
         rules: [
@@ -148,6 +150,7 @@ const _devConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
+        new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}]),
     ],
     module: {
         rules: [
@@ -164,6 +167,14 @@ const _devConfig = {
                     path.resolve(__dirname, 'scripts/widgets/player.js'),
                 ],
                 test: /\.js$/
+            },
+            {
+                loader: 'json-loader',
+                test: /\.json$/,
+                // use: ExtractTextPlugin.extract({
+                //     fallback: "style-loader",
+                    // use: "json-loader"
+                // })
             },
             {
                 test: /\.sass$/,

@@ -10,11 +10,14 @@ const { SendMail } = require('../mail');
 
 const MAIL_CFG_NAME = "pwdRecovery";
 
-exports.UserPwdRecovery = (user_data, userCache) => {
+exports.UserPwdRecovery = (user_data, userCache, fromApp) => {
     let user;
     return new Promise((resolve, reject) => {
         if (!user_data.Password) {
             user_data.ActivationKey = randomstring.generate(Activation.ACTIVATION_KEY_LENGTH);
+            if (fromApp)
+                user_data.ActivationKey =
+                    user_data.ActivationKey.substr(0, user_data.ActivationKey.length - Activation.APP_SUFIX.length) + Activation.APP_SUFIX;
             user_data.ExpDate = new Date((new Date()) - 0 + (Activation.EXP_PERIOD_SEC * 1000));
         }
         resolve(userCache.userPwdRecovery(user_data));

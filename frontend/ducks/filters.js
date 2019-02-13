@@ -70,7 +70,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         }
 
-
         default:
             return state
     }

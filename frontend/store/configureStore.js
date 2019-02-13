@@ -14,6 +14,7 @@ import AudioLoaderMiddleware from './audio-loader-middleware';
 import BookmarksMiddleware from './bookmarks-middleware';
 import GoogleAnalyticsMiddleware from './google-analytics-middleware';
 import AppOptionsMiddleware from './app-options-middleware';
+import VersionMiddleware from './version-middleware';
 
 export const store = configureStore();
 
@@ -36,6 +37,7 @@ function configureStore(initialState) {
                 applyMiddleware(BookmarksMiddleware),
                 applyMiddleware(GoogleAnalyticsMiddleware),
                 applyMiddleware(AppOptionsMiddleware),
+                applyMiddleware(VersionMiddleware),
             )
         ) :
         createStore(
@@ -51,6 +53,7 @@ function configureStore(initialState) {
                 applyMiddleware(BookmarksMiddleware),
                 applyMiddleware(GoogleAnalyticsMiddleware),
                 applyMiddleware(AppOptionsMiddleware),
+                applyMiddleware(VersionMiddleware),
             )
         );
 
