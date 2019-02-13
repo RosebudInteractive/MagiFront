@@ -17932,7 +17932,7 @@ ul.lectures-tab {
 
 @media (max-width: 767px) {
   .lecture-info {
-    padding-top: 24px;
+    /*padding-top: 24px;*/
     padding-bottom: 36px; } }
 
 @media (max-width: 599px) {
