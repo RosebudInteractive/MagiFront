@@ -191,6 +191,10 @@ function setupAPI(express, app) {
                 options = { appId: {}, siteKey: {}, scriptPath: {}, billing: { productReqParams: ProductReqParams }, debug: {} };
                 if (config.has('snets.facebook.appId'))
                     options.appId.fb = config.snets.facebook.appId;
+                if (config.has('snets.vk.appId'))
+                    options.appId.vk = config.snets.vk.appId;
+                if (config.has('snets.google.appId'))
+                    options.appId.google = config.snets.google.appId;
                 if (config.has('authentication.reCapture.siteKey'))
                     options.siteKey.reCapture = config.authentication.reCapture.siteKey;
                 if (config.has('server.pushNotifications') &&
