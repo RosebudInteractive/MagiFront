@@ -15,7 +15,7 @@ const { HttpCode } = require("../const/http-codes");
 const { HttpError } = require('../errors/http-error');
 const { AccessFlags } = require('../const/common');
 const { AuthJWTInit, AuthenticateJWT } = require('../security/jwt-auth');
-const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI } = require('../security/local-auth');
+const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI, SetupLogOut } = require('../security/local-auth');
 const { AuthVKInit } = require('../security/vk-auth');
 const { AuthFBInit } = require('../security/fb-auth');
 const { AuthGoogleInit } = require('../security/google-auth');
@@ -150,6 +150,7 @@ function setupAPI(express, app) {
         app.use("/api", AuthenticateJWT(app)); // Optional JWT Authentication
     }
 
+    SetupLogOut(app);
     SetupWhoAmI(app);
     app.post('/api/adm/upload', FileUpload.getFileUploadProc(config.get('uploadPath')));
     app.post('/api/adm/import', FileUpload.getFileUploadProc(config.get('uploadPath'), ImportEpisode(), ImportEpisodeParams()));
