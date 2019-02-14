@@ -6234,11 +6234,7 @@ ul.user-tooltip {
   .lesson-aggregators .aggregator-list{
     padding: 0;
     border-top: 1px solid rgba(47, 47, 74, 0.2);
-    border-bottom: 1px solid rgba(47, 47, 74, 0.2);
-    width: 100%; }
-
-  .single .lesson-aggregators .aggregator-list{
-    border-bottom: none; } }
+    width: 100%; } }
 .aggregator-list__item{
   position: relative;
   width: 25%;
@@ -17931,12 +17927,12 @@ ul.lectures-tab {
 
 @media (max-width: 899px) {
   .lecture-info {
-    padding-top: 30px;
+    padding-top: 0;
     padding-bottom: 30px; } }
 
 @media (max-width: 767px) {
   .lecture-info {
-    padding-top: 24px;
+    /*padding-top: 24px;*/
     padding-bottom: 36px; } }
 
 @media (max-width: 599px) {
