@@ -1,17 +1,16 @@
 import React from 'react';
-import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 
-class MessageSubform extends React.Component {
+export default class MessageSubform extends React.Component {
 
     constructor(props) {
         super(props)
     }
 
     render() {
-        let {error} = this.props;
+        let {serverError} = this.props;
 
-        let _text = error ? <p>{'При смене пароля произошла ошибка'} <br/>{error}</p> : <p>{'Смена пароля прошла успешно'}</p>
+        let _text = serverError ? <p>{'При смене пароля произошла ошибка'} <br/>{serverError}</p> : <p>{'Смена пароля прошла успешно'}</p>
 
         return (
             <div className="popup js-popup _registration opened">
@@ -30,11 +29,3 @@ class MessageSubform extends React.Component {
         )
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        error: state.user.error,
-    }
-}
-
-export default connect(mapStateToProps)(MessageSubform);

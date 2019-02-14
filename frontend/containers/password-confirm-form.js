@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 import * as userActions from '../actions/user-actions'
 import Wrapper from "../components/password-confirm/wrapper";
 
-
 class PasswordConfirmForm extends React.Component {
 
     constructor(props) {

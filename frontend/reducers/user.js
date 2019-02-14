@@ -36,7 +36,7 @@ import {
     RECOVERY_PASSWORD_FAIL, CLOSE_SIGN_IN_FORM,
     WHO_AM_I_START,
     WHO_AM_I_SUCCESS,
-    WHO_AM_I_FAIL,
+    WHO_AM_I_FAIL, REDIRECT_TO_APP, REDIRECT_TO_APP_COMPLETE,
 } from '../constants/user'
 
 const initialState = {
@@ -48,6 +48,8 @@ const initialState = {
     email: '',
     error: null,
     user: null,
+    msgUrl: '#',
+    redirect: {active: false, url: ''},
 };
 
 export default function app(state = initialState, action) {
@@ -83,7 +85,7 @@ export default function app(state = initialState, action) {
             return {...state, loading: false, user: Object.assign({}, payload)}
 
         case RECOVERY_PASSWORD_SUCCESS:
-            return {...state, loading: false, user: Object.assign({}, payload)}
+            return {...state, loading: false, user: null, msgUrl: payload.PData ? payload.PData.msgUrl : '#', }
 
         case LOGOUT_SUCCESS:
             return {...state, loading: false, user: null}
@@ -138,7 +140,7 @@ export default function app(state = initialState, action) {
 
         case SWITCH_TO_RECOVERY_PASSWORD_MESSAGE:
             if (state.authorizationState !== AUTHORIZATION_STATE.PASSWORD_CONFIRM_FINISHED) {
-                return {...state, authorizationState: AUTHORIZATION_STATE.PASSWORD_CONFIRM_FINISHED, error: null};
+                return {...state, authorizationState: AUTHORIZATION_STATE.PASSWORD_CONFIRM_FINISHED,};
             } else {
                 return state
             }
@@ -152,6 +154,12 @@ export default function app(state = initialState, action) {
         case SEND_NEW_PASSWORD_FAIL:
         case GET_ACTIVATION_USER_FAIL:
             return {...state, loading: false, error: payload.error.message, user: null}
+
+        case REDIRECT_TO_APP:
+            return {...state, loading: false, redirect: {active: true, url: payload}}
+
+        case REDIRECT_TO_APP_COMPLETE:
+            return {...state, redirect: {active: false, url:''}}
 
         default:
             return state;

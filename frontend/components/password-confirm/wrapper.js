@@ -11,6 +11,15 @@ import {AUTHORIZATION_STATE} from '../../constants/user'
 
 class Wrapper extends React.Component {
 
+    componentWillReceiveProps(nextProps) {
+        if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
+
+            this.props.userActions.redirectComplete();
+            window.location = nextProps.redirectUrl;
+        }
+    }
+
+
     render() {
         let {authorizationState : state, error, user, loading} = this.props;
 
@@ -24,7 +33,9 @@ function mapStateToProps(state) {
         authorizationState: state.user.authorizationState,
         error: state.user.error,
         user: state.user.user,
-        loading: state.user.loading
+        loading: state.user.loading,
+        needRedirect: state.user.redirect.active,
+        redirectUrl: state.user.redirect.url,
     }
 }
 

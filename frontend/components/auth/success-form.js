@@ -47,8 +47,7 @@ class AuthConfirmForm extends React.Component {
     }
 
     render() {
-        let {user, email} = this.props,
-            _link = user ? user.PData.msgUrl : '#';
+        let {email, msgUrl} = this.props
 
         return (
 
@@ -58,7 +57,7 @@ class AuthConfirmForm extends React.Component {
                     <p className="success-message__text">{'Мы отправили письмо с дальнешими инструкциями на почту' + (email ? (' ' + email) : '')}</p>
                     {
                         NODE_ENV === 'development' ?
-                            <a href={_link} className="success-message__check-link">Открыть тестовое письмо</a>
+                            <a href={msgUrl} className="success-message__check-link">Открыть тестовое письмо</a>
                             :
                             null
                     }
@@ -86,6 +85,7 @@ class AuthConfirmForm extends React.Component {
 function mapStateToProps(state) {
     return {
         user: state.user.user,
+        msgUrl: state.user.msgUrl,
         email: state.user.email,
     }
 }

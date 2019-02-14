@@ -67,12 +67,12 @@ class PasswordConfirmSubform extends React.Component {
                 <div className='register-block-wrapper__logo'/>
                 <span className="register-block-wrapper__label">{user ? user.DisplayName : ''}</span>
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
-                    <Field name="password1" component={PasswordEdit} id={'password1'}/>
-                    <Field name="password2" component={PasswordEdit} id={'password2'}/>
+                    <Field name="password1" component={PasswordEdit} id={'password1'} disabled = {!!serverError}/>
+                    <Field name="password2" component={PasswordEdit} id={'password2'} disabled = {!!serverError}/>
                     {_errorText}
                     <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
                     <div className="register-form__buttons">
-                        <SignUpButton disabled={invalid || !this.state.captcha || loading} caption={'Отправить'}
+                        <SignUpButton disabled={invalid || !this.state.captcha || loading || !!serverError} caption={'Отправить'}
                                       type={'submit'}/>
                     </div>
                 </form>

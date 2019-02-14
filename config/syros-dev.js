@@ -63,6 +63,7 @@ module.exports = {
         enabled: true,
         useJWT: true,
         useCapture: true,
+        appLoginUrl: "https://magisteria.ru",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'local'// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
     },
