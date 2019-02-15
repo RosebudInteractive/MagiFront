@@ -6,7 +6,7 @@ const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
 const { AccessRights } = require('./access-rights');
-const { StdLogin, DestroySession } = require('./local-auth');
+const { GetTokenFromReq, StdLogin, DestroySession } = require('./local-auth');
 const { UserRegister } = require("./user-register");
 
 class AuthJWT {
@@ -150,7 +150,7 @@ exports.AuthenticateJWT = (app, isAuthRequired, accessRights) => {
         if (req.jwtResult)
             return processAuth(req.user, isAuthRequired, accessRights, res, next, req.jwtResult.info);
         req.jwtResult = { isSuccess: false };
-        let token = req.headers["authorization"] || (req.query["token"] ? ("JWT " + req.query["token"]) : null);
+        let token = GetTokenFromReq(req);
         if (token)
             passport.authenticate('jwt', function (err, user, info) {
                 req.jwtResult.info = { message: info && info.message ? info.message : JSON.stringify(info) };

@@ -20,6 +20,8 @@ let usersCache = null;
 
 class AuthLocal {
 
+    static getTokenFromReq(req) { return req.headers["authorization"] || (req.query["token"] ? ("JWT " + req.query["token"]) : null) }
+
     static destroySession(req) {
         return new Promise((resolve, reject) => {
             if (req.session)
@@ -31,7 +33,7 @@ class AuthLocal {
                 resolve();
         })
             .then(() => {
-                let token = req.headers["authorization"];
+                let token = this.getTokenFromReq(req);
                 if (token)
                     return usersCache.destroyToken(token);
             });
@@ -43,6 +45,18 @@ class AuthLocal {
                 res.json(usersCache.userToClientJSON(req.user))
             else
                 res.status(HttpCode.ERR_UNAUTH).json({ message: "Unauthorized." });
+        });
+    }
+
+    static setupLogOut(app) {
+        app.get("/api/logout", (req, res) => {
+            this.destroySession(req)
+                .then(() => {
+                    res.status(HttpCode.OK).json({ message: "OK" });
+                })
+                .catch((err) => {
+                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
         });
     }
 
@@ -88,16 +102,6 @@ class AuthLocal {
                         res.json(user);
                     else
                         res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
-                })
-                .catch((err) => {
-                    res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
-                });
-        });
-
-        app.get("/api/logout", (req, res) => {
-            AuthLocal.destroySession(req)
-                .then(() => {
-                    res.status(HttpCode.OK).json({ message: "OK" });
                 })
                 .catch((err) => {
                     res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
@@ -317,7 +321,9 @@ let AuthLocalInit = (app) => {
         authLocal = new AuthLocal(app);
 };
 
+exports.GetTokenFromReq = (req) => { return AuthLocal.getTokenFromReq(req) };
 exports.SetupWhoAmI = (app) => { AuthLocal.setupWhoAmI(app) };
+exports.SetupLogOut = (app) => { AuthLocal.setupLogOut(app) };
 exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession;
