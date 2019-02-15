@@ -33,7 +33,7 @@ import {
     RECOVERY_PASSWORD_FAIL,
     WHO_AM_I_START,
     WHO_AM_I_SUCCESS,
-    WHO_AM_I_FAIL,
+    WHO_AM_I_FAIL, REDIRECT_TO_APP, REDIRECT_TO_APP_COMPLETE,
 } from '../constants/user'
 
 import 'whatwg-fetch';
@@ -329,12 +329,19 @@ export const sendNewPassword = (values) => {
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                handleUserData(data);
+                if (data.hasOwnProperty('redirectUrl')) {
+                    dispatch({
+                        type: REDIRECT_TO_APP,
+                        payload: data.redirectUrl
+                    });
+                } else {
+                    handleUserData(data);
 
-                dispatch({
-                    type: SEND_NEW_PASSWORD_SUCCESS,
-                    payload: data
-                });
+                    dispatch({
+                        type: SEND_NEW_PASSWORD_SUCCESS,
+                        payload: data
+                    });
+                }
 
                 dispatch({
                     type: SWITCH_TO_RECOVERY_PASSWORD_MESSAGE,
@@ -352,6 +359,13 @@ export const sendNewPassword = (values) => {
                     payload: null
                 });
             });
+    }
+}
+
+export const redirectComplete = () => {
+    return {
+        type: REDIRECT_TO_APP_COMPLETE,
+        payload: null,
     }
 }
 

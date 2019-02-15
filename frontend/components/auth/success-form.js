@@ -47,8 +47,7 @@ class AuthConfirmForm extends React.Component {
     }
 
     render() {
-        let {user, email} = this.props,
-            _link = user ? user.PData.msgUrl : '#';
+        let {email, msgUrl} = this.props
 
         return (
 
@@ -56,14 +55,12 @@ class AuthConfirmForm extends React.Component {
                 <div className='register-block-wrapper__logo'/>
                 <div className="success-message">
                     <p className="success-message__text">{'Мы отправили письмо с дальнешими инструкциями на почту' + (email ? (' ' + email) : '')}</p>
-                    /* eslint-disable no-undef */
                     {
                         NODE_ENV === 'development' ?
-                            <a href={_link} className="success-message__check-link">Открыть тестовое письмо</a>
+                            <a href={msgUrl} className="success-message__check-link">Открыть тестовое письмо</a>
                             :
                             null
                     }
-                    /* eslint-enable no-undef */
                     {
                         this.props.enableCountdown ?
                             <div>
@@ -88,6 +85,7 @@ class AuthConfirmForm extends React.Component {
 function mapStateToProps(state) {
     return {
         user: state.user.user,
+        msgUrl: state.user.msgUrl,
         email: state.user.email,
     }
 }
