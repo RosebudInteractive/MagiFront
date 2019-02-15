@@ -26,7 +26,7 @@ export default class LessonFullWrapper extends React.Component {
         return (
             <div className="lecture-full__wrapper">
                 <PlayBlock id={lesson.Id} courseUrl={courseUrl} lessonUrl={lesson.URL}
-                           isAuthRequired={lesson.isAuthenticated} audios={lesson.Audios} cover={_cover}
+                           isAuthRequired={lesson.IsAuthRequired} audios={lesson.Audios} cover={_cover}
                            duration={lesson.DurationFmt} totalDuration={lesson.Duration}/>
                 <InfoBlock {...this.props}/>
             </div>

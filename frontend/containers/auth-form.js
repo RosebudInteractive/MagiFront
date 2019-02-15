@@ -32,8 +32,7 @@ class AuthPopup extends React.Component {
     componentDidUpdate(prevProps) {
         if ((!prevProps.visible) && (this.props.visible)) {
             OverflowHandler.rememberScrollPos();
-            OverflowHandler.turnOn();
-            // $('body').addClass('overflow');
+            OverflowHandler.turnOnWithPause();
             setTimeout(() => {
                 this.setState({
                     noTransition: true
@@ -42,9 +41,9 @@ class AuthPopup extends React.Component {
         }
 
         if ((prevProps.visible) && (!this.props.visible)) {
-            if ($(window).innerWidth() > 899) {
+            // if ($(window).innerWidth() > 899) {
+            if (!this.props.pageHeaderState.showMenu) {
                 OverflowHandler.turnOff();
-                // $('body').removeClass('overflow');
             }
 
             if (this.state.noTransition) {
@@ -95,6 +94,7 @@ class AuthPopup extends React.Component {
 function mapStateToProps(state) {
     return {
         authorizationState: state.user.authorizationState,
+        pageHeaderState: state.pageHeader,
     }
 }
 
