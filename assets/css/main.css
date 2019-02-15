@@ -350,7 +350,8 @@ body {
       min-width: 320px; } }
   body.overflow {
     height: 100%;
-    overflow: hidden;
+    overflow: hidden; }
+  body.overflow_fixed {
     position: fixed; }
 
 .size-info {
