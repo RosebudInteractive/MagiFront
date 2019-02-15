@@ -211,6 +211,19 @@ Promise.resolve()
 
         if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
             app.get("/*", function (req, res) {
+                // let flag = req.originalUrl.indexOf("2D1C4FA9-117C-C34D-A0B2-1AA57EEF3E67") >= 0;
+                // flag = flag || (req.ip ==="188.168.52.25")
+                // if (flag) {
+                //     console.log(buildLogString("=== DATA REQUEST ==="));
+                //     console.log(buildLogString("  OriginalUrl: " + req.originalUrl));
+                //     console.log(buildLogString("  Method: " + req.method));
+                //     console.log(buildLogString("  upgrade: " + req.upgrade));
+                //     console.log(buildLogString("  Ip: " + req.ip));
+                //     console.log(buildLogString("=== START HEADERS ==="));
+                //     for (let h in req.headers)
+                //         console.log(buildLogString(`    ${h}: "${req.headers[h]}"`));
+                //     console.log(buildLogString("===  END HEADERS  ==="));
+                // };
                 res.sendFile(__dirname + '/index.html');
             });
 
