@@ -46,7 +46,7 @@ class PlayBlock extends React.Component {
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
         } else {
-            _button = <button className="play-block__btn" onClick={::this._play}>
+            _button = <button className={"play-block__btn" + (isFinished ? ' paused' : '')} onClick={::this._play}>
                 {isFinished
                     ?
                     <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
