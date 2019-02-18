@@ -67,30 +67,18 @@ const LessonInfoStorageMiddleware = store => next => action => {
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
                 let _id = _state.player.playingLesson.lessonId,
-                    _totalDuration = _state.player.totalDuration,
                     _lessonsMap = _state.lessonInfoStorage.lessons,
                     _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
-                    _newPosition = action.payload,
-                    _isFinished = Math.round(_newPosition) === _totalDuration;
+                    _newPosition = action.payload
 
                 store.dispatch(storageActions.setCurrentTimeForLesson({
                     id: _state.player.playingLesson.lessonId,
                     currentTime: _newPosition,
-                    isFinished: _isFinished
                 }))
-
-                if (_isFinished) {
-                    // store.dispatch(storageActions.setLessonEnded({
-                    //     id: _state.player.playingLesson.lessonId,
-                    //     currentTime: _newPosition,
-                    //     isFinished: _isFinished
-                    // }))
-                }
 
                 if (Math.abs(_newPosition - _currentPosition) > 1) {
                     LessonInfoStorage.calcDelta(_currentPosition, _newPosition, _id)
                     LessonInfoStorage.saveChanges()
-                    // LessonInfoStorage.setDeltaStart(_newPosition)
                 } else {
                     LessonInfoStorage.setDeltaStart(_currentPosition, _id)
                     LessonInfoStorage.hasChangedPosition();
@@ -111,9 +99,34 @@ const LessonInfoStorageMiddleware = store => next => action => {
         }
 
         case PLAYER_SET_RATE:
-        case PLAYER_PAUSED:
         case PLAYER_STOPPED: {
             LessonInfoStorage.saveChanges();
+            return next(action)
+        }
+
+        case PLAYER_PAUSED: {
+            let _state = store.getState();
+
+            console.log(_state)
+
+            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            if (_isPlayingLessonExists) {
+                let _id = _state.player.playingLesson.lessonId,
+                    _totalDuration = _state.player.totalDuration,
+                    _lessonsMap = _state.lessonInfoStorage.lessons,
+                    _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
+                    _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false,
+                    _willBeFinished = Math.round(_currentPosition) === _totalDuration;
+
+                console.log(_lessonsMap.get(_id))
+
+                if (_willBeFinished && !_isFinished) {
+                    store.dispatch(storageActions.setLessonEnded({id: _id}))
+                    LessonInfoStorage.saveChanges()
+                    LessonInfoStorage.clearDeltaStart(_id)
+                }
+            }
+
             return next(action)
         }
 
@@ -122,11 +135,15 @@ const LessonInfoStorageMiddleware = store => next => action => {
 
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
-                let _id = _state.player.playingLesson.lessonId;
+                let _id = _state.player.playingLesson.lessonId,
+                    _lessonsMap = _state.lessonInfoStorage.lessons,
+                    _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false
 
-                store.dispatch(storageActions.setLessonEnded({id: _id}))
-                LessonInfoStorage.saveChanges()
-                LessonInfoStorage.clearDeltaStart(_id)
+                if (!_isFinished) {
+                    store.dispatch(storageActions.setLessonEnded({id: _id}))
+                    LessonInfoStorage.saveChanges()
+                    LessonInfoStorage.clearDeltaStart(_id)
+                }
             }
 
             return next(action)

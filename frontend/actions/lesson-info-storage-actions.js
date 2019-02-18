@@ -202,6 +202,10 @@ const _getDebugLsnPosPath = (state, params) => {
         if (params.lsn[_lessonId].r) {
             _params.r = params.lsn[_lessonId].r
         }
+
+        if (params.lsn[_lessonId].isFinished) {
+            _params.isFinished = params.lsn[_lessonId].isFinished
+        }
     }
 
     _params.ver = '2.0'

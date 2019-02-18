@@ -1,5 +1,7 @@
 export const getTimeFmt = (time) => {
-    let date = new Date(time * 1000),
+    let _time = (time < 0) ? 0 : time;
+
+    let date = new Date(_time * 1000),
         hh = date.getUTCHours(),
         mm = date.getUTCMinutes(),
         ss = date.getSeconds();
