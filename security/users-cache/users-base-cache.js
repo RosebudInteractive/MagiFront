@@ -9,6 +9,8 @@ const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbprom
 const { ACCOUNT_ID } = require('../../const/sql-req-common');
 const { UserLoginError } = require("../errors");
 const { DbObject } = require('../../database/db-object');
+const { HttpError } = require('../../errors/http-error');
+const { HttpCode } = require("../../const/http-codes");
 
 const TOKEN_EXP_TIME = 24 * 3600 * 1000;
 const TOKEN_UPD_TIME = 1 * 3600 * 1000;
@@ -331,7 +333,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 .then(() => {
                     let collection = root_obj.getCol("DataElements");
                     if (collection.count() > 0)
-                        throw new Error("UsersBaseCache::createUser: User with  login: \"" + data.Login + "\" already exists.");
+                        throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                            error:"emailAlreadyRegistered",
+                            message: "Email \"" + data.Login + "\" уже был зарегистрирован."
+                        });
 
                     // Create new user
 

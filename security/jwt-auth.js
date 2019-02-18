@@ -4,6 +4,7 @@ const passport = require("passport");
 const config = require('config');
 const passportJWT = require("passport-jwt");
 const { HttpCode } = require("../const/http-codes");
+const { HttpError } = require('../errors/http-error');
 const { UsersCache } = require("./users-cache");
 const { AccessRights } = require('./access-rights');
 const { GetTokenFromReq, StdLogin, DestroySession } = require('./local-auth');
@@ -69,7 +70,10 @@ class AuthJWT {
                     resolve(rc);
                 })
                     .catch((err) => {
-                        res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                        if (err instanceof HttpError)
+                            res.status(err.statusCode).json(err.errObject)
+                        else
+                            res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
                     });
             });
 
