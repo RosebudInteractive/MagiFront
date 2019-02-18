@@ -59,9 +59,11 @@ exports.SetupRoute = (app) => {
                     let lessonId = (req.query && req.query.lessonId) ? parseInt(req.query.lessonId) : null;
                     if (lessonId && ((typeof (lessonId) !== "number") || isNaN(lessonId)))
                         throw new Error(`Invalid parameter "lessonId": "${req.query.lessonId}"`);
+                    let isFinished = (req.query && req.query.isFinished && (req.query.isFinished === "true")) ? true : false;
                     let pos = (req.query && req.query.pos) ? parseFloat(req.query.pos) : null;
-                    if (lessonId && ((typeof (pos) !== "number") || isNaN(pos)))
-                        throw new Error(`Invalid or missing parameter "pos": "${req.query.pos}"`);
+                    if (!isFinished)
+                        if (lessonId && ((typeof (pos) !== "number") || isNaN(pos)))
+                            throw new Error(`Invalid or missing parameter "pos": "${req.query.pos}"`);
                     let dt = (req.query && req.query.dt) ? parseFloat(req.query.dt) : null;
                     if (lessonId && ((typeof (dt) !== "number") || isNaN(dt)))
                         throw new Error(`Invalid or missing parameter "dt": "${req.query.dt}"`);
@@ -70,7 +72,10 @@ exports.SetupRoute = (app) => {
                         throw new Error(`Invalid parameter "r": "${req.query.r}"`);
                     if (lessonId) {
                         let lsn = data.lsn[lessonId] = {};
-                        lsn.pos = pos;
+                        if (isFinished)
+                            lsn.isFinished = isFinished
+                        else
+                            lsn.pos = pos;
                         lsn.dt = dt;
                         if (r)
                             lsn.r = r;
