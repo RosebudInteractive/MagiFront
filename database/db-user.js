@@ -92,6 +92,17 @@ const GET_SHORT_BKM_MSSQL =
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "where b.[UserId] = <%= userId %>";
 
+const GET_SHORT_BKM_MSSQL_APP =
+    "select c.[URL] from [Bookmark] b\n" +
+    "  join[Course] c on c.[Id] = b.[CourseId]\n" +
+    "where b.[UserId] = <%= userId %>\n" +
+    "union\n" +
+    "select c.[URL] + '/' + l.[URL] from[Bookmark] b\n" +
+    "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where b.[UserId] = <%= userId %>";
+
 const GET_LESSON_IDS_BKM_MSSQL =
     "select l.[Id] from[Bookmark] b\n" +
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
