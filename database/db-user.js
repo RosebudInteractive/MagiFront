@@ -570,15 +570,21 @@ const DbUser = class DbUser extends DbObject {
             });
     }
     
-    getShortBookmarks(userId) {
+    getShortBookmarks(userId, isApp) {
         let opts = {};
         return new Promise((resolve, reject) => {
-            resolve($data.execSql({
-                dialect: {
+            let dialect = isApp ?
+                {
+                    mysql: _.template(GET_SHORT_BKM_MYSQL_APP)({ userId: userId }),
+                    mssql: _.template(GET_SHORT_BKM_MSSQL_APP)({ userId: userId })
+
+                } :
+                {
                     mysql: _.template(GET_SHORT_BKM_MYSQL)({ userId: userId }),
                     mssql: _.template(GET_SHORT_BKM_MSSQL)({ userId: userId })
-                }
-            }, {}));
+
+                };
+            resolve($data.execSql({ dialect: dialect }, {}));
         })
             .then((result) => {
                 let res = [];
