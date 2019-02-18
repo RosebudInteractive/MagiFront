@@ -41,6 +41,20 @@ function setupUsers(app) {
                 });
     });
 
+    app.get('/api/users/bookmark-app', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getShortBookmarks(req.user.Id, true)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
     app.get('/api/users/bookmark-ext', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
