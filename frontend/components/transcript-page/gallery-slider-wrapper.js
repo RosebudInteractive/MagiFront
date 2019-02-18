@@ -8,7 +8,7 @@ import * as appActions from "../../actions/app-actions";
 
 import $ from 'jquery'
 import {getImagePath, ImageSize} from "../../tools/page-tools";
-import {Link} from 'react-router-dom';
+import * as userActions from "actions/user-actions";
 
 class GalleryWrapper extends React.Component {
 
@@ -71,15 +71,19 @@ class GalleryWrapper extends React.Component {
     }
 
     _openGallerySlider() {
-        let _controls = $('.js-gallery-controls'),
-            _wrap = $('.js-gallery-slider-wrapper'),
-            _stickyBlock = $('.js-sticky-block');
+        if (this.props.authorized) {
+            let _controls = $('.js-gallery-controls'),
+                _wrap = $('.js-gallery-slider-wrapper'),
+                _stickyBlock = $('.js-sticky-block');
 
-        _controls.removeClass('hide').addClass('show');
-        _wrap.addClass('show');
-        _stickyBlock.addClass('slider-opened');
+            _controls.removeClass('hide').addClass('show');
+            _wrap.addClass('show');
+            _stickyBlock.addClass('slider-opened');
 
-        this.props.appActions.openGallery()
+            this.props.appActions.openGallery()
+        } else {
+            this.props.userActions.showSignInForm();
+        }
     }
 
     _closeGallerySlider() {
@@ -125,10 +129,17 @@ class GalleryWrapper extends React.Component {
     }
 }
 
-function mapDispatchToProps(dispatch) {
+function mapStateToProps(state) {
     return {
-        appActions: bindActionCreators(appActions, dispatch),
+        authorized: !!state.user.user,
     }
 }
 
-export default connect(null, mapDispatchToProps)(GalleryWrapper);
+function mapDispatchToProps(dispatch) {
+    return {
+        appActions: bindActionCreators(appActions, dispatch),
+        userActions: bindActionCreators(userActions, dispatch),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(GalleryWrapper);

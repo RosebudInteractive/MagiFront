@@ -235,6 +235,7 @@ class Frame extends Component {
         const _invisibleStyle = {
             opacity: 0,
             zIndex: -100,
+            visibility: "hidden"
         }
 
         const _speed = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#speed"/>',
