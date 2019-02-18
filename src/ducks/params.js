@@ -136,7 +136,7 @@ export const getParameters = () => {
             payload: null
         });
 
-        fetch("/api/adm/parameters", {credentials: 'include'})
+        fetch("/api/adm/parameters", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

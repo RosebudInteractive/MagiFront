@@ -21,7 +21,7 @@ export const getCourses = () => {
             payload: null
         });
 
-        fetch("/api/courses", {credentials: 'include'})
+        fetch("/api/courses", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -53,7 +53,7 @@ export const getCourse = (url) => {
             payload: null
         });
 
-        fetch("/api/courses/" + url, {credentials: 'include'})
+        fetch("/api/courses/" + url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {

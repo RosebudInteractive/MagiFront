@@ -44,7 +44,7 @@ export const get = (id) => {
             payload: null
         });
 
-        fetch("/api/adm/courses/" + id, {credentials: 'include'})
+        fetch("/api/adm/courses/" + id, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -155,7 +155,7 @@ export const getCourseAuthors = (courseId) => {
             payload: null
         });
 
-        fetch("/api/adm/courses/" + courseId + '/authors', {credentials: 'include'})
+        fetch("/api/adm/courses/" + courseId + '/authors', {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

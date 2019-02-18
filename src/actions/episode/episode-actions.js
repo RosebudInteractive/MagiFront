@@ -27,7 +27,7 @@ export const get = (id, lessonId) => {
             payload: null
         });
 
-        fetch("/api/episodes/" + id + '/' + lessonId, {credentials: 'include'})
+        fetch("/api/episodes/" + id + '/' + lessonId, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

@@ -34,7 +34,7 @@ export const get = (id) => {
             payload: null
         });
 
-        fetch("/api/adm/authors/" + id, {credentials: 'include'})
+        fetch("/api/adm/authors/" + id, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

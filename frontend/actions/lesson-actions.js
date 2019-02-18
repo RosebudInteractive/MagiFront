@@ -32,7 +32,7 @@ export const getLesson = (courseUrl, lessonUrl) => {
             payload: null
         });
 
-        fetch("/api/lessons/v2/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+        fetch("/api/lessons/v2/" + courseUrl + '/' + lessonUrl, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -65,7 +65,7 @@ export const getLessonsAll = (courseUrl, lessonUrl) => {
             payload: null
         });
 
-        fetch("/api/lessons-all/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+        fetch("/api/lessons-all/" + courseUrl + '/' + lessonUrl, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -92,7 +92,7 @@ export const getLessonText = (courseUrl, lessonUrl) => {
             payload: null
         });
 
-        fetch("/api/lessons-text/" + courseUrl + '/' + lessonUrl, {credentials: 'include'})
+        fetch("/api/lessons-text/" + courseUrl + '/' + lessonUrl, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

@@ -28,7 +28,8 @@ export const hide = () => {
 
 export const loadData = (object) => {
     return (dispatch) => {
-        fetch("/api/adm/episodes/play/" + object.episodeId + '/' + object.lessonId, {credentials: 'include'})
+        fetch("/api/adm/episodes/play/" + object.episodeId + '/' + object.lessonId,
+            {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

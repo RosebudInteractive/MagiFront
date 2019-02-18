@@ -76,7 +76,7 @@ export function getAuthor(url) {
             payload: {url}
         });
 
-        fetch("/api/authors/" + url, {credentials: 'include'})
+        fetch("/api/authors/" + url, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

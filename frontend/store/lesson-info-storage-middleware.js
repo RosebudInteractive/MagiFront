@@ -107,8 +107,6 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case PLAYER_PAUSED: {
             let _state = store.getState();
 
-            console.log(_state)
-
             let _isPlayingLessonExists = !!_state.player.playingLesson;
             if (_isPlayingLessonExists) {
                 let _id = _state.player.playingLesson.lessonId,
@@ -117,8 +115,6 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
                     _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false,
                     _willBeFinished = Math.round(_currentPosition) === _totalDuration;
-
-                console.log(_lessonsMap.get(_id))
 
                 if (_willBeFinished && !_isFinished) {
                     store.dispatch(storageActions.setLessonEnded({id: _id}))
