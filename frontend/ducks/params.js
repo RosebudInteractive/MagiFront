@@ -23,7 +23,6 @@ export const ReducerRecord = Record({
 
 })
 
-
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
@@ -55,9 +54,9 @@ export const stateSelector = state => state[moduleName]
 export const parametersSelector = createSelector(stateSelector, state => state.parameters)
 export const parametersFetchingSelector = createSelector(stateSelector, state => state.parameters.get('fetching'))
 
-export const fixedCourseIdSelector = createSelector(parametersSelector, params => params ? params.getIn(['fixedCourseId', 'Value']): null)
-export const fixedLessonIdSelector = createSelector(parametersSelector, params => params ? params.getIn(['fixedLessonId', 'Value']): null)
-export const fixedObjDescrSelector = createSelector(parametersSelector, params => params.getIn(['fixedObjDescr', 'Value']))
+export const fixedCourseIdSelector = createSelector(parametersSelector, params => params ? params.get('fixedCourseId'): null)
+export const fixedLessonIdSelector = createSelector(parametersSelector, params => params ? params.get('fixedLessonId'): null)
+export const fixedObjDescrSelector = createSelector(parametersSelector, params => params.get('fixedObjDescr'))
 
 /**
  * Action Creators
@@ -69,19 +68,13 @@ export const getParameters = () => {
             payload: null
         });
 
-        fetch("/api/adm/parameters", {method: 'GET', credentials: 'include'})
+        fetch("/api/parameters", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-
-                let _map = {}
-                data.forEach((item) => {
-                    _map[item.Key] = item
-                })
-
                 dispatch({
                     type: GET_PARAMETERS_SUCCESS,
-                    payload: _map
+                    payload: data
                 });
             })
             .catch((err) => {
