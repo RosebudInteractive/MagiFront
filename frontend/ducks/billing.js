@@ -146,7 +146,7 @@ export const getSubscriptionTypes = () => {
             _str = $.param(_state.billingParams),
             _url = '/api/products' + (_str ? '?' + _str : '');
 
-        fetch(_url, {credentials: 'include'})
+        fetch(_url, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

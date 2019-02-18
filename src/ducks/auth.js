@@ -115,7 +115,7 @@ export const whoAmI = () => {
             payload: null
         });
 
-        fetch("/api/whoami", {credentials: 'include'})
+        fetch("/api/whoami", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -191,7 +191,7 @@ export const logout = () => {
             payload: null
         });
 
-        fetch("/api/logout", {credentials: 'include'})
+        fetch("/api/logout", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

@@ -13,7 +13,7 @@ export const getLessonPlayInfo = (lesson) => {
             payload: lesson.Id
         });
 
-        fetch('/api/lessons/play/' + lesson.Id, {credentials: 'include'})
+        fetch('/api/lessons/play/' + lesson.Id, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

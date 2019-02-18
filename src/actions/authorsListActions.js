@@ -21,7 +21,7 @@ export const getAuthors = () => {
             payload: null
         });
 
-        fetch("/api/adm/authors", {credentials: 'include'})
+        fetch("/api/adm/authors", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

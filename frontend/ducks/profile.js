@@ -251,7 +251,7 @@ export function getUserProfile() {
             payload: null
         });
 
-        fetch("/api/users", {credentials: 'include'})
+        fetch("/api/users", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -277,7 +277,7 @@ export function getUserHistory() {
             payload: null
         });
 
-        fetch("/api/users/history", {credentials: 'include'})
+        fetch("/api/users/history", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -303,7 +303,7 @@ export function getUserBookmarks() {
             payload: null
         });
 
-        fetch("/api/users/bookmark", {credentials: 'include'})
+        fetch("/api/users/bookmark", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -328,7 +328,7 @@ export function getUserBookmarksFull() {
             payload: null
         });
 
-        fetch("/api/users/bookmark-ext", {credentials: 'include'})
+        fetch("/api/users/bookmark-ext", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -355,7 +355,7 @@ export function getTransactionHistory() {
             payload: null
         });
 
-        fetch("/api/users/invoice", {credentials: 'include'})
+        fetch("/api/users/invoice", {method: 'GET', credentials: 'include'})
         // mockFetch(mockTransactions)
             .then(checkStatus)
             .then(parseJSON)
@@ -383,7 +383,7 @@ export const getSubscriptionInfo = () => {
             payload: null
         });
 
-        fetch("/api/users/subs-info", {credentials: 'include'})
+        fetch("/api/users/subs-info", {method: 'GET', credentials: 'include'})
         // mockFetch(mockSubsInfo)
             .then(checkStatus)
             .then(parseJSON)

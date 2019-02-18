@@ -160,7 +160,7 @@ export const getAppOptions = () => {
             payload: null
         });
 
-        fetch("/api/options", {credentials: 'include'})
+        fetch("/api/options", {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

@@ -37,7 +37,7 @@ export const getResources = (lessonId) => {
             payload: null
         });
 
-        fetch('/api/adm/lessons/resources/' + lessonId, {credentials: 'include'})
+        fetch('/api/adm/lessons/resources/' + lessonId, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -72,7 +72,7 @@ export const get = (id, courseId) => {
             payload: null
         });
 
-        fetch("/api/adm/lessons/" + id + '/' + courseId, {credentials: 'include'})
+        fetch("/api/adm/lessons/" + id + '/' + courseId, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

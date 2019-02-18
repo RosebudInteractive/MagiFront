@@ -34,7 +34,7 @@ export const loadParentLessonInfo = (parentLessonId, courseId) => {
             payload: null
         });
 
-        fetch("/api/adm/lessons/" + parentLessonId + '/' + courseId, {credentials: 'include'})
+        fetch("/api/adm/lessons/" + parentLessonId + '/' + courseId, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {
