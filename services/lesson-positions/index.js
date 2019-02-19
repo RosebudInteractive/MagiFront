@@ -119,6 +119,20 @@ exports.SetupRoute = (app) => {
             res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
     });
 
+    app.post("/api/lsnpos/hist", (req, res, next) => {
+        if (req.user) {
+            positionsService().setHist(req.user.Id, req.body)
+                .then((result) => {
+                    res.send({ result: "OK" });
+                })
+                .catch((err) => {
+                    next(err);
+                });
+        }
+        else
+            res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
+    });
+
     app.post("/api/adm/lsnpos", (req, res, next) => {
         if (req.body && req.body.userId)
             positionsService().setLessonPositions(req.body.userId, req.body)

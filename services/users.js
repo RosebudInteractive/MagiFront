@@ -60,7 +60,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getExtBookmarks(req.user.Id)
+                .getExtBookmarks(req.user.Id, req.query)
                 .then(rows => {
                     res.send(rows);
                 })
@@ -125,26 +125,12 @@ function setupUsers(app) {
                 });
     });
 
-    app.get('/api/users/bookmark', (req, res, next) => {
-        if (!req.user)
-            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else
-            UsersService()
-                .getBookmark(req.user.Id)
-                .then(rows => {
-                    res.send(rows);
-                })
-                .catch(err => {
-                    next(err);
-                });
-    });
-
     app.get('/api/users/history', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getHistory(req.user.Id)
+                .getHistory(req.user.Id, null, req.query)
                 .then(rows => {
                     res.send(rows);
                 })

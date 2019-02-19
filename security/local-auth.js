@@ -326,7 +326,7 @@ exports.SetupWhoAmI = (app) => { AuthLocal.setupWhoAmI(app) };
 exports.SetupLogOut = (app) => { AuthLocal.setupLogOut(app) };
 exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
-exports.DestroySession = AuthLocal.destroySession;
+exports.DestroySession = AuthLocal.destroySession.bind(AuthLocal);
 exports.StdLoginProcessor = StdLoginProcessor;
 exports.StdLogin = StdLogin;
 exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {

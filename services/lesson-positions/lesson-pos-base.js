@@ -1,5 +1,7 @@
 'use strict'
 const config = require('config');
+const { HttpError } = require('../../errors/http-error');
+const { HttpCode } = require("../../const/http-codes");
 const { LessonPos } = require('../../const/lesson-pos');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
@@ -41,6 +43,49 @@ exports.LessonPositionsBase = class LessonPositionsBase {
 
     getAllLessonPositions(userId) {
         return this._getAllPos(userId);
+    }
+
+    setHist(userId, data) {
+        return new Promise(resolve => {
+            if (!data)
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Arg "data" is empty.`
+                });
+            if (typeof (data.id) !== "number")
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "id" isn't a number: "${data.id}".`
+                });
+            if (typeof (data.t) !== "number")
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "t" isn't a number: "${data.t}".`
+                });
+            if (typeof (data.ut) !== "number")
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "ut" isn't a number: "${data.ut}".`
+                });
+            if (typeof (data.ts) !== "number")
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "ts" isn't a number: "${data.ts}".`
+                });
+            if (typeof (data.ts_start) !== "number")
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "ts_start" isn't a number: "${data.ts_start}".`
+                });
+            if (data.ts_start > data.ts)
+                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, {
+                    error: "invArg",
+                    message: `LessonPositionsBase::setHist: Field "ts_start" (${data.ts_start}) > "ts" (${data.ts}).`
+                });
+            let hist = { t: data.t, ut: data.ut, ts: data.ts };
+            let rc = this._setHist(userId, data.id, data.ts_start, hist, this.histTTL);
+            resolve(rc);
+        });
     }
 
     setLessonPositions(userId, pos) {
