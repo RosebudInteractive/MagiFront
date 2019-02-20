@@ -36,6 +36,18 @@
   margin: 0
   padding: 0
   float: left
+  &:focus
+    border-color: #0d95e8
+  &::placeholder
+    color: #b2b2b2
+    font-size: 14px
+
+.field-text
+  padding: 0 8px 0 8px
+  border: 1px solid #ddd
+  border-radius: 5px
+  outline: none
+  height: 33px
 
 .field-checkbox
   height: 30px
@@ -56,3 +68,17 @@
   min-height: 80px
   max-height: 300px
   overflow: auto
+
+.form__error-message
+  display: block
+  position: relative
+  margin: 3px 0 3px 0
+  text-align: center
+  font-family: "Fira Sans", Arial, sans-serif
+  font-size: 15px
+  line-height: 25px
+  color: #E02F37
+
+.select__empty_value
+  color: #b2b2b2
+  font-size: 14px

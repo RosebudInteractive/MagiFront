@@ -350,7 +350,11 @@ html,
 
 .app {
     font: 12px sans-serif;
-    display: flex;
+    display: grid;
+    grid-template-areas: "nav head"
+                         "nav main";
+    grid-auto-columns: 15% 1fr;
+    grid-template-rows: 60px 1fr;
     flex-direction: row;
     height: 100%;
 }
@@ -360,8 +364,7 @@ html,
 }
 
 .app .left {
-    width: 20em;
-    position: relative;
+    grid-area: nav;
 }
 
 .app .tollbar {
@@ -386,6 +389,7 @@ html,
 .app .logo-sidebar div {
     position: absolute;
     top: 50%;
+    right: 50%;
     transform: translate(50%, -50%);
 }
 
@@ -405,14 +409,13 @@ html,
 }
 
 .app .right-top {
-    flex: none;
+    grid-area: head;
     background-color: #4f5a6e;
     display: flex;
 }
 
 .app .main-area {
-    flex: 1 1 100px;
-    width: 100%;
+    grid-area: main;
     overflow-y: scroll;
 }
 
@@ -734,18 +737,6 @@ html,
     background-color: rgba(47, 47, 47, 0.2);
     pointer-events: none;
     cursor: auto;
-}
-
-.form__error-message {
-    display: block;
-    position: relative;
-    top: 6px;
-    margin: 0;
-    text-align: center;
-    font-family: "Fira Sans", Arial, sans-serif;
-    font-size: 15px;
-    line-height: 25px;
-    color: #E02F37;
 }
 
 .btn--brown .icon {
@@ -1086,20 +1077,8 @@ html,
     height: 100%;
 }
 
-.app {
-    font: 12px sans-serif;
-    display: flex;
-    flex-direction: row;
-    height: 100%;
-}
-
 .app div {
     box-sizing: border-box;
-}
-
-.app .left {
-    width: 20em;
-    position: relative;
 }
 
 .app .tollbar {
@@ -1108,23 +1087,6 @@ html,
 
 .app .top-bar-size {
     height: 5em;
-}
-
-.app .logo-sidebar {
-    text-align: center;
-    display: block;
-    top: 0px;
-    background-color: #424b5f;
-    height: 100%;
-    color: #fff;
-    font-size: 2em;
-    position: relative;
-}
-
-.app .logo-sidebar div {
-    position: absolute;
-    top: 50%;
-    transform: translate(50%, -50%);
 }
 
 .app .bar-bgcolor {
@@ -1140,12 +1102,6 @@ html,
     height: 100%;
     display: flex;
     flex-direction: column;
-}
-
-.app .right-top {
-    flex: none;
-    background-color: #4f5a6e;
-    display: flex;
 }
 
 .app .main-area {
@@ -1401,18 +1357,6 @@ html,
     background-color: rgba(47, 47, 47, 0.2);
     pointer-events: none;
     cursor: auto;
-}
-
-.form__error-message {
-    display: block;
-    position: relative;
-    top: 6px;
-    margin: 0;
-    text-align: center;
-    font-family: "Fira Sans", Arial, sans-serif;
-    font-size: 15px;
-    line-height: 25px;
-    color: #E02F37;
 }
 
 .btn--brown .icon {

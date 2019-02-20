@@ -1,13 +1,14 @@
 import React from 'react'
-import Webix from '../components/Webix';
+
+import LoadingPage from '../components/common/loading-page'
+import BottomControls from '../components/bottom-contols'
+import ErrorDialog from '../components/dialog/error-dialog'
+import CourseFormWrapper from '../components/course-editor/form-wrapper'
+import CourseAuthorDialog from '../components/course-editor/dialogs/author-dialog'
 
 import * as singleCourseActions from "../actions/course/courseActions";
-import * as courseAuthorsActions from '../actions/course/courseAuthorsActions';
-import * as courseCategoriesActions from '../actions/course/courseCategoriesActions';
-import * as courseLessonsActions from '../actions/course/courseLessonsActions';
 
 import * as appActions from '../actions/app-actions';
-import * as coursesActions from '../actions/coursesListActions';
 import * as authorsActions from "../actions/authorsListActions";
 import * as categoriesActions from "../actions/categoriesListActions";
 import * as languagesActions from "../actions/languages-actions";
@@ -15,12 +16,8 @@ import * as languagesActions from "../actions/languages-actions";
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import {CourseAuthors, CourseCategories, CourseLessons} from '../components/course-editor/details/course-grids'
-import LookupDialog from '../components/LookupDialog';
-import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import FixControl from '../components/course-editor/fix-course-wrapper';
-import ObjectEditor, {labelWidth,} from './object-editor';
-import {EDIT_MODE_INSERT} from "../constants/Common";
+
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import {
     disableButtons,
@@ -30,81 +27,99 @@ import {
     getParameters,
     setFixedCourse,
 } from "adm-ducks/params";
-import { getFormValues, isValid, isDirty, reset, focus} from 'redux-form'
+import {getFormValues, isValid, isDirty, reset, focus} from 'redux-form'
+import {Prompt} from "react-router-dom";
+import CourseCategoryDialog from "../components/course-editor/dialogs/category-dialog";
+import DetailsWrapper from "../components/course-editor/details";
 
-class CourseEditor extends ObjectEditor {
+class CourseEditor extends React.Component {
 
     constructor(props) {
         super(props);
-        const {
-            authorsActions,
-            categoriesActions,
-            languagesActions,
-        } = this.props;
 
-        authorsActions.getAuthors();
-        categoriesActions.getCategories();
-        languagesActions.getLanguages();
+        this.state = {
+            editMode: this.props.courseId > 0
+        }
     }
 
     componentDidMount() {
-        super.componentDidMount();
-
+        this.props.authorsActions.getAuthors();
+        this.props.categoriesActions.getCategories();
+        this.props.languagesActions.getLanguages();
         this.props.getParameters()
+
+        if (this.state.editMode) {
+            this.props.courseActions.get(this.props.courseId)
+        } else {
+            this.props.courseActions.create()
+        }
     }
 
     componentWillReceiveProps(next) {
-        const {
-            course,
-        } = next;
-
-        if (this.editMode === EDIT_MODE_INSERT) {
-            if (!course) {
-                this.objectActions.create(this._getInitStateOfNewObject(next));
-            }
-        }
-
+        const {course} = next;
+        //
+        // if (this.editMode === EDIT_MODE_INSERT) {
+        //     if (!course) {
+        //         this.objectActions.create(this._getInitStateOfNewObject(next));
+        //     }
+        // }
+        //
         this.cover = course ? course.Cover : null;
         this.coverMeta = course ? course.CoverMeta : null;
         this.mask = course ? course.Mask : null;
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.hasChanges) {
-            this.handleChangeDataOnWebixForm()
-        }
-
-        super.componentDidUpdate(prevProps)
+        // if (this.props.hasChanges) {
+        //     this.handleChangeDataOnWebixForm()
+        // }
+        //
+        // super.componentDidUpdate(prevProps)
     }
 
-    getObject() {
-        return this.props.course
+    render() {
+        const {fetching, hasChanges, courseId} = this.props;
+
+        // if (fetching) {
+        //     this._dataLoaded = false;
+        //     this._validateResult = {};
+        // }
+
+        return (
+            fetching ?
+                <LoadingPage/>
+                :
+                <div className="course_editor">
+                    <Prompt when={hasChanges}
+                            message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+                    <CourseFormWrapper/>
+                    <DetailsWrapper editMode={this.state.editMode} courseId={courseId}/>
+                    <ErrorDialog/>
+                    <CourseAuthorDialog/>
+                    <CourseCategoryDialog/>
+                </div>
+        )
     }
+
+// <div className="control-wrapper">
+// <div id='webix_editors_wrapper' className='webix_editors_wrapper'/>
+// {this._getNonWebixForm()}
+// </div>
+// {this._getWebixForm()}
+
+// <BottomControls editor={this} hasChanges={hasChanges} onAccept={::this._save}
+// onCancel={::this._cancel}/>
 
     getRootRout() {
         return '/adm/courses'
     }
 
-    get objectIdPropName() {
-        return 'courseId'
-    }
-
-    get objectName() {
-        return 'course'
-    }
-
-    get objectActions() {
-        return this.props.courseActions;
-    }
-
-    _getMainDivClassName() {
-        return "course_editor";
-    }
-
     _save(value) {
         this.props.focusReduxForm('FixingBlock', 'description')
 
-        if (!this.props.fixFormValid) {return}
+        if (!this.props.fixFormValid) {
+            return
+        }
         this.props.setFixedCourse({courseId: value.id, ...this.props.fixFormValues})
 
         let _checkResult = checkExtLinks(value.extLinksValues)
@@ -179,145 +194,6 @@ class CourseEditor extends ObjectEditor {
         })
     }
 
-    showAddAuthorLookup() {
-        this.props.courseAuthorsActions.showAddDialog()
-    }
-
-    hideAddAuthorDialog() {
-        this.props.courseAuthorsActions.hideAddDialog()
-    }
-
-    addAuthorAction(id) {
-        this.props.courseAuthorsActions.add(id);
-        // this.props.courseAuthorsActions.hideAddDialog();
-    }
-
-    _removeAuthorFromCourse(id) {
-        this.props.courseAuthorsActions.remove(id)
-    }
-
-    _selectAuthor(id) {
-        this.props.courseAuthorsActions.select(id)
-    }
-
-    _getCourseAuthors() {
-        const {
-            authors,
-            courseAuthors
-        } = this.props;
-
-        let _courseAuthors = [];
-
-        courseAuthors.map((item) => {
-            let _author = authors.find((author) => {
-                return author.id === item
-            });
-
-            if (_author) {
-                _courseAuthors.push(_author);
-            }
-        });
-
-        return _courseAuthors;
-    }
-
-    _getAuthorsList() {
-        const {
-            authors,
-            courseAuthors
-        } = this.props;
-
-
-        let _filtered = authors.filter((value) => {
-            return !courseAuthors.includes(value.id);
-        });
-
-        return _filtered.map((element) => {
-            return {id: element.id, value: element.FirstName + ' ' + element.LastName}
-        })
-    }
-
-    showAddCategoryLookup() {
-        this.props.courseCategoriesActions.showAddDialog();
-    }
-
-    hideAddCategoryDialog() {
-        this.props.courseCategoriesActions.hideAddDialog()
-    }
-
-    addCategoryAction(id) {
-        // this.props.courseCategoriesActions.hideAddCategoryDialog();
-        this.props.courseCategoriesActions.add(id);
-    }
-
-    _removeCategoryFromCourse(id) {
-        this.props.courseCategoriesActions.remove(id)
-    }
-
-    _selectCategory(id) {
-        this.props.courseCategoriesActions.select(id)
-    }
-
-    _getCourseCategories() {
-        const {
-            categories,
-            courseCategories
-        } = this.props;
-
-        let _courseCategories = [];
-
-        courseCategories.map((item) => {
-            let _category = categories.find((category) => {
-                return category.id === item
-            });
-
-            if (_category) {
-                _courseCategories.push(_category);
-            }
-        });
-
-        return _courseCategories;
-    }
-
-    _getCategories() {
-        const {
-            categories,
-            courseCategories
-        } = this.props;
-
-        let _filtered = categories.filter((value) => {
-            return !courseCategories.includes(value.id);
-        });
-
-        return _filtered.map((element) => {
-            return {id: element.id, value: element.Name}
-        })
-    }
-
-    _selectLesson(id) {
-        this.props.courseLessonsActions.select(id)
-    }
-
-    _editLesson(id) {
-        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/edit/' + id);
-    }
-
-    _createLesson() {
-        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
-    }
-
-    _moveUpLesson(id) {
-        this.props.courseLessonsActions.moveUp(id);
-    }
-
-    _moveDownLesson(id) {
-        this.props.courseLessonsActions.moveDown(id);
-    }
-
-    _removeLessonFromCourse(id) {
-        this.props.courseLessonsActions.remove(id)
-    }
-
     _checkLessonsState(newState) {
         if (!newState) {
             return false
@@ -332,72 +208,12 @@ class CourseEditor extends ObjectEditor {
         }
     }
 
-    getLanguagesArray() {
-        return this.props.languages.map((elem) => {
-            return {id: elem.id, value: elem.Language};
-        })
-    }
-
-    _getWebixForm() {
-        const {courseLessons, selectedAuthor, selectedCategory, selectedLesson,} = this.props;
-
-        let _data = this.getObject();
-        return [
-            <Webix ui={::this.getUI()} data={_data} key='webix1'/>,
-            <Tabs className="tabs tabs-1" renderActiveTabContentOnly={true} key='tab1'>
-                <div className="tab-links">
-                    <TabLink to="tab1">Авторы</TabLink>
-                    <TabLink to="tab2">Категории</TabLink>
-                    <TabLink to="tab3">Лекции</TabLink>
-                </div>
-                <div className="content">
-                    <TabContent for="tab1">
-                        <CourseAuthors addAction={::this.showAddAuthorLookup}
-                                       removeAction={::this._removeAuthorFromCourse}
-                                       selectAction={::this._selectAuthor}
-                                       selected={selectedAuthor}
-                                       editMode={this.editMode}
-                                       data={::this._getCourseAuthors()}/>
-                    </TabContent>
-                    <TabContent for="tab2">
-                        <CourseCategories addAction={::this.showAddCategoryLookup}
-                                          removeAction={::this._removeCategoryFromCourse}
-                                          selectAction={::this._selectCategory}
-                                          selected={selectedCategory}
-                                          editMode={this.editMode}
-                                          data={::this._getCourseCategories()}/>
-                    </TabContent>
-                    <TabContent for="tab3">
-                        <CourseLessons data={courseLessons}
-                                       selectAction={::this._selectLesson}
-                                       createAction={this._canCreateLesson() ? ::this._createLesson : null}
-                                       removeAction={::this._removeLessonFromCourse}
-                                       editAction={::this._editLesson}
-                                       moveUpAction={::this._moveUpLesson}
-                                       moveDownAction={::this._moveDownLesson}
-                                       editMode={this.editMode}
-                                       selected={selectedLesson}
-                        />
-                    </TabContent>
-                </div>
-            </Tabs>
-        ]
-    }
-
     _getNonWebixForm() {
         let _data = this.getObject();
 
         return <FixControl course={_data} canFix={this._canFixCourse()}/>
     }
 
-    _canCreateLesson() {
-        let _data = this.getObject()
-
-        return (_data && _data.OneLesson) ?
-            (_data.Lessons && this.props.courseLessons.length < 1)
-            :
-            true
-    }
 
     _canFixCourse() {
         let _data = this.getObject()
@@ -412,30 +228,6 @@ class CourseEditor extends ObjectEditor {
         }
 
         return _masks;
-    }
-
-
-    _getExtDialogs() {
-        let _dialogs = [];
-        if (this.props.showAddAuthorDialog) {
-            _dialogs.push(<LookupDialog
-                message='Авторы'
-                data={::this._getAuthorsList()}
-                yesAction={::this.addAuthorAction}
-                noAction={::this.hideAddAuthorDialog}
-            />)
-        }
-
-        if (this.props.showAddCategoryDialog) {
-            _dialogs.push(<LookupDialog
-                message='Категориии'
-                data={::this._getCategories()}
-                yesAction={::this.addCategoryAction}
-                noAction={::this.hideAddCategoryDialog}
-            />)
-        }
-
-        return _dialogs;
     }
 
     _getExtElements() {
@@ -697,6 +489,8 @@ class CourseEditor extends ObjectEditor {
 
 function mapStateToProps(state, ownProps) {
     return {
+        courseId: ownProps.match ? Number(ownProps.match.params.id) : null,
+
         course: state.singleCourse.current,
 
         authors: state.authorsList.authors,
@@ -706,21 +500,13 @@ function mapStateToProps(state, ownProps) {
         courseCategories: state.courseCategories.current,
         courseLessons: state.courseLessons.current,
 
-        selectedAuthor: state.courseAuthors.selected,
-        selectedCategory: state.courseCategories.selected,
-        selectedLesson: state.courseLessons.selected,
-
-        editMode: state.courses.editMode,
-        languages: state.languages.languages,
-        showAddAuthorDialog: state.courseAuthors.showAddDialog,
-        showAddCategoryDialog: state.courseCategories.showAddDialog,
+        // languages: state.languages.languages,
         // fixFormHasChanges: isDirty('FixingBlock')(state),
         hasChanges: state.singleCourse.hasChanges ||
             state.courseAuthors.hasChanges ||
             state.courseCategories.hasChanges ||
             state.courseLessons.hasChanges || isDirty('FixingBlock')(state),
 
-        courseId: Number(ownProps.match.params.id),
         fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
         fixFormValues: getFormValues('FixingBlock')(state),
         fixFormValid: isValid('FixingBlock')(state),
@@ -731,14 +517,11 @@ function mapDispatchToProps(dispatch) {
     return {
         appActions: bindActionCreators(appActions, dispatch),
         courseActions: bindActionCreators(singleCourseActions, dispatch),
-        courseAuthorsActions: bindActionCreators(courseAuthorsActions, dispatch),
-        courseCategoriesActions: bindActionCreators(courseCategoriesActions, dispatch),
-        courseLessonsActions: bindActionCreators(courseLessonsActions, dispatch),
-
         authorsActions: bindActionCreators(authorsActions, dispatch),
         categoriesActions: bindActionCreators(categoriesActions, dispatch),
         languagesActions: bindActionCreators(languagesActions, dispatch),
-        coursesActions: bindActionCreators(coursesActions, dispatch),
+
+
 
         disableButtons: bindActionCreators(disableButtons, dispatch),
         enableButtons: bindActionCreators(enableButtons, dispatch),

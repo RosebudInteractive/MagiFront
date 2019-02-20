@@ -1,4 +1,4 @@
-import GridControl from './gridControl';
+import GridControl from '../../gridControl';
 
 export class CourseAuthors extends GridControl{
     _getColumns() {

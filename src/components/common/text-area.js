@@ -7,10 +7,6 @@ export default class TextArea extends React.Component {
     constructor(props) {
         super(props)
 
-        // this.state = {
-        //     descr: props.defaultValue
-        // }
-
         this._handlePaste = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -25,20 +21,12 @@ export default class TextArea extends React.Component {
             if (!activeElem) return false;
 
             this.props.input.onChange(_descr)
-            // this.setState({descr: _descr});
         }
     }
 
     componentDidMount() {
         $('.field-textarea').bind('paste', this._handlePaste)
     }
-
-    // componentDidUpdate(prevProps) {
-    //     if (prevProps.defaultValue !== this.props.defaultValue) {
-    //         // this.props.input.onChange(this.props.defaultValue)
-    //         this.setState({descr: this.props.defaultValue})
-    //     }
-    // }
 
     componentWillUnmount() {
         $('.field-textarea').unbind('paste', this._handlePaste)
