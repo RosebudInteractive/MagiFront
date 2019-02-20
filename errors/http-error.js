@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 
 exports.HttpError = class HttpError extends Error {
 
@@ -6,8 +7,20 @@ exports.HttpError = class HttpError extends Error {
         return this._statusCode;
     }
 
+    get errObject() {
+        return this._errObject;
+    }
+
     constructor(statusCode, message) {
-        super(message);
+        let errObject = { statusCode: statusCode, message: "" };
+        if (typeof (message) === "string") {
+            errObject.message = message;
+        }
+        else {
+            errObject = _.defaultsDeep(message, errObject);
+        }
+        super(errObject.message);
+        this._errObject = errObject;
         this._statusCode = statusCode;
     }
 }

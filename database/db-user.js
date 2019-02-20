@@ -69,6 +69,12 @@ const GET_LESSON_COURSE_ID_MSSQL =
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "where c.[URL] = '<%= courseUrl %>' and l.[URL] = '<%= lessonUrl %>'";
 
+const GET_LESSON_COURSE_ID_BYID_MSSQL =
+    "select lc.[Id] from [Course] c\n" +
+    "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where c.[Id] = '<%= courseId %>' and l.[Id] = '<%= lessonId %>'";
+
 const DEL_COURSE_BKM_MSSQL =
     "delete b from [Bookmark] b\n" +
     "  join[Course] c on c.[Id] = b.[CourseId]\n" +
@@ -80,6 +86,13 @@ const DEL_LESSON_BKM_MSSQL =
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "where b.[UserId] = <%= userId %> and c.[URL] = '<%= courseUrl %>' and l.[URL] = '<%= lessonUrl %>'";
+
+const DEL_LESSON_BKM_ID_MSSQL =
+    "delete b from[Bookmark] b\n" +
+    "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
+    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
+    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
+    "where b.[UserId] = <%= userId %> and c.[Id] = '<%= courseId %>' and l.[Id] = '<%= lessonId %>'";
 
 const GET_SHORT_BKM_MSSQL =
     "select c.[URL] from [Bookmark] b\n" +
@@ -93,14 +106,12 @@ const GET_SHORT_BKM_MSSQL =
     "where b.[UserId] = <%= userId %>";
 
 const GET_SHORT_BKM_MSSQL_APP =
-    "select c.[URL] from [Bookmark] b\n" +
+    "select c.[Id] as [CourseId], NULL as [LessonId] from [Bookmark] b\n" +
     "  join[Course] c on c.[Id] = b.[CourseId]\n" +
     "where b.[UserId] = <%= userId %>\n" +
     "union\n" +
-    "select c.[URL] + '/' + l.[URL] from[Bookmark] b\n" +
+    "select NULL as [CourseId], lc.[LessonId] from[Bookmark] b\n" +
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
-    "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
-    "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "where b.[UserId] = <%= userId %>";
 
 const GET_LESSON_IDS_BKM_MSSQL =
@@ -144,6 +155,12 @@ const GET_LESSON_COURSE_ID_MYSQL =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where c.`URL` = '<%= courseUrl %>' and l.`URL` = '<%= lessonUrl %>'";
 
+const GET_LESSON_COURSE_ID_BYID_MYSQL =
+    "select lc.`Id` from `Course` c\n" +
+    "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where c.`Id` = '<%= courseId %>' and l.`Id` = '<%= lessonId %>'";
+
 const DEL_COURSE_BKM_MYSQL =
     "delete b from `Bookmark` b\n" +
     "  join`Course` c on c.`Id` = b.`CourseId`\n" +
@@ -156,6 +173,13 @@ const DEL_LESSON_BKM_MYSQL =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "where b.`UserId` = <%= userId %> and c.`URL` = '<%= courseUrl %>' and l.`URL` = '<%= lessonUrl %>'";
 
+const DEL_LESSON_BKM_ID_MYSQL =
+    "delete b from`Bookmark` b\n" +
+    "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
+    "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
+    "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where b.`UserId` = <%= userId %> and c.`Id` = '<%= courseId %>' and l.`Id` = '<%= lessonId %>'";
+
 const GET_SHORT_BKM_MYSQL =
     "select c.`URL` from `Bookmark` b\n" +
     "  join`Course` c on c.`Id` = b.`CourseId`\n" +
@@ -165,6 +189,15 @@ const GET_SHORT_BKM_MYSQL =
     "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
+    "where b.`UserId` = <%= userId %>";
+
+const GET_SHORT_BKM_MYSQL_APP =
+    "select c.`Id` as `CourseId`, NULL as `LessonId` from `Bookmark` b\n" +
+    "  join`Course` c on c.`Id` = b.`CourseId`\n" +
+    "where b.`UserId` = <%= userId %>\n" +
+    "union\n" +
+    "select NULL as `CourseId`, lc.`LessonId` from`Bookmark` b\n" +
+    "  join`LessonCourse` lc on lc.`Id` = b.`LessonCourseId`\n" +
     "where b.`UserId` = <%= userId %>";
 
 const GET_LESSON_IDS_BKM_MYSQL =
@@ -275,10 +308,12 @@ const DbUser = class DbUser extends DbObject {
             })
     }
 
-    getHistory(id, lessonFilter) {
+    getHistory(id, lessonFilter, options) {
         let positions = {};
         let lessonIds = [];
         let history = { Lessons: [], Courses: {}, Authors: {} };
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
 
         return new Promise((resolve, reject) => {
             resolve(PositionsService().getAllLessonPositions(id));
@@ -329,12 +364,12 @@ const DbUser = class DbUser extends DbObject {
                                             course = {
                                                 Id: elem.Id,
                                                 LanguageId: elem.LanguageId,
-                                                Cover: elem.Cover,
-                                                CoverMeta: elem.CoverMeta,
+                                                Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                                CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                                 Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
-                                                URL: elem.URL,
+                                                URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                                 OneLesson: elem.OneLesson ? true : false
                                             };
                                             history.Courses[elem.Id] = course;
@@ -348,9 +383,9 @@ const DbUser = class DbUser extends DbObject {
                                                 isSubLesson: false,
                                                 ReadyDate: elem.ReadyDate,
                                                 State: elem.State,
-                                                Cover: elem.LCover,
-                                                CoverMeta: elem.LCoverMeta,
-                                                URL: elem.LURL,
+                                                Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
+                                                CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                                URL: isAbsPath ? this._baseUrl + '/' + elem.URL + '/' + elem.LURL : elem.LURL,
                                                 IsAuthRequired: elem.IsAuthRequired ? true : false,
                                                 IsSubsRequired: elem.IsSubsRequired ? true : false,
                                                 Name: elem.LName,
@@ -367,7 +402,7 @@ const DbUser = class DbUser extends DbObject {
                                                     Id: elem.AuthorId,
                                                     FirstName: elem.FirstName,
                                                     LastName: elem.LastName,
-                                                    URL: elem.AURL
+                                                    URL: isAbsPath ? this._absAuthorUrl + elem.AURL : elem.AURL
                                                 };
                                                 history.Authors[elem.AuthorId] = author;
                                             }
@@ -392,7 +427,7 @@ const DbUser = class DbUser extends DbObject {
                                                 history.Lessons.push(lsn);
                                             }
                                         }
-                                        lsn.Audios.push(elem.Audio);
+                                        lsn.Audios.push(isAbsPath ? (elem.Audio ? this._absDataUrl + elem.Audio : null) : elem.Audio);
                                     })
                                 }
                             })
@@ -410,11 +445,12 @@ const DbUser = class DbUser extends DbObject {
         })
     }
 
-    getExtBookmarks(userId) {
+    getExtBookmarks(userId, options) {
         let courseIds = [];
         let courseList = {};
         let bookmarks = { Authors: {}, Categories: {}, LessonCourses: {}, Courses: [], Lessons: [] };
-        let opts = {};
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let arrayOfIds = [];
         let lessonBoookmarkOrder = {};
         let courseBoookmarkOrder = {};
@@ -455,7 +491,7 @@ const DbUser = class DbUser extends DbObject {
         }
 
         return new Promise((resolve, reject) => {
-            resolve(this.getHistory(userId, getLessonIdsByBookmarks))
+            resolve(this.getHistory(userId, getLessonIdsByBookmarks, opts))
         })
             .then((result) => {
                 bookmarks.Authors = result.Authors;
@@ -496,9 +532,9 @@ const DbUser = class DbUser extends DbObject {
                                         let course = {
                                             Id: elem.Id,
                                             Name: elem.Name,
-                                            URL: elem.URL,
-                                            Cover: elem.Cover,
-                                            CoverMeta: elem.CoverMeta,
+                                            URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                                            Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                            CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                             Mask: elem.Mask,
                                             Order: courseBoookmarkOrder[elem.Id],
                                             OneLesson: elem.OneLesson ? true : false,
@@ -529,11 +565,11 @@ const DbUser = class DbUser extends DbObject {
                                         if (!author) {
                                             author = {
                                                 Id: elem.Id,
-                                                URL: elem.URL,
+                                                URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
                                                 FirstName: elem.FirstName,
                                                 LastName: elem.LastName,
-                                                Portrait: elem.Portrait,
-                                                PortraitMeta: elem.PortraitMeta
+                                                Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
+                                                PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
                                             };
                                             bookmarks.Authors[elem.Id] = author;
                                         }
@@ -562,7 +598,7 @@ const DbUser = class DbUser extends DbObject {
                                         if (!category) {
                                             category = {
                                                 Id: elem.Id,
-                                                URL: elem.URL,
+                                                URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
                                                 Name: elem.Name
                                             };
                                             bookmarks.Categories[elem.Id] = category;
@@ -598,32 +634,72 @@ const DbUser = class DbUser extends DbObject {
             resolve($data.execSql({ dialect: dialect }, {}));
         })
             .then((result) => {
-                let res = [];
+                let res = isApp ? { courses: [], lessons: [] } : [];
                 if (result && result.detail && (result.detail.length >0)) {
                     result.detail.forEach((elem) => {
-                        res.push(elem.URL);
+                        if (isApp) {
+                            if (elem.CourseId)
+                                res.courses.push(elem.CourseId)
+                            else
+                                res.lessons.push(elem.LessonId);
+                        }
+                        else
+                            res.push(elem.URL);
                     })
                 }
                 return res;
             });
     }
     
+    convertToNumber(str) {
+        let result = { isInt: false, val: str };
+        result.isInt = (typeof (str) === "number");
+        if (result.isInt && isNaN(str))
+            throw new Error(`Invalid argument "str": ${str}.`);
+        if (!result.isInt)
+            if (typeof (str) === "string") {
+                let res = str.match(/[0-9]*/);
+                if (res && (str.length > 0) && (res[0].length === str.length)) {
+                    result.val = parseInt(str);
+                    result.isInt = true;
+                }
+            }
+            else
+                throw new Error(`Invalid argument "str": ${str}.`);
+        return result;
+    }
+
     insBookmark(userId, courseUrl, lessonUrl) {
         let isLessonBookmark = lessonUrl ? true : false;
         let opts = {};
         return new Promise((resolve, reject) => {
             let req = {};
-            if (isLessonBookmark)
-                req.dialect = {
-                    mysql: _.template(GET_LESSON_COURSE_ID_MYSQL)({ courseUrl: courseUrl, lessonUrl: lessonUrl }),
-                    mssql: _.template(GET_LESSON_COURSE_ID_MSSQL)({ courseUrl: courseUrl, lessonUrl: lessonUrl })
-                }
-            else
-                req.dialect = {
-                    mysql: _.template(GET_COURSE_ID_MYSQL)({ courseUrl: courseUrl }),
-                    mssql: _.template(GET_COURSE_ID_MSSQL)({ courseUrl: courseUrl })
-                };
-            resolve($data.execSql(req, {}));
+            let rc;
+            if (isLessonBookmark) {
+                let { isInt, val } = this.convertToNumber(lessonUrl);
+                let { isInt: isCourseInt, val: courseVal } = this.convertToNumber(courseUrl);
+                if (isInt && isCourseInt)
+                    req.dialect = {
+                        mysql: _.template(GET_LESSON_COURSE_ID_BYID_MYSQL)({ courseId: courseVal, lessonId: val }),
+                        mssql: _.template(GET_LESSON_COURSE_ID_BYID_MSSQL)({ courseId: courseVal, lessonId: val })
+                    };
+                else
+                    req.dialect = {
+                        mysql: _.template(GET_LESSON_COURSE_ID_MYSQL)({ courseUrl: courseUrl, lessonUrl: lessonUrl }),
+                        mssql: _.template(GET_LESSON_COURSE_ID_MSSQL)({ courseUrl: courseUrl, lessonUrl: lessonUrl })
+                    };
+            }
+            else {
+                let { isInt, val } = this.convertToNumber(courseUrl);
+                if (isInt)
+                    rc = { detail: [{ Id: val }] }
+                else
+                    req.dialect = {
+                        mysql: _.template(GET_COURSE_ID_MYSQL)({ courseUrl: courseUrl }),
+                        mssql: _.template(GET_COURSE_ID_MSSQL)({ courseUrl: courseUrl })
+                    };
+            };
+            resolve(rc ? rc : $data.execSql(req, {}));
         })
             .then((result) => {
                 if (result && result.detail && (result.detail.length === 1))
@@ -689,16 +765,33 @@ const DbUser = class DbUser extends DbObject {
         let opts = {};
         return new Promise((resolve, reject) => {
             let req = {};
-            if (isLessonBookmark)
-                req.dialect = {
-                    mysql: _.template(DEL_LESSON_BKM_MYSQL)({ userId: userId, courseUrl: courseUrl, lessonUrl: lessonUrl }),
-                    mssql: _.template(DEL_LESSON_BKM_MSSQL)({ userId: userId, courseUrl: courseUrl, lessonUrl: lessonUrl })
-                }
-            else
-                req.dialect = {
-                    mysql: _.template(DEL_COURSE_BKM_MYSQL)({ userId: userId, courseUrl: courseUrl }),
-                    mssql: _.template(DEL_COURSE_BKM_MSSQL)({ userId: userId, courseUrl: courseUrl })
-                };
+            if (isLessonBookmark) {
+                let { isInt, val } = this.convertToNumber(lessonUrl);
+                let { isInt: isCourseInt, val: courseVal } = this.convertToNumber(courseUrl);
+                if (isInt && isCourseInt)
+                    req.dialect = {
+                        mysql: _.template(DEL_LESSON_BKM_ID_MYSQL)({ userId: userId, courseId: courseVal, lessonId: val }),
+                        mssql: _.template(DEL_LESSON_BKM_ID_MSSQL)({ userId: userId, courseId: courseVal, lessonId: val })
+                    }
+                else
+                    req.dialect = {
+                        mysql: _.template(DEL_LESSON_BKM_MYSQL)({ userId: userId, courseUrl: courseUrl, lessonUrl: lessonUrl }),
+                        mssql: _.template(DEL_LESSON_BKM_MSSQL)({ userId: userId, courseUrl: courseUrl, lessonUrl: lessonUrl })
+                    }
+            }
+            else {
+                let { isInt, val } = this.convertToNumber(courseUrl);
+                if (isInt)
+                    req.dialect = {
+                        mysql: _.template(DEL_COURSE_BKM_ID_MYSQL)({ userId: userId, id: val }),
+                        mssql: _.template(DEL_COURSE_BKM_ID_MSSQL)({ userId: userId, id: val })
+                    }
+                else
+                    req.dialect = {
+                        mysql: _.template(DEL_COURSE_BKM_MYSQL)({ userId: userId, courseUrl: courseUrl }),
+                        mssql: _.template(DEL_COURSE_BKM_MSSQL)({ userId: userId, courseUrl: courseUrl })
+                    }
+            };
             resolve($data.execSql(req, {}));
         })
             .then((result) => {

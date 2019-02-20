@@ -53,8 +53,12 @@ function errorHandler(err, req, res, next) {
         error = err.error;
         errStr = JSON.stringify(err.error);
     }
+    let jsonRes = { statusCode: statusCode, message: errStr, error: error };
+    if (err instanceof HttpError) {
+        error = jsonRes = err.errObject;
+    }
     console.error(buildLogString(`setup::errorHandler [${statusCode}] ==> ${errStr}${error ? "\nErrorObject: " + JSON.stringify(error, null, 2) : ""}`));
-    res.status(statusCode).json({ statusCode: statusCode, message: errStr, error: error });
+    res.status(statusCode).json(jsonRes);
 }
 
 function setupAPI(express, app) {

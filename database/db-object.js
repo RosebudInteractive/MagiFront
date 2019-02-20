@@ -16,6 +16,7 @@ exports.DbObject = class DbObject extends CacheableObject {
         }
         super(optsCache);
         this._db = $memDataBase;
+        this._baseUrl = config.proxyServer.siteHost + "/";
         this._absDataUrl = config.proxyServer.siteHost + config.dataUrl + "/";
         this._absCourseUrl = config.proxyServer.siteHost + config.courseUrl + "/";
         this._absAuthorUrl = config.proxyServer.siteHost + config.authorUrl + "/";
