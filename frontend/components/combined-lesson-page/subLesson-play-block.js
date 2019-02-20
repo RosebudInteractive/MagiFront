@@ -108,13 +108,11 @@ class SubLessonPlayBlock extends React.Component {
             _radius = 86.75;
 
         let {lesson, playingLesson, paused, authorized} = this.props,
-            {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
             {IsAuthRequired} = lesson,
-            _lessonLocked = (IsAuthRequired && !authorized),
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _playedPart = _totalDuration ? ((_currentTime) / _totalDuration) : 0,
+            _lessonLocked = (IsAuthRequired && !authorized);
+
+        let {isFinished : _isFinished, playedPart : _playedPart} = this._calcLessonProps(lesson),
+            {Id: id, DurationFmt: duration} = lesson,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -159,6 +157,26 @@ class SubLessonPlayBlock extends React.Component {
                 <span className="lectures-sublist__item-duration">{duration}</span>
             </div>
         )
+    }
+
+    _calcLessonProps(lesson) {
+        let {lessonInfoStorage} = this.props,
+            {Id: id, Duration: totalDuration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let _isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+
+        let result = {};
+
+        result.playedPart = _isFinished ? 0 : _playedPart;
+        result.isFinished = _isFinished;
+
+        return result
     }
 }
 

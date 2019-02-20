@@ -170,10 +170,9 @@ class LessonFrame extends React.Component {
         let {lesson} = this.props;
         let _number = getLessonNumber(lesson);
             _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
-        let _lessonInfo = this.props.lessonInfoStorage.lessons.get(lesson.Id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playPercent = lesson.Duration ? ((_currentTime * 100) / lesson.Duration) : 0,
+
+        let {isFinished : _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
+            _playPercent = playedPart * 100,
             _inFavorites = this._isLessonInBookmarks();
 
         return [
@@ -214,6 +213,24 @@ class LessonFrame extends React.Component {
                 </div>
             </div>
         ]
+    }
+
+    _calcIsFinishedAndPlayedPart(lesson) {
+        let {lessonInfoStorage,} = this.props,
+            {Id: id, Duration: totalDuration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let result = {};
+
+        result.playedPart = _playedPart;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+
+        return result
     }
 }
 

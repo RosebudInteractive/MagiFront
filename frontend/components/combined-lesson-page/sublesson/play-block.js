@@ -110,15 +110,13 @@ class PlayBlock extends React.Component {
 
         let {playingLesson, paused, lesson, authorized} = this.props,
             {IsAuthRequired} = lesson,
-            _lessonLocked = (IsAuthRequired && !authorized),
+            _lessonLocked = (IsAuthRequired && !authorized);
+
+
+        let {isFinished: _isFinished, playedPart: _playedPart,} = this._calcLessonProps(lesson),
             _id = lesson.Id,
-            _totalDuration = lesson.Duration,
             _lessonUrl = lesson.URL,
             _courseUrl= lesson.courseUrl,
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playedPart = _totalDuration ? ((_currentTime) / _totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -165,6 +163,24 @@ class PlayBlock extends React.Component {
                 <div className="play-block__red-shadow"/>
             </div>
         )
+    }
+
+    _calcLessonProps(lesson) {
+        let {lessonInfoStorage,} = this.props,
+            {Id: id, Duration: totalDuration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let result = {};
+
+        result.playedPart = _playedPart;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+
+        return result
     }
 }
 

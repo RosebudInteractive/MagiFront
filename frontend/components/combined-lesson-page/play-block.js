@@ -9,7 +9,6 @@ import $ from "jquery";
 import history from '../../history';
 import {TooltipTitles} from "../../tools/page-tools";
 
-
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
@@ -115,15 +114,12 @@ class PlayBlock extends React.Component {
             _radius = 97.75;
 
         let {playingLesson, paused, lesson, extClass, authorized} = this.props,
-            _id = lesson.Id,
             {IsAuthRequired} = lesson,
-            _lessonLocked = (IsAuthRequired && !authorized),
-            _totalDuration = lesson.Duration,
+            _lessonLocked = (IsAuthRequired && !authorized);
+
+        let {isFinished: _isFinished, playedPart: _playedPart,} = this._calcLessonProps(lesson),
+            _id = lesson.Id,
             _duration = lesson.DurationFmt,
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playedPart = _totalDuration ? ((_currentTime) / _totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -132,11 +128,6 @@ class PlayBlock extends React.Component {
             _isThisLessonPlaying = _playingLessonId === _id;
 
         let _tooltipText = this._getTooltip(_isThisLessonPlaying, _isFinished);
-
-        // if (this._redirect) {
-        //     this._redirect = false;
-        //     return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
-        // }
 
         return [
             <div className={"play-block" + (extClass ? ' ' + extClass : '')}>
@@ -201,6 +192,24 @@ class PlayBlock extends React.Component {
                 </div>
             </div>
         ]
+    }
+
+    _calcLessonProps(lesson) {
+        let {lessonInfoStorage,} = this.props,
+            {Id: id, Duration: totalDuration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let result = {};
+
+        result.playedPart = _playedPart;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+
+        return result
     }
 }
 
