@@ -114,7 +114,7 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     _lessonsMap = _state.lessonInfoStorage.lessons,
                     _currentPosition = _lessonsMap.has(_id) ? _lessonsMap.get(_id).currentTime : 0,
                     _isFinished = _lessonsMap.has(_id) ? _lessonsMap.get(_id).isFinished : false,
-                    _willBeFinished = Math.round(_currentPosition) === _totalDuration;
+                    _willBeFinished = Math.round(_totalDuration - _currentPosition) <= 0;
 
                 if (_willBeFinished && !_isFinished) {
                     store.dispatch(storageActions.setLessonEnded({id: _id}))
