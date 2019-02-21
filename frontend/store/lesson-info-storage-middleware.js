@@ -178,6 +178,7 @@ const LessonInfoStorageMiddleware = store => next => action => {
                     id: _id,
                     currentTime: 0,
                 }))
+                LessonInfoStorage.saveChanges()
 
             }
 
