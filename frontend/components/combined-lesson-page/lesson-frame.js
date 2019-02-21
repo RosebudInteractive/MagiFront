@@ -21,6 +21,7 @@ import {
 
 import {setScrollTop} from "../../containers/combined-lesson-page";
 import {getLessonNumber} from "../../tools/page-tools";
+import {FINISH_DELTA_TIME} from "../../constants/player";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -228,7 +229,7 @@ class LessonFrame extends React.Component {
         let result = {};
 
         result.playedPart = _playedPart;
-        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
 
         return result
     }

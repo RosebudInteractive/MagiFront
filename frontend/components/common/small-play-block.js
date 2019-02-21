@@ -8,6 +8,7 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
 import {TooltipTitles} from "../../tools/page-tools";
 import {getTimeFmt} from "../../tools/time-tools";
+import {FINISH_DELTA_TIME} from "../../constants/player";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -175,7 +176,7 @@ class LessonPlayBlockSmall extends React.Component {
         let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
             _deltaTime = Math.round(totalDuration - _currentTime);
 
-        let _isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false,
+        let _isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false,
             _restTime = totalDuration - _currentTime;
 
         _restTime = (_restTime < 0) ? 0 : _restTime;

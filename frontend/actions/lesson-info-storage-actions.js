@@ -188,11 +188,11 @@ const _getDebugLsnPosPath = (state, params) => {
     if (_lessonId) {
         _params.lessonId = _lessonId
 
-        if (params.lsn[_lessonId].pos) {
+        if (params.lsn[_lessonId].hasOwnProperty('pos')) {
             _params.pos = params.lsn[_lessonId].pos
         }
 
-        if (params.lsn[_lessonId].dt) {
+        if (params.lsn[_lessonId].hasOwnProperty('dt')) {
             _params.dt = params.lsn[_lessonId].dt
             if (_params.dt < 0) {
                 console.error(`lsnpos : negative value [${_params.dt}]`)

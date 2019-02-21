@@ -7,6 +7,7 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
 import {TooltipTitles} from "../../tools/page-tools";
+import {FINISH_DELTA_TIME} from "../../constants/player";
 
 class PlayBlock extends React.Component {
 
@@ -131,7 +132,7 @@ class PlayBlock extends React.Component {
         let result = {};
 
         result.playedPart = _playedPart;
-        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= 0)) : false;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
 
         return result
     }
