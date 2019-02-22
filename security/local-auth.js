@@ -101,7 +101,7 @@ class AuthLocal {
                     if (user)
                         res.json(user);
                     else
-                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "User is not found." });
+                        res.status(HttpCode.ERR_NOT_FOUND).json({ message: "Пользователь не найден." });
                 })
                 .catch((err) => {
                     res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
@@ -111,7 +111,7 @@ class AuthLocal {
         app.get("/api/activation/:activationKey", (req, res) => {
             UserActivate(req.params.activationKey, this._usersCache)
                 .then((user) => {
-                    StdLogin(req, res, user, { message: "Activation key has expired." });
+                    StdLogin(req, res, user, { message: "Период активации истек." });
                 })
                 .catch((err) => {
                     res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
@@ -122,7 +122,8 @@ class AuthLocal {
             let fromApp = (req.query && req.query.app && ((req.query.app === "true" || (req.query.app === "1")))) ? true : false;
             UserPwdRecovery({ key: { Email: req.params.email } }, this._usersCache, fromApp)
                 .then((user) => {
-                    res.json(user);
+                    let result = fromApp ? { user: user, message: `Вам отправлено письмо на "${req.params.email}"` } : user;
+                    res.json(result);
                 })
                 .catch((err) => {
                     res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });

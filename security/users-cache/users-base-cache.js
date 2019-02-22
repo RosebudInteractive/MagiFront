@@ -395,6 +395,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         let isRecovery;
         let hasActivationKey = false;
         let activationExpired = false;
+        let field;
+        let value;
 
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, ((resolve, reject) => {
@@ -404,8 +406,6 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                 if (!user_data.key)
                     throw new Error("UsersBaseCache::userPwdRecovery: Missing \"user_data.key\" argument.");
 
-                let field;
-                let value;
                 if (typeof (value = user_data.key.Id) === "number")
                     field = "Id"
                 else
@@ -457,9 +457,13 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     let collection = root_obj.getCol("DataElements");
                     if (collection.count() !== 1)
                         if (hasActivationKey)
-                            throw new Error("Activation key has expired.")
-                        else
-                            throw new Error("UsersBaseCache::userPwdRecovery: User doesn't exist or duplicate.");
+                            throw new Error(`Неправильный ключ активации.`)
+                        else {
+                            if (collection.count() === 0)
+                                throw new Error(`Пользователь с ${field} = ${value} не найден.`)
+                            else
+                                throw new Error(`Существует несколько пользователей (${collection.count()}) с ${field} = ${value}.`);
+                        }
 
                     user = collection.get(0);
                     let rc = Promise.resolve();
@@ -484,7 +488,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                         return root_obj.save()
                             .then(() => {
                                 if (activationExpired)
-                                    throw new Error("Activation key has expired.")
+                                    throw new Error(`Период активации истек.`)
                                 return this.getUserInfoById(user.id(), true)
                             });
                     });
