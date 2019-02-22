@@ -4,6 +4,7 @@ const config = require('config');
 const { HttpCode } = require("../../const/http-codes");
 const LessonPositionsMem = require('./lesson-pos-mem');
 const LessonPositionsRedis = require('./lesson-pos-redis');
+const { LsnHistoryService } = require('../../database/db-lsn-history');
 
 let positions = null;
 
@@ -124,6 +125,23 @@ exports.SetupRoute = (app) => {
             positionsService().setHist(req.user.Id, req.body)
                 .then((result) => {
                     res.send({ result: "OK" });
+                })
+                .catch((err) => {
+                    next(err);
+                });
+        }
+        else
+            res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
+    });
+
+    app.get("/api/adm/lsnpos/stat", (req, res, next) => {
+        if (req.user) {
+            LsnHistoryService().getStat(req.query)
+                .then(result => {
+                    res.header("Content-Type", "text/csv; charset=UTF-8");
+                    if(result.filename)
+                        res.header("Content-Disposition", `attachment; filename="${result.filename}"`);
+                    res.send(result.content);
                 })
                 .catch((err) => {
                     next(err);

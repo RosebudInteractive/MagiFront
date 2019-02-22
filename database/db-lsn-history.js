@@ -33,6 +33,16 @@ const LsnHistory = class LsnHistory extends DbObject {
         return super._getObjById(id, exp, options);
     }
 
+    getStat(options) {
+        return new Promise(resolve => {
+            let opts = options || {};
+            let firstDate;
+            let lastDate;
+            let rc = { filename: "stat_all.csv", content: `"Колонка 1","Колонка 2","Колонка 3"\n` };
+            resolve(rc);
+        })
+    }
+
     insert(data, options) {
         let memDbOptions = { dbRoots: [] };
         let opts = options || {};
