@@ -8,6 +8,7 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 import * as userActions from "../../../actions/user-actions";
 import $ from "jquery";
 import {TooltipTitles} from "../../../tools/page-tools";
+import {FINISH_DELTA_TIME} from "../../../constants/player";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -73,7 +74,7 @@ class PlayBlock extends React.Component {
                 ?
                 <button type="button" className="extras-list__play-btn mobile paused"
                         onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
+                    <svg width="16" height="11" dangerouslySetInnerHTML={{__html: _replaySmall}}/>
                 </button>
                 :
                 <button type="button" className="extras-list__play-btn mobile"
@@ -108,15 +109,12 @@ class PlayBlock extends React.Component {
 
         let {playingLesson, paused, lesson, authorized} = this.props,
             {IsAuthRequired} = lesson,
-            _lessonLocked = (IsAuthRequired && !authorized),
+            _lessonLocked = (IsAuthRequired && !authorized);
+
+        let {isFinished: _isFinished, playedPart: _playedPart,} = this._calcLessonProps(lesson),
             _id = lesson.Id,
-            _totalDuration = lesson.Duration,
             _lessonUrl = lesson.URL,
             _courseUrl = lesson.courseUrl,
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playedPart = _totalDuration ? ((_currentTime) / _totalDuration) : 0,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -161,6 +159,26 @@ class PlayBlock extends React.Component {
                 <div className="lecture__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
             </div>
         )
+    }
+
+    _calcLessonProps(lesson) {
+        let {lessonInfoStorage,} = this.props,
+            {Id: id, Duration: totalDuration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let _isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
+
+        let result = {};
+
+        result.playedPart = _isFinished ? 0 : _playedPart;
+        result.isFinished = _isFinished;
+
+        return result
     }
 }
 

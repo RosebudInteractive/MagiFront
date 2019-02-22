@@ -41,7 +41,8 @@ export function widthBetween(min, max) {
 }
 
 export function isMobile() {
-    return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
+    // return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
+    return window.innerWidth <= 899
 }
 
 export const pages = {

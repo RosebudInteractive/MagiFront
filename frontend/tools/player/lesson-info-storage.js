@@ -144,14 +144,10 @@ export default class LessonInfoStorage {
     }
 
     _saveForce() {
-        if (this._localTimer) {
-            this._saveToLocalStorage()
-        }
+        this._saveToLocalStorage()
 
         if (this._isUserAuthorized) {
-            if (this._positionTimer) {
-                this._savePositionToDB()
-            }
+            this._savePositionToDB()
         }
     }
 
@@ -210,7 +206,7 @@ export default class LessonInfoStorage {
         if (_playingLessonId) {
             let _value = object.get(_playingLessonId);
 
-            let _pos = _value ? (Math.round(_value.currentTime  * 100) / 100) : 0,
+            let _pos = _value ? (Math.round(_value.currentTime * 100) / 100) : 0,
                 _lessonsMap = _state.lessonInfoStorage.lessons,
                 _currentPosition = _lessonsMap.has(_playingLessonId) ? _lessonsMap.get(_playingLessonId).currentTime : 0;
 

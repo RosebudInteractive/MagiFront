@@ -256,19 +256,21 @@ class Navigation extends React.Component {
             return
         }
 
-        let _menuTop = _menu.position().top,
-            _menuBottom = _menuTop + _menu.height();
+        if (_menu && _menu.length > 0) {
+            let _menuTop = _menu.position().top,
+                _menuBottom = _menuTop + _menu.height();
 
-        if (_menuBottom > window.innerHeight) {
-            OverflowHandler.rememberScrollPos();
-            if (this.state.expanded) {
-                OverflowHandler.turnOn();
+            if (_menuBottom > window.innerHeight) {
+                OverflowHandler.rememberScrollPos();
+                if (this.state.expanded) {
+                    OverflowHandler.turnOn();
+                }
+                _menu.addClass('scroll');
+            } else {
+                OverflowHandler.turnOff();
+                // $('body').removeClass('overflow');
+                _menu.removeClass('scroll');
             }
-            _menu.addClass('scroll');
-        } else {
-            OverflowHandler.turnOff();
-            // $('body').removeClass('overflow');
-            _menu.removeClass('scroll');
         }
     }
 

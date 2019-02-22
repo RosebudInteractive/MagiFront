@@ -8,6 +8,7 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
 import {TooltipTitles} from "../../tools/page-tools";
 import {getTimeFmt} from "../../tools/time-tools";
+import {FINISH_DELTA_TIME} from "../../constants/player";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -112,18 +113,15 @@ class LessonPlayBlockSmall extends React.Component {
         const _pauseSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause-small"/>',
             _radius = 86.75;
 
-        let {lesson, playingLesson, paused, authorized, showRestTime} = this.props,
+        let {lesson, playingLesson, paused, authorized,} = this.props,
             {IsAuthRequired} = lesson,
-            _lessonLocked = (IsAuthRequired && !authorized),
-            {Id: id, Duration: _totalDuration, DurationFmt: duration} = lesson,
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _playedPart = (_totalDuration && !_isFinished) ? ((_currentTime) / _totalDuration) : 0,
+            _lessonLocked = (IsAuthRequired && !authorized);
+
+        let {isFinished : _isFinished, playedPart : _playedPart, duration: _duration} = this._calcLessonProps(lesson),
+            {Id: id} = lesson,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
-            _offset = 2 * 3.14 * 0.25 * _radius,
-            _duration = (showRestTime && !_isFinished) ? getTimeFmt(_totalDuration - _currentTime) : duration;
+            _offset = 2 * 3.14 * 0.25 * _radius;
 
         let _playingLessonId = playingLesson ? playingLesson.lessonId : 0,
             _isThisLessonPlaying = _playingLessonId === id;
@@ -166,6 +164,30 @@ class LessonPlayBlockSmall extends React.Component {
 
             </div>
         )
+    }
+
+    _calcLessonProps(lesson) {
+        let {lessonInfoStorage, showRestTime} = this.props,
+            {Id: id, Duration: totalDuration, DurationFmt: duration} = lesson;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let _isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false,
+            _restTime = totalDuration - _currentTime;
+
+        _restTime = (_restTime < 0) ? 0 : _restTime;
+
+        let result = {};
+
+        result.playedPart = _isFinished ? 0 : _playedPart;
+        result.isFinished = _isFinished;
+        result.duration = (showRestTime && !_isFinished) ? getTimeFmt(_restTime) : duration;
+
+        return result
     }
 }
 

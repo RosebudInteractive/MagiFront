@@ -8,6 +8,7 @@ import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from '../../actions/user-actions'
 import * as storageActions from '../../actions/lesson-info-storage-actions'
 import {TooltipTitles} from "../../tools/page-tools";
+import {FINISH_DELTA_TIME} from "../../constants/player";
 
 class PlayBlock extends React.Component {
 
@@ -46,7 +47,7 @@ class PlayBlock extends React.Component {
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
         } else {
-            _button = <button className="play-block__btn" onClick={::this._play}>
+            _button = <button className={"play-block__btn" + (isFinished ? ' paused' : '')} onClick={::this._play}>
                 {isFinished
                     ?
                     <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
@@ -75,12 +76,10 @@ class PlayBlock extends React.Component {
     render() {
         const _radius = 98.75;
 
-        let {id, totalDuration, isAuthRequired, authorized} = this.props,
-            _lessonLocked = (isAuthRequired && !authorized),
-            _lessonInfo = this.props.lessonInfoStorage.lessons.get(id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
-            _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
-            _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+        let {isAuthRequired, authorized} = this.props,
+            _lessonLocked = (isAuthRequired && !authorized);
+
+        let {isFinished : _isFinished, playedPart : _playedPart} = this._calcIsFinishedAndPlayedPart(),
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
             _offset = 2 * 3.14 * 0.25 * _radius;
@@ -117,6 +116,23 @@ class PlayBlock extends React.Component {
                 </div>
             </div>
         )
+    }
+
+    _calcIsFinishedAndPlayedPart() {
+        let {id, totalDuration, lessonInfoStorage} = this.props;
+
+        let _lessonInfo = lessonInfoStorage.lessons.get(id),
+            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+
+        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+            _deltaTime = Math.round(totalDuration - _currentTime);
+
+        let result = {};
+
+        result.playedPart = _playedPart;
+        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
+
+        return result
     }
 }
 
