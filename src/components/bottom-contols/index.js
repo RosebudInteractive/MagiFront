@@ -19,12 +19,14 @@ class BottomControls extends React.Component {
 
     _getEnableAccept() {
         let {editor, enableButtons} = this.props;
-        return editor._hasChanges() && editor._enableApplyChanges() && enableButtons
+        // return editor._hasChanges() && editor._enableApplyChanges() && enableButtons
+        return true
     }
 
     _getEnableCancel() {
         let {editor, enableButtons} = this.props;
-        return editor._hasChanges() && enableButtons
+        // return editor._hasChanges() && enableButtons
+        return true
     }
 
     _accept() {

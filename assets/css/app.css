@@ -1,4 +1,8 @@
 /*https://www.iconfinder.com/iconsets/evil-icons-user-interface*/
+
+@font-face{font-family:'PT Sans';font-style:normal;font-weight:400;src:url(../fonts/PTS-webfont.woff) format('woff')}
+@font-face{font-family:'PT Sans';font-style:normal;font-weight:700;src:url(../fonts/PTS-bold.woff) format('woff')}
+
 ._mask01 image {
     /*-webkit-clip-path: url("#clipping01");*/
     clip-path: url("#clipping01");
@@ -136,7 +140,6 @@
     width: 100%;
     min-width: 500px;
     display: inline-block;
-    margin-right: 30px;
     vertical-align: top;
 }
 
@@ -146,9 +149,30 @@
     display: inline-block;
     vertical-align: top;
     overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover;
     /*border-radius: 100%; !* Радиус скругления *!*/
     /*box-shadow: 0 0 0 3px green, 0 0 13px #333; !* Параметры теней *!*/
     /*display: none;*/
+}
+
+.editor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.editor__main-area {
+    position: relative;
+    overflow-y: auto;
+    min-height: calc(100% - 100px);
+}
+
+.main-area__container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
 }
 
 .cover svg {
@@ -353,7 +377,7 @@ html,
     display: grid;
     grid-template-areas: "nav head"
                          "nav main";
-    grid-auto-columns: 15% 1fr;
+    grid-template-columns: 15% 1fr;
     grid-template-rows: 60px 1fr;
     flex-direction: row;
     height: 100%;
@@ -416,7 +440,7 @@ html,
 
 .app .main-area {
     grid-area: main;
-    overflow-y: scroll;
+    position: relative;
 }
 
 .app .tab-scroll-box {
@@ -886,22 +910,6 @@ html,
     font-weight: 600;
 }
 
-.cover {
-    width: 360px;
-    /*height: auto;*/
-    display: inline-block;
-    vertical-align: top;
-    overflow: hidden;
-    /*border-radius: 100%; !* Радиус скругления *!*/
-    /*box-shadow: 0 0 0 3px green, 0 0 13px #333; !* Параметры теней *!*/
-    /*display: none;*/
-}
-
-.cover svg {
-    max-width: 360px;
-    max-height: 334px;
-}
-
 .tabs-1 .tab-links {
     margin: 0;
     padding: 0;
@@ -1104,11 +1112,6 @@ html,
     flex-direction: column;
 }
 
-.app .main-area {
-    flex: 1 1 100px;
-    width: 100%;
-    overflow-y: scroll;
-}
 
 .app .tab-scroll-box {
     height: 300px;

@@ -99,6 +99,7 @@ Promise.resolve()
 
         app.use("/images", express.static(__dirname + '/images'));
         app.use("/fonts", express.static(__dirname + '/fonts'));
+        app.use("/fonts", express.static(path.join(__dirname, 'assets', 'fonts')));
         app.use("/css", express.static(__dirname + '/css'));
         app.use("/css", express.static(path.join(__dirname, 'assets', 'css')));
         app.use("/images", express.static(path.join(__dirname, 'assets', 'images')));

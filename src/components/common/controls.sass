@@ -32,7 +32,10 @@
   font-size: 15px
   background: #fff
   font-family: 'PT Sans', Tahoma
-  border-color: #ccc
+  //border-color: #ccc
+  border-radius: 5px
+  border: 1px solid #ddd
+  outline: none
   margin: 0
   padding: 0
   float: left
@@ -44,9 +47,7 @@
 
 .field-text
   padding: 0 8px 0 8px
-  border: 1px solid #ddd
-  border-radius: 5px
-  outline: none
+
   height: 33px
 
 .field-checkbox
@@ -82,3 +83,19 @@
 .select__empty_value
   color: #b2b2b2
   font-size: 14px
+
+.cover-wrapper
+  display: flex
+  &__controls
+    margin-top: 5px
+    display: flex
+    height: 33px
+
+.cover-control
+  margin: 0 2px 0 5px
+  &__btn
+    border: 1px solid #ddd
+    border-radius: 5px
+    height: 100%
+    width: 33px
+    font-size: 15px

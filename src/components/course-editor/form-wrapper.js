@@ -1,9 +1,10 @@
 import React from 'react'
 import {connect} from "react-redux";
 import {reduxForm, Field, formValueSelector,} from 'redux-form'
-import {CheckBox, TextBox, ImageBox} from '../common/input-controls'
+import {CheckBox, TextBox,} from '../common/input-controls'
 import TextArea from '../common/text-area'
 import Select from '../common/select-control'
+import Cover from '../common/masked-cover-control'
 import PropTypes from 'prop-types'
 import '../common/form.sass'
 
@@ -27,8 +28,14 @@ class CourseEditorForm extends React.Component {
                 name: course.Name,
                 URL: course.URL,
                 state: course.State,
-                // languageId: course.LanguageId,
-                description: course.Description});
+                languageId: course.LanguageId,
+                cover: {
+                    cover: course.Cover,
+                    meta: course.CoverMeta,
+                    mask: course.Mask,
+                },
+                description: course.Description
+            });
         }
     }
 
@@ -46,21 +53,26 @@ class CourseEditorForm extends React.Component {
     }
 
     render() {
-        let {courseLessons, isFixedActive} = this.props;
+        let {courseLessons, isFixedActive, } = this.props;
         let _disabled = false;
 
         let _oneLessonDisable = _disabled || (courseLessons.length > 1)
 
         return <div className="form-wrapper non-webix-form">
             <form className="controls-wrapper">
-                <Field component={TextBox} name="name" label="Название курса" placeholder="Введите название" disabled={_disabled}/>
+                <Field component={TextBox} name="name" label="Название курса" placeholder="Введите название"
+                       disabled={_disabled}/>
                 <Field component={TextBox} name="URL" label="URL" placeholder="Введите URL" disabled={_disabled}/>
-                <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние" options={STATE_OPTIONS} disabled={_disabled}/>
-                <Field component={Select} name="languageId" label="Язык" placeholder="Выберите язык" options={this._getLanguagesArray()} disabled={_disabled}/>
+                <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние"
+                       options={STATE_OPTIONS} disabled={_disabled}/>
+                <Field component={Select} name="languageId" label="Язык" placeholder="Выберите язык"
+                       options={this._getLanguagesArray()} disabled={_disabled}/>
                 <Field component={TextArea} name="description" label="Описание курса" disabled={_disabled}/>
-                <Field component={TextArea} name="extLinksValues" label="Ссылки на другие ресурсы" disabled={_disabled}/>
-                <Field component={ImageBox} name="extLinksValues" label="Обложка курса" disabled={_disabled}/>
-                <Field component={CheckBox} name="oneLesson" label="Курс с одиночной лекцией" disabled={_oneLessonDisable}/>
+                <Field component={TextArea} name="extLinksValues" label="Ссылки на другие ресурсы"
+                       disabled={_disabled}/>
+                <Field component={Cover} name="cover" label="Обложка курса" disabled={_disabled}/>
+                <Field component={CheckBox} name="oneLesson" label="Курс с одиночной лекцией"
+                       disabled={_oneLessonDisable}/>
                 <Field component={CheckBox} name="fixed" label="Зафиксировать курс" disabled={!this._canFixCourse()}/>
                 <Field component={TextArea} name="fixDescription" label="Описание" hidden={!isFixedActive}
                        onBlur={::this.props.validate} defaultValue={"this.props.descr"}/>
@@ -79,7 +91,6 @@ class CourseEditorForm extends React.Component {
 
         return ((course && !course.OneLesson) || !isOneLessonActive)
     }
-
 }
 
 const validate = values => {
@@ -109,9 +120,9 @@ const selector = formValueSelector('CourseEditor')
 
 CourseEditorWrapper = connect(state => {
     return {
-        isFixedActive : selector(state, 'fixed'),
-        isOneLessonActive : selector(state, 'oneLesson'),
-        descriptionFix :selector(state, 'fixDescription'),
+        isFixedActive: selector(state, 'fixed'),
+        isOneLessonActive: selector(state, 'oneLesson'),
+        descriptionFix: selector(state, 'fixDescription'),
     }
 })(CourseEditorWrapper)
 
@@ -124,4 +135,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps,null)(CourseEditorWrapper)
+export default connect(mapStateToProps, null)(CourseEditorWrapper)

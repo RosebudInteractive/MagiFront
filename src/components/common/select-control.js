@@ -13,10 +13,6 @@ export default class SelectControl extends React.Component {
         options: PropTypes.array.required,
     };
 
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps.input)
-    }
-
     render() {
         const {input, meta: {error, touched}, id, label, placeholder, disabled, hidden, extClass,} = this.props;
         const _errorText = touched && error &&
@@ -29,7 +25,7 @@ export default class SelectControl extends React.Component {
                 <label htmlFor={id} className="field-label">{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
                     {disabled ?
-                        <select {...input} id={id} className={_inputClass} placeholder={placeholder} disabled>
+                        <select {...input} id={id} className={_inputClass} placeholder={placeholder} defaultValue={"default"} value={input.value} disabled>
                             {this._getOptions()}
                         </select>
                         :
