@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportGoogle = require('passport-google-oauth20');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { StdLoginProcessor, DestroySession } = require('./local-auth');
+const { StdLoginProcessor, AuthByToken, DestroySession } = require('./local-auth');
 const { GenTokenFunc } = require('./jwt-auth');
 
 const GOOGLE_USER_INFO = "https://www.googleapis.com/oauth2/v3/userinfo"; // https://developers.google.com/identity/protocols/OpenIDConnect
@@ -23,29 +23,30 @@ class AuthGoogle {
 
         this._usersCache = UsersCache();
 
-        const strategy = new GoogleStrategy(GoogleOptions,
-            ((req, accessToken, refreshToken, params, profile, done) => {
+        const processUserProfile = ((req, accessToken, refreshToken, params, profile, done) => {
 
-                // google won't allow to use an email w/o verification
-                if (!profile.emails || !profile.emails[0]) { // user may allow authentication, but disable email access (e.g in fb)
-                    done(null, false, { message: "\"Email\" is required for application!" });
-                    return;
-                }
+            // google won't allow to use an email w/o verification
+            if (!profile.emails || !profile.emails[0]) { // user may allow authentication, but disable email access (e.g in fb)
+                done(null, false, { message: "\"Email\" is required for application!" });
+                return;
+            }
 
-                profile.displayName = profile.name.givenName + " " + profile.name.familyName;
-                profile.username = profile.name.givenName;
-                profile.firstName = profile.name.givenName;
-                profile.lastName = profile.name.familyName;
-                profile.identifier = profile.id;
+            profile.displayName = profile.name.givenName + " " + profile.name.familyName;
+            profile.username = profile.name.givenName;
+            profile.firstName = profile.name.givenName;
+            profile.lastName = profile.name.familyName;
+            profile.identifier = profile.id;
 
-                this._usersCache.getUserByProfile(profile)
-                    .then((user) => {
-                        done(null, user ? user : false);
-                    })
-                    .catch((err) => {
-                        done(err);
-                    });
-            }).bind(this));
+            this._usersCache.getUserByProfile(profile)
+                .then((user) => {
+                    done(null, user ? user : false);
+                })
+                .catch((err) => {
+                    done(err);
+                });
+        }).bind(this);
+
+        const strategy = new GoogleStrategy(GoogleOptions, processUserProfile);
 
         passport.use(strategy);
 
@@ -58,7 +59,7 @@ class AuthGoogle {
         }
 
         app.get('/api/googlelogin', passport.authenticate('google', config.snets.google.passportOptions));
-        app.get('/api/app-googlelogin', StdLoginProcessor('google', false, null, GenTokenFunc));
+        app.get('/api/app-googlelogin', AuthByToken(strategy.userProfile.bind(strategy), processUserProfile, null, GenTokenFunc));
         let processor = (!config.snets.google.redirectURL) ? StdLoginProcessor('google') :
             StdLoginProcessor('google', false, config.snets.google.redirectURL);
         app.get(config.snets.google.callBack, processor);

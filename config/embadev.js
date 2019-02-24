@@ -192,22 +192,22 @@ let options = {
 // login: 'course.test.facebook@gmail.com',
 // password: 'course-test-facebook'
 
-if (process.env.EMBA_TEST_HOST !== "dragonegg") {
-    options.snets= {
-        facebook: {
-            appId: '1584514044907807',
-            appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
-            callBack: '/oauth/facebook',
-            profileURL: 'https://graph.facebook.com/v2.12/me',
-            // profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
-            profileFields: ['id', 'about', 'email', 'name', 'photos'],
-            passportOptions: {
-                display: 'popup',
-                scope: ['email', 'public_profile'] // don't require application review
-                // scope: ['email', 'user_about_me', 'user_birthday', 'user_hometown']
-            }
-        }
-    }
-};
+// if (process.env.EMBA_TEST_HOST !== "dragonegg") {
+//     options.snets= {
+//         facebook: {
+//             appId: '1584514044907807',
+//             appSecret: 'f0f14ef63e0c6b9ec549b9b15f63a808',
+//             callBack: '/oauth/facebook',
+//             profileURL: 'https://graph.facebook.com/v2.12/me',
+//             // profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
+//             profileFields: ['id', 'about', 'email', 'name', 'photos'],
+//             passportOptions: {
+//                 display: 'popup',
+//                 scope: ['email', 'public_profile'] // don't require application review
+//                 // scope: ['email', 'user_about_me', 'user_birthday', 'user_hometown']
+//             }
+//         }
+//     }
+// };
 
 module.exports = options;

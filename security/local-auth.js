@@ -279,41 +279,69 @@ let chechRecapture = (hasCapture, req, res, processor) => {
         });
 }
 
-let StdLoginProcessor = (strategy, hasCapture, redirectUrl, genTokenFunc) => {
+const getAuthProcessor = (req, res, next, redirectUrl, genTokenFunc) => {
+    return (err, user, info) => {
+        if (err || !user) {
+            AuthLocal.destroySession(req)
+                .then(() => {
+                    if (err) {
+                        if (redirectUrl)
+                            res.redirect(buildRedirectUrl(redirectUrl, err.toString()))
+                        else
+                            res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() });
+                        return;
+                    }
+                    if (!user) {
+                        if (redirectUrl)
+                            res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
+                        else
+                            res.status(HttpCode.ERR_UNAUTH).json(info);
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    if (redirectUrl)
+                        res.redirect(buildRedirectUrl(redirectUrl, err.message))
+                    else
+                        res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
+                });
+        }
+        else
+            StdLogin(req, res, user, null, redirectUrl, genTokenFunc);
+    }
+}
+
+const StdLoginProcessor = (strategy, hasCapture, redirectUrl, genTokenFunc) => {
     return (req, res, next) => {
         chechRecapture(hasCapture, req, res, () => {
-            passport.authenticate(strategy, (err, user, info) => {
-                if (err || !user) {
-                    AuthLocal.destroySession(req)
-                        .then(() => {
-                            if (err) {
-                                if (redirectUrl)
-                                    res.redirect(buildRedirectUrl(redirectUrl, err.toString()))
-                                else
-                                    res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() });
-                                return;
-                            }
-                            if (!user) {
-                                if (redirectUrl)
-                                    res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
-                                else
-                                    res.status(HttpCode.ERR_UNAUTH).json(info);
-                                return;
-                            }
-                        })
-                        .catch((err) => {
-                            if (redirectUrl)
-                                res.redirect(buildRedirectUrl(redirectUrl, err.message))
-                            else
-                                res.status(HttpCode.ERR_INTERNAL).json({ message: err.message });
-                        });
-                }
-                else
-                    StdLogin(req, res, user, null, redirectUrl, genTokenFunc);
-            })(req, res, next);
+            passport.authenticate(strategy, getAuthProcessor(req, res, next, redirectUrl, genTokenFunc))(req, res, next);
         })
     }
 };
+
+const AuthByToken = (getUserProfile, processUserProfile, redirectUrl, genTokenFunc) => {
+    if (typeof (getUserProfile) !== "function")
+        throw new Error(`Arg "getUserProfile" must be a function.`);
+    if (typeof (processUserProfile) !== "function")
+        throw new Error(`Arg "processUserProfile" must be a function.`);
+    return (req, res, next) => {
+        let accessToken = req.query.accessToken;
+        let refreshToken = null;
+        let authProcessor = getAuthProcessor(req, res, next, redirectUrl, genTokenFunc);
+        getUserProfile(accessToken, (err, profile) => {
+            if (err)
+                next(err)
+            else {
+                if (processUserProfile.length === 6) {
+                    let rawParams = req.query;
+                    processUserProfile(req, accessToken, refreshToken, rawParams, profile, authProcessor)
+                }
+                else
+                    processUserProfile(req, accessToken, refreshToken, profile, authProcessor);
+            }
+        })
+    }
+}
 
 const isFeatureEnabled = config.get('authentication.enabled');
 let authLocal = null;
@@ -329,6 +357,7 @@ exports.ChechRecapture = chechRecapture;
 exports.AuthLocalInit = AuthLocalInit;
 exports.DestroySession = AuthLocal.destroySession.bind(AuthLocal);
 exports.StdLoginProcessor = StdLoginProcessor;
+exports.AuthByToken = AuthByToken;
 exports.StdLogin = StdLogin;
 exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {
     AuthLocalInit(app);

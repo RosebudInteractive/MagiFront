@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportVKontakte = require('passport-vkontakte');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { StdLoginProcessor, DestroySession } = require('./local-auth');
+const { StdLoginProcessor, AuthByToken, DestroySession } = require('./local-auth');
 const { GenTokenFunc } = require('./jwt-auth');
 
 class AuthVK {
@@ -23,41 +23,42 @@ class AuthVK {
 
         this._usersCache = UsersCache();
 
-        const strategy = new VKontakteStrategy(VKontakteOptions,
-            ((req, accessToken, refreshToken, rawParams, profile, done) => {
-                // VK doesn't give an email in a profile, use raw authentication response data instead
-                if (!rawParams.email) { // user may allow authentication, but disable email access (e.g in fb)
-                    done(null, false, { message: "\"Email\" field is required for application!" });
-                    return;
-                }
-                profile.emails = [{ type: "email", value: rawParams.email }];
-                profile.description = profile._json.about && (profile._json.about.length > 0) ? profile._json.about : null;
-                profile.city = profile._json.city ? profile._json.city.title : null;
-                profile.country = profile._json.country ? profile._json.country.title : null;
-                profile.firstName = profile._json.first_name ? profile._json.first_name : null;
-                profile.lastName = profile._json.last_name ? profile._json.last_name : null;
-                profile.identifier = profile.id + "";
-                if (typeof (profile.birthday) === "string") {
-                    let barr = profile.birthday.split("-");
-                    if (barr.length === 3) {
-                        profile.yearOfBirth = parseInt(barr[0]);
-                        profile.monthOfBirth = parseInt(barr[1]);
-                        profile.dayOfBirth = parseInt(barr[2]);
-                        if (isNaN(profile.yearOfBirth) || isNaN(profile.monthOfBirth) || isNaN(profile.dayOfBirth)) {
-                            delete profile.yearOfBirth;
-                            delete profile.monthOfBirth;
-                            delete profile.dayOfBirth;
-                        }
+        const processUserProfile = ((req, accessToken, refreshToken, rawParams, profile, done) => {
+            // VK doesn't give an email in a profile, use raw authentication response data instead
+            if (!rawParams.email) { // user may allow authentication, but disable email access (e.g in fb)
+                done(null, false, { message: "\"Email\" field is required for application!" });
+                return;
+            }
+            profile.emails = [{ type: "email", value: rawParams.email }];
+            profile.description = profile._json.about && (profile._json.about.length > 0) ? profile._json.about : null;
+            profile.city = profile._json.city ? profile._json.city.title : null;
+            profile.country = profile._json.country ? profile._json.country.title : null;
+            profile.firstName = profile._json.first_name ? profile._json.first_name : null;
+            profile.lastName = profile._json.last_name ? profile._json.last_name : null;
+            profile.identifier = profile.id + "";
+            if (typeof (profile.birthday) === "string") {
+                let barr = profile.birthday.split("-");
+                if (barr.length === 3) {
+                    profile.yearOfBirth = parseInt(barr[0]);
+                    profile.monthOfBirth = parseInt(barr[1]);
+                    profile.dayOfBirth = parseInt(barr[2]);
+                    if (isNaN(profile.yearOfBirth) || isNaN(profile.monthOfBirth) || isNaN(profile.dayOfBirth)) {
+                        delete profile.yearOfBirth;
+                        delete profile.monthOfBirth;
+                        delete profile.dayOfBirth;
                     }
                 }
-                this._usersCache.getUserByProfile(profile)
-                    .then((user) => {
-                        done(null, user ? user : false);
-                    })
-                    .catch((err) => {
-                        done(err);
-                    });
-            }).bind(this));
+            }
+            this._usersCache.getUserByProfile(profile)
+                .then((user) => {
+                    done(null, user ? user : false);
+                })
+                .catch((err) => {
+                    done(err);
+                });
+        }).bind(this);
+
+        const strategy = new VKontakteStrategy(VKontakteOptions, processUserProfile);
 
         passport.use(strategy);
 
@@ -70,7 +71,7 @@ class AuthVK {
         }
 
         app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
-        app.get('/api/app-vklogin', StdLoginProcessor('vkontakte', false, null, GenTokenFunc));
+        app.get('/api/app-vklogin', AuthByToken(strategy.userProfile.bind(strategy), processUserProfile, null, GenTokenFunc));
         let processor = (!config.snets.vk.redirectURL) ? StdLoginProcessor('vkontakte') :
             StdLoginProcessor('vkontakte', false, config.snets.vk.redirectURL);
         app.get(config.snets.vk.callBack, processor);
