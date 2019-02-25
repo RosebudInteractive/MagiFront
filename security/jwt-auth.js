@@ -100,11 +100,11 @@ class AuthJWT {
                                     });
                             })
                             .catch((err) => {
-                                res.status(HttpCode.ERR_UNAUTH).json({ message: "Недопустимое имя пользователя или пароль." });
+                                res.status(HttpCode.ERR_UNAUTH).json({ message: "Неправильный email или пароль." });
                             });
                     }
                     else
-                        res.status(HttpCode.ERR_UNAUTH).json({ message: "Недопустимое имя пользователя или пароль." });
+                        res.status(HttpCode.ERR_UNAUTH).json({ message: "Неправильный email или пароль." });
                 }).bind(this));
         }
     }

@@ -16,7 +16,7 @@ exports.UserLoginError = class UserLoginError extends ErrorWithCode {
     static get REG_EXPIRED() { return { code: "REG_EXPIRED", message: "Период регистрации истек." }; }
     static get REG_BLOCKED() { return { code: "REG_BLOCKED", message: "Пользователь заблокирован." }; }
     static get REG_OLDSTYLE() { return { code: "REG_OLDSTYLE", message: "\"Old style\" пользователь." }; }
-    static get AUTH_FAIL() { return { code: "AUTH_FAIL", message: "Недопустимое имя пользователя или пароль." }; }
+    static get AUTH_FAIL() { return { code: "AUTH_FAIL", message: "Неправильный email или пароль." }; }
     get info() {
         return { code: this._code, message: this.message };
     }
