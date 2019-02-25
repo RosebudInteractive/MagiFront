@@ -73,7 +73,7 @@ class AuthJWT {
                         if (err instanceof HttpError)
                             res.status(err.statusCode).json(err.errObject)
                         else
-                            res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                            res.status(HttpCode.ERR_BAD_REQ).json({ message: (err && err.message) ? err.message : JSON.stringify(err) });
                     });
             });
 
@@ -100,11 +100,11 @@ class AuthJWT {
                                     });
                             })
                             .catch((err) => {
-                                res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
+                                res.status(HttpCode.ERR_UNAUTH).json({ message: "Недопустимое имя пользователя или пароль." });
                             });
                     }
                     else
-                        res.status(HttpCode.ERR_UNAUTH).json({ message: "Invalid user name or password" });
+                        res.status(HttpCode.ERR_UNAUTH).json({ message: "Недопустимое имя пользователя или пароль." });
                 }).bind(this));
         }
     }

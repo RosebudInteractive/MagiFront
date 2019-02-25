@@ -309,8 +309,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
 
                 var predicate = new Predicate(this._db, {});
                 predicate
-                    .addCondition({ field: "Login", op: "=", value: data.Login });
-
+                    .addCondition({ field: "Email", op: "=", value: data.Login });
 
                 let exp_filtered = Object.assign({}, USER_USERROLE_EXPRESSION);
                 exp_filtered.expr.predicate = predicate.serialize(true);
@@ -825,7 +824,13 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
             .then(((result) => {
                 let res = this._convUserDataFn ? this._convUserDataFn(result.fields) : result.fields;
                 return this._storeUser(res);
-            }).bind(this));
+            }).bind(this))
+            .catch(err => {
+                if (err === "Incorrect user name or password.")
+                    throw new UserLoginError(UserLoginError.AUTH_FAIL)
+                else
+                    throw err;
+            });
     }
 
     getUserInfoById(id, isRenew) {

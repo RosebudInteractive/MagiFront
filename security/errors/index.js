@@ -13,10 +13,10 @@ class ErrorWithCode extends Error {
 }
 
 exports.UserLoginError = class UserLoginError extends ErrorWithCode {
-    static get REG_EXPIRED() { return { code: "REG_EXPIRED", message: "Registration period has expired." }; }
-    static get REG_BLOCKED() { return { code: "REG_BLOCKED", message: "User is blocked." }; }
-    static get REG_OLDSTYLE() { return { code: "REG_OLDSTYLE", message: "\"Old style\" user." }; }
-    static get AUTH_FAIL() { return { code: "AUTH_FAIL", message: "Incorrect user name or password." }; }
+    static get REG_EXPIRED() { return { code: "REG_EXPIRED", message: "Период регистрации истек." }; }
+    static get REG_BLOCKED() { return { code: "REG_BLOCKED", message: "Пользователь заблокирован." }; }
+    static get REG_OLDSTYLE() { return { code: "REG_OLDSTYLE", message: "\"Old style\" пользователь." }; }
+    static get AUTH_FAIL() { return { code: "AUTH_FAIL", message: "Недопустимое имя пользователя или пароль." }; }
     get info() {
         return { code: this._code, message: this.message };
     }

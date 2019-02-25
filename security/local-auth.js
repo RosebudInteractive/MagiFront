@@ -5,6 +5,7 @@ const config = require('config');
 const passport = require('passport');
 const passportLocal = require('passport-local');
 const { HttpCode } = require("../const/http-codes");
+const { HttpError } = require('../errors/http-error');
 const { UsersCache } = require("./users-cache");
 const { UserRegister } = require("./user-register");
 const { SendRegMail } = require("./user-register");
@@ -164,7 +165,10 @@ class AuthLocal {
                         StdLogin(req, res, user, { message: "User Register: Unknown error." });
                     })
                     .catch((err) => {
-                        res.status(HttpCode.ERR_BAD_REQ).json({ message: err.toString() });
+                        if (err instanceof HttpError)
+                            res.status(err.statusCode).json(err.errObject)
+                        else
+                            res.status(HttpCode.ERR_BAD_REQ).json({ message: (err && err.message) ? err.message : JSON.stringify(err) });
                     });
             });
         });
