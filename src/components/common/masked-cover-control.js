@@ -29,7 +29,7 @@ class SelectControl extends React.Component {
         const {input, meta: {error, visited}, id, label, disabled, hidden,} = this.props;
 
         let _mask = input.value ? input.value.mask : '',
-            _cover = input.value ? '/data/' + input.value.cover : ''
+            _cover = input.value ? '/data/' + input.value.file : ''
 
         // const _style = {width: 360, height: 334}
 
@@ -72,8 +72,9 @@ class SelectControl extends React.Component {
             let _newMask = this._masks[this._maskIndex - 1]
 
             this.props.input.onChange({
-                cover: this.props.input.value.cover,
-                mask: _newMask.id
+                file: this.props.input.value.file,
+                mask: _newMask.id,
+                meta: this.props.input.value.meta,
             })
         }
     }
@@ -85,8 +86,9 @@ class SelectControl extends React.Component {
             let _newMask = this._masks[this._maskIndex + 1]
 
             this.props.input.onChange({
-                cover: this.props.input.value.cover,
-                mask: _newMask.id
+                file: this.props.input.value.file,
+                mask: _newMask.id,
+                meta: this.props.input.value.meta,
             })
         }
     }
@@ -96,8 +98,9 @@ class SelectControl extends React.Component {
             _selected = _select.options[_select.selectedIndex];
 
         this.props.input.onChange({
-            cover: this.props.input.value.cover,
-            mask: _selected.value
+            file: this.props.input.value.file,
+            mask: _selected.value,
+            meta: this.props.input.value.meta,
         })
     }
 
@@ -118,7 +121,7 @@ class SelectControl extends React.Component {
             let _fileInfo = JSON.parse(data)
 
             this.props.input.onChange({
-                cover: _fileInfo[0].file,
+                file: _fileInfo[0].file,
                 mask: value.mask,
                 meta: JSON.stringify(_fileInfo[0].info)
             })

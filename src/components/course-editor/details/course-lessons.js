@@ -28,27 +28,6 @@ class CourseLessonsWrapper extends React.Component {
         />
     }
 
-    _getCourseCategories() {
-        const {
-            categories,
-            courseCategories
-        } = this.props;
-
-        let _courseCategories = [];
-
-        courseCategories.map((item) => {
-            let _category = categories.find((category) => {
-                return category.id === item
-            });
-
-            if (_category) {
-                _courseCategories.push(_category);
-            }
-        });
-
-        return _courseCategories;
-    }
-
     _canCreateLesson() {
         let {course, courseLessons} = this.props
 
@@ -59,7 +38,7 @@ class CourseLessonsWrapper extends React.Component {
     }
 
     _createLesson() {
-        this.props.history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
+        history.push('/adm/courses/edit/' + this.props.courseId + '/lessons/new/');
     }
 
     _editLesson(id) {

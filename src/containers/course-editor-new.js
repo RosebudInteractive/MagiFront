@@ -1,36 +1,33 @@
 import React from 'react'
-
-import LoadingPage from '../components/common/loading-page'
-import BottomControls from '../components/bottom-contols'
-import ErrorDialog from '../components/dialog/error-dialog'
-import CourseFormWrapper from '../components/course-editor/form-wrapper'
-import CourseAuthorDialog from '../components/course-editor/dialogs/author-dialog'
-
-import * as singleCourseActions from "../actions/course/courseActions";
-
-import * as appActions from '../actions/app-actions';
-import * as authorsActions from "../actions/authorsListActions";
-import * as categoriesActions from "../actions/categoriesListActions";
-import * as languagesActions from "../actions/languages-actions";
-
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import FixControl from '../components/course-editor/fix-course-wrapper';
-
-import {checkExtLinks, getExtLinks} from "../tools/link-tools";
-import {
-    disableButtons,
-    enableButtons,
-} from "adm-ducks/app";
-import {
-    getParameters,
-    setFixedCourse,
-} from "adm-ducks/params";
-import {getFormValues, isValid, isDirty, reset, focus} from 'redux-form'
-import {Prompt} from "react-router-dom";
+import LoadingPage from '../components/common/loading-page'
+import BottomControls from '../components/bottom-contols/buttons'
+import ErrorDialog from '../components/dialog/error-dialog'
 import CourseCategoryDialog from "../components/course-editor/dialogs/category-dialog";
-import DetailsWrapper from "../components/course-editor/details";
+import CourseFormWrapper from '../components/course-editor/form-wrapper'
+import CourseAuthorDialog from '../components/course-editor/dialogs/author-dialog'
+import AuthorsTab from '../components/course-editor/tabs/authors-and-categories'
+import LessonsTab from '../components/course-editor/tabs/lessons'
+
+import * as singleCourseActions from "../actions/course/courseActions";
+import {showErrorDialog} from '../actions/app-actions';
+import {getAuthors} from "../actions/authorsListActions";
+import {getCategories} from "../actions/categoriesListActions";
+import {getLanguages} from "../actions/languages-actions";
+import {checkExtLinks, getExtLinks} from "../tools/link-tools";
+import {getParameters, setFixedCourse,} from "adm-ducks/params";
+import {getFormValues, isValid, isDirty, reset, setSubmitSucceeded, untouch} from 'redux-form'
+import {Prompt} from "react-router-dom";
+
+import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common'
+
+const TABS = {
+    MAIN: 'main',
+    AUTHORS: 'authors',
+    LESSONS: 'lessons'
+}
 
 class CourseEditor extends React.Component {
 
@@ -38,14 +35,15 @@ class CourseEditor extends React.Component {
         super(props);
 
         this.state = {
-            editMode: this.props.courseId > 0
+            editMode: this.props.courseId > 0,
+            currentTab: TABS.MAIN,
         }
     }
 
     componentDidMount() {
-        this.props.authorsActions.getAuthors();
-        this.props.categoriesActions.getCategories();
-        this.props.languagesActions.getLanguages();
+        this.props.getAuthors();
+        this.props.getCategories();
+        this.props.getLanguages();
         this.props.getParameters()
 
         if (this.state.editMode) {
@@ -55,13 +53,23 @@ class CourseEditor extends React.Component {
         }
     }
 
+    componentWillReceiveProps(nextProps,) {
+        let _needRefreshAfterSave = this.props.savingCourse && !nextProps.savingCourse && !nextProps.courseError,
+            _needSwitchToEditMode = !this.state.editMode && _needRefreshAfterSave
+
+        if (_needSwitchToEditMode) {
+            let _newRout = `/adm/courses/edit/${nextProps.course.id}`;
+            this.props.history.push(_newRout);
+            this.setState({editMode: true})
+        }
+
+        if (_needRefreshAfterSave) {
+            this.props.courseActions.get(nextProps.course.id)
+        }
+    }
+
     render() {
         const {fetching, hasChanges, courseId} = this.props;
-
-        // if (fetching) {
-        //     this._dataLoaded = false;
-        //     this._validateResult = {};
-        // }
 
         return (
             fetching ?
@@ -71,22 +79,61 @@ class CourseEditor extends React.Component {
                     <Prompt when={hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                     <div className='editor__head'>
-                        <button className={"adm__button "} onClick={::this._goBack}>{"<<< Назад"}</button>
+                        <div className="tabs tabs-1" key='tab1'>
+                            <div className="tab-links">
+                                <div
+                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
+                                    onClick={::this._switchToMainTab}>Основные
+                                </div>
+                                <div
+                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.AUTHORS ? ' tab-link-active' : '')}
+                                    onClick={::this._switchToAuthorsTab}>Авторы и категории
+                                </div>
+                                <div
+                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LESSONS ? ' tab-link-active' : '')}
+                                    onClick={::this._switchToLessonsTab}>Лекции
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="editor__main-area">
                         <div className="main-area__container">
-                            <CourseFormWrapper/>
-                            <DetailsWrapper editMode={this.state.editMode} courseId={courseId}/>
-                            <ErrorDialog/>
-                            <CourseAuthorDialog/>
-                            <CourseCategoryDialog/>
+                            <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN}
+                                               editMode={this.state.editMode}/>
+                            <AuthorsTab editMode={this.state.editMode}
+                                        visible={this.state.currentTab === TABS.AUTHORS}/>
+                            <LessonsTab editMode={this.state.editMode} courseId={courseId}
+                                        visible={this.state.currentTab === TABS.LESSONS}/>
                         </div>
+
+                        <ErrorDialog/>
+                        <CourseAuthorDialog/>
+                        <CourseCategoryDialog/>
                     </div>
                     <div className="editor__footer">
-                        < BottomControls editor={this} onAccept={::this._save} onCancel={::this._cancel}/>
+                        <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
+                                        onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
                     </div>
                 </div>
         )
+    }
+
+    _switchToMainTab() {
+        this.setState({
+            currentTab: TABS.MAIN
+        })
+    }
+
+    _switchToAuthorsTab() {
+        this.setState({
+            currentTab: TABS.AUTHORS
+        })
+    }
+
+    _switchToLessonsTab() {
+        this.setState({
+            currentTab: TABS.LESSONS
+        })
     }
 
     _goBack() {
@@ -94,65 +141,57 @@ class CourseEditor extends React.Component {
     }
 
 
-    _save(value) {
-        this.props.focusReduxForm('FixingBlock', 'description')
+    _save() {
+        let {editorValues, editorValid, courseId} = this.props;
 
-        if (!this.props.fixFormValid) {
+        if (!editorValid) {
             return
         }
-        this.props.setFixedCourse({courseId: value.id, ...this.props.fixFormValues})
 
-        let _checkResult = checkExtLinks(value.extLinksValues)
+        this.props.setFixedCourse({
+            courseId: courseId,
+            description: editorValues.fixDescription,
+            active: editorValues.fixed
+        })
+
+        let _checkResult = checkExtLinks(editorValues.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
             let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
-            this.props.appActions.showErrorDialog(_message)
+            this.props.showErrorDialog(_message)
             return
         }
 
-        this.props.courseActions.setExtLinks(getExtLinks(value.extLinksValues))
+        this.props.courseActions.setExtLinks(getExtLinks(editorValues.extLinksValues))
 
         let _obj = {
-            id: value.id,
-            Id: value.id,
-            Name: value.Name,
-            State: value.State,
-            Cover: value.Cover,
-            CoverMeta: JSON.stringify(this.coverMeta),
-            LanguageId: value.LanguageId,
-            URL: value.URL,
-            Description: value.Description,
-            Mask: value.Mask,
+            id: courseId,
+            Id: courseId,
+            Name: editorValues.name,
+            State: editorValues.state,
+            Cover: editorValues.cover.file,
+            CoverMeta: editorValues.cover.meta,
+            LanguageId: editorValues.languageId,
+            URL: editorValues.URL,
+            Description: editorValues.description,
+            Mask: editorValues.cover.mask,
             Authors: [],
             Categories: [],
             Lessons: [],
-            ExtLinks: getExtLinks(value.extLinksValues),
-            OneLesson: !!value.OneLesson,
+            ExtLinks: getExtLinks(editorValues.extLinksValues),
+            OneLesson: !!editorValues.oneLesson,
         };
 
         _obj.Authors.push(...this.props.courseAuthors);
         _obj.Categories.push(...this.props.courseCategories);
         this._fillLessons(_obj.Lessons);
 
-        super._save(_obj);
+        this.props.courseActions.save(_obj, this.state.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
     }
 
     _cancel() {
-        super._cancel()
-
-        this.props.resetReduxForm('FixingBlock')
-    }
-
-    get coverMeta() {
-        return this._coverMeta;
-    }
-
-    set coverMeta(value) {
-        if ((!!value) && (typeof (value) === 'string')) {
-            this._coverMeta = JSON.parse(value)
-        } else {
-            this._coverMeta = value
-        }
+        this.props.courseActions.cancelChanges()
+        this.props.resetReduxForm('CourseEditor')
     }
 
     _fillLessons(array) {
@@ -179,28 +218,8 @@ class CourseEditor extends React.Component {
         }
     }
 
-    _canFixCourse() {
-        let _data = this.getObject()
-
-        return ((_data && !_data.OneLesson) || (window.$$('one-lesson-checkbox') && !window.$$('one-lesson-checkbox').getValue()))
-    }
-
-
     _enableApplyChanges() {
-        let _enable = super._enableApplyChanges();
-
-        return _enable && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
-    }
-
-    handleChangeDataOnWebixForm() {
-        if (!window.$$('one-lesson-checkbox')) return
-
-        if (this.props.courseLessons.length <= 1) {
-            window.$$('one-lesson-checkbox').enable()
-        } else {
-            window.$$('one-lesson-checkbox').disable()
-        }
-
+        return this.props.editorValid && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
     }
 }
 
@@ -209,7 +228,8 @@ function mapStateToProps(state, ownProps) {
         courseId: ownProps.match ? Number(ownProps.match.params.id) : null,
 
         course: state.singleCourse.current,
-
+        savingCourse: state.singleCourse.saving,
+        courseError: state.singleCourse.error,
         authors: state.authorsList.authors,
         categories: state.categoriesList.categories,
 
@@ -217,34 +237,29 @@ function mapStateToProps(state, ownProps) {
         courseCategories: state.courseCategories.current,
         courseLessons: state.courseLessons.current,
 
-        // languages: state.languages.languages,
-        // fixFormHasChanges: isDirty('FixingBlock')(state),
         hasChanges: state.singleCourse.hasChanges ||
             state.courseAuthors.hasChanges ||
             state.courseCategories.hasChanges ||
-            state.courseLessons.hasChanges || isDirty('FixingBlock')(state),
+            state.courseLessons.hasChanges || isDirty('CourseEditor')(state),
 
         fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
-        fixFormValues: getFormValues('FixingBlock')(state),
-        fixFormValid: isValid('FixingBlock')(state),
+        editorValues: getFormValues('CourseEditor')(state),
+        editorValid: isValid('CourseEditor')(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        appActions: bindActionCreators(appActions, dispatch),
+        showErrorDialog: bindActionCreators(showErrorDialog, dispatch),
         courseActions: bindActionCreators(singleCourseActions, dispatch),
-        authorsActions: bindActionCreators(authorsActions, dispatch),
-        categoriesActions: bindActionCreators(categoriesActions, dispatch),
-        languagesActions: bindActionCreators(languagesActions, dispatch),
+        getAuthors: bindActionCreators(getAuthors, dispatch),
+        getCategories: bindActionCreators(getCategories, dispatch),
+        getLanguages: bindActionCreators(getLanguages, dispatch),
 
-
-        disableButtons: bindActionCreators(disableButtons, dispatch),
-        enableButtons: bindActionCreators(enableButtons, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
         setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
         resetReduxForm: bindActionCreators(reset, dispatch),
-        focusReduxForm: bindActionCreators(focus, dispatch),
+        setSubmitSucceeded: bindActionCreators(setSubmitSucceeded, dispatch),
     }
 }
 

@@ -18,7 +18,7 @@ export default class SelectControl extends React.Component {
         const _errorText = touched && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
-        let _inputClass = "field-input" + (input.value ? '' : ' select__empty_value') + (extClass ? (' ' + extClass) : '')
+        let _inputClass = "field-input field-select" + (input.value ? '' : ' select__empty_value') + (extClass ? (' ' + extClass) : '')
 
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>

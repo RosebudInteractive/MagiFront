@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware, compose } from 'redux'
 import rootReducer from '../reducers'
-import { createLogger } from 'redux-logger'
+// import { createLogger } from 'redux-logger'
 import thunk from 'redux-thunk'
 import { routerMiddleware } from 'react-router-redux'
 import workShopMiddleware from '../middlewares/work-shop-middleware'
@@ -11,14 +11,14 @@ import ParamsMiddleware from '../middlewares/params-middleware'
 export const store = configureStore();
 
 function configureStore(initialState) {
-    const logger = createLogger();
+    // const logger = createLogger();
     const routerMiddl = routerMiddleware(history);
 
     const store = createStore(
         rootReducer,
         initialState,
         compose(
-            applyMiddleware(thunk, logger),
+            applyMiddleware(thunk),
             applyMiddleware(routerMiddl),
             applyMiddleware(workShopMiddleware),
             applyMiddleware(ButtonsMiddleware),

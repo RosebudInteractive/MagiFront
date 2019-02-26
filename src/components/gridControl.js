@@ -142,12 +142,15 @@ export default class GridControl extends Component {
 
     render() {
         const {data} = this.props;
-        return [
-            <div className="dlg-btn-bar">
+        return <div className="grid-wrapper">
+            <div className="action-bar">
                 {this._configButtons()}
-            </div>,
-            <Webix ui={::this.getUI()} data={data}/>
-        ]
+            </div>
+            <div className="detail-grid-container">
+                <Webix ui={::this.getUI()} data={data}/>
+            </div>
+
+        </div>
 
     }
 
@@ -159,18 +162,24 @@ export default class GridControl extends Component {
         }]
     }
 
+    _getId() {
+        return ''
+    }
+
     getUI() {
         let that = this;
 
         return {
             view: "datatable",
-            scroll: 'y',
+            // scroll: 'y',
             height: 300,
             select: true,
             resizeColumn: true,
             width: 0,
             editable: false,
             columns: that._getColumns(),
+            id: that._getId(),
+            scroll: false,
 
             on: {
                 onAfterSelect: function (selObj) {

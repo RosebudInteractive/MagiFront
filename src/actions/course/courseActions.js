@@ -108,7 +108,7 @@ export const save = (values, mode) => {
                     .then((message) => {
                         dispatch({
                             type: SAVE_COURSE_FAIL,
-                            payload: null
+                            payload: message
                         });
 
                         dispatch({
