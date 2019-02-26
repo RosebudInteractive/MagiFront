@@ -4,3 +4,17 @@
 
 .form-wrapper
   margin-bottom: 10px
+  &.hidden
+    display: none
+
+.controls-wrapper
+  margin-right: 17px
+  //display: grid
+  //display: flex
+  flex-direction: row
+  flex-wrap: nowrap
+  justify-content: flex-start
+  align-items: flex-start
+  grid-template-columns: 50% 50%
+  @media (max-width: 1279px)
+    display: block

@@ -1,6 +1,11 @@
-import GridControl from './gridControl';
+import GridControl from '../../gridControl';
 
 export class CourseAuthors extends GridControl{
+
+    _getId() {
+        return 'course-authors';
+    }
+
     _getColumns() {
         let _columns = [
             {id: 'FirstName', header: 'Имя', width: 100,},
@@ -14,6 +19,11 @@ export class CourseAuthors extends GridControl{
 }
 
 export class CourseCategories extends GridControl {
+
+    _getId() {
+        return 'course-categories';
+    }
+
     _getColumns() {
         let _columns = [
             {id: 'Name', header: 'Имя', fillspace: true,},
@@ -26,6 +36,11 @@ export class CourseCategories extends GridControl {
 }
 
 export class CourseLessons extends GridControl{
+
+    _getId() {
+        return 'course-lessons';
+    }
+
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},

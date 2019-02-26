@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Webix from '../components/Webix';
 import PropTypes from 'prop-types';
-import {EDIT_MODE_EDIT} from '../constants/Common'
+import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common'
 
 export default class GridControl extends Component {
 
@@ -102,8 +102,14 @@ export default class GridControl extends Component {
         } = this.props;
 
         let _buttons = [];
+
+        let _editMode = typeof editMode === "string" ?
+            editMode
+            :
+            editMode === true ? EDIT_MODE_EDIT : EDIT_MODE_INSERT
+
         if (createAction) {
-            let _disabled = editMode !== EDIT_MODE_EDIT;
+            let _disabled = _editMode !== EDIT_MODE_EDIT;
             _buttons.push(<button key='btnNew' className="tool-btn new" disabled={_disabled} onClick={::this._create}/>)
         }
 
@@ -112,7 +118,7 @@ export default class GridControl extends Component {
         }
 
         if (editAction) {
-            let _disabled = (!this._selected) || (editMode !== EDIT_MODE_EDIT);
+            let _disabled = (!this._selected) || (_editMode !== EDIT_MODE_EDIT);
             _buttons.push(<button key='btnEdit' className='tool-btn edit' disabled={_disabled} onClick={::this._edit}/>)
         }
 
@@ -136,12 +142,15 @@ export default class GridControl extends Component {
 
     render() {
         const {data} = this.props;
-        return [
-            <div className="dlg-btn-bar">
+        return <div className="grid-wrapper">
+            <div className="action-bar">
                 {this._configButtons()}
-            </div>,
-            <Webix ui={::this.getUI()} data={data}/>
-        ]
+            </div>
+            <div className="detail-grid-container">
+                <Webix ui={::this.getUI()} data={data}/>
+            </div>
+
+        </div>
 
     }
 
@@ -153,18 +162,24 @@ export default class GridControl extends Component {
         }]
     }
 
+    _getId() {
+        return ''
+    }
+
     getUI() {
         let that = this;
 
         return {
             view: "datatable",
-            scroll: 'y',
+            // scroll: 'y',
             height: 300,
             select: true,
             resizeColumn: true,
             width: 0,
             editable: false,
             columns: that._getColumns(),
+            id: that._getId(),
+            scroll: false,
 
             on: {
                 onAfterSelect: function (selObj) {

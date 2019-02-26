@@ -15,7 +15,7 @@ import * as languagesActions from "../actions/languages-actions";
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import {CourseAuthors, CourseCategories, CourseLessons} from '../components/courseGrids'
+import {CourseAuthors, CourseCategories, CourseLessons} from '../components/course-editor/details/course-grids'
 import LookupDialog from '../components/LookupDialog';
 import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import FixControl from '../components/course-editor/fix-course-wrapper';

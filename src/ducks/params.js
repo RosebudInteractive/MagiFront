@@ -177,6 +177,7 @@ export const setFixedCourse = (data) => {
 
         let _needSave = (
             (!_courseId && data.active) ||
+            (_courseId && (_courseId !== data.courseId)) ||
             ((_courseId === data.courseId) && ((data.description !== _descr) || !data.active))
         )
 

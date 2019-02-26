@@ -26,12 +26,16 @@ class Editor extends React.Component {
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
                 <label htmlFor={id} className="field-label">{label}</label>
-                {disabled ?
-                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} checked={this._checked()} disabled/>
-                    :
-                    <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder} checked={this._checked()}/>
-                }
-                {_errorText}
+                <div className={"field-wrapper__editor-wrapper"}>
+                    {disabled ?
+                        <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder}
+                               checked={this._checked()} disabled/>
+                        :
+                        <input {...input} id={id} type={type} className={_inputClass} placeholder={placeholder}
+                               checked={this._checked()}/>
+                    }
+                    {_errorText}
+                </div>
             </div>
         );
     }
@@ -44,6 +48,26 @@ export class CheckBox extends Editor {
 
     render() {
         return <Editor type={'checkbox'} {...this.props} extClass={'field-checkbox'}/>;
+    }
+}
+
+export class TextBox extends Editor {
+    static propTypes = {
+        label: PropTypes.string,
+    }
+
+    render() {
+        return <Editor type={'text'} {...this.props} extClass={'field-text'}/>;
+    }
+}
+
+export class ImageBox extends Editor {
+    static propTypes = {
+        label: PropTypes.string,
+    }
+
+    render() {
+        return <Editor type={'image'} {...this.props} extClass={'field-text'}/>;
     }
 }
 

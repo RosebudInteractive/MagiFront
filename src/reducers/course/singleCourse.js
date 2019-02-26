@@ -17,6 +17,8 @@ const initialState = {
     initial: null,
     current: null,
     fetching: false,
+    saving: false,
+    error: null,
     hasChanges: false,
 };
 
@@ -66,7 +68,7 @@ export default function singleCourse(state = initialState, action) {
             };
 
         case SAVE_COURSE_START : {
-            return {...state, fetching: false,}
+            return {...state, fetching: false, saving: true, error: null,}
         }
 
         case SAVE_COURSE_SUCCESS : {
@@ -80,11 +82,12 @@ export default function singleCourse(state = initialState, action) {
                 initial: Object.assign({}, state.current),
                 fetching: false,
                 hasChanges: false,
+                saving: false,
             };
         }
 
         case SAVE_COURSE_FAIL : {
-            return {...state, fetching: false,}
+            return {...state, fetching: false, saving: false, error: action.payload,}
         }
 
         case CLEAR_COURSE: {

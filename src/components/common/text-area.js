@@ -4,66 +4,55 @@ import './controls.sass'
 
 export default class TextArea extends React.Component {
 
+    static propTypes = {
+        label: PropTypes.string,
+        enableHtml: PropTypes.bool,
+    }
+
+
     constructor(props) {
         super(props)
 
-        // this.state = {
-        //     descr: props.defaultValue
-        // }
+        this._id = new Date().getUTCMilliseconds()
 
         this._handlePaste = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
 
-            let _html = (e.originalEvent || e).clipboardData.getData('text/html'),
-                _text = (e.originalEvent || e).clipboardData.getData('text/plain')
+            setTimeout(() => {
+                let _id = this.props.id ? this.props.id : this._id
+                let _target = $('#' + _id)[0];
 
-            let _descr = _html ? normalizeHtml(_html) : _text
+                let _descr = (this.props.enableHtml) && _target.innerHTML ? normalizeHtml(_target.innerHTML) : _target.innerText
 
-            const activeElem = document.activeElement;
+                this.props.input.onChange(_descr)
+            }, 0);
 
-            if (!activeElem) return false;
-
-            this.props.input.onChange(_descr)
-            // this.setState({descr: _descr});
         }
     }
 
     componentDidMount() {
-        $('.field-textarea').bind('paste', this._handlePaste)
-    }
+        let _id = this.props.id ? this.props.id : this._id
 
-    // componentDidUpdate(prevProps) {
-    //     if (prevProps.defaultValue !== this.props.defaultValue) {
-    //         // this.props.input.onChange(this.props.defaultValue)
-    //         this.setState({descr: this.props.defaultValue})
-    //     }
-    // }
+        $('#' + _id).bind('paste', this._handlePaste)
+    }
 
     componentWillUnmount() {
-        $('.field-textarea').unbind('paste', this._handlePaste)
-    }
+        let _id = this.props.id ? this.props.id : this._id
 
-    static propTypes = {
-        label: PropTypes.string
+        $('#' + _id).unbind('paste', this._handlePaste)
     }
 
     render() {
-        const {input, meta: {error, visited}, id, label, disabled, hidden} = this.props;
+        const {enableHtml, meta: {error, visited}, id, label, hidden} = this.props;
         const _errorText = visited && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
+        let _id = id ? id : this._id
+
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
-                <label htmlFor={id} className="field-label">{label}</label>
+                <label htmlFor={_id} className="field-label">{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
-                    {disabled ?
-                        <div dangerouslySetInnerHTML={{__html: input.value}} {...input} id={id}
-                             className="field-textarea" disabled/>
-                        :
-                        <div contentEditable={true} dangerouslySetInnerHTML={{__html: input.value}} {...input}
-                             id={id} className="field-textarea" onBlur={::this._onChange}/>
-                    }
+                    {enableHtml ? <HtmlTextArea id={_id} {...this.props}/> : <PlainTextArea id={_id} {...this.props}/>}
                     {_errorText}
                 </div>
             </div>
@@ -71,12 +60,58 @@ export default class TextArea extends React.Component {
     }
 
     _onChange(e) {
-        if (this.props.input.value !== e.target.innerHTML) {
-            this.props.input.onChange(e.target.innerHTML);
-        }
+        // let _value = this.props.enableHtml ? e.target.innerHTML : e.target.innerText
+        //
+        // if (this.props.input.value !== _value) {
+        //     this.props.input.onChange(_value);
+        // }
     }
 }
 
 function normalizeHtml(str) {
     return str && str.replace(/&nbsp;|\u202F|\u00A0/g, ' ');
+}
+
+class HtmlTextArea extends React.Component {
+    render() {
+        const {input, id, disabled,} = this.props;
+
+        return (
+            disabled ?
+                <div dangerouslySetInnerHTML={{__html: input.value}} {...input} id={id}
+                     className="field-textarea" disabled/>
+                :
+                <div contentEditable={true} dangerouslySetInnerHTML={{__html: input.value}} {...input}
+                     id={id} className="field-textarea" onBlur={::this._onChange}/>
+        )
+    }
+
+    _onChange(e) {
+        let _value = e.target.innerHTML
+
+        if (this.props.input.value !== _value) {
+            this.props.input.onChange(_value);
+        }
+    }
+}
+
+class PlainTextArea extends React.Component {
+    render() {
+        const {input, id, disabled,} = this.props;
+
+        return (
+            disabled ?
+                <div {...input} id={id} className="field-textarea plain-text" disabled>{input.value}</div>
+                :
+                <div contentEditable={true} {...input} id={id} className="field-textarea plain-text" onBlur={::this._onChange}>{input.value}</div>
+        )
+    }
+
+    _onChange(e) {
+        let _value = e.target.innerText
+
+        if (this.props.input.value !== _value) {
+            this.props.input.onChange(_value);
+        }
+    }
 }

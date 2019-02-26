@@ -15,10 +15,10 @@ class Coureses extends React.Component {
         super(props)
 
         this._resizeHandler = () => {
-            let _height = $(window).height() - $('.top-bar-size').innerHeight() + $('.action-bar').innerHeight(),
-                _widht = $('.grid-container').innerWidth();
-
-            $('.grid-container').innerHeight(_height);
+            // let _height = $(window).height() - $('.top-bar-size').innerHeight() + $('.action-bar').innerHeight()
+            //     _widht = $('.grid-container').innerWidth();
+            //
+            // $('.webix-grid-wrapper').innerHeight(_height);
 
             // if (window.$$('courses-grid')) {
             //     window.$$('courses-grid').$setSize(_widht, _height)
@@ -111,7 +111,9 @@ class Coureses extends React.Component {
                             :
                             loaded ?
                                 <div className="grid-container">
-                                    <Webix ui={::this.getUI(::this.select)} data={courses}/>
+                                    <div className="webix-grid-wrapper">
+                                        <Webix ui={::this.getUI(::this.select)} data={courses}/>
+                                    </div>
                                 </div>
                                 : null
                 }
