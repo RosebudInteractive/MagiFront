@@ -53,18 +53,18 @@ class CourseEditor extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps,) {
-        let _needRefreshAfterSave = this.props.savingCourse && !nextProps.savingCourse && !nextProps.courseError,
-            _needSwitchToEditMode = !this.state.editMode && _needRefreshAfterSave
+    componentDidUpdate(prevProps, prevState) {
+        let _needRefreshAfterSave = prevProps.savingCourse && !this.props.savingCourse && !this.props.courseError,
+            _needSwitchToEditMode = !prevState.editMode && _needRefreshAfterSave
 
         if (_needSwitchToEditMode) {
-            let _newRout = `/adm/courses/edit/${nextProps.course.id}`;
+            let _newRout = `/adm/courses/edit/${this.props.course.id}`;
             this.props.history.push(_newRout);
             this.setState({editMode: true})
         }
 
         if (_needRefreshAfterSave) {
-            this.props.courseActions.get(nextProps.course.id)
+            this.props.courseActions.get(this.props.course.id)
         }
     }
 

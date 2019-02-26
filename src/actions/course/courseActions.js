@@ -27,6 +27,7 @@ import {
 import 'whatwg-fetch';
 import {parseJSON, handleJsonError, checkStatus} from '../../tools/fetch-tools';
 import {convertLinksToString} from "../../tools/link-tools";
+import {reset} from 'redux-form'
 
 export const create = () => {
     return (dispatch) => {
@@ -98,6 +99,8 @@ export const save = (values, mode) => {
             .then(checkStatus)
             .then(parseJSON)
             .then((id) => {
+                dispatch(reset('CourseEditor'));
+
                 dispatch({
                     type: SAVE_COURSE_SUCCESS,
                     payload: id

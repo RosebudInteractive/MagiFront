@@ -7,21 +7,27 @@ import {bindActionCreators} from "redux";
 import {disableButtons, enableButtons} from "adm-ducks/app";
 import {showErrorDialog} from "../../actions/app-actions";
 
-class SelectControl extends React.Component {
+const MASKS = [
+    {id: '_mask01', value: 'Маска 1', width: 574, height: 503,},
+    {id: '_mask02', value: 'Маска 2', width: 543, height: 511,},
+    {id: '_mask03', value: 'Маска 3', width: 549, height: 549,},
+    {id: '_mask04', value: 'Маска 4', width: 546, height: 492,},
+    {id: '_mask05', value: 'Маска 5', width: 564, height: 515,},
+    {id: '_mask06', value: 'Маска 6', width: 566, height: 507,},
+    {id: '_mask07', value: 'Маска 7', width: 570, height: 569,},
+    {id: '_mask08', value: 'Маска 8', width: 528, height: 551,},
+    {id: '_mask09', value: 'Маска 9', width: 560, height: 529,},
+    {id: '_mask10', value: 'Маска 10', width: 560, height: 479,},
+    {id: '_mask11', value: 'Маска 11', width: 525, height: 495,},
+    {id: '_mask12', value: 'Маска 12', width: 548, height: 507,},
+]
 
-    static propTypes = {
-        mask: PropTypes.string,
-    };
+class SelectControl extends React.Component {
 
     constructor(props) {
         super(props)
 
         this._maskIndex = 0;
-
-        this._masks = [];
-        for (let i = 1; i <= 12; i++) {
-            this._masks.push({id: '_mask' + i.toString().padStart(2, '0'), value: 'Маска ' + i})
-        }
     }
 
 
@@ -31,13 +37,11 @@ class SelectControl extends React.Component {
         let _mask = input.value ? input.value.mask : '',
             _cover = input.value ? '/data/' + input.value.file : ''
 
-        // const _style = {width: 360, height: 334}
-
-        this._maskIndex = this._masks.findIndex((item) => {
+        this._maskIndex = MASKS.findIndex((item) => {
             return item.id === _mask
         })
 
-        let _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="' + _cover + '" x="0" width="574" height="503"/>';
+        let _image = this._getMaskedImage(_cover)
 
         return <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
             <label htmlFor={id} className="field-label">{label}</label>
@@ -58,18 +62,30 @@ class SelectControl extends React.Component {
                             {this._getMasks()}
                         </select>
                         <button className="cover-control cover-control__btn down" onClick={::this._incMask}
-                                disabled={this._maskIndex === (this._masks.length - 1)}/>
+                                disabled={this._maskIndex === (MASKS.length - 1)}/>
                     </div>
                 </div>
             </div>
         </div>
     }
 
+    _getMaskedImage(cover) {
+        let _mask = MASKS[this._maskIndex]
+
+        return _mask ?
+            '<image preserveAspectRatio="xMidYMid slice" ' +
+            'xmlns:xlink="http://www.w3.org/1999/xlink" ' +
+            'xlink:href="' + cover + '" x="0" ' +
+            'width="' + _mask.width+ '" height="' + _mask.height + '"/>'
+            :
+            null
+    }
+
     _decMask(e) {
         e.preventDefault()
 
         if (this._maskIndex > 0) {
-            let _newMask = this._masks[this._maskIndex - 1]
+            let _newMask = MASKS[this._maskIndex - 1]
 
             this.props.input.onChange({
                 file: this.props.input.value.file,
@@ -82,8 +98,8 @@ class SelectControl extends React.Component {
     _incMask(e) {
         e.preventDefault()
 
-        if (this._maskIndex < (this._masks.length - 1)) {
-            let _newMask = this._masks[this._maskIndex + 1]
+        if (this._maskIndex < (MASKS.length - 1)) {
+            let _newMask = MASKS[this._maskIndex + 1]
 
             this.props.input.onChange({
                 file: this.props.input.value.file,
@@ -105,7 +121,7 @@ class SelectControl extends React.Component {
     }
 
     _getMasks() {
-        return this._masks.map((item) => {
+        return MASKS.map((item) => {
             return <option value={item.id} selected={item.id === this.props.input.value.mask}>{item.value}</option>
         });
     }

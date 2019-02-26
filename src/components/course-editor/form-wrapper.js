@@ -57,9 +57,10 @@ class CourseEditorForm extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // if (prevProps.courseSaving && !this.props.saving && !this.props.courseError) {
-        //     this._init()
-        // }
+        if (prevProps.courseSaving && !this.props.courseSaving && !this.props.courseError) {
+            this.props.destroy();
+            this._init()
+        }
 
         // if (prevProps.editMode !== this.props.editMode) {
         //     this.props.destroy();

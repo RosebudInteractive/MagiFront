@@ -191,6 +191,8 @@
     left: 0;
     top: 0;
     height: 100%;
+    width: -webkit-fill-available;
+    width: -moz-available;
 }
 
 .cover svg {
@@ -251,7 +253,7 @@
 }
 
 .tabs-1 .content {
-    padding: 10px;
+    /*padding: 10px;*/
     /*border: 1px solid #868686;*/
     /*border-top: 1px solid transparent;*/
     /*height: 200px;*/
@@ -970,15 +972,6 @@ html,
     color: #fff
 }
 
-.tabs-1 .content {
-    padding: 10px;
-    /*border: 1px solid #868686;*/
-    /*border-top: 1px solid transparent;*/
-    /*height: 200px;*/
-}
-
-/*.tabs-1 .tabContent: {}*/
-
 .del {
     background: #96c8ff url(../images/icons/basket.svg);
     height: 25px;
@@ -1494,7 +1487,7 @@ html,
     position: absolute;
     top: 0;
     left: 0;
-    height: calc(100vh - 105px);
+    height: calc(100vh - 110px);
     width: 100%;
     overflow-y: auto;
 }
