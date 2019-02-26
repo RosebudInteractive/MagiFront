@@ -3,14 +3,16 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import * as coursesActions from "../actions/coursesListActions";
+import {deleteCourse} from "../actions/coursesListActions";
 import * as commonDlgActions from '../actions/CommonDlgActions';
 
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/dialog/yes-no-dialog";
 import ErrorDialog from '../components/dialog/error-dialog';
 import $ from "jquery";
+import LoadingPage from "../components/common/loading-page";
 
-class Coureses extends React.Component {
+class Courses extends React.Component {
     constructor(props) {
         super(props)
 
@@ -46,15 +48,35 @@ class Coureses extends React.Component {
     }
 
     onEditBtnClick() {
-        this.props.history.push('/adm/courses/edit/' + this.props.selected);
+        this.props.history.push('/adm/courses/edit/' + this._selected);
     }
 
     deleteCourse() {
-        this.props.coursesActions.deleteCourse(this.props.selected)
+        let _index = this.props.courses.findIndex((item) => {
+            return item.id === this._selected
+        })
+
+        this.props.deleteCourse(this._selected)
+            .then(({courses}) => {
+                this._selected =
+                    ((courses.length > 0) && (_index > -1))
+                        ?
+                        (_index < courses.length)
+                            ?
+                            courses[_index].id
+                            :
+                            courses[courses.length - 1].id
+                        :
+                        null;
+
+                this.forceUpdate();
+            })
+            .catch(() => {
+            })
     }
 
     confirmDeleteCourse() {
-        this.props.commonDlgActions.showDeleteConfirmation(this.props.selected)
+        this.props.commonDlgActions.showDeleteConfirmation(this._selected)
     }
 
     cancelDelete() {
@@ -62,11 +84,14 @@ class Coureses extends React.Component {
     }
 
     select(id) {
-        this.props.coursesActions.selectCourse(id);
+        this._selected = +id;
     }
 
-    shouldComponentUpdate(nextProps,) {
-        return !(this.props.selected && (this.props.selected !== nextProps.selected));
+    componentWillReceiveProps(nextProps,) {
+        if (!this.props.loaded && nextProps.loaded) {
+
+            this._selected = (nextProps.courses.length > 0) ? nextProps.courses[0].id : null;
+        }
     }
 
     render() {
@@ -74,13 +99,10 @@ class Coureses extends React.Component {
             courses,
             fetching,
             loaded,
-            hasError,
             message,
-            selected,
             deleteDlgShown,
             errorDlgShown,
         } = this.props;
-        this._selected = selected;
 
         return <div className="courses">
 
@@ -91,31 +113,28 @@ class Coureses extends React.Component {
                     />
                     {' '}
                     <button
-                        className={'tool-btn edit' + (selected === null ? " disabled" : "")}
+                        className={'tool-btn edit' + (this._selected === null ? " disabled" : "")}
                         onClick={::this.onEditBtnClick}
-                        disabled={(selected === null)}
+                        disabled={(this._selected === null)}
                     />
                     {' '}
                     <button
-                        className={'tool-btn delete' + (selected === null ? " disabled" : "")}
+                        className={'tool-btn delete' + (this._selected === null ? " disabled" : "")}
                         onClick={::this.confirmDeleteCourse}
-                        disabled={(selected === null)}
+                        disabled={(this._selected === null)}
                     />
                 </div>
                 {
                     fetching ?
-                        <p>Загрузка...</p>
+                        <LoadingPage/>
                         :
-                        hasError ?
-                            <p>{message}</p>
-                            :
-                            loaded ?
-                                <div className="grid-container">
-                                    <div className="webix-grid-wrapper">
-                                        <Webix ui={::this.getUI(::this.select)} data={courses}/>
-                                    </div>
+                        loaded ?
+                            <div className="grid-container">
+                                <div className="webix-grid-wrapper">
+                                    <Webix ui={::this.getUI(::this.select)} data={courses}/>
                                 </div>
-                                : null
+                            </div>
+                            : null
                 }
             </div>
 
@@ -124,8 +143,7 @@ class Coureses extends React.Component {
                     <YesNoDialog
                         yesAction={::this.deleteCourse}
                         noAction={::this.cancelDelete}
-                        message="Удалить курс?"
-                        data={selected}
+                        message={"Удалить курс" + this._getSelectedCourseName() + "?"}
                     />
                     :
                     ""
@@ -134,12 +152,23 @@ class Coureses extends React.Component {
                 errorDlgShown ?
                     <ErrorDialog
                         message={message}
-                        data={selected}
                     />
                     :
                     ""
             }
         </div>
+    }
+
+    _getSelectedCourseName() {
+        let _course = null;
+
+        if (this._selected) {
+            _course = this.props.courses.find((item) => {
+                return item.id === this._selected
+            })
+        }
+
+        return _course ? ' "' + _course.Name + '"' : ''
     }
 
     getUI() {
@@ -193,7 +222,6 @@ function mapStateToProps(state) {
         fetching: state.courses.fetching,
         loaded: state.courses.loaded,
         courses: state.courses.items,
-        selected: state.courses.selected,
         editDlgShown: state.courses.editDlgShown,
         editMode: state.courses.editMode,
 
@@ -207,8 +235,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         coursesActions: bindActionCreators(coursesActions, dispatch),
+        deleteCourse: bindActionCreators(deleteCourse, dispatch),
         commonDlgActions: bindActionCreators(commonDlgActions, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Coureses);
+export default connect(mapStateToProps, mapDispatchToProps)(Courses);
