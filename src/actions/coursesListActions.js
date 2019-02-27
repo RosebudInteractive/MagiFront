@@ -57,9 +57,10 @@ export const selectCourse = (id) => {
     }
 };
 
-export const deleteCourse = (id) => {
+// export const deleteCourse = (id) => {
+const _deleteCourse = (id) => {
     return (dispatch) => {
-        fetch("/api/adm/courses/" + id,
+        return fetch("/api/adm/courses/" + id,
             {
                 method: "DELETE",
                 credentials: 'include'
@@ -86,10 +87,22 @@ export const deleteCourse = (id) => {
                             payload: message
                         })
                     })
+
+                throw new Error("Delete course error")
             });
 
     }
 };
+
+export const deleteCourse = (id) => {
+    return (dispatch, getState) => {
+        return dispatch(_deleteCourse(id))
+            .then(() => {
+                let _state = getState();
+                return {id : id, courses : _state.courses.items}
+            })
+    }
+}
 
 export const cancelDelete = () => {
     return (dispatch) => {

@@ -28,6 +28,7 @@ export default function singleCourse(state = initialState, action) {
 
         case CREATE_NEW_COURSE: {
             let _newObject = {
+                LanguageId: 1,
                 State: 'D',
                 Mask: '_mask01'
             };

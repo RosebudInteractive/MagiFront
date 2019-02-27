@@ -35,20 +35,26 @@ class SelectControl extends React.Component {
         const {input, meta: {error, visited}, id, label, disabled, hidden,} = this.props;
 
         let _mask = input.value ? input.value.mask : '',
-            _cover = input.value ? '/data/' + input.value.file : ''
+            _cover = (input.value && input.value.file) ? '/data/' + input.value.file : ''
 
         this._maskIndex = MASKS.findIndex((item) => {
             return item.id === _mask
         })
 
-        let _image = this._getMaskedImage(_cover)
+        let _svgData = this._getMaskedImage(_cover)
 
         return <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
             <label htmlFor={id} className="field-label">{label}</label>
             <div className={"field-wrapper__editor-wrapper"}>
                 <div className="cover-wrapper">
                     <div className={"cover " + _mask}>
-                        <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
+                        {
+                            _svgData ?
+                                <svg viewBox={"0 0 " + _svgData.width + " " + _svgData.height} width={_svgData.width} height={_svgData.height}
+                                     dangerouslySetInnerHTML={{__html: _svgData.image}}/>
+                                :
+                                null
+                        }
                     </div>
                     <div className="cover-wrapper__controls">
                         <Uploader multiple={false} upload={'/api/adm/upload'}
@@ -72,13 +78,21 @@ class SelectControl extends React.Component {
     _getMaskedImage(cover) {
         let _mask = MASKS[this._maskIndex]
 
-        return _mask ?
-            '<image preserveAspectRatio="xMidYMid slice" ' +
-            'xmlns:xlink="http://www.w3.org/1999/xlink" ' +
-            'xlink:href="' + cover + '" x="0" ' +
-            'width="' + _mask.width+ '" height="' + _mask.height + '"/>'
-            :
-            null
+        if (_mask && cover) {
+            let _image = '<image preserveAspectRatio="xMidYMid slice" ' +
+                'xmlns:xlink="http://www.w3.org/1999/xlink" ' +
+                'xlink:href="' + cover + '" x="0" ' +
+                'width="' + _mask.width + '" height="' + _mask.height + '"/>'
+
+            return {
+                image: _image,
+                width: _mask.width,
+                height: _mask.height,
+            }
+        } else {
+            return null
+        }
+
     }
 
     _decMask(e) {
