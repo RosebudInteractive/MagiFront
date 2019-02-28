@@ -209,6 +209,22 @@ class Upgrader{
         }
     }
 
+    async _createModelLinksInDb(query, schema, model) {
+        let links = schema.outgoingDbRefsLinks(model)[model.name()];
+        if (links) {
+            for (let link in links)
+                await query.createLink(links[link]);
+        }
+    }
+
+    async _createNewModelsInDb(schema, models) {
+        let query = this._dataObjectEngine.getQuery();
+        for (let i = 0; i < models.length; i++)
+            await query.createTable(models[i]);
+        for (let i = 0; i < models.length; i++)
+            await this._createModelLinksInDb(query, schema, models[i]);
+    }
+
     async _processBuild(schema, buildInfo, buildNum) {
 
         let curBuild = this._getBuild(buildInfo, buildNum);
@@ -262,10 +278,17 @@ class Upgrader{
         await this._runScript(buildInfo, buildNum, "script_before");
         newModels = await this._fillTypeModel(newModels); // sorted newModels
         await this._createNewBuild(newModels, updModels);
-        await this._runScript(buildInfo, buildNum, "script_upgrade");
+        await this._createNewModelsInDb(schema, newModels);
+
+        const { scriptUpgrade } = require(modulePath);
+        if (typeof (scriptUpgrade) === "function")
+            await scriptUpgrade(this._dataObjectEngine, schema)
+        else
+            await this._runScript(buildInfo, buildNum, "script_upgrade");
+        
         await this._runScript(buildInfo, buildNum, "script_after");
     }
-    
+
     async upgrade() {
         await this._dataObjectEngine.whenIsReady();
 

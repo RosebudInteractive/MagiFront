@@ -3,7 +3,7 @@ const { InvoiceService } = require("../database/db-invoice");
 
 function setupInvoices(app) {
 
-    app.get('/api/invoices/:id', (req, res, next) => {
+    app.get('/api/adm/invoices/:id', (req, res, next) => {
         InvoiceService()
             .get(parseInt(req.params.id), { filter: req.query })
             .then(rows => {
@@ -14,7 +14,7 @@ function setupInvoices(app) {
             });
     });
 
-    app.post('/api/invoices', (req, res, next) => {
+    app.post('/api/adm/invoices', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
