@@ -12,6 +12,7 @@ import LessonInfo from '../components/combined-lesson-page/lesson-info';
 import TranscriptPage from '../components/combined-lesson-page/transcript-page';
 import NotFoundPage from '../components/not-found';
 import LoadingFrame from '../components/loading-frame';
+import GalleryButtons from '../components/combined-lesson-page/gallery-button'
 
 import * as lessonActions from '../actions/lesson-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -488,7 +489,7 @@ class CombineLessonPage extends React.Component {
                                   active={_lesson.Id}
                                   history={this.props.history}
                                   extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>,
-                            _isNeedHideGallery ? null : <GalleryButtons/>,
+                            <GalleryButtons isLocked={!authorized}/>,
                             lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                             this._getLessonsBundles(),
                             <LessonAggregators extLinks={_lesson.ExtLinks}/>,
@@ -530,31 +531,6 @@ function _openGallerySlider() {
     _controls.removeClass('hide').addClass('show');
     _wrap.addClass('show');
     _stickyBlock.addClass('slider-opened');
-}
-
-class GalleryButtons extends React.Component {
-
-    render() {
-        const _gallery = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#gallery"/>',
-            _prev = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-prev"/>',
-            _next = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#slider-next"/>';
-
-        return (
-            <div className="js-gallery-controls gallery-controls hide" style={{display: 'none'}}>
-                <button className="gallery-trigger js-gallery-trigger" type="button">
-                    <span className="visually-hidden">Галерея</span>
-                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _gallery}}/>
-                    <span className="text">Галерея</span>
-                </button>
-                <button className="swiper-button-prev swiper-button-disabled" type="button">
-                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _prev}}/>
-                </button>
-                <button className="swiper-button-next" type="button">
-                    <svg width="11" height="18" dangerouslySetInnerHTML={{__html: _next}}/>
-                </button>
-            </div>
-        )
-    }
 }
 
 function mapStateToProps(state, ownProps) {
