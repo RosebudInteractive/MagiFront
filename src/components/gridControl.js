@@ -166,12 +166,16 @@ export default class GridControl extends Component {
         return ''
     }
 
+    _getScroll() {
+        return 'y'
+    }
+
     getUI() {
         let that = this;
 
         return {
             view: "datatable",
-            // scroll: 'y',
+            scroll: 'y',
             height: 300,
             select: true,
             resizeColumn: true,
@@ -179,7 +183,7 @@ export default class GridControl extends Component {
             editable: false,
             columns: that._getColumns(),
             id: that._getId(),
-            scroll: false,
+            // scroll: that._getScroll(),
 
             on: {
                 onAfterSelect: function (selObj) {
