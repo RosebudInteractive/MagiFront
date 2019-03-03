@@ -80,6 +80,11 @@ const DEL_COURSE_BKM_MSSQL =
     "  join[Course] c on c.[Id] = b.[CourseId]\n" +
     "where b.[UserId] = <%= userId %> and c.[URL] = '<%= courseUrl %>'";
 
+const DEL_COURSE_BKM_ID_MSSQL =
+    "delete b from [Bookmark] b\n" +
+    "  join[Course] c on c.[Id] = b.[CourseId]\n" +
+    "where b.[UserId] = <%= userId %> and c.[Id] = '<%= id %>'";
+
 const DEL_LESSON_BKM_MSSQL =
     "delete b from[Bookmark] b\n" +
     "  join[LessonCourse] lc on lc.[Id] = b.[LessonCourseId]\n" +
@@ -165,6 +170,11 @@ const DEL_COURSE_BKM_MYSQL =
     "delete b from `Bookmark` b\n" +
     "  join`Course` c on c.`Id` = b.`CourseId`\n" +
     "where b.`UserId` = <%= userId %> and c.`URL` = '<%= courseUrl %>'";
+
+const DEL_COURSE_BKM_ID_MYSQL =
+    "delete b from `Bookmark` b\n" +
+    "  join`Course` c on c.`Id` = b.`CourseId`\n" +
+    "where b.`UserId` = <%= userId %> and c.`Id` = '<%= id %>'";
 
 const DEL_LESSON_BKM_MYSQL =
     "delete b from`Bookmark` b\n" +
