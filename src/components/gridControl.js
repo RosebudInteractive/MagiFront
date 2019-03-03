@@ -166,6 +166,10 @@ export default class GridControl extends Component {
         return ''
     }
 
+    _getScroll() {
+        return 'y'
+    }
+
     getUI() {
         let that = this;
 
@@ -179,7 +183,7 @@ export default class GridControl extends Component {
             editable: false,
             columns: that._getColumns(),
             id: that._getId(),
-            scroll: false,
+            scroll: that._getScroll(),
 
             on: {
                 onAfterSelect: function (selObj) {
