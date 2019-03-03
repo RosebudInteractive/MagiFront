@@ -2,7 +2,7 @@ import {SAVE_COURSE_SUCCESS,} from "../constants/course/singleCourse";
 import {SAVE_LESSON_SUCCESS} from "../constants/lesson/singleLesson";
 
 import {saveParameters} from "adm-ducks/params";
-import {store} from '../store/configureStore';
+import {store} from '../redux/configureStore';
 
 const ParamsMiddleware = store => next => action => {
 

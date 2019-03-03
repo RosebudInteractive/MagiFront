@@ -7,7 +7,7 @@ import './styles/app.css'
 import "./styles/font-awesome.min.css"
 import '../css/general.css'
 import '../css/webix.css'
-import { store } from './store/configureStore'
+import { store } from './redux/configureStore'
 import { Router } from 'react-router-dom'
 import history from './history'
 

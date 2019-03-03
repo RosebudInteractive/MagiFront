@@ -8,12 +8,12 @@ import {SHOW_ERROR_DIALOG} from "../constants/Common";
 /**
  * Constants
  * */
-export const moduleName = 'params'
+export const moduleName = 'books'
 const prefix = `${appName}/${moduleName}`
 
-export const GET_PARAMETERS_START = `${prefix}/GET_PARAMETERS_START`
-export const GET_PARAMETERS_SUCCESS = `${prefix}/GET_PARAMETERS_SUCCESS`
-export const GET_PARAMETERS_FAIL = `${prefix}/GET_PARAMETERS_FAIL`
+export const GET_BOOKS_START = `${prefix}/GET_BOOKS_START`
+export const GET_BOOKS_SUCCESS = `${prefix}/GET_BOOKS_SUCCESS`
+export const GET_BOOKS_FAIL = `${prefix}/GET_BOOKS_FAIL`
 
 export const SET_FIXED_COURSE = `${prefix}/SET_FIXED_COURSE`
 export const CLEAR_FIXED_COURSE = `${prefix}/CLEAR_FIXED_COURSE`
@@ -30,8 +30,7 @@ export const SAVE_PARAMETERS_FAIL = `${prefix}/SAVE_PARAMETERS_FAIL`
  * */
 export const ReducerRecord = Record({
     fetching: false,
-    needSave: false,
-    parameters: new Map(),
+    books: new Map(),
 
 })
 
@@ -129,7 +128,7 @@ export const fixedObjDescrSelector = createSelector(parametersSelector, params =
 /**
  * Action Creators
  * */
-export const getParameters = () => {
+export const getBooks = () => {
     return (dispatch) => {
         dispatch({
             type: GET_PARAMETERS_START,

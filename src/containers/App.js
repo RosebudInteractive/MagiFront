@@ -102,6 +102,7 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
                             <Route path={_homePath + '/courses'} component={Courses}/>
+                            <Route path={_homePath + '/books'} component={Books}/>
                         </Switch>
                     </div>
                 </div>

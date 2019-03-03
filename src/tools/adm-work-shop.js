@@ -1,5 +1,5 @@
 import * as workShopActions from '../actions/work-shop-actions';
-import {store} from '../store/configureStore';
+import {store} from '../redux/configureStore';
 
 import CWorkShop from "work-shop/work-shop2";
 import 'jquery-ui/jquery-ui.js';
