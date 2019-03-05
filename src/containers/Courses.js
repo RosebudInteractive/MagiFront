@@ -89,7 +89,6 @@ class Courses extends React.Component {
 
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
-
             this._selected = (nextProps.courses.length > 0) ? nextProps.courses[0].id : null;
         }
     }

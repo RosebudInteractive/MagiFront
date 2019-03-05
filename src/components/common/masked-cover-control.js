@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './controls.sass'
 import Uploader from "./uploader";
 import {connect} from "react-redux";
@@ -22,7 +21,7 @@ const MASKS = [
     {id: '_mask12', value: 'Маска 12', width: 548, height: 507,},
 ]
 
-class SelectControl extends React.Component {
+class MaskedCoverControl extends React.Component {
 
     constructor(props) {
         super(props)
@@ -168,4 +167,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(SelectControl);
+export default connect(null, mapDispatchToProps)(MaskedCoverControl);

@@ -1,0 +1,55 @@
+.modal-editor
+  height: 90%
+  width: 90%
+  position: relative
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+  background: #fff
+
+  &__close
+    cursor: pointer
+    padding: 0
+    background-color: rgba(255, 255, 255, 0)
+    border: none
+    outline: none
+    position: absolute
+    top: -24px
+    right: -24px
+    width: 48px
+    height: 48px
+    font-size: 0
+    background-color: #fff
+    border-radius: 50%
+    -webkit-transition: -webkit-box-shadow 0.3s ease
+    transition: -webkit-box-shadow 0.3s ease
+    transition: box-shadow 0.3s ease
+    transition: box-shadow 0.3s ease, -webkit-box-shadow 0.3s ease
+    z-index: 1
+
+    &:before, &:after 
+      content: ""
+      position: absolute
+      top: 50%
+      left: 50%
+      -webkit-transform: translate(-50%, -50%)
+      -ms-transform: translate(-50%, -50%)
+      transform: translate(-50%, -50%)
+      width: 24px
+      height: 2px
+      background-color: #2f2f2f
+      -webkit-transition: background-color 0.3s ease
+      transition: background-color 0.3s ease
+      
+    &:before
+      -webkit-transform: translate(-50%, -50%) rotate(45deg)
+      -ms-transform: translate(-50%, -50%) rotate(45deg)
+      transform: translate(-50%, -50%) rotate(45deg) 
+      
+    &:after
+      -webkit-transform: translate(-50%, -50%) rotate(-45deg)
+      -ms-transform: translate(-50%, -50%) rotate(-45deg)
+      transform: translate(-50%, -50%) rotate(-45deg) 
+      
+    &:hover::before, &:hover::after
+      background-color: #828282 

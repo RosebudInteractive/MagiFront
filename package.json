@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/plugin-transform-regenerator": "^7.3.4",
     "autoprefixer": "^7.2.5",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.1",

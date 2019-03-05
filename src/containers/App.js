@@ -14,6 +14,7 @@ import CourseEditor from './course-editor-new';
 import LessonEditor from './lesson-editor';
 import SubLessonEditor from './subLesson-editor';
 import EpisodeEditor from './episode-editor';
+import BooksPage from './books-list-page';
 import WorkShop from './work-shop';
 import SignInForm from './sign-in-form';
 
@@ -102,7 +103,9 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
                             <Route path={_homePath + '/courses'} component={Courses}/>
-                            <Route path={_homePath + '/books'} component={Books}/>
+                            <Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>
+                            <Route path={_homePath + '/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>
+                            <Route path={_homePath + '/books'} component={BooksPage}/>
                         </Switch>
                     </div>
                 </div>
@@ -111,6 +114,8 @@ class App extends Component {
         ]
     }
 }
+
+{/**/}
 
 function mapStateToProps(state, ownProps) {
     return {

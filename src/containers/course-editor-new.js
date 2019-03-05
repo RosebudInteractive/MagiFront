@@ -18,7 +18,7 @@ import {getCategories} from "../actions/categoriesListActions";
 import {getLanguages} from "../actions/languages-actions";
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import {getParameters, setFixedCourse,} from "adm-ducks/params";
-import {getFormValues, isValid, isDirty, reset, setSubmitSucceeded, untouch} from 'redux-form'
+import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common'
@@ -259,7 +259,6 @@ function mapDispatchToProps(dispatch) {
         getParameters: bindActionCreators(getParameters, dispatch),
         setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
         resetReduxForm: bindActionCreators(reset, dispatch),
-        setSubmitSucceeded: bindActionCreators(setSubmitSucceeded, dispatch),
     }
 }
 

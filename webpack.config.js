@@ -1,3 +1,4 @@
+require("babel-polyfill");
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
@@ -122,8 +123,8 @@ const _prodConfig = {
 const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
-        'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         'babel-polyfill': 'babel-polyfill',
+        'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',

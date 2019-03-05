@@ -8,6 +8,7 @@ import * as commonDlgActions from '../actions/CommonDlgActions';
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/dialog/yes-no-dialog";
 import ErrorDialog from '../components/dialog/error-dialog';
+import history from '../history'
 
 class Authors extends React.Component {
     componentDidMount(){
@@ -15,11 +16,11 @@ class Authors extends React.Component {
     }
 
     onAddBtnClick() {
-        this.props.history.push('/adm/authors/new');
+        history.push('/adm/authors/new');
     }
 
     onEditBtnClick() {
-        this.props.history.push('/adm/authors/edit/' + this.props.selected);
+        history.push('/adm/authors/edit/' + this.props.selected);
     }
 
     deleteAuthor() {

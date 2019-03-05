@@ -1,11 +1,13 @@
 {
-  "presets": ["stage-0", "es2015", "react"], //поддержка ES2015, ES7 и JSX
+  "presets": ["es2015", "stage-0", "react"], //поддержка ES2015, ES7 и JSX
 //  "presets": ["latest", "react"], //поддержка ES2015, ES7 и JSX
   "plugins": [
+    "transform-runtime",
+    "@babel/plugin-transform-regenerator",
     "transform-class-properties",
     "transform-es2015-classes",
     "transform-object-assign",
     "es6-promise",
-    "transform-decorators-legacy"
+    "transform-decorators-legacy",
   ]
 }

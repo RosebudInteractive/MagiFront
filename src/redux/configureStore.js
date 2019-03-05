@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from 'redux'
+import { createStore, applyMiddleware, compose} from 'redux'
 import createSagaMiddleware from 'redux-saga'
 import { routerMiddleware } from 'react-router-redux'
 
@@ -12,54 +12,58 @@ import rootReducer from '../reducers'
 import rootSaga from './saga'
 
 
-const sagaMiddleware = createSagaMiddleware()
+// const sagaMiddleware = createSagaMiddleware()
 
-const enhancer = applyMiddleware(sagaMiddleware,
-    routerMiddleware(history),
-    thunk,
-    workShopMiddleware,
-    ButtonsMiddleware,
-    ParamsMiddleware)
-
-const store = createStore(rootReducer, enhancer)
-
-sagaMiddleware.run(rootSaga)
-
-if (module.hot) {
-    module.hot.accept('../reducers', () => {
-        const nextRootReducer = require('../reducers');
-        store.replaceReducer(nextRootReducer)
-    })
-}
-
-
-window.store = store
-
-export default store
-
-// export const store = configureStore();
+// const enhancer = applyMiddleware(sagaMiddleware,
+//     routerMiddleware(history),
+//     thunk,
+//     workShopMiddleware,
+//     ButtonsMiddleware,
+//     ParamsMiddleware)
 //
-// function configureStore(initialState) {
-//     const routerMiddl = routerMiddleware(history);
+// const store = createStore(rootReducer, enhancer)
 //
-//     const store = createStore(
-//         rootReducer,
-//         initialState,
-//         compose(
-//             applyMiddleware(thunk),
-//             applyMiddleware(routerMiddl),
-//             applyMiddleware(workShopMiddleware),
-//             applyMiddleware(ButtonsMiddleware),
-//             applyMiddleware(ParamsMiddleware),
-//         )
-//     );
+// sagaMiddleware.run(rootSaga)
 //
-//     if (module.hot) {
-//         module.hot.accept('../reducers', () => {
-//             const nextRootReducer = require('../reducers');
-//             store.replaceReducer(nextRootReducer)
-//         })
-//     }
-//
-//     return store
+// if (module.hot) {
+//     module.hot.accept('../reducers', () => {
+//         const nextRootReducer = require('../reducers');
+//         store.replaceReducer(nextRootReducer)
+//     })
 // }
+//
+//
+// window.store = store
+//
+// export default store
+
+export const store = configureStore();
+
+function configureStore(initialState) {
+    const routerMiddl = routerMiddleware(history);
+    const sagaMiddleware = createSagaMiddleware()
+
+    const store = createStore(
+        rootReducer,
+        initialState,
+        compose(
+            applyMiddleware(sagaMiddleware),
+            applyMiddleware(thunk),
+            applyMiddleware(routerMiddl),
+            applyMiddleware(workShopMiddleware),
+            applyMiddleware(ButtonsMiddleware),
+            applyMiddleware(ParamsMiddleware),
+        )
+    );
+
+    sagaMiddleware.run(rootSaga)
+
+    if (module.hot) {
+        module.hot.accept('../reducers', () => {
+            const nextRootReducer = require('../reducers');
+            store.replaceReducer(nextRootReducer)
+        })
+    }
+
+    return store
+}

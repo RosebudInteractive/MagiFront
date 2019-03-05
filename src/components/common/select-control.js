@@ -25,7 +25,8 @@ export default class SelectControl extends React.Component {
                 <label htmlFor={id} className="field-label">{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
                     {disabled ?
-                        <select {...input} id={id} className={_inputClass} placeholder={placeholder} defaultValue={"default"} value={input.value} disabled>
+                        <select {...input} id={id} className={_inputClass} placeholder={placeholder}
+                                defaultValue={"default"} value={input.value} disabled>
                             {this._getOptions()}
                         </select>
                         :
@@ -40,11 +41,14 @@ export default class SelectControl extends React.Component {
     }
 
     _getOptions() {
-        let _options = this.props.options.map((item) => {
-            return <option value={item.id}>{item.value}</option>
-        })
+        let _options = this.props.options ?
+            this.props.options.map((item) => {
+                return <option value={item.id}>{item.value}</option>
+            })
+            : []
 
-        _options.unshift(<option className="select__placeholder" value="" disabled selected hidden>{this.props.placeholder}</option>)
+        _options.unshift(<option className="select__placeholder" value="" disabled selected
+                                 hidden>{this.props.placeholder}</option>)
 
         return _options
     }

@@ -2,173 +2,216 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as coursesActions from "../actions/coursesListActions";
-import {deleteCourse} from "../actions/coursesListActions";
-import * as commonDlgActions from '../actions/CommonDlgActions';
+import {
+    getBooks,
+    createBook,
+    editCurrentBook,
+    deleteBook,
+    moveUp,
+    moveDown,
+    saveChanges,
+    booksSelector,
+    loadingSelector,
+    loadedSelector,
+} from "../ducks/books";
+import {showDeleteConfirmation, cancelDelete} from '../actions/CommonDlgActions';
+import BookEditor from '../components/books/editor'
 
 import Webix from '../components/Webix';
 import YesNoDialog from "../components/dialog/yes-no-dialog";
 import ErrorDialog from '../components/dialog/error-dialog';
-import $ from "jquery";
 import LoadingPage from "../components/common/loading-page";
+import PropTypes from "prop-types";
 
-class Courses extends React.Component {
+const TIMEOUT = 500;
+
+class BooksPage extends React.Component {
+
+    static propTypes = {
+        showEditor: PropTypes.bool,
+        editMode: PropTypes.bool,
+    }
+
     constructor(props) {
         super(props)
 
-        this._resizeHandler = () => {
-            // let _height = $(window).height() - $('.top-bar-size').innerHeight() + $('.action-bar').innerHeight()
-            //     _widht = $('.grid-container').innerWidth();
-            //
-            // $('.webix-grid-wrapper').innerHeight(_height);
+        this._isFirstSelected = false;
+        this._isLastSelected = false;
 
-            // if (window.$$('courses-grid')) {
-            //     window.$$('courses-grid').$setSize(_widht, _height)
-            // }
-        }
+        this._timer = null
     }
 
-
     componentWillMount() {
-        this.props.coursesActions.getCourses();
+        if (this.props.showEditor) {
+            if (this.props.editMode) {
+                this.props.actions.editCurrentBook(this.props.bookId)
+            } else {
+                this.props.actions.createBook();
+            }
+
+        }
+
+        this.props.actions.getBooks();
         this._selected = null;
     }
 
-    componentDidMount() {
-        $(window).on('resize', this._resizeHandler);
-        this._resizeHandler();
-    }
-
     componentWillUnmount() {
-        $(window).unbind('resize', this._resizeHandler)
+        this.props.actions.saveChanges()
     }
 
-    onAddBtnClick() {
-        this.props.history.push('/adm/courses/new');
+    _onAddBtnClick() {
+        this.props.actions.createBook();
     }
 
-    onEditBtnClick() {
-        this.props.history.push('/adm/courses/edit/' + this._selected);
+    _onEditBtnClick() {
+        this.props.actions.editCurrentBook(this._selected);
     }
 
-    deleteCourse() {
-        let _index = this.props.courses.findIndex((item) => {
-            return item.id === this._selected
-        })
+    _deleteBook() {
+        // let _index = this.props.courses.findIndex((item) => {
+        //     return item.id === this._selected
+        // })
+        //
+        this.props.actions.deleteBook(this._selected)
 
-        this.props.deleteCourse(this._selected)
-            .then(({courses}) => {
-                this._selected =
-                    ((courses.length > 0) && (_index > -1))
-                        ?
-                        (_index < courses.length)
-                            ?
-                            courses[_index].id
-                            :
-                            courses[courses.length - 1].id
-                        :
-                        null;
-
-                this.forceUpdate();
-            })
-            .catch(() => {
-            })
+        //     .then(({courses}) => {
+        //         this._selected =
+        //             ((courses.length > 0) && (_index > -1))
+        //                 ?
+        //                 (_index < courses.length)
+        //                     ?
+        //                     courses[_index].id
+        //                     :
+        //                     courses[courses.length - 1].id
+        //                 :
+        //                 null;
+        //
+        //         this.forceUpdate();
+        //     })
+        //     .catch(() => {
+        //     })
     }
 
-    confirmDeleteCourse() {
-        this.props.commonDlgActions.showDeleteConfirmation(this._selected)
+    _confirmDelete() {
+        this.props.actions.showDeleteConfirmation(this._selected)
     }
 
-    cancelDelete() {
-        this.props.coursesActions.cancelDelete()
+    _cancelDelete() {
+        this.props.actions.cancelDelete()
     }
 
-    select(id) {
-        this._selected = +id;
+    _select(selectedObj) {
+        let _needForceUpdate = (this._selected !== +selectedObj.id) || (this._isFirstSelected !== selectedObj.isFirst) || (this._isLastSelected !== selectedObj.isLast);
+
+        this._isFirstSelected = selectedObj.isFirst;
+        this._isLastSelected = selectedObj.isLast;
+        this._selected = +selectedObj.id;
+
+        if (_needForceUpdate) {
+            this.forceUpdate()
+        }
     }
 
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
-            this._selected = (nextProps.courses.length > 0) ? nextProps.courses[0].id : null;
+            this._selected = (nextProps.books.length > 0) ? nextProps.books[0].id : null;
+            this._isFirstSelected = !!this._selected
         }
     }
 
     render() {
         const {
-            courses,
-            fetching,
-            loaded,
+            books,
+            loading,
             message,
             deleteDlgShown,
             errorDlgShown,
         } = this.props;
 
-        return <div className="courses">
-
-            <div className="courses-content">
-                <div className="action-bar">
-                    <button className='tool-btn new'
-                            onClick={::this.onAddBtnClick}
-                    />
-                    {' '}
-                    <button
-                        className={'tool-btn edit' + (this._selected === null ? " disabled" : "")}
-                        onClick={::this.onEditBtnClick}
-                        disabled={(this._selected === null)}
-                    />
-                    {' '}
-                    <button
-                        className={'tool-btn delete' + (this._selected === null ? " disabled" : "")}
-                        onClick={::this.confirmDeleteCourse}
-                        disabled={(this._selected === null)}
-                    />
+        return loading ?
+            <LoadingPage/>
+            :
+            <div className="courses">
+                <div className="courses-content">
+                    <div className="action-bar">
+                        <button className='tool-btn new'
+                                onClick={::this._onAddBtnClick}
+                        />
+                        <button
+                            className={'tool-btn edit' + (this._selected === null ? " disabled" : "")}
+                            onClick={::this._onEditBtnClick}
+                            disabled={(this._selected === null)}
+                        />
+                        <button
+                            className={'tool-btn delete' + (this._selected === null ? " disabled" : "")}
+                            onClick={::this._confirmDelete}
+                            disabled={(this._selected === null)}
+                        />
+                        <button key='btnUp' className='tool-btn up'
+                                disabled={(!this._selected) || (this._isFirstSelected)} onClick={::this._moveUp}/>
+                        <button key='btnDown' className='tool-btn down'
+                                disabled={(!this._selected) || (this._isLastSelected)} onClick={::this._moveDown}/>
+                    </div>
+                    <div className="grid-container">
+                        <div className="webix-grid-wrapper">
+                            <Webix ui={::this.getUI(::this._select)} data={books}/>
+                        </div>
+                    </div>
                 </div>
                 {
-                    fetching ?
-                        <LoadingPage/>
+                    deleteDlgShown ?
+                        <YesNoDialog
+                            yesAction={::this._deleteBook}
+                            noAction={::this._cancelDelete}
+                            message={"Удалить книгу" + this._getSelectedBooksName() + "?"}
+                        />
                         :
-                        loaded ?
-                            <div className="grid-container">
-                                <div className="webix-grid-wrapper">
-                                    <Webix ui={::this.getUI(::this.select)} data={courses}/>
-                                </div>
-                            </div>
-                            : null
+                        ""
                 }
+                {
+                    errorDlgShown ?
+                        <ErrorDialog
+                            message={message}
+                        />
+                        :
+                        ""
+                }
+                <BookEditor/>
             </div>
-
-            {
-                deleteDlgShown ?
-                    <YesNoDialog
-                        yesAction={::this.deleteCourse}
-                        noAction={::this.cancelDelete}
-                        message={"Удалить курс" + this._getSelectedCourseName() + "?"}
-                    />
-                    :
-                    ""
-            }
-            {
-                errorDlgShown ?
-                    <ErrorDialog
-                        message={message}
-                    />
-                    :
-                    ""
-            }
-        </div>
     }
 
-    _getSelectedCourseName() {
-        let _course = null;
+    _getSelectedBooksName() {
+        let _book = null;
 
         if (this._selected) {
-            _course = this.props.courses.find((item) => {
+            _book = this.props.books.find((item) => {
                 return item.id === this._selected
             })
         }
 
-        return _course ? ' "' + _course.Name + '"' : ''
+        return _book ? ' "' + _book.Name + '"' : ''
+    }
+
+    _moveUp() {
+        this.props.actions.moveUp(this._selected);
+        this._restartTimeout()
+    }
+
+    _moveDown() {
+        this.props.actions.moveDown(this._selected);
+        this._restartTimeout()
+    }
+
+    _restartTimeout() {
+        if (this._timer) {
+            clearTimeout(this._timer)
+        }
+
+        this._timer = setTimeout(() => {
+            clearTimeout(this._timer)
+            this.props.actions.saveChanges()
+        }, TIMEOUT)
     }
 
     getUI() {
@@ -179,37 +222,28 @@ class Courses extends React.Component {
             id: 'courses-grid',
             scroll: false,
             autoheight: true,
-            select: true,
+            select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название', width: 230},
-                {
-                    id: 'URL',
-                    header: 'Ярлык URL',
-                    width: 150,
-                    template: (obj) => {
-                        return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
-                    },
-                },
-                {
-                    id: 'State', header: 'Состояние', width: 150, editor: 'select',
-                    options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {
-                        id: 'A',
-                        value: 'Архив'
-                    }]
-                },
-                {id: 'LanguageName', header: 'Язык курса', width: 200},
+                {id: 'Name', header: 'Название книги', width: 230},
                 {id: "Description", header: "Описание курса", fillspace: true},
             ],
             on: {
                 onAfterSelect: function (selObj) {
-                    if (selObj.id !== that._selected)
-                        that._selected = null;
-                    that.select(selObj.id);
+                    let _obj = {
+                        isFirst: this.getFirstId() === +selObj.id,
+                        isLast: this.getLastId() === +selObj.id,
+                        id: +selObj.id,
+                    };
+                    that._select(_obj);
                 },
                 onAfterRender: function () {
                     if ((that._selected) && this.getItem(that._selected)) {
-                        this.select(that._selected)
+                        let _selectedItem = this.getSelectedItem()
+
+                        if (!_selectedItem || (_selectedItem.Id !== that._selected)) {
+                            this.select(that._selected)
+                        }
                     }
                 }
             }
@@ -217,27 +251,35 @@ class Courses extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     return {
-        fetching: state.courses.fetching,
-        loaded: state.courses.loaded,
-        courses: state.courses.items,
-        editDlgShown: state.courses.editDlgShown,
-        editMode: state.courses.editMode,
+        loaded: loadedSelector(state),
+        loading: loadingSelector(state),
+        books: booksSelector(state),
 
         hasError: state.commonDlg.hasError,
         message: state.commonDlg.message,
         deleteDlgShown: state.commonDlg.deleteDlgShown,
         errorDlgShown: state.commonDlg.errorDlgShown,
+
+        bookId: ownProps.match ? Number(ownProps.match.params.id) : null,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        coursesActions: bindActionCreators(coursesActions, dispatch),
-        deleteCourse: bindActionCreators(deleteCourse, dispatch),
-        commonDlgActions: bindActionCreators(commonDlgActions, dispatch),
-    }
+        actions: bindActionCreators({
+            getBooks,
+            createBook,
+            editCurrentBook,
+            deleteBook,
+            showDeleteConfirmation,
+            cancelDelete,
+            moveUp,
+            moveDown,
+            saveChanges,
+        }, dispatch)
+    };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Courses);
+export default connect(mapStateToProps, mapDispatchToProps)(BooksPage);

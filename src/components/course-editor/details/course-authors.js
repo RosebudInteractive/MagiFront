@@ -40,8 +40,6 @@ class CourseAuthorsWrapper extends React.Component {
 
         return _courseAuthors;
     }
-
-
 }
 
 function mapStateToProps(state) {

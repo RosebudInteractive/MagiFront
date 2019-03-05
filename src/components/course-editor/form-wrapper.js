@@ -61,11 +61,6 @@ class CourseEditorForm extends React.Component {
             this.props.destroy();
             this._init()
         }
-
-        // if (prevProps.editMode !== this.props.editMode) {
-        //     this.props.destroy();
-        //     this._init()
-        // }
     }
 
     render() {

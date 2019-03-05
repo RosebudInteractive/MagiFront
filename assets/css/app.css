@@ -3,6 +3,10 @@
 @font-face{font-family:'PT Sans';font-style:normal;font-weight:400;src:url(../fonts/PTS-webfont.woff) format('woff')}
 @font-face{font-family:'PT Sans';font-style:normal;font-weight:700;src:url(../fonts/PTS-bold.woff) format('woff')}
 
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
 ._mask01 image {
     /*-webkit-clip-path: url("#clipping01");*/
     clip-path: url("#clipping01");

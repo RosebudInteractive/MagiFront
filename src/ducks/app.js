@@ -22,7 +22,7 @@ export const ENABLE_BUTTONS = `${prefix}/ENABLE_BUTTONS`
  * */
 export const ReducerRecord = Record({
     reCapture: '',
-    enableButtons: false,
+    enableButtons: true,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
