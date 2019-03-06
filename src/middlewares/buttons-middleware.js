@@ -10,10 +10,12 @@ import {
 import {
     disableButtons,
     enableButtons,
+} from "adm-ducks/app";
+import {
     SAVE_PARAMETERS_FAIL,
     SAVE_PARAMETERS_START,
     SAVE_PARAMETERS_SUCCESS
-} from "adm-ducks/app";
+} from "adm-ducks/params"
 
 const ButtonsMiddleware = store => next => action => {
 
