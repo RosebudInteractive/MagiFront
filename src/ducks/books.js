@@ -1,12 +1,13 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {OrderedMap, Record, OrderedSet} from 'immutable'
+import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {reset,} from 'redux-form'
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, select, take, put, apply, call} from 'redux-saga/effects'
+import {convertLinksToString} from "../tools/link-tools";
 
 /**
  * Constants
@@ -126,12 +127,17 @@ export const booksSelector = createSelector(entriesSelector, (entries) => {
 
     return _array.map((item) => {
         let _item = item.toObject()
+
         _item.id = _item.Id
+
         if (_item.Authors) {
             _item.Authors.forEach((author) => {
                 author.id = author.Id
             })
         }
+
+        _item.extLinksValues = convertLinksToString(_item.ExtLinks)
+
         return _item
     })
 })
