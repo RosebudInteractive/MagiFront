@@ -209,6 +209,24 @@ const LESSON_MSSQL_REFERENCE_REQ =
     "  join [LessonLng] l on l.[Id] = r.[LessonLngId]\n" +
     "where l.[LessonId] = <%= id %>";
 
+const LESSON_MSSQL_BOOK_REQ =
+    "select b.[Order], b.[Id], b.[Name], b.[Description], b.[CourseId], b.[OtherAuthors], b.[OtherCAuthors],\n" +
+    "  b.[Cover], b.[CoverMeta], b.[ExtLinks], ba.[AuthorId], ba.[Tp], ba.[TpView],\n" +
+    "  a.[URL], al.[FirstName], al.[LastName]\n" +
+    "from[Book] b\n" +
+    "  left join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "  left join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "  left join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "where b.[Id] in\n" +
+    "(\n" +
+    "  select distinct b.[Id] from[Book] b\n" +
+    "    join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "    join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "    join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "  where(ba.[AuthorId] = <%= authorId %>) and(ba.[TpView] = 2) and((b.[CourseId] is NULL) or(b.[CourseId] = <%= courseId %>))\n" +
+    ")\n" +
+    "order by 1";
+
 const LESSON_MSSQL_RESOURCE_REQ =
     "select r.[Id], r.[ResType], r.[FileName], r.[ResLanguageId], r.[ShowInGalery], ll.[Language], l.[Name], l.[Description], l.[AltAttribute], r.[MetaData] from [Resource] r\n" +
     "  join [ResourceLng] l on l.[ResourceId] = r.[Id]\n" +
@@ -378,6 +396,24 @@ const LESSON_MYSQL_REFERENCE_REQ =
     "select r.`Id`, r.`Description`, r.`Number`, r.`URL`, r.`Recommended` from `Reference` r\n" +
     "  join `LessonLng` l on l.`Id` = r.`LessonLngId`\n" +
     "where l.`LessonId` = <%= id %>";
+
+const LESSON_MYSQL_BOOK_REQ =
+    "select b.`Order`, b.`Id`, b.`Name`, b.`Description`, b.`CourseId`, b.`OtherAuthors`, b.`OtherCAuthors`,\n" +
+    "  b.`Cover`, b.`CoverMeta`, b.`ExtLinks`, ba.`AuthorId`, ba.`Tp`, ba.`TpView`,\n" +
+    "  a.`URL`, al.`FirstName`, al.`LastName`\n" +
+    "from`Book` b\n" +
+    "  left join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "  left join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "  left join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "where b.`Id` in\n" +
+    "(\n" +
+    "  select distinct b.`Id` from`Book` b\n" +
+    "    join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "    join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "    join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "  where(ba.`AuthorId` = <%= authorId %>) and(ba.`TpView` = 2) and((b.`CourseId` is NULL) or(b.`CourseId` = <%= courseId %>))\n" +
+    ")\n" +
+    "order by 1";
 
 const LESSON_MYSQL_RESOURCE_REQ =
     "select r.`Id`, r.`ResType`, r.`FileName`, r.`ResLanguageId`, r.`ShowInGalery`, ll.`Language`, l.`Name`, l.`Description`, l.`AltAttribute`, r.`MetaData` from `Resource` r\n" +
@@ -1271,8 +1307,6 @@ const DbLesson = class DbLesson extends DbObject {
                         }, {});
                     })
                     .then((result) => {
-                        let curr_id = -1;
-                        let curr_episode = null;;
                         if (result && result.detail && (result.detail.length > 0)) {
                             result.detail.forEach((elem) => {
                                 let item = { Number: elem.Number, Description: elem.Description, URL: elem.URL };
@@ -1289,10 +1323,9 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getLessonV2(course_url, lesson_url, options) {
-        let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
+        let data = { Galery: [], Episodes: [], Refs: [], RefBooks: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
         let epi_list = {};
         let assets_list = {};
-        let id;
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let hostUrl;
@@ -1300,6 +1333,8 @@ const DbLesson = class DbLesson extends DbObject {
         let condMSSQL;
         let condMYSQL;
         let isInt = false;
+        let courseId;
+        let authorId;
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
@@ -1546,16 +1581,61 @@ const DbLesson = class DbLesson extends DbObject {
                         }, {});
                     })
                     .then((result) => {
-                        let curr_id = -1;
-                        let curr_episode = null;;
                         if (result && result.detail && (result.detail.length > 0)) {
                             result.detail.forEach((elem) => {
                                 let item = { Number: elem.Number, Description: elem.Description, URL: elem.URL };
                                 if (elem.Recommended)
-                                    data.Books.push(item)
+                                    data.RefBooks.push(item)
                                 else
                                     data.Refs.push(item);
                             });
+                        }
+                        courseId = data.Course.Id;
+                        authorId = data.Author.Id;
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(LESSON_MYSQL_BOOK_REQ)({ courseId: courseId, authorId: authorId }),
+                                mssql: _.template(LESSON_MSSQL_BOOK_REQ)({ courseId: courseId, authorId: authorId })
+                            }
+                        }, {});
+                    })
+                    .then(result => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let couseBooks = [];
+                            let otherBooks = [];
+                            let currId = -1;
+                            let book;
+                            result.detail.forEach(elem => {
+                                if (currId !== elem.Id) {
+                                    currId = elem.Id;
+                                    book = {};
+                                    if (elem.CourseId === courseId)
+                                        couseBooks.push(book)
+                                    else
+                                        otherBooks.push(book);
+                                    book.Id = elem.Id;
+                                    book.Name = elem.Name;
+                                    book.Description = elem.Description;
+                                    book.CourseId = elem.CourseId;
+                                    book.OtherAuthors = elem.OtherAuthors;
+                                    book.OtherCAuthors = elem.OtherCAuthors;
+                                    book.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
+                                    book.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
+                                    book.ExtLinks = elem.ExtLinks;
+                                    book.Authors = [];
+                                }
+                                if (typeof (elem.AuthorId) === "number")
+                                    book.Authors.push({
+                                        Id: elem.AuthorId,
+                                        Tp: elem.Tp,
+                                        TpView: elem.TpView,
+                                        FirstName: elem.FirstName,
+                                        LastName: elem.LastName,
+                                        URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
+                                    });
+                            })
+                            Array.prototype.push.apply(data.Books, couseBooks);
+                            Array.prototype.push.apply(data.Books, otherBooks);
                         }
                         return data;
                     })
