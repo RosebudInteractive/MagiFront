@@ -303,6 +303,30 @@ const COURSE_SHARE_COUNTERS_MSSQL_REQ =
     "select sp.[Code], cs.[Counter] from [CrsShareCounter] cs\n" +
     "  join[SNetProvider] sp on sp.[Id] = cs.[SNetProviderId]\n" +
     "where[CourseId] = <%= courseId %>";
+const COURSE_BOOKS_MSSQL_REQ =
+    "select b.[Order], b.[Id], b.[Name], b.[Description], b.[CourseId], b.[OtherAuthors], b.[OtherCAuthors],\n" +
+    "  b.[Cover], b.[CoverMeta], b.[ExtLinks], ba.[AuthorId], ba.[Tp], ba.[TpView],\n" +
+    "  a.[URL], al.[FirstName], al.[LastName]\n" +
+    "from[Book] b\n" +
+    "  left join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "  left join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "  left join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "where b.[Id] in\n" +
+    "(\n" +
+    "  select b.[Id] from[Book] b\n" +
+    "    left join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "    left join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "    left join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "  where b.[CourseId] = <%= courseId %>\n" +
+    "  union\n" +
+    "  select b.[Id] from[Book] b\n" +
+    "    join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "    join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "    join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "    join[AuthorToCourse] ac on ac.[AuthorId] = ba.[AuthorId]\n" +
+    "  where(ac.[CourseId]) = <%= courseId %> and(b.[CourseId] is NULL)\n" +
+    ")\n" +
+    "order by 1";
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
@@ -344,6 +368,30 @@ const COURSE_SHARE_COUNTERS_MYSQL_REQ =
     "select sp.`Code`, cs.`Counter` from `CrsShareCounter` cs\n" +
     "  join`SNetProvider` sp on sp.`Id` = cs.`SNetProviderId`\n" +
     "where`CourseId` = <%= courseId %>";
+const COURSE_BOOKS_MYSQL_REQ =
+    "select b.`Order`, b.`Id`, b.`Name`, b.`Description`, b.`CourseId`, b.`OtherAuthors`, b.`OtherCAuthors`,\n" +
+    "  b.`Cover`, b.`CoverMeta`, b.`ExtLinks`, ba.`AuthorId`, ba.`Tp`, ba.`TpView`,\n" +
+    "  a.`URL`, al.`FirstName`, al.`LastName`\n" +
+    "from`Book` b\n" +
+    "  left join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "  left join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "  left join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "where b.`Id` in\n" +
+    "(\n" +
+    "  select b.`Id` from`Book` b\n" +
+    "    left join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "    left join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "    left join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "  where b.`CourseId` = <%= courseId %>\n" +
+    "  union\n" +
+    "  select b.`Id` from`Book` b\n" +
+    "    join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "    join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "    join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "    join`AuthorToCourse` ac on ac.`AuthorId` = ba.`AuthorId`\n" +
+    "  where(ac.`CourseId`) = <%= courseId %> and(b.`CourseId` is NULL)\n" +
+    ")\n" +
+    "order by 1";
 
 const GET_COURSE_FOR_PRERENDER_MSSQL =
     "select c.[URL] from[Course] c\n" +
@@ -770,6 +818,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Categories: [],
                                         Lessons: [],
                                         Books: [],
+                                        RefBooks: [],
                                         ShareCounters: {}
                                     };
                                 };
@@ -911,7 +960,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 let lsn = lsn_list[elem.LessonId]
                                 if (lsn)
                                     lsn.NBooks++;
-                                course.Books.push({
+                                course.RefBooks.push({
                                     Id: elem.Id,
                                     Description: elem.Description
                                 });
@@ -930,6 +979,52 @@ const DbCourse = class DbCourse extends DbObject {
                             result.detail.forEach((elem) => {
                                 course.ShareCounters[elem.Code] = elem.Counter;
                             })
+                        }
+                        if (course)
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(COURSE_BOOKS_MYSQL_REQ)({ courseId: courseId }),
+                                    mssql: _.template(COURSE_BOOKS_MSSQL_REQ)({ courseId: courseId })
+                                }
+                            }, {});
+                    })
+                    .then(result => {
+                        if (course && result && result.detail && (result.detail.length > 0)) {
+                            let couseBooks = [];
+                            let otherBooks = [];
+                            let currId = -1;
+                            let book;
+                            result.detail.forEach(elem => {
+                                if (currId !== elem.Id) {
+                                    currId = elem.Id;
+                                    book = {};
+                                    if (elem.CourseId === courseId)
+                                        couseBooks.push(book)
+                                    else
+                                        otherBooks.push(book);
+                                    book.Id = elem.Id;
+                                    book.Name = elem.Name;
+                                    book.Description = elem.Description;
+                                    book.CourseId = elem.CourseId;
+                                    book.OtherAuthors = elem.OtherAuthors;
+                                    book.OtherCAuthors = elem.OtherCAuthors;
+                                    book.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
+                                    book.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
+                                    book.ExtLinks = elem.ExtLinks;
+                                    book.Authors = [];
+                                }
+                                if (typeof (elem.AuthorId) === "number")
+                                    book.Authors.push({
+                                        Id: elem.AuthorId,
+                                        Tp: elem.Tp,
+                                        TpView: elem.TpView,
+                                        FirstName: elem.FirstName,
+                                        LastName: elem.LastName,
+                                        URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
+                                    });
+                            })
+                            Array.prototype.push.apply(course.Books, couseBooks);
+                            Array.prototype.push.apply(course.Books, otherBooks);
                         }
                         return course;
                     })

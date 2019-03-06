@@ -75,6 +75,24 @@ const AUTHOR_MSSQL_REF_PUB_REQ =
     "where(l.[AuthorId] = <%= authorId %>) and(lc.[State] = 'R')\n" +
     "group by l.[Id]";
 
+const AUTHOR_MSSQL_BOOK_REQ =
+    "select b.[Order], b.[Id], b.[Name], b.[Description], b.[CourseId], b.[OtherAuthors], b.[OtherCAuthors],\n" +
+    "  b.[Cover], b.[CoverMeta], b.[ExtLinks], ba.[AuthorId], ba.[Tp], ba.[TpView],\n" +
+    "  a.[URL], al.[FirstName], al.[LastName]\n" +
+    "from[Book] b\n" +
+    "  left join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "  left join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "  left join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "where b.[Id] in\n" +
+    "(\n" +
+    "  select distinct b.[Id] from[Book] b\n" +
+    "    join[BookAuthor] ba on ba.[BookId] = b.[Id]\n" +
+    "    join[Author] a on a.[Id] = ba.[AuthorId]\n" +
+    "    join[AuthorLng] al on al.[AuthorId] = ba.[AuthorId]\n" +
+    "  where ba.[AuthorId] = <%= authorId %>\n" +
+    ")\n" +
+    "order by 1";
+
 const AUTHOR_MYSQL_PUB_REQ =
     "select a.`Id`, a.`Portrait`, a.`PortraitMeta`, a.`URL`, g.`FirstName`, g.`LastName`, g.`Description`\n" +
     "from`Author` a\n" +
@@ -115,6 +133,24 @@ const AUTHOR_MYSQL_REF_PUB_REQ =
     "  join`Reference` r on r.`LessonLngId` = ll.`Id`\n" +
     "where(l.`AuthorId` = <%= authorId %>) and(lc.`State` = 'R')\n" +
     "group by l.`Id`";
+
+const AUTHOR_MYSQL_BOOK_REQ =
+    "select b.`Order`, b.`Id`, b.`Name`, b.`Description`, b.`CourseId`, b.`OtherAuthors`, b.`OtherCAuthors`,\n" +
+    "  b.`Cover`, b.`CoverMeta`, b.`ExtLinks`, ba.`AuthorId`, ba.`Tp`, ba.`TpView`,\n" +
+    "  a.`URL`, al.`FirstName`, al.`LastName`\n" +
+    "from`Book` b\n" +
+    "  left join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "  left join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "  left join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "where b.`Id` in\n" +
+    "(\n" +
+    "  select distinct b.`Id` from`Book` b\n" +
+    "    join`BookAuthor` ba on ba.`BookId` = b.`Id`\n" +
+    "    join`Author` a on a.`Id` = ba.`AuthorId`\n" +
+    "    join`AuthorLng` al on al.`AuthorId` = ba.`AuthorId`\n" +
+    "  where ba.`AuthorId` = <%= authorId %>\n" +
+    ")\n" +
+    "order by 1";
 
 const GET_AUTHOR_FOR_PRERENDER_MSSQL =
     "select [URL] from [Author]\n" +
@@ -244,6 +280,7 @@ const DbAuthor = class DbAuthor extends DbObject {
         let lsn_list = {};
         let lc_list = {};
         let couse_list = {};
+        let isAbsPath = false;
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
@@ -358,7 +395,6 @@ const DbAuthor = class DbAuthor extends DbObject {
                                 }
                             }, {});
                         }
-                        return author;
                     })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
@@ -369,6 +405,67 @@ const DbAuthor = class DbAuthor extends DbObject {
                                     lsn.NBooks = elem.NRec;
                                 }
                             })
+                        }
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(AUTHOR_MYSQL_BOOK_REQ)({ authorId: author.Id }),
+                                mssql: _.template(AUTHOR_MSSQL_BOOK_REQ)({ authorId: author.Id })
+                            }
+                        }, {});
+                    })
+                    .then(result => {
+                        author.Books = [];
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            let authText = [];
+                            let authComment = [];
+                            let authInterp = [];
+                            let currId = -1;
+                            let book;
+                            let bookToPush = null;
+                            result.detail.forEach(elem => {
+                                if (currId !== elem.Id) {
+                                    currId = elem.Id;
+                                    bookToPush = book = {};
+                                    book.Id = elem.Id;
+                                    book.Name = elem.Name;
+                                    book.Description = elem.Description;
+                                    book.CourseId = elem.CourseId;
+                                    book.OtherAuthors = elem.OtherAuthors;
+                                    book.OtherCAuthors = elem.OtherCAuthors;
+                                    book.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
+                                    book.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
+                                    book.ExtLinks = elem.ExtLinks;
+                                    book.Authors = [];
+                                }
+                                if (typeof (elem.AuthorId) === "number")
+                                    if (bookToPush && (elem.AuthorId === author.Id)) {
+                                        switch (elem.Tp) {
+                                            case 1:
+                                                authText.push(bookToPush);
+                                                break;
+                                            case 2:
+                                                authComment.push(bookToPush);
+                                                break;
+                                            case 3:
+                                                authInterp.push(bookToPush);
+                                                break;
+                                            default:
+                                                throw new HttpError(HttpCode.ERR_UNPROC_ENTITY, `Unknown author type: "${elem.Tp}".`);
+                                        }
+                                        bookToPush = null;
+                                    }
+                                    book.Authors.push({
+                                        Id: elem.AuthorId,
+                                        Tp: elem.Tp,
+                                        TpView: elem.TpView,
+                                        FirstName: elem.FirstName,
+                                        LastName: elem.LastName,
+                                        URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
+                                    });
+                            })
+                            Array.prototype.push.apply(author.Books, authText);
+                            Array.prototype.push.apply(author.Books, authInterp);
+                            Array.prototype.push.apply(author.Books, authComment);
                         }
                         return author;
                     })
