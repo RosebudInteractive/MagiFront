@@ -15,6 +15,7 @@ import BottomControls from "../bottom-contols/buttons";
 import {booksSelector, bookIdSelector, editModeSelector, closeEditor, insertBook, updateBook} from "adm-ducks/books"
 import AuthorsTab from "./tabs/authors-tab";
 import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
+import {showErrorDialog} from "../../actions/app-actions";
 
 const TABS = {
     MAIN: 'main',
@@ -29,7 +30,7 @@ const NEW_BOOK = {
     OtherCAuthors: null,
     Cover: null,
     CoverMeta: null,
-    ExtLinks: null,
+    extLinksValues: null,
     Authors: [],
     Order: null,
 }
@@ -122,9 +123,10 @@ class BookEditorForm extends React.Component {
     }
 
     _save() {
-        let {editorValues, editMode, bookId,} = this.props
+        let {editorValues, editMode, bookId,} = this.props,
+            _values = Object.assign({}, editorValues)
 
-        let _checkResult = checkExtLinks(editorValues.extLinksValues)
+        let _checkResult = checkExtLinks(_values.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
             let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
@@ -132,15 +134,15 @@ class BookEditorForm extends React.Component {
             return
         }
 
-        editorValues.extLinksValues = getExtLinks(editorValues.extLinksValues)
+        _values.extLinksValues = getExtLinks(_values.extLinksValues)
 
         if (!editMode) {
-            this.props.insertBook(editorValues)
+            this.props.insertBook(_values)
         } else {
-            editorValues.Id = bookId;
-            editorValues.Order = this._order
+            _values.Id = bookId;
+            _values.Order = this._order
 
-            this.props.updateBook(editorValues)
+            this.props.updateBook(_values)
         }
 
     }
@@ -187,7 +189,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset}, dispatch);
+    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(BookEditorWrapper)

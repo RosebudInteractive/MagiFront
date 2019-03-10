@@ -148,9 +148,11 @@ class BookAuthorsGrid extends React.Component {
             })
 
         if (_index >= 0) {
-            _array = _array.slice()
-            _array[_index].Tp = +data.Tp
-            _array[_index].TpView = +data.TpView
+            let _item = Object.assign({}, _array[_index])
+            _item.Tp = +data.Tp
+            _item.TpView = +data.TpView
+
+            _array[_index] = _item;
         }
 
         this.props.input.onChange(_array)

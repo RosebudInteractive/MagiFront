@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 import {Switch, Route, withRouter} from 'react-router-dom'
 // import MetaTags from 'react-meta-tags';
-
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
 import CombineLessonPage, {scroll} from './containers/combined-lesson-page';

@@ -12,7 +12,7 @@ import {
     saveChanges,
     booksSelector,
     loadingSelector,
-    loadedSelector,
+    loadedSelector, showEditorSelector,
 } from "../ducks/books";
 import {showDeleteConfirmation, cancelDelete} from '../actions/CommonDlgActions';
 import BookEditor from '../components/books/editor'
@@ -127,6 +127,7 @@ class BooksPage extends React.Component {
             message,
             deleteDlgShown,
             errorDlgShown,
+            showBookEditor,
         } = this.props;
 
         return loading ?
@@ -160,23 +161,16 @@ class BooksPage extends React.Component {
                     </div>
                 </div>
                 {
-                    deleteDlgShown ?
+                    (deleteDlgShown && !showBookEditor)?
                         <YesNoDialog
                             yesAction={::this._deleteBook}
                             noAction={::this._cancelDelete}
                             message={"Удалить книгу" + this._getSelectedBooksName() + "?"}
                         />
                         :
-                        ""
+                        null
                 }
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                        />
-                        :
-                        ""
-                }
+                { !showBookEditor ? <ErrorDialog/> : null }
                 <BookEditor/>
             </div>
     }
@@ -257,10 +251,8 @@ function mapStateToProps(state, ownProps) {
         loading: loadingSelector(state),
         books: booksSelector(state),
 
-        hasError: state.commonDlg.hasError,
-        message: state.commonDlg.message,
         deleteDlgShown: state.commonDlg.deleteDlgShown,
-        errorDlgShown: state.commonDlg.errorDlgShown,
+        showBookEditor: showEditorSelector(state),
 
         bookId: ownProps.match ? Number(ownProps.match.params.id) : null,
     }

@@ -4,7 +4,6 @@ import { routerReducer } from 'react-router-redux';
 import page from "./page"
 import user from "./user"
 import commonDlg from './commonDlg';
-import episodes from "./episodes";
 import author from './author';
 import authorsList from './authorsList';
 import category from './category';
@@ -46,7 +45,6 @@ export default combineReducers({
     user,
     commonDlg,
     author,
-    episodes,
     languages,
     authorsList,
     category,

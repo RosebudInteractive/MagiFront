@@ -1,9 +1,11 @@
-require("babel-polyfill");
+require("@babel/polyfill");
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
+const MinifyPlugin = require("babel-minify-webpack-plugin");
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 // const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 // require('webpack-jquery-ui');
 
@@ -11,7 +13,7 @@ const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 const _prodConfig = {
     entry: {
-        "babel-polyfill": "babel-polyfill",
+        "babel-polyfill": "@babel/polyfill",
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
@@ -34,12 +36,7 @@ const _prodConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false,
-                drop_console: true
-            }
-        }),
+        new MinifyPlugin(),
         new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
     module: {
@@ -54,6 +51,7 @@ const _prodConfig = {
                     path.resolve(__dirname, 'node_modules/dom7'),
                     path.resolve(__dirname, 'node_modules/fullpage.js'),
                     path.resolve(__dirname, 'scripts/'),
+                    path.resolve(__dirname, 'static/'),
                 ],
                 // language=JSRegexp
                 test: /\.js$/
@@ -123,7 +121,7 @@ const _prodConfig = {
 const _devConfig = {
     devtool: 'cheap-module-eval-source-map',
     entry: {
-        'babel-polyfill': 'babel-polyfill',
+        'babel-polyfill': '@babel/polyfill',
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         main: './frontend/index',
         adm: './src/index',

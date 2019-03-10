@@ -7,6 +7,7 @@ import BookEditorWrapper from "./form-wrapper"
 import {getCourses} from "../../actions/coursesListActions";
 import {getAuthors} from "../../actions/authorsListActions";
 import LoadingPage from "../common/loading-page";
+import ErrorDialog from "../../components/dialog/error-dialog";
 
 class BookEditor extends React.Component {
 
@@ -23,7 +24,7 @@ class BookEditor extends React.Component {
     }
 
     render() {
-        let {showEditor, fetching} = this.props
+        let {showEditor, fetching,} = this.props
 
         return showEditor
             ?
@@ -36,6 +37,7 @@ class BookEditor extends React.Component {
                         <div className="modal-editor">
                             <button type="button" className="modal-editor__close" onClick={::this.props.actions.closeEditor}>Закрыть</button>
                             <BookEditorWrapper/>
+                            <ErrorDialog/>
                         </div>
                 }
             </div>

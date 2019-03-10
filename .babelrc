@@ -1,13 +1,21 @@
 {
-  "presets": ["es2015", "stage-0", "react"], //поддержка ES2015, ES7 и JSX
-//  "presets": ["latest", "react"], //поддержка ES2015, ES7 и JSX
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "loose": true,
+        "exclude": [
+          "transform-async-to-generator",
+          "transform-regenerator"
+        ]
+      }
+    ],
+    "@babel/preset-react"
+  ],
   "plugins": [
-    "transform-runtime",
-    "@babel/plugin-transform-regenerator",
-    "transform-class-properties",
-    "transform-es2015-classes",
-    "transform-object-assign",
-    "es6-promise",
-    "transform-decorators-legacy",
+    ["fast-async", {"useRuntimeModule": true}],
+    "transform-function-bind",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose" : true }]
   ]
 }
