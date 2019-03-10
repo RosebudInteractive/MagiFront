@@ -131,9 +131,6 @@ class Item extends React.Component {
 
     }
 
-// <svg width="50" height="50" dangerouslySetInnerHTML={{__html: this._getImage()}}/>
-// <img width={50} src={this._getImage()}/>
-
     _getImage() {
         if (hosts.hasOwnProperty(this.props.host)) {
             return hosts[this.props.host].svg

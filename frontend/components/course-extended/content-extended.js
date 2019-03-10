@@ -7,6 +7,7 @@ import {
     OKShareButton,
 } from 'react-share';
 import CourseAggregators from "./course-aggregators";
+import Sources from "./sources";
 
 class Content extends React.Component {
     constructor(props) {
@@ -33,6 +34,7 @@ class Content extends React.Component {
             <div className="course-module__info-block">
                 <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
                 <Description descr={_descr} isFull={this.state.expanded} extLinks={this.props.course.ExtLinks}/>
+                <Sources course={this.props.course}/>
                 {/*<BookCard/>*/}
                 {/*<div className={"course-module__read-more" + (this.state.expanded ? ' opened' : '')}>*/}
                     {/*<span className="more" onClick={::this._switchExpanded}>Читать полное описание <span className="icon">↓</span></span>*/}

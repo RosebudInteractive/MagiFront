@@ -167,6 +167,14 @@ const handleCourse = (data) => {
             }
         });
 
+        if (data.Books) {
+            data.Books.forEach((book) => {
+                if (book.ExtLinks) {
+                    book.ExtLinks = JSON.parse(book.ExtLinks)
+                }
+            })
+        }
+
         let _lessonCount = 0,
             _readyLessonCount = 0;
 
