@@ -148,7 +148,7 @@ class Main extends React.Component {
                             />
                             <CourseTabs
                                 lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
-                                books={{total: course.Books.length}}
+                                books={{total: course.RefBooks.length}}
                                 courseUrl={courseUrl}
                             />
                         </div>

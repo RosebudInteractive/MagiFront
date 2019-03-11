@@ -15,7 +15,7 @@ export default class MainTab extends React.Component {
     render() {
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <Field component={TextBox} name="name" label="Название книги" placeholder="Введите название"/>
-            <Field component={TextArea} name="description" label="Описание книги" enableHtml={true}/>
+            <Field component={TextArea} name="description" label="Описание книги" enableHtml={false}/>
             <Field component={Cover} name="cover" label="Обложка книги"/>
             <Field component={TextArea} name="extLinksValues" label="Ссылки на другие ресурсы" enableHtml={false} />
         </div>

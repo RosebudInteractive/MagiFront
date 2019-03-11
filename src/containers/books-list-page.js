@@ -124,9 +124,7 @@ class BooksPage extends React.Component {
         const {
             books,
             loading,
-            message,
             deleteDlgShown,
-            errorDlgShown,
             showBookEditor,
         } = this.props;
 

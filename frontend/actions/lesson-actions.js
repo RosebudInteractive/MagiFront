@@ -168,6 +168,14 @@ const handleData = (data) => {
         lesson.courseUrl = data.Course.URL;
         lesson.Number = _parentNumber + '.' + lesson.Number
     })
+
+    if (_lesson.Books) {
+        _lesson.Books.forEach((book) => {
+            if (book.ExtLinks) {
+                book.ExtLinks = JSON.parse(book.ExtLinks)
+            }
+        })
+    }
 };
 
 const handleLessons = (data) => {
@@ -206,18 +214,3 @@ const handleTextData = (data) => {
         console.error('ERR: ' + err.message);
     }
 };
-
-const Months = [
-    'Январь',
-    'Февраль',
-    'Март',
-    'Апрель',
-    'Май',
-    'Июнь',
-    'Июль',
-    'Август',
-    'Сентябрь',
-    'Октябрь',
-    'Ноябрь',
-    'Декабрь',
-];

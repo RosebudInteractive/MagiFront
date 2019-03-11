@@ -1,6 +1,8 @@
 import $ from "jquery";
 
 const availableLinks = {
+    'www.ozon.ru': 'ozon',
+    'www.labirint.ru': 'labirint',
     'www.litres.ru': 'litres',
     'ru.bookmate.com': 'bookmate',
     'www.storytel.com': 'storytel',

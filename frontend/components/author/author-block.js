@@ -3,6 +3,8 @@ import {connect} from "react-redux";
 import {authorSelector} from '../../ducks/author'
 import $ from 'jquery'
 import {getAuthorPortraitPath, ImageSize} from "../../tools/page-tools";
+import CourseBooksList from "../books/course-books-list";
+import Books from "../books";
 
 class AuthorBlock extends React.Component {
 
@@ -42,6 +44,7 @@ class AuthorBlock extends React.Component {
                         <div className="author-block__info">
                             <h2 className="author-block__name">{author.FirstName + ' ' + author.LastName}</h2>
                             <p className="author-block__descr">{author.Description}</p>
+                            <Books books={author.Books} titleClassName={"books__title"} extClass={"_vertical"} listClass={CourseBooksList}/>
                         </div>
                     </div>
                 </div>

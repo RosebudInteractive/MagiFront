@@ -27,6 +27,7 @@ import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson
 
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import LessonAggregators from "../components/combined-lesson-page/lesson-aggregators";
+import Sources from "../components/combined-lesson-page/sources";
 
 let _scrollTop = 0;
 
@@ -492,7 +493,7 @@ class CombineLessonPage extends React.Component {
                             <GalleryButtons isLocked={!authorized}/>,
                             lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                             this._getLessonsBundles(),
-                            <LessonAggregators extLinks={_lesson.ExtLinks}/>,
+                            <Sources lesson={_lesson}/>,
                             <LessonInfo lesson={_lesson}/>,
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}

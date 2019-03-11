@@ -123,6 +123,14 @@ const handleData = (data) => {
     if (data.PortraitMeta) {
         data.PortraitMeta = JSON.parse(data.PortraitMeta)
     }
+
+    if (data.Books) {
+        data.Books.forEach((book) => {
+            if (book.ExtLinks) {
+                book.ExtLinks = JSON.parse(book.ExtLinks)
+            }
+        })
+    }
 }
 
 const handleCourse = (data) => {

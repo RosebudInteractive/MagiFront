@@ -26,9 +26,11 @@ export const getExtLinks = (extLinks) => {
         return _orderA - _orderB
     })
 
-    return _links.map((item) => {
+    _links = _links.map((item) => {
         return <li>
-            <Link to={extLinks[item]}><span>{HOSTS[item].title}</span></Link>
+            <Link to={extLinks[item]} target="_blank"><span>{HOSTS[item].title}</span></Link>
         </li>
-    });
+    })
+
+    return (_links.length > 1) ? _links.reduce((prev, curr) => [prev, ', ', curr]) : _links;
 }

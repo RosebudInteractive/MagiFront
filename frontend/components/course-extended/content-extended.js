@@ -6,7 +6,6 @@ import {
     VKShareButton,
     OKShareButton,
 } from 'react-share';
-import CourseAggregators from "./course-aggregators";
 import Sources from "./sources";
 
 class Content extends React.Component {
@@ -105,7 +104,6 @@ class Description extends React.Component {
         return (
             <div className={"course-module__course-descr" + (this.props.isFull ? ' full' : '')}>
                 <p dangerouslySetInnerHTML={this.createMarkup()}/>
-                <CourseAggregators extLinks={this.props.extLinks}/>
             </div>
         )
     }

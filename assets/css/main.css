@@ -5176,6 +5176,15 @@ ul.user-tooltip {
       padding-bottom: 30px; }
     .course-module._small .course-module__description-block p {
       margin: 0; }
+  .course-module__sources {
+    padding-right: 16.666666%; }
+  @media (max-width: 899px) {
+    .course-module__sources {
+      padding-right: 36px; } }
+  @media (max-width: 639px) {
+    .course-module__sources {
+      padding-right: 0;
+      max-width: 100%; } }
   .course-module a.course-module__read-more {
     display: none;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -11085,6 +11094,14 @@ ul.lectures-tab {
   @media (max-width: 639px) {
     .author-block__info {
       padding-bottom: 41px; } }
+  .author-block__info .books._vertical {
+      padding-right: 18%; }
+  @media (max-width: 899px) {
+      .author-block__info .books._vertical {
+          padding-right: 10%; } }
+  @media (max-width: 639px) {
+      .author-block__info .books._vertical {
+          padding-right: 0; } }
   @media (max-width: 768px) {
     .author-block__info .book-card__descr {
       max-width: 350px; } }
@@ -19671,6 +19688,9 @@ ul.lectures-tab {
   .other-sources li {
     margin-right: 21px;
     margin-bottom: 6px; }
+  .aggregator-list.other-sources li {
+    margin-top: 4px;
+    margin-bottom: 0; }
   .other-sources__icon {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -19945,6 +19965,10 @@ ul.lectures-tab {
       ._vertical .book-preview__author {
         font-size: 12px;
         line-height: 14px; } }
+    .books__author-wrapper {
+      white-space: pre-line;
+      display: inline-block;
+      margin-bottom: 4px; }
     .book-preview__author a {
       white-space: nowrap;
       color: rgba(47, 47, 47, 0.6); }
@@ -19954,6 +19978,10 @@ ul.lectures-tab {
       border-bottom: 1px solid rgba(200, 104, 76, 0.3);
       -webkit-transition: border-color 0.3s ease;
       transition: border-color 0.3s ease; }
+    .book-preview__author .no-link {
+        border-bottom: none;
+        white-space: nowrap;
+        color: rgba(47, 47, 47, 0.6);}
   .book-preview__title {
     margin: 0;
     font-weight: 400;

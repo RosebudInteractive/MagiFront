@@ -7,17 +7,23 @@ export default class Books extends React.Component {
         books: PropTypes.array,
         extClass: PropTypes.string,
         listClass: PropTypes.string.required,
+        titleClassName: PropTypes.string,
     }
 
 
     render() {
-        let {books, extClass} = this.props;
+        let {books, extClass, titleClassName} = this.props,
+            _needShowBlock = books && Array.isArray(books) && (books.length > 0)
 
         const BooksList = this.props.listClass
 
-        return <div className={"books" + (extClass ? (' ' + extClass) : '')}>
-            <h3 className="books__title">Книги</h3>
-            <BooksList books={books}/>
-        </div>
+        return _needShowBlock
+            ?
+            <div className={"books" + (extClass ? (' ' + extClass) : '')}>
+                <h3 className={titleClassName}>Книги</h3>
+                <BooksList books={books}/>
+            </div>
+            :
+            null
     }
 }

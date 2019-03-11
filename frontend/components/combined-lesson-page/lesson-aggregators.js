@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from "prop-types";
-import Aggregators from '../common/aggregators'
+import Aggregators from '../aggregators/one-line-aggregators'
 
 export default class LessonAggregators extends React.Component {
 
@@ -11,7 +11,7 @@ export default class LessonAggregators extends React.Component {
     render() {
         return this.props.extLinks ?
             <div className="lecture-info__wrapper">
-                <div className='lesson-aggregators'>
+                <div className='lesson-aggregators other-sources'>
                     <div className="aggregator-list_title">Лекция на других ресурсах</div>
                     <Aggregators extLinks={this.props.extLinks}/>
                 </div>
