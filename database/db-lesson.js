@@ -6,6 +6,7 @@ const { Intervals } = require('../const/common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { PartnerLink } = require('../utils/partner-link');
 const { getTimeStr, buildLogString } = require('../utils');
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
@@ -723,6 +724,7 @@ const DbLesson = class DbLesson extends DbObject {
     constructor(options) {
         super(options);
         this._prerenderCache = PrerenderCache();
+        this._partnerLink = new PartnerLink();
     }
 
     _getObjById(id, expression, options) {
@@ -2295,7 +2297,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             lsn_lng_obj.snDescription(inpFields["SnDescription"]);
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
-                            lsn_lng_obj.extLinks(inpFields["ExtLinks"]);
+                            lsn_lng_obj.extLinks(this._partnerLink.processLinks(inpFields["ExtLinks"]));
 
                         let prevState = ls_course_obj.state();
                         let currDate = new Date();
@@ -2669,7 +2671,7 @@ const DbLesson = class DbLesson extends DbObject {
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             fields["SnDescription"] = inpFields["SnDescription"];
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
-                            fields["ExtLinks"] = inpFields["ExtLinks"];
+                            fields["ExtLinks"] = this._partnerLink.processLinks(inpFields["ExtLinks"]);
 
                         return root_lng.newObject({
                             fields: fields

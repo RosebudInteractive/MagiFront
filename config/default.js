@@ -113,6 +113,15 @@ module.exports = {
             Discontinued: "0"
         }
     },
+    partnership: {
+        "www.ozon.ru": {
+            "partner": "magisteria",
+            "utm_content": "link"
+        },
+        "www.labirint.ru": {
+            "p": "27672"
+        }
+    },
     authentication: {
         enabled: false,
         useJWT: false,
