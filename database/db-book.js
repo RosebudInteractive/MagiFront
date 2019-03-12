@@ -4,6 +4,7 @@ const { DbObject } = require('./db-object');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { DbUtils } = require('./db-utils');
+const { PartnerLink } = require('../utils/partner-link');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
@@ -40,6 +41,7 @@ const DbBook = class DbBook extends DbObject {
 
     constructor(options) {
         super(options);
+        this._partnerLink = new PartnerLink();
     }
 
     _getObjById(id, expression, options) {
@@ -184,7 +186,10 @@ const DbBook = class DbBook extends DbObject {
                                     
                                     default:
                                         if (typeof (book[this._genGetterName(fn)]) === "function")
-                                            book[this._genGetterName(fn)](elem[fn]);
+                                            if (fn === "ExtLinks")
+                                                book[this._genGetterName(fn)](this._partnerLink.processLinks(elem[fn]))
+                                            else
+                                                book[this._genGetterName(fn)](elem[fn]);
                                 }
                         }
                         else
@@ -223,7 +228,7 @@ const DbBook = class DbBook extends DbObject {
                             if (typeof (elem.CoverMeta) !== "undefined")
                                 fields.CoverMeta = elem.CoverMeta;
                             if (typeof (elem.ExtLinks) !== "undefined")
-                                fields.ExtLinks = elem.ExtLinkss
+                                fields.ExtLinks = this._partnerLink.processLinks(elem.ExtLinks);
                             return root_obj.newObject({
                                 fields: fields
                             }, dbOpts)

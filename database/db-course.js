@@ -4,6 +4,7 @@ const { DbUtils } = require('./db-utils');
 const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { PartnerLink } = require('../utils/partner-link');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const {
     ACCOUNT_ID,
@@ -457,6 +458,7 @@ const DbCourse = class DbCourse extends DbObject {
     constructor(options) {
         super(options);
         this._prerenderCache = PrerenderCache();
+        this._partnerLink = new PartnerLink();
     }
 
     _isNumericString(str) {
@@ -1412,7 +1414,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (typeof (inpFields["Description"]) !== "undefined")
                             crs_lng_obj.description(inpFields["Description"]);
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
-                            crs_lng_obj.extLinks(inpFields["ExtLinks"]);
+                            crs_lng_obj.extLinks(this._partnerLink.processLinks(inpFields["ExtLinks"]));
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -1657,7 +1659,7 @@ const DbCourse = class DbCourse extends DbObject {
                         if (typeof (inpFields["Description"]) !== "undefined")
                             fields["Description"] = inpFields["Description"];
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
-                            fields["ExtLinks"] = inpFields["ExtLinks"];
+                            fields["ExtLinks"] = this._partnerLink.processLinks(inpFields["ExtLinks"]);
 
                         return root_lng.newObject({
                             fields: fields
