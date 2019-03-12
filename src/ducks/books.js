@@ -258,7 +258,7 @@ export function* upsertBookSaga(action) {
         Id: _data.Id ? _data.Id : -1,
         Name: _data.name,
         Description: _data.description,
-        CourseId: _data.course ? +_data.course : null,
+        CourseId: (_data.course && +_data.course) ? +_data.course : null,
         OtherAuthors: _data.otherAuthors,
         OtherCAuthors: _data.otherCommentAuthors,
         Cover: _data.cover.file,

@@ -135,6 +135,7 @@ class BookEditorForm extends React.Component {
         }
 
         _values.extLinksValues = getExtLinks(_values.extLinksValues)
+        _values.course = (_values.course && +_values.course) ? +_values.course : null
 
         if (!editMode) {
             this.props.insertBook(_values)

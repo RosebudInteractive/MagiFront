@@ -110,7 +110,7 @@ class PlainTextArea extends React.Component {
     _onChange(e) {
         let _value = e.target.innerText
 
-        if (this.props.input.value !== _value) {
+        if (!this.props.input.value.localeCompare(_value)) {
             this.props.input.onChange(_value);
         }
     }
