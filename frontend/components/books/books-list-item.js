@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import {getCoverPath, ImageSize} from "../../tools/page-tools";
-import {getExtLinks} from "./tools";
+import {getExtLinks, getDefaultExtLink} from "./tools";
 import {Link} from "react-router-dom";
 
 export default class Item extends React.Component {
@@ -14,12 +14,20 @@ export default class Item extends React.Component {
     render() {
         let {book, isMain} = this.props,
             _coverPath = isMain ? getCoverPath(book, ImageSize.small) : getCoverPath(book, ImageSize.icon),
-            _cover = _coverPath ? '/data/' + _coverPath : '';
+            _cover = _coverPath ? '/data/' + _coverPath : '',
+            _defaultLink = getDefaultExtLink(book.ExtLinks);
 
-        return <li className={"book-list__item book-preview" + (isMain ? " _main" : "")}>
+        const _imageDiv = _defaultLink ?
+            <Link to={_defaultLink} target="_blank" className="book-preview__image">
+                <img src={_cover} alt=""/>
+            </Link>
+            :
             <div className="book-preview__image">
                 <img src={_cover} alt=""/>
             </div>
+
+        return <li className={"book-list__item book-preview" + (isMain ? " _main" : "")}>
+            {_imageDiv}
             <div className="book-preview__info-block">
                 <div className="book-preview__info">
                     <h4 className="book-preview__name">{book.Name}</h4>
@@ -58,5 +66,5 @@ export const getBookAuthors = (book) => {
         </div>)
     })
 
-    return _authors.reduce((prev, curr) => [prev, ', ', curr])
+    return (_authors.length > 1) ? _authors.reduce((prev, curr) => [prev, ', ', curr]) : _authors
 }

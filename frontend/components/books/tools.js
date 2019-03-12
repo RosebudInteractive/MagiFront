@@ -11,6 +11,26 @@ const HOSTS = {
 }
 
 export const getExtLinks = (extLinks) => {
+    let _links = _getSortedLinks(extLinks)
+
+    _links = _links.map((item) => {
+        return <li>
+            <Link to={extLinks[item]} target="_blank"><span>{HOSTS[item].title}</span></Link>
+        </li>
+    })
+
+    return (_links.length > 1) ? _links.reduce((prev, curr) => [prev, ', ', curr]) : _links;
+}
+
+export const getDefaultExtLink = (extLinks) => {
+
+    let _links = _getSortedLinks(extLinks)
+
+    return (_links.length > 0) ? extLinks[_links[0]] : null
+}
+
+const _getSortedLinks = (extLinks) => {
+
     let _links = [];
 
     for (let host in extLinks) {
@@ -26,11 +46,5 @@ export const getExtLinks = (extLinks) => {
         return _orderA - _orderB
     })
 
-    _links = _links.map((item) => {
-        return <li>
-            <Link to={extLinks[item]} target="_blank"><span>{HOSTS[item].title}</span></Link>
-        </li>
-    })
-
-    return (_links.length > 1) ? _links.reduce((prev, curr) => [prev, ', ', curr]) : _links;
+    return _links
 }
