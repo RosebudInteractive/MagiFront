@@ -16,10 +16,13 @@ export default class Sources extends React.Component {
             _needShowBooks = lesson.Books && Array.isArray(lesson.Books) && (lesson.Books.length > 0)
 
         return _needShowBooks
-        ?
-            <div className="lecture-sources">
-                <Aggregators title={'Лекция на других ресурсах'} titleClass={"other-sources__title"} extLinks={lesson.ExtLinks}/>
-                <Books books={lesson.Books} titleClassName={"books__headline"} listClass={LessonBooksList}/>
+            ?
+            <div className="lecture-info__wrapper">
+                <div className="lecture-sources">
+                    <Aggregators title={'Лекция на других ресурсах'} titleClass={"other-sources__title"}
+                                 extLinks={lesson.ExtLinks}/>
+                    <Books books={lesson.Books} titleClassName={"books__headline"} listClass={LessonBooksList}/>
+                </div>
             </div>
             :
             <LessonAggregators extLinks={lesson.ExtLinks}/>

@@ -19649,6 +19649,7 @@ ul.lectures-tab {
         margin-bottom: 14px;
         padding-bottom: 7px;
         font-size: 15px;
+        color: rgba(47, 47, 47, 0.6);
         border-bottom: 1px solid rgba(47, 47, 47, 0.2); } }
   .other-sources ul {
     margin: 0;
@@ -19767,6 +19768,11 @@ ul.lectures-tab {
     @media (max-width: 1023px) {
       .books__headline {
         font-size: 17px; } }
+    @media (max-width: 899px) {
+      .books__headline {
+        font-size: 15px;
+        color: rgba(47, 47, 47, 0.6);
+        border-bottom: 1px solid rgba(47, 47, 47, 0.2); } }
     @media (max-width: 767px) {
       .books__headline {
         margin-bottom: 6px;
@@ -19775,7 +19781,7 @@ ul.lectures-tab {
         border-bottom: 1px solid rgba(47, 47, 47, 0.2); } }
   .lecture-sources .books {
     padding: 12px 0 18px 18px; }
-    @media (max-width: 767px) {
+    @media (max-width: 900px) {
       .lecture-sources .books {
         padding-left: 0; } }
 
@@ -19790,9 +19796,13 @@ ul.lectures-tab {
     display: -ms-flexbox;
     display: flex;
     padding-right: 30px; }
+    @media (max-width: 1099px) {
+        .lecture-sources .book-list {
+            display: block;} }
     @media (max-width: 899px) {
       .lecture-sources .book-list {
-        padding-right: 0; } }
+        padding-right: 0;
+        display: flex;} }
     @media (max-width: 767px) {
       .lecture-sources .book-list {
         display: block; } }
@@ -20059,7 +20069,8 @@ ul.lectures-tab {
   @media (max-width: 899px) {
     .lecture-sources {
       display: block;
-      padding-top: 8px; }
+      padding-top: 8px;
+      border-bottom: none; }
       .lecture-sources .book-preview {
         padding-bottom: 6px; } }
 
