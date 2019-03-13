@@ -19779,11 +19779,17 @@ ul.lectures-tab {
         padding-bottom: 8px;
         font-size: 15px;
         border-bottom: 1px solid rgba(47, 47, 47, 0.2); } }
+  .books__headline.lecture-info__extras-label {
+      padding-left: 0;
+      padding-top: 0; }
   .lecture-sources .books {
     padding: 12px 0 18px 18px; }
     @media (max-width: 900px) {
       .lecture-sources .books {
         padding-left: 0; } }
+  .lecture-sources .books.lecture-info__extras {
+      padding-top: 28px; }
+
 
 .book-list {
   margin: 0;
@@ -19802,7 +19808,7 @@ ul.lectures-tab {
     @media (max-width: 899px) {
       .lecture-sources .book-list {
         padding-right: 0;
-        display: flex;} }
+        /*display: flex;*/} }
     @media (max-width: 767px) {
       .lecture-sources .book-list {
         display: block; } }
