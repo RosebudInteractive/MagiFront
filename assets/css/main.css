@@ -19788,7 +19788,8 @@ ul.lectures-tab {
       .lecture-sources .books {
         padding-left: 0; } }
   .lecture-sources .books.lecture-info__extras {
-      padding-top: 28px; }
+      padding-top: 28px;
+      border-bottom: none; }
 
 
 .book-list {
