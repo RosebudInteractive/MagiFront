@@ -37,6 +37,15 @@
                 "mysql": "./build_5/upgrade_5_mysql.sql"
             },
             "upgrader": "./build_5"
+        },
+        "6": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_6/upgrade_6_mssql.sql",
+                "mysql": "./build_6/upgrade_6_mysql.sql"
+            },
+            "upgrader": "./build_6"
         }
     }
 }

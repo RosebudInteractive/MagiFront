@@ -225,6 +225,60 @@ class Upgrader{
             await this._createModelLinksInDb(query, schema, models[i]);
     }
 
+    async _getObjects(expression, simple_condition, options) {
+        let db = $memDataBase;
+        return new MemDbPromise(db, (resolve) => {
+            if (!expression)
+                throw new Error("Upgrader::_getObjects: Invalid parameter \"expression\": " + JSON.stringify(expression));
+            let exp_filtered = Object.assign({}, expression);
+
+            if (simple_condition) {
+                let predicate = new Predicate(db, {});
+                predicate
+                    .addCondition(simple_condition);
+                exp_filtered.expr.predicate = predicate.serialize(true);
+                db._deleteRoot(predicate.getRoot());
+            }
+            resolve(
+                db.getData(Utils.guid(), null, null, exp_filtered, options)
+                    .then((result) => {
+                        if (result && result.guids && (result.guids.length === 1)) {
+                            let obj = db.getObj(result.guids[0]);
+                            if (!obj)
+                                throw new Error("Upgrader::_getObjects: Object doesn't exist: " + result.guids[0]);
+                            return obj;
+                        }
+                        else
+                            throw new Error("Upgrader::_getObjects: Invalid result of \"getData\": " + JSON.stringify(result));
+                    })
+            );
+        });
+    }
+
+    async _simpleEditWrapper(expr, simple_condition, processor, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let memDbOptions = { dbRoots: [] };
+        let root_obj = null;
+        let db = $memDataBase;
+
+        await Utils.editDataWrapper(() => {
+            return new MemDbPromise(db, resolve => {
+                resolve(this._getObjects(expr, simple_condition, dbOpts));
+            })
+                .then((result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    return root_obj.edit();
+                })
+                .then(async () => {
+                    if (typeof (processor) === "function")
+                        await processor(root_obj);
+                    await root_obj.save(dbOpts);
+                });
+        }, memDbOptions);
+    }
+
     async _processBuild(schema, buildInfo, buildNum) {
 
         let curBuild = this._getBuild(buildInfo, buildNum);
@@ -280,11 +334,21 @@ class Upgrader{
         await this._createNewBuild(newModels, updModels);
         await this._createNewModelsInDb(schema, newModels);
 
+        await this._runScript(buildInfo, buildNum, "script_upgrade");
+
         const { scriptUpgrade } = require(modulePath);
         if (typeof (scriptUpgrade) === "function")
-            await scriptUpgrade(this._dataObjectEngine, schema)
-        else
-            await this._runScript(buildInfo, buildNum, "script_upgrade");
+            
+            await scriptUpgrade({
+                engine: this._dataObjectEngine,
+                schema: schema,
+                db: $memDataBase,
+                meta: Meta,
+                memDbPromise: MemDbPromise,
+                predicate: Predicate,
+                utils: Utils,
+                simpleEditWrapper: async (expr, simple_condition, processor, options) => { return this._simpleEditWrapper(expr, simple_condition, processor, options)}
+            });
         
         await this._runScript(buildInfo, buildNum, "script_after");
     }
