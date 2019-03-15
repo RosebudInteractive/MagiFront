@@ -14,6 +14,10 @@ exports.upgradeDb = async (schema) => {
     schema.getModel("Product")
         .addField("Ver", { type: "int", allowNull: true });
 
+    schema.addModel("UserPaidCourse", "dbd115a0-68eb-4f8c-8c48-f2d04bbf17a3", "RootUserPaidCourse", "26ff2da4-bfc1-4396-a47a-d3160273216d")
+        .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
+        .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false });
+
     schema.addModel("DiscountType", "7f46d555-bf8b-45bb-af1c-dd8cb6093913", "RootDiscountType", "a0bc5e79-1574-422c-a25a-8ce2a95b02e9")
         .addField("Code", { type: "string", length: 50, allowNull: false })
         .addField("Name", { type: "string", length: 255, allowNull: false })
