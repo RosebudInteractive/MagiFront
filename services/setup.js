@@ -183,7 +183,7 @@ function setupAPI(express, app) {
     //
     // Common API options
     //
-    const { Accounting: { ProductReqParams } } = require("../const/accounting");
+    const { Product: { ProductReqParams } } = require('../const/product');
     let { ParametersService } = require('../database/db-parameter');
 
     /*

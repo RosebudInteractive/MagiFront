@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { DbObject } = require('../../database/db-object');
 const { InvoiceService } = require('../../database/db-invoice');
 const { Accounting } = require('../../const/accounting');
+const { Product } = require('../../const/product');
 const { HttpCode } = require("../../const/http-codes");
 const { UsersCache } = require("../../security/users-cache");
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
@@ -456,7 +457,7 @@ exports.Payment = class Payment extends DbObject {
                         for (let i = 0; i < invoiceData.Items.length; i++) {
                             let itm = prod = invoiceData.Items[i];
                             if (itm.ExtFields && itm.ExtFields.prod &&
-                                (itm.ExtFields.prodType === Accounting.SubsProdType)) {
+                                (itm.ExtFields.prodType === Product.ProductTypes.Subscription)) {
                                 duration = itm.ExtFields.prod;
                                 break;
                             }

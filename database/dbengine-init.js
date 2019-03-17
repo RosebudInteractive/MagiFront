@@ -205,7 +205,7 @@ exports.DbEngineInit = class DbEngineInit {
             password: process.env.MS_PASSWORD || pwd || "system",
             database: process.env.MS_DB || dbname || "genetix_test",
             provider: "mssql",
-            connection_options: { requestTimeout: 0 },
+            connection_options: { requestTimeout: 0, useUTC: false },
             provider_options: {},
             pool: {
                 max: 5,

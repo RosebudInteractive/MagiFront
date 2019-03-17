@@ -1,6 +1,7 @@
 const config = require('config');
 const _ = require('lodash');
 const { CacheableObject } = require('../utils/cache-base');
+const { DbUtils: { intFmtWithLeadingZeros } } = require('./db-utils');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
@@ -113,8 +114,13 @@ exports.DbObject = class DbObject extends CacheableObject {
         });
     }
 
-    _dateToString(dt) {
-        return "" + dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate();
+    _dateToString(dt, withTime) {
+        let result = "" + dt.getFullYear() + "-" +
+            intFmtWithLeadingZeros((dt.getMonth() + 1), 2) + "-" + intFmtWithLeadingZeros(dt.getDate(), 2);
+        if (withTime)
+            result = result + " " + intFmtWithLeadingZeros(dt.getHours(), 2) + ":" + intFmtWithLeadingZeros(dt.getMinutes(), 2) +
+                ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) + "." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3);
+        return result;
     }
 
     getAll() {

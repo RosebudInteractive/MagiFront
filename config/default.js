@@ -216,7 +216,7 @@ module.exports = {
             username: 'sa',
             password: 'system',
             database: 'mag_admin',
-            connection_options: { requestTimeout: 0 },
+            connection_options: { requestTimeout: 0, useUTC: false },
             provider_options: {},
             pool: {
                 max: 5,

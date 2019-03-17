@@ -11,6 +11,28 @@ function setupProducts(app) {
                 next(err);
             });
     });
+
+    app.post('/api/adm/products', (req, res, next) => {
+        ProductService()
+            .insert(req.body, { dbOptions: { userId: req.user.Id } })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.put('/api/adm/products/:id', (req, res, next) => {
+        ProductService()
+            .update(parseInt(req.params.id), req.body, { dbOptions: { userId: req.user.Id } })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
 }
 
 exports.setupProducts = setupProducts;

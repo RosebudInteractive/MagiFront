@@ -15,17 +15,14 @@ function setupInvoices(app) {
     });
 
     app.post('/api/adm/invoices', (req, res, next) => {
-        if (!req.user)
-            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
-        else
-            InvoiceService()
-                .insert(req.body, { dbOptions: { userId: req.user.Id } })
-                .then(rows => {
-                    res.send(rows);
-                })
-                .catch(err => {
-                    next(err);
-                });
+        InvoiceService()
+            .insert(req.body, { dbOptions: { userId: req.user.Id } })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
     });
 }
 
