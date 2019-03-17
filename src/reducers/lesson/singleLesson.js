@@ -5,10 +5,14 @@ import {
     GET_SINGLE_LESSON_FAIL,
     CHANGE_LESSON_DATA,
     CANCEL_CHANGE_LESSON_DATA,
+    SAVE_LESSON_START,
     SAVE_LESSON_SUCCESS,
+    SAVE_LESSON_FAIL,
     CLEAR_LESSON,
     SET_OG_IMAGE_RESOURCE_ID,
-    SET_TWITTER_IMAGE_RESOURCE_ID, LOAD_PARENT_LESSON_SUCCESS, SET_LESSON_EXT_LINKS,
+    SET_TWITTER_IMAGE_RESOURCE_ID,
+    LOAD_PARENT_LESSON_SUCCESS,
+    SET_LESSON_EXT_LINKS,
 } from '../../constants/lesson/singleLesson'
 import {convertLinksToString} from "../../tools/link-tools";
 
@@ -16,6 +20,7 @@ const initialState = {
     initial: null,
     current: null,
     fetching: false,
+    saving: false,
     hasChanges: false,
     ogImageResourceId: null,
     ogImageId: null,
@@ -114,6 +119,10 @@ export default function singleLesson(state = initialState, action) {
                 fetching: false,
                 hasChanges: false,};
 
+        case SAVE_LESSON_START: {
+            return {...state, fetching: false, saving: true, error: null,}
+        }
+
         case SAVE_LESSON_SUCCESS: {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
@@ -129,7 +138,12 @@ export default function singleLesson(state = initialState, action) {
                 hasTwitterImage: !!state.current.twitterImageResourceId,
                 fetching: false,
                 hasChanges: false,
+                saving: false,
             };
+        }
+
+        case SAVE_LESSON_FAIL: {
+            return {...state, fetching: false, saving: false, error: action.payload,}
         }
 
         case CHANGE_LESSON_DATA : {

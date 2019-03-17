@@ -11,7 +11,7 @@ import Categories from './Categories';
 import CategoriesForm from './categoryEditor';
 import Courses from './Courses';
 import CourseEditor from './course-editor-new';
-import LessonEditor from './lesson-editor';
+import LessonEditor from './lesson-editor-new';
 import SubLessonEditor from './subLesson-editor';
 import EpisodeEditor from './episode-editor';
 import BooksPage from './books-list-page';

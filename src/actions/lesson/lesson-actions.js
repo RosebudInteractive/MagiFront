@@ -15,7 +15,7 @@ import {
     CLEAR_LESSON,
     SET_OG_IMAGE_RESOURCE_ID,
     SET_TWITTER_IMAGE_RESOURCE_ID,
-    SET_LESSON_EXT_LINKS,
+    SET_LESSON_EXT_LINKS, SAVE_LESSON_START, SAVE_LESSON_FAIL,
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -110,6 +110,8 @@ export const create = (obj) => {
 export const save = (values, mode) => {
 
     return (dispatch) => {
+        dispatch({ type: SAVE_LESSON_START })
+
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/adm/lessons";
 
@@ -143,6 +145,11 @@ export const save = (values, mode) => {
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {
+                        dispatch({
+                            type: SAVE_LESSON_FAIL,
+                            payload: message
+                        })
+
                         dispatch({
                             type: SHOW_ERROR_DIALOG,
                             payload: message
