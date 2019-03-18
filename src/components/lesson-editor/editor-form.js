@@ -5,6 +5,7 @@ import MainTab from './tabs/main-tab'
 import SocialNetworkTab from './tabs/social-network-tab'
 import EpisodesTab from './tabs/episodes-tab'
 import ReferencesTab from './tabs/references-tab'
+import ResourcesTab from './tabs/resources-tab'
 import BottomControls from "../bottom-contols/buttons";
 import {
     reduxForm,
@@ -15,6 +16,7 @@ import {
 } from 'redux-form'
 import {Prompt} from "react-router-dom";
 import {showErrorDialog} from "../../actions/app-actions";
+import history from '../../history'
 
 const TABS = {
     MAIN: 'main',
@@ -128,7 +130,7 @@ class LessonEditorForm extends React.Component {
                         <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
                         <EpisodesTab visible={this.state.currentTab === TABS.EPISODES_AND_SUBS} editMode={this.props.editMode}/>
                         <ReferencesTab visible={this.state.currentTab === TABS.REFERENCES} editMode={this.props.editMode}/>
-
+                        <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode}/>
                     </form>
                 </div>
             </div>
@@ -150,7 +152,7 @@ class LessonEditorForm extends React.Component {
     }
 
     _goBack() {
-        this.props.history.push('/adm/courses');
+        history.push(`/adm/courses/edit/${this.props.course.id}`);
     }
 
     _cancel() {

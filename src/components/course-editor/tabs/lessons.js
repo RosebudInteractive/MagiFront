@@ -22,7 +22,6 @@ export default class AuthorsTab extends React.Component {
 
                 _grid.$setSize(_width, _height);
             }
-
         }
     }
 
