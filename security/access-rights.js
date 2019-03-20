@@ -6,7 +6,7 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { AccessFlags } = require('../const/common');
 
 const LESSON_FILE_MSSQL_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired] from[FreeExpDate] el\n" +
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate] from[EpisodeLng] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
     "where el.[Audio] = '<%= file %>'";

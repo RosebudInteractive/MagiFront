@@ -16,7 +16,8 @@ exports.upgradeDb = async (schema) => {
 
     schema.addModel("UserPaidCourse", "dbd115a0-68eb-4f8c-8c48-f2d04bbf17a3", "RootUserPaidCourse", "26ff2da4-bfc1-4396-a47a-d3160273216d")
         .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
-        .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false });
+        .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: false })
+        .addField("Counter", { type: "int", allowNull: false });
 
     schema.addModel("DiscountType", "7f46d555-bf8b-45bb-af1c-dd8cb6093913", "RootDiscountType", "a0bc5e79-1574-422c-a25a-8ce2a95b02e9")
         .addField("Code", { type: "string", length: 50, allowNull: false })
@@ -29,6 +30,7 @@ exports.upgradeDb = async (schema) => {
         .addField("ProductId", { type: "dataRef", model: "Product", refAction: "parentRestrict", allowNull: true })
         .addField("ProductTypeId", { type: "dataRef", model: "ProductType", refAction: "parentRestrict", allowNull: true })
         .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: true })
+        .addField("Description", { type: "string", allowNull: true })
         .addField("Perc", { type: "decimal", precision: 7, scale: 4, allowNull: true })
         .addField("AbsVal", { type: "decimal", precision: 12, scale: 4, allowNull: true })
         .addField("FirstDate", { type: "datetime", allowNull: false })

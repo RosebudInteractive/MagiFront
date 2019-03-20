@@ -577,6 +577,83 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         }).bind(this), memDbOptions);
     }
 
+    paidCourses(id, courses, options) {
+        let memDbOptions = { dbRoots: [] };
+        let root_obj;
+        let dbopts = options || {};
+
+        return Utils.editDataWrapper((() => {
+            return new MemDbPromise(this._db, (resolve => {
+                if (!courses)
+                    throw new Error("UsersBaseCache::paidCourses: Empty \"courses\" argument.");
+
+                let predicate = new Predicate(this._db, {});
+                predicate
+                    .addCondition({ field: "UserId", op: "=", value: id });
+
+                let exp_filtered = { expr: { model: { name: "UserPaidCourse" } } };
+                exp_filtered.expr.predicate = predicate.serialize(true);
+                this._db._deleteRoot(predicate.getRoot());
+
+                resolve(this._db.getData(Utils.guid(), null, null, exp_filtered, dbopts));
+            }))
+                .then(async (result) => {
+                    if (result && result.guids && (result.guids.length === 1)) {
+                        root_obj = this._db.getObj(result.guids[0]);
+                        if (!root_obj)
+                            throw new Error("UsersBaseCache::paidCourses: Object doesn't exist: " + result.guids[0]);
+                    }
+                    else
+                        throw new Error("UsersBaseCache::paidCourses: Invalid result of \"getData\": " + JSON.stringify(result));
+
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    await root_obj.edit();
+
+                    let courseList = {};
+                    function buildList(courses, sign) {
+                        for (let i = 0; i < courses.length; i++) {
+                            let courseId = courses[i];
+                            let cnt = (typeof (courseList[courseId]) === "number" ? courseList[courseId] : 0) + sign;
+                            if (cnt === 0)
+                                delete courseList[courseId]
+                            else
+                                courseList[courseId] = cnt;
+                        }
+                    }
+                    if (courses.added)
+                        buildList(courses.added, 1);
+                    if (courses.deleted)
+                        buildList(courses.deleted, -1);
+
+                    let collection = root_obj.getCol("DataElements");
+                    let itemsToDelete = [];
+                    for (let i = 0; i < collection.count(); i++) {
+                        let obj = collection.get(i);
+                        let courseId = obj.courseId();
+                        let item = courseList[courseId];
+                        if (typeof (item) === "number") {
+                            let newCnt = obj.counter() + item;
+                            if (newCnt <= 0)
+                                itemsToDelete.push(obj)
+                            else
+                                obj.counter(newCnt);
+                            delete courseList[courseId];
+                        }
+                    }
+                    for (let i = 0; i < itemsToDelete.length; i++)
+                        collection._del(itemsToDelete[i]);
+                    for (let cid in courseList) {
+                        let cnt = courseList[cid];
+                        if ((+cid) > 0)
+                            await root_obj.newObject({
+                                fields: { UserId: id, CourseId: +cid, Counter: cnt }
+                            }, dbopts);
+                    }
+                    return root_obj.save(dbopts);
+                })
+        }), memDbOptions);
+    }
+
     getUserByProfile(profile) {
 
         let providerId;

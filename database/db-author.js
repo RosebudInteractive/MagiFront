@@ -5,6 +5,7 @@ const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { CoursesService } = require('./db-course');
 const { getTimeStr, buildLogString } = require('../utils');
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
@@ -38,10 +39,14 @@ const AUTHOR_MSSQL_PUB_REQ =
     "select a.[Id], a.[Portrait], a.[PortraitMeta], a.[URL], g.[FirstName], g.[LastName], g.[Description]\n" +
     "from[Author] a\n" +
     "  join[AuthorLng] g on g.[AuthorId] = a.[Id]\n" +
-    "where a.[URL] = '<%= authorUrl %>'";
+    "<%= whereClause %>";
+
+const AUTHOR_MSSQL_PUB_WHERE_URL = "where a.[URL] = '<%= authorUrl %>'";
+const AUTHOR_MSSQL_PUB_WHERE_ID = "where a.[Id] = <%= authorId %>";
 
 const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
@@ -97,10 +102,14 @@ const AUTHOR_MYSQL_PUB_REQ =
     "select a.`Id`, a.`Portrait`, a.`PortraitMeta`, a.`URL`, g.`FirstName`, g.`LastName`, g.`Description`\n" +
     "from`Author` a\n" +
     "  join`AuthorLng` g on g.`AuthorId` = a.`Id`\n" +
-    "where a.`URL` = '<%= authorUrl %>'";
+    "<%= whereClause %>";
+
+const AUTHOR_MYSQL_PUB_WHERE_URL = "where a.`URL` = '<%= authorUrl %>'";
+const AUTHOR_MYSQL_PUB_WHERE_ID = "where a.`Id` = <%= authorId %>";
 
 const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
@@ -178,6 +187,7 @@ const DbAuthor = class DbAuthor extends DbObject {
     constructor(options) {
         super(options);
         this._prerenderCache = PrerenderCache();
+        this._coursesService = CoursesService();
     }
 
     _getObjById(id, expression, options) {
@@ -275,23 +285,50 @@ const DbAuthor = class DbAuthor extends DbObject {
             });
     }
 
-    getPublic(url) {
+    getPublic(url, options) {
         let author = {};
         let lsn_list = {};
         let lc_list = {};
         let couse_list = {};
-        let isAbsPath = false;
-        return new Promise((resolve, reject) => {
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let paidCourses = [];
+
+        return new Promise(resolve => {
+
+            let id = url;
+            let isInt = (typeof (id) === "number");
+            if (isInt && isNaN(id))
+                throw new Error(`Invalid argument "url": ${url}.`);
+            if (!isInt)
+                if (typeof (id) === "string") {
+                    let res = id.match(/[0-9]*/);
+                    if (res && (id.length > 0) && (res[0].length === id.length)) {
+                        id = parseInt(id);
+                        isInt = true;
+                    }
+                }
+                else
+                    throw new Error(`Invalid argument "url": ${url}.`);
+
+            let whereMSSQL = isInt ? _.template(AUTHOR_MSSQL_PUB_WHERE_ID)({ authorId: id })
+                : _.template(AUTHOR_MSSQL_PUB_WHERE_URL)({ authorUrl: id })
+            let whereMYSQL = isInt ? _.template(AUTHOR_MYSQL_PUB_WHERE_ID)({ authorId: id })
+                : _.template(AUTHOR_MYSQL_PUB_WHERE_URL)({ authorUrl: id });
+            
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(AUTHOR_MYSQL_PUB_REQ)({ authorUrl: url }),
-                        mssql: _.template(AUTHOR_MSSQL_PUB_REQ)({ authorUrl: url })
+                        mysql: _.template(AUTHOR_MYSQL_PUB_REQ)({ whereClause: whereMYSQL }),
+                        mssql: _.template(AUTHOR_MSSQL_PUB_REQ)({ whereClause: whereMSSQL })
                     }
                 }, {})
                     .then((result) => {
                         if (result && result.detail && (result.detail.length === 1)) {
                             author = result.detail[0];
+                            author.URL = isAbsPath ? this._absAuthorUrl + author.URL : author.URL;
+                            author.Portrait = isAbsPath ? (author.Portrait ? this._absDataUrl + author.Portrait : null) : author.Portrait;
+                            author.PortraitMeta = isAbsPath ? this._convertMeta(author.PortraitMeta) : author.PortraitMeta;
                             author.Courses = [];
                             author.Lessons = [];
 
@@ -305,31 +342,42 @@ const DbAuthor = class DbAuthor extends DbObject {
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find author "${url}".`);
                     })
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let authors_list = {};
                             let courseId = -1;
                             let course = null;
                             let now = new Date();
+                            let courseUrl;
                             result.detail.forEach((elem) => {
                                 if (courseId !== elem.Id) {
                                     courseId = elem.Id;
+                                    courseUrl = this._baseUrl + elem.URL + "/";
                                     course = {
                                         Id: elem.Id,
                                         LanguageId: elem.LanguageId,
                                         OneLesson: elem.OneLesson ? true : false,
-                                        Cover: elem.Cover,
-                                        CoverMeta: elem.CoverMeta,
+                                        Cover: isAbsPath ? (author.Portrait ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                        CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                         Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
-                                        URL: elem.URL,
+                                        URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                                        IsPaid: elem.IsPaid ? true : false,
+                                        IsSubsFree: elem.IsSubsFree ? true : false,
+                                        ProductId: elem.ProductId,
+                                        Price: 0,
+                                        DPrice: 0,
                                         Total: 0,
                                         Ready: 0
                                     };
                                     author.Courses.push(course);
                                     couse_list[elem.Id] = course;
+                                    if (course.IsPaid && course.ProductId)
+                                        paidCourses.push(course)
+                                    else
+                                        course.ProductId = null;
                                 };
                                 let lsn = lsn_list[elem.LessonId];
                                 if (!lsn) {
@@ -339,9 +387,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: elem.LCover,
-                                        CoverMeta: elem.LCoverMeta,
-                                        URL: elem.LURL,
+                                        Cover: isAbsPath ? (author.Portrait ? this._absDataUrl + elem.LCover : null) : elem.LCover,
+                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
+                                        IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         Name: elem.LName,
@@ -371,6 +420,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                                 }
                                 lsn.Audios.push(elem.Audio);
                             })
+                            if (paidCourses.length > 0) {
+                                for (let i = 0; i < paidCourses.length; i++)
+                                    await this._coursesService.getCoursePrice(paidCourses[i]);
+                            }
                             return $data.execSql({
                                 dialect: {
                                     mysql: _.template(AUTHOR_MYSQL_CNT_PUB_REQ)({ authorId: author.Id }),
@@ -454,14 +507,14 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         }
                                         bookToPush = null;
                                     }
-                                    book.Authors.push({
-                                        Id: elem.AuthorId,
-                                        Tp: elem.Tp,
-                                        TpView: elem.TpView,
-                                        FirstName: elem.FirstName,
-                                        LastName: elem.LastName,
-                                        URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
-                                    });
+                                book.Authors.push({
+                                    Id: elem.AuthorId,
+                                    Tp: elem.Tp,
+                                    TpView: elem.TpView,
+                                    FirstName: elem.FirstName,
+                                    LastName: elem.LastName,
+                                    URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
+                                });
                             })
                             Array.prototype.push.apply(author.Books, authText);
                             Array.prototype.push.apply(author.Books, authInterp);

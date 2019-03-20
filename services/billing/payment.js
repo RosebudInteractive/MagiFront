@@ -445,21 +445,30 @@ exports.Payment = class Payment extends DbObject {
                 .then(() => {
                     return UsersCache().getUserInfoById(chequeObj.userId(), true);
                 })
-                .then(user => {
+                .then(async (user) => {
                     let fields = {};
                     if (chequeObj.isSaved())
                         fields.SubsAutoPayId = chequeObj.id();
                     if (invoiceData) {
-                        // Calculate new subscription duration
+                        // Calculate new subscription duration and paid courses list
                         //
                         let duration = null;
                         let prod = null;
+                        let paidCourses = [];
                         for (let i = 0; i < invoiceData.Items.length; i++) {
-                            let itm = prod = invoiceData.Items[i];
-                            if (itm.ExtFields && itm.ExtFields.prod &&
-                                (itm.ExtFields.prodType === Product.ProductTypes.Subscription)) {
-                                duration = itm.ExtFields.prod;
-                                break;
+                            let itm = invoiceData.Items[i];
+                            if (itm.ExtFields && itm.ExtFields.prod) {
+                                switch (itm.ExtFields.prodType) {
+                                    case Product.ProductTypes.Subscription:
+                                        if (!duration) {
+                                            duration = itm.ExtFields.prod;
+                                            prod = itm;
+                                        }
+                                        break;
+                                    case Product.ProductTypes.CourseOnLine:
+                                        paidCourses.push(itm.ExtFields.prod.courseId)
+                                        break;
+                                }
                             }
                         }
                         if (duration) {
@@ -485,10 +494,14 @@ exports.Payment = class Payment extends DbObject {
                             fields.SubsExpDate = current > now ? current : null;
                             fields.SubsProductId = fields.SubsExpDate ? prod.ProductId : null;
                         }
+                        if (paidCourses.length > 0) {
+                            let data = {};
+                            data[isRefund ? "deleted" : "added"] = paidCourses;
+                            await UsersCache().paidCourses(user.Id, data, dbOpts);
+                        }
                     }
-                    if (Object.keys(fields).length > 0) {
-                        return UsersCache().editUser(user.Id, { alter: fields }, dbOpts);
-                    }
+                    if (Object.keys(fields).length > 0)
+                        await UsersCache().editUser(user.Id, { alter: fields }, dbOpts);
                 })
             return rci;
         }

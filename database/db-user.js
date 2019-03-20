@@ -7,10 +7,12 @@ const { PositionsService } = require('../services/lesson-positions');
 const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
+const { CoursesService } = require('./db-course');
 
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
     "from[Lesson] l\n" +
@@ -37,6 +39,7 @@ const GET_HISTORY_MSSQL =
 const GET_HISTORY_MYSQL =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
     "from`Lesson` l\n" +
@@ -134,7 +137,7 @@ const GET_COURSE_IDS_BKM_MSSQL =
     "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
-    "select c.[Id], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
+    "select c.[Id], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
@@ -225,7 +228,7 @@ const GET_COURSE_IDS_BKM_MYSQL =
     "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
-    "select c.`Id`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
+    "select c.`Id`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
@@ -262,6 +265,7 @@ const DbUser = class DbUser extends DbObject {
     constructor(options) {
         super(options);
         this._usersCache = UsersCache();
+        this._coursesService = CoursesService();
     }
 
     _getObjById(id, expression, options) {
@@ -379,6 +383,9 @@ const DbUser = class DbUser extends DbObject {
                                                 Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
+                                                IsPaid: elem.IsPaid ? true : false,
+                                                IsSubsFree: elem.IsSubsFree ? true : false,
+                                                ProductId: elem.ProductId,
                                                 URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                                 OneLesson: elem.OneLesson ? true : false
                                             };
@@ -398,6 +405,7 @@ const DbUser = class DbUser extends DbObject {
                                                 URL: isAbsPath ? this._baseUrl + '/' + elem.URL + '/' + elem.LURL : elem.LURL,
                                                 IsAuthRequired: elem.IsAuthRequired ? true : false,
                                                 IsSubsRequired: elem.IsSubsRequired ? true : false,
+                                                IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                                 Name: elem.LName,
                                                 Duration: elem.Duration,
                                                 DurationFmt: elem.DurationFmt,
@@ -536,7 +544,7 @@ const DbUser = class DbUser extends DbObject {
                                 mssql: _.template(GET_COURSES_BY_IDS_MSSQL)({ courseIds: elem.join() })
                             }
                         }, {})
-                            .then((result) => {
+                            .then(async (result) => {
                                 if (result && result.detail && (result.detail.length > 0)) {
                                     result.detail.forEach((elem) => {
                                         let course = {
@@ -548,12 +556,19 @@ const DbUser = class DbUser extends DbObject {
                                             Mask: elem.Mask,
                                             Order: courseBoookmarkOrder[elem.Id],
                                             OneLesson: elem.OneLesson ? true : false,
+                                            IsPaid: elem.IsPaid ? true : false,
+                                            IsSubsFree: elem.IsSubsFree ? true : false,
+                                            ProductId: elem.ProductId,
                                             Authors: [],
                                             Categories: []
                                         };
                                         bookmarks.Courses.push(course);
                                         courseList[elem.Id] = course;
                                     })
+                                    if (bookmarks.Courses.length > 0) {
+                                        for (let i = 0; i < bookmarks.Courses.length; i++)
+                                            await this._coursesService.getCoursePrice(bookmarks.Courses[i]);
+                                    }
                                 }
                             })
                     });

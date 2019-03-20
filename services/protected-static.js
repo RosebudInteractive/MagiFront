@@ -8,7 +8,7 @@ let uploadPath = config.get('uploadPath');
 let dataUrl = config.get('dataUrl');
 let oldDataUrl = config.get('oldDataUrl');
 
-exports.setupProtectedStatic = (app) => {
+exports.setupProtectedStatic = (app, errorHandler) => {
     let dataProcessor = (req, res, next) => {
         let { name, ext } = path.parse(decodeURIComponent(req.url))
         if (false && (ext === ".mp3")) {
@@ -43,4 +43,8 @@ exports.setupProtectedStatic = (app) => {
     };
     app.use(dataUrl, dataProcessor);
     app.use(oldDataUrl, dataProcessor);
+    if (errorHandler) {
+        app.use(dataUrl, errorHandler);
+        app.use(oldDataUrl, errorHandler);
+    }
 }

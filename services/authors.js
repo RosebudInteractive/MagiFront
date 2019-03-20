@@ -4,7 +4,7 @@ function setupAuthors(app) {
 
     app.get('/api/authors/:url', (req, res, next) => {
         AuthorsService()
-            .getPublic(req.params.url)
+            .getPublic(req.params.url, req.query)
             .then(rows => {
                 res.send(rows);
             })

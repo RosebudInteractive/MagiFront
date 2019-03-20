@@ -5,6 +5,8 @@ const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { PartnerLink } = require('../utils/partner-link');
+const { Product } = require('../const/product');
+const { ProductService } = require('./db-product');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const {
     ACCOUNT_ID,
@@ -80,12 +82,14 @@ const COURSE_UPD_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
+    "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from `Course` c\n" +
+    "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
 
@@ -204,6 +208,7 @@ const COURSE_LESSONS_MYSQL =
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
@@ -232,6 +237,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
@@ -260,6 +266,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -331,6 +338,7 @@ const COURSE_BOOKS_MSSQL_REQ =
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -459,6 +467,7 @@ const DbCourse = class DbCourse extends DbObject {
         super(options);
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
+        this._productService = ProductService();
     }
 
     _isNumericString(str) {
@@ -612,6 +621,7 @@ const DbCourse = class DbCourse extends DbObject {
         let languageId = (typeof (opts.lang_id) === "number") && (!isNaN(opts.lang_id)) ? opts.lang_id : LANGUAGE_ID;
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let baseUrl;
+        let productList = {};
 
         return new Promise((resolve, reject) => {
             baseUrl = config.proxyServer.siteHost + "/";
@@ -622,7 +632,7 @@ const DbCourse = class DbCourse extends DbObject {
                         mssql: _.template(COURSE_MSSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: languageId })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let crs_id = -1;
                             let curr_course;
@@ -644,10 +654,20 @@ const DbCourse = class DbCourse extends DbObject {
                                             URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
                                             OneLesson: elem.OneLesson ? true : false,
+                                            IsPaid: elem.IsPaid ? true : false,
+                                            IsSubsFree: elem.IsSubsFree ? true : false,
+                                            ProductId: elem.ProductId,
+                                            Price: 0,
+                                            DPrice: 0,
                                             Authors: [],
                                             Categories: [],
                                             Lessons: []
                                         };
+                                        if (curr_course.IsPaid && curr_course.ProductId) {
+                                            productList[curr_course.ProductId] = curr_course;
+                                        }
+                                        else
+                                            curr_course.ProductId = null;
                                         courses_list[elem.Id] = curr_course;
                                         courses.push(curr_course);
                                     }
@@ -664,6 +684,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? baseCourseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
+                                        IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -680,6 +701,17 @@ const DbCourse = class DbCourse extends DbObject {
                                 if (elem.Audio)
                                     lesson.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                             })
+
+                            if (Object.keys(productList).length > 0) {
+                                let prods = await this._productService.get({ TypeCode: "COURSEONLINE", Detail: true });
+                                for (let i = 0; i < prods.length; i++){
+                                    let prod = prods[i];
+                                    let course = productList[prod.Id];
+                                    if (course)
+                                        this._setPriceByProd(course, prod);
+                                }
+                            }
+
                             return $data.execSql({
                                 dialect: {
                                     mysql: _.template(AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ)({ languageId: languageId, whereClause: "where cs.`State` = 'P'" }),
@@ -764,7 +796,7 @@ const DbCourse = class DbCourse extends DbObject {
         let baseUrl;
 
         return new Promise((resolve, reject) => {
-            baseUrl = config.proxyServer.siteHost + "/";
+            baseUrl = this._baseUrl;
             let id = url;
             let isInt = (typeof (id) === "number");
             if (isInt && isNaN(id))
@@ -791,7 +823,7 @@ const DbCourse = class DbCourse extends DbObject {
                         mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let isFirst = true;
                             let authors_list = {};
@@ -816,6 +848,11 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
+                                        IsPaid: elem.IsPaid ? true : false,
+                                        IsSubsFree: elem.IsSubsFree ? true : false,
+                                        ProductId: elem.ProductId,
+                                        Price: 0,
+                                        DPrice: 0,
                                         Authors: [],
                                         Categories: [],
                                         Lessons: [],
@@ -823,7 +860,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         RefBooks: [],
                                         ShareCounters: {}
                                     };
-                                };
+                               };
                                 let lsn = lsn_list[elem.LessonId];
                                 if (!lsn) {
                                     lsn = {
@@ -836,6 +873,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
+                                        IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -867,6 +905,9 @@ const DbCourse = class DbCourse extends DbObject {
                                 if (elem.Audio)
                                     lsn.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                             })
+
+                            await this.getCoursePrice(course);
+
                             let authors = "";
                             isFirst = true;
                             for (let author in authors_list) {
@@ -1054,6 +1095,42 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
+    _setPriceByProd(course, prod) {
+        course.Price = prod.Price;
+        course.DPrice = prod.DPrice;
+        if (prod.Discount)
+            course.Discount = prod.Discount;
+    }
+
+    async getCoursePrice(course, withCheckProd) {
+        course.Price = 0;
+        course.DPrice = 0;
+        delete course.Discount;
+        if (course.IsPaid && course.ProductId) {
+            let prods = await this._productService.get({ Id: course.ProductId, Detail: true });
+            if (prods.length === 1)
+                this._setPriceByProd(course, prods[0])
+            else
+                if (withCheckProd)
+                    throw new HttpError(HttpCode.ERR_NOT_FOUND,
+                        `Can't find product "ProductId" = ${course.ProductId} of paid course "Id" = ${course.Id}.`);
+        }
+        else
+            course.ProductId = null;
+        let result = {
+            courseId: course.Id,
+            IsPaid: course.IsPaid,
+            Price: course.Price,
+            DPrice: course.DPrice,
+            IsSubsFree: course.IsSubsFree
+        };
+        if (course.ProductId)
+            result.ProductId = course.ProductId;
+        if (course.Discount)
+            result.Discount = course.Discount;
+        return result;
+    }
+
     get(id) {
         let course = {};
         return new Promise((resolve, reject) => {
@@ -1064,11 +1141,16 @@ const DbCourse = class DbCourse extends DbObject {
                         mssql: _.template(COURSE_MSSQL_ID_REQ)({ accountId: ACCOUNT_ID, id: id })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length === 1)) {
                             course = result.detail[0];
                             course.OneLesson = course.OneLesson ? true : false;
+                            course.IsPaid = course.IsPaid ? true : false;
+                            course.IsSubsFree = course.IsSubsFree ? true : false;
+                            await this.getCoursePrice(course, true);
                         }
+                        else
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "Id" = ${id}.`);                            
                         return $data.execSql({
                             dialect: {
                                 mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ id: id }),
@@ -1232,6 +1314,42 @@ const DbCourse = class DbCourse extends DbObject {
                     })
             );
         })
+    }
+
+    async _createOrUpdateProduct(crsObj, data, dbOptions) {
+        let result = { id: crsObj.productId(), isModified: false };
+        if (crsObj.isPaid()) {
+            let crsLng = crsObj.getDataRoot("CourseLng").getCol("DataElements").get(0);
+            if (!data.Price)
+                throw new Error(`Invalid or missing course price: "${data.Price}".`);
+            let prodData = {
+                ProductTypeId: Product.ProductTypes.CourseOnLine,
+                VATTypeId: Product.VATTypes.Vat20Id,
+                Code: `CRS-${crsObj.id()}`,
+                Name: `Курс: ${crsLng.name()}`,
+                Picture: crsObj.cover(),
+                PictureMeta: crsObj.coverMeta(),
+                Description: crsLng.description(),
+                Price: data.Price,
+                ExtFields: {
+                    courseId: crsObj.id()
+                }
+            };
+            if (data.Discount) {
+                prodData.Discount = data.Discount;
+                prodData.Discount.DiscountTypeId = Product.DiscountTypes.CoursePercId;
+                prodData.Discount.PriceListId = Product.DefaultPriceListId;
+            }
+            if (crsObj.productId()) {
+                let res = await this._productService.update(crsObj.productId(), prodData, { dbOptions: dbOptions });
+                result.isModified = res.isModified;
+            }
+            else {
+                let res = await this._productService.insert(prodData, { dbOptions: dbOptions });
+                result = { id: res.id, isModified: true };
+            }
+        }
+        return result;
     }
 
     update(id, data, options) {
@@ -1407,6 +1525,11 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_obj.oneLesson(inpFields["OneLesson"]);
                         isOneLessonCourse = crs_obj.oneLesson();
 
+                        if (typeof (inpFields["IsPaid"]) === "boolean")
+                            crs_obj.isPaid(inpFields["IsPaid"]);
+                        if (typeof (inpFields["IsSubsFree"]) === "boolean")
+                            crs_obj.isSubsFree(inpFields["IsSubsFree"]);
+
                         if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1496,7 +1619,13 @@ const DbCourse = class DbCourse extends DbObject {
                             .then((result) => {
                                 transactionId = result.transactionId;
                                 opts.transactionId = transactionId;
-                                return crs_obj.save(opts)
+                                return this._createOrUpdateProduct(crs_obj, { Price: inpFields.Price, Discount: inpFields.Discount }, opts)
+                                    .then(result => {
+                                        isModified = isModified || result.isModified;
+                                        if (result.isModified)
+                                            crs_obj.productId(result.id);
+                                        return crs_obj.save(opts)
+                                    })
                                     .then((result) => {
                                         isModified = isModified || (result && result.detail && (result.detail.length > 0));
                                     });
@@ -1608,6 +1737,7 @@ const DbCourse = class DbCourse extends DbObject {
             let languageId;
             let isOneLessonCourse;
             let isNotDraft = false;
+            let transactionId = null;
             resolve(
                 this._getObjById(-1)
                     .then((result) => {
@@ -1639,6 +1769,14 @@ const DbCourse = class DbCourse extends DbObject {
                         if (typeof (inpFields["OneLesson"]) === "boolean")
                             fields["OneLesson"] = inpFields["OneLesson"];
                         isOneLessonCourse = fields["OneLesson"];
+
+                        fields["IsPaid"] = false;
+                        if (inpFields["IsPaid"])
+                            fields["IsPaid"] = inpFields["IsPaid"];
+                        fields["IsSubsFree"] = false;
+                        if (typeof (inpFields["IsSubsFree"]) === "boolean")
+                            fields["IsSubsFree"] = inpFields["IsSubsFree"];
+
                         if (!languageId)
                             throw new Erorr("Field \"LanguageId\" is required.");
                         return root_obj.newObject({
@@ -1703,7 +1841,17 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                     })
                     .then(() => {
-                        return root_obj.save(opts);
+                        return $data.tranStart({})
+                            .then((result) => {
+                                transactionId = result.transactionId;
+                                opts.transactionId = transactionId;
+                                return this._createOrUpdateProduct(new_obj, { Price: inpFields.Price, Discount: inpFields.Discount }, opts)
+                                    .then(result => {
+                                        if (result.isModified)
+                                            new_obj.productId(result.id);
+                                        return root_obj.save(opts)
+                                    })
+                            });
                     })
                     .then(() => {
                         if (logModif)
@@ -1711,11 +1859,18 @@ const DbCourse = class DbCourse extends DbObject {
                         return { id: newId };
                     })
                     .finally((isErr, res) => {
+                        let result = transactionId ?
+                            (isErr ? $data.tranRollback(transactionId) : $data.tranCommit(transactionId)) : Promise.resolve();
                         if (root_obj)
                             this._db._deleteRoot(root_obj.getRoot());
-                        if (isErr)
-                            throw res;
-                        return res;
+                        if (isErr) {
+                            result = result.then(() => {
+                                throw res;
+                            });
+                        }
+                        else
+                            result = result.then(() => { return res; })
+                        return result;
                     })
                     .then((result) => {
                         return this.prerender(newId)

@@ -40,7 +40,7 @@ const GET_PROD_DETAIL_MSSQL =
     "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
     "  p.[ProductTypeId], pt.[Code] as [TypeCode], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
-    "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate]\n" +
+    "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription]\n" +
     "from[Product] p\n" +
     "  join[ProductType] pt on pt.[Id] = p.[ProductTypeId]\n" +
     "  join[Price] pr on pr.[ProductId] = p.[Id]\n" +
@@ -60,7 +60,7 @@ const GET_PROD_DETAIL_MYSQL =
     "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
     "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
-    "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`\n" +
+    "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`\n" +
     "from`Product` p\n" +
     "  join`ProductType` pt on pt.`Id` = p.`ProductTypeId`\n" +
     "  join`Price` pr on pr.`ProductId` = p.`Id`\n" +
@@ -221,12 +221,18 @@ const DbProduct = class DbProduct extends DbObject {
                         }
                         elem.DPrice = elem.Price;
                         if (typeof (elem.Perc) === "number") {
-                            let d = elem.Discount = { Perc: elem.Perc, FirstDate: elem.FirstDate, LastDate: elem.LastDate };
+                            let d = elem.Discount = {
+                                Description: elem.DDescription,
+                                Perc: elem.Perc,
+                                FirstDate: elem.FirstDate,
+                                LastDate: elem.LastDate
+                            };
                             elem.DPrice = roundNumber(elem.Price * (1 - d.Perc / 100), Accounting.SumPrecision);
                         }
                         delete elem.Perc;
                         delete elem.FirstDate;
                         delete elem.LastDate;
+                        delete elem.DDescription;
                         products.push(elem);
                     });
                 }
@@ -253,7 +259,7 @@ const DbProduct = class DbProduct extends DbObject {
                 else
                     throw new Error(`Invalid priceObj "FirstDate": "${priceObj.FirstDate}".`);
         };
-        if ((!priceObj.Price) || (typeof (priceObj.Price) !== "number") || (isNaN(priceObj.Price)))
+        if ((!priceObj.Price) || (typeof (priceObj.Price) !== "number") || (isNaN(priceObj.Price)) || (priceObj.Price <= 0))
             throw new Error(`Invalid priceObj: "${priceObj.Price}".`);
         let priceListId = priceObj.PriceListId ? priceObj.PriceListId : Product.DefaultPriceListId;
 
@@ -322,6 +328,7 @@ const DbProduct = class DbProduct extends DbObject {
         let fields = {
             DiscountTypeId: discount.DiscountTypeId,
             PriceListId: discount.PriceListId ? discount.PriceListId : Product.DefaultPriceListId,
+            Description: discount.Description,
             FirstDate: firstDate,
             LastDate: lastDate,
             Perc: discount.Perc
@@ -334,7 +341,7 @@ const DbProduct = class DbProduct extends DbObject {
                 && (!p.productTypeId()) && (!p.userId())) {
         
                 activePrice = p;
-                if ((p.perc() === fields.Perc) &&
+                if ((p.perc() === fields.Perc) && (p.description() === fields.Description) &&
                     (Math.abs(p.firstDate() - fields.FirstDate) < 500) && (Math.abs(p.lastDate() - fields.LastDate) < 500)) {
                     result = false;
                     break;
@@ -343,6 +350,7 @@ const DbProduct = class DbProduct extends DbObject {
         }
         if (result) {
             if (activePrice) {
+                activePrice.description(fields.Description);
                 activePrice.firstDate(fields.FirstDate);
                 activePrice.lastDate(fields.LastDate);
                 activePrice.perc(fields.Perc)
@@ -411,8 +419,9 @@ const DbProduct = class DbProduct extends DbObject {
                     }
                     if (isDetMdf)
                         productObj.ver(++ver);
-                    await root_obj.save(dbOpts);
-                    return { result: "OK" };
+                    let res = await root_obj.save(dbOpts);
+                    let isModified = res && res.detail && (res.detail.length > 0);
+                    return { result: "OK", isModified: isModified };
                 })
         }, memDbOptions);
     }

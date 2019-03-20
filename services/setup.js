@@ -165,7 +165,7 @@ function setupAPI(express, app) {
     setupBilling(app);
     setupMailSubscription(app);
     setupFeedback(app);
-    setupProtectedStatic(app);
+    setupProtectedStatic(app, errorHandler);
     setupLessonPositions(app);
     setupDebugRoutes(app);
     setupProducts(app);

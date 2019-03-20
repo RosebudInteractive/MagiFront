@@ -136,7 +136,7 @@ const LESSON_UPD_TREE = {
 };
 
 const LESSON_MSSQL_ID_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
+    "select l.[Id], l.[IsFreeInPaidCourse], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], ll.[Name], ll.[LanguageId], ll.[ShortDescription], ll.[FullDescription], cl.[Name] as [CourseName], c.[Id] as [CourseId],\n" +
     "  ll.[SnPost], ll.[SnName], ll.[SnDescription], ll.[ExtLinks],\n" +
     "  clo.[Name] as [CourseNameOrig], co.[Id] as [CourseIdOrig], a.[Id] as [AuthorId], l.[Cover], l.[CoverMeta], lc.[Number], lc.[ReadyDate],\n"+
     "  lc.[State], l.[LessonType], l.[ParentId], lcp.[LessonId] as [CurrParentId], lpl.[Name] as [CurrParentName] from [Lesson] l\n" +
@@ -168,7 +168,7 @@ const LESSON_MSSQL_CHLD_REQ =
     "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>";
 
 const LESSON_MYSQL_ID_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
+    "select l.`Id`, l.`IsFreeInPaidCourse`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
     "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`, ll.`ExtLinks`,\n" +
     "  clo.`Name` as `CourseNameOrig`, co.`Id` as `CourseIdOrig`, a.`Id` as `AuthorId`, l.`Cover`, l.`CoverMeta`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  lc.`State`, l.`LessonType`, l.`ParentId`, lcp.`LessonId` as `CurrParentId`, lpl.`Name` as `CurrParentName` from `Lesson` l\n" +
@@ -315,7 +315,7 @@ const LESSON_MSSQL_REQ =
 
 const LESSON_MSSQL_REQ_V2 =
     "select lc.[Id] as [ParentId], lc.[CourseId], c.[URL] as [CURL], cl.[LanguageId], cl.[Name] as [CName], l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
-    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsFreeInPaidCourse], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
     "  ll.[SnPost], ll.[SnName], ll.[SnDescription], ll.[ExtLinks],\n" +
     "  al.[FirstName], al.[LastName], a.[Portrait], a.[PortraitMeta], a.[URL] as [AURL]\n" +
     "from[LessonCourse] lc\n" +
@@ -365,6 +365,7 @@ const PARENT_MSSQL_REQ =
 
 const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -503,7 +504,7 @@ const LESSON_MYSQL_REQ =
 
 const LESSON_MYSQL_REQ_V2 =
     "select lc.`Id` as `ParentId`, lc.`CourseId`, c.`URL` as `CURL`, cl.`LanguageId`, cl.`Name` as `CName`, l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
-    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsFreeInPaidCourse`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
     "  ll.`SnPost`, ll.`SnName`, ll.`SnDescription`, ll.`ExtLinks`,\n" +
     "  al.`FirstName`, al.`LastName`, a.`Portrait`, a.`PortraitMeta`, a.`URL` as `AURL`\n" +
     "from`LessonCourse` lc\n" +
@@ -553,6 +554,7 @@ const PARENT_MYSQL_REQ =
 
 const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -836,6 +838,7 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         if (result && result.detail && (result.detail.length === 1)) {
                             lesson = result.detail[0];
+                            lesson.IsFreeInPaidCourse = lesson.IsFreeInPaidCourse ? true : false;
                             lesson.IsAuthRequired = lesson.IsAuthRequired ? true : false;
                             lesson.IsSubsRequired = lesson.IsSubsRequired ? true : false;
                             isNotFound = false;
@@ -1387,6 +1390,9 @@ const DbLesson = class DbLesson extends DbObject {
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
                                 URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL,
+                                IsPaid: elem.IsPaid ? true : false,
+                                IsSubsFree: elem.IsSubsFree ? true : false,
+                                ProductId: elem.ProductId,
                                 OneLesson: elem.OneLesson ? true : false
                             };
                         }
@@ -1414,6 +1420,7 @@ const DbLesson = class DbLesson extends DbObject {
                             data.Duration = elem.Duration;
                             data.DurationFmt = elem.DurationFmt;
                             data.URL = isAbsPath ? courseUrl + elem.URL : elem.URL;
+                            data.IsFreeInPaidCourse = elem.IsFreeInPaidCourse ? true : false;
                             data.IsAuthRequired = elem.IsAuthRequired ? true : false;
                             data.IsSubsRequired = elem.IsSubsRequired ? true : false;
                             if (elem.SnName)
@@ -2276,6 +2283,8 @@ const DbLesson = class DbLesson extends DbObject {
                             lsn_obj.coverMeta(inpFields["CoverMeta"]);
                         if (typeof (inpFields["URL"]) !== "undefined")
                             lsn_obj.uRL(inpFields["URL"]);
+                        if (typeof (inpFields["IsFreeInPaidCourse"]) !== "undefined")
+                            lsn_obj.isFreeInPaidCourse(inpFields["IsFreeInPaidCourse"] ? true : false);
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             lsn_obj.isAuthRequired(inpFields["IsAuthRequired"] ? true : false);
                         if (typeof (inpFields["IsSubsRequired"]) !== "undefined")
@@ -2636,6 +2645,9 @@ const DbLesson = class DbLesson extends DbObject {
                             fields["CoverMeta"] = inpFields["CoverMeta"];
                         if (typeof (inpFields["URL"]) !== "undefined")
                             fields["URL"] = inpFields["URL"];
+                        fields["IsFreeInPaidCourse"] = false;
+                        if (typeof (inpFields["IsFreeInPaidCourse"]) !== "undefined")
+                            fields["IsFreeInPaidCourse"] = inpFields["IsFreeInPaidCourse"] ? true : false;
                         fields["IsAuthRequired"] = false;
                         if (typeof (inpFields["IsAuthRequired"]) !== "undefined")
                             fields["IsAuthRequired"] = inpFields["IsAuthRequired"] ? true : false;
