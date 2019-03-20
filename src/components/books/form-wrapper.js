@@ -14,7 +14,7 @@ import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
 import {booksSelector, bookIdSelector, editModeSelector, closeEditor, insertBook, updateBook} from "adm-ducks/books"
 import AuthorsTab from "./tabs/authors-tab";
-import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
+import {checkBookExtLinks, getExtLinks} from "../../tools/link-tools";
 import {showErrorDialog} from "../../actions/app-actions";
 
 const TABS = {
@@ -126,7 +126,7 @@ class BookEditorForm extends React.Component {
         let {editorValues, editMode, bookId,} = this.props,
             _values = Object.assign({}, editorValues)
 
-        let _checkResult = checkExtLinks(_values.extLinksValues)
+        let _checkResult = checkBookExtLinks(_values.extLinksValues)
 
         if (_checkResult && _checkResult.length) {
             let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
@@ -135,6 +135,7 @@ class BookEditorForm extends React.Component {
         }
 
         _values.extLinksValues = getExtLinks(_values.extLinksValues)
+        _values.course = (_values.course && +_values.course) ? +_values.course : null
 
         if (!editMode) {
             this.props.insertBook(_values)

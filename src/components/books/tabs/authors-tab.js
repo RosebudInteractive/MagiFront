@@ -58,10 +58,10 @@ class AuthorsTab extends React.Component {
 
 
         _options.sort((a, b) =>  {
-            // if(a.value < b.value) { return -1; }
-            // if(a.value > b.value) { return 1; }
             return a.value.localeCompare(b.value);
         })
+
+        _options.unshift({id: 0, value: '<<< Без курса >>>'})
 
         return _options
     }

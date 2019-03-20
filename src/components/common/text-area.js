@@ -110,7 +110,13 @@ class PlainTextArea extends React.Component {
     _onChange(e) {
         let _value = e.target.innerText
 
-        if (this.props.input.value !== _value) {
+        let _array1 = _value.match(/[^\r\n]+/g),
+            _array2 = this.props.input.value.match(/[^\r\n]+/g),
+            _equals = (!_array1 && !_array2) || ((!!_array1 && !!_array2) && (_array1.length === _array2.length) && _array1.every((item, index) => {
+                return item === _array2[index]
+            }))
+
+        if (!_equals) {
             this.props.input.onChange(_value);
         }
     }

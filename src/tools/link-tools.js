@@ -1,12 +1,18 @@
 import $ from "jquery";
 
-const availableLinks = {
-    'www.ozon.ru': 'ozon',
-    'www.labirint.ru': 'labirint',
-    'www.litres.ru': 'litres',
-    'ru.bookmate.com': 'bookmate',
-    'www.storytel.com': 'storytel',
-    'zvukislov.ru': 'zvukislov',
+const AVAILABLE_FOR = {
+    COURSE: 'COURSE',
+    BOOK: 'BOOK',
+    COURSE_AND_BOOK: 'COURSE_AND_BOOK',
+}
+
+const AVAILABLE_LINKS = {
+    'www.ozon.ru': {name: 'ozon', availableFor: AVAILABLE_FOR.BOOK},
+    'www.labirint.ru': {name: 'labirint', availableFor: AVAILABLE_FOR.BOOK},
+    'www.litres.ru': {name: 'litres', availableFor: AVAILABLE_FOR.COURSE},
+    'ru.bookmate.com': {name: 'bookmate', availableFor: AVAILABLE_FOR.COURSE_AND_BOOK},
+    'www.storytel.com': {name: 'storytel', availableFor: AVAILABLE_FOR.COURSE},
+    'zvukislov.ru': {name: 'zvukislov', availableFor: AVAILABLE_FOR.COURSE},
 }
 
 export class ExtLinkObject {
@@ -43,9 +49,47 @@ export const checkExtLinks = (links) => {
     _arrayOfLines.forEach((link) => {
         if (!link) return;
 
-        let _extLink = new ExtLinkObject(link);
-        if (!_extLink.isValid() || (!availableLinks[_extLink.host()])) {
+        let _extLink = new ExtLinkObject(link)
+
+        if (!_extLink.isValid()) {
             _result.push(link)
+        } else {
+            let _availableLink = AVAILABLE_LINKS[_extLink.host()],
+                _linkNotAllowed = (!_availableLink)
+                    || ((_availableLink.availableFor !== AVAILABLE_FOR.COURSE)
+                        && (_availableLink.availableFor !== AVAILABLE_FOR.COURSE_AND_BOOK))
+
+            if (_linkNotAllowed) {
+                _result.push(link)
+            }
+        }
+    })
+
+    return _result
+}
+
+export const checkBookExtLinks = (links) => {
+    if (!links) return null
+
+    let _arrayOfLines = links.match(/[^\r\n]+/g);
+
+    let _result = []
+
+    _arrayOfLines.forEach((link) => {
+        if (!link) return;
+
+        let _extLink = new ExtLinkObject(link);
+        if (!_extLink.isValid()) {
+            _result.push(link)
+        } else {
+            let _availableLink = AVAILABLE_LINKS[_extLink.host()],
+                _linkNotAllowed = (!_availableLink)
+                    || ((_availableLink.availableFor !== AVAILABLE_FOR.BOOK)
+                        && (_availableLink.availableFor !== AVAILABLE_FOR.COURSE_AND_BOOK))
+
+            if (_linkNotAllowed) {
+                _result.push(link)
+            }
         }
     })
 
