@@ -8,6 +8,7 @@ const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { CoursesService } = require('./db-course');
+const { splitArray } = require('../utils');
 
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
@@ -141,6 +142,10 @@ const GET_COURSES_BY_IDS_MSSQL =
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
+const GET_PAID_COURSES_MSSQL =
+    "select [CourseId] as [Id] from [UserPaidCourse]\n" +
+    "where [UserId] = <%= userId %>";
+
 const GET_AUTHORS_BY_COURSE_IDS_MSSQL =
     "select a.[Id], ac.[CourseId], a.[Portrait], a.[PortraitMeta], a.[URL],\n" +
     "  al.[FirstName], al.[LastName] from [Author] a\n" +
@@ -231,6 +236,10 @@ const GET_COURSES_BY_IDS_MYSQL =
     "select c.`Id`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "where c.`Id` in (<%= courseIds %>)";
+
+const GET_PAID_COURSES_MYSQL =
+    "select `CourseId` as `Id` from `UserPaidCourse`\n" +
+    "where `UserId` = <%= userId %>";
 
 const GET_AUTHORS_BY_COURSE_IDS_MYSQL =
     "select a.`Id`, ac.`CourseId`, a.`Portrait`, a.`PortraitMeta`, a.`URL`,\n" +
@@ -463,6 +472,77 @@ const DbUser = class DbUser extends DbObject {
         })
     }
 
+    async getPaidCourses(userId, isDetailed, options) {
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let data = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_PAID_COURSES_MYSQL)({ userId: userId }),
+                mssql: _.template(GET_PAID_COURSES_MSSQL)({ userId: userId })
+            }
+        }, {});
+        let courseIds = [];
+        if (data && data.detail && (data.detail.length > 0)) {
+            data.detail.forEach(elem => {
+                courseIds.push(elem.Id);
+            })
+        }
+        let result;
+        if (isDetailed && (courseIds.length > 0)) {
+            result = [];
+            let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
+            result = await this._getCoursesByIds(arrayOfIds, isAbsPath);
+        }
+        else
+            result = courseIds;
+        return result;
+    }
+
+    async _getCoursesByIds(arrayOfIds, isAbsPath, courseList, courseBoookmarkOrder) {
+        let courses = [];
+
+        if (arrayOfIds.length > 0) {
+            await Utils.seqExec(arrayOfIds, (elem) => {
+                return $data.execSql({
+                    dialect: {
+                        mysql: _.template(GET_COURSES_BY_IDS_MYSQL)({ courseIds: elem.join() }),
+                        mssql: _.template(GET_COURSES_BY_IDS_MSSQL)({ courseIds: elem.join() })
+                    }
+                }, {})
+                    .then(async (result) => {
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            result.detail.forEach((elem) => {
+                                let course = {
+                                    Id: elem.Id,
+                                    Name: elem.Name,
+                                    URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                                    Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
+                                    CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                    Mask: elem.Mask,
+                                    OneLesson: elem.OneLesson ? true : false,
+                                    IsPaid: elem.IsPaid ? true : false,
+                                    IsSubsFree: elem.IsSubsFree ? true : false,
+                                    ProductId: elem.ProductId,
+                                    Authors: [],
+                                    Categories: []
+                                };
+                                if (courseBoookmarkOrder)
+                                    course.Order= courseBoookmarkOrder[elem.Id];
+                                courses.push(course);
+                                if (courseList)
+                                    courseList[elem.Id] = course;
+                            })
+                            if (courses.length > 0) {
+                                for (let i = 0; i < courses.length; i++)
+                                    await this._coursesService.getCoursePrice(courses[i]);
+                            }
+                        }
+                    })
+            });
+        }
+        return courses;
+    }
+
     getExtBookmarks(userId, options) {
         let courseIds = [];
         let courseList = {};
@@ -495,19 +575,6 @@ const DbUser = class DbUser extends DbObject {
                 });
         };
 
-        function prepareArrayOfIds() {
-            let restIds = courseIds.length;
-            let currPos = 0;
-            let arrayOfIds = [];
-            while (restIds > 0) {
-                let len = restIds > MAX_COURSES_REQ_NUM ? MAX_COURSES_REQ_NUM : restIds;
-                arrayOfIds.push(courseIds.slice(currPos, currPos + len));
-                restIds -= len;
-                currPos += len;
-            }
-            return arrayOfIds;
-        }
-
         return new Promise((resolve, reject) => {
             resolve(this.getHistory(userId, getLessonIdsByBookmarks, opts))
         })
@@ -534,45 +601,9 @@ const DbUser = class DbUser extends DbObject {
                         }
                     });
             })
-            .then(() => {
-                if (courseIds.length > 0) {
-                    arrayOfIds = prepareArrayOfIds();
-                    return Utils.seqExec(arrayOfIds, (elem) => {
-                        return $data.execSql({
-                            dialect: {
-                                mysql: _.template(GET_COURSES_BY_IDS_MYSQL)({ courseIds: elem.join() }),
-                                mssql: _.template(GET_COURSES_BY_IDS_MSSQL)({ courseIds: elem.join() })
-                            }
-                        }, {})
-                            .then(async (result) => {
-                                if (result && result.detail && (result.detail.length > 0)) {
-                                    result.detail.forEach((elem) => {
-                                        let course = {
-                                            Id: elem.Id,
-                                            Name: elem.Name,
-                                            URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
-                                            Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                            CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
-                                            Mask: elem.Mask,
-                                            Order: courseBoookmarkOrder[elem.Id],
-                                            OneLesson: elem.OneLesson ? true : false,
-                                            IsPaid: elem.IsPaid ? true : false,
-                                            IsSubsFree: elem.IsSubsFree ? true : false,
-                                            ProductId: elem.ProductId,
-                                            Authors: [],
-                                            Categories: []
-                                        };
-                                        bookmarks.Courses.push(course);
-                                        courseList[elem.Id] = course;
-                                    })
-                                    if (bookmarks.Courses.length > 0) {
-                                        for (let i = 0; i < bookmarks.Courses.length; i++)
-                                            await this._coursesService.getCoursePrice(bookmarks.Courses[i]);
-                                    }
-                                }
-                            })
-                    });
-                }
+            .then(async() => {
+                arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
+                bookmarks.Courses = await this._getCoursesByIds(arrayOfIds, isAbsPath, courseList, courseBoookmarkOrder);
             })
             .then(() => {
                 if (courseIds.length > 0) {

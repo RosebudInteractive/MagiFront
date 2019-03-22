@@ -558,7 +558,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                             rc = $dbUser.checkPwd(user_data.Password, user.pwdHash())
                                 .then((result) => {
                                     if (!result)
-                                        throw new Error("UsersBaseCache::editUser: Invalid password!");
+                                        throw new Error("Неверный пароль.");
                                     if (user_data.NewPassword) {
                                         return $dbUser.getPwdHash(user_data.NewPassword)
                                             .then((hash) => {

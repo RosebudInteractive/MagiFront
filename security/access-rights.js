@@ -6,45 +6,60 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { AccessFlags } = require('../const/common');
 
 const LESSON_FILE_MSSQL_REQ =
-    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate] from[EpisodeLng] el\n" +
+    "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], l.[IsFreeInPaidCourse], pc.[CourseId]\n" +
+    "from [EpisodeLng] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
+    "  join [Course] c on c.[Id] = l.[CourseId]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= userId %>) and (pc.[CourseId] = c.[Id])\n" +
     "where el.[Audio] = '<%= file %>'";
     
 const LESSON_FILE_MYSQL_REQ =
-    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate` from`EpisodeLng` el\n" +
+    "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, l.`IsFreeInPaidCourse`, pc.`CourseId`\n" +
+    "from `EpisodeLng` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `Lesson` l on l.`Id` = e.`LessonId`\n" +
+    "  join `Course` c on c.`Id` = l.`CourseId`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= userId %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where el.`Audio` = '<%= file %>'";
 
 exports.AccessRights = class {
 
     static _canAccessAudio(user, file) {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             let canAccess = $data.execSql({
                 dialect: {
-                    mysql: _.template(LESSON_FILE_MYSQL_REQ)({ file: file }),
-                    mssql: _.template(LESSON_FILE_MSSQL_REQ)({ file: file })
+                    mysql: _.template(LESSON_FILE_MYSQL_REQ)({ file: file, userId: user ? user.Id : 0 }),
+                    mssql: _.template(LESSON_FILE_MSSQL_REQ)({ file: file, userId: user ? user.Id : 0 })
                 }
             }, {})
                 .then((result) => {
                     let res = false;
-                    if (result && result.detail && (result.detail.length === 1))
-                        res = result.detail[0].IsAuthRequired ? true : false;
-                    if (!res)
-                        res = true
-                    else {
-                        res = user ? true : false;
-                        if (res) {
-                            let rec = result.detail[0];
-                            let now = new Date();
-                            if ((!rec.FreeExpDate)||(now > rec.FreeExpDate)) {
-                                if (rec.IsSubsRequired && ((!user.SubsExpDateExt) || (now > rec.SubsExpDateExt)))
-                                    res = false;    
+                    if (result && result.detail && (result.detail.length === 1)) {
+                        let now = new Date();
+                        let rec = result.detail[0];
+                        let needAuth = rec.IsAuthRequired || rec.IsSubsRequired || rec.IsPaid;
+                        if (needAuth) {
+                            if (user) {
+                                if (rec.IsSubsRequired || rec.IsPaid) {
+                                    res = rec.IsPaid && (rec.IsFreeInPaidCourse || rec.CourseId);
+                                    if (!res) {
+                                        if (rec.IsSubsRequired || (rec.IsPaid && rec.IsSubsFree)) {
+                                            res = rec.FreeExpDate && (now <= rec.FreeExpDate);
+                                            res = res || (user.SubsExpDateExt && (now <= rec.SubsExpDateExt));
+                                        }
+                                    }
+                                }
+                                else
+                                    res = true;
                             }
                         }
+                        else
+                            res = true;
                     }
-                    return res;
+                    return res ? true : false;
                 });
             resolve(canAccess);
         });
@@ -52,18 +67,15 @@ exports.AccessRights = class {
 
     static canAccessFile(user, file) {
         return new Promise((resolve) => {
-            let result = user ? true : false;
-            if (!result) {
-                result = true;
-                let mimeType = mime.getType(file);
-                let typeArr = mimeType ? mimeType.split("/") : null;
-                if (typeArr && (typeArr.length > 0)) {
-                    let fn = file.substring(0, 1) === "/" ? file.substring(1) : file;
-                    switch (typeArr[0]) {
-                        case "audio":
-                            result = this._canAccessAudio(user, fn);
-                            break;
-                    }
+            let result = true;
+            let mimeType = mime.getType(file);
+            let typeArr = mimeType ? mimeType.split("/") : null;
+            if (typeArr && (typeArr.length > 0)) {
+                let fn = file.substring(0, 1) === "/" ? file.substring(1) : file;
+                switch (typeArr[0]) {
+                    case "audio":
+                        result = this._canAccessAudio(user, fn);
+                        break;
                 }
             }
             resolve(result);

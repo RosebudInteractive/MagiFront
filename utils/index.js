@@ -26,8 +26,22 @@ function roundNumber(num, scale) {
     }
 }
 
+function splitArray(in_array, max_size) {
+    let restIds = in_array.length;
+    let currPos = 0;
+    let arrayOfIds = [];
+    while (restIds > 0) {
+        let len = restIds > max_size ? max_size : restIds;
+        arrayOfIds.push(in_array.slice(currPos, currPos + len));
+        restIds -= len;
+        currPos += len;
+    }
+    return arrayOfIds;
+}
+
 module.exports = {
     getTimeStr: getTimeStr,
     buildLogString: buildLogString,
-    roundNumber: roundNumber
+    roundNumber: roundNumber,
+    splitArray: splitArray
 };

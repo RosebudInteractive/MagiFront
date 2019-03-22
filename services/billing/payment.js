@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { DbObject } = require('../../database/db-object');
 const { InvoiceService } = require('../../database/db-invoice');
+const { UsersService } = require('../../database/db-user');
 const { Accounting } = require('../../const/accounting');
 const { Product } = require('../../const/product');
 const { HttpCode } = require("../../const/http-codes");
@@ -495,6 +496,9 @@ exports.Payment = class Payment extends DbObject {
                             fields.SubsProductId = fields.SubsExpDate ? prod.ProductId : null;
                         }
                         if (paidCourses.length > 0) {
+                            if (!isRefund)
+                                for (let i = 0; i < paidCourses.length; i++)
+                                    await UsersService().insBookmark(user.Id, paidCourses[i]);
                             let data = {};
                             data[isRefund ? "deleted" : "added"] = paidCourses;
                             await UsersCache().paidCourses(user.Id, data, dbOpts);

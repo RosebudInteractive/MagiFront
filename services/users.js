@@ -69,6 +69,34 @@ function setupUsers(app) {
                 });
     });
 
+    app.get('/api/users/paid/courses', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getPaidCourses(req.user.Id, false, req.query)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.get('/api/users/paid/courses-ext', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getPaidCourses(req.user.Id, true, req.query)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
     app.post('/api/users/bookmark/:course_url/:lesson_url', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
