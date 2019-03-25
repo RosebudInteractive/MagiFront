@@ -28,7 +28,7 @@ export default class BooksList extends React.Component {
 
         return books.map((item, index) => {
             let _isMain = ((index === 0) || _allBooksIsMain)
-            return <Item book={item} isMain={_isMain}/>
+            return <Item book={item} isMain={_isMain} isSingle={books.length === 1}/>
         })
     }
 }
