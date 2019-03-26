@@ -198,7 +198,8 @@ class PlayerFrame extends Component {
             _invisibleStyle = {
                 opacity: 0,
                 zIndex: -100,
-                display: "flex",
+                display: "contents",
+                visibility: "hidden",
             }
 
 

@@ -5742,9 +5742,7 @@ ul.user-tooltip {
       width: 100%;
       height: auto; }
   .course-module__course-descr {
-    /* todo : включить auto когда будут книги */
-    /*margin-top: auto;*/
-    margin-bottom: 32px;
+    margin-bottom: 12px;
     padding-top: 12px; }
     @media (max-width: 1399px) {
       .course-module__course-descr {
@@ -19624,6 +19622,7 @@ ul.lectures-tab {
       margin-bottom: 32px; } }
   @media (max-width: 639px) {
     .other-sources {
+      margin-top: 14px;
       margin-bottom: 14px; } }
   .other-sources__headline {
     margin: 0 0 13px;
@@ -19641,7 +19640,7 @@ ul.lectures-tab {
     font-weight: 400;
     font-size: 28px;
     line-height: 1.2; }
-    @media (max-width: 1023px) {
+    @media (max-width: 1399px) {
       .other-sources__title {
         font-size: 17px; } }
     @media (max-width: 899px) {
@@ -19755,6 +19754,7 @@ ul.lectures-tab {
     border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
     @media (max-width: 639px) {
       .books__title {
+        font-size: 15px;
         margin-bottom: 6px;
         padding-bottom: 3px; } }
     @media (max-width: 768px) {
@@ -19765,7 +19765,7 @@ ul.lectures-tab {
     font-weight: 400;
     font-size: 28px;
     line-height: 1.2; }
-    @media (max-width: 1023px) {
+    @media (max-width: 1399px) {
       .books__headline {
         font-size: 17px; } }
     @media (max-width: 899px) {
@@ -19830,6 +19830,15 @@ ul.lectures-tab {
       box-sizing: border-box;
       padding-right: 30px;
       width: 100%; }
+    .lecture-sources .book-list__item._single,
+    .lecture-sources .lecture-info__extras .book-list__item._single {
+      width: 50%; }
+    @media (max-width: 1399px) {
+      .lecture-sources .book-list__item._single {
+        width: 100%; } }
+    @media (max-width: 1279px) {
+      .lecture-sources .lecture-info__extras .book-list__item._single {
+        width: 100%; } }
   .book-list._grid {
     display: -ms-grid;
     display: grid;

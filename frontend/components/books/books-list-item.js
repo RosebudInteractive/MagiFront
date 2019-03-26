@@ -9,10 +9,15 @@ export default class Item extends React.Component {
     static propTypes = {
         book: PropTypes.object,
         isMain: PropTypes.bool,
+        isSingle: PropTypes.bool,
+    }
+
+    static defaultProps = {
+        isSingle: false,
     }
 
     render() {
-        let {book, isMain} = this.props,
+        let {book, isMain, isSingle} = this.props,
             _coverPath = isMain ? getCoverPath(book, ImageSize.small) : getCoverPath(book, ImageSize.icon),
             _cover = _coverPath ? '/data/' + _coverPath : '',
             _defaultLink = getDefaultExtLink(book.ExtLinks);
@@ -26,7 +31,7 @@ export default class Item extends React.Component {
                 <img src={_cover} alt=""/>
             </div>
 
-        return <li className={"book-list__item book-preview" + (isMain ? " _main" : "")}>
+        return <li className={"book-list__item book-preview" + (isMain ? " _main" : "") + (isSingle ? " _single" : "")}>
             {_imageDiv}
             <div className="book-preview__info-block">
                 <div className="book-preview__info">
