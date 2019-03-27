@@ -15,6 +15,7 @@ export default class GridControl extends Component {
         moveDownAction: PropTypes.func,
         multiUploadAction: PropTypes.func,
         editMode: PropTypes.string,
+        viewId: PropTypes.string,
         selected: PropTypes.number,
         data: PropTypes.any.isRequired,
     }

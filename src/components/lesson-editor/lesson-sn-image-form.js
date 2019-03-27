@@ -1,6 +1,6 @@
 import React from 'react'
-import Webix from '../components/Webix';
-import * as lessonActions from '../actions/lesson/lesson-actions'
+import Webix from '../Webix';
+import * as lessonActions from '../../actions/lesson/lesson-actions'
 
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';

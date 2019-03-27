@@ -28,7 +28,7 @@ import {Tabs, TabLink, TabContent} from 'react-tabs-redux';
 import ObjectEditor, {labelWidth,} from './object-editor';
 import ResourceForm from "../components/resource-form";
 import MultiResourceForm from "../components/multi-resource-form";
-import SnImageSelectForm from "../components/lesson-sn-image-form";
+import SnImageSelectForm from "../components/lesson-editor/lesson-sn-image-form";
 import $ from 'jquery';
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
 import * as appActions from "../actions/app-actions";
