@@ -262,7 +262,7 @@ class LessonEditorForm extends React.Component {
             this._fillChilds(_obj.Childs);
         }
 
-        this.props.save(_obj, this.state.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
+        this.props.save(_obj, this.props.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
     }
 
     _fillEpisodes(array) {

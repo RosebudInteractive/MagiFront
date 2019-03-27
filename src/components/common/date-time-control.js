@@ -64,9 +64,9 @@ class Datepicker extends React.Component {
     }
 
     handleBlur(e) {
-        // const {onBlur, input} = this.props
-        // if (onBlur) onBlur(e)
-        // if (input) input.onBlur(input.value)
+        const {onBlur, input} = this.props
+        if (onBlur) onBlur()
+        if (input) input.onBlur()
     }
 
     render() {
@@ -76,7 +76,7 @@ class Datepicker extends React.Component {
         const errorMessage = input ? reduxFormError(meta) : error
 
         const _error = errorMessage &&
-            <p className="form__error-message" style={{display: "block"}}>{error}</p>
+            <p className="form__error-message" style={{display: "block"}}>{errorMessage}</p>
 
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
@@ -84,13 +84,14 @@ class Datepicker extends React.Component {
                 <div className={"field-wrapper__editor-wrapper"}>
                     <ReactDatetime
                         inputProps={{
-                            placeholder: placeholder || 'Select Date'
+                            placeholder: placeholder || 'Укажите дату',
+                            disabled: disabled,
                         }}
                         {...this.props}
                         selected={currentValue}
                         onChange={this.handleChange.bind(this)}
                         onFocus={this.handleFocus.bind(this)}
-                        onBlur={this.handleBlur.bind(this)}
+                        onBlur={::this.handleBlur}
                         closeOnSelect={true}
                         dateFormat={"DD MMMM YYYY"}
                         locale={"ru-ru"}
