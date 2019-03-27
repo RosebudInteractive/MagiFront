@@ -50,7 +50,8 @@ const GET_PROD_DETAIL_MSSQL =
     "  join[VATRate] vr on vr.[VATTypeId] = vt.[Id]\n" +
     "  left join[Discount] d on d.[ProductId] = p.[Id] and pl.[Id] = d.[PriceListId]\n" +
     "    and (d.[UserId] is NULL) and (d.[ProductTypeId] is NULL)\n" +
-    "    and (d.[FirstDate] <= convert(datetime, '<%= dt %>') and((d.[LastDate] > convert(datetime, '<%= dt %>')) or(d.[LastDate] is NULL)))\n" +
+    "    and ((1 = <%= always_show_discount %>) or\n" +
+    "    ((d.[FirstDate] <= convert(datetime, '<%= dt %>') and((d.[LastDate] > convert(datetime, '<%= dt %>')) or(d.[LastDate] is NULL)))))\n" +
     "where(<%= alias %>.[<%= field %>] <%= cond %>) and(pl.[Code] = '<%= priceList %>') and(pr.[FirstDate] <= convert(datetime, '<%= dt %>')\n" +
     "  and((pr.[LastDate] > convert(datetime, '<%= dt %>')) or(pr.[LastDate] is NULL)))\n" +
     "  and(vr.[FirstDate] <= convert(datetime, '<%= dt %>')\n" +
@@ -70,7 +71,8 @@ const GET_PROD_DETAIL_MYSQL =
     "  join`VATRate` vr on vr.`VATTypeId` = vt.`Id`\n" +
     "  left join`Discount` d on d.`ProductId` = p.`Id` and pl.`Id` = d.`PriceListId`\n" +
     "    and (d.`UserId` is NULL) and (d.`ProductTypeId` is NULL)\n" +
-    "    and (d.`FirstDate` <= '<%= dt %>' and((d.`LastDate` > '<%= dt %>') or(d.`LastDate` is NULL)))\n" +
+    "    and ((1 = <%= always_show_discount %>) or\n" +
+    "    ((d.`FirstDate` <= '<%= dt %>' and((d.`LastDate` > '<%= dt %>') or(d.`LastDate` is NULL)))))\n" +
     "where(<%= alias %>.`<%= field %>` <%= cond %>) and(pl.`Code` = '<%= priceList %>') and(pr.`FirstDate` <= '<%= dt %>'\n" +
     "  and((pr.`LastDate` > '<%= dt %>') or(pr.`LastDate` is NULL)))\n" +
     "  and(vr.`FirstDate` <= '<%= dt %>'\n" +
@@ -101,6 +103,7 @@ const DbProduct = class DbProduct extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let products = [];
         let dt;
+        let always_show_discount;
         return new Promise(resolve => {
             let ids;
             let codes;
@@ -118,6 +121,8 @@ const DbProduct = class DbProduct extends DbObject {
                     dt = new Date(ms);
                 }
             }
+            always_show_discount = ((opts.AlwaysShowDiscount === "true") || (opts.AlwaysShowDiscount === "1")
+                || (opts.AlwaysShowDiscount === true) || (opts.AlwaysShowDiscount === 1)) ? 1 : 0;
             if (opts.Id) {
                 let id = typeof (opts.Id) === "number" ? opts.Id : parseInt(opts.Id);
                 if (isNaN(id))
@@ -187,7 +192,15 @@ const DbProduct = class DbProduct extends DbObject {
                 throw new Error(`Invalid parameters: Missing "Id" or "Code" or "Ids" or "Codes".`);
 
             let params = dt ?
-                { discontinued: discontinued, alias: alias, field: field, cond: cond, priceList: priceList, dt: this._dateToString(dt, true) } :
+                {
+                    always_show_discount: always_show_discount,
+                    discontinued: discontinued,
+                    alias: alias,
+                    field: field,
+                    cond: cond,
+                    priceList: priceList,
+                    dt: this._dateToString(dt, true)
+                } :
                 { discontinued: discontinued, alias: alias, field: field, cond: cond };
             let sql = dt ?
                 {
