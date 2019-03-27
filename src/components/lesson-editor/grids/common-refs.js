@@ -26,6 +26,7 @@ class CommonRefsGrid extends React.Component {
                               editMode={this.props.editMode}
                               selected={this.props.selected}
                               data={this.props.commonRef}
+                              viewId={'common-refs'}
             />
             {
                 (this.props.showReferenceEditor && !this.props.reference.Recommended) ?

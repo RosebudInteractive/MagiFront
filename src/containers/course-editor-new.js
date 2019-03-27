@@ -17,7 +17,7 @@ import {getAuthors} from "../actions/authorsListActions";
 import {getCategories} from "../actions/categoriesListActions";
 import {getLanguages} from "../actions/languages-actions";
 import {checkExtLinks, getExtLinks} from "../tools/link-tools";
-import {getParameters, setFixedCourse,} from "adm-ducks/params";
+import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
@@ -204,20 +204,6 @@ class CourseEditor extends React.Component {
         })
     }
 
-    _checkLessonsState(newState) {
-        if (!newState) {
-            return false
-        }
-
-        if (newState === 'P') {
-            return this.props.courseLessons.some((lesson) => {
-                return lesson.State === 'R'
-            })
-        } else {
-            return true
-        }
-    }
-
     _enableApplyChanges() {
         return this.props.editorValid && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
     }
@@ -242,7 +228,12 @@ function mapStateToProps(state, ownProps) {
             state.courseCategories.hasChanges ||
             state.courseLessons.hasChanges || isDirty('CourseEditor')(state),
 
-        fetching: state.authorsList.fetching || state.categoriesList.fetching || state.languages.fetching || state.singleCourse.fetching,
+        fetching: state.authorsList.fetching ||
+            state.categoriesList.fetching ||
+            state.languages.fetching ||
+            state.singleCourse.fetching ||
+            parametersFetchingSelector(state),
+
         editorValues: getFormValues('CourseEditor')(state),
         editorValid: isValid('CourseEditor')(state),
     }

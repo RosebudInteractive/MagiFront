@@ -14,18 +14,17 @@ export default class ReferencesTab extends React.Component{
         super(props)
 
         this._resizeHandler = () => {
-            let _episodes = window.$$('lesson-episodes'),
-                _subs = window.$$('lesson-subs'),
+            let _commonRefs = window.$$('common-refs'),
+                _recommendedRefs = window.$$('recommended-refs'),
                 _width = $('.editor__main-area').width() - 20
 
-            if (_episodes) {
-                _episodes.$setSize(_width, _episodes.height);
+            if (_commonRefs) {
+                _commonRefs.$setSize(_width, _commonRefs.height);
             }
 
-            if (_subs) {
-                _subs.$setSize(_width, _subs.height);
+            if (_recommendedRefs) {
+                _recommendedRefs.$setSize(_width, _recommendedRefs.height);
             }
-
         }
     }
 

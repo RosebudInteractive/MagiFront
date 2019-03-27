@@ -1,16 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './controls.sass'
+import '../common/controls.sass'
+import './image-link.sass'
 import SnImageSelectForm from "./lesson-sn-image-form";
 import ResourceForm from "../resource-form";
+import {bindActionCreators} from "redux";
+import * as lessonResourcesActions from "../../actions/lesson/lesson-resources-actions";
+import * as resourcesActions from "../../actions/resources-actions";
+import {connect} from "react-redux";
+import {EDIT_MODE_EDIT} from "../../constants/Common";
+import * as singleLessonActions from "../../actions/lesson/lesson-actions";
 
-export default class ImageLink extends React.Component {
+export const IMAGE_TYPE = {
+    OG : 'og',
+    TWITTER : 'twitter',
+}
+
+class ImageLink extends React.Component {
 
     static propTypes = {
         id: PropTypes.string,
         label: PropTypes.string,
         placeholder: PropTypes.string,
-        resources: PropTypes.array,
+        // resources: PropTypes.array,
+        imageType: PropTypes.string,
     };
 
     constructor(props) {
@@ -20,6 +33,22 @@ export default class ImageLink extends React.Component {
             showCreateDialog: false,
             showSelectDialog: false,
         }
+
+        this._name = '';
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.props.input.value !== nextProps.input.value) {
+            this._name = this._getResourceName(nextProps.input.value)
+        }
+    }
+
+    _getResourceName(resourceId) {
+        let _resource = this.props.resources.find((item) => {
+            return item.Id === resourceId
+        })
+
+        return _resource ? _resource.Name : ''
     }
 
     render() {
@@ -32,12 +61,11 @@ export default class ImageLink extends React.Component {
                 <label htmlFor={id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
                     <div className={"image-link-wrapper"}>
-                        <input className="field-input" type='text' value={input.name} id={id} placeholder={placeholder}
+                        <input className="field-input field-text" type='text' value={this._name} id={id} placeholder={placeholder}
                                disabled={disabled ? "disabled" : ""}/>
-                        <button className="image-link-wrapper__upload-button" onClick={::this._showCreateDialog}/>
-                        <button className="image-link-wrapper__select-button" onClick={::this._showSelectDialog}/>
+                        <button className="image-link-wrapper__button upload" onClick={::this._showCreateDialog}/>
+                        <button className="image-link-wrapper__button find" onClick={::this._showSelectDialog}/>
                     </div>
-
                     {_errorText}
                 </div>
             </div>
@@ -45,7 +73,7 @@ export default class ImageLink extends React.Component {
                 this.state.showSelectDialog ?
                     <SnImageSelectForm
                         cancel={::this._closeSelectDialog}
-                        save={::this._setValue}
+                        save={::this._selectImage}
                         lessonId={this.props.lessonId}
                     />
                     :
@@ -73,6 +101,12 @@ export default class ImageLink extends React.Component {
         this.setState({showSelectDialog: false})
     }
 
+    _selectImage(value) {
+        this._setValue(value.Id)
+
+        this.setState({showSelectDialog: false})
+    }
+
     _setValue(id) {
         const {onChange, input, resources} = this.props
 
@@ -80,18 +114,57 @@ export default class ImageLink extends React.Component {
             return
         }
 
-        let _resource = resources.find((item) => {
-            return item.Id === this.props.id
-        })
-
-        let _value = {id: id, name: _resource.Name}
-
-        if (onChange) onChange(_value)
-        if (input) input.onChange(_value)
+        if (onChange) onChange(id)
+        if (input) input.onChange(id)
     }
 
     _showCreateDialog() {
         this.setState({showCreateDialog: true})
         this.props.resourcesActions.create({ShowInGalery: false})
     }
+
+    _closeCreateDialog() {
+        this.setState({ showCreateDialog: false })
+        this.props.resourcesActions.clear();
+    }
+
+    _saveResource(value) {
+        if (this.props.resourceEditMode === EDIT_MODE_EDIT) {
+            this.props.lessonResourcesActions.update(value)
+        } else {
+            this.props.lessonResourcesActions.insert(value);
+        }
+
+        if (this.props.imageType === IMAGE_TYPE.OG) {
+            this.props.lessonActions.setOgImage(value.Id);
+        }
+
+        if (this.props.imageType === IMAGE_TYPE.TWITTER) {
+            this.props.lessonActions.setTwitterImage(value.Id);
+        }
+
+        this._setValue(value.Id)
+
+        this.props.resourcesActions.clear();
+        this.setState({ showCreateDialog: false })
+    }
 }
+
+function mapStateToProps(state) {
+    return {
+        resources: state.lessonResources.current,
+        // selected: state.lessonResources.selected,
+        // resourceEditMode: state.resources.editMode,
+        resource: state.resources.object,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
+        resourcesActions: bindActionCreators(resourcesActions, dispatch),
+        lessonActions: bindActionCreators(singleLessonActions, dispatch),
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ImageLink);

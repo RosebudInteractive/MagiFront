@@ -3,7 +3,7 @@ import GridControl from "../../gridControl";
 export default class LessonReferences extends GridControl {
 
     _getId() {
-        return 'lesson-refs';
+        return this.props.viewId ? this.props.viewId : 'lesson-refs';
     }
 
     _getColumns() {
