@@ -100,6 +100,7 @@ class CourseEditor extends React.Component {
                         <div className="main-area__container">
                             <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN}
                                                editMode={this.state.editMode}/>
+
                             <AuthorsTab editMode={this.state.editMode}
                                         visible={this.state.currentTab === TABS.AUTHORS}/>
                             <LessonsTab editMode={this.state.editMode} courseId={courseId}
