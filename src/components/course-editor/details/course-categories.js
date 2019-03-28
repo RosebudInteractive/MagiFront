@@ -8,16 +8,19 @@ import * as courseCategoriesActions from "../../../actions/course/courseCategori
 class CourseCategoriesWrapper extends React.Component {
 
     static propTypes = {
-        editMode : PropTypes.bool,
+        editMode: PropTypes.bool,
     }
 
     render() {
-        return <CourseCategories addAction={::this.props.courseCategoriesActions.showAddDialog}
-                                 removeAction={::this.props.courseCategoriesActions.remove}
-                                 selectAction={::this.props.courseCategoriesActions.select}
-                                 selected={this.props.selectedCategory}
-                                 editMode={this.editMode}
-                                 data={::this._getCourseCategories()}/>
+        return <div className="course-categories">
+            <label className="grid-label">Категории курса</label>
+            <CourseCategories addAction={::this.props.courseCategoriesActions.showAddDialog}
+                              removeAction={::this.props.courseCategoriesActions.remove}
+                              selectAction={::this.props.courseCategoriesActions.select}
+                              selected={this.props.selectedCategory}
+                              editMode={this.editMode}
+                              data={::this._getCourseCategories()}/>
+        </div>
     }
 
     _getCourseCategories() {

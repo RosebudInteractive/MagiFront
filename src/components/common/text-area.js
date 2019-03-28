@@ -21,7 +21,7 @@ export default class TextArea extends React.Component {
                 let _id = this.props.id ? this.props.id : this._id
                 let _target = $('#' + _id)[0];
 
-                let _descr = (this.props.enableHtml) && _target.innerHTML ? normalizeHtml(_target.innerHTML) : _target.innerText
+                let _descr = (this.props.enableHtml) && _target.innerHTML ? normalizeHtml(_target.innerHTML) : normalizeText(_target.innerText)
 
                 this.props.input.onChange(_descr)
             }, 0);
@@ -72,6 +72,10 @@ function normalizeHtml(str) {
     return str && str.replace(/&nbsp;|\u202F|\u00A0/g, ' ');
 }
 
+function normalizeText(str) {
+    return str && str.replace(/[^\x20-\xFF]/gi, '');
+}
+
 class HtmlTextArea extends React.Component {
     render() {
         const {input, id, disabled,} = this.props;
@@ -103,7 +107,7 @@ class PlainTextArea extends React.Component {
             disabled ?
                 <div {...input} id={id} className="field-textarea plain-text" disabled>{input.value}</div>
                 :
-                <div contentEditable={true} {...input} id={id} className="field-textarea plain-text" onBlur={::this._onChange}>{input.value}</div>
+                <p contentEditable={true} {...input} id={id} className="field-textarea plain-text" onBlur={::this._onChange}>{input.value}</p>
         )
     }
 
