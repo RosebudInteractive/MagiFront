@@ -1102,12 +1102,16 @@ const DbCourse = class DbCourse extends DbObject {
             course.Discount = prod.Discount;
     }
 
-    async getCoursePrice(course, withCheckProd) {
+    async getCoursePrice(course, withCheckProd, alwaysShowDiscount) {
         course.Price = 0;
         course.DPrice = 0;
         delete course.Discount;
         if (course.IsPaid && course.ProductId) {
-            let prods = await this._productService.get({ Id: course.ProductId, Detail: true });
+            let prods = await this._productService.get({
+                Id: course.ProductId,
+                Detail: true,
+                AlwaysShowDiscount: alwaysShowDiscount ? true : false
+            });
             if (prods.length === 1)
                 this._setPriceByProd(course, prods[0])
             else
@@ -1147,7 +1151,7 @@ const DbCourse = class DbCourse extends DbObject {
                             course.OneLesson = course.OneLesson ? true : false;
                             course.IsPaid = course.IsPaid ? true : false;
                             course.IsSubsFree = course.IsSubsFree ? true : false;
-                            await this.getCoursePrice(course, true);
+                            await this.getCoursePrice(course, true, true);
                         }
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "Id" = ${id}.`);                            
