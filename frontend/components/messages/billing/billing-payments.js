@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {
@@ -13,7 +14,20 @@ import StoredCard from "./stored-card";
 import {Alfa, AutosubscribeButton, Card, Mobile, Qiwi, Sberbank, WebMoney, Yandex,} from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "../../../ducks/profile";
 
+export const PAYMENT_TYPE = {
+    BILLING: 'BILLING',
+    COURSE: 'COURSE',
+}
+
 class PaymentForm extends React.Component {
+
+    static propTypes = {
+        paymentType : PropTypes.string,
+    }
+
+    static defaultProps = {
+        paymentType: PAYMENT_TYPE.BILLING,
+    }
 
     constructor(props) {
         super(props)
@@ -143,15 +157,22 @@ class PaymentForm extends React.Component {
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
-        let {selectedSubscription} = this.props;
+        let {selectedSubscription, paymentType} = this.props;
 
         return <div className="billing-steps__item js-billing-step active">
             <div className="modal__header">
-                <p className="modal__headline">Оформить подписку <span className="js-subcribe-period">   </span></p>
-                <button className="billing-steps__back js-billing-back" type="button"
-                        onClick={::this.props.switchToSubscription}>
-                    ← Выбрать другой вариант подписки
-                </button>
+                {paymentType === PAYMENT_TYPE.BILLING ?
+                    <React.Fragment>
+                        <p className="modal__headline">Оформить подписку <span className="js-subcribe-period">   </span>
+                        </p>
+                        <button className="billing-steps__back js-billing-back" type="button"
+                                onClick={::this.props.switchToSubscription}>
+                            ← Выбрать другой вариант подписки
+                        </button>
+                    </React.Fragment>
+                    :
+                    <p className="modal__headline">{"Купить курс «" + selectedSubscription.Title + "»"}</p>
+                }
             </div>
             <div className="modal__body payment-methods">
                 <h3 className="payment-methods__title">Выберите способ оплаты</h3>

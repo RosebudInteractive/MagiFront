@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from "redux";
+import {showCoursePaymentWindow, setSubscriptionType} from "ducks/billing";
+import connect from "react-redux/es/connect/connect";
 
-
-export default class PriceBlock extends React.Component {
+class PriceBlock extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
@@ -21,7 +23,7 @@ export default class PriceBlock extends React.Component {
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <a href="#" className="btn btn--brown course-module__price-btn">Купить</a>
+                <div className="btn btn--brown course-module__price-btn" onClick={::this._onClick}>Купить</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
@@ -47,4 +49,34 @@ export default class PriceBlock extends React.Component {
             }
         </div>
     }
+
+    _onClick() {
+        const {course} = this.props;
+
+        this._setSubscriptionType({
+            Price: course.DPrice ? course.DPrice : course.Price,
+            Id : course.ProductId,
+            Title: course.Name,
+        })
+        this.props.showPaymentWindow()
+    }
+
+    _setSubscriptionType(item) {
+        let {billingTest, user} = this.props,
+            _disablePayment = billingTest && (!!user && user.PData && (!user.PData.isAdmin) && user.PData.roles.billing_test)
+        this.props.setSubscriptionType(item)
+
+        // if (!_disablePayment) {
+        //     this.props.switchToPayment()
+        // }
+    }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
+        setSubscriptionType: bindActionCreators(setSubscriptionType, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(PriceBlock);

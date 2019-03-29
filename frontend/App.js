@@ -41,6 +41,7 @@ import SizeInfo from './components/size-info'
 
 import Platform from 'platform';
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
+import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
 Polyfill.registry();
@@ -288,6 +289,7 @@ class App extends Component {
                 {showFeedbackWindow ? <FeedbackMessageBox/> : null}
                 {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
                 <BillingWrapper/>
+                <CoursePaymentWrapper/>
                 <CookiesMessage/>
             </div>
 

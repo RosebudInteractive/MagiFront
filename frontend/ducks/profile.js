@@ -753,6 +753,12 @@ const handleBookmarksData = (data) => {
     }
 }
 
+export const saga = function* () {
+    yield all([
+        takeEvery(GET_BOOKS_REQUEST, getBooksSaga),
+    ])
+}
+
 const Months = [
     'Январь',
     'Февраль',

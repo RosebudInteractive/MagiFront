@@ -3,21 +3,19 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 
 import {
-    showBillingWindowSelector,
+    showCoursePaymentWindowSelector,
     billingStepSelector,
     loadingSelector,
     isRedirectActiveSelector,
-    BillingStep,
-    hideBillingWindow,
+    hideCoursePaymentWindow,
     redirectComplete,
     isRedirectUrlSelector
 } from "../../../ducks/billing";
 
-import Subscription from './billing-subscription'
-import Payment from './billing-payments'
+import Payment, {PAYMENT_TYPE} from './billing-payments'
 import $ from "jquery";
 
-class BillingWrapper extends React.Component {
+class CoursePaymentWrapper extends React.Component {
     constructor(props) {
         super(props)
 
@@ -35,11 +33,11 @@ class BillingWrapper extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (!prevProps.showBillingWindow && this.props.showBillingWindow) {
+        if (!prevProps.showWindow && this.props.showWindow) {
             this._onShow()
         }
 
-        if (prevProps.showBillingWindow && !this.props.showBillingWindow) {
+        if (prevProps.showWindow && !this.props.showWindow) {
             this._onHide()
         }
 
@@ -64,21 +62,6 @@ class BillingWrapper extends React.Component {
         })
     }
 
-    _getStep() {
-        let {billingStep: step, loading,} = this.props;
-
-        switch (step) {
-            case BillingStep.subscription:
-                return <Subscription/>
-
-            case BillingStep.payment:
-                return <Payment loading={loading}/>
-
-            default:
-                return null;
-        }
-    }
-
     _onCloseClick() {
         this.setState({
             opened: false
@@ -91,16 +74,16 @@ class BillingWrapper extends React.Component {
     }
 
     render() {
-        let {showBillingWindow, enabledBilling, showSignInForm} = this.props;
+        let {showWindow, enabledBilling, showSignInForm, loading} = this.props;
 
-        return (showBillingWindow && enabledBilling && !showSignInForm) ?
+        return (showWindow && enabledBilling && !showSignInForm) ?
             <div
                 className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
                             onClick={::this._onCloseClick}>Закрыть
                     </button>
-                    {this._getStep()}
+                    <Payment loading={loading} paymentType={PAYMENT_TYPE.COURSE}/>
                 </div>
             </div>
             :
@@ -111,7 +94,7 @@ class BillingWrapper extends React.Component {
 function mapStateToProps(state) {
     return {
         showSignInForm: state.app.showSignInForm,
-        showBillingWindow: showBillingWindowSelector(state),
+        showWindow: showCoursePaymentWindowSelector(state),
         billingStep: billingStepSelector(state),
         loading: loadingSelector(state),
         needRedirect: isRedirectActiveSelector(state),
@@ -125,9 +108,9 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        close: bindActionCreators(hideBillingWindow, dispatch),
+        close: bindActionCreators(hideCoursePaymentWindow, dispatch),
         complete: bindActionCreators(redirectComplete, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BillingWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(CoursePaymentWrapper);

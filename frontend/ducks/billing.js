@@ -13,6 +13,8 @@ const prefix = `${appName}/${moduleName}`
 
 export const SHOW_BILLING_WINDOW = `${prefix}/SHOW_BILLING_WINDOW`
 export const HIDE_BILLING_WINDOW = `${prefix}/HIDE_BILLING_WINDOW`
+export const SHOW_COURSE_PAYMENT_WINDOW = `${prefix}/SHOW_COURSE_PAYMENT_WINDOW`
+export const HIDE_COURSE_PAYMENT_WINDOW = `${prefix}/HIDE_COURSE_PAYMENT_WINDOW`
 export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
 export const SWITCH_TO_PAYMENT = `${prefix}/SWITCH_TO_PAYMENT`
 export const SWITCH_TO_SUBSCRIPTION = `${prefix}/SWITCH_TO_SUBSCRIPTION`
@@ -36,6 +38,7 @@ const Redirect = Record({url: '', active: false})
 
 export const ReducerRecord = Record({
     showBillingWindow: false,
+    showCoursePaymentWindow: false,
     step: BillingStep.subscription,
     types: null,
     selectedType: null,
@@ -77,6 +80,16 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('showBillingWindow', false)
 
+        case SHOW_COURSE_PAYMENT_WINDOW:
+            return state
+                .set('error', null)
+                .set('fetching', false)
+                .set('showCoursePaymentWindow', true)
+
+        case HIDE_COURSE_PAYMENT_WINDOW:
+            return state
+                .set('showCoursePaymentWindow', false)
+
         case SWITCH_TO_PAYMENT:
             return state
                 .set('step', BillingStep.payment)
@@ -88,10 +101,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_SUBSCRIPTION_TYPE:
             return state
                 .set('selectedType', payload)
-
-        // case SEND_PAYMENT_START:
-        //     return state
-        //         .set('processing', true)
 
         case SEND_PAYMENT_SUCCESS: {
             let _state = state
@@ -123,6 +132,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const showBillingWindowSelector = createSelector(stateSelector, state => state.showBillingWindow)
+export const showCoursePaymentWindowSelector = createSelector(stateSelector, state => state.showCoursePaymentWindow)
 export const billingStepSelector = createSelector(stateSelector, state => state.step)
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
@@ -197,7 +207,6 @@ export const sendPayment = (values) => {
     }
 }
 
-
 export const showBillingWindow = () => {
     return {
         type: SHOW_BILLING_WINDOW,
@@ -208,6 +217,20 @@ export const showBillingWindow = () => {
 export const hideBillingWindow = () => {
     return {
         type: HIDE_BILLING_WINDOW,
+        payload: null
+    }
+}
+
+export const showCoursePaymentWindow = () => {
+    return {
+        type: SHOW_COURSE_PAYMENT_WINDOW,
+        payload: null
+    }
+}
+
+export const hideCoursePaymentWindow = () => {
+    return {
+        type: HIDE_COURSE_PAYMENT_WINDOW,
         payload: null
     }
 }

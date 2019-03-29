@@ -5632,7 +5632,8 @@ ul.user-tooltip {
     padding: 17px 32px;
     min-width: 140px;
     font-size: 17px;
-    font-weight: 400; }
+    font-weight: 400;
+    cursor: pointer; }
   .author-page .course-module__price-btn {
     min-width: 216px; }
     @media (max-width: 1280px) {
