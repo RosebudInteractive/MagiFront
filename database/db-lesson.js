@@ -338,7 +338,7 @@ const LESSON_MSSQL_CHILDS_REQ =
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
-    "where lc.[ParentId] = <%= id %>\n" +
+    "where (lc.[ParentId] = <%= id %>) and (lc.[State] = 'R')\n" +
     "order by l.[Id], el.[Number]";
 
 const LESSON_SHARE_COUNTERS_MSSQL_REQ =
@@ -527,7 +527,7 @@ const LESSON_MYSQL_CHILDS_REQ =
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
-    "where lc.`ParentId` = <%= id %>\n" +
+    "where (lc.`ParentId` = <%= id %>) and (lc.`State` = 'R')\n" +
     "order by l.`Id`, el.`Number`";
 
 const LESSON_SHARE_COUNTERS_MYSQL_REQ =
@@ -1018,7 +1018,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         if (parent) {
                                             if (isCurrent)
                                                 currLesson = [parent.idx, parent.lesson.Lessons.length];
-                                            parent.lesson.Lessons.push(lsn);
+                                            if (lsn.State === "R") // Show ready childs only !!!
+                                                parent.lesson.Lessons.push(lsn);
                                         }
                                     }
                                 };
