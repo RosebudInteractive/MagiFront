@@ -896,8 +896,10 @@ const DbCourse = class DbCourse extends DbObject {
                                     else {
                                         let parent = lc_list[elem.ParentId];
                                         if (parent) {
-                                            parent.Lessons.push(lsn);
-                                            parent.NSub++;
+                                            if (lsn.State === "R") { // Show ready childs only !!!
+                                                parent.Lessons.push(lsn);
+                                                parent.NSub++;
+                                            }
                                         }
                                     }
                                     lsn_list[elem.LessonId] = lsn;

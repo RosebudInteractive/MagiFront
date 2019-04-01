@@ -61,7 +61,7 @@ function init(user_id,secret,storage) {
         TOKEN = fs.readFileSync(TOKEN_STORAGE+hashName,{encoding:'utf8'});
     }
 
-    if (! TOKEN.length) {
+    if ((!TOKEN) || (!TOKEN.length)) {
         getToken();
     }
 }
@@ -82,8 +82,8 @@ function sendRequest(path, method, data, useToken, callback){
     headers['Content-Type'] = 'application/json';
     headers['Content-Length'] =  Buffer.byteLength(JSON.stringify(data));
 
-    if (useToken && TOKEN.length) {
-        headers['Authorization'] = 'Bearer '+TOKEN;
+    if (useToken && TOKEN && TOKEN.length) {
+        headers['Authorization'] = 'Bearer ' + TOKEN;
     }
     if (method === undefined) {
         method = 'POST';
