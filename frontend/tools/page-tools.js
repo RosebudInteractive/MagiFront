@@ -52,6 +52,7 @@ export const pages = {
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
     bookmarks: {name: 'bookmarks', url: '/favorites'},
+    purchases: {name: 'purchases', url: '/purchases'},
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile/'},
     notFound: {name: 'not-found', url: null}

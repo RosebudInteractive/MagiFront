@@ -76,7 +76,8 @@ class PaymentForm extends React.Component {
         let {selectedMethod, showSaveMethodButton, savePayment,} = this.state;
 
         if (this._isSendingEnable()) {
-            const data = new FormData(event.target);
+            // const data = new FormData(event.target);
+            const data = new FormData();
             if (selectedMethod === 'stored-card') {
                 data.Payment = {
                     cheque_id: this.props.info.get('SubsAutoPayId')
@@ -158,6 +159,10 @@ class PaymentForm extends React.Component {
     render() {
         let _disabledBtn = !this._isSendingEnable()
         let {selectedSubscription, paymentType} = this.props;
+
+        if (this.props.loading || !selectedSubscription) {
+            return null
+        }
 
         return <div className="billing-steps__item js-billing-step active">
             <div className="modal__header">

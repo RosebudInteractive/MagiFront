@@ -6,14 +6,16 @@ import {
     getCourseBookmarks,
     getLessonBookmarks,
     getUserBookmarksFull, loadingSelector
-} from "../ducks/profile";
-import * as pageHeaderActions from "../actions/page-header-actions";
-import * as userActions from "../actions/user-actions";
-import * as appActions from "../actions/app-actions";
-import * as storageActions from "../actions/lesson-info-storage-actions";
+} from "ducks/profile";
+import {setCurrentPage} from "../actions/page-header-actions";
+import {whoAmI, showSignInForm} from "../actions/user-actions";
+// import * as appActions from "../actions/app-actions";
+import {refreshState} from "../actions/lesson-info-storage-actions";
 import LessonsBlock from '../components/bookmarks/lessons-block'
 import CoursesBlock from '../components/bookmarks/courses-block'
 import {Redirect} from 'react-router';
+import {reset} from "redux-form";
+import {showErrorDialog} from "../../src/actions/app-actions";
 
 class BookmarksPage extends React.Component {
     constructor(props) {
@@ -31,13 +33,7 @@ class BookmarksPage extends React.Component {
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getUserBookmarksFull();
-        this.props.pageHeaderActions.setCurrentPage(pages.bookmarks);
-        if ((this.props.page === '/favorites/lessons') && (!this.props.showLessonBookmarks)) {
-            this.props.appActions.showLessonsBookmarks();
-        }
-
-        if ((this.props.page === '/favorites/courses') && (!this.props.showCourseBookmarks)) {
-            this.props.appActions.showCoursesBookmarks();
+        this.props.pageHeaderActions.setCurrentPage(pages.purchases);
         }
     }
 
@@ -56,7 +52,7 @@ class BookmarksPage extends React.Component {
             if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
                 this.props.appActions.showCoursesBookmarks();
                 this.props.history.replace('/favorites/courses')
-            }
+            }§
 
             if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
                 this.props.appActions.showLessonsBookmarks();
@@ -124,7 +120,7 @@ function mapStateToProps(state, ownProps) {
         lessonsBookmarks: getLessonBookmarks(state),
         coursesBookmarks: getCourseBookmarks(state),
         authorized: !!state.user.user,
-        loading: state.user.loading || loadingSelector(state),
+        loading: state.user.loading,
         showLessonBookmarks: state.app.showLessonBookmarks,
         showCourseBookmarks: state.app.showCourseBookmarks,
         page: ownProps.location.pathname,
@@ -132,14 +128,18 @@ function mapStateToProps(state, ownProps) {
     }
 }
 
+// function mapDispatchToProps(dispatch) {
+//     return {
+//         userActions: bindActionCreators(userActions, dispatch),
+//         appActions: bindActionCreators(appActions, dispatch),
+//         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
+//         storageActions: bindActionCreators(storageActions, dispatch),
+//         getUserBookmarksFull: bindActionCreators(getUserBookmarksFull, dispatch),
+//     }
+// }
+
 function mapDispatchToProps(dispatch) {
-    return {
-        userActions: bindActionCreators(userActions, dispatch),
-        appActions: bindActionCreators(appActions, dispatch),
-        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-        storageActions: bindActionCreators(storageActions, dispatch),
-        getUserBookmarksFull: bindActionCreators(getUserBookmarksFull, dispatch),
-    }
+    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(BookmarksPage);

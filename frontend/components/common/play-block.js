@@ -21,6 +21,7 @@ class PlayBlock extends React.Component {
         isAuthRequired: PropTypes.bool,
         duration: PropTypes.string,
         totalDuration: PropTypes.number,
+        isPaid: PropTypes.bool,
     }
 
     _play() {
@@ -37,6 +38,7 @@ class PlayBlock extends React.Component {
     _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
+            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
         let {isAuthRequired, authorized} = this.props,

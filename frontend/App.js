@@ -21,7 +21,7 @@ import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
-import {getUserBookmarks} from "./ducks/profile";
+import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
@@ -140,6 +140,7 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.hideUserBlock()
+            this.props.getUserPaidCourses()
 
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
@@ -326,6 +327,7 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
+        getUserPaidCourses: bindActionCreators(getUserPaidCourses, dispatch),
         loadVersion: bindActionCreators(loadVersion, dispatch),
     }
 }
