@@ -199,6 +199,9 @@
             </filter>
             <path id="pause-small-a" d="M3 0H0v10h3V0z"/>
             <path id="pause-a" d="M0 0h8v36H0V0z"/>
+            <clipPath id="play-crown-a">
+                <path d="M0 0h102v90H0z"/>
+            </clipPath>
             <clipPath id="play-lock-a">
                 <path d="M0 0h102v90H0z"/>
             </clipPath>
@@ -692,6 +695,23 @@
                       stroke="#FFF" stroke-opacity=".2"/>
                 <path d="M41 42v-3c0-3.86-3.14-7-7-7s-7 3.14-7 7v3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2zm-6 7h-2v-5h2v5zm4-7H29v-3c0-2.757 2.243-5 5-5s5 2.243 5 5v3z"
                       fill="#FFF"/>
+            </g>
+        </symbol>
+        <symbol id="play-crown" viewBox="0 0 102 90">
+            <g clip-path="url(#play-crown-a)">
+                <clipPath id="play-crown-b">
+                    <path fill="#FFF" d="M0 0h102v90H0z"/>
+                </clipPath>
+                <g clip-path="url(#play-crown-b)">
+                    <mask id="play-crown-c" x="-200%" y="-200%" width="400%" height="400%">
+                        <rect x="-200%" y="-200%" width="400%" height="400%" fill="#fff"/>
+                        <path d="M.5 89.224V.758L100.761 43.65.5 89.224z"/>
+                    </mask>
+                    <path d="M.5 89.224V.758L100.761 43.65.5 89.224z" fill="none" mask="url(#play-crown-c)"
+                          vector-effect="non-scaling-stroke" stroke-width="2" stroke="#FFF" stroke-opacity="20"/>
+                    <path d="M42.944 52H25.056v-2.556h17.888V52zM45.5 35.389l-6.389 6.389L34 29l-5.111 12.778-6.389-6.389 2.556 11.5h17.888l2.556-11.5z"
+                          fill="#FFF"/>
+                </g>
             </g>
         </symbol>
         <symbol id="play-nofill" viewBox="0 0 12 11"><title>Rectangle</title>
