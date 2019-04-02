@@ -12,6 +12,7 @@ export default class Extras extends React.Component {
         isLessonInBookmarks: PropTypes.func,
         onSwitchFavorites: PropTypes.func,
         courseUrl: PropTypes.string,
+        isPaidCourse: PropTypes.bool,
     }
 
     render() {
@@ -41,7 +42,7 @@ export default class Extras extends React.Component {
                     {lesson.Name + ' '}
                     <span className="duration">{lesson.DurationFmt}</span>
                 </Link>
-                <LessonPlayBlockSmall lesson={lesson}/>
+                <LessonPlayBlockSmall lesson={lesson} isPaidCourse={this.props.isPaidCourse}/>
                 <FavoritesButton className={"extras-list__fav"} courseUrl={lesson.courseUrl} lessonUrl={lesson.URL}/>
             </li>
         })

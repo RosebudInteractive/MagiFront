@@ -9,18 +9,19 @@ export default class Wrapper extends React.Component {
         courseUrl: PropTypes.string.isRequired,
         lessons: PropTypes.array.isRequired,
         isMobile: PropTypes.bool.isRequired,
+        isPaidCourse: PropTypes.bool,
     };
 
     render() {
-        let {lessons, isMobile} = this.props;
+        let {lessons, isMobile, isPaidCourse} = this.props;
 
         return (
             <div className='lectures-wrapper'>
                 {
                     isMobile ?
-                        <LecturesList lessons={lessons} courseUrl={this.props.courseUrl}/>
+                        <LecturesList lessons={lessons} courseUrl={this.props.courseUrl} isPaidCourse={isPaidCourse}/>
                         :
-                        <SingleLecture lesson={lessons[0]} courseUrl={this.props.courseUrl}/>
+                        <SingleLecture lesson={lessons[0]} courseUrl={this.props.courseUrl} isPaidCourse={isPaidCourse}/>
                 }
             </div>
         )

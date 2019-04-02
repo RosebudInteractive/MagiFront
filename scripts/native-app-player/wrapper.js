@@ -349,6 +349,15 @@ export default class NativeAppPlayer {
                     eventType: 'magisteriaPlayer',
                     eventName: 'Suspend',
                 })
+            },
+            onMessage: (message) => {
+                this._sendMessageToApp({
+                    eventType: 'magisteriaPlayer',
+                    eventName: 'Message',
+                    data: {
+                        message,
+                    },
+                })
             }
         };
     }

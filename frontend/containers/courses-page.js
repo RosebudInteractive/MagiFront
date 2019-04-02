@@ -18,7 +18,8 @@ import {
     selectedFilterSelector,
     applyExternalFilter
 } from "../ducks/filters";
-import {fixedCourseIdSelector, fixedLessonIdSelector} from "../ducks/params";
+import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
+import {userPaidCoursesSelector} from "ducks/profile";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -60,7 +61,7 @@ class CoursesPage extends React.Component {
 
     _getCoursesBundles() {
 
-        let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId} = this.props,
+        let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId, userPaidCourses} = this.props,
             _courses = this.props.courses.items,
             _result = [];
 
@@ -87,9 +88,11 @@ class CoursesPage extends React.Component {
                         })
 
                         if (_lesson) {
+                            let _isPaidCourse = (course && course.IsPaid && !userPaidCourses.includes(course.Id))
+
                             _lesson.author = course.AuthorsObj.find(author => author.Id === _lesson.AuthorId)
                             _lesson.category = course.CategoriesObj
-                            _result.unshift(<FixLessonWrapper lesson={_lesson} courseUrl={course.URL}/>)
+                            _result.unshift(<FixLessonWrapper lesson={_lesson} courseUrl={course.URL} isPaidCourse={_isPaidCourse}/>)
                         }
                     }
 
@@ -136,6 +139,7 @@ function mapStateToProps(state, ownProps) {
         externalFilter: ownProps.match.params.filter,
         fixedCourseId: fixedCourseIdSelector(state),
         fixedLessonId: fixedLessonIdSelector(state),
+        userPaidCourses : userPaidCoursesSelector(state),
         ownProps,
     }
 }

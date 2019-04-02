@@ -14,6 +14,7 @@ class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
         lesson: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     };
 
     constructor(props) {
@@ -59,13 +60,18 @@ class PlayBlock extends React.Component {
     _getButton(isThisLessonPlaying, isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
+            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
-        let {authorized, lesson} = this.props,
+        let {authorized, lesson, isPaidCourse} = this.props,
             _isAuthRequired = lesson.IsAuthRequired,
             _button = null;
 
-        if (_isAuthRequired && !authorized) {
+        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+            return <button className="lecture__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+            </button>
+        } else if (_isAuthRequired && !authorized) {
             _button = <button className="lecture__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
@@ -89,11 +95,13 @@ class PlayBlock extends React.Component {
     }
 
     _getTooltip(isThisLessonPlaying, isFinished) {
-        let {lesson, authorized, paused} = this.props,
+        let {lesson, authorized, paused, isPaidCourse} = this.props,
             {IsAuthRequired} = lesson,
             _tooltip = null;
 
-        if (IsAuthRequired && !authorized) {
+        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+            _tooltip = TooltipTitles.IS_PAID
+        } else if (IsAuthRequired && !authorized) {
             _tooltip = TooltipTitles.locked
         } else {
             _tooltip = isThisLessonPlaying ?

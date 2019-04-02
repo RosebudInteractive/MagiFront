@@ -12,6 +12,7 @@ export default class InfoBlock extends React.Component {
         courseUrl: PropTypes.string,
         needShowAuthors: PropTypes.bool,
         isSingleLesson: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -20,7 +21,7 @@ export default class InfoBlock extends React.Component {
     };
 
     render() {
-        let {lesson, courseUrl, needShowAuthors, isSingleLesson} = this.props;
+        let {lesson, courseUrl, needShowAuthors, isSingleLesson, isPaidCourse} = this.props;
 
         return (
             <div className="lecture-full__info-block">
@@ -37,7 +38,8 @@ export default class InfoBlock extends React.Component {
                 {!isSingleLesson ?
                     <Extras subLessons={lesson.Lessons}
                             parentNumber={lesson.Number}
-                            courseUrl={courseUrl}/>
+                            courseUrl={courseUrl}
+                            isPaidCourse={isPaidCourse}/>
                     :
                     null
                 }

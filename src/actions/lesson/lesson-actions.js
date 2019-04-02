@@ -15,7 +15,7 @@ import {
     CLEAR_LESSON,
     SET_OG_IMAGE_RESOURCE_ID,
     SET_TWITTER_IMAGE_RESOURCE_ID,
-    SET_LESSON_EXT_LINKS,
+    SET_LESSON_EXT_LINKS, SAVE_LESSON_START, SAVE_LESSON_FAIL,
 } from '../../constants/lesson/singleLesson'
 
 import {
@@ -29,6 +29,7 @@ import {
 import 'whatwg-fetch';
 import {handleJsonError, checkStatus, parseJSON} from '../../tools/fetch-tools';
 import {convertLinksToString} from "../../tools/link-tools";
+import {reset} from "redux-form";
 
 export const getResources = (lessonId) => {
     return (dispatch) => {
@@ -110,6 +111,8 @@ export const create = (obj) => {
 export const save = (values, mode) => {
 
     return (dispatch) => {
+        dispatch({ type: SAVE_LESSON_START })
+
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/adm/lessons";
 
@@ -130,6 +133,8 @@ export const save = (values, mode) => {
             .then(checkStatus)
             .then(parseJSON)
             .then((data) => {
+                dispatch(reset('LessonEditor'));
+
                 dispatch({
                     type: SAVE_LESSON_SUCCESS,
                     payload: data
@@ -143,6 +148,11 @@ export const save = (values, mode) => {
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {
+                        dispatch({
+                            type: SAVE_LESSON_FAIL,
+                            payload: message
+                        })
+
                         dispatch({
                             type: SHOW_ERROR_DIALOG,
                             payload: message

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Info from './course-module-info';
 import CourseModuleBody from './course-module-body';
 import Header from './header'
+import PriceBlock from '../common/price-block'
 
 export default class InfoBlock extends React.Component {
 
@@ -19,9 +20,10 @@ export default class InfoBlock extends React.Component {
         return (
             <div className='course-module__info-block'>
                 <div className="course-module__header">
-                    <Header title={title} url={url}/>
+                    <Header title={title} url={url} isPaid={course && course.IsPaid}/>
                     <Info authors={course ? course.AuthorsObj : []}
                           categories={course ? course.CategoriesObj : []}/>
+                    <PriceBlock course={course}/>
                 </div>
                 <CourseModuleBody course={course} isMobile={isMobile}/>
             </div>

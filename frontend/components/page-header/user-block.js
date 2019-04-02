@@ -95,6 +95,9 @@ class UserBlock extends React.Component {
                                 <Link to={'/history'} onClick={::this._onHistoryClick}>История</Link>
                             </li>
                             <li>
+                                <Link to={'/purchases'} onClick={::this._onHistoryClick}>Покупки</Link>
+                            </li>
+                            <li>
                                 <div className="logout-btn" style={_style}
                                      onClick={::this._onLogout}>
                                     <svg width="15" height="16" dangerouslySetInnerHTML={{__html: _logout}}/>

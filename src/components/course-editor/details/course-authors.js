@@ -8,16 +8,19 @@ import * as courseAuthorsActions from "../../../actions/course/courseAuthorsActi
 class CourseAuthorsWrapper extends React.Component {
 
     static propTypes = {
-        editMode : PropTypes.bool,
+        editMode: PropTypes.bool,
     }
 
     render() {
-        return <CourseAuthors addAction={::this.props.courseAuthorsActions.showAddDialog}
-                              removeAction={::this.props.courseAuthorsActions.remove}
-                              selectAction={::this.props.courseAuthorsActions.select}
-                              selected={this.props.selectedAuthor}
-                              editMode={this.props.editMode}
-                              data={::this._getCourseAuthors()}/>
+        return <div className="course-authors">
+            <label className="grid-label">Авторы курса</label>
+            <CourseAuthors addAction={::this.props.courseAuthorsActions.showAddDialog}
+                           removeAction={::this.props.courseAuthorsActions.remove}
+                           selectAction={::this.props.courseAuthorsActions.select}
+                           selected={this.props.selectedAuthor}
+                           editMode={this.props.editMode}
+                           data={::this._getCourseAuthors()}/>
+        </div>
     }
 
     _getCourseAuthors() {

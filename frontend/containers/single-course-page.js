@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import MetaTags from 'react-meta-tags';
 
-import Cover from '../components/course-extended/cover-extended';
+import InfoBlock from '../components/course-extended/info-block/'
 import Content from '../components/course-extended/content-extended';
 import CourseLessons from '../components/course-extended/course-lessons';
 import CourseBooks from '../components/course-extended/course-books';
@@ -14,6 +14,7 @@ import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import * as userActions from "../actions/user-actions";
+import PropTypes from 'prop-types';
 
 import $ from 'jquery'
 
@@ -140,11 +141,10 @@ class Main extends React.Component {
                         this._getMetaTags(),
                         <div className="courses">
                             <CourseModuleExt
-                                title={course.Name}
                                 isFavorite={this._isCourseInBookmarks()}
                                 onFavoritesClick={::this._favoritesClick}
                                 shareUrl={window.location.href}
-                                counter={course.ShareCounters}
+                                course={course}
                             />
                             <CourseTabs
                                 lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
@@ -158,26 +158,54 @@ class Main extends React.Component {
 }
 
 class CourseModuleExt extends React.Component {
+
+    static propTypes = {
+        isFavorite: PropTypes.func,
+        onFavoritesClick: PropTypes.func,
+        shareUrl: PropTypes.string,
+        course: PropTypes.object,
+    }
+
     render() {
+        const {course, shareUrl} = this.props
+
         return (
             <div className="course-module course-module--extended">
                 <TitleWrapper {...this.props}/>
-                <Inner shareUrl={this.props.shareUrl} counter={this.props.counter}/>
+                <Inner shareUrl={shareUrl} counter={course.ShareCounters}/>
             </div>
         )
     }
 }
 
 class TitleWrapper extends React.Component {
+    static propTypes = {
+        isFavorite: PropTypes.func,
+        onFavoritesClick: PropTypes.func,
+        course: PropTypes.object,
+    }
+
     render() {
-        let {isFavorite, onFavoritesClick, title} = this.props;
+        let {isFavorite, onFavoritesClick, course} = this.props;
+
+        const _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
 
         return (
             <div className="course-module__title-wrapper">
                 <h1 className="course-module__title no_underline">
                     <span className={"favourites" + (isFavorite ? ' active' : '')}
                           onClick={onFavoritesClick}>В закладки</span>
-                    <p className="course-module__label">Курс:</p> <span>{title}</span>
+                    <p className="course-module__label">
+                        {
+                            course.IsPaid ?
+                                <svg className="course-module__label-icon" width="18" height="18"
+                                     dangerouslySetInnerHTML={{__html: _crown}}/>
+                                :
+                                null
+                        }
+                        Курс:
+                    </p>
+                    <span>{course.Name}</span>
                 </h1>
             </div>
         )
@@ -188,7 +216,7 @@ class Inner extends React.Component {
     render() {
         return (
             <div className="course-module__inner">
-                <Cover/>
+                <InfoBlock/>
                 <Content shareUrl={this.props.shareUrl} counter={this.props.counter}/>
             </div>
         )

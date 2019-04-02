@@ -9,6 +9,7 @@ import SubLessonPlayBlock from './subLesson-play-block'
 import * as lessonActions from '../../actions/lesson-actions';
 import {ImageSize, getCoverPath, OverflowHandler} from '../../tools/page-tools'
 import $ from 'jquery'
+import {userPaidCoursesSelector} from "ducks/profile";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -21,7 +22,9 @@ class LessonsListWrapper extends React.Component {
 
     _getLessonsList() {
         const {object: lessons, authors} = this.props.lessons;
-        let _needShowAuthor = (authors && (authors.length > 1))
+        const {course, userPaidCourses} = this.props;
+        let _needShowAuthor = (authors && (authors.length > 1)),
+            _isPaidCourse = (course.IsPaid && !userPaidCourses.includes(course.Id))
 
         return lessons.map((lesson, index) => {
             lesson.Author = authors.find((author) => {
@@ -34,7 +37,7 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson} showAuthor={_needShowAuthor} key={index}/>
+            return <ListItem {...this.props} lesson={lesson} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}/>
         });
     }
 
@@ -91,9 +94,9 @@ class ListItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
-        // currentNumber: PropTypes.string.isRequired,
         active: PropTypes.string,
         showAuthor: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     render() {
@@ -110,9 +113,9 @@ class ListItem extends React.Component {
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={'lesson-' + lesson.Id}>
                 <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
                     <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
-                    <PlayBlock {...this.props} lesson={lesson} cover={_cover}/>
+                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} isPaidCourse={this.props.isPaidCourse}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl}/>
+                <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl} isPaidCourse={this.props.isPaidCourse} />
             </li>
         )
     }
@@ -165,10 +168,11 @@ class SubList extends React.Component {
         subLessons: PropTypes.array.isRequired,
         courseUrl: PropTypes.string.isRequired,
         active: PropTypes.string.isRequired,
+        isPaidCourse: PropTypes.bool,
     };
 
     _getItems() {
-        const {active} = this.props;
+        const {active, isPaidCourse} = this.props;
 
         return this.props.subLessons.map((lesson, index) => {
             let _isActive = lesson.Id === active;
@@ -180,7 +184,7 @@ class SubList extends React.Component {
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
-                    <SubLessonPlayBlock lesson={lesson}/>
+                    <SubLessonPlayBlock lesson={lesson} isPaidCourse={isPaidCourse}/>
                 </div>
             </li>
         })
@@ -200,6 +204,7 @@ function mapStateToProps(state) {
     return {
         fetching: state.lessons.fetching,
         lessons: state.lessons,
+        userPaidCourses : userPaidCoursesSelector(state),
     }
 }
 

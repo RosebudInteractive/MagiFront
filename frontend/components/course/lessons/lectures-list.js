@@ -14,11 +14,12 @@ export default class LecturesList extends React.Component {
     static propTypes = {
         lessons: PropTypes.array.isRequired,
         courseUrl: PropTypes.string.isRequired,
+        isPaidCourse: PropTypes.bool,
     }
 
     render() {
         return this.props.lessons.map((item, index) => {
-            return <SingleLecture lesson={item} key={index} courseUrl={this.props.courseUrl}/>
+            return <SingleLecture lesson={item} key={index} courseUrl={this.props.courseUrl} isPaidCourse={this.props.isPaidCourse}/>
         })
     }
 }

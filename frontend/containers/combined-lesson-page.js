@@ -28,6 +28,7 @@ import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import LessonAggregators from "../components/combined-lesson-page/lesson-aggregators";
 import Sources from "../components/combined-lesson-page/sources";
+import {userPaidCoursesSelector} from "ducks/profile";
 
 let _scrollTop = 0;
 
@@ -316,13 +317,15 @@ class CombineLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course} = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course, userPaidCourses} = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
             _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
 
         let _audios = lesson.Audios;
+
+        let _isPaidCourse = (course && course.IsPaid && !userPaidCourses.includes(course.Id))
 
         return (isMobileApp) ?
             <MobileLessonWrapper lesson={lesson}
@@ -335,6 +338,7 @@ class CombineLessonPage extends React.Component {
                                  shareUrl={this._getShareUrl()}
                                  counter={lesson.ShareCounters}
                                  singleLesson={course.OneLesson}
+                                 isPaidCourse={_isPaidCourse}
             />
             :
             <DesktopLessonWrapper lesson={lesson}
@@ -350,6 +354,7 @@ class CombineLessonPage extends React.Component {
                                   shareUrl={this._getShareUrl()}
                                   counter={lesson.ShareCounters}
                                   singleLesson={course.OneLesson}
+                                  isPaidCourse={_isPaidCourse}
             />
     }
 
@@ -464,6 +469,7 @@ class CombineLessonPage extends React.Component {
             isMobileApp,
             notFound,
             course,
+            userPaidCourses
         } = this.props;
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
@@ -473,6 +479,8 @@ class CombineLessonPage extends React.Component {
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
+
+        let _isPaidCourse = (course && course.IsPaid && !userPaidCourses.includes(course.Id))
 
         return (
             fetching ?
@@ -494,7 +502,7 @@ class CombineLessonPage extends React.Component {
                             lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
                             this._getLessonsBundles(),
                             <Sources lesson={_lesson}/>,
-                            <LessonInfo lesson={_lesson}/>,
+                            <LessonInfo lesson={_lesson} isPaidCourse={_isPaidCourse}/>,
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}
                                             gallery={lessonText.gallery}
@@ -506,7 +514,8 @@ class CombineLessonPage extends React.Component {
                                             lessonUrl={this.props.lessonUrl}
                                             shareUrl={this._getShareUrl()}
                                             counter={_lesson.ShareCounters}
-                                            singleLesson={course.OneLesson} />
+                                            singleLesson={course.OneLesson}
+                                            isPaidCourse={_isPaidCourse}/>
                         ]
                         :
                         null
@@ -557,6 +566,7 @@ function mapStateToProps(state, ownProps) {
         galleryIsOpen: state.app.galleryIsOpen,
 
         facebookAppID: state.app.facebookAppID,
+        userPaidCourses : userPaidCoursesSelector(state),
     }
 }
 
