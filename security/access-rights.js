@@ -67,15 +67,18 @@ exports.AccessRights = class {
 
     static canAccessFile(user, file) {
         return new Promise((resolve) => {
-            let result = true;
-            let mimeType = mime.getType(file);
-            let typeArr = mimeType ? mimeType.split("/") : null;
-            if (typeArr && (typeArr.length > 0)) {
-                let fn = file.substring(0, 1) === "/" ? file.substring(1) : file;
-                switch (typeArr[0]) {
-                    case "audio":
-                        result = this._canAccessAudio(user, fn);
-                        break;
+            let requiredRights = AccessFlags.Administrator + AccessFlags.ContentManager;
+            let result = this.checkPermissions(user, requiredRights) !== 0 ? true : false;
+            if (!result) {
+                let mimeType = mime.getType(file);
+                let typeArr = mimeType ? mimeType.split("/") : null;
+                if (typeArr && (typeArr.length > 0)) {
+                    let fn = file.substring(0, 1) === "/" ? file.substring(1) : file;
+                    switch (typeArr[0]) {
+                        case "audio":
+                            result = this._canAccessAudio(user, fn);
+                            break;
+                    }
                 }
             }
             resolve(result);
@@ -84,14 +87,16 @@ exports.AccessRights = class {
 
     static checkPermissions(user, accessRights) {
         let result = 0;
-        if (accessRights & AccessFlags.Administrator)
-            result += user.PData.isAdmin ? AccessFlags.Administrator : 0;
-        if (accessRights & AccessFlags.ContentManager)
-            result += (user.PData.isAdmin || user.PData.roles.e) ? AccessFlags.ContentManager : 0;
-        if (accessRights & AccessFlags.Pending)
-            result += user.PData.roles.p ? AccessFlags.Pending : 0;
-        if (accessRights & AccessFlags.Subscriber)
-            result += user.PData.roles.s ? AccessFlags.Subscriber : 0;
+        if (user && user.PData) {
+            if (accessRights & AccessFlags.Administrator)
+                result += user.PData.isAdmin ? AccessFlags.Administrator : 0;
+            if (accessRights & AccessFlags.ContentManager)
+                result += (user.PData.isAdmin || user.PData.roles.e) ? AccessFlags.ContentManager : 0;
+            if (accessRights & AccessFlags.Pending)
+                result += user.PData.roles.p ? AccessFlags.Pending : 0;
+            if (accessRights & AccessFlags.Subscriber)
+                result += user.PData.roles.s ? AccessFlags.Subscriber : 0;
+        }
         return result;
     }
 };

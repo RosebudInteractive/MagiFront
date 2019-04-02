@@ -4,6 +4,7 @@ const _ = require('lodash');
 const config = require('config');
 const RSS = require('rss');
 const { FileTask } = require('../lib/file-task');
+const { truncateHtml } = require('../../utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const GET_LESSONS_IDS_MSSQL =
@@ -23,7 +24,7 @@ const GET_CATEGORIES_MSSQL =
 
 const GET_LESSONS_MSSQL =
     "select lc.[ReadyDate], l.[Id], c.[URL], l.[URL] as [LURL], l.[Cover], l.[CoverMeta],\n" +
-    "  ell.[Transcript], ll.[ShortDescription], ll.[Name], cl.[Name] as [CName]\n" +
+    "  ell.[Transcript], ll.[ShortDescription], ll.[Name], cl.[Name] as [CName], l.[IsFreeInPaidCourse], c.[IsPaid]\n" +
     "from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -53,7 +54,7 @@ const GET_CATEGORIES_MYSQL =
 
 const GET_LESSONS_MYSQL =
     "select lc.`ReadyDate`, l.`Id`, c.`URL`, l.`URL` as `LURL`, l.`Cover`, l.`CoverMeta`,\n" +
-    "  ell.`Transcript`, ll.`ShortDescription`, ll.`Name`, cl.`Name` as `CName`\n" +
+    "  ell.`Transcript`, ll.`ShortDescription`, ll.`Name`, cl.`Name` as `CName`, l.`IsFreeInPaidCourse`, c.`IsPaid`\n" +
     "from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -177,8 +178,10 @@ exports.RssTask = class RssTask extends FileTask {
                                 let lsns = [];
                                 if (result && result.detail && (result.detail.length > 0)) {
                                     let lsn = null;
+                                    let isFirst = true;
                                     result.detail.forEach((elem) => {
                                         if ((!lsn) || (lsn.Id !== elem.Id)) {
+                                            isFirst = true;
                                             lsn = {};
                                             lsn.Id = elem.Id;
                                             lsn.date = elem.ReadyDate;
@@ -195,7 +198,15 @@ exports.RssTask = class RssTask extends FileTask {
                                             lsns.push(lsn);
                                             items.push(lsn);
                                         }
-                                        lsn.transcript += elem.Transcript;
+                                        let transcript = elem.Transcript;
+                                        if (elem.IsPaid && (!elem.IsFreeInPaidCourse)) {
+                                            if (isFirst)
+                                                transcript = truncateHtml(transcript)
+                                            else
+                                                transcript = "";
+                                            isFirst = false;
+                                        }
+                                        lsn.transcript += transcript;
                                     });
                                 }
                                 return lsns;
@@ -308,9 +319,11 @@ exports.RssTask = class RssTask extends FileTask {
                                 let lsns = [];
                                 if (result && result.detail && (result.detail.length > 0)) {
                                     let lsn = null;
+                                    let isFirst;
                                     result.detail.forEach((elem) => {
                                         if ((!lsn) || (lsn.Id !== elem.Id)) {
                                             lsn = {};
+                                            isFirst = true;
                                             lsn.Id = elem.Id;
                                             lsn.date = elem.ReadyDate;
                                             lsn.url = elem.URL + "/" + elem.LURL;
@@ -323,7 +336,15 @@ exports.RssTask = class RssTask extends FileTask {
                                             lsns.push(lsn);
                                             items.push(lsn);
                                         }
-                                        lsn.transcript += elem.Transcript;
+                                        let transcript = elem.Transcript;
+                                        if (elem.IsPaid && (!elem.IsFreeInPaidCourse)) {
+                                            if (isFirst)
+                                                transcript = truncateHtml(transcript)
+                                            else
+                                                transcript = "";
+                                            isFirst = false;
+                                        }
+                                        lsn.transcript += transcript;
                                     });
                                 }
                                 return lsns;

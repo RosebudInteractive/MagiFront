@@ -7,7 +7,12 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { PartnerLink } = require('../utils/partner-link');
+const { CoursesService } = require('./db-course');
 const { getTimeStr, buildLogString } = require('../utils');
+const { AccessFlags } = require('../const/common');
+const { AccessRights } = require('../security/access-rights');
+const { truncateHtml } = require('../utils');
+
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const {
@@ -353,6 +358,7 @@ const LESSON_IMG_META_MSSQL_REQ =
 
 const PARENT_MSSQL_REQ =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], l.[IsFreeInPaidCourse],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -361,11 +367,12 @@ const PARENT_MSSQL_REQ =
     "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
     "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -374,6 +381,7 @@ const PARENT_MSSQL_REQ_COND =
     "  left join[LessonCourse] lcp on lcp.[Id] = lc.[ParentId]\n" +
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
     "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "<%= cond %>";
 const PARENT_MSSQL_COND_ID =
     "where l.[Id] = <%= id %>";
@@ -542,6 +550,7 @@ const LESSON_IMG_META_MYSQL_REQ =
 
 const PARENT_MYSQL_REQ =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, l.`IsFreeInPaidCourse`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -550,11 +559,12 @@ const PARENT_MYSQL_REQ =
     "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
     "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -563,6 +573,7 @@ const PARENT_MYSQL_REQ_COND =
     "  left join`LessonCourse` lcp on lcp.`Id` = lc.`ParentId`\n" +
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
     "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "<%= cond %>";
 const PARENT_MYSQL_COND_ID =
     "where l.`Id` = <%= id %>";
@@ -635,7 +646,7 @@ const GET_LESSON_DURATION_MYSQL =
 
 const LESSONS_ALL_MSSQL_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
-    "  lc.[Number], lc.[ReadyDate],\n" +
+    "  lc.[Number], lc.[ReadyDate], l.[IsFreeInPaidCourse],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], ell.Audio, el.[Number] Eln from [Course] c\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -650,7 +661,7 @@ const LESSONS_ALL_MSSQL_REQ =
 
 const LESSONS_ALL_MYSQL_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
-    "  lc.`Number`, lc.`ReadyDate`,\n" +
+    "  lc.`Number`, lc.`ReadyDate`, l.`IsFreeInPaidCourse`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, ell.Audio, el.`Number` Eln from `Course` c\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -996,6 +1007,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         URL: elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
+                                        IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                         Name: elem.LName,
                                         Duration: elem.Duration,
                                         DurationFmt: elem.DurationFmt,
@@ -1069,20 +1081,21 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getLesson(course_url, lesson_url) {
+    getLesson(course_url, lesson_url, user) {
         let data = { Authors: [] };
         let lesson = null;
         let course = null;
         let curLesson = null;
         let parentUrl = lesson_url;
         let now = new Date();
+        let userId = user ? user.Id : 0;
 
         return new Promise((resolve, reject) => {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
-                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
+                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url, user_id: userId }),
+                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url, user_id: userId })
                     }
                 }, {})
                     .then((result) => {
@@ -1201,34 +1214,45 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getLessonText(course_url, lesson_url) {
+    getLessonText(course_url, lesson_url, user) {
         let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [] };
         let epi_list = {};
         let assets_list = {};
         let parentUrl = lesson_url;
+        let userId = user ? user.Id : 0;
         let id;
+        let showTranscript = AccessRights.checkPermissions(user,
+            AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
+        let IsFreeInPaidCourse;
 
         return new Promise((resolve, reject) => {
             resolve(
 
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url }),
-                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url })
+                        mysql: _.template(PARENT_MYSQL_REQ)({ course_url: course_url, lesson_url: lesson_url, user_id: userId }),
+                        mssql: _.template(PARENT_MSSQL_REQ)({ course_url: course_url, lesson_url: lesson_url, user_id: userId })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length == 1)) {
                             let elem = result.detail[0];
                             if (elem.URL)
                                 parentUrl = elem.URL;
                             id = elem.Id;
+                            IsFreeInPaidCourse = elem.IsFreeInPaidCourse;
                             data.Course = {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
+                                IsPaid: elem.IsPaid ? true : false,
+                                IsSubsFree: elem.IsSubsFree ? true : false,
+                                ProductId: elem.ProductId,
+                                IsBought: elem.Counter ? true : false,
                                 URL: elem.CURL
                             };
+                            await CoursesService().getCoursePrice(data.Course);
+                            showTranscript = showTranscript || (!data.Course.IsPaid) || (data.Course.IsPaid && data.Course.IsBought);
                         }
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
@@ -1268,6 +1292,7 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            let isFirst = true;
                             result.detail.forEach((elem) => {
                                 let curr_episode = {
                                     Id: elem.Id,
@@ -1279,6 +1304,13 @@ const DbLesson = class DbLesson extends DbObject {
                                 data.Episodes.push(curr_episode);
                                 data.Audios.push(elem.Audio);
                                 epi_list[elem.Id] = curr_episode;
+                                if (!(showTranscript || IsFreeInPaidCourse)) {
+                                    if (isFirst)
+                                        curr_episode.Transcript = truncateHtml(curr_episode.Transcript)
+                                    else
+                                        curr_episode.Transcript = "";
+                                    isFirst = false;
+                                }
                             });
                         }
                         return $data.execSql({
@@ -1328,7 +1360,7 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getLessonV2(course_url, lesson_url, options) {
+    getLessonV2(course_url, lesson_url, user, options) {
         let data = { Galery: [], Episodes: [], Refs: [], RefBooks: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
         let epi_list = {};
         let assets_list = {};
@@ -1341,6 +1373,9 @@ const DbLesson = class DbLesson extends DbObject {
         let isInt = false;
         let courseId;
         let authorId;
+        let userId = user ? user.Id : 0;
+        let showTranscript = AccessRights.checkPermissions(user,
+            AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
@@ -1369,11 +1404,11 @@ const DbLesson = class DbLesson extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(PARENT_MYSQL_REQ_COND)({ cond: condMYSQL }),
-                        mssql: _.template(PARENT_MSSQL_REQ_COND)({ cond: condMSSQL })
+                        mysql: _.template(PARENT_MYSQL_REQ_COND)({ cond: condMYSQL, user_id: userId }),
+                        mssql: _.template(PARENT_MSSQL_REQ_COND)({ cond: condMSSQL, user_id: userId })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length == 1)) {
                             let elem = result.detail[0];
                             courseUrl = hostUrl + elem.CURL + "/";
@@ -1394,8 +1429,11 @@ const DbLesson = class DbLesson extends DbObject {
                                 IsPaid: elem.IsPaid ? true : false,
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
+                                IsBought: elem.Counter ? true : false,
                                 OneLesson: elem.OneLesson ? true : false
                             };
+                            await CoursesService().getCoursePrice(data.Course);
+                            showTranscript = showTranscript || (!data.Course.IsPaid) || (data.Course.IsPaid && data.Course.IsBought);
                         }
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find lesson "${course_url}"${isInt ? "" : " : \"" + lesson_url + "\""}.`);
@@ -1547,6 +1585,7 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             result.detail.forEach((elem) => {
+                                let isFirst = true;
                                 let curr_episode = {
                                     Id: elem.Id,
                                     Number: elem.Number,
@@ -1554,6 +1593,13 @@ const DbLesson = class DbLesson extends DbObject {
                                     Transcript: elem.Transcript,
                                     Toc: []
                                 };
+                                if (!(showTranscript || data.IsFreeInPaidCourse)) {
+                                    if (isFirst)
+                                        curr_episode.Transcript = truncateHtml(curr_episode.Transcript)
+                                    else
+                                        curr_episode.Transcript = "";
+                                    isFirst = false;
+                                }
                                 data.Episodes.push(curr_episode);
                                 data.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
                                 epi_list[elem.Id] = curr_episode;

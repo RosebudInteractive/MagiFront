@@ -267,7 +267,7 @@ const GET_SUBS_INFO_MYSQL =
     "where u.`SysParentId` = <%= id %>";
 
 const MAX_LESSONS_REQ_NUM = 15;
-const MAX_COURSES_REQ_NUM = 1;
+const MAX_COURSES_REQ_NUM = 10;
 
 const DbUser = class DbUser extends DbObject {
 
@@ -527,7 +527,7 @@ const DbUser = class DbUser extends DbObject {
                                     Categories: []
                                 };
                                 if (courseBoookmarkOrder)
-                                    course.Order= courseBoookmarkOrder[elem.Id];
+                                    course.Order = courseBoookmarkOrder[elem.Id];
                                 data.Courses.push(course);
                                 courseList[elem.Id] = course;
                             })
@@ -537,66 +537,66 @@ const DbUser = class DbUser extends DbObject {
                             }
                         }
                     })
-                    .then(() => {
-                        return Utils.seqExec(arrayOfIds, (elem) => {
-                            return $data.execSql({
-                                dialect: {
-                                    mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                    mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+            })
+                .then(() => {
+                    return Utils.seqExec(arrayOfIds, (elem) => {
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
+                                mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+                            }
+                        }, {})
+                            .then((result) => {
+                                if (result && result.detail && (result.detail.length > 0)) {
+                                    result.detail.forEach((elem) => {
+                                        let author = data.Authors[elem.Id];
+                                        if (!author) {
+                                            author = {
+                                                Id: elem.Id,
+                                                URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
+                                                FirstName: elem.FirstName,
+                                                LastName: elem.LastName,
+                                                Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
+                                                PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
+                                            };
+                                            data.Authors[elem.Id] = author;
+                                        }
+                                        let course = courseList[elem.CourseId];
+                                        if (course)
+                                            course.Authors.push(author.Id);
+                                    })
                                 }
-                            }, {})
-                                .then((result) => {
-                                    if (result && result.detail && (result.detail.length > 0)) {
-                                        result.detail.forEach((elem) => {
-                                            let author = data.Authors[elem.Id];
-                                            if (!author) {
-                                                author = {
-                                                    Id: elem.Id,
-                                                    URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
-                                                    FirstName: elem.FirstName,
-                                                    LastName: elem.LastName,
-                                                    Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
-                                                    PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
-                                                };
-                                                data.Authors[elem.Id] = author;
-                                            }
-                                            let course = courseList[elem.CourseId];
-                                            if (course)
-                                                course.Authors.push(author.Id);
-                                        })
-                                    }
-                                })
-                        });
-                    })
-                    .then(() => {
-                        return Utils.seqExec(arrayOfIds, (elem) => {
-                            return $data.execSql({
-                                dialect: {
-                                    mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                    mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+                            })
+                    });
+                })
+                .then(() => {
+                    return Utils.seqExec(arrayOfIds, (elem) => {
+                        return $data.execSql({
+                            dialect: {
+                                mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
+                                mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+                            }
+                        }, {})
+                            .then((result) => {
+                                if (result && result.detail && (result.detail.length > 0)) {
+                                    result.detail.forEach((elem) => {
+                                        let category = data.Categories[elem.Id];
+                                        if (!category) {
+                                            category = {
+                                                Id: elem.Id,
+                                                URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
+                                                Name: elem.Name
+                                            };
+                                            data.Categories[elem.Id] = category;
+                                        }
+                                        let course = courseList[elem.CourseId];
+                                        if (course)
+                                            course.Categories.push(category.Id);
+                                    })
                                 }
-                            }, {})
-                                .then((result) => {
-                                    if (result && result.detail && (result.detail.length > 0)) {
-                                        result.detail.forEach((elem) => {
-                                            let category = data.Categories[elem.Id];
-                                            if (!category) {
-                                                category = {
-                                                    Id: elem.Id,
-                                                    URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
-                                                    Name: elem.Name
-                                                };
-                                                data.Categories[elem.Id] = category;
-                                            }
-                                            let course = courseList[elem.CourseId];
-                                            if (course)
-                                                course.Categories.push(category.Id);
-                                        })
-                                    }
-                                })
-                        });
-                    })
-            });
+                            })
+                    });
+                });
         }
         return data;
     }
