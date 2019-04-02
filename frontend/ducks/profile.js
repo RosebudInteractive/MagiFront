@@ -838,7 +838,7 @@ function* getUserPaidCoursesExtSaga() {
 
         yield put({
             type: GET_USER_PAID_COURSES_EXT_SUCCESS,
-            payload: _data.Courses
+            payload: _data.Courses ? _data.Courses : []
         })
     } catch (error) {
         yield put({

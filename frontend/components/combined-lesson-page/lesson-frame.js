@@ -102,7 +102,7 @@ class LessonFrame extends React.Component {
 
     _getButton(isFinished) {
         const _playLock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-lock"/>',
-            _playCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
+            _playCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-crown"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lecture-replay"/>';
 
         const _style = {cursor: 'pointer'};
