@@ -164,6 +164,8 @@ export default class CWSPlayer extends CWSBase {
         let contH = that._container.height();
         let contRatio = contW == 0 ? 0 : contH/contW;
         let playerRatio = that._options.ratioY/that._options.ratioX;
+        this._broadcastMessage(`container width: ${contW} height: ${contH}`)
+        this._broadcastMessage(`container ratio: ${contRatio} player ratio: ${playerRatio}`)
         item.show();
         // console.log(fontSize);
 
@@ -183,6 +185,8 @@ export default class CWSPlayer extends CWSBase {
             //element._textTools.setRatio(contRatio);
             element._textTools.update();
         });
+
+        this._broadcastMessage(`item width: ${item.width()} height: ${item.height()}`)
     }
 
     _setAudio(audio) {
@@ -602,6 +606,12 @@ export default class CWSPlayer extends CWSBase {
     _broadcastSuspend() {
         if (this._options.onSuspend) {
             this._options.onSuspend()
+        }
+    }
+
+    _broadcastMessage(message) {
+        if (this._options.onMessage) {
+            this._options.onMessage(message)
         }
     }
 
