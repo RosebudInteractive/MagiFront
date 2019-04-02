@@ -1,6 +1,6 @@
 import React from 'react'
 import EpisodesGrid from '../grids/episodes'
-import SublessonsGrid from '../grids/sublessons'
+import SublessonsGrid from '../grids/subLessons'
 import PropTypes from 'prop-types'
 
 export default class EpisodesTab extends React.Component{
