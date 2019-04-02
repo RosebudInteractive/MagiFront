@@ -55,7 +55,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons/v2/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
-            .getLessonV2(req.params.course_url, req.params.lesson_url, req.query)
+            .getLessonV2(req.params.course_url, req.params.lesson_url, req.user, req.query)
             .then(rows => {
                 res.send(rows);
             })
@@ -66,7 +66,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons/v2/:id', (req, res, next) => {
         LessonsService()
-            .getLessonV2(parseInt(req.params.id), null, req.query)
+            .getLessonV2(parseInt(req.params.id), null, req.user, req.query)
             .then(rows => {
                 res.send(rows);
             })
@@ -77,7 +77,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons-text/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
-            .getLessonText(req.params.course_url, req.params.lesson_url)
+            .getLessonText(req.params.course_url, req.params.lesson_url, req.user)
             .then(rows => {
                 res.send(rows);
             })
@@ -99,7 +99,7 @@ function setupLessons(app) {
 
     app.get('/api/lessons/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
-            .getLesson(req.params.course_url, req.params.lesson_url)
+            .getLesson(req.params.course_url, req.params.lesson_url, req.user)
             .then(rows => {
                 res.send(rows);
             })
