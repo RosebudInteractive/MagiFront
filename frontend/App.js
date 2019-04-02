@@ -9,6 +9,7 @@ import CombineLessonPage, {scroll} from './containers/combined-lesson-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
 import BookmarksPage from './containers/bookmark-page'
+import PurchasesPage from './containers/purchases-page'
 import ProjectPage from './containers/project-page'
 
 import PageHeader from './components/page-header/page-header';
@@ -21,7 +22,7 @@ import * as appActions from './actions/app-actions';
 import * as userActions from './actions/user-actions';
 import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
-import {getUserBookmarks} from "./ducks/profile";
+import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
@@ -41,6 +42,7 @@ import SizeInfo from './components/size-info'
 
 import Platform from 'platform';
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
+import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
 Polyfill.registry();
@@ -139,6 +141,7 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.hideUserBlock()
+            this.props.getUserPaidCourses()
 
             if (nextProps.playInfo) {
                 let _targetUrl = _homePath + nextProps.playInfo.courseUrl + '/' + nextProps.playInfo.lessonUrl;
@@ -255,6 +258,7 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl/:garbage'} component={NotFound}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
+                <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )
@@ -288,6 +292,7 @@ class App extends Component {
                 {showFeedbackWindow ? <FeedbackMessageBox/> : null}
                 {showFeedbackResultMessage ? <FeedbackResultMessage/> : null}
                 <BillingWrapper/>
+                <CoursePaymentWrapper/>
                 <CookiesMessage/>
             </div>
 
@@ -324,6 +329,7 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         getParameters: bindActionCreators(getParameters, dispatch),
+        getUserPaidCourses: bindActionCreators(getUserPaidCourses, dispatch),
         loadVersion: bindActionCreators(loadVersion, dispatch),
     }
 }

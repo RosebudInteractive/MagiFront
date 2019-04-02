@@ -8,6 +8,7 @@ export default class LessonFull extends React.Component {
         courseUrl: PropTypes.string,
         needShowAuthors: PropTypes.bool,
         lesson: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     };
 
     render() {

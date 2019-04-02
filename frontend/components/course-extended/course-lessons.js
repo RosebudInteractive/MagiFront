@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import LessonFull from "../common/lecture-full-list-item";
 import LessonPreview from './lesson/lesson-preview';
+import {userPaidCoursesSelector} from "ducks/profile";
 
 class CourseLessons extends React.Component {
 
@@ -20,15 +21,16 @@ class CourseLessons extends React.Component {
     }
 
     _getList() {
-        let {course} = this.props,
-            _needShowAuthors = (course.Authors && course.Authors.length > 1);
+        let {course, userPaidCourses} = this.props,
+            _needShowAuthors = (course.Authors && course.Authors.length > 1),
+            _isPaidCourse = (course.IsPaid && !userPaidCourses.includes(course.Id))
 
         return course.Lessons.map((lesson, index) => {
 
             lesson.authorName = _needShowAuthors ? this._getAuthor(lesson.AuthorId) : '';
 
             return lesson.State === 'R' ?
-                <LessonFull lesson={lesson} courseUrl={this.props.courseUrl} needShowAuthors={_needShowAuthors}/>
+                <LessonFull lesson={lesson} courseUrl={this.props.courseUrl} needShowAuthors={_needShowAuthors} isPaidCourse={_isPaidCourse}/>
                 :
                 <LessonPreview
                     title={lesson.Name}
@@ -54,6 +56,7 @@ class CourseLessons extends React.Component {
 function mapStateToProps(state) {
     return {
         course: state.singleCourse.object,
+        userPaidCourses : userPaidCoursesSelector(state),
     }
 }
 

@@ -191,7 +191,7 @@ class LessonEditorForm extends React.Component {
         }
 
         this.props.setFixedLesson({
-            courseId: lesson.id,
+            lessonId: lesson.id,
             description: editorValues.fixDescription,
             active: editorValues.fixed
         })

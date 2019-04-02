@@ -22,6 +22,8 @@ class PlayBlock extends React.Component {
         courseUrl: PropTypes.string,
         audios: PropTypes.array,
         isAuthRequired: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
+        isLessonFree: PropTypes.bool,
     }
 
     _play() {
@@ -38,12 +40,17 @@ class PlayBlock extends React.Component {
     _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
+            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
-        let {isAuthRequired, authorized} = this.props,
+        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
             _button = null;
 
-        if (isAuthRequired && !authorized) {
+        if (isPaidCourse && !isLessonFree) {
+            return <button className="lecture__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+            </button>
+        } else if (isAuthRequired && !authorized) {
             _button = (
                 <button type="button" className="lecture__btn paused" onClick={::this._unlock}>
                     <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
@@ -67,10 +74,12 @@ class PlayBlock extends React.Component {
     }
 
     _getTooltip(isFinished) {
-        let {isAuthRequired, authorized, } = this.props,
+        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
             _tooltip = null;
 
-        if (isAuthRequired && !authorized) {
+        if (isPaidCourse && !isLessonFree) {
+            _tooltip = TooltipTitles.IS_PAID
+        } else if (isAuthRequired && !authorized) {
             _tooltip = TooltipTitles.locked
         } else {
             _tooltip = isFinished ? TooltipTitles.replay : TooltipTitles.play;

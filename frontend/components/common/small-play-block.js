@@ -19,6 +19,7 @@ class LessonPlayBlockSmall extends React.Component {
         audios: PropTypes.array,
         lesson: PropTypes.object,
         showRestTime : PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     constructor(props) {
@@ -62,13 +63,19 @@ class LessonPlayBlockSmall extends React.Component {
     _getSmallButton(isThisLessonPlaying, isFinished) {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
+            _crownSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lockSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock-small"/>'
 
-        let {lesson, authorized} = this.props,
+        let {lesson, authorized, isPaidCourse,} = this.props,
             {IsAuthRequired} = lesson,
             _button = null;
 
-        if (IsAuthRequired && !authorized) {
+        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+            return <button className="play-btn-small paused" onClick={::this._unlock}>
+                <svg width="18" height="20" dangerouslySetInnerHTML={{__html: _crownSmall}}/>
+                <div className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</div>
+            </button>
+        } else if (IsAuthRequired && !authorized) {
             _button = <button className="play-btn-small paused play-btn-small_locked" onClick={::this._unlock}>
                 <svg width="18" height="20" dangerouslySetInnerHTML={{__html: _lockSmall}}/>
                 <div className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</div>
@@ -93,11 +100,13 @@ class LessonPlayBlockSmall extends React.Component {
     }
 
     _getTooltip(isThisLessonPlaying, isFinished) {
-        let {lesson, authorized, paused} = this.props,
+        let {lesson, authorized, paused, isPaidCourse} = this.props,
             {IsAuthRequired} = lesson,
             _tooltip = null;
 
-        if (IsAuthRequired && !authorized) {
+        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+            _tooltip = TooltipTitles.IS_PAID
+        } else if (IsAuthRequired && !authorized) {
             _tooltip = TooltipTitles.locked
         } else {
             _tooltip = isThisLessonPlaying ?

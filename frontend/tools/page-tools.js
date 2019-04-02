@@ -52,6 +52,7 @@ export const pages = {
     player: {name: 'player', url: null},
     transcript: {name: 'transcript', url: null},
     bookmarks: {name: 'bookmarks', url: '/favorites'},
+    purchases: {name: 'purchases', url: '/purchases'},
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile/'},
     notFound: {name: 'not-found', url: null}
@@ -149,6 +150,7 @@ export const TooltipTitles = {
     play: 'Начать просмотр',
     replay : 'С начала',
     pause: 'Пауза',
+    IS_PAID: 'Для просмотра лекции необходимо купить курс',
 }
 
 let _isOverflowEnable = false,

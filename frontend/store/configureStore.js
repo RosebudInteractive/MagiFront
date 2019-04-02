@@ -1,6 +1,9 @@
+import rootSaga from "./saga";
+
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
 import {createStore, applyMiddleware, compose} from 'redux'
+import createSagaMiddleware from 'redux-saga'
 import rootReducer from '../reducers';
 
 import {createLogger} from 'redux-logger';
@@ -21,6 +24,7 @@ export const store = configureStore();
 function configureStore(initialState) {
     const logger = NODE_ENV === 'development' ? createLogger() : null;
     const routerMiddl = routerMiddleware(history);
+    const sagaMiddleware = createSagaMiddleware()
 
     const store = (NODE_ENV === 'development') ?
         createStore(
@@ -28,6 +32,7 @@ function configureStore(initialState) {
             initialState,
             compose(
                 // responsiveStoreEnhancer,
+                applyMiddleware(sagaMiddleware),
                 applyMiddleware(thunk, logger),
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
@@ -44,6 +49,7 @@ function configureStore(initialState) {
             rootReducer,
             initialState,
             compose(
+                applyMiddleware(sagaMiddleware),
                 applyMiddleware(thunk),
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
@@ -56,6 +62,8 @@ function configureStore(initialState) {
                 applyMiddleware(VersionMiddleware),
             )
         );
+
+    sagaMiddleware.run(rootSaga)
 
     if (module.hot) {
         module.hot.accept('../reducers', () => {

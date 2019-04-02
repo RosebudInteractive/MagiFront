@@ -4,7 +4,7 @@ import {Record} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
-
+import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 /**
  * Constants
  * */
@@ -13,6 +13,8 @@ const prefix = `${appName}/${moduleName}`
 
 export const SHOW_BILLING_WINDOW = `${prefix}/SHOW_BILLING_WINDOW`
 export const HIDE_BILLING_WINDOW = `${prefix}/HIDE_BILLING_WINDOW`
+export const SHOW_COURSE_PAYMENT_WINDOW = `${prefix}/SHOW_COURSE_PAYMENT_WINDOW`
+export const HIDE_COURSE_PAYMENT_WINDOW = `${prefix}/HIDE_COURSE_PAYMENT_WINDOW`
 export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
 export const SWITCH_TO_PAYMENT = `${prefix}/SWITCH_TO_PAYMENT`
 export const SWITCH_TO_SUBSCRIPTION = `${prefix}/SWITCH_TO_SUBSCRIPTION`
@@ -23,6 +25,11 @@ export const SET_SUBSCRIPTION_TYPE = `${prefix}/SET_SUBSCRIPTION_TYPE`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
 export const REDIRECT_COMPLETE = `${prefix}/REDIRECT_COMPLETE`
+
+export const GET_PAID_COURSE_INFO_REQUEST = `${prefix}/GET_PAID_COURSE_INFO_REQUEST`
+export const GET_PAID_COURSE_INFO_START = `${prefix}/GET_PAID_COURSE_INFO_START`
+export const GET_PAID_COURSE_INFO_SUCCESS = `${prefix}/GET_PAID_COURSE_INFO_SUCCESS`
+export const GET_PAID_COURSE_INFO_FAIL = `${prefix}/GET_PAID_COURSE_INFO_FAIL`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -36,6 +43,7 @@ const Redirect = Record({url: '', active: false})
 
 export const ReducerRecord = Record({
     showBillingWindow: false,
+    showCoursePaymentWindow: false,
     step: BillingStep.subscription,
     types: null,
     selectedType: null,
@@ -50,6 +58,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case GET_SUBSCRIPTION_TYPES_START:
+        case GET_PAID_COURSE_INFO_START:
         case SEND_PAYMENT_START:
             return state
                 .set('error', null)
@@ -60,7 +69,13 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('fetching', false)
                 .set('types', payload)
 
+        case GET_PAID_COURSE_INFO_SUCCESS:
+            return state
+                .set('types', payload)
+                .set('selectedType', payload)
+
         case GET_SUBSCRIPTION_TYPES_ERROR:
+        case GET_PAID_COURSE_INFO_FAIL:
             return state
                 .set('fetching', false)
                 .set('error', payload.error)
@@ -77,6 +92,16 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('showBillingWindow', false)
 
+        case SHOW_COURSE_PAYMENT_WINDOW:
+            return state
+                .set('error', null)
+                .set('fetching', false)
+                .set('showCoursePaymentWindow', true)
+
+        case HIDE_COURSE_PAYMENT_WINDOW:
+            return state
+                .set('showCoursePaymentWindow', false)
+
         case SWITCH_TO_PAYMENT:
             return state
                 .set('step', BillingStep.payment)
@@ -88,10 +113,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SET_SUBSCRIPTION_TYPE:
             return state
                 .set('selectedType', payload)
-
-        // case SEND_PAYMENT_START:
-        //     return state
-        //         .set('processing', true)
 
         case SEND_PAYMENT_SUCCESS: {
             let _state = state
@@ -123,6 +144,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const showBillingWindowSelector = createSelector(stateSelector, state => state.showBillingWindow)
+export const showCoursePaymentWindowSelector = createSelector(stateSelector, state => state.showCoursePaymentWindow)
 export const billingStepSelector = createSelector(stateSelector, state => state.step)
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
@@ -197,6 +219,9 @@ export const sendPayment = (values) => {
     }
 }
 
+export const getPaidCourseInfo = (productId) => {
+    return { type: GET_PAID_COURSE_INFO_REQUEST, payload: productId }
+}
 
 export const showBillingWindow = () => {
     return {
@@ -208,6 +233,20 @@ export const showBillingWindow = () => {
 export const hideBillingWindow = () => {
     return {
         type: HIDE_BILLING_WINDOW,
+        payload: null
+    }
+}
+
+export const showCoursePaymentWindow = () => {
+    return {
+        type: SHOW_COURSE_PAYMENT_WINDOW,
+        payload: null
+    }
+}
+
+export const hideCoursePaymentWindow = () => {
+    return {
+        type: HIDE_COURSE_PAYMENT_WINDOW,
         payload: null
     }
 }
@@ -238,6 +277,38 @@ export const redirectComplete = () => {
         type: REDIRECT_COMPLETE,
         payload: null
     }
+}
+
+function* watchPaidCourseInfoSaga(data) {
+    yield put({type: GET_PAID_COURSE_INFO_START})
+
+    try {
+        let _data = yield call(_fetchPaidCourseInfo, data.payload);
+
+        _data = _data ? _data[0] : null;
+
+        let _price = {
+                Price: _data.DPrice ? _data.DPrice : _data.Price,
+                Id : _data.Id,
+                Title: _data.Name,
+            }
+
+        yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
+    } catch (error) {
+        yield put({type: GET_PAID_COURSE_INFO_FAIL, payload: {error}})
+    }
+}
+
+const _fetchPaidCourseInfo = (productId) => {
+    return fetch(`/api/products?Id=${productId}&Detail=true`, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+export const saga = function* () {
+    yield all([
+        takeEvery(GET_PAID_COURSE_INFO_REQUEST, watchPaidCourseInfoSaga),
+    ])
 }
 
 

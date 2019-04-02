@@ -10,6 +10,7 @@ import {
     LOGOUT_SUCCESS,
 } from "../constants/user";
 import {parseReadyDate} from "../tools/time-tools";
+import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 
 /**
  * Constants
@@ -18,8 +19,19 @@ export const moduleName = 'profile'
 const prefix = `${appName}/${moduleName}`
 
 export const GET_USER_INFO_REQUEST = `${prefix}/GET_USER_INFO_REQUEST`
+export const GET_USER_INFO_START = `${prefix}/GET_USER_INFO_START`
 export const GET_USER_INFO_SUCCESS = `${prefix}/GET_USER_INFO_SUCCESS`
 export const GET_USER_INFO_ERROR = `${prefix}/GET_USER_INFO_ERROR`
+
+export const GET_USER_PAID_COURSES_REQUEST = `${prefix}/GET_USER_PAID_COURSES_REQUEST`
+export const GET_USER_PAID_COURSES_START = `${prefix}/GET_USER_PAID_COURSES_START`
+export const GET_USER_PAID_COURSES_SUCCESS = `${prefix}/GET_USER_PAID_COURSES_SUCCESS`
+export const GET_USER_PAID_COURSES_FAIL = `${prefix}/GET_USER_PAID_COURSES_FAIL`
+
+export const GET_USER_PAID_COURSES_EXT_REQUEST = `${prefix}/GET_USER_PAID_COURSES_EXT_REQUEST`
+export const GET_USER_PAID_COURSES_EXT_START = `${prefix}/GET_USER_PAID_COURSES_EXT_START`
+export const GET_USER_PAID_COURSES_EXT_SUCCESS = `${prefix}/GET_USER_PAID_COURSES_EXT_SUCCESS`
+export const GET_USER_PAID_COURSES_EXT_FAIL = `${prefix}/GET_USER_PAID_COURSES_EXT_FAIL`
 
 export const GET_HISTORY_REQUEST = `${prefix}/GET_HISTORY_REQUEST`
 export const GET_HISTORY_SUCCESS = `${prefix}/GET_HISTORY_SUCCESS`
@@ -84,8 +96,10 @@ export const ReducerRecord = Record({
     history: [],
     transactions: new List(),
     bookmarks: new Set(),
+    paidCourses: new Set(),
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
+    paidCoursesInfo: new List(),
     subsInfo: new SubscriptionInfo(),
     loading: false,
     loadingSubsInfo: false,
@@ -98,8 +112,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-        case GET_USER_INFO_REQUEST:
-        // case CHANGE_PASSWORD_START:
+        case GET_USER_INFO_START:
         case GET_HISTORY_REQUEST:
             return state
                 .set('error', null)
@@ -118,6 +131,8 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_HISTORY_ERROR:
         case GET_TRANSACTIONS_ERROR:
         case CHANGE_PASSWORD_ERROR:
+        case GET_USER_PAID_COURSES_FAIL:
+        case GET_USER_PAID_COURSES_EXT_FAIL:
             return state
                 .set('loading', false)
                 .set('error', payload.error.message)
@@ -135,6 +150,29 @@ export default function reducer(state = new ReducerRecord(), action) {
         case CLEAR_ERROR:
             return state
                 .set('error', null)
+
+        case GET_USER_PAID_COURSES_START:
+            return state
+                .set('error', null)
+                .set('loading', true)
+                .update('paidCourses', paidCourses => paidCourses.clear())
+
+        case GET_USER_PAID_COURSES_SUCCESS:
+            return state
+                .set('loading', false)
+                .update('paidCourses', paidCourses => paidCourses.union(payload))
+
+        case GET_USER_PAID_COURSES_EXT_START :
+            return state
+                .set('error', null)
+                .set('loading', true)
+                .update('paidCoursesInfo', paidCoursesInfo => paidCoursesInfo.clear())
+
+        case GET_USER_PAID_COURSES_EXT_SUCCESS:
+            return state
+                .set('error', null)
+                .set('loading', false)
+                .update('paidCoursesInfo', paidCoursesInfo => paidCoursesInfo.concat(payload))
 
         case GET_BOOKMARKS_START:
             return state
@@ -227,6 +265,7 @@ export const stateSelector = state => state[moduleName]
 export const userSelector = createSelector(stateSelector, state => state.user)
 export const userHistorySelector = createSelector(stateSelector, state => state.history)
 export const userBookmarksSelector = createSelector(stateSelector, state => state.bookmarks)
+export const userPaidCoursesSelector = createSelector(stateSelector, state => state.paidCourses)
 
 export const getCourseBookmarks = createSelector(stateSelector, state => state.courseBookmarks)
 export const getLessonBookmarks = createSelector(stateSelector, state => state.lessonBookmarks)
@@ -239,35 +278,22 @@ export const loadingSubsInfoSelector = createSelector(stateSelector, state => st
 
 export const transactionsSelector = createSelector(stateSelector, state => state.transactions)
 export const subscriptionInfoSelector = createSelector(stateSelector, state => state.subsInfo)
+export const paidCoursesInfoSelector = createSelector(stateSelector, state => state.paidCoursesInfo)
 
 /**
  * Action Creators
  * */
 
 export function getUserProfile() {
-    return (dispatch) => {
-        dispatch({
-            type: GET_USER_INFO_REQUEST,
-            payload: null
-        });
+    return { type: GET_USER_INFO_REQUEST, payload: null }
+}
 
-        fetch("/api/users", {method: 'GET', credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                handleData(data);
-                dispatch({
-                    type: GET_USER_INFO_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: GET_USER_INFO_ERROR,
-                    payload: {error}
-                });
-            });
-    }
+export const getUserPaidCourses = () => {
+    return { type: GET_USER_PAID_COURSES_REQUEST }
+}
+
+export function getUserProfileFull() {
+    return { type: GET_USER_PAID_COURSES_EXT_REQUEST, payload: null }
 }
 
 export function getUserHistory() {
@@ -605,28 +631,6 @@ export const changePassword = (values) => {
     }
 }
 
-const handleData = (data) => {
-    if (data.Courses) {
-        data.Courses.forEach(course => handleCourse(course))
-    }
-
-    if (data.Lessons) {
-        data.Lessons.forEach((lesson) => {
-            handleLesson(lesson);
-
-            let _course = data.Courses.find((course) => {
-                return course.Id === lesson.CourseId
-            })
-
-            lesson.courseUrl = _course ? _course.URL : null;
-        })
-    }
-
-    if (data.PortraitMeta) {
-        data.PortraitMeta = JSON.parse(data.PortraitMeta)
-    }
-}
-
 const handleCourse = (data) => {
     if (data.CoverMeta) {
         data.CoverMeta = JSON.parse(data.CoverMeta);
@@ -751,6 +755,117 @@ const handleBookmarksData = (data) => {
             return _result
         })
     }
+}
+
+const _handlePaidCoursesData = (data) => {
+    if (data.Courses) {
+        data.Courses.forEach(course => {
+            handleCourse(course)
+            course.authors = [];
+
+            course.Authors.forEach((authorId) => {
+                course.authors.push(data.Authors[authorId])
+            })
+
+            course.categories = [];
+
+            course.Categories.forEach((categoryId) => {
+                course.categories.push(data.Categories[categoryId])
+            })
+        })
+    }
+}
+
+/**
+ * Sagas watcher
+ */
+function* watchGetUserProfile() {
+    yield fork(getUserProfileSaga);
+    yield fork(getUserPaidCoursesSaga);
+}
+
+/**
+ * Saga workers
+ */
+function* getUserProfileSaga() {
+    yield put({type: GET_USER_INFO_START})
+
+    try {
+        let _data = yield call(_fetchUserProfile)
+
+        yield put({
+            type: GET_USER_INFO_SUCCESS,
+            payload: _data
+        })
+    } catch (error) {
+        yield put({
+            type: GET_USER_INFO_ERROR,
+            payload: {error}
+        })
+    }
+}
+
+const _fetchUserProfile = () => {
+    return fetch("/api/users", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* getUserPaidCoursesSaga() {
+    yield put({type: GET_USER_PAID_COURSES_START})
+
+    try {
+        let _data = yield call(_fetchPaidCourses)
+
+        yield put({
+            type: GET_USER_PAID_COURSES_SUCCESS,
+            payload: _data
+        })
+    } catch (error) {
+        yield put({
+            type: GET_USER_PAID_COURSES_FAIL,
+            payload: {error}
+        })
+    }
+}
+
+function* getUserPaidCoursesExtSaga() {
+    yield put({type: GET_USER_PAID_COURSES_EXT_START})
+
+    try {
+        let _data = yield call(_fetchPaidCoursesExt)
+        _handlePaidCoursesData(_data)
+
+        yield put({
+            type: GET_USER_PAID_COURSES_EXT_SUCCESS,
+            payload: _data.Courses ? _data.Courses : []
+        })
+    } catch (error) {
+        yield put({
+            type: GET_USER_PAID_COURSES_EXT_FAIL,
+            payload: {error}
+        })
+    }
+}
+
+const _fetchPaidCourses = () => {
+    return fetch("/api/users/paid/courses", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _fetchPaidCoursesExt = () => {
+    return fetch("/api/users/paid/courses-ext", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+export const saga = function* () {
+    yield all([
+        takeEvery(GET_USER_INFO_REQUEST, watchGetUserProfile),
+        takeEvery(GET_USER_PAID_COURSES_REQUEST, getUserPaidCoursesSaga),
+        takeEvery(GET_USER_PAID_COURSES_EXT_REQUEST, getUserPaidCoursesExtSaga),
+    ])
 }
 
 const Months = [

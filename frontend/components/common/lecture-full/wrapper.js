@@ -12,6 +12,7 @@ export default class LessonFullWrapper extends React.Component {
         needShowAuthors: PropTypes.bool,
         lesson: PropTypes.object,
         isSingleLesson: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -20,14 +21,15 @@ export default class LessonFullWrapper extends React.Component {
     };
 
     render() {
-        let {lesson, courseUrl} = this.props,
+        let {lesson, courseUrl, isPaidCourse,} = this.props,
             _cover = getCoverPath(lesson, ImageSize.small)
 
         return (
             <div className="lecture-full__wrapper">
                 <PlayBlock id={lesson.Id} courseUrl={courseUrl} lessonUrl={lesson.URL}
                            isAuthRequired={lesson.IsAuthRequired} audios={lesson.Audios} cover={_cover}
-                           duration={lesson.DurationFmt} totalDuration={lesson.Duration}/>
+                           duration={lesson.DurationFmt} totalDuration={lesson.Duration}
+                           isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
                 <InfoBlock {...this.props}/>
             </div>
         )
