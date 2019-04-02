@@ -8,10 +8,11 @@ export default class SingleLecture extends React.Component {
     static propTypes = {
         lesson: PropTypes.object.isRequired,
         courseUrl: PropTypes.string.isRequired,
+        isPaidCourse: PropTypes.bool,
     }
 
     render() {
-        let {lesson} = this.props;
+        let {lesson, isPaidCourse} = this.props;
         if (lesson.State === 'D') {
             return null
         }
@@ -34,7 +35,8 @@ export default class SingleLecture extends React.Component {
             <section className="lecture">
                 <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL}
                            courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
-                           totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}/>
+                           totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}
+                           isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
                 <div className='lecture__descr'>
                     <Link to={'/' + this.props.courseUrl + '/' + lesson.URL}>
                         <h3>

@@ -124,7 +124,7 @@ function mapStateToProps(state, ownProps) {
         lessonsBookmarks: getLessonBookmarks(state),
         coursesBookmarks: getCourseBookmarks(state),
         authorized: !!state.user.user,
-        loading: state.user.loading,
+        loading: state.user.loading || loadingSelector(state),
         showLessonBookmarks: state.app.showLessonBookmarks,
         showCourseBookmarks: state.app.showCourseBookmarks,
         page: ownProps.location.pathname,

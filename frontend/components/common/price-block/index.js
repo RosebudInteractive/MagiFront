@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from "redux";
-import {showCoursePaymentWindow, setSubscriptionType} from "ducks/billing";
-import connect from "react-redux/es/connect/connect";
+import {showCoursePaymentWindow, getPaidCourseInfo} from "ducks/billing";
+import {showSignInForm} from '../../../actions/user-actions'
+import {userPaidCoursesSelector} from "ducks/profile";
+import {connect} from 'react-redux';
 
 class PriceBlock extends React.Component {
 
@@ -12,9 +14,9 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course} = this.props
+        const {course, userPaidCourses,} = this.props
 
-        if (!(course && course.IsPaid)) {
+        if (!(course && course.IsPaid) || userPaidCourses.includes(course.Id)) {
             return null
         }
 
@@ -51,32 +53,30 @@ class PriceBlock extends React.Component {
     }
 
     _onClick() {
+        if (!this.props.authorized) {
+            this.props.showSignInForm();
+        }
+
         const {course} = this.props;
 
-        this._setSubscriptionType({
-            Price: course.DPrice ? course.DPrice : course.Price,
-            Id : course.ProductId,
-            Title: course.Name,
-        })
+        this.props.getPaidCourseInfo(course.ProductId)
         this.props.showPaymentWindow()
     }
+}
 
-    _setSubscriptionType(item) {
-        let {billingTest, user} = this.props,
-            _disablePayment = billingTest && (!!user && user.PData && (!user.PData.isAdmin) && user.PData.roles.billing_test)
-        this.props.setSubscriptionType(item)
-
-        // if (!_disablePayment) {
-        //     this.props.switchToPayment()
-        // }
+function mapStateToProps(state) {
+    return {
+        userPaidCourses : userPaidCoursesSelector(state),
+        authorized: !!state.user.user,
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return {
         showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
-        setSubscriptionType: bindActionCreators(setSubscriptionType, dispatch),
+        getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        showSignInForm: bindActionCreators(showSignInForm, dispatch),
     }
 }
 
-export default connect(null, mapDispatchToProps)(PriceBlock);
+export default connect(mapStateToProps, mapDispatchToProps)(PriceBlock);

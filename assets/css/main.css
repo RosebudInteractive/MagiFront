@@ -5496,6 +5496,8 @@ ul.user-tooltip {
     .course-module__stats span {
       color: rgba(47, 47, 47, 0.6); }
     .course-module__stats .author-name a {
+      white-space: pre-line;
+      display: inline-block;
       color: rgba(47, 47, 47, 0.6);
       border-bottom: 1px solid rgba(255, 255, 255, 0);
       -webkit-transition: border-color 0.3s ease;
@@ -5566,6 +5568,11 @@ ul.user-tooltip {
       -moz-box-align: center;
       -ms-flex-align: center;
       align-items: center; }
+    .bookmarks-page .course-module__price-block-wrapper {
+      flex-direction: column; }
+    @media (max-width: 899px) {
+      .bookmarks-page .course-module__price-block-wrapper {
+        flex-direction: row; } }
     .course-module__price-block-section {
       display: -webkit-box;
       display: -webkit-flex;
@@ -5590,8 +5597,23 @@ ul.user-tooltip {
       -ms-flex-align: start;
       align-items: flex-start;
       margin-left: 18px; }
-    .author-page .course-module__price-block {
+    .bookmarks-page .course-module__price-block-section{
+      margin: 0;
+      width: 100%; }
+    @media (max-width: 899px) {
+      .bookmarks-page .course-module__price-block-section {
+        width: auto;
+        margin: 18px; } }
+    .author-page .course-module__price-block,
+    .bookmarks-page .course-module__price-block {
       margin: 0; }
+    .bookmarks-page .course-module__price-block {
+      position: absolute;
+      bottom: 36px; }
+    @media (max-width: 899px) {
+      .bookmarks-page .course-module__price-block {
+        position: relative;
+        bottom: 0;  } }
     .course-module__price-block p {
       margin: 0; }
   .course-module__price {
@@ -5632,10 +5654,18 @@ ul.user-tooltip {
     padding: 17px 32px;
     min-width: 140px;
     font-size: 17px;
-    font-weight: 400;
-    cursor: pointer; }
+    font-weight: 400; }
   .author-page .course-module__price-btn {
     min-width: 216px; }
+  .bookmarks-page .course-module__price-btn {
+    min-width: 140px;
+    min-height: 54px;
+    order: 1;}
+    @media (max-width: 899px) {
+      .bookmarks-page .course-module__price-btn {
+        min-width: 108px;
+        min-height: 48px;
+        order: 0; } }
     @media (max-width: 1280px) {
       .course-module__price-btn {
         min-width: 120px; } }
@@ -5664,7 +5694,8 @@ ul.user-tooltip {
         max-width: 280px; } }
     .course-module .course-module__price-block-info .label {
       color: #2f2f2f; }
-  .author-page .course-module__price-block-info {
+  .author-page .course-module__price-block-info,
+  .bookmarks-page .course-module__price-block-info{
     display: none; }
   .course-module__title {
     position: relative;
@@ -6106,6 +6137,17 @@ ul.user-tooltip {
             height: 22px;
             background-image: url("../images/svg/flag.svg");
             opacity: 0.2; } }
+    .fav-card__title .course-module__label {
+      position: unset;
+      padding-left: 0; }
+    .fav-card__title .course-module__label-icon {
+      padding-right: 5px;
+      padding-bottom: 3px;
+      fill: #c8684c; }
+    @media (max-width: 899px) {
+      .fav-card__title .course-module__label-icon {
+        padding-right: 5px;
+        padding-bottom: 0; } }
     .course-module--extended .course-module__info-col {
       width: 45.5%; }
       @media (max-width: 1399px) {
@@ -6791,7 +6833,8 @@ ul.user-tooltip {
   .lectures-list__item-header .lecture__btn svg,
   .play-block.play-block--big .play-block__btn svg{
     margin-left: auto;
-    margin-right: auto; }
+    margin-right: auto;
+    fill: #fff; }
     .lecture__btn:hover + .play-block__tooltip,
     .play-block__btn:hover + .play-block__tooltip,
     .play-btn-small:hover .play-block__tooltip,
@@ -7312,7 +7355,8 @@ ul.user-tooltip {
       width: 40px;
       -webkit-transition: all ease-in-out;
       transition: all ease-in-out;
-      fill-opacity: .8; }
+      fill-opacity: .8;
+      fill: #fff}
   .play-block__btn.paused {
     margin-left: 0;}
   .play-block--big {
@@ -8171,7 +8215,8 @@ body[data-page="fullpage-player"] .lectures-menu {
     width: 12px;
     height: 11px;
     max-width: 12px;
-    max-height: 11px; }
+    max-height: 11px;
+    fill: #c8684c; }
   .play-btn-small:hover:after, .play-btn-small:focus:after, .play-btn-small:active:after {
     opacity: 0.7; }
   .play-btn-small.paused svg{
@@ -14259,6 +14304,7 @@ ul.lectures-tab {
       vertical-align: middle; }
 
 .fav-card {
+  position: relative;
   -webkit-box-flex: 0;
   -webkit-flex: none;
   -moz-box-flex: 0;
@@ -14306,6 +14352,9 @@ ul.lectures-tab {
   .fav-card__header {
     margin-bottom: 8px;
     min-height: 103px; }
+  @media (max-width: 899px) {
+    .fav-card__header._with-price-button {
+      min-height: auto; } }
   .fav-card__title {
     /*max-width: calc(100% - 20px);*/
     padding-right: 20px;
@@ -14513,6 +14562,10 @@ ul.lectures-tab {
       width: 100%;
       height: 100%; }
   .fav-card__link {
+    position: absolute;
+    top: 300px;
+    line-height: 22px;
+    min-height: 54px;
     margin-top: auto;
     min-width: 171px; }
 
@@ -15193,6 +15246,8 @@ ul.lectures-tab {
     font-size: 13px;
     line-height: 17px;
     color: rgba(47, 47, 47, 0.6); }
+  .courses .play-block-small__duration {
+    display: none; }
 
   .sublesson__play-block__wrapper {
     position: relative;

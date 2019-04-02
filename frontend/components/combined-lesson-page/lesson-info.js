@@ -13,13 +13,14 @@ import {
     addLessonToBookmarks,
     getUserBookmarks,
     removeLessonFromBookmarks,
-    userBookmarksSelector
-} from "../../ducks/profile";
+    userBookmarksSelector,
+} from "ducks/profile";
 
 class LessonInfo extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     }
 
     _favoritesClick(courseUrl, lessonUrl) {
@@ -44,7 +45,7 @@ class LessonInfo extends React.Component {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
-        let {lesson} = this.props;
+        let {lesson, isPaidCourse} = this.props
 
         return lesson.Childs.map((item) => {
             let _cover = getCoverPath(item, ImageSize.icon),
@@ -57,8 +58,8 @@ class LessonInfo extends React.Component {
                         {item.Name + ' '}
                         <span className="duration">{item.DurationFmt}</span>
                     </Link>
-                    <PlayBlockSmall lesson={item} cover={_cover}/>
-                    <PlayBlock lesson={item} cover={_cover}/>
+                    <PlayBlockSmall lesson={item} cover={_cover} isPaidCourse={isPaidCourse}/>
+                    <PlayBlock lesson={item} cover={_cover} isPaidCourse={isPaidCourse}/>
                     <button className="extras-list__fav" type="button"
                             onClick={() => {
                                 this._favoritesClick(item.courseUrl, item.URL)

@@ -17,6 +17,7 @@ export default class TranscriptPage extends React.Component {
         isNeedHideRefs: PropTypes.bool,
         lesson: PropTypes.object,
         singleLesson: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     render() {
@@ -213,7 +214,7 @@ class TextBlock extends React.Component {
     }
 
     render() {
-        let {lesson, isNeedHideRefs, singleLesson} = this.props,
+        let {lesson, isNeedHideRefs, singleLesson, isPaidCourse} = this.props,
             _cover = getCoverPath(lesson, ImageSize.icon);
 
         let _number = getLessonNumber(lesson);
@@ -225,7 +226,7 @@ class TextBlock extends React.Component {
             <div className={_transcriptClassName} id="transcript">
                 <section className="text-block js-social-start">
                     <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}/>
+                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'} isPaidCourse={isPaidCourse}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
                         <div className='text-block__headline'>

@@ -491,15 +491,15 @@ const DbUser = class DbUser extends DbObject {
         if (isDetailed && (courseIds.length > 0)) {
             result = [];
             let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-            result = await this._getCoursesByIds(arrayOfIds, isAbsPath);
+            result = await this._getCoursesByIds({ Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
         }
         else
             result = courseIds;
         return result;
     }
 
-    async _getCoursesByIds(arrayOfIds, isAbsPath, courseList, courseBoookmarkOrder) {
-        let courses = [];
+    async _getCoursesByIds(data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
+        let courseList = {};
 
         if (arrayOfIds.length > 0) {
             await Utils.seqExec(arrayOfIds, (elem) => {
@@ -528,19 +528,77 @@ const DbUser = class DbUser extends DbObject {
                                 };
                                 if (courseBoookmarkOrder)
                                     course.Order= courseBoookmarkOrder[elem.Id];
-                                courses.push(course);
-                                if (courseList)
-                                    courseList[elem.Id] = course;
+                                data.Courses.push(course);
+                                courseList[elem.Id] = course;
                             })
-                            if (courses.length > 0) {
-                                for (let i = 0; i < courses.length; i++)
-                                    await this._coursesService.getCoursePrice(courses[i]);
+                            if (data.Courses.length > 0) {
+                                for (let i = 0; i < data.Courses.length; i++)
+                                    await this._coursesService.getCoursePrice(data.Courses[i]);
                             }
                         }
                     })
+                    .then(() => {
+                        return Utils.seqExec(arrayOfIds, (elem) => {
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
+                                    mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+                                }
+                            }, {})
+                                .then((result) => {
+                                    if (result && result.detail && (result.detail.length > 0)) {
+                                        result.detail.forEach((elem) => {
+                                            let author = data.Authors[elem.Id];
+                                            if (!author) {
+                                                author = {
+                                                    Id: elem.Id,
+                                                    URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
+                                                    FirstName: elem.FirstName,
+                                                    LastName: elem.LastName,
+                                                    Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
+                                                    PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
+                                                };
+                                                data.Authors[elem.Id] = author;
+                                            }
+                                            let course = courseList[elem.CourseId];
+                                            if (course)
+                                                course.Authors.push(author.Id);
+                                        })
+                                    }
+                                })
+                        });
+                    })
+                    .then(() => {
+                        return Utils.seqExec(arrayOfIds, (elem) => {
+                            return $data.execSql({
+                                dialect: {
+                                    mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
+                                    mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
+                                }
+                            }, {})
+                                .then((result) => {
+                                    if (result && result.detail && (result.detail.length > 0)) {
+                                        result.detail.forEach((elem) => {
+                                            let category = data.Categories[elem.Id];
+                                            if (!category) {
+                                                category = {
+                                                    Id: elem.Id,
+                                                    URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
+                                                    Name: elem.Name
+                                                };
+                                                data.Categories[elem.Id] = category;
+                                            }
+                                            let course = courseList[elem.CourseId];
+                                            if (course)
+                                                course.Categories.push(category.Id);
+                                        })
+                                    }
+                                })
+                        });
+                    })
             });
         }
-        return courses;
+        return data;
     }
 
     getExtBookmarks(userId, options) {
@@ -601,74 +659,9 @@ const DbUser = class DbUser extends DbObject {
                         }
                     });
             })
-            .then(async() => {
+            .then(async () => {
                 arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-                bookmarks.Courses = await this._getCoursesByIds(arrayOfIds, isAbsPath, courseList, courseBoookmarkOrder);
-            })
-            .then(() => {
-                if (courseIds.length > 0) {
-                    return Utils.seqExec(arrayOfIds, (elem) => {
-                        return $data.execSql({
-                            dialect: {
-                                mysql: _.template(GET_AUTHORS_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                mssql: _.template(GET_AUTHORS_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
-                            }
-                        }, {})
-                            .then((result) => {
-                                if (result && result.detail && (result.detail.length > 0)) {
-                                    result.detail.forEach((elem) => {
-                                        let author = bookmarks.Authors[elem.Id];
-                                        if (!author) {
-                                            author = {
-                                                Id: elem.Id,
-                                                URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
-                                                FirstName: elem.FirstName,
-                                                LastName: elem.LastName,
-                                                Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
-                                                PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
-                                            };
-                                            bookmarks.Authors[elem.Id] = author;
-                                        }
-                                        let course = courseList[elem.CourseId];
-                                        if (course)
-                                            course.Authors.push(author.Id);
-                                    })
-                                }
-                            })
-                    });
-                }
-            })
-            .then(() => {
-                if (courseIds.length > 0) {
-                    return Utils.seqExec(arrayOfIds, (elem) => {
-                        return $data.execSql({
-                            dialect: {
-                                mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
-                            }
-                        }, {})
-                            .then((result) => {
-                                if (result && result.detail && (result.detail.length > 0)) {
-                                    result.detail.forEach((elem) => {
-                                        let category = bookmarks.Categories[elem.Id];
-                                        if (!category) {
-                                            category = {
-                                                Id: elem.Id,
-                                                URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
-                                                Name: elem.Name
-                                            };
-                                            bookmarks.Categories[elem.Id] = category;
-                                        }
-                                        let course = courseList[elem.CourseId];
-                                        if (course)
-                                            course.Categories.push(category.Id);
-                                    })
-                                }
-                            })
-                    });
-                }
-            })
-            .then(() => {
+                await this._getCoursesByIds(bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
                 return bookmarks;
             });
     }

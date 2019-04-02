@@ -8,6 +8,7 @@ import {fixedObjDescrSelector} from 'ducks/params'
 import {addCourseToBookmarks, getUserBookmarks, removeCourseFromBookmarks, userBookmarksSelector} from "ducks/profile";
 import {bindActionCreators} from "redux";
 import * as userActions from "actions/user-actions";
+import PriceBlock from "../../common/price-block";
 
 class Wrapper extends React.Component {
 
@@ -50,7 +51,8 @@ class Wrapper extends React.Component {
                     </div>
                 </div>
                 <div className="course-module__description-block">
-                    <p dangerouslySetInnerHTML={this.createMarkup()}/>
+                    <p className="course-module__descr" dangerouslySetInnerHTML={this.createMarkup()}/>
+                    <PriceBlock course={course}/>
                 </div>
             </div>,
             <PlayerBlock poster={_coverPath} courseUrl={course.URL} visibleButton={false} />
