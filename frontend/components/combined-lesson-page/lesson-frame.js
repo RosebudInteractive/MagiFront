@@ -28,6 +28,7 @@ class LessonFrame extends React.Component {
         courseUrl: PropTypes.string,
         lesson: PropTypes.object,
         isMain: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -101,14 +102,24 @@ class LessonFrame extends React.Component {
 
     _getButton(isFinished) {
         const _playLock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-lock"/>',
+            _playCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lecture-replay"/>';
 
         const _style = {cursor: 'pointer'};
 
-        let {lesson, authorized} = this.props,
+        let {lesson, authorized, isPaidCourse} = this.props,
             _button = null;
 
-        if (lesson.IsAuthRequired && !authorized) {
+        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+            _button = (
+                <div style={_style} onClick={::this._unlock}>
+                    <span className="play-btn-big lecture-frame__play-btn lock">
+                        <svg width="102" height="90" fill="#fff" dangerouslySetInnerHTML={{__html: _playCrown}}/>
+                        Воспроизвести
+                    </span>
+                </div>
+            )
+        } else if (lesson.IsAuthRequired && !authorized) {
             _button = (
                 <div style={_style} onClick={::this._unlock}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
@@ -170,9 +181,9 @@ class LessonFrame extends React.Component {
 
         let {lesson} = this.props;
         let _number = getLessonNumber(lesson);
-            _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
+        _number = lesson.Parent ? (_number + ' ') : (_number + '. ');
 
-        let {isFinished : _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
+        let {isFinished: _isFinished, playedPart} = this._calcIsFinishedAndPlayedPart(lesson),
             _playPercent = playedPart * 100,
             _inFavorites = this._isLessonInBookmarks();
 

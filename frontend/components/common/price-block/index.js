@@ -20,8 +20,6 @@ class PriceBlock extends React.Component {
             return null
         }
 
-        this._visible = true;
-
         let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
             _hasDiscountDescr = _hasDiscount && course.Discount.Description;
 

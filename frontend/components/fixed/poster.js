@@ -18,6 +18,8 @@ class PlayerBlock extends React.Component {
         audios: PropTypes.array,
         courseUrl: PropTypes.string,
         lessonUrl: PropTypes.string,
+        isPaidCourse: PropTypes.bool,
+        isLessonFree: PropTypes.bool,
     }
 
     render() {
@@ -64,7 +66,7 @@ class PlayerBlock extends React.Component {
     _getButton() {
         if (!this.props.visibleButton) { return null }
 
-        let {lessonId, isAuthRequired, authorized} = this.props,
+        let {lessonId, isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
             _lessonInfo = this.props.lessonInfoStorage.lessons.get(lessonId),
             _isFinished = _lessonInfo ? _lessonInfo.isFinished : false,
             _button = null;
@@ -72,9 +74,14 @@ class PlayerBlock extends React.Component {
 
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
+            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
-        if (isAuthRequired && !authorized) {
+        if (isPaidCourse && !isLessonFree) {
+            return <button className="play-block__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+            </button>
+        } else if (isAuthRequired && !authorized) {
             _button = <button className="play-block__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>

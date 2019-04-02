@@ -26,6 +26,7 @@ export default class Wrapper extends React.Component {
         active: PropTypes.string,
         isPlayer: PropTypes.bool,
         singleLesson: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -119,6 +120,7 @@ export default class Wrapper extends React.Component {
                                  isMain={this.props.isMain}
                                  courseUrl={this.props.courseUrl}
                                  visible={!this.props.isPlayer}
+                                 isPaidCourse={this.props.isPaidCourse}
                     />
                 </div>
             </section>

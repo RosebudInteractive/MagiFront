@@ -14,10 +14,11 @@ class Wrapper extends React.Component {
     static propTypes = {
         lesson: PropTypes.object,
         courseUrl: PropTypes.string,
+        isPaidCourse: PropTypes.bool,
     }
 
     render() {
-        let {lesson, courseUrl} = this.props,
+        let {lesson, courseUrl, isPaidCourse} = this.props,
             _coverPath = '/data/' + getCoverPath(lesson);
 
 
@@ -50,7 +51,7 @@ class Wrapper extends React.Component {
                 </div>
             </div>,
             <PlayerBlock poster={_coverPath} visibleButton={true} lessonId={lesson.Id} audios={lesson.Audios}
-                         courseUrl={courseUrl} lessonUrl={lesson.URL}/>
+                         courseUrl={courseUrl} lessonUrl={lesson.URL} isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
 
         ]
     }

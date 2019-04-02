@@ -21,7 +21,8 @@ class PlayBlock extends React.Component {
         isAuthRequired: PropTypes.bool,
         duration: PropTypes.string,
         totalDuration: PropTypes.number,
-        isPaid: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
+        isLessonFree: PropTypes.bool,
     }
 
     _play() {
@@ -41,15 +42,18 @@ class PlayBlock extends React.Component {
             _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
 
-        let {isAuthRequired, authorized} = this.props,
-            _button = null;
+        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props
 
-        if (isAuthRequired && !authorized) {
-            _button = <button className="play-block__btn paused" onClick={::this._unlock}>
+        if (isPaidCourse && !isLessonFree) {
+            return <button className="play-block__btn paused" onClick={::this._unlock}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+            </button>
+        } else if (isAuthRequired && !authorized) {
+            return <button className="play-block__btn paused" onClick={::this._unlock}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
             </button>
         } else {
-            _button = <button className={"play-block__btn" + (isFinished ? ' paused' : '')} onClick={::this._play}>
+            return <button className={"play-block__btn" + (isFinished ? ' paused' : '')} onClick={::this._play}>
                 {isFinished
                     ?
                     <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
@@ -58,15 +62,16 @@ class PlayBlock extends React.Component {
                 }
             </button>
         }
-
-        return _button;
     }
 
     _getTooltip(isFinished) {
-        let {isAuthRequired, authorized} = this.props,
+        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
             _tooltip = null;
 
-        if (isAuthRequired && !authorized) {
+        if (isPaidCourse && !isLessonFree) {
+            return TooltipTitles.IS_PAID
+        }
+        else if (isAuthRequired && !authorized) {
             _tooltip = TooltipTitles.locked
         } else {
             _tooltip = isFinished ? TooltipTitles.replay : TooltipTitles.play

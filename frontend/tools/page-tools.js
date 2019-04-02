@@ -150,6 +150,7 @@ export const TooltipTitles = {
     play: 'Начать просмотр',
     replay : 'С начала',
     pause: 'Пауза',
+    IS_PAID: 'Для просмотра лекции необходимо купить курс',
 }
 
 let _isOverflowEnable = false,

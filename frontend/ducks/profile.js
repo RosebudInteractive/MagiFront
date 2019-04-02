@@ -8,7 +8,6 @@ import {checkStatus, mockFetch, parseJSON} from "../tools/fetch-tools";
 import {
     SIGN_IN_SUCCESS,
     LOGOUT_SUCCESS,
-    WHO_AM_I_SUCCESS, SHOW_SIGN_IN_FORM,
 } from "../constants/user";
 import {parseReadyDate} from "../tools/time-tools";
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
@@ -100,6 +99,7 @@ export const ReducerRecord = Record({
     paidCourses: new Set(),
     courseBookmarks: new List(),
     lessonBookmarks: new List(),
+    paidCoursesInfo: new List(),
     subsInfo: new SubscriptionInfo(),
     loading: false,
     loadingSubsInfo: false,
@@ -161,6 +161,18 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .update('paidCourses', paidCourses => paidCourses.union(payload))
+
+        case GET_USER_PAID_COURSES_EXT_START :
+            return state
+                .set('error', null)
+                .set('loading', true)
+                .update('paidCoursesInfo', paidCoursesInfo => paidCoursesInfo.clear())
+
+        case GET_USER_PAID_COURSES_EXT_SUCCESS:
+            return state
+                .set('error', null)
+                .set('loading', false)
+                .update('paidCoursesInfo', paidCoursesInfo => paidCoursesInfo.concat(payload))
 
         case GET_BOOKMARKS_START:
             return state
@@ -266,6 +278,7 @@ export const loadingSubsInfoSelector = createSelector(stateSelector, state => st
 
 export const transactionsSelector = createSelector(stateSelector, state => state.transactions)
 export const subscriptionInfoSelector = createSelector(stateSelector, state => state.subsInfo)
+export const paidCoursesInfoSelector = createSelector(stateSelector, state => state.paidCoursesInfo)
 
 /**
  * Action Creators
@@ -760,10 +773,6 @@ const _handlePaidCoursesData = (data) => {
                 course.categories.push(data.Categories[categoryId])
             })
         })
-
-        data.Courses.sort((a, b) => {
-            return a.Order - b.Order
-        })
     }
 }
 
@@ -825,11 +834,11 @@ function* getUserPaidCoursesExtSaga() {
 
     try {
         let _data = yield call(_fetchPaidCoursesExt)
-        _data = _handlePaidCoursesData(_data)
+        _handlePaidCoursesData(_data)
 
         yield put({
             type: GET_USER_PAID_COURSES_EXT_SUCCESS,
-            payload: _data
+            payload: _data.Courses
         })
     } catch (error) {
         yield put({

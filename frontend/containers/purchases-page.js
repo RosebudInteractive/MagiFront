@@ -3,21 +3,15 @@ import {pages} from "../tools/page-tools";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
-    getCourseBookmarks,
-    getLessonBookmarks,
-    getUserBookmarksFull, loadingSelector
+    getUserProfileFull, loadingSelector, paidCoursesInfoSelector
 } from "ducks/profile";
 import {setCurrentPage} from "../actions/page-header-actions";
 import {whoAmI, showSignInForm} from "../actions/user-actions";
-// import * as appActions from "../actions/app-actions";
 import {refreshState} from "../actions/lesson-info-storage-actions";
-import LessonsBlock from '../components/bookmarks/lessons-block'
-import CoursesBlock from '../components/bookmarks/courses-block'
+import CoursesBlock from '../components/purchases/courses-block'
 import {Redirect} from 'react-router';
-import {reset} from "redux-form";
-import {showErrorDialog} from "../../src/actions/app-actions";
 
-class BookmarksPage extends React.Component {
+class PurchasesPage extends React.Component {
     constructor(props) {
         super(props);
 
@@ -30,11 +24,9 @@ class BookmarksPage extends React.Component {
     }
 
     componentWillMount() {
-        this.props.userActions.whoAmI()
-        this.props.storageActions.refreshState();
-        this.props.getUserBookmarksFull();
-        this.props.pageHeaderActions.setCurrentPage(pages.purchases);
-        }
+        this.props.whoAmI()
+        this.props.getUserProfileFull();
+        this.props.setCurrentPage(pages.purchases);
     }
 
     componentWillReceiveProps(nextProps) {
@@ -47,34 +39,11 @@ class BookmarksPage extends React.Component {
                 }
             }
         }
-
-        if (nextProps.isBookmarksPage) {
-            if (nextProps.showCourseBookmarks && (nextProps.page !== '/favorites/courses')) {
-                this.props.appActions.showCoursesBookmarks();
-                this.props.history.replace('/favorites/courses')
-            }§
-
-            if (nextProps.showLessonBookmarks && (nextProps.page !== '/favorites/lessons')) {
-                this.props.appActions.showLessonsBookmarks();
-                this.props.history.replace('/favorites/lessons')
-            }
-        }
-    }
-
-    _openCourses() {
-        this.props.appActions.showCoursesBookmarks();
-        this.props.history.push('/favorites/courses')
-    }
-
-    _openLessons() {
-        this.props.appActions.showLessonsBookmarks();
-        this.props.history.push('/favorites/lessons')
     }
 
     render() {
-        let {lessonsBookmarks, coursesBookmarks, showLessonBookmarks, showCourseBookmarks} = this.props,
-            _lessonsCount = lessonsBookmarks ? lessonsBookmarks.size : 0,
-            _coursesCount = coursesBookmarks ? coursesBookmarks.size : 0;
+        let {paidCoursesInfo} = this.props,
+            _count = paidCoursesInfo ? paidCoursesInfo.size : 0;
 
         if (this._redirect) {
             this._redirect = false;
@@ -89,25 +58,16 @@ class BookmarksPage extends React.Component {
                             <div className="profile-block__tab-controls">
                                 <ul>
                                     <li className="profile-block__tab-control active">
-                                        <span className="text">Закладки: </span>
-                                    </li>
-                                    <li className={"profile-block__tab-control" + (showCourseBookmarks ? " active" : "")}
-                                        onClick={::this._openCourses}>
-                                        <span className="text">Курсы</span>
-                                        <span className="qty">{_coursesCount}</span>
-                                    </li>
-                                    <li className={"profile-block__tab-control" + (showLessonBookmarks ? " active" : "")}
-                                        onClick={::this._openLessons}>
-                                        <span className="text">Лекции</span>
-                                        <span className="qty">{_lessonsCount}</span>
+                                        <span className="text">Купленные курсы</span>
+                                        <span className="qty">{_count}</span>
+                                        <span className="text">: </span>
                                     </li>
                                 </ul>
                             </div>
                         </div>
                     </header>
                     <div className="profile-block__body">
-                        <LessonsBlock active={showLessonBookmarks}/>
-                        <CoursesBlock active={showCourseBookmarks}/>
+                        <CoursesBlock active={true}/>
                     </div>
                 </div>
             </div>
@@ -117,29 +77,15 @@ class BookmarksPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        lessonsBookmarks: getLessonBookmarks(state),
-        coursesBookmarks: getCourseBookmarks(state),
+        paidCoursesInfo: paidCoursesInfoSelector(state),
         authorized: !!state.user.user,
-        loading: state.user.loading,
-        showLessonBookmarks: state.app.showLessonBookmarks,
-        showCourseBookmarks: state.app.showCourseBookmarks,
+        loading: state.user.loading || loadingSelector(state),
         page: ownProps.location.pathname,
-        isBookmarksPage: ownProps.match.path === "/favorites",
     }
 }
 
-// function mapDispatchToProps(dispatch) {
-//     return {
-//         userActions: bindActionCreators(userActions, dispatch),
-//         appActions: bindActionCreators(appActions, dispatch),
-//         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-//         storageActions: bindActionCreators(storageActions, dispatch),
-//         getUserBookmarksFull: bindActionCreators(getUserBookmarksFull, dispatch),
-//     }
-// }
-
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog}, dispatch);
+    return bindActionCreators({getUserProfileFull, refreshState, setCurrentPage, whoAmI, showSignInForm,}, dispatch)
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BookmarksPage);
+export default connect(mapStateToProps, mapDispatchToProps)(PurchasesPage);
