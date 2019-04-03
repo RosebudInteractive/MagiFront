@@ -70,6 +70,7 @@ exports.AccessRights = class {
             let requiredRights = AccessFlags.Administrator + AccessFlags.ContentManager;
             let result = this.checkPermissions(user, requiredRights) !== 0 ? true : false;
             if (!result) {
+                result = true;
                 let mimeType = mime.getType(file);
                 let typeArr = mimeType ? mimeType.split("/") : null;
                 if (typeArr && (typeArr.length > 0)) {
