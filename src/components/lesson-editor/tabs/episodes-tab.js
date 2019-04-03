@@ -8,6 +8,7 @@ export default class EpisodesTab extends React.Component{
     static propTypes = {
         editMode : PropTypes.bool,
         visible: PropTypes.bool,
+        isSublesson : PropTypes.bool,
     }
 
     constructor(props) {
@@ -42,7 +43,13 @@ export default class EpisodesTab extends React.Component{
     render() {
         return <div className={"tab-wrapper tab-wrapper__authors-and-categories" + (this.props.visible ? '' : ' hidden')}>
             <EpisodesGrid editMode={this.props.editMode}/>
-            <SublessonsGrid editMode={this.props.editMode}/>
+            {
+                !this.props.isSublesson ?
+                    <SublessonsGrid editMode={this.props.editMode}/>
+                    :
+                    null
+            }
+
         </div>
     }
 }

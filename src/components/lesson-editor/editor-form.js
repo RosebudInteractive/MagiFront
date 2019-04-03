@@ -1,5 +1,6 @@
 import React from 'react'
 import {connect} from "react-redux";
+import PropTypes from "prop-types";
 import {bindActionCreators} from 'redux';
 import MainTab from './tabs/main-tab'
 import SubscriptionTab from './tabs/subscription-tab'
@@ -47,6 +48,10 @@ const NEW_LESSON = {
 
 class LessonEditorForm extends React.Component {
 
+    static propTypes = {
+        isSublesson : PropTypes.bool,
+    }
+
     constructor(props) {
         super(props)
 
@@ -60,8 +65,8 @@ class LessonEditorForm extends React.Component {
     }
 
     _init() {
-        let {editMode, lesson, fixedLessonId, fixDescription} = this.props,
-            _lesson = editMode ? lesson : this._getNewLesson(),
+        let {lesson, fixedLessonId, fixDescription} = this.props,
+            _lesson = lesson ? lesson : this._getNewLesson(),
             _fixed = (lesson && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
 
@@ -69,6 +74,7 @@ class LessonEditorForm extends React.Component {
             this.props.initialize({
                 courseId: _lesson.CourseId,
                 courseName: _lesson.CourseName,
+                currParentName: _lesson.CurrParentName,
                 name: _lesson.Name,
                 number: _lesson.Number,
                 lessonType: _lesson.LessonType,
@@ -134,7 +140,7 @@ class LessonEditorForm extends React.Component {
                         </div>
                         <div
                             className={"tabs-1 tab-link" + (this.state.currentTab === TABS.EPISODES_AND_SUBS ? ' tab-link-active' : '')}
-                            onClick={() => {this._switchTo(TABS.EPISODES_AND_SUBS)}}>Эпизоды и доп.лекции
+                            onClick={() => {this._switchTo(TABS.EPISODES_AND_SUBS)}}>{"Эпизоды" + (this.props.isSublesson ? "" : " и доп.лекции")}
                         </div>
                         <div
                             className={"tabs-1 tab-link" + (this.state.currentTab === TABS.REFERENCES ? ' tab-link-active' : '')}
@@ -150,10 +156,10 @@ class LessonEditorForm extends React.Component {
             <div className="editor__main-area">
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
-                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}/>
+                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode} isSublesson={this.props.isSublesson}/>
                         <SubscriptionTab visible={this.state.currentTab === TABS.SUBSCRIPTION} editMode={this.props.editMode}/>
                         <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
-                        <EpisodesTab visible={this.state.currentTab === TABS.EPISODES_AND_SUBS} editMode={this.props.editMode}/>
+                        <EpisodesTab visible={this.state.currentTab === TABS.EPISODES_AND_SUBS} editMode={this.props.editMode} isSublesson={this.props.isSublesson}/>
                         <ReferencesTab visible={this.state.currentTab === TABS.REFERENCES} editMode={this.props.editMode}/>
                         <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode}/>
                     </form>
@@ -175,7 +181,11 @@ class LessonEditorForm extends React.Component {
     }
 
     _goBack() {
-        history.push(`/adm/courses/edit/${this.props.course.id}`);
+        if (this.props.isSublesson) {
+            history.push(`/adm/courses/edit/${this.props.course.id}/lessons/edit/${this.props.lesson.CurrParentId}`);
+        } else {
+            history.push(`/adm/courses/edit/${this.props.course.id}`);
+        }
     }
 
     _cancel() {
@@ -219,7 +229,7 @@ class LessonEditorForm extends React.Component {
             LessonType: editorValues.lessonType,
             ReadyDate: editorValues.readyDate,
             ShortDescription: editorValues.description,
-            ParentId: editorValues.currParentId,
+            ParentId: this.props.isSublesson ? this.props.lesson.CurrParentId : null,
             IsAuthRequired: editorValues.isAuthRequired,
             IsSubsRequired: editorValues.isSubsRequired,
             FreeExpDate: editorValues.isSubsRequired ? editorValues.freeExpDate : null,

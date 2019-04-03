@@ -13,14 +13,14 @@ import {
     booksSelector,
     loadingSelector,
     loadedSelector, showEditorSelector,
-} from "../ducks/books";
-import {showDeleteConfirmation, cancelDelete} from '../actions/CommonDlgActions';
-import BookEditor from '../components/books/editor'
+} from "../../ducks/books";
+import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
+import BookEditor from '../../components/books/editor'
 
-import Webix from '../components/Webix';
-import YesNoDialog from "../components/dialog/yes-no-dialog";
-import ErrorDialog from '../components/dialog/error-dialog';
-import LoadingPage from "../components/common/loading-page";
+import Webix from '../../components/Webix';
+import YesNoDialog from "../../components/dialog/yes-no-dialog";
+import ErrorDialog from '../../components/dialog/error-dialog';
+import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
 
 const TIMEOUT = 500;

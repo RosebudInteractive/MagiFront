@@ -2,15 +2,15 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import * as coursesActions from "../actions/coursesListActions";
-import {deleteCourse} from "../actions/coursesListActions";
-import * as commonDlgActions from '../actions/CommonDlgActions';
+import * as coursesActions from "../../actions/coursesListActions";
+import {deleteCourse} from "../../actions/coursesListActions";
+import * as commonDlgActions from '../../actions/CommonDlgActions';
 
-import Webix from '../components/Webix';
-import YesNoDialog from "../components/dialog/yes-no-dialog";
-import ErrorDialog from '../components/dialog/error-dialog';
+import Webix from '../../components/Webix';
+import YesNoDialog from "../../components/dialog/yes-no-dialog";
+import ErrorDialog from '../../components/dialog/error-dialog';
 import $ from "jquery";
-import LoadingPage from "../components/common/loading-page";
+import LoadingPage from "../../components/common/loading-page";
 
 class Courses extends React.Component {
     constructor(props) {
