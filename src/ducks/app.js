@@ -17,12 +17,15 @@ export const GET_OPTIONS_FAIL = `${prefix}/GET_OPTIONS_FAIL`
 export const DISABLE_BUTTONS = `${prefix}/DISABLE_BUTTONS`
 export const ENABLE_BUTTONS = `${prefix}/ENABLE_BUTTONS`
 
+export const SET_ACTIVE_TAB = `${prefix}/SET_ACTIVE_TAB`
+
 /**
  * Reducer
  * */
 export const ReducerRecord = Record({
     reCapture: '',
     enableButtons: true,
+    activeTabs: new Map(),
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -45,6 +48,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('enableButtons', true)
 
+        case SET_ACTIVE_TAB:
+            return state
+                .setIn(['activeTabs', payload.page], payload.value)
+
         default:
             return state
     }
@@ -57,6 +64,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 export const stateSelector = state => state[moduleName]
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
 export const enableButtonsSelector = createSelector(stateSelector, state => state.enableButtons)
+export const activeTabsSelector = createSelector(stateSelector, state => state.activeTabs)
 
 /**
  * Action Creators
@@ -97,6 +105,13 @@ export const enableButtons = () => {
     return {
         type: ENABLE_BUTTONS,
         payload: null
+    }
+}
+
+export const setActiveTab = (value) => {
+    return {
+        type: SET_ACTIVE_TAB,
+        payload: value
     }
 }
 

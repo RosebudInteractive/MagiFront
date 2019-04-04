@@ -19,6 +19,7 @@ import {getCategories} from "../../actions/categoriesListActions";
 import {getLanguages} from "../../actions/languages-actions";
 import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
+import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
@@ -53,6 +54,13 @@ class CourseEditor extends React.Component {
         } else {
             this.props.courseActions.create()
         }
+
+        let _activeTab = this.props.activeTabs.get('CourseEditor')
+        if (_activeTab) {
+            this.setState({
+                currentTab: _activeTab,
+            })
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -68,6 +76,10 @@ class CourseEditor extends React.Component {
         if (_needRefreshAfterSave) {
             this.props.courseActions.get(this.props.course.id)
         }
+    }
+
+    componentWillUnmount() {
+        this.props.setActiveTab({page: 'CourseEditor', value: this.state.currentTab})
     }
 
     render() {
@@ -256,6 +268,7 @@ function mapStateToProps(state, ownProps) {
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
         editorValid: isValid('CourseEditor')(state) && isValid('CourseSubscriptionForm')(state),
+        activeTabs : activeTabsSelector(state)
     }
 }
 
@@ -270,6 +283,7 @@ function mapDispatchToProps(dispatch) {
         getParameters: bindActionCreators(getParameters, dispatch),
         setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
         resetReduxForm: bindActionCreators(reset, dispatch),
+        setActiveTab: bindActionCreators(setActiveTab, dispatch),
     }
 }
 
