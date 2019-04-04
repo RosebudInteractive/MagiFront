@@ -92,7 +92,7 @@ class CoursesPage extends React.Component {
 
                             _lesson.author = course.AuthorsObj.find(author => author.Id === _lesson.AuthorId)
                             _lesson.category = course.CategoriesObj
-                            _result.unshift(<FixLessonWrapper lesson={_lesson} courseUrl={course.URL} isPaidCourse={_isPaidCourse}/>)
+                            _result.unshift(<FixLessonWrapper lesson={_lesson} courseUrl={course.URL} isPaidCourse={_isPaidCourse} />)
                         }
                     }
 

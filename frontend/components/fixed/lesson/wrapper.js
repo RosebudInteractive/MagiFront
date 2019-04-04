@@ -15,6 +15,7 @@ class Wrapper extends React.Component {
         lesson: PropTypes.object,
         courseUrl: PropTypes.string,
         isPaidCourse: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     }
 
     render() {
@@ -51,13 +52,18 @@ class Wrapper extends React.Component {
                 </div>
             </div>,
             <PlayerBlock poster={_coverPath} visibleButton={true} lessonId={lesson.Id} audios={lesson.Audios}
-                         courseUrl={courseUrl} lessonUrl={lesson.URL} isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
+                         courseUrl={courseUrl} lessonUrl={lesson.URL} isPaidCourse={isPaidCourse}
+                         isLessonFree={lesson.IsFreeInPaidCourse} needLockLessonAsPaid={this._needLockLessonAsPaid()}/>
 
         ]
     }
 
     createMarkup() {
         return {__html: this.props.fixedObjDescr};
+    }
+
+    _needLockLessonAsPaid() {
+        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
     }
 
     _getAuthor() {
@@ -100,6 +106,7 @@ function mapStateToProps(state) {
         fixedObjDescr: fixedObjDescrSelector(state),
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

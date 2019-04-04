@@ -10,6 +10,7 @@ export default class Wrapper extends React.Component {
         lessons: PropTypes.array.isRequired,
         isMobile: PropTypes.bool.isRequired,
         isPaidCourse: PropTypes.bool,
+        isAdmin: PropTypes.bool,
     };
 
     render() {

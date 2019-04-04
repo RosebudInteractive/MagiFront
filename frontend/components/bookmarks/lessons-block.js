@@ -5,7 +5,8 @@ import {
     getLessonBookmarks,
     removeLessonFromBookmarks,
     addLessonToBookmarks,
-    userBookmarksSelector
+    userBookmarksSelector,
+    userPaidCoursesSelector,
 } from '../../ducks/profile'
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../actions/lesson-info-storage-actions";
@@ -61,7 +62,7 @@ class LessonsBlock extends React.Component {
         for (let i = 0; i < this._visibleCount; i++) {
             let _item = bookmarks.get(i);
             _result.push(<Item item={_item} key={i} onRemoveItem={::this._favoritesClick}
-                               isFavorite={this._isLessonInBookmarks(_item)}/>)
+                               isFavorite={this._isLessonInBookmarks(_item)} isPaidCourse={this._isPaidCourse(_item)}/>)
         }
 
         return (_result.length > 0) ? _result : <Message/>
@@ -102,12 +103,19 @@ class LessonsBlock extends React.Component {
             </div>
         )
     }
+
+    _isPaidCourse(lesson) {
+        let {userPaidCourses,} = this.props;
+
+        return (lesson.courseIsPaid && !userPaidCourses.includes(lesson.CourseId))
+    }
 }
 
 function mapStateToProps(state) {
     return {
         bookmarks: getLessonBookmarks(state),
         userBookmarks: userBookmarksSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
     }
 }
 

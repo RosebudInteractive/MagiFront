@@ -27,6 +27,7 @@ export default class Wrapper extends React.Component {
         isPlayer: PropTypes.bool,
         singleLesson: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     };
 
     static defaultProps = {

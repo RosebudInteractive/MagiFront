@@ -9,6 +9,7 @@ export default class SingleLecture extends React.Component {
         lesson: PropTypes.object.isRequired,
         courseUrl: PropTypes.string.isRequired,
         isPaidCourse: PropTypes.bool,
+        isAdmin: PropTypes.bool,
     }
 
     render() {
@@ -31,12 +32,15 @@ export default class SingleLecture extends React.Component {
 
         _cover = '/data/' + (_cover ? (lesson.CoverMeta.path + _cover) : lesson.Cover);
 
+        let _needLockLessonAsPaid = this.props.isPaidCourse && !(lesson.IsFreeInPaidCourse || this.props.isAdmin)
+
         return (
             <section className="lecture">
                 <PlayBlock cover={_cover} duration={lesson.DurationFmt} lessonUrl={lesson.URL}
                            courseUrl={this.props.courseUrl} audios={lesson.Audios} id={lesson.Id}
                            totalDuration={lesson.Duration} isAuthRequired={lesson.IsAuthRequired}
-                           isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
+                           isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}
+                           needLockLessonAsPaid={_needLockLessonAsPaid}/>
                 <div className='lecture__descr'>
                     <Link to={'/' + this.props.courseUrl + '/' + lesson.URL}>
                         <h3>

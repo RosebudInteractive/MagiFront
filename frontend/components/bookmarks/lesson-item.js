@@ -8,6 +8,7 @@ export default class Item extends React.Component {
     static propTypes = {
         item: PropTypes.object,
         isFavorite: PropTypes.bool,
+        isPaidCourse: PropTypes.bool,
     }
 
     _favoritesClick() {
@@ -21,7 +22,7 @@ export default class Item extends React.Component {
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
             _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>';
 
-        let {item, isFavorite} = this.props;
+        let {item, isFavorite, isPaidCourse} = this.props;
 
         return (
             <div className={"bookmarks__lesson-item" + (item.singleLessonInCourse ? ' _single' : '')}>
@@ -57,7 +58,7 @@ export default class Item extends React.Component {
                         <p className="history-item__author">{item.authorName}</p>
                     </Link>
                 </div>
-                <LessonPlayBlockSmall lesson={item} wrapperClass={'bookmarks__lesson-item__play-block'}/>
+                <LessonPlayBlockSmall lesson={item} wrapperClass={'bookmarks__lesson-item__play-block'} isPaidCourse={isPaidCourse}/>
             </div>
         )
     }

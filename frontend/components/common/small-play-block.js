@@ -18,7 +18,7 @@ class LessonPlayBlockSmall extends React.Component {
         lessonUrl: PropTypes.string,
         audios: PropTypes.array,
         lesson: PropTypes.object,
-        showRestTime : PropTypes.bool,
+        showRestTime: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
     };
 
@@ -26,6 +26,7 @@ class LessonPlayBlockSmall extends React.Component {
         super(props)
 
         this._redirect = false
+        this._redirectWithoutPlay = false
     }
 
     _play() {
@@ -60,6 +61,20 @@ class LessonPlayBlockSmall extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
+    _goToLesson(isThisLessonPlaying) {
+        if (this.needLockLessonAsPaid) {
+            let _currentLocation = window.location.pathname + window.location.search,
+                _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL
+
+            if (_currentLocation !== _needLocation) {
+                this._redirectWithoutPlay = true
+                this.forceUpdate()
+            }
+        } else {
+            if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
+        }
+    }
+
     _getSmallButton(isThisLessonPlaying, isFinished) {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
@@ -71,7 +86,7 @@ class LessonPlayBlockSmall extends React.Component {
             _button = null;
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
-            return <button className="play-btn-small paused" onClick={::this._unlock}>
+            return <button className="play-btn-small paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="18" height="20" dangerouslySetInnerHTML={{__html: _crownSmall}}/>
                 <div className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</div>
             </button>
@@ -126,7 +141,7 @@ class LessonPlayBlockSmall extends React.Component {
             {IsAuthRequired} = lesson,
             _lessonLocked = (IsAuthRequired && !authorized);
 
-        let {isFinished : _isFinished, playedPart : _playedPart, duration: _duration} = this._calcLessonProps(lesson),
+        let {isFinished: _isFinished, playedPart: _playedPart, duration: _duration} = this._calcLessonProps(lesson),
             {Id: id} = lesson,
             _fullLineLength = 2 * 3.14 * _radius,
             _timeLineLength = 2 * 3.14 * _playedPart * _radius,
@@ -140,10 +155,15 @@ class LessonPlayBlockSmall extends React.Component {
             return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL + '?play'}/>;
         }
 
+        if (this._redirectWithoutPlay) {
+            this._redirectWithoutPlay = false;
+            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL}/>;
+        }
+
         return (
             <div className={this.props.wrapperClass ? this.props.wrapperClass : 'history-item__play-block'}>
                 <span className="play-block-small__duration">{_duration}</span>
-                { !_lessonLocked ?
+                {!_lessonLocked ?
                     <div className="play-block-small">
                         <svg className="svg-loader small" width="200" height="200" viewBox="0 0 200 200"
                              version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -165,7 +185,8 @@ class LessonPlayBlockSmall extends React.Component {
                             <button className="play-btn-small paused"
                                     onClick={::this.props.playerStartActions.startPause}>
                                 <svg width="8" height="10" dangerouslySetInnerHTML={{__html: _pauseSmall}}/>
-                                <div className="play-block__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
+                                <div
+                                    className="play-block__tooltip">{this._getTooltip(_isThisLessonPlaying, _isFinished)}</div>
                             </button>
                         :
                         this._getSmallButton(_isThisLessonPlaying, _isFinished)
@@ -198,6 +219,10 @@ class LessonPlayBlockSmall extends React.Component {
 
         return result
     }
+
+    get needLockLessonAsPaid() {
+        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
+    }
 }
 
 function mapStateToProps(state) {
@@ -206,6 +231,7 @@ function mapStateToProps(state) {
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

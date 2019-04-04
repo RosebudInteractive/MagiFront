@@ -109,9 +109,9 @@ class Course extends React.Component {
                             course.IsPaid ?
                                 <PriceBlock course={course}/>
                                 :
-                                <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">Подробнее
-                                    о
-                                    курсе</Link>
+                                <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
+                                    Подробнее о курсе
+                                </Link>
                         }
                     </div>
                 </div>

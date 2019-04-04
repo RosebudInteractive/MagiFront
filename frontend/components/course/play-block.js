@@ -15,6 +15,7 @@ class PlayBlock extends React.Component {
         super(props)
 
         this._redirect = false
+        this._redirectWithoutPlay = false
     }
 
     static propTypes = {
@@ -24,6 +25,7 @@ class PlayBlock extends React.Component {
         isAuthRequired: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
         isLessonFree: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     }
 
     _play() {
@@ -37,6 +39,20 @@ class PlayBlock extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
+    _goToLesson() {
+        if (this.props.needLockLessonAsPaid) {
+            let _currentLocation = window.location.pathname + window.location.search,
+                _needLocation = '/' + this.props.courseUrl + '/' + this.props.lessonUrl
+
+            if (_currentLocation !== _needLocation) {
+                this._redirectWithoutPlay = true
+                this.forceUpdate()
+            } else {
+                this._play()
+            }
+        }
+    }
+
     _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
@@ -47,7 +63,7 @@ class PlayBlock extends React.Component {
             _button = null;
 
         if (isPaidCourse && !isLessonFree) {
-            return <button className="lecture__btn paused" onClick={::this._unlock}>
+            return <button className="lecture__btn paused" onClick={::this._goToLesson}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
             </button>
         } else if (isAuthRequired && !authorized) {
@@ -104,6 +120,11 @@ class PlayBlock extends React.Component {
         if (this._redirect) {
             this._redirect = false;
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+        }
+
+        if (this._redirectWithoutPlay) {
+            this._redirectWithoutPlay = false;
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}/>;
         }
 
         return (

@@ -25,6 +25,13 @@ class PlayBlock extends React.Component {
         isLessonFree: PropTypes.bool,
     }
 
+    constructor(props) {
+        super(props)
+
+        this._redirect = false
+        this._redirectWithoutPlay = false
+    }
+
     _play() {
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this._redirect = true;
@@ -36,6 +43,20 @@ class PlayBlock extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
+    _goToLesson() {
+        if (this.needLockLessonAsPaid) {
+            let _currentLocation = window.location.pathname + window.location.search,
+                _needLocation = '/' + this.props.courseUrl + '/' + this.props.lessonUrl
+
+            if (_currentLocation !== _needLocation) {
+                this._redirectWithoutPlay = true
+                this.forceUpdate()
+            }
+        } else {
+            this._play()
+        }
+    }
+
     _getButton(isFinished) {
         const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
             _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
@@ -45,7 +66,7 @@ class PlayBlock extends React.Component {
         let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props
 
         if (isPaidCourse && !isLessonFree) {
-            return <button className="play-block__btn paused" onClick={::this._unlock}>
+            return <button className="play-block__btn paused" onClick={::this._goToLesson}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
             </button>
         } else if (isAuthRequired && !authorized) {
@@ -97,6 +118,11 @@ class PlayBlock extends React.Component {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
+        if (this._redirectWithoutPlay) {
+            this._redirectWithoutPlay = false;
+            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}/>;
+        }
+
         return (
             <div className="lecture-full__play-block">
                 <div className="play-block play-block--big">
@@ -141,12 +167,17 @@ class PlayBlock extends React.Component {
 
         return result
     }
+
+    get needLockLessonAsPaid() {
+        return this.props.isPaidCourse && !(this.props.isLessonFree || this.props.isAdmin)
+    }
 }
 
 function mapStateToProps(state) {
     return {
         lessonInfoStorage: state.lessonInfoStorage,
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

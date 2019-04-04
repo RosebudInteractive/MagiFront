@@ -19,6 +19,7 @@ class SubLessonPlayBlock extends React.Component {
         super(props)
 
         this._redirect = false
+        this._redirectWithoutPlay = false
     }
 
     _play() {
@@ -55,6 +56,20 @@ class SubLessonPlayBlock extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
+    _goToLesson(isThisLessonPlaying) {
+        if (this.needLockLessonAsPaid) {
+            let _currentLocation = window.location.pathname + window.location.search,
+                _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL
+
+            if (_currentLocation !== _needLocation) {
+                this._redirectWithoutPlay = true
+                this.forceUpdate()
+            }
+        } else {
+            if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
+        }
+    }
+
     _getSmallButton(isThisLessonPlaying, isFinished) {
         const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
@@ -66,7 +81,7 @@ class SubLessonPlayBlock extends React.Component {
             _button = null;
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
-            return <button className="play-btn-small paused" onClick={::this._unlock}>
+            return <button className="play-btn-small paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="18" height="20" dangerouslySetInnerHTML={{__html: _crownSmall}}/>
                 <span className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</span>
             </button>
@@ -136,6 +151,12 @@ class SubLessonPlayBlock extends React.Component {
             return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL + '?play'}/>;
         }
 
+        if (this._redirectWithoutPlay) {
+            this._redirectWithoutPlay = false;
+            return <Redirect push to={'/' + lesson.courseUrl + '/' + lesson.URL}/>;
+        }
+
+
         return (
             <div className="lectures-sublist__play-block">
                 { !_lessonLocked ?
@@ -189,6 +210,10 @@ class SubLessonPlayBlock extends React.Component {
 
         return result
     }
+
+    get needLockLessonAsPaid() {
+        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
+    }
 }
 
 function mapStateToProps(state) {
@@ -197,6 +222,7 @@ function mapStateToProps(state) {
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

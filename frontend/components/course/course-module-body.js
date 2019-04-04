@@ -12,7 +12,7 @@ class CourseModuleBody extends React.Component {
     }
 
     render() {
-        let {course, isMobile, userPaidCourses} = this.props;
+        let {course, isMobile, userPaidCourses, isAdmin} = this.props;
         let _lessonsCount = course.Lessons.length;
         let _current = course.readyLessonCount,
             _isPaidCourse = (course.IsPaid && !userPaidCourses.includes(course.Id))
@@ -20,7 +20,7 @@ class CourseModuleBody extends React.Component {
         return (
             <div className='course-module__body'>
                 <Counter current={_current} total={_lessonsCount}/>
-                <LectureWrapper lessons={course.Lessons}  isMobile={isMobile} courseUrl={course.URL} isPaidCourse={_isPaidCourse}/>
+                <LectureWrapper lessons={course.Lessons} isMobile={isMobile} courseUrl={course.URL} isPaidCourse={_isPaidCourse} isAdmin={isAdmin}/>
             </div>
         );
     }
@@ -50,6 +50,7 @@ class Counter extends React.Component {
 function mapStateToProps(state) {
     return {
         userPaidCourses : userPaidCoursesSelector(state),
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

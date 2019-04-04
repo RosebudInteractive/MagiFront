@@ -49,6 +49,7 @@ const initialState = {
     error: null,
     user: null,
     msgUrl: '#',
+    isAdmin: false,
     redirect: {active: false, url: ''},
 };
 
@@ -81,8 +82,12 @@ export default function app(state = initialState, action) {
         case SIGN_OUT_SUCCESS:
         case ACTIVATION_SUCCESS:
         case SEND_NEW_PASSWORD_SUCCESS:
-        case GET_ACTIVATION_USER_SUCCESS:
-            return {...state, loading: false, user: Object.assign({}, payload)}
+        case GET_ACTIVATION_USER_SUCCESS: {
+            let _user = Object.assign({}, payload)
+            
+            _user.isAdmin = _isUserAdmin(payload)
+            return {...state, loading: false, user: _user}
+        }
 
         case RECOVERY_PASSWORD_SUCCESS:
             return {...state, loading: false, user: null, msgUrl: payload.PData ? payload.PData.msgUrl : '#', }
@@ -164,4 +169,9 @@ export default function app(state = initialState, action) {
         default:
             return state;
     }
+}
+
+const _isUserAdmin = (data) => {
+    let _rights = data.PData;
+    return _rights && (_rights.isAdmin || (_rights.roles && _rights.roles.e))
 }

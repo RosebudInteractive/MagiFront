@@ -57,8 +57,22 @@ class PlayBlock extends React.Component {
         this.props.userActions.showSignInForm();
     }
 
+    _goToLesson(isThisLessonPlaying) {
+        if (this.needLockLessonAsPaid) {
+            let _currentLocation = window.location.pathname + window.location.search,
+                _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL
+
+            if (_currentLocation !== _needLocation) {
+                this._redirectWithoutPlay = true
+                this.forceUpdate()
+            }
+        } else {
+            if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
+        }
+    }
+
     _getSmallButton(isThisLessonPlaying, isFinished) {
-        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"></use>',
+        const _playSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play-small"/>',
             _replaySmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload-small"/>',
             _crownSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _lockSmall = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock-small"/>'
@@ -68,7 +82,7 @@ class PlayBlock extends React.Component {
             _button = null;
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
-            return <button className="extras-list__play-btn mobile play-btn-small_locked paused" onClick={::this._unlock}>
+            return <button className="extras-list__play-btn mobile play-btn-small_locked paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="14" height="15" fill={"#fff"} dangerouslySetInnerHTML={{__html: _crownSmall}}/>
             </button>
         } else if (IsAuthRequired && !authorized) {
@@ -188,6 +202,10 @@ class PlayBlock extends React.Component {
 
         return result
     }
+
+    get needLockLessonAsPaid() {
+        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
+    }
 }
 
 function
@@ -198,6 +216,7 @@ mapStateToProps(state) {
         paused: state.player.paused,
         playingLesson: state.player.playingLesson,
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
     }
 }
 

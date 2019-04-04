@@ -29,6 +29,7 @@ class LessonFrame extends React.Component {
         lesson: PropTypes.object,
         isMain: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -90,9 +91,11 @@ class LessonFrame extends React.Component {
 
     _play() {
         setScrollTop($('body, html').scrollTop())
+
+        if (this.props.needLockLessonAsPaid) return
+
         this.props.playerStartActions.preinitAudios(this.props.audios);
         this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
-        // this.forceUpdate()
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
@@ -112,7 +115,7 @@ class LessonFrame extends React.Component {
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
             _button = (
-                <div style={_style} onClick={::this._unlock}>
+                <div style={_style} onClick={::this._play}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
                         <svg width="102" height="90" fill="#fff" dangerouslySetInnerHTML={{__html: _playCrown}}/>
                         Воспроизвести

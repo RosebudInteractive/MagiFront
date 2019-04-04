@@ -7,12 +7,13 @@ export default class Item extends React.Component {
 
     static propTypes = {
         item: PropTypes.object,
+        isPaidCourse: PropTypes.bool,
     }
 
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>';
 
-        let {item} = this.props;
+        let {item, isPaidCourse} = this.props;
 
         return (
             <div className="history-item">
@@ -49,7 +50,7 @@ export default class Item extends React.Component {
                 </div>
                 <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
                                       courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
-                                      totalDuration={item.Duration} lesson={item} showRestTime={true}/>
+                                      totalDuration={item.Duration} lesson={item} showRestTime={true} isPaidCourse={isPaidCourse}/>
             </div>
         )
     }

@@ -7,6 +7,7 @@ import SocialBlock from './social-block'
 import GallerySlides from '../transcript-page/gallery-slides';
 import $ from 'jquery'
 import {getCoverPath, getLessonNumber, ImageSize} from "../../tools/page-tools";
+import PriceBlock from "../common/price-block";
 
 export default class TranscriptPage extends React.Component {
     static propTypes = {
@@ -16,8 +17,10 @@ export default class TranscriptPage extends React.Component {
         isNeedHideGallery: PropTypes.bool,
         isNeedHideRefs: PropTypes.bool,
         lesson: PropTypes.object,
+        course: PropTypes.object,
         singleLesson: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     };
 
     render() {
@@ -75,7 +78,8 @@ class TextBlock extends React.Component {
                     tocName: _matches[1].trim(),
                     text: _text,
                     lastHeaderPos: _re.lastIndex,
-                    isFirstParagraph: _isFirstParagraph})
+                    isFirstParagraph: _isFirstParagraph
+                })
 
                 _div.push(data.div)
                 _isFirstParagraph = data.isFirstParagraph
@@ -88,9 +92,13 @@ class TextBlock extends React.Component {
                 toc: episode.Toc,
                 text: _text,
                 lastHeaderPos: 0,
-                isFirstParagraph: _isFirstParagraph})
+                isFirstParagraph: _isFirstParagraph
+            })
 
-            _div.push(data.div)
+            if (data && data.div) {
+                console.log(data)
+                _div.push(data.div)
+            }
         }
 
         if ((_div.length === 0) && (episode.Transcript)) {
@@ -101,7 +109,7 @@ class TextBlock extends React.Component {
             </div>)
         }
 
-        return _div
+        return (_div.length > 0) ? _div : null
     }
 
     _parseChapter(data) {
@@ -171,8 +179,8 @@ class TextBlock extends React.Component {
             _isToc = false;
         })
 
-        data.div = _div;
-        return {div: _div, newTranscriptText: _transcriptText, isFirstParagraph: _isFirstParagraph};
+        data.div = _div
+        return {div: _div.length ? _div : null, newTranscriptText: _transcriptText, isFirstParagraph: _isFirstParagraph};
     }
 
     _getText() {
@@ -180,10 +188,17 @@ class TextBlock extends React.Component {
 
         this.props.episodes.forEach((episode) => {
             let _episodeTranscript = this._parseTranscript(episode)
-            _div = _div.concat(_episodeTranscript)
+            if (_episodeTranscript) {
+                _div = _div.concat(_episodeTranscript)
+            }
         });
 
-        return _div;
+        return (_div.length > 0) ?
+            <div className={"text-block__content" + (this.props.needLockLessonAsPaid ? " _isPaid" : "")}>
+                {_div}
+            </div>
+            :
+            null;
     }
 
     componentDidMount() {
@@ -226,7 +241,8 @@ class TextBlock extends React.Component {
             <div className={_transcriptClassName} id="transcript">
                 <section className="text-block js-social-start">
                     <SocialBlock shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'} isPaidCourse={isPaidCourse}/>
+                    <PlayBlock {...this.props} lesson={lesson} cover={_cover} extClass={'play-btn js-play'}
+                               isPaidCourse={isPaidCourse}/>
                     <p className="text-block__label">Транскрипт</p>
                     <div className={'text-block__wrapper'}>
                         <div className='text-block__headline'>
@@ -236,6 +252,12 @@ class TextBlock extends React.Component {
                             {lesson.Name}
                         </div>
                         {this._getText()}
+                        {
+                            this.props.isPaidCourse && !lesson.IsFreeInPaidCourse ?
+                                <PriceBlock course={this.props.course}/>
+                                :
+                                null
+                        }
                         {isNeedHideRefs ? null : <Refs {...this.props}/>}
                     </div>
                 </section>

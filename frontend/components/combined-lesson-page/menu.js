@@ -181,7 +181,12 @@ class Navigation extends React.Component {
                            e.preventDefault();
                            this._closeMenu();
 
-                           let position = $("#" + _id).offset().top - 75;
+                           let _item = $("#" + _id)
+                           if (!_item || !_item.length) {
+                               return
+                           }
+
+                           let position = _item.offset().top - 75;
 
                            $("body, html").animate({
                                scrollTop: position

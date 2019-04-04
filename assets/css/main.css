@@ -5549,6 +5549,14 @@ ul.user-tooltip {
     @media (max-width: 639px) {
       .course-module__price-block {
         margin-bottom: 15px; } }
+    .text-block .course-module__price-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 120px;
+      margin-top: 120px; }
+    .text-block .course-module__price-block p {
+      margin: 0 }
     .course-module__price-block-wrapper {
       display: -webkit-box;
       display: -webkit-flex;
@@ -5565,6 +5573,8 @@ ul.user-tooltip {
     @media (max-width: 899px) {
       .bookmarks-page .course-module__price-block-wrapper {
         flex-direction: row; } }
+    .text-block .course-module__price-block-wrapper {
+      max-width: 70%; }
     .course-module__price-block-section {
       display: -webkit-box;
       display: -webkit-flex;
@@ -5672,17 +5682,20 @@ ul.user-tooltip {
   @media (max-width: 639px) {
     .course-module__descr {
       display: none; } }
-  .course-module .course-module__price-block-info {
-    margin-top: 14px;
+  .course-module .course-module__price-block-info,
+  .text-block .course-module__price-block-info {
+    margin-top: 14px !important;
     max-width: 370px;
     font-size: 14px;
     line-height: 1.4em;
     color: #c8684c; }
     @media (max-width: 1024px) {
-      .course-module .course-module__price-block-info {
+      .course-module .course-module__price-block-info,
+      .text-block .course-module__price-block-info {
         font-size: 12px; } }
     @media (max-width: 639px) {
-      .course-module .course-module__price-block-info {
+      .course-module .course-module__price-block-info,
+      .text-block .course-module__price-block-info {
         max-width: 280px; } }
     .course-module .course-module__price-block-info .label {
       color: #2f2f2f; }
@@ -9703,6 +9716,18 @@ body[data-page="fullpage-player"] .lectures-menu {
           width: auto;
           font-size: 30px;
           line-height: 30px; } }
+  .text-block__content {
+    position: relative; }
+  .text-block__content._isPaid:after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-image: -webkit-gradient(linear, left bottom, left top, from(#fff), to(rgba(255, 255, 255, 0)));
+    background-image: -webkit-linear-gradient(bottom, #fff, rgba(255, 255, 255, 0));
+    background-image: linear-gradient(to top, #fff, rgba(255, 255, 255, 0.7)); }
   .text-block__quote {
     position: relative;
     margin: 32px 0 38px 0;

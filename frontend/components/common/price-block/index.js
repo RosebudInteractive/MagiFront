@@ -42,7 +42,7 @@ class PriceBlock extends React.Component {
                 _hasDiscountDescr ?
                     <div className="course-module__price-block-wrapper">
                         <p className="course-module__price-block-info">
-                            <span className="label">Персональная скидка.</span>
+                            {/*<span className="label">Персональная скидка.</span>*/}
                             {" " + course.Discount.Description}
                         </p>
                     </div>

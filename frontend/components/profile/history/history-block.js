@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import PropTypes from 'prop-types';
-import {userHistorySelector, loadingSelector, getUserHistory} from '../../../ducks/profile'
+import {userHistorySelector, loadingSelector, getUserHistory, userPaidCoursesSelector} from 'ducks/profile'
 import {bindActionCreators} from "redux";
 import * as storageActions from "../../../actions/lesson-info-storage-actions";
 import Item from "./history-item";
@@ -44,7 +44,7 @@ class HistoryBlock extends React.Component {
 
 
         for (let i = 0; i < this._visibleCount; i++) {
-            _result.push(<Item item={history[i]} key={i}/>)
+            _result.push(<Item item={history[i]} key={i} isPaidCourse={this._isPaidCourse(history[i])}/>)
         }
 
         return _result
@@ -82,12 +82,19 @@ class HistoryBlock extends React.Component {
             </div>
         )
     }
+
+    _isPaidCourse(lesson) {
+        let {userPaidCourses,} = this.props;
+
+        return (lesson.courseIsPaid && !userPaidCourses.includes(lesson.CourseId))
+    }
 }
 
 function mapStateToProps(state) {
     return {
         history: userHistorySelector(state),
         loading: loadingSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
     }
 }
 

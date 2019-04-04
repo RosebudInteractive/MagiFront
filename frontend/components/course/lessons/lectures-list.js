@@ -15,6 +15,7 @@ export default class LecturesList extends React.Component {
         lessons: PropTypes.array.isRequired,
         courseUrl: PropTypes.string.isRequired,
         isPaidCourse: PropTypes.bool,
+        isAdmin: PropTypes.bool,
     }
 
     render() {

@@ -26,7 +26,6 @@ import * as playerStartActions from "../actions/player-start-actions";
 import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson-page/desktop/tools'
 
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
-import LessonAggregators from "../components/combined-lesson-page/lesson-aggregators";
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
 
@@ -183,7 +182,7 @@ class CombineLessonPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized} = this.props;
+        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized, isAdmin} = this.props;
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
             this.props.lessonActions.getLesson(courseUrl, lessonUrl);
@@ -206,7 +205,7 @@ class CombineLessonPage extends React.Component {
             if (_isPlayingLesson) {
                 this.props.appActions.switchToFullPlayer()
             } else {
-                if (_lesson.IsAuthRequired && !authorized) {
+                if ((_lesson.IsAuthRequired && !authorized) || this._needLockLessonAsPaid(_lesson)) {
                     let _newUrl = '/' + courseUrl + '/' + lessonUrl;
                     this.props.history.replace(_newUrl)
                 } else {
@@ -317,15 +316,13 @@ class CombineLessonPage extends React.Component {
     }
 
     _createBundle(lesson) {
-        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course, userPaidCourses} = this.props,
+        let {lessonText, lessonUrl, playingLesson, isMobileApp, lessonEnded, course, } = this.props,
             _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0);
 
         let _playingLessonUrl = (lesson.URL === lessonUrl) && (this.props.params === '?play'),
             _lessonInPlayer = (playingLesson && (lesson.URL === playingLesson.lessonUrl))
 
         let _audios = lesson.Audios;
-
-        let _isPaidCourse = (course && course.IsPaid && !userPaidCourses.includes(course.Id))
 
         return (isMobileApp) ?
             <MobileLessonWrapper lesson={lesson}
@@ -338,7 +335,8 @@ class CombineLessonPage extends React.Component {
                                  shareUrl={this._getShareUrl()}
                                  counter={lesson.ShareCounters}
                                  singleLesson={course.OneLesson}
-                                 isPaidCourse={_isPaidCourse}
+                                 isPaidCourse={this._isPaidCourse}
+                                 needLockLessonAsPaid={this._needLockLessonAsPaid(lesson)}
             />
             :
             <DesktopLessonWrapper lesson={lesson}
@@ -354,7 +352,8 @@ class CombineLessonPage extends React.Component {
                                   shareUrl={this._getShareUrl()}
                                   counter={lesson.ShareCounters}
                                   singleLesson={course.OneLesson}
-                                  isPaidCourse={_isPaidCourse}
+                                  isPaidCourse={this._isPaidCourse}
+                                  needLockLessonAsPaid={this._needLockLessonAsPaid(lesson)}
             />
     }
 
@@ -469,7 +468,6 @@ class CombineLessonPage extends React.Component {
             isMobileApp,
             notFound,
             course,
-            userPaidCourses
         } = this.props;
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
@@ -480,8 +478,6 @@ class CombineLessonPage extends React.Component {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
         }
 
-        let _isPaidCourse = (course && course.IsPaid && !userPaidCourses.includes(course.Id))
-
         return (
             fetching ?
                 <LoadingFrame/>
@@ -490,19 +486,19 @@ class CombineLessonPage extends React.Component {
                     <NotFoundPage/>
                     :
                     (lesson && _lesson && lessonText.loaded) ?
-                        [
-                            this._getMetaTags(),
+                        <React.Fragment>
+                            {this._getMetaTags()}
                             <Menu lesson={_lesson}
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={_lesson.Id}
                                   history={this.props.history}
-                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>,
-                            <GalleryButtons isLocked={!authorized}/>,
-                            lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null,
-                            this._getLessonsBundles(),
-                            <Sources lesson={_lesson}/>,
-                            <LessonInfo lesson={_lesson} isPaidCourse={_isPaidCourse}/>,
+                                  extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
+                            <GalleryButtons isLocked={!authorized}/>
+                            {lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null}
+                            {this._getLessonsBundles()}
+                            <Sources lesson={_lesson}/>
+                            <LessonInfo lesson={_lesson} isPaidCourse={this._isPaidCourse}/>
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}
                                             gallery={lessonText.gallery}
@@ -515,11 +511,23 @@ class CombineLessonPage extends React.Component {
                                             shareUrl={this._getShareUrl()}
                                             counter={_lesson.ShareCounters}
                                             singleLesson={course.OneLesson}
-                                            isPaidCourse={_isPaidCourse}/>
-                        ]
+                                            isPaidCourse={this._isPaidCourse}
+                                            needLockLessonAsPaid={this._needLockLessonAsPaid(_lesson)}
+                                            course={course}/>
+                        </React.Fragment>
                         :
                         null
         )
+    }
+
+    get _isPaidCourse() {
+        let {course, userPaidCourses,} = this.props;
+
+        return (course && course.IsPaid && !userPaidCourses.includes(course.Id))
+    }
+
+    _needLockLessonAsPaid(lesson) {
+        return this._isPaidCourse && !(lesson.IsFreeInPaidCourse || this.props.isAdmin)
     }
 }
 
@@ -559,6 +567,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleLesson.course,
         lessons: state.lessons,
         authorized: !!state.user.user,
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
 
         playInfo: state.lessonPlayInfo.playInfo,
         playingLesson: state.player.playingLesson,
@@ -566,7 +575,7 @@ function mapStateToProps(state, ownProps) {
         galleryIsOpen: state.app.galleryIsOpen,
 
         facebookAppID: state.app.facebookAppID,
-        userPaidCourses : userPaidCoursesSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
     }
 }
 

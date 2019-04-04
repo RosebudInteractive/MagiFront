@@ -12,7 +12,6 @@ let _landscapeHeight = 0;
 function _getLandscapeHeight() {
     if (_landscapeHeight < $(window).outerHeight()) {
         _landscapeHeight = $(window).outerHeight()
-        // $.cookie('landscapeHeight', _landscapeHeight);
     }
     return _landscapeHeight
 }
@@ -26,6 +25,7 @@ export default class Wrapper extends React.Component {
         isPlayer: PropTypes.bool,
         singleLesson: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
+        needLockLessonAsPaid: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -104,6 +104,7 @@ export default class Wrapper extends React.Component {
                                  courseUrl={this.props.courseUrl}
                                  visible={!this.props.isPlayer}
                                  isPaidCourse={this.props.isPaidCourse}
+                                 needLockLessonAsPaid={this.props.needLockLessonAsPaid}
                     />
                 </div>
             </section>
