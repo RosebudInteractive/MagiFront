@@ -13,7 +13,7 @@ const { splitArray } = require('../utils');
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
     "from[Lesson] l\n" +
@@ -26,6 +26,7 @@ const GET_HISTORY_MSSQL =
     "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
     "  join[AuthorLng] al on al.[AuthorId] = a.[Id]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "where l.[Id] in\n" +
     "  (\n" +
     "    select distinct lc.[LessonId] from LessonCourse lc\n" +
@@ -40,7 +41,7 @@ const GET_HISTORY_MSSQL =
 const GET_HISTORY_MYSQL =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
     "from`Lesson` l\n" +
@@ -53,6 +54,7 @@ const GET_HISTORY_MYSQL =
     "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
     "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where l.`Id` in\n" +
     "  (\n" +
     "    select distinct lc.`LessonId` from LessonCourse lc\n" +
@@ -138,8 +140,9 @@ const GET_COURSE_IDS_BKM_MSSQL =
     "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
-    "select c.[Id], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
+    "select c.[Id], pc.[Counter], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MSSQL =
@@ -233,8 +236,9 @@ const GET_COURSE_IDS_BKM_MYSQL =
     "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
-    "select c.`Id`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
+    "select c.`Id`, pc.`Counter`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MYSQL =
@@ -368,8 +372,8 @@ const DbUser = class DbUser extends DbObject {
                     return Utils.seqExec(arrayOfIds, (elem) => {
                         return $data.execSql({
                             dialect: {
-                                mysql: _.template(GET_HISTORY_MYSQL)({ lessonIds: elem.join() }),
-                                mssql: _.template(GET_HISTORY_MSSQL)({ lessonIds: elem.join() })
+                                mysql: _.template(GET_HISTORY_MYSQL)({ lessonIds: elem.join(), user_id: id ? id : 0 }),
+                                mssql: _.template(GET_HISTORY_MSSQL)({ lessonIds: elem.join(), user_id: id ? id : 0 })
                             }
                         }, {})
                             .then((result) => {
@@ -393,6 +397,7 @@ const DbUser = class DbUser extends DbObject {
                                                 Color: elem.Color,
                                                 Name: elem.Name,
                                                 IsPaid: elem.IsPaid ? true : false,
+                                                IsBought: elem.Counter ? true : false,
                                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                                 ProductId: elem.ProductId,
                                                 URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
@@ -491,22 +496,22 @@ const DbUser = class DbUser extends DbObject {
         if (isDetailed && (courseIds.length > 0)) {
             result = [];
             let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-            result = await this._getCoursesByIds({ Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
+            result = await this._getCoursesByIds(userId, { Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
         }
         else
             result = courseIds;
         return result;
     }
 
-    async _getCoursesByIds(data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
+    async _getCoursesByIds(userId, data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
         let courseList = {};
 
         if (arrayOfIds.length > 0) {
             await Utils.seqExec(arrayOfIds, (elem) => {
                 return $data.execSql({
                     dialect: {
-                        mysql: _.template(GET_COURSES_BY_IDS_MYSQL)({ courseIds: elem.join() }),
-                        mssql: _.template(GET_COURSES_BY_IDS_MSSQL)({ courseIds: elem.join() })
+                        mysql: _.template(GET_COURSES_BY_IDS_MYSQL)({ courseIds: elem.join(), user_id: userId ? userId : 0 }),
+                        mssql: _.template(GET_COURSES_BY_IDS_MSSQL)({ courseIds: elem.join(), user_id: userId ? userId : 0 })
                     }
                 }, {})
                     .then(async (result) => {
@@ -521,6 +526,7 @@ const DbUser = class DbUser extends DbObject {
                                     Mask: elem.Mask,
                                     OneLesson: elem.OneLesson ? true : false,
                                     IsPaid: elem.IsPaid ? true : false,
+                                    IsBought: elem.Counter ? true : false,
                                     IsSubsFree: elem.IsSubsFree ? true : false,
                                     ProductId: elem.ProductId,
                                     Authors: [],
@@ -661,7 +667,7 @@ const DbUser = class DbUser extends DbObject {
             })
             .then(async () => {
                 arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-                await this._getCoursesByIds(bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
+                await this._getCoursesByIds(userId, bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
                 return bookmarks;
             });
     }

@@ -6,7 +6,7 @@ function setupCourses(app) {
     app.get('/api/courses', (req, res, next) => {
         CoursesService()
             // .getAllPublic(parseInt(req.params.lessonId))
-            .getAllPublic(req.query)
+            .getAllPublic(req.user, req.query)
             .then(rows => {
                 res.send(rows);
             })
@@ -17,7 +17,7 @@ function setupCourses(app) {
 
     app.get('/api/courses/:url', (req, res, next) => {
         CoursesService()
-            .getPublic(req.params.url, req.query)
+            .getPublic(req.params.url, req.user, req.query)
             .then(rows => {
                 res.send(rows);
             })

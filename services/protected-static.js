@@ -10,7 +10,7 @@ let oldDataUrl = config.get('oldDataUrl');
 
 exports.setupProtectedStatic = (app, errorHandler) => {
     let dataProcessor = (req, res, next) => {
-        let { name, ext } = path.parse(decodeURIComponent(req.url))
+        let { name, ext } = path.parse(decodeURIComponent(req.path))
         if (false && (ext === ".mp3")) {
             console.log("=== DATA REQUEST ===");
             console.log("  OriginalUrl: " + req.originalUrl);
@@ -20,22 +20,22 @@ exports.setupProtectedStatic = (app, errorHandler) => {
                 console.log(`    ${h}: "${req.headers[h]}"`);
             console.log("===  END HEADERS  ===");
         };
-        AccessRights.canAccessFile(req.user, req.url)
+        AccessRights.canAccessFile(req.user, req.path)
             .then((canAccess) => {
                 if (canAccess) {
                     let isNginxProxy = req.get('X-NginX-Proxy') === "true";
                     let nginxStatic = req.get('X-NginX-Static');
                     if (isNginxProxy && nginxStatic) {
-                        let url = '/' + nginxStatic + req.url;
+                        let url = '/' + nginxStatic + req.path;
                         res.set('X-Accel-Redirect', url);
                         res.send();
                     } else {
-                        let fn = path.join(uploadPath, decodeURIComponent(req.url));
+                        let fn = path.join(uploadPath, decodeURIComponent(req.path));
                         res.sendFile(fn);
                     }
                 }
                 else
-                    return res.status(HttpCode.ERR_UNAUTH).json({ message: "Can't access file: " + req.url + "." });
+                    return res.status(HttpCode.ERR_UNAUTH).json({ message: "Can't access file: " + req.path + "." });
             })
             .catch((err) => {
                 next(err);
