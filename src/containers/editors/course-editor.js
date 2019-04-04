@@ -2,27 +2,27 @@ import React from 'react'
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import LoadingPage from '../components/common/loading-page'
-import BottomControls from '../components/bottom-contols/buttons'
-import ErrorDialog from '../components/dialog/error-dialog'
-import CourseCategoryDialog from "../components/course-editor/dialogs/category-dialog";
-import CourseFormWrapper from '../components/course-editor/form-wrapper'
-import CourseAuthorDialog from '../components/course-editor/dialogs/author-dialog'
-import SubscriptionTab from '../components/course-editor/tabs/subscription-tab'
-import AuthorsTab from '../components/course-editor/tabs/authors-and-categories'
-import LessonsTab from '../components/course-editor/tabs/lessons'
+import LoadingPage from '../../components/common/loading-page'
+import BottomControls from '../../components/bottom-contols/buttons'
+import ErrorDialog from '../../components/dialog/error-dialog'
+import CourseCategoryDialog from "../../components/course-editor/dialogs/category-dialog";
+import CourseFormWrapper from '../../components/course-editor/form-wrapper'
+import CourseAuthorDialog from '../../components/course-editor/dialogs/author-dialog'
+import SubscriptionTab from '../../components/course-editor/tabs/subscription-tab'
+import AuthorsTab from '../../components/course-editor/tabs/authors-and-categories'
+import LessonsTab from '../../components/course-editor/tabs/lessons'
 
-import * as singleCourseActions from "../actions/course/courseActions";
-import {showErrorDialog} from '../actions/app-actions';
-import {getAuthors} from "../actions/authorsListActions";
-import {getCategories} from "../actions/categoriesListActions";
-import {getLanguages} from "../actions/languages-actions";
-import {checkExtLinks, getExtLinks} from "../tools/link-tools";
+import * as singleCourseActions from "../../actions/course/courseActions";
+import {showErrorDialog} from '../../actions/app-actions';
+import {getAuthors} from "../../actions/authorsListActions";
+import {getCategories} from "../../actions/categoriesListActions";
+import {getLanguages} from "../../actions/languages-actions";
+import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
-import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common'
+import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../../constants/Common'
 
 const TABS = {
     MAIN: 'MAIN',

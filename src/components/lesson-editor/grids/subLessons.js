@@ -5,6 +5,7 @@ import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {select, remove,} from '../../../actions/subLessonsActions'
+import {set} from '../../../actions/lesson/parent-lesson-actions';
 
 class SublessonsGrid extends React.Component {
 
@@ -17,7 +18,7 @@ class SublessonsGrid extends React.Component {
         return <div className="lesson-episodes">
             <label className="grid-label">Дополнительные лекции</label>
             <SubLessons selectAction={::this.props.select}
-                        createAction={::SublessonsGrid._create}
+                        createAction={::this._create}
                         editAction={::SublessonsGrid._edit}
                         removeAction={::this.props.remove}
                         selected={this.props.selected}
@@ -31,8 +32,9 @@ class SublessonsGrid extends React.Component {
         this.props.lessonMainEpisodesActions.select(id)
     }
 
-    static _create() {
-        // history.push(window.location.pathname + '/episodes/new')
+    _create() {
+        this.props.setParentLesson({id: this.props.lesson.id, name: this.props.lesson.Name});
+        history.push(window.location.pathname + '/sub-lessons/new')
     }
 
     static _edit(id) {
@@ -68,11 +70,12 @@ function mapStateToProps(state) {
     return {
         subLessons: state.subLessons.current,
         selected: state.subLessons.selected,
+        lesson: state.singleLesson.current,
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({select, remove,}, dispatch);
+    return bindActionCreators({select, remove, setParentLesson: set}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SublessonsGrid);

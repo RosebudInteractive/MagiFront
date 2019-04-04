@@ -7,7 +7,7 @@ import Cover from "../../common/cover-control";
 import PropTypes from "prop-types";
 import Select from "../../common/select-control";
 import {connect} from "react-redux";
-import {fixedLessonIdSelector, fixedObjDescrSelector, parametersFetchingSelector} from "adm-ducks/params";
+import {fixedLessonIdSelector, fixedObjDescrSelector,} from "adm-ducks/params";
 
 const LESSON_TYPES = [
         {id: 'L', value: 'Лекция'},
@@ -24,15 +24,22 @@ class MainTab extends React.Component {
     static propTypes = {
         editMode: PropTypes.bool,
         visible: PropTypes.bool,
+        isSublesson : PropTypes.bool,
     }
 
     render() {
-        let { lesson, fixedLessonId, fixDescription, } = this.props,
+        let { lesson, fixedLessonId, fixDescription, isSublesson} = this.props,
             _fixed = (lesson && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <Field component={TextBox} name="courseName" label="Курс" disabled={true}/>
+            {
+                isSublesson ?
+                    <Field component={TextBox} name="currParentName" label="Основная лекция" disabled={true}/>
+                    :
+                    null
+            }
             <Field component={TextBox} name="number" label="Номер урока" disabled={true}/>
             <Field component={Select} name="lessonType" label="Тип урока" placeholder="Выберите тип урока"
                    options={LESSON_TYPES}/>
