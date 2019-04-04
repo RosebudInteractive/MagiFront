@@ -208,13 +208,14 @@ const COURSE_LESSONS_MYSQL =
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
@@ -237,13 +238,14 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
@@ -266,7 +268,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -274,6 +276,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
@@ -338,7 +341,7 @@ const COURSE_BOOKS_MSSQL_REQ =
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -346,6 +349,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
@@ -609,7 +613,7 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    getAllPublic(options) {
+    getAllPublic(user, options) {
         let courses = [];
         let authors = [];
         let categories = [];
@@ -620,6 +624,7 @@ const DbCourse = class DbCourse extends DbObject {
         let opts = options || {};
         let languageId = (typeof (opts.lang_id) === "number") && (!isNaN(opts.lang_id)) ? opts.lang_id : LANGUAGE_ID;
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let userId = user ? user.Id : 0;
         let baseUrl;
         let productList = {};
 
@@ -628,8 +633,8 @@ const DbCourse = class DbCourse extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(COURSE_MYSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: languageId }),
-                        mssql: _.template(COURSE_MSSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: languageId })
+                        mysql: _.template(COURSE_MYSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: languageId, user_id: userId }),
+                        mssql: _.template(COURSE_MSSQL_ALL_PUBLIC_REQ)({ accountId: ACCOUNT_ID, languageId: languageId, user_id: userId })
                     }
                 }, {})
                     .then(async (result) => {
@@ -655,6 +660,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             IsSubsRequired: false,
                                             OneLesson: elem.OneLesson ? true : false,
                                             IsPaid: elem.IsPaid ? true : false,
+                                            IsBought: elem.Counter ? true : false,
                                             IsSubsFree: elem.IsSubsFree ? true : false,
                                             ProductId: elem.ProductId,
                                             Price: 0,
@@ -785,7 +791,7 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    getPublic(url, options) {
+    getPublic(url, user, options) {
         let course = null;
         let courseId = 0;
         let lsn_list = {};
@@ -793,6 +799,7 @@ const DbCourse = class DbCourse extends DbObject {
         let languageId;
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let userId = user ? user.Id : 0;
         let baseUrl;
 
         return new Promise((resolve, reject) => {
@@ -819,8 +826,8 @@ const DbCourse = class DbCourse extends DbObject {
             resolve(
                 $data.execSql({
                     dialect: {
-                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ where: whereMYSQL }),
-                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
+                        mysql: _.template(COURSE_MYSQL_PUBLIC_REQ)({ user_id: userId, where: whereMYSQL }),
+                        mssql: _.template(COURSE_MSSQL_PUBLIC_REQ)({ user_id: userId, where: whereMSSQL })
                     }
                 }, {})
                     .then(async (result) => {
@@ -848,6 +855,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
+                                        IsBought: elem.Counter ? true : false,
                                         IsPaid: elem.IsPaid ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,
