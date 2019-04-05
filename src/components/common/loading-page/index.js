@@ -1,5 +1,6 @@
 import React from 'react'
 import "./loading-page.sass"
+import "./preloader.gif"
 
 export default class LoadingPage extends React.Component {
     render() {
