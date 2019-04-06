@@ -210,6 +210,8 @@ function setupAPI(express, app) {
                     options.scriptPath.sendPulse = config.mail.sendPulse.scriptPath;
                 if (config.has('billing.billing_test') && (config.billing.billing_test === true))
                     options.billing.billing_test = true;
+                if (config.has('billing.mode'))
+                    options.billing.mode = config.billing.mode;
                 if (config.has('billing.productReqParams'))
                     options.billing.productReqParams = config.billing.productReqParams;
                 if (config.has('lessonPositions.debug'))

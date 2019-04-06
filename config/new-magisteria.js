@@ -76,6 +76,7 @@ module.exports = {
         enabled: true,
         debug: true,
         billing_test: true,
+        mode: { corses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",
