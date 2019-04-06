@@ -156,19 +156,18 @@ export default class CWSPlayer extends CWSBase {
     }
 
     _setRatio(item) {
-        // console.log(window.textId);
-            //item.css({height: "100%", width: "100%"});//, fontSize: fontSize + 'px'});
+
+        // if (item.parent()) {
+        //     console.log(`${item.parent()[0].className} width: ${item.parent().width()} height: ${item.parent().height()}`)
+        // }
+
         item.hide();
         let that = this;
         let contW = that._container.width();
         let contH = that._container.height();
         let contRatio = contW == 0 ? 0 : contH/contW;
         let playerRatio = that._options.ratioY/that._options.ratioX;
-        // this._broadcastMessage(`container width: ${contW} height: ${contH}`)
-        // this._broadcastMessage(`container ratio: ${contRatio} player ratio: ${playerRatio}`)
         item.show();
-        // console.log(fontSize);
-
 
         if (contRatio == playerRatio) {
             item.height(contH);
@@ -176,17 +175,27 @@ export default class CWSPlayer extends CWSBase {
         } else if (contRatio < playerRatio) {
             item.height(contH);
             item.width(contH / playerRatio);
+
+            // if (this._audioState.externalPlayer && item.parent()) {
+            //     $(window).unbind("resize")
+            //     item.parent().resize();
+            //     $(window).bind("resize", ::this._onResize)
+            // }
         } else {
             item.width(contW);
             item.height(contW * playerRatio);
+
+            // if (this._audioState.externalPlayer && item.parent()) {
+            //     $(window).unbind("resize")
+            //     item.parent().resize();
+            //     $(window).bind("resize", ::this._onResize)
+            // }
         }
 
         $('.ws-text-element').each((index, element) => {
             //element._textTools.setRatio(contRatio);
             element._textTools.update();
         });
-
-        // this._broadcastMessage(`item width: ${item.width()} height: ${item.height()}`)
     }
 
     _setAudio(audio) {
