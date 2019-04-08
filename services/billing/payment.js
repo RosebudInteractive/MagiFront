@@ -51,11 +51,17 @@ const GET_CHEQUE_MYSQL =
 
 const DRAFT_CHEQUE_ID = "00000000-0000-0000-0000-000000000000";
 const GUID_REG_EXP = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+const PAYMENT_CACHE_PREFIX = "pay:";
+const CHEQUE_PENDING_PERIOD = 15 * 60; // cheque pending period in sec - 15 min
 
 exports.Payment = class Payment extends DbObject {
     
     constructor(options) {
-        super(options);
+        let opts = _.cloneDeep(options || {});
+        opts.cache = opts.cache ? opts.cache : {};
+        if (!opts.cache.prefix)
+            opts.cache.prefix = PAYMENT_CACHE_PREFIX;
+        super(opts);
     }
 
     _getObjById(id, expression, options) {
@@ -347,9 +353,10 @@ exports.Payment = class Payment extends DbObject {
             });
     }
 
-    _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoiceData) {
+    _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoice_data) {
         let chequeObj = cheque.chequeObj;
         let parentCheque = cheque.parentCheque;
+        let invoiceData = invoice_data;
 
         function updateState(reqResult) {
             let dbOptsInt;
@@ -420,6 +427,18 @@ exports.Payment = class Payment extends DbObject {
             return rc.then(() => reqResult);
         }
 
+        async function getInvoiceData(currDbOpts){
+            if (!invoiceData) {
+                return Promise.resolve()
+                    .then(() => {
+                        return InvoiceService().get(chequeObj.invoiceId(), { dbOptions: currDbOpts ? currDbOpts : dbOpts });
+                    })
+                    .then(invoice => {
+                        invoiceData = invoice.data && (invoice.data.length === 1) ? invoice.data[0] : null;
+                    });
+            }
+        }
+
         function updateUserSubscription() {
             //
             // Set subscription data and saved payment
@@ -433,16 +452,10 @@ exports.Payment = class Payment extends DbObject {
                 delete memDbOptions.transactionId;
                 rci = $data.tranCommit(transactionId);
             };
-            if (!invoiceData) {
-                rci = rci
-                    .then(() => {
-                        return InvoiceService().get(chequeObj.invoiceId(), { dbOptions: dbOpts });
-                    })
-                    .then(invoice => {
-                        invoiceData = invoice.data && (invoice.data.length === 1) ? invoice.data[0] : null;
-                    });
-            }
             rci = rci
+                .then(() => {
+                    return getInvoiceData();
+                })
                 .then(() => {
                     return UsersCache().getUserInfoById(chequeObj.userId(), true);
                 })
@@ -544,6 +557,23 @@ exports.Payment = class Payment extends DbObject {
                     && (chequeObj.stateId() !== iniState);
                 let rc = changeUserSubs ? updateUserSubscription() : Promise.resolve();
                 return rc.then(() => result);
+            })
+            .then(async (result) => {
+                if (!result.isError) {
+                    // create or remove pending objects
+                    let isRefund = chequeObj.chequeTypeId() === Accounting.ChequeType.Refund;
+                    if (!isRefund) {
+                        let currDbOpts = null;
+                        if (memDbOptions.transactionId)
+                            currDbOpts = { transactionId: memDbOptions.transactionId };
+                        await getInvoiceData(currDbOpts);
+                        if (invoiceData) {
+                            let flag = chequeObj.stateId() === Accounting.ChequeState.Pending;
+                            await this._setPendingObjects(invoiceData, flag);
+                        }
+                    }
+                }
+                return result;
             });
     }
 
@@ -642,7 +672,7 @@ exports.Payment = class Payment extends DbObject {
                     return this._updateChequeState(result, root_obj, { chequeObj: chequeObj, parentCheque: parentCheque }, dbOpts, memDbOptions);
                 })
         }, memDbOptions)
-            .then(result => {
+            .then(async (result) => {
                 let rc;
                 if (result.isError) {
                     rc = Promise.resolve()
@@ -659,10 +689,50 @@ exports.Payment = class Payment extends DbObject {
                             throw result.result;
                         });
                 }
-                else
+                else {
                     rc = opts.fullResult ? result.result : (result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
                         (opts.debug ? result.result : { result: "OK" }));
+                }
                 return rc;
             });
+    }
+
+    async getPendingObjects(user_id) {
+        let key = `crs:${user_id}`;
+        let userPending = await this.cacheGet(key, { json: true });
+        return userPending ? userPending : {};
+    }
+
+    async _setPendingObjects(invoice_data, flag) {
+        let currList = null;
+        let key = `crs:${invoice_data.UserId}`;
+        let self = this;
+
+        async function getCurrent() {
+            if (!currList) {
+                let userPending = await self.cacheGet(key, { json: true });
+                currList = userPending ? userPending : {};
+            }
+            return currList;
+        }
+
+        if (invoice_data.Items && (invoice_data.Items.length > 0)) {
+            for (let i = 0; i < invoice_data.Items.length; i++) {
+                let item = invoice_data.Items[i];
+                if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
+                    && item.ExtFields.prod && item.ExtFields.prod.courseId) {
+                    await getCurrent();
+                    if (flag)
+                        currList[item.ExtFields.prod.courseId] = 1
+                    else
+                        delete currList[item.ExtFields.prod.courseId];
+                }
+            }
+            if (currList)
+                if (Object.keys(currList).length > 0)
+                    await this.cacheSet(key, currList, { json: true, ttlInSec: CHEQUE_PENDING_PERIOD })
+                else
+                    await this.cacheDel(key);
+        }
     }
 }

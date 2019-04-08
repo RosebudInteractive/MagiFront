@@ -240,7 +240,20 @@ const DbProduct = class DbProduct extends DbObject {
                                 FirstDate: elem.FirstDate,
                                 LastDate: elem.LastDate
                             };
-                            elem.DPrice = roundNumber(elem.Price * (1 - d.Perc / 100), Accounting.SumPrecision);
+                            let dprice = elem.Price * (1 - d.Perc / 100);
+                            let prec = Accounting.SumPrecision;
+                            let isDone = false;
+                            if ((opts.Truncate === "true") || (opts.Truncate === true)) {
+                                elem.DPrice = Math.trunc(dprice);
+                                isDone = true;
+                            }
+                            else {
+                                let p = +opts.Prec;
+                                if ((typeof (p) === "number") && (!isNaN(p)))
+                                    prec = p;
+                            }
+                            if (!isDone)
+                                elem.DPrice = roundNumber(dprice, prec);
                         }
                         delete elem.Perc;
                         delete elem.FirstDate;

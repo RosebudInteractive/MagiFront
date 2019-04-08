@@ -60,13 +60,15 @@ Promise.resolve()
 
         if (NODE_ENV === 'development') {
             app.use(require('morgan')('dev')); // log HTTP requests
-            let compiler = webpack(webpackConfig);
-            try {
-                app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath}));
-                app.use(webpackHotMiddleware(compiler));
-            }
-            catch (e) {
-                console.log(e)
+            if (config.has("client.devHotReload") && (config.client.devHotReload === true)) {
+                let compiler = webpack(webpackConfig);
+                try {
+                    app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath }));
+                    app.use(webpackHotMiddleware(compiler));
+                }
+                catch (e) {
+                    console.log(e)
+                }
             }
         }
 // headers['Access-Control-Allow-Origin'] = '*'
@@ -91,7 +93,7 @@ Promise.resolve()
         //////////////////////////////////////////
         let fs = require('fs');
 
-        if (NODE_ENV !== 'development') {
+        if ((NODE_ENV !== 'development') || (config.has("client.devHotReload") && (config.client.devHotReload === false))) {
             app.use('/static', express.static(path.join(__dirname, 'static')));
         }
 
