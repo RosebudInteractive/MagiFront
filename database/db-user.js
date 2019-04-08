@@ -494,9 +494,11 @@ const DbUser = class DbUser extends DbObject {
             }
         }, {});
         let courseIds = [];
+        let courseList = {};
         if (data && data.detail && (data.detail.length > 0)) {
             data.detail.forEach(elem => {
                 courseIds.push(elem.Id);
+                courseList[elem.Id] = true;
             })
         }
         let result;
@@ -506,7 +508,10 @@ const DbUser = class DbUser extends DbObject {
             result = await this._getCoursesByIds(userId, { Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
         }
         else
-            result = courseIds;
+            if (opts.is_list)
+                result = courseList
+            else
+                result = courseIds;
         return result;
     }
 

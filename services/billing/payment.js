@@ -629,11 +629,13 @@ exports.Payment = class Payment extends DbObject {
                 }
                 resolve(rc);
             })
-                .then(invoice => {
+                .then(async (invoice) => {
                     if (invoice && invoice.data && (invoice.data.length === 1)) {
                         invoiceData = invoice.data[0];
                         if (isRefund)
-                            refundInvoiceId = invoiceData.Id;
+                            refundInvoiceId = invoiceData.Id
+                        else
+                            await this._preCheckInvoice(invoiceData);
                     }
                     return this._getObjById(-1, null, dbOpts);
                 })
@@ -701,6 +703,36 @@ exports.Payment = class Payment extends DbObject {
         let key = `crs:${user_id}`;
         let userPending = await this.cacheGet(key, { json: true });
         return userPending ? userPending : {};
+    }
+
+    async _preCheckInvoice(invoice_data) {
+        if (invoice_data.Items && (invoice_data.Items.length > 0)) {
+            let inv_courses = [];
+            for (let i = 0; i < invoice_data.Items.length; i++) {
+                let item = invoice_data.Items[i];
+                if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
+                    && item.ExtFields.prod && item.ExtFields.prod.courseId) {
+                    inv_courses.push({
+                        id: item.ExtFields.prod.courseId,
+                        name: item.Name
+                    });
+                }
+            }
+            if (inv_courses.length > 0) {
+                let pending = await this.getPendingObjects(invoice_data.UserId);
+                let bought = {};
+                    let userService = this.getService("users", true);
+                if (userService)
+                    bought = await userService.getPaidCourses(invoice_data.UserId, false, { is_list: true });
+                for (let i = 0; i < inv_courses.length; i++){
+                    let crs = inv_courses[i];
+                    if (bought[crs.id])
+                        throw new Error(`${crs.name} уже куплен.`);
+                    if (pending[crs.id])
+                        throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
+                }
+           }
+        }
     }
 
     async _setPendingObjects(invoice_data, flag) {
