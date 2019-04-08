@@ -9,6 +9,7 @@ import Cover from '../common/masked-cover-control'
 import PropTypes from 'prop-types'
 import {fixedCourseIdSelector, fixedObjDescrSelector, parametersFetchingSelector,} from "adm-ducks/params"
 import '../common/form.sass'
+import {enableButtonsSelector} from "adm-ducks/app";
 
 const STATE_OPTIONS = [
     {id: 'D', value: 'Черновик'},
@@ -64,11 +65,11 @@ class CourseEditorForm extends React.Component {
     }
 
     render() {
-        let {course, courseLessons, fixedCourseId, fixDescription, visible,} = this.props,
+        let {course, courseLessons, fixedCourseId, fixDescription, visible, enableButtons} = this.props,
             _fixed = (course && (course.id === fixedCourseId)),
             _fixDescription = _fixed ? fixDescription : ''
 
-        let _disabled = false;
+        let _disabled = !enableButtons;
 
         let _oneLessonDisable = _disabled || (courseLessons.length > 1)
 
@@ -87,9 +88,9 @@ class CourseEditorForm extends React.Component {
                 <Field component={Cover} name="cover" label="Обложка курса" disabled={_disabled}/>
                 <Field component={CheckBox} name="oneLesson" label="Курс с одиночной лекцией"
                        disabled={_oneLessonDisable}/>
-                <Field component={CheckBox} name="fixed" label="Зафиксировать курс" disabled={!this._canFixCourse()}/>
+                <Field component={CheckBox} name="fixed" label="Зафиксировать курс" disabled={!this._canFixCourse() || _disabled}/>
                 <Field component={TextArea} enableHtml={true} name="fixDescription" label="Описание" hidden={!this.props.isFixedActive}
-                       value={_fixDescription}/>
+                       value={_fixDescription} disabled={_disabled}/>
             </form>
         </div>
     }
@@ -101,7 +102,7 @@ class CourseEditorForm extends React.Component {
     }
 
     _canFixCourse() {
-        let {course, isOneLessonActive} = this.props;
+        let {course, isOneLessonActive,} = this.props;
 
         return ((course && !course.OneLesson) || !isOneLessonActive)
     }
@@ -177,6 +178,7 @@ function mapStateToProps(state) {
         fetching: state.singleCourse.fetching || parametersFetchingSelector(state),
         fixedCourseId: fixedCourseIdSelector(state),
         fixDescription: fixedObjDescrSelector(state),
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

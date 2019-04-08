@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {CourseAuthors,} from './course-grids'
 import PropTypes from 'prop-types'
 import * as courseAuthorsActions from "../../../actions/course/courseAuthorsActions";
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class CourseAuthorsWrapper extends React.Component {
 
@@ -19,7 +20,8 @@ class CourseAuthorsWrapper extends React.Component {
                            selectAction={::this.props.courseAuthorsActions.select}
                            selected={this.props.selectedAuthor}
                            editMode={this.props.editMode}
-                           data={::this._getCourseAuthors()}/>
+                           data={::this._getCourseAuthors()}
+                           disabled={!this.props.enableButtons}/>
         </div>
     }
 
@@ -50,6 +52,7 @@ function mapStateToProps(state) {
         courseAuthors: state.courseAuthors.current,
         authors: state.authorsList.authors,
         selectedAuthor: state.courseAuthors.selected,
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

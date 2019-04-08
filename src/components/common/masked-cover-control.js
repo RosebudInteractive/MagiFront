@@ -43,7 +43,7 @@ class MaskedCoverControl extends React.Component {
         let _svgData = this._getMaskedImage(_cover)
 
         return <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
-            <label htmlFor={id} className="field-label">{label}</label>
+            <label htmlFor={id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
             <div className={"field-wrapper__editor-wrapper"}>
                 <div className="cover-wrapper">
                     <div className={"cover " + _mask}>
@@ -60,14 +60,15 @@ class MaskedCoverControl extends React.Component {
                                   onUploadStart={::this.props.disableButtons}
                                   onUploadComplete={::this.props.enableButtons}
                                   onFileUploadError={::this._showError}
-                                  onUploadFile={::this._handleFileUpload}/>
+                                  onUploadFile={::this._handleFileUpload}
+                                  disabled={disabled}/>
                         <button className="cover-control cover-control__btn up" onClick={::this._decMask}
-                                disabled={this._maskIndex === 0}/>
-                        <select className="cover-control field-input" onChange={::this._selectMask}>
+                                disabled={(this._maskIndex === 0) || disabled}/>
+                        <select className="cover-control field-input" onChange={::this._selectMask} disabled={disabled}>
                             {this._getMasks()}
                         </select>
                         <button className="cover-control cover-control__btn down" onClick={::this._incMask}
-                                disabled={this._maskIndex === (MASKS.length - 1)}/>
+                                disabled={(this._maskIndex === (MASKS.length - 1)) || disabled}/>
                     </div>
                 </div>
             </div>

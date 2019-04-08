@@ -42,7 +42,7 @@ export default class TextArea extends React.Component {
     }
 
     render() {
-        const {enableHtml, meta: {error, visited}, id, label, hidden} = this.props;
+        const {enableHtml, meta: {error, visited}, id, label, hidden, disabled} = this.props;
         const _errorText = visited && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
@@ -50,7 +50,7 @@ export default class TextArea extends React.Component {
 
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
-                <label htmlFor={_id} className="field-label">{label}</label>
+                <label htmlFor={_id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
                     {enableHtml ? <HtmlTextArea id={_id} {...this.props}/> : <PlainTextArea id={_id} {...this.props}/>}
                     {_errorText}
@@ -83,7 +83,7 @@ class HtmlTextArea extends React.Component {
         return (
             disabled ?
                 <div dangerouslySetInnerHTML={{__html: input.value}} {...input} id={id}
-                     className="field-textarea" disabled/>
+                     className="field-textarea disabled"/>
                 :
                 <div contentEditable={true} dangerouslySetInnerHTML={{__html: input.value}} {...input}
                      id={id} className="field-textarea" onBlur={::this._onChange}/>
@@ -105,7 +105,7 @@ class PlainTextArea extends React.Component {
 
         return (
             disabled ?
-                <div {...input} id={id} className="field-textarea plain-text" disabled>{input.value}</div>
+                <div {...input} id={id} className={"field-textarea plain-text disabled"}>{input.value}</div>
                 :
                 <p contentEditable={true} {...input} id={id} className="field-textarea plain-text" onBlur={::this._onChange}>{input.value}</p>
         )

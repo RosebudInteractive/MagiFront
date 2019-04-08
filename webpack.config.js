@@ -2,12 +2,8 @@ require("@babel/polyfill");
 let path = require('path');
 let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
-const MinifyPlugin = require("babel-minify-webpack-plugin");
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-// const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-// require('webpack-jquery-ui');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
@@ -36,7 +32,12 @@ const _prodConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
-        new MinifyPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false,
+                drop_console: true
+            }
+        }),
         new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
     module: {

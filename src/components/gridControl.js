@@ -18,6 +18,7 @@ export default class GridControl extends Component {
         viewId: PropTypes.string,
         selected: PropTypes.number,
         data: PropTypes.any.isRequired,
+        disabled: PropTypes.bool,
     }
 
     constructor(props) {
@@ -86,6 +87,7 @@ export default class GridControl extends Component {
             moveDownAction,
             multiUploadAction,
             editMode,
+            disabled,
         } = this.props;
 
         let _buttons = [];
@@ -96,32 +98,32 @@ export default class GridControl extends Component {
             editMode === true ? EDIT_MODE_EDIT : EDIT_MODE_INSERT
 
         if (createAction) {
-            let _disabled = _editMode !== EDIT_MODE_EDIT;
+            let _disabled = (_editMode !== EDIT_MODE_EDIT) || disabled;
             _buttons.push(<button key='btnNew' className="tool-btn new" disabled={_disabled} onClick={::this._create}/>)
         }
 
         if (addAction) {
-            _buttons.push(<button key='btnAdd' className="tool-btn add" onClick={::this._addClicked}/>)
+            _buttons.push(<button key='btnAdd' className="tool-btn add" disabled={disabled} onClick={::this._addClicked}/>)
         }
 
         if (editAction) {
-            let _disabled = (!this._selected) || (_editMode !== EDIT_MODE_EDIT);
+            let _disabled = (!this._selected) || (_editMode !== EDIT_MODE_EDIT) || disabled;
             _buttons.push(<button key='btnEdit' className='tool-btn edit' disabled={_disabled} onClick={::this._edit}/>)
         }
 
         if (moveUpAction) {
-            let _disabled = ((!this._selected) || (this._isFirstSelected));
+            let _disabled = ((!this._selected) || (this._isFirstSelected)) || disabled;
             _buttons.push(<button key='btnUp' className='tool-btn up' disabled={_disabled} onClick={::this._moveUp}/>)
         }
 
         if (moveDownAction) {
-            let _disabled = ((!this._selected) || (this._isLastSelected));
+            let _disabled = ((!this._selected) || (this._isLastSelected)) || disabled;
             _buttons.push(<button key='btnDown' className='tool-btn down' disabled={_disabled}
                                   onClick={::this._moveDown}/>)
         }
 
         if (multiUploadAction) {
-            _buttons.push(<button key='btnUpload' className='tool-btn upload' onClick={::this._upload}/>)
+            _buttons.push(<button key='btnUpload' className='tool-btn upload' disabled={disabled} onClick={::this._upload}/>)
         }
 
         return _buttons;
@@ -144,7 +146,7 @@ export default class GridControl extends Component {
     _getColumns() {
         return [{
             id: "",
-            template: "<input class='tool-btn del' type='button'>",
+            template: this.props.disabled ? `<button class='tool-btn del' disabled/>` : `<button class='tool-btn del'/>`,
             width: 50
         }]
     }

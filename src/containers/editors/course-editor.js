@@ -97,19 +97,27 @@ class CourseEditor extends React.Component {
                             <div className="tab-links">
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
-                                    onClick={() => {this._switchTo(TABS.MAIN)}}>Основные
+                                    onClick={() => {
+                                        this._switchTo(TABS.MAIN)
+                                    }}>Основные
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SUBSCRIPTION ? ' tab-link-active' : '')}
-                                    onClick={() => {this._switchTo(TABS.SUBSCRIPTION)}}>Подписка
+                                    onClick={() => {
+                                        this._switchTo(TABS.SUBSCRIPTION)
+                                    }}>Подписка
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.AUTHORS ? ' tab-link-active' : '')}
-                                    onClick={() => {this._switchTo(TABS.AUTHORS)}}>Авторы и категории
+                                    onClick={() => {
+                                        this._switchTo(TABS.AUTHORS)
+                                    }}>Авторы и категории
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LESSONS ? ' tab-link-active' : '')}
-                                    onClick={() => {this._switchTo(TABS.LESSONS)}}>Лекции
+                                    onClick={() => {
+                                        this._switchTo(TABS.LESSONS)
+                                    }}>Лекции
                                 </div>
                             </div>
                         </div>
@@ -194,13 +202,17 @@ class CourseEditor extends React.Component {
             IsSubsFree: subscriptionValues.IsSubsFree, // признак бесплатности в рамках подписки
             Price: _roundNum(subscriptionValues.Price), // цена
             DPrice: subscriptionValues.DPrice, // цена со скидкой
-            Discount: { // скидка
+        };
+
+        if (subscriptionValues.Perc) {
+            _obj.Discount = { // скидка
                 Description: subscriptionValues.Description, // описание скидки
                 Perc: _roundNum(subscriptionValues.Perc), // % скидки
                 FirstDate: subscriptionValues.FirstDate, // начало действия
                 LastDate: subscriptionValues.LastDate, // конец действия
-            },
-        };
+            }
+        }
+
 
         if (this.props.course.ProductId) {
             _obj.ProductId = this.props.course.ProductId // продукт, который продаем
@@ -234,7 +246,7 @@ class CourseEditor extends React.Component {
     }
 }
 
-const _roundNum = (value)  => {
+const _roundNum = (value) => {
     return Math.round(value * 100) / 100;
 }
 
@@ -268,7 +280,7 @@ function mapStateToProps(state, ownProps) {
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
         editorValid: isValid('CourseEditor')(state) && isValid('CourseSubscriptionForm')(state),
-        activeTabs : activeTabsSelector(state)
+        activeTabs: activeTabsSelector(state)
     }
 }
 

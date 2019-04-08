@@ -7,6 +7,7 @@ import PropTypes from 'prop-types'
 import '../../common/form.sass'
 import {bindActionCreators} from "redux";
 import moment from 'moment'
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class CourseSubscriptionForm extends React.Component {
 
@@ -42,7 +43,7 @@ class CourseSubscriptionForm extends React.Component {
             this.props.initialize({
                 IsPaid: course.IsPaid,
                 IsSubsFree: course.IsSubsFree,
-                Price: course.Price,
+                Price: course.Price ? course.Price : '',
                 DPrice: course.DPrice,
                 Description: course.Discount ? course.Discount.Description : '',
                 Perc: course.Discount ? course.Discount.Perc : '',
@@ -62,7 +63,7 @@ class CourseSubscriptionForm extends React.Component {
             this._init()
         }
 
-        if ((prevProps.percent !== this.props.percent) || (prevProps.price !== this.props.price)) {
+        if ((+prevProps.percent !== +this.props.percent) || (+prevProps.price !== +this.props.price)) {
             let _discountPrice = (this.props.percent && $.isNumeric(this.props.percent)) ? this.props.price * (1 - this.props.percent / 100) : this.props.price;
 
             _discountPrice = Math.round(_discountPrice * 100) / 100;
@@ -72,20 +73,27 @@ class CourseSubscriptionForm extends React.Component {
     }
 
     render() {
-        let {visible, isPaid, percent} = this.props;
+        let {visible, isPaid, percent, enableButtons} = this.props;
+
+        let _disabled = !enableButtons;
 
         return <div className={"form-wrapper non-webix-form" + (visible ? '' : ' hidden')}>
             <form className="controls-wrapper">
-                <Field component={CheckBox} name="IsPaid" label="Платный"/>
-                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки"/>
-                <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену" disabled={!isPaid}/>
-                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену" disabled={true}/>
+                <Field component={CheckBox} name="IsPaid" label="Платный" disabled={_disabled}/>
+                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки" disabled={_disabled}/>
+                <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену" disabled={!isPaid || _disabled}/>
+                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену"
+                       disabled={true}/>
                 <div className="group-box">
                     <div className="group-box__title">Скидка</div>
-                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание" disabled={!percent || !isPaid}/>
-                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid}/>
-                    <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid}/>
-                    <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid}/>
+                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание"
+                           disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение"
+                           disabled={!isPaid || _disabled}/>
+                    <Field component={Datepicker} name="FirstDate" label="Начало действия"
+                           disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={Datepicker} name="LastDate" label="Окончание действия"
+                           disabled={!percent || !isPaid || _disabled}/>
                 </div>
             </form>
         </div>
@@ -111,18 +119,19 @@ const validate = (values) => {
             if (values.Perc >= 100) {
                 errors.Perc = 'Скидка не может быть 100% или более'
             }
-        }
 
-        if (!values.FirstDate) {
-            errors.FirstDate = 'Значение не может быть пустым'
-        }
+            if (!values.FirstDate) {
+                errors.FirstDate = 'Значение не может быть пустым'
+            }
 
-        if (!values.LastDate) {
-            errors.LastDate = 'Значение не может быть пустым'
-        }
+            if (!values.LastDate) {
+                errors.LastDate = 'Значение не может быть пустым'
+            }
 
-        if (values.FirstDate && values.LastDate && (values.FirstDate.isSameOrAfter(values.LastDate))) {
-            errors.LastDate = 'Дата окончания должна быть больше даты начала'
+            if (values.FirstDate && values.LastDate && (values.FirstDate.isSameOrAfter(values.LastDate))) {
+                errors.LastDate = 'Дата окончания должна быть больше даты начала'
+            }
+
         }
     }
 
@@ -149,11 +158,12 @@ function mapStateToProps(state) {
         course: state.singleCourse.current,
         courseSaving: state.singleCourse.saving,
         courseError: state.singleCourse.error,
+        enableButtons: enableButtonsSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ changeFieldValue }, dispatch);
+    return bindActionCreators({changeFieldValue}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(CourseSubscriptionWrapper)

@@ -22,7 +22,7 @@ export default class SelectControl extends React.Component {
 
         return (
             <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
-                <label htmlFor={id} className="field-label">{label}</label>
+                <label htmlFor={id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
                 <div className={"field-wrapper__editor-wrapper"}>
                     {disabled ?
                         <select {...input} id={id} className={_inputClass} placeholder={placeholder}
