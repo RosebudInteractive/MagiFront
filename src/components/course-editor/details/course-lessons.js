@@ -5,6 +5,7 @@ import {CourseLessons,} from './course-grids'
 import PropTypes from 'prop-types'
 import * as courseLessonsActions from "../../../actions/course/courseLessonsActions";
 import history from '../../../history'
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class CourseLessonsWrapper extends React.Component {
 
@@ -14,7 +15,7 @@ class CourseLessonsWrapper extends React.Component {
     }
 
     render() {
-        let {courseLessons, selectedLesson, editMode} = this.props;
+        let {courseLessons, selectedLesson, editMode, enableButtons} = this.props;
 
         return <CourseLessons selected={selectedLesson}
                               editMode={editMode}
@@ -25,7 +26,7 @@ class CourseLessonsWrapper extends React.Component {
                               removeAction={::this.props.courseLessonsActions.remove}
                               moveUpAction={::this.props.courseLessonsActions.moveUp}
                               moveDownAction={::this.props.courseLessonsActions.moveDown}
-        />
+                              disabled={!enableButtons}/>
     }
 
     _canCreateLesson() {
@@ -56,6 +57,8 @@ function mapStateToProps(state) {
 
         courseCategories: state.courseCategories.current,
         selectedCategory: state.courseCategories.selected,
+
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

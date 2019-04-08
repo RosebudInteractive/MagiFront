@@ -12,6 +12,7 @@ export default class Uploader extends React.Component {
         onUploadComplete: PropTypes.func,
         onUploadFile: PropTypes.func,
         onFileUploadError: PropTypes.func,
+        disabled: PropTypes.bool,
     }
 
     constructor(props) {
@@ -24,7 +25,7 @@ export default class Uploader extends React.Component {
         return <form method="#" encType="multipart/form-data">
             <input ref={e => this._uploader = e} multiple type="file" accept="image/*" hidden
                    onChange={::this._uploadFiles}/>
-            <button className="cover-control cover-control__btn upload" onClick={::this._upload}/>
+            <button className="cover-control cover-control__btn upload" onClick={::this._upload} disabled={this.props.disabled}/>
         </form>
     }
 

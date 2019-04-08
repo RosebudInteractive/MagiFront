@@ -86,6 +86,7 @@ class Datepicker extends React.Component {
                         inputProps={{
                             placeholder: placeholder || 'Укажите дату',
                             disabled: disabled,
+                            readOnly:true,
                         }}
                         {...this.props}
                         selected={currentValue}

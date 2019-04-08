@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {CourseCategories,} from './course-grids'
 import PropTypes from 'prop-types'
 import * as courseCategoriesActions from "../../../actions/course/courseCategoriesActions";
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class CourseCategoriesWrapper extends React.Component {
 
@@ -19,7 +20,8 @@ class CourseCategoriesWrapper extends React.Component {
                               selectAction={::this.props.courseCategoriesActions.select}
                               selected={this.props.selectedCategory}
                               editMode={this.editMode}
-                              data={::this._getCourseCategories()}/>
+                              data={::this._getCourseCategories()}
+                              disabled={!this.props.enableButtons}/>
         </div>
     }
 
@@ -51,6 +53,7 @@ function mapStateToProps(state) {
         categories: state.categoriesList.categories,
         courseCategories: state.courseCategories.current,
         selectedCategory: state.courseCategories.selected,
+        enableButtons: enableButtonsSelector(state),
     }
 }
 
