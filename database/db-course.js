@@ -627,6 +627,7 @@ const DbCourse = class DbCourse extends DbObject {
         let userId = user ? user.Id : 0;
         let baseUrl;
         let productList = {};
+        let pendingCourses = {};
 
         return new Promise((resolve, reject) => {
             baseUrl = config.proxyServer.siteHost + "/";
@@ -639,6 +640,11 @@ const DbCourse = class DbCourse extends DbObject {
                 }, {})
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             let crs_id = -1;
                             let curr_course;
                             let now = new Date();
@@ -661,6 +667,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             OneLesson: elem.OneLesson ? true : false,
                                             IsPaid: elem.IsPaid ? true : false,
                                             IsBought: elem.Counter ? true : false,
+                                            IsPending: pendingCourses[elem.Id] ? true : false,
                                             IsSubsFree: elem.IsSubsFree ? true : false,
                                             ProductId: elem.ProductId,
                                             Price: 0,
@@ -709,7 +716,11 @@ const DbCourse = class DbCourse extends DbObject {
                             })
 
                             if (Object.keys(productList).length > 0) {
-                                let prods = await this._productService.get({ TypeCode: "COURSEONLINE", Detail: true });
+                                let prods = await this._productService.get({
+                                    TypeCode: "COURSEONLINE",
+                                    Detail: true,
+                                    Truncate: true
+                                });
                                 for (let i = 0; i < prods.length; i++){
                                     let prod = prods[i];
                                     let course = productList[prod.Id];
@@ -801,6 +812,7 @@ const DbCourse = class DbCourse extends DbObject {
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let userId = user ? user.Id : 0;
         let baseUrl;
+        let pendingCourses = {};
 
         return new Promise((resolve, reject) => {
             baseUrl = this._baseUrl;
@@ -832,6 +844,11 @@ const DbCourse = class DbCourse extends DbObject {
                 }, {})
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             let isFirst = true;
                             let authors_list = {};
                             let now = new Date();
@@ -857,6 +874,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         ExtLinks: elem.ExtLinks,
                                         IsBought: elem.Counter ? true : false,
                                         IsPaid: elem.IsPaid ? true : false,
+                                        IsPending: pendingCourses[elem.Id] ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,
                                         Price: 0,
@@ -1120,7 +1138,8 @@ const DbCourse = class DbCourse extends DbObject {
             let prods = await this._productService.get({
                 Id: course.ProductId,
                 Detail: true,
-                AlwaysShowDiscount: alwaysShowDiscount ? true : false
+                AlwaysShowDiscount: alwaysShowDiscount ? true : false,
+                Truncate: true
             });
             if (prods.length === 1)
                 this._setPriceByProd(course, prods[0])

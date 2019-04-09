@@ -45,6 +45,9 @@ module.exports = {
                 (this.server.port ? (':' + this.server.port) : '');
         })
     },
+    client: {
+        devHotReload: true  
+    },
     admin: {
         logFileUpload: false,
         logModif: false
@@ -100,7 +103,7 @@ module.exports = {
         enabled: false,
         debug: false,
         billing_test: true,
-        mode: { corses: true, subscription: false },
+        mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",

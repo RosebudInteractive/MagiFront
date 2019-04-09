@@ -341,6 +341,7 @@ const DbUser = class DbUser extends DbObject {
         let history = { Lessons: [], Courses: {}, Authors: {} };
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let pendingCourses = {};
 
         return new Promise((resolve, reject) => {
             resolve(PositionsService().getAllLessonPositions(id));
@@ -376,8 +377,13 @@ const DbUser = class DbUser extends DbObject {
                                 mssql: _.template(GET_HISTORY_MSSQL)({ lessonIds: elem.join(), user_id: id ? id : 0 })
                             }
                         }, {})
-                            .then((result) => {
+                            .then(async (result) => {
                                 if (result && result.detail && (result.detail.length > 0)) {
+                                    if (id) {
+                                        let paymentService = this.getService("payments", true);
+                                        if (paymentService)
+                                            pendingCourses = await paymentService.getPendingObjects(id);
+                                    }
                                     let lessons = {};
                                     for (let i = 0; i < elem.length; i++)
                                         lessons[elem[i]] = true;
@@ -398,6 +404,7 @@ const DbUser = class DbUser extends DbObject {
                                                 Name: elem.Name,
                                                 IsPaid: elem.IsPaid ? true : false,
                                                 IsBought: elem.Counter ? true : false,
+                                                IsPending: pendingCourses[elem.Id] ? true : false,
                                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                                 ProductId: elem.ProductId,
                                                 URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
@@ -487,9 +494,11 @@ const DbUser = class DbUser extends DbObject {
             }
         }, {});
         let courseIds = [];
+        let courseList = {};
         if (data && data.detail && (data.detail.length > 0)) {
             data.detail.forEach(elem => {
                 courseIds.push(elem.Id);
+                courseList[elem.Id] = true;
             })
         }
         let result;
@@ -499,12 +508,16 @@ const DbUser = class DbUser extends DbObject {
             result = await this._getCoursesByIds(userId, { Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
         }
         else
-            result = courseIds;
+            if (opts.is_list)
+                result = courseList
+            else
+                result = courseIds;
         return result;
     }
 
     async _getCoursesByIds(userId, data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
         let courseList = {};
+        let pendingCourses = {};
 
         if (arrayOfIds.length > 0) {
             await Utils.seqExec(arrayOfIds, (elem) => {
@@ -516,6 +529,11 @@ const DbUser = class DbUser extends DbObject {
                 }, {})
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             result.detail.forEach((elem) => {
                                 let course = {
                                     Id: elem.Id,
@@ -527,6 +545,7 @@ const DbUser = class DbUser extends DbObject {
                                     OneLesson: elem.OneLesson ? true : false,
                                     IsPaid: elem.IsPaid ? true : false,
                                     IsBought: elem.Counter ? true : false,
+                                    IsPending: pendingCourses[elem.Id] ? true : false,
                                     IsSubsFree: elem.IsSubsFree ? true : false,
                                     ProductId: elem.ProductId,
                                     Authors: [],

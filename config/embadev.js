@@ -36,6 +36,9 @@ let options = {
             logRequest: true
         }
     },
+    client: {
+        devHotReload: false
+    },
     admin: {
         logFileUpload: true,
         logModif: true
@@ -74,8 +77,8 @@ let options = {
         module: "./yandex-kassa",
         enabled: true,
         debug: true,
-        billing_test: true,
-        mode: { corses: true, subscription: false },
+        billing_test: false,
+        mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
             shopId: "536331",

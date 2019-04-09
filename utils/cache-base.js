@@ -17,6 +17,15 @@ exports.CacheableObject = class CacheableObject {
         }
     }
 
+    getService(service_name, isSilent) {
+        let result = null;
+        if (global.$Services && global.$Services[service_name])
+            result = global.$Services[service_name]();
+        if ((!result) && (!isSilent))
+            throw new Error(`Service "${service_name}" isn't registered.`);
+        return result;        
+    }
+
     cacheGetKey(key) {
         return this._prefix + key;
     }

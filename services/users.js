@@ -13,6 +13,10 @@ const ALLOWED_TO_EDIT = {
 
 function setupUsers(app) {
 
+    if (!global.$Services)
+        global.$Services = {};
+    global.$Services.users = UsersService;
+
     app.get('/api/users/invoice', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })

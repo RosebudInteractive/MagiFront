@@ -1224,6 +1224,7 @@ const DbLesson = class DbLesson extends DbObject {
         let showTranscript = AccessRights.checkPermissions(user,
             AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
         let IsFreeInPaidCourse;
+        let pendingCourses = {};
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1236,6 +1237,11 @@ const DbLesson = class DbLesson extends DbObject {
                 }, {})
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length == 1)) {
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             let elem = result.detail[0];
                             if (elem.URL)
                                 parentUrl = elem.URL;
@@ -1249,6 +1255,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
                                 IsBought: elem.Counter ? true : false,
+                                IsPending: pendingCourses[elem.CId] ? true : false,
                                 URL: elem.CURL
                             };
                             await CoursesService().getCoursePrice(data.Course);
@@ -1376,6 +1383,7 @@ const DbLesson = class DbLesson extends DbObject {
         let userId = user ? user.Id : 0;
         let showTranscript = AccessRights.checkPermissions(user,
             AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
+        let pendingCourses = {};
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
@@ -1410,6 +1418,11 @@ const DbLesson = class DbLesson extends DbObject {
                 }, {})
                     .then(async (result) => {
                         if (result && result.detail && (result.detail.length == 1)) {
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             let elem = result.detail[0];
                             courseUrl = hostUrl + elem.CURL + "/";
                             if (elem.URL) {
@@ -1430,6 +1443,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
                                 IsBought: elem.Counter ? true : false,
+                                IsPending: pendingCourses[elem.CId] ? true : false,
                                 OneLesson: elem.OneLesson ? true : false
                             };
                             await CoursesService().getCoursePrice(data.Course);
