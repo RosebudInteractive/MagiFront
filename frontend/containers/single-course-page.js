@@ -24,6 +24,7 @@ import {
     userBookmarksSelector,
     removeCourseFromBookmarks
 } from "../ducks/profile";
+import {facebookAppIdSelector} from "ducks/app";
 
 class Main extends React.Component {
     constructor(props) {
@@ -326,7 +327,7 @@ function mapStateToProps(state, ownProps) {
         course: state.singleCourse.object,
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
-        facebookAppID: state.app.facebookAppID,
+        facebookAppID: facebookAppIdSelector(state),
     }
 }
 

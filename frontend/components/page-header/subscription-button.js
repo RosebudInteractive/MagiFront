@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {showBillingWindow} from "../../ducks/billing";
+import {showBillingWindow} from "ducks/billing";
+import {enabledSubscriptionSelector} from "ducks/app";
 import {bindActionCreators} from "redux";
 import {getDaysBetween} from "../../tools/time-tools";
 import PropTypes from "prop-types";
@@ -48,7 +49,7 @@ function mapStateToProps(state) {
     return {
         authorized: !!state.user.user,
         user: state.user.user,
-        enabledBilling: state.app.enabledBilling,
+        enabledBilling: enabledSubscriptionSelector(state),
     }
 }
 

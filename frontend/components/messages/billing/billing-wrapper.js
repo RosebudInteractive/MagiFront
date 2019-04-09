@@ -16,6 +16,7 @@ import {
 import Subscription from './billing-subscription'
 import Payment from './billing-payments'
 import $ from "jquery";
+import {enabledSubscriptionSelector} from "ducks/app";
 
 class BillingWrapper extends React.Component {
     constructor(props) {
@@ -117,7 +118,7 @@ function mapStateToProps(state) {
         needRedirect: isRedirectActiveSelector(state),
         redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
-        enabledBilling: state.app.enabledBilling,
+        enabledBilling: enabledSubscriptionSelector(state),
 
         error: state.user.error,
     }

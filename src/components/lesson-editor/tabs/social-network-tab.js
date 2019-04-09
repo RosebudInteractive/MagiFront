@@ -4,8 +4,10 @@ import {TextBox} from "../../common/input-controls";
 import TextArea from "../../common/text-area";
 import ImageLink, {IMAGE_TYPE} from "../image-link-control";
 import PropTypes from "prop-types";
+import {enableButtonsSelector} from "adm-ducks/app";
+import {connect} from "react-redux";
 
-export default class SocialNetworkTab extends React.Component {
+class SocialNetworkTab extends React.Component {
 
     static propTypes = {
         editMode: PropTypes.bool,
@@ -13,12 +15,22 @@ export default class SocialNetworkTab extends React.Component {
     }
 
     render() {
+        let _disabled = !this.props.enableButtons;
+
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
-            <Field component={TextBox} name="snName" label="Название" placeholder="Введите название"/>
-            <Field component={TextArea} name="snDescription" label="Описание" enableHtml={false}/>
-            <Field component={TextArea} name="snPost" label="Текст поста" enableHtml={false}/>
-            <Field component={ImageLink} name="ogImageResourceId" label="Изображение для Facebook" imageType={IMAGE_TYPE.OG}/>
-            <Field component={ImageLink} name="twitterImageResourceId" label="Изображение для Twitter" imageType={IMAGE_TYPE.TWITTER}/>
+            <Field component={TextBox} name="snName" label="Название" placeholder="Введите название" disabled={_disabled}/>
+            <Field component={TextArea} name="snDescription" label="Описание" enableHtml={false} disabled={_disabled}/>
+            <Field component={TextArea} name="snPost" label="Текст поста" enableHtml={false} disabled={_disabled}/>
+            <Field component={ImageLink} name="ogImageResourceId" label="Изображение для Facebook" imageType={IMAGE_TYPE.OG} disabled={_disabled}/>
+            <Field component={ImageLink} name="twitterImageResourceId" label="Изображение для Twitter" imageType={IMAGE_TYPE.TWITTER} disabled={_disabled}/>
         </div>
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        enableButtons: enableButtonsSelector(state),
+    }
+}
+
+export default connect(mapStateToProps,)(SocialNetworkTab)

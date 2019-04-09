@@ -19,6 +19,12 @@ export const ENABLE_BUTTONS = `${prefix}/ENABLE_BUTTONS`
 
 export const SET_ACTIVE_TAB = `${prefix}/SET_ACTIVE_TAB`
 
+
+const Mode = Record({course: false, subscription: false})
+
+const Billing = Record({
+    mode: new Mode()
+})
 /**
  * Reducer
  * */
@@ -26,7 +32,9 @@ export const ReducerRecord = Record({
     reCapture: '',
     enableButtons: true,
     activeTabs: new Map(),
+    billing: new Billing()
 })
+
 
 export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
@@ -35,6 +43,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_OPTIONS_SUCCESS:
             return state
                 .set('reCapture', payload.siteKey.reCapture)
+                .set('billing', new Billing(payload.billing))
 
         case GET_OPTIONS_FAIL:
             return state
@@ -65,6 +74,7 @@ export const stateSelector = state => state[moduleName]
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
 export const enableButtonsSelector = createSelector(stateSelector, state => state.enableButtons)
 export const activeTabsSelector = createSelector(stateSelector, state => state.activeTabs)
+export const billingModeSelector = createSelector(stateSelector, state => state.getIn(['billing', 'mode']))
 
 /**
  * Action Creators

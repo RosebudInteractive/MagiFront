@@ -5796,9 +5796,9 @@ ul.user-tooltip {
   @media (max-width: 1279px) {
   .course-module .favourites {
       top: 8px; } }
-  @media (max-width: 1023px) {
-  .course-module .favourites {
-      left: -51px; } }
+  /*@media (max-width: 1023px) {*/
+  /*.course-module .favourites {*/
+      /*left: -51px; } }*/
   @media (max-width: 899px) {
   .course-module .favourites {
       left: -15px;

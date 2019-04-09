@@ -24,28 +24,29 @@ class CoverControl extends React.Component {
 
 
     render() {
-        const {input, id, label, hidden,} = this.props;
+        const {input, id, label, hidden, disabled} = this.props;
 
         let _cover = (input.value && input.value.file) ? '/data/' + input.value.file : '',
             _coverSize = this._getSize(),
             _imageStyle = _coverSize ? {width: _coverSize.width, height: _coverSize.height} : null
 
         return <div className="field-wrapper" style={hidden ? {display: 'none'} : null}>
-            <label htmlFor={id} className="field-label">{label}</label>
+            <label htmlFor={id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
             <div className={"field-wrapper__editor-wrapper"}>
                 <div className="cover-wrapper">
                     {
                         _cover ?
-                        <img className="cover" style={_imageStyle} src={_cover} alt={_cover}/>
-                        :
-                        <div className="cover" style={_imageStyle}/>
+                            <img className="cover" style={_imageStyle} src={_cover} alt={_cover}/>
+                            :
+                            <div className="cover" style={_imageStyle}/>
                     }
                     <div className="cover-wrapper__controls">
                         <Uploader multiple={false} upload={'/api/adm/upload'}
                                   onUploadStart={::this.props.disableButtons}
                                   onUploadComplete={::this.props.enableButtons}
                                   onFileUploadError={::this._showError}
-                                  onUploadFile={::this._handleFileUpload}/>
+                                  onUploadFile={::this._handleFileUpload}
+                                  disabled={disabled}/>
                     </div>
                 </div>
             </div>

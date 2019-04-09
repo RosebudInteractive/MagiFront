@@ -4,6 +4,7 @@ import {bindActionCreators} from "redux";
 import {showCoursePaymentWindow, getPaidCourseInfo} from "ducks/billing";
 import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
+import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
 
 class PriceBlock extends React.Component {
@@ -14,7 +15,11 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course, userPaidCourses,} = this.props
+        const {course, userPaidCourses, enabledPaidCourse} = this.props
+
+        if (!enabledPaidCourse) {
+            return null
+        }
 
         if (!(course && course.IsPaid) || userPaidCourses.includes(course.Id)) {
             return null
@@ -68,6 +73,7 @@ function mapStateToProps(state) {
     return {
         userPaidCourses : userPaidCoursesSelector(state),
         authorized: !!state.user.user,
+        enabledPaidCourse: enabledPaidCoursesSelector(state)
     }
 }
 

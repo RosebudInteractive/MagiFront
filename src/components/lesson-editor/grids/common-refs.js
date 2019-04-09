@@ -7,6 +7,7 @@ import LessonReferences from './lesson-refs-control'
 import * as commonRefsActions from '../../../actions/lesson/lessonCommonRefsActions'
 import {createNewReference, editReference, clearReference} from '../../../actions/references-actions';
 import {EDIT_MODE_EDIT} from "../../../constants/Common";
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class CommonRefsGrid extends React.Component {
 
@@ -27,7 +28,7 @@ class CommonRefsGrid extends React.Component {
                               selected={this.props.selected}
                               data={this.props.commonRef}
                               viewId={'common-refs'}
-            />
+                              disabled={!this.props.enableButtons}/>
             {
                 (this.props.showReferenceEditor && !this.props.reference.Recommended) ?
                     <ReferenceDialog
@@ -78,6 +79,8 @@ function mapStateToProps(state) {
         referenceEditMode: state.references.editMode,
         commonRef: state.lessonCommonRefs.current,
         selected: state.lessonCommonRefs.selected,
+
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

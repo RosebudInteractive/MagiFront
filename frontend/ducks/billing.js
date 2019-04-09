@@ -300,7 +300,7 @@ function* watchPaidCourseInfoSaga(data) {
 }
 
 const _fetchPaidCourseInfo = (productId) => {
-    return fetch(`/api/products?Id=${productId}&Detail=true`, {method: 'GET', credentials: 'include'})
+    return fetch(`/api/products?Id=${productId}&Detail=true&Truncate=true`, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }

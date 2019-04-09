@@ -21,6 +21,7 @@ import filtersReducer, {moduleName as filtersModule} from 'ducks/filters'
 import billingReducer, {moduleName as billingModule} from 'ducks/billing'
 import paramsReducer, {moduleName as paramsModule} from 'ducks/params'
 import versionReducer, {moduleName as versionModule} from 'ducks/version'
+import appReducer, {moduleName as appModule} from 'ducks/app'
 
 export default combineReducers({
 
@@ -44,6 +45,7 @@ export default combineReducers({
     [billingModule]: billingReducer,
     [paramsModule]: paramsReducer,
     [versionModule]: versionReducer,
+    [appModule]: appReducer,
     routing: routerReducer,
     form: formReducer,
 })

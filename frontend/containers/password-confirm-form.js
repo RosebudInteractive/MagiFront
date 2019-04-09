@@ -5,6 +5,7 @@ import {Link} from 'react-router-dom';
 
 import * as userActions from '../actions/user-actions'
 import Wrapper from "../components/password-confirm/wrapper";
+import {fetchingAppIdSelector} from 'ducks/app'
 
 class PasswordConfirmForm extends React.Component {
 
@@ -37,7 +38,7 @@ function mapStateToProps(state, ownProps) {
         error: state.user.error,
         user: state.user.user,
         activationKey: ownProps.match.params.activationKey,
-        fetching: state.app.fetching,
+        fetching: fetchingAppIdSelector(state),
     }
 }
 
