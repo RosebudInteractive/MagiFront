@@ -10,9 +10,9 @@ export default class StoredCard extends React.Component {
         onChange: PropTypes.func,
     };
 
-    _onChange() {
+    _onChange(e) {
         if (this.props.onChange) {
-            this.props.onChange()
+            this.props.onChange(e)
         }
     }
 
@@ -24,7 +24,7 @@ export default class StoredCard extends React.Component {
                 <div className="payment-methods__stored">
                     <div className="payment-methods__stored-col">
                         <input type="radio" className="payment-form__option _single" name="stored" id="stored-card"
-                               checked={checked} onChange={this._onChange}/>
+                               checked={checked} onChange={::this._onChange}/>
                         <label htmlFor="stored-card" className="payment-form__text">
                             <span>Запомненные реквизиты</span>
                         </label>

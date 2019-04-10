@@ -8,6 +8,7 @@ import * as resourcesActions from '../../../actions/resources-actions';
 import ResourceForm from "../../resource-form";
 import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import MultiResourceForm from "../../multi-resource-form";
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class ResourcesGrid extends React.Component {
 
@@ -34,7 +35,8 @@ class ResourcesGrid extends React.Component {
                              multiUploadAction={::this._multiUpload}
                              editMode={this.props.editMode}
                              selected={this.props.selected}
-                             data={this.props.resources}/>
+                             data={this.props.resources}
+                             disabled={!this.props.enableButtons}/>
             {
                 this.state.showResourceDialog ?
                     <ResourceForm
@@ -131,6 +133,8 @@ function mapStateToProps(state) {
         selected: state.lessonResources.selected,
         resourceEditMode: state.resources.editMode,
         resource: state.resources.object,
+
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

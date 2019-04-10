@@ -22,6 +22,8 @@ export const MAIL_SUBSCRIBE_START = `${prefix}/MAIL_SUBSCRIBE_START`
 export const MAIL_SUBSCRIBE_SUCCESS = `${prefix}/MAIL_SUBSCRIBE_SUCCESS`
 export const MAIL_SUBSCRIBE_ERROR = `${prefix}/MAIL_SUBSCRIBE_ERROR`
 
+export const SHOW_MODAL_MESSAGE_ERROR = `${prefix}/SHOW_MODAL_MESSAGE_ERROR`
+
 /**
  * Reducer
  * */
@@ -58,6 +60,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case MAIL_SUBSCRIBE_ERROR:
         case SEND_FEEDBACK_ERROR:
+        case SHOW_MODAL_MESSAGE_ERROR:
             return state
                 .set('fetching', false)
                 .set('error', payload.error)

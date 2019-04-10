@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {
-    loadingSelector,
+    loadingSelector as billingFetching,
     errorSelector,
     selectedTypeSelector,
     sendPayment,
     switchToSubscription,
     isRedirectActiveSelector
-} from "../../../ducks/billing";
+} from "ducks/billing";
 import StoredCard from "./stored-card";
 import {Alfa, AutosubscribeButton, Card, Mobile, Qiwi, Sberbank, WebMoney, Yandex,} from "./payment-items";
-import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "../../../ducks/profile";
+import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -27,6 +27,7 @@ class PaymentForm extends React.Component {
 
     static defaultProps = {
         paymentType: PAYMENT_TYPE.BILLING,
+        returnUrl: null,
     }
 
     constructor(props) {
@@ -74,6 +75,7 @@ class PaymentForm extends React.Component {
         event.preventDefault();
 
         let {selectedMethod, showSaveMethodButton, savePayment,} = this.state;
+        const {selectedSubscription} = this.props;
 
         if (this._isSendingEnable()) {
             // const data = new FormData(event.target);
@@ -84,7 +86,7 @@ class PaymentForm extends React.Component {
                 }
             } else {
                 data.Payment = {
-                    returnUrl: window.location.pathname,
+                    returnUrl: selectedSubscription.ReturnUrl ? selectedSubscription.ReturnUrl : window.location.pathname,
                     save_payment_method: showSaveMethodButton ? savePayment : false,
                     payment_method_data: {
                         type: this.state.selectedMethod
@@ -160,7 +162,7 @@ class PaymentForm extends React.Component {
         let _disabledBtn = !this._isSendingEnable()
         let {selectedSubscription, paymentType} = this.props;
 
-        if (this.props.loading || !selectedSubscription) {
+        if (!selectedSubscription) {
             return null
         }
 
@@ -182,7 +184,8 @@ class PaymentForm extends React.Component {
             <div className="modal__body payment-methods">
                 <h3 className="payment-methods__title">Выберите способ оплаты</h3>
                 <form action="#" method="post" className="payment-form">
-                    <StoredCard checked={this.state.selectedMethod === 'stored-card'}
+                    <StoredCard onChange={::this._selectPayment}
+                                checked={this.state.selectedMethod === 'stored-card'}
                                 visible={this.state.showStoredMethod}/>
                     <ul className="payment-methods__list">
                         <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
@@ -217,7 +220,7 @@ function mapStateToProps(state) {
     return {
         loadingSubsInfo: loadingSubsInfoSelector(state),
         info: subscriptionInfoSelector(state),
-        loading: loadingSelector(state),
+        loading: billingFetching(state),
         selectedSubscription: selectedTypeSelector(state),
         needRedirect: isRedirectActiveSelector(state),
         error: errorSelector(state),

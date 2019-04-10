@@ -3,7 +3,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import MetaTags from 'react-meta-tags';
 
-import {authorSelector, loadingSelector, notFoundSelector, getAuthor} from '../ducks/author'
+import {authorSelector, loadingSelector, notFoundSelector, getAuthor} from 'ducks/author'
+import {facebookAppIdSelector} from 'ducks/app'
 import AuthorBlock from '../components/author/author-block';
 import CoursesBlock from '../components/author/courses-and-lessons';
 import NotFoundPage from '../components/not-found'
@@ -124,7 +125,7 @@ function mapStateToProps(state, ownProps) {
         loading: loadingSelector(state),
         notFound: notFoundSelector(state),
         authorUrl: ownProps.match.params.url,
-        facebookAppID: state.app.facebookAppID,
+        facebookAppID: facebookAppIdSelector(state),
     }
 }
 

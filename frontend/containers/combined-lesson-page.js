@@ -28,6 +28,7 @@ import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
+import {facebookAppIdSelector} from "ducks/app";
 
 let _scrollTop = 0;
 
@@ -574,7 +575,7 @@ function mapStateToProps(state, ownProps) {
         lessonEnded: state.player.ended,
         galleryIsOpen: state.app.galleryIsOpen,
 
-        facebookAppID: state.app.facebookAppID,
+        facebookAppID: facebookAppIdSelector(state),
         userPaidCourses: userPaidCoursesSelector(state),
     }
 }

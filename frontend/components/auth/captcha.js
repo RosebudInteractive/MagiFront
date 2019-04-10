@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Recaptcha from '../common/g-recaptcha';
 import {connect} from "react-redux";
+import {reCaptureSelector} from 'ducks/app'
 
 let recaptchaInstance;
 
@@ -57,7 +58,7 @@ class Captcha extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        reCapture: state.app.reCapture,
+        reCapture: reCaptureSelector(state),
     }
 }
 

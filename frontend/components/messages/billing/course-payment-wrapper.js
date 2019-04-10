@@ -5,15 +5,16 @@ import {bindActionCreators} from 'redux';
 import {
     showCoursePaymentWindowSelector,
     billingStepSelector,
-    loadingSelector,
+    loadingSelector as billingFetching,
     isRedirectActiveSelector,
     hideCoursePaymentWindow,
     redirectComplete,
     isRedirectUrlSelector
-} from "../../../ducks/billing";
+} from "ducks/billing";
 
 import Payment, {PAYMENT_TYPE} from './billing-payments'
 import $ from "jquery";
+import {enabledPaidCoursesSelector} from "ducks/app";
 
 class CoursePaymentWrapper extends React.Component {
     constructor(props) {
@@ -74,16 +75,16 @@ class CoursePaymentWrapper extends React.Component {
     }
 
     render() {
-        let {showWindow, enabledBilling, showSignInForm, loading} = this.props;
+        let {showWindow, enabledPaidCourses, showSignInForm, fetching} = this.props;
 
-        return (showWindow && enabledBilling && !showSignInForm) ?
+        return (showWindow && enabledPaidCourses && !showSignInForm) ?
             <div
                 className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
-                            onClick={::this._onCloseClick}>Закрыть
+                            onClick={::this._onCloseClick} disabled={fetching}>Закрыть
                     </button>
-                    <Payment loading={loading} paymentType={PAYMENT_TYPE.COURSE}/>
+                    <Payment paymentType={PAYMENT_TYPE.COURSE}/>
                 </div>
             </div>
             :
@@ -96,11 +97,11 @@ function mapStateToProps(state) {
         showSignInForm: state.app.showSignInForm,
         showWindow: showCoursePaymentWindowSelector(state),
         billingStep: billingStepSelector(state),
-        loading: loadingSelector(state),
+        fetching: billingFetching(state),
         needRedirect: isRedirectActiveSelector(state),
         redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
-        enabledBilling: state.app.enabledBilling,
+        enabledPaidCourses: enabledPaidCoursesSelector(state),
 
         error: state.user.error,
     }

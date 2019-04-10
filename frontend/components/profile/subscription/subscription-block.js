@@ -75,7 +75,7 @@ class SubscriptionBlock extends React.Component {
         return ((this._visibleCount < transactions.size) && (transactions.size > 0))
             ?
             <button className="btn btn--rounded subscription-history__btn"
-                    onClick={::this._getMoreTransactions}>{'Загрузать еще ' + _pagingSize}</button>
+                    onClick={::this._getMoreTransactions}>{'Загрузить еще ' + _pagingSize}</button>
             :
             null
     }

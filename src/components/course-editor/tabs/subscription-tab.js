@@ -66,7 +66,7 @@ class CourseSubscriptionForm extends React.Component {
         if ((+prevProps.percent !== +this.props.percent) || (+prevProps.price !== +this.props.price)) {
             let _discountPrice = (this.props.percent && $.isNumeric(this.props.percent)) ? this.props.price * (1 - this.props.percent / 100) : this.props.price;
 
-            _discountPrice = Math.round(_discountPrice * 100) / 100;
+            _discountPrice = Math.trunc(_discountPrice);
 
             this.props.changeFieldValue('CourseSubscriptionForm', 'DPrice', _discountPrice);
         }

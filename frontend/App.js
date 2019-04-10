@@ -45,6 +45,8 @@ import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
+import {getAppOptions} from 'ducks/app'
+
 Polyfill.registry();
 
 let _homePath = '/';
@@ -72,7 +74,7 @@ class App extends Component {
             this.props.appActions.setAppTypeMobile()
         }
 
-        this.props.appActions.getAppOptions()
+        this.props.getAppOptions()
     }
 
     get width() {
@@ -331,6 +333,7 @@ function mapDispatchToProps(dispatch) {
         getParameters: bindActionCreators(getParameters, dispatch),
         getUserPaidCourses: bindActionCreators(getUserPaidCourses, dispatch),
         loadVersion: bindActionCreators(loadVersion, dispatch),
+        getAppOptions: bindActionCreators(getAppOptions, dispatch),
     }
 }
 

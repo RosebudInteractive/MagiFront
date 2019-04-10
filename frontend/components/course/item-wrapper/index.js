@@ -3,9 +3,10 @@ import PropTypes from "prop-types";
 import * as tools from "../../../tools/page-tools";
 import LazyItem from './lazyload-item'
 import NotLazyItem from './not-lazyload-item'
+import {enabledPaidCoursesSelector} from "ducks/app";
+import {connect} from "react-redux";
 
-
-export default class Wrapper extends React.Component {
+class Wrapper extends React.Component {
 
     constructor(props) {
         super(props)
@@ -19,7 +20,11 @@ export default class Wrapper extends React.Component {
     };
 
     render() {
-        let {course, lazyload} = this.props
+        let {course, lazyload, enabledPaidCourse} = this.props
+
+        if (course && course.IsPaid && !enabledPaidCourse) {
+            return null
+        }
 
         return lazyload
             ?
@@ -28,3 +33,11 @@ export default class Wrapper extends React.Component {
             <NotLazyItem course={course} isMobile={this._isMobile()} key={course.Id}/>
     }
 }
+
+function mapStateToProps(state) {
+    return {
+        enabledPaidCourse: enabledPaidCoursesSelector(state)
+    }
+}
+
+export default connect(mapStateToProps)(Wrapper)

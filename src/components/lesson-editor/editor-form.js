@@ -24,6 +24,7 @@ import {cancelChanges, setExtLinks, save} from "../../actions/lesson/lesson-acti
 import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
 import {setFixedLesson,} from "adm-ducks/params";
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from "../../constants/Common";
+import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
 
 const TABS = {
     MAIN: 'main',
@@ -62,6 +63,17 @@ class LessonEditorForm extends React.Component {
 
     componentDidMount() {
         this._init()
+
+        let _activeTab = this.props.activeTabs.get(this.props.isSublesson ? 'SublessonEditor' : 'LessonEditor')
+        if (_activeTab) {
+            this.setState({
+                currentTab: _activeTab,
+            })
+        }
+    }
+
+    componentWillUnmount() {
+        this.props.setActiveTab({page: this.props.isSublesson ? 'SublessonEditor' : 'LessonEditor', value: this.state.currentTab})
     }
 
     _init() {
@@ -93,8 +105,8 @@ class LessonEditorForm extends React.Component {
                 snPost: _lesson.SnPost,
                 ogImageResourceId: this.props.ogImageResourceId,
                 twitterImageResourceId : this.props.twitterImageResourceId,
-                isAuthRequired: _lesson.IsAuthRequired,
-                isSubsRequired: _lesson.IsSubsRequired,
+                isAuthRequired: _lesson.IsAuthRequired ? _lesson.IsAuthRequired : false,
+                isSubsRequired: _lesson.IsSubsRequired ? _lesson.IsSubsRequired : false,
                 freeExpDate: _lesson.FreeExpDate,
                 isFreeInPaidCourse: _lesson.IsFreeInPaidCourse,
                 fixed: _fixed,
@@ -415,11 +427,13 @@ function mapStateToProps(state) {
 
         fixedLessonId: fixedLessonIdSelector(state),
         fixDescription: fixedObjDescrSelector(state),
+
+        activeTabs: activeTabsSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({resetReduxForm: reset, showErrorDialog, cancelChanges, setExtLinks, setFixedLesson, save}, dispatch);
+    return bindActionCreators({resetReduxForm: reset, showErrorDialog, cancelChanges, setExtLinks, setFixedLesson, save, setActiveTab}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(LessonEditorWrapper)

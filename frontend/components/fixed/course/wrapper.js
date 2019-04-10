@@ -9,6 +9,7 @@ import {addCourseToBookmarks, getUserBookmarks, removeCourseFromBookmarks, userB
 import {bindActionCreators} from "redux";
 import * as userActions from "actions/user-actions";
 import PriceBlock from "../../common/price-block";
+import {enabledPaidCoursesSelector} from "ducks/app";
 
 class Wrapper extends React.Component {
 
@@ -17,8 +18,13 @@ class Wrapper extends React.Component {
     }
 
     render() {
-        let {course} = this.props,
-            _coverPath = '/data/' + getCoverPath(course);
+        let {course, enabledPaidCourse} = this.props;
+
+        if (course && course.IsPaid && !enabledPaidCourse) {
+            return null
+        }
+
+        const _coverPath = '/data/' + getCoverPath(course);
 
         let _authors = course.AuthorsObj.map((author, index, array) => {
             let _authorName = author.FirstName + ' ' + author.LastName;
@@ -88,6 +94,7 @@ function mapStateToProps(state) {
         fixedObjDescr: fixedObjDescrSelector(state),
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
+        enabledPaidCourse: enabledPaidCoursesSelector(state),
     }
 }
 

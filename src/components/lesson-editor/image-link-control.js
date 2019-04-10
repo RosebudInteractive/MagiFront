@@ -24,6 +24,7 @@ class ImageLink extends React.Component {
         placeholder: PropTypes.string,
         // resources: PropTypes.array,
         imageType: PropTypes.string,
+        disabled: PropTypes.bool,
     };
 
     constructor(props) {
@@ -63,8 +64,8 @@ class ImageLink extends React.Component {
                     <div className={"image-link-wrapper"}>
                         <input className="field-input field-text" type='text' value={this._name} id={id} placeholder={placeholder}
                                disabled={disabled ? "disabled" : ""}/>
-                        <button className="image-link-wrapper__button upload" onClick={::this._showCreateDialog}/>
-                        <button className="image-link-wrapper__button find" onClick={::this._showSelectDialog}/>
+                        <button className="image-link-wrapper__button upload" onClick={::this._showCreateDialog} disabled={disabled}/>
+                        <button className="image-link-wrapper__button find" onClick={::this._showSelectDialog} disabled={disabled}/>
                     </div>
                     {_errorText}
                 </div>

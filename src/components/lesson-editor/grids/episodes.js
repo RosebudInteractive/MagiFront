@@ -5,6 +5,7 @@ import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {select, remove, moveUp, moveDown} from '../../../actions/lesson/lessonMainEpisodesActions'
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class EpisodesGrid extends React.Component {
 
@@ -24,7 +25,8 @@ class EpisodesGrid extends React.Component {
                       moveDownAction={::this.props.moveDown}
                       selected={this.props.selected}
                       editMode={this.props.editMode}
-                      data={this.props.episodes}/>
+                      data={this.props.episodes}
+                      disabled={!this.props.enableButtons}/>
         </div>
 
     }
@@ -69,6 +71,8 @@ function mapStateToProps(state) {
     return {
         episodes: state.lessonMainEpisodes.current,
         selected: state.lessonMainEpisodes.selected,
+
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

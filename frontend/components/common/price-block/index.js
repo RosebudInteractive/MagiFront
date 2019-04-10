@@ -4,6 +4,7 @@ import {bindActionCreators} from "redux";
 import {showCoursePaymentWindow, getPaidCourseInfo} from "ducks/billing";
 import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
+import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
 
 class PriceBlock extends React.Component {
@@ -14,18 +15,23 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course, userPaidCourses,} = this.props
+        const {course, userPaidCourses, enabledPaidCourse} = this.props
+
+        if (!enabledPaidCourse) {
+            return null
+        }
 
         if (!(course && course.IsPaid) || userPaidCourses.includes(course.Id)) {
             return null
         }
 
         let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description;
+            _hasDiscountDescr = _hasDiscount && course.Discount.Description,
+            _disabled = !course || course.IsPending
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <div className="btn btn--brown course-module__price-btn" onClick={::this._onClick}>Купить</div>
+                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")}onClick={::this._onClick}>Купить</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
@@ -59,7 +65,9 @@ class PriceBlock extends React.Component {
 
         const {course} = this.props;
 
-        this.props.getPaidCourseInfo(course.ProductId)
+        const _returnUrl = '/category/' + course.URL;
+
+        this.props.getPaidCourseInfo({productId: course.ProductId, returnUrl: _returnUrl})
         this.props.showPaymentWindow()
     }
 }
@@ -68,6 +76,7 @@ function mapStateToProps(state) {
     return {
         userPaidCourses : userPaidCoursesSelector(state),
         authorized: !!state.user.user,
+        enabledPaidCourse: enabledPaidCoursesSelector(state)
     }
 }
 

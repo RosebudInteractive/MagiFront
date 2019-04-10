@@ -30,26 +30,26 @@ export class LessonEditor extends React.Component {
 
         this.state = {
             editMode: this.props.lessonId > 0,
+            loading: true,
         }
     }
 
     componentDidMount() {
-        const {courseId, course, lessonId} = this.props;
+        const {courseId, lessonId} = this.props;
 
-        let _needLoadCourse = (!course) || (course.id !== courseId)
+        this._loadCourseInfo()
+            .then(() => {
+                if (this.state.editMode) {
+                    this.props.getLesson(lessonId, courseId)
+                } else {
+                    this.props.createLesson(this._getNewLesson())
+                }
 
-        if (_needLoadCourse) {
-            this.props.getCourse(courseId);
-        }
+                this.setState({loading : false})
+            })
 
         this.props.getCourseAuthors(courseId)
         this.props.getParameters()
-
-        if (this.state.editMode) {
-            this.props.getLesson(lessonId, courseId)
-        } else {
-            this.props.createLesson(this._getNewLesson())
-        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -70,7 +70,7 @@ export class LessonEditor extends React.Component {
     render() {
         let {fetching,} = this.props
 
-        return fetching ?
+        return fetching || this.state.loading ?
             <LoadingPage/>
             :
             <div className="editor lesson_editor">
@@ -90,6 +90,18 @@ export class LessonEditor extends React.Component {
         }
 
         return _lesson
+    }
+
+    _loadCourseInfo() {
+        const {courseId, course,} = this.props;
+
+        let _needLoadCourse = (!course) || (course.id !== courseId)
+
+        if (_needLoadCourse) {
+            return this.props.getCourse(courseId);
+        } else {
+            return Promise.resolve()
+        }
     }
 }
 

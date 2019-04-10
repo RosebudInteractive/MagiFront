@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {select, remove,} from '../../../actions/subLessonsActions'
 import {set} from '../../../actions/lesson/parent-lesson-actions';
+import {enableButtonsSelector} from "adm-ducks/app";
 
 class SublessonsGrid extends React.Component {
 
@@ -23,7 +24,8 @@ class SublessonsGrid extends React.Component {
                         removeAction={::this.props.remove}
                         selected={this.props.selected}
                         editMode={this.props.editMode}
-                        data={this.props.subLessons}/>
+                        data={this.props.subLessons}
+                        disabled={!this.props.enableButtons}/>
         </div>
 
     }
@@ -71,6 +73,8 @@ function mapStateToProps(state) {
         subLessons: state.subLessons.current,
         selected: state.subLessons.selected,
         lesson: state.singleLesson.current,
+
+        enableButtons: enableButtonsSelector(state),
     }
 }
 

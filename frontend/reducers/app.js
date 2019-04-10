@@ -38,11 +38,7 @@ const initialState = {
     showCourseBookmarks: true,
     showSizeInfo: false,
     galleryIsOpen: false,
-    facebookAppID: '',
-    reCapture: '',
     sendPulseScript: null,
-    billingTest: false,
-    enabledBilling: false,
     billingParams: null,
     fetching: false,
     cookiesConfirmed: false,
@@ -135,38 +131,15 @@ export default function app(state = initialState, action) {
             return {...state, galleryIsOpen: false}
         }
 
-        case GET_APP_OPTIONS_REQUEST: {
-            return {...state, fetching: true}
-        }
-
         case GET_APP_OPTIONS_SUCCESS: {
             let _sendPulse = (payload.scriptPath && payload.scriptPath.sendPulse) ? payload.scriptPath.sendPulse : null,
-                _buildingTest = (payload.billing && payload.billing.billing_test) ? payload.billing.billing_test : false,
                 _billingParams = (payload.billing && payload.billing.productReqParams) ? Object.assign({}, payload.billing.productReqParams) : null;
-                // _debug = payload.debug ? Object.assign({}, payload.debug) : null;
 
             return {
                 ...state,
-                billingTest: _buildingTest,
-                facebookAppID: payload.appId.fb,
-                reCapture: payload.siteKey.reCapture,
                 sendPulseScript: _sendPulse,
                 billingParams: _billingParams,
-                // debug: {},
-                fetching: false,
             }
-        }
-
-        case GET_APP_OPTIONS_FAIL: {
-            return {...state, facebookAppID: '', fetching: false}
-        }
-
-        case ENABLE_BILLING: {
-            return {...state, enabledBilling: true}
-        }
-
-        case DISABLE_BILLING: {
-            return {...state, enabledBilling: false}
         }
 
         case GET_COOKIES_CONFIRMATION: {

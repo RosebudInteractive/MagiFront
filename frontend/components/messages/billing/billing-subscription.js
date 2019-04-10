@@ -10,6 +10,7 @@ import {
 } from "../../../ducks/billing";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
+import {billingTestModeSelector} from "ducks/app";
 
 class SubscriptionForm extends React.Component {
 
@@ -117,7 +118,7 @@ function mapStateToProps(state) {
         loading: loadingSelector(state),
         subscriptionList: typesSelector(state),
         error: errorSelector(state),
-        billingTest : state.app.billingTest,
+        billingTest : billingTestModeSelector(state),
         user: state.user.user,
 
     }

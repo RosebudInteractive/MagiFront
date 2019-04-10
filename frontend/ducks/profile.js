@@ -11,6 +11,7 @@ import {
 } from "../constants/user";
 import {parseReadyDate} from "../tools/time-tools";
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
+import {SEND_PAYMENT_SUCCESS} from "ducks/billing";
 
 /**
  * Constants
@@ -41,6 +42,7 @@ export const CHANGE_PASSWORD_START = `${prefix}/CHANGE_PASSWORD_START`
 export const CHANGE_PASSWORD_SUCCESS = `${prefix}/CHANGE_PASSWORD_SUCCESS`
 export const CHANGE_PASSWORD_ERROR = `${prefix}/CHANGE_PASSWORD_ERROR`
 
+export const GET_BOOKMARKS_REQUEST = `${prefix}/GET_BOOKMARKS_REQUEST`
 export const GET_BOOKMARKS_START = `${prefix}/GET_BOOKMARKS_START`
 export const GET_BOOKMARKS_SUCCESS = `${prefix}/GET_BOOKMARKS_SUCCESS`
 export const GET_BOOKMARKS_ERROR = `${prefix}/GET_BOOKMARKS_ERROR`
@@ -323,28 +325,7 @@ export function getUserHistory() {
 }
 
 export function getUserBookmarks() {
-    return (dispatch) => {
-        dispatch({
-            type: GET_BOOKMARKS_START,
-            payload: null
-        });
-
-        fetch("/api/users/bookmark", {method: 'GET', credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                dispatch({
-                    type: GET_BOOKMARKS_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: GET_BOOKMARKS_ERROR,
-                    payload: {error}
-                });
-            });
-    }
+    return { type : GET_BOOKMARKS_REQUEST }
 }
 
 export function getUserBookmarksFull() {
@@ -786,6 +767,11 @@ function* watchGetUserProfile() {
     yield fork(getUserPaidCoursesSaga);
 }
 
+function* watchPaymentSuccess() {
+    yield fork(getUserBookmarksSaga);
+    yield fork(getUserPaidCoursesSaga);
+}
+
 /**
  * Saga workers
  */
@@ -850,6 +836,21 @@ function* getUserPaidCoursesExtSaga() {
     }
 }
 
+function* getUserBookmarksSaga() {
+    yield put({ type: GET_BOOKMARKS_START });
+
+    try {
+        let _data = yield call(_fetchBookmarks)
+
+        yield put({ type: GET_BOOKMARKS_SUCCESS, payload: _data })
+    } catch (error) {
+        yield put({
+            type: GET_BOOKMARKS_ERROR,
+            payload: {error}
+        })
+    }
+}
+
 const _fetchPaidCourses = () => {
     return fetch("/api/users/paid/courses", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
@@ -862,10 +863,18 @@ const _fetchPaidCoursesExt = () => {
         .then(parseJSON)
 }
 
+const _fetchBookmarks = () => {
+    return fetch("/api/users/bookmark", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_USER_INFO_REQUEST, watchGetUserProfile),
+        takeEvery(GET_BOOKMARKS_REQUEST, getUserBookmarksSaga),
         takeEvery(GET_USER_PAID_COURSES_REQUEST, getUserPaidCoursesSaga),
+        takeEvery(SEND_PAYMENT_SUCCESS, watchPaymentSuccess),
         takeEvery(GET_USER_PAID_COURSES_EXT_REQUEST, getUserPaidCoursesExtSaga),
     ])
 }

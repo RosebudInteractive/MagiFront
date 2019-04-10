@@ -7,6 +7,7 @@ import * as appActions from '../../actions/app-actions'
 import {Link} from 'react-router-dom';
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import {OverflowHandler, widthLessThan900} from "../../tools/page-tools";
+import {enabledPaidCoursesSelector, enabledBillingSelector} from "ducks/app";
 
 class UserBlock extends React.Component {
 
@@ -82,9 +83,14 @@ class UserBlock extends React.Component {
                 {
                     this.props.showUserBlock ?
                         <ul className="user-tooltip">
-                            <li>
-                                <Link to={'/subscription'} onClick={::this._onProfileClick}>Подписка</Link>
-                            </li>
+                            {
+                                this.props.enabledBilling ?
+                                    <li>
+                                        <Link to={'/subscription'} onClick={::this._onProfileClick}>Платежи</Link>
+                                    </li>
+                                    :
+                                    null
+                            }
                             <li>
                                 <Link to={'/profile'} onClick={::this._onProfileClick}>Настройки</Link>
                             </li>
@@ -94,9 +100,15 @@ class UserBlock extends React.Component {
                             <li>
                                 <Link to={'/history'} onClick={::this._onHistoryClick}>История</Link>
                             </li>
-                            <li>
-                                <Link to={'/purchases'} onClick={::this._onHistoryClick}>Покупки</Link>
-                            </li>
+                            {
+                                this.props.enabledPaidCourses
+                                    ?
+                                    <li>
+                                        <Link to={'/purchases'} onClick={::this._onHistoryClick}>Покупки</Link>
+                                    </li>
+                                    :
+                                    null
+                            }
                             <li>
                                 <div className="logout-btn" style={_style}
                                      onClick={::this._onLogout}>
@@ -108,7 +120,6 @@ class UserBlock extends React.Component {
                         :
                         null
                 }
-
             </div>
         )
     }
@@ -118,6 +129,8 @@ function mapStateToProps(state) {
     return {
         user: state.user.user,
         showUserBlock: state.app.showUserBlock,
+        enabledBilling: enabledBillingSelector(state),
+        enabledPaidCourses: enabledPaidCoursesSelector(state),
     }
 }
 
