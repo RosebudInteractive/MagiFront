@@ -462,6 +462,11 @@ class YandexKassa extends Payment {
                         delete paymentObject.email;
                         invoice.Items.forEach(elem => {
                             let item = {};
+                            if (elem.ExtFields && elem.ExtFields.typeExt
+                                && elem.ExtFields.typeExt.yandexKassa && elem.ExtFields.typeExt.yandexKassa.payment_subject)
+                                item.payment_subject = elem.ExtFields.typeExt.yandexKassa.payment_subject
+                            else
+                                throw new Error(`Missing field "payment_subject" for "${elem.Name}"`);
                             if (elem.ExtFields && elem.ExtFields.vat && elem.ExtFields.vat.yandexKassaCode)
                                 item.vat_code = elem.ExtFields.vat.yandexKassaCode
                             else
