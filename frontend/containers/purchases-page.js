@@ -2,9 +2,8 @@ import React from "react";
 import {pages} from "../tools/page-tools";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {
-    getUserProfileFull, loadingSelector, paidCoursesInfoSelector
-} from "ducks/profile";
+import {getUserProfileFull, loadingSelector as profileLoading, paidCoursesInfoSelector} from 'ducks/profile';
+import {enabledPaidCoursesSelector, fetchingSelector as appOptionsLoading} from 'ducks/app';
 import {setCurrentPage} from "../actions/page-header-actions";
 import {whoAmI, showSignInForm} from "../actions/user-actions";
 import {refreshState} from "../actions/lesson-info-storage-actions";
@@ -31,11 +30,11 @@ class PurchasesPage extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if ((this.props.loading) && (!nextProps.loading)) {
-            if (!nextProps.authorized) {
+            if (!nextProps.authorized || !nextProps.enabledPaidCourses) {
                 this._redirect = true;
                 this.forceUpdate();
-                if (!this.props.authorized) {
-                    this.props.userActions.showSignInForm();
+                if (!this.props.authorized && nextProps.enabledPaidCourses) {
+                    this.props.showSignInForm();
                 }
             }
         }
@@ -79,8 +78,9 @@ function mapStateToProps(state, ownProps) {
     return {
         paidCoursesInfo: paidCoursesInfoSelector(state),
         authorized: !!state.user.user,
-        loading: state.user.loading || loadingSelector(state),
+        loading: state.user.loading || profileLoading(state) || appOptionsLoading(state),
         page: ownProps.location.pathname,
+        enabledPaidCourses: enabledPaidCoursesSelector(state),
     }
 }
 

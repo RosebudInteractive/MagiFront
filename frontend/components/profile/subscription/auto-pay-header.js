@@ -1,6 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
-import {loadingSubsInfoSelector, subscriptionInfoSelector, switchAutoPay} from "../../../ducks/profile";
+import {loadingSubsInfoSelector, subscriptionInfoSelector, switchAutoPay} from "ducks/profile";
+import {enabledSubscriptionSelector} from 'ducks/app'
 import {bindActionCreators} from "redux";
 import {getDaysBetween} from "../../../tools/time-tools";
 import CardBlock from './card-block'
@@ -10,7 +11,7 @@ class AutoPayHeader extends React.Component {
     _switchAutoPay(event) {
         const data = new FormData(event.target);
         data.alter = {
-            SubsAutoPay : !this.props.info.get('SubsAutoPay')
+            SubsAutoPay: !this.props.info.get('SubsAutoPay')
         }
         this.props.switchAutoPay(data)
     }
@@ -47,15 +48,20 @@ class AutoPayHeader extends React.Component {
                 {this._getDays()}
                 <form action="#" method="post" className="subscription-form">
                     <CardBlock parent="subscription-form__card-block"/>
-                    <div className="subscription-form__actions">
-                        <div className="subscription-form__check">
-                            <input type="checkbox" id="autosubscribe" className="visually-hidden"
-                                   defaultChecked={this._checked()}
-                                   onChange={::this._switchAutoPay}/>
-                            <label htmlFor="autosubscribe"
-                                   className="subscription-form__label">Автопродление</label>
-                        </div>
-                    </div>
+                    {
+                        this.props.enabledSubscription ?
+                            <div className="subscription-form__actions">
+                                <div className="subscription-form__check">
+                                    <input type="checkbox" id="autosubscribe" className="visually-hidden"
+                                           defaultChecked={this._checked()}
+                                           onChange={::this._switchAutoPay}/>
+                                    <label htmlFor="autosubscribe"
+                                           className="subscription-form__label">Автопродление</label>
+                                </div>
+                            </div>
+                            :
+                            null
+                    }
                 </form>
             </div>
             :
@@ -67,6 +73,7 @@ function mapStateToProps(state) {
     return {
         loadingSubsInfo: loadingSubsInfoSelector(state),
         info: subscriptionInfoSelector(state),
+        enabledSubscription: enabledSubscriptionSelector(state)
     }
 }
 

@@ -117,7 +117,7 @@ exports.CacheableObject = class CacheableObject {
                 });
             }
             else
-                rc = opts.json ? JSON.parse(this._cache[id]) : this._cache[id];
+                rc = opts.json ? JSON.parse(this._cache[id] ? this._cache[id] : null) : this._cache[id];
             resolve(rc);
         });
     }

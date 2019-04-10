@@ -26,11 +26,12 @@ class PriceBlock extends React.Component {
         }
 
         let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description;
+            _hasDiscountDescr = _hasDiscount && course.Discount.Description,
+            _disabled = !course || course.IsPending
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <div className="btn btn--brown course-module__price-btn" onClick={::this._onClick}>Купить</div>
+                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")}onClick={::this._onClick}>Купить</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
@@ -64,7 +65,9 @@ class PriceBlock extends React.Component {
 
         const {course} = this.props;
 
-        this.props.getPaidCourseInfo(course.ProductId)
+        const _returnUrl = '/category/' + course.URL;
+
+        this.props.getPaidCourseInfo({productId: course.ProductId, returnUrl: _returnUrl})
         this.props.showPaymentWindow()
     }
 }

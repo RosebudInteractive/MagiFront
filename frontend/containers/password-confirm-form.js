@@ -5,7 +5,7 @@ import {Link} from 'react-router-dom';
 
 import * as userActions from '../actions/user-actions'
 import Wrapper from "../components/password-confirm/wrapper";
-import {fetchingAppIdSelector} from 'ducks/app'
+import {fetchingSelector as fetchingAppIdSelector} from 'ducks/app'
 
 class PasswordConfirmForm extends React.Component {
 

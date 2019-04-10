@@ -3,7 +3,8 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {Redirect} from 'react-router';
 
-import {userSelector, loadingSelector, errorSelector, getUserProfile} from '../ducks/profile'
+import {userSelector, loadingSelector as profileLoading, errorSelector, getUserProfile} from 'ducks/profile'
+import {enabledBillingSelector, fetchingSelector as appOptionsLoading} from 'ducks/app'
 
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as appActions from '../actions/app-actions';
@@ -39,7 +40,10 @@ class ProfilePage extends React.Component {
             if (nextProps.error === "Authorization required!") {
                 this._redirect = true;
                 this.forceUpdate();
-                this.props.userActions.showSignInForm();
+                let _needOnlyRedirect = (nextProps.page === '/subscription') && !this.props.enabledBilling
+                if (!_needOnlyRedirect) {
+                    this.props.userActions.showSignInForm();
+                }
             }
         }
 
@@ -48,7 +52,7 @@ class ProfilePage extends React.Component {
             this.forceUpdate();
         }
 
-        let _showSubscription = nextProps.page === '/subscription',
+        let _showSubscription = nextProps.page === '/subscription' && this.props.enabledBilling,
             _showHistory = nextProps.page === '/history',
             _showProfile = nextProps.page === '/profile',
             _needUpdateState = (this.state.showSubscription !== _showSubscription) ||
@@ -103,10 +107,15 @@ class ProfilePage extends React.Component {
                                     <div className="profile-block__header-col">
                                         <div className="profile-block__tab-controls">
                                             <ul>
-                                                <li className={"profile-block__tab-control" + (this.state.showSubscription ? " active" : "")}
-                                                    onClick={::this._openSubscription}>
-                                                    <span className="text">Подписка</span>
-                                                </li>
+                                                {
+                                                    this.props.enabledBilling ?
+                                                        <li className={"profile-block__tab-control" + (this.state.showSubscription ? " active" : "")}
+                                                            onClick={::this._openSubscription}>
+                                                            <span className="text">Платежи</span>
+                                                        </li>
+                                                        :
+                                                        null
+                                                }
                                                 <li className={"profile-block__tab-control" + (this.state.showHistory ? " active" : "")}
                                                     onClick={::this._openHistory}>
                                                     <span className="text">История</span>
@@ -137,11 +146,12 @@ class ProfilePage extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         profile: userSelector(state),
-        loading: loadingSelector(state),
+        loading: profileLoading(state) || appOptionsLoading(state),
         error: errorSelector(state),
         user: state.user.user,
         pageHeaderState: state.pageHeader,
         page: ownProps.match.path,
+        enabledBilling: enabledBillingSelector(state)
     }
 }
 

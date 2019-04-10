@@ -5,6 +5,9 @@ import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
+import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
+import {billingParamsSelector} from "ducks/app";
+
 /**
  * Constants
  * */
@@ -15,15 +18,22 @@ export const SHOW_BILLING_WINDOW = `${prefix}/SHOW_BILLING_WINDOW`
 export const HIDE_BILLING_WINDOW = `${prefix}/HIDE_BILLING_WINDOW`
 export const SHOW_COURSE_PAYMENT_WINDOW = `${prefix}/SHOW_COURSE_PAYMENT_WINDOW`
 export const HIDE_COURSE_PAYMENT_WINDOW = `${prefix}/HIDE_COURSE_PAYMENT_WINDOW`
-export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
+
 export const SWITCH_TO_PAYMENT = `${prefix}/SWITCH_TO_PAYMENT`
 export const SWITCH_TO_SUBSCRIPTION = `${prefix}/SWITCH_TO_SUBSCRIPTION`
+
+export const GET_SUBSCRIPTION_TYPES_REQUEST = `${prefix}/GET_SUBSCRIPTION_TYPES_REQUEST`
 export const GET_SUBSCRIPTION_TYPES_START = `${prefix}/GET_SUBSCRIPTION_TYPES_START`
 export const GET_SUBSCRIPTION_TYPES_SUCCESS = `${prefix}/GET_SUBSCRIPTION_TYPES_SUCCESS`
 export const GET_SUBSCRIPTION_TYPES_ERROR = `${prefix}/GET_SUBSCRIPTION_TYPES_ERROR`
+
 export const SET_SUBSCRIPTION_TYPE = `${prefix}/SET_SUBSCRIPTION_TYPE`
+
+export const SEND_PAYMENT_REQUEST = `${prefix}/SEND_PAYMENT_REQUEST`
+export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
+
 export const REDIRECT_COMPLETE = `${prefix}/REDIRECT_COMPLETE`
 
 export const GET_PAID_COURSE_INFO_REQUEST = `${prefix}/GET_PAID_COURSE_INFO_REQUEST`
@@ -76,11 +86,9 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_SUBSCRIPTION_TYPES_ERROR:
         case GET_PAID_COURSE_INFO_FAIL:
+        case SEND_PAYMENT_ERROR:
             return state
                 .set('fetching', false)
-                .set('error', payload.error)
-                .set('showFeedbackWindow', false)
-                .set('showFeedbackResultMessage', true)
 
         case SHOW_BILLING_WINDOW:
             return state
@@ -117,7 +125,8 @@ export default function reducer(state = new ReducerRecord(), action) {
         case SEND_PAYMENT_SUCCESS: {
             let _state = state
                 .set('fetching', false)
-                .set('showBillingWindow', false);
+                .set('showBillingWindow', false)
+                .set('showCoursePaymentWindow', false)
 
             if (payload) {
                 _state = _state
@@ -158,69 +167,15 @@ export const isRedirectUrlSelector = createSelector(redirectSelector, redirect =
  * Action Creators
  * */
 export const getSubscriptionTypes = () => {
-    return (dispatch, getState) => {
-        dispatch({
-            type: GET_SUBSCRIPTION_TYPES_START,
-            payload: null
-        });
-
-        let _state = getState().app,
-            _str = $.param(_state.billingParams),
-            _url = '/api/products' + (_str ? '?' + _str : '');
-
-        fetch(_url, {method: 'GET', credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                dispatch({
-                    type: GET_SUBSCRIPTION_TYPES_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((err) => {
-                dispatch({
-                    type: GET_SUBSCRIPTION_TYPES_ERROR,
-                    payload: err
-                });
-            });
-    }
+    return { type : GET_SUBSCRIPTION_TYPES_REQUEST }
 }
 
 export const sendPayment = (values) => {
-    return (dispatch) => {
-        dispatch({
-            type: SEND_PAYMENT_START,
-            payload: null
-        });
-
-        fetch('/api/payments', {
-            method: 'POST',
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify(values),
-            credentials: 'include',
-            redirect: 'manual'
-        })
-            .then(checkStatus)
-            .then(parseJSON)
-            .then((data) => {
-                dispatch({
-                    type: SEND_PAYMENT_SUCCESS,
-                    payload: data.confirmationUrl
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: SEND_PAYMENT_ERROR,
-                    payload: {error}
-                });
-            });
-    }
+    return {type: SEND_PAYMENT_REQUEST, payload: values}
 }
 
-export const getPaidCourseInfo = (productId) => {
-    return { type: GET_PAID_COURSE_INFO_REQUEST, payload: productId }
+export const getPaidCourseInfo = (data) => {
+    return {type: GET_PAID_COURSE_INFO_REQUEST, payload: data}
 }
 
 export const showBillingWindow = () => {
@@ -279,23 +234,28 @@ export const redirectComplete = () => {
     }
 }
 
+/**
+ * Sagas
+ */
 function* watchPaidCourseInfoSaga(data) {
     yield put({type: GET_PAID_COURSE_INFO_START})
 
     try {
-        let _data = yield call(_fetchPaidCourseInfo, data.payload);
+        let _data = yield call(_fetchPaidCourseInfo, data.payload.productId);
 
         _data = _data ? _data[0] : null;
 
         let _price = {
-                Price: _data.DPrice ? _data.DPrice : _data.Price,
-                Id : _data.Id,
-                Title: _data.Name,
-            }
+            Price: _data.DPrice ? _data.DPrice : _data.Price,
+            Id: _data.Id,
+            Title: _data.Name,
+            ReturnUrl: data.payload.returnUrl,
+        }
 
         yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
     } catch (error) {
-        yield put({type: GET_PAID_COURSE_INFO_FAIL, payload: {error}})
+        yield put({type: GET_PAID_COURSE_INFO_FAIL})
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
 
@@ -305,9 +265,61 @@ const _fetchPaidCourseInfo = (productId) => {
         .then(parseJSON)
 }
 
+function* sendPaymentSaga(data) {
+    yield put({type: SEND_PAYMENT_START});
+
+    try {
+        let _data = yield call(_fetchSendPayment, data.payload);
+
+        yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
+    } catch (error) {
+        yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
+    }
+}
+
+const _fetchSendPayment = (values) => {
+    return fetch('/api/payments', {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(values),
+        credentials: 'include',
+        redirect: 'manual'
+    })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* getSubscriptionTypesSaga() {
+    yield put({type: GET_SUBSCRIPTION_TYPES_START})
+
+    try {
+        const _billingParams = yield select(billingParamsSelector),
+            _str = $.param(_billingParams),
+            _url = '/api/products' + (_str ? '?' + _str : '');
+
+        const _data = yield call(_fetchSubscriptionTypes, _url)
+
+        yield put({ type: GET_SUBSCRIPTION_TYPES_SUCCESS, payload: _data })
+    } catch (error) {
+        yield put({type: GET_SUBSCRIPTION_TYPES_ERROR})
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
+    }
+}
+
+const _fetchSubscriptionTypes = (url) => {
+    return fetch(url, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_PAID_COURSE_INFO_REQUEST, watchPaidCourseInfoSaga),
+        takeEvery(GET_SUBSCRIPTION_TYPES_REQUEST, getSubscriptionTypesSaga),
+        takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
     ])
 }
 

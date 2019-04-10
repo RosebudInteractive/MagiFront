@@ -20,10 +20,8 @@ export const CALC_BILLING_ENABLE_REQUEST = `${prefix}/CALC_BILLING_ENABLE_REQUES
 export const DISABLE_BILLING = `${prefix}/DISABLE_BILLING`
 export const ENABLE_BILLING = `${prefix}/ENABLE_BILLING`
 
-const Mode = Record({course: false, subscription: false})
-
 const Billing = Record({
-    mode: new Mode(),
+    mode: {courses: false, subscription: false},
     billing_test: false,
     productReqParams: null,
 })
@@ -79,21 +77,23 @@ export default function reducer(state = new ReducerRecord(), action) {
  * Selectors
  * */
 export const stateSelector = state => state[moduleName]
+export const billingTestModeSelector = createSelector(stateSelector, state => state.getIn(['billing', 'billing_test']))
+export const billingParamsSelector = createSelector(stateSelector, state => state.getIn(['billing', 'productReqParams']))
 export const enabledBillingSelector = createSelector(stateSelector, state => state.enabledBilling)
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
 export const facebookAppIdSelector = createSelector(stateSelector, state => state.facebookAppID)
-export const fetchingAppIdSelector = createSelector(stateSelector, state => state.fetching)
+export const fetchingSelector = createSelector(stateSelector, state => state.fetching)
 export const enabledSubscriptionSelector = createSelector(stateSelector, (state) => {
     const _enable = state.get('enabledBilling'),
-        _subscriptionEnable = state.getIn(['billing', 'mode', 'subscription'])
+        _mode = state.getIn(['billing', 'mode'])
 
-    return _enable && _subscriptionEnable
+    return _enable && _mode.subscription
 })
 export const enabledPaidCoursesSelector = createSelector(stateSelector, (state) => {
     const _enable = state.get('enabledBilling'),
-        _paidCoursesEnable = state.getIn(['billing', 'mode', 'course'])
+        _mode = state.getIn(['billing', 'mode'])
 
-    return _enable && _paidCoursesEnable
+    return _enable && _mode.courses
 })
 
 
@@ -138,13 +138,13 @@ const fetchOptions = () => {
 export function* calcBillingEnabledSaga() {
     const state = yield select(state => state)
 
-    const enabledBilling = yield select(enabledBillingSelector)
+    const enabledBilling = yield select(enabledBillingSelector),
+        _billingTest = yield select(billingTestModeSelector)
 
     let _user = state.user.user,
-        _app = state.app,
         _enabled = false;
 
-    if (_app.billingTest) {
+    if (_billingTest) {
         _enabled = !!_user && ((_user.PData && _user.PData.isAdmin) || (_user.PData && _user.PData.roles && _user.PData.roles.billing_test))
     } else {
         _enabled = true

@@ -4229,7 +4229,8 @@ li.fancybox-thumbs-loading {
       pointer-events: none; }
       .btn--brown.disabled svg {
         fill: rgba(47, 47, 47, 0.6); }
-    .settings-block .btn--brown.disabled {
+    .settings-block .btn--brown.disabled,
+    .course-module__price-block .btn--brown.disabled {
       background-color: rgba(47, 47, 47, 0.2);
       color: #FFFFFF; }
   .btn--light {
@@ -5168,7 +5169,11 @@ ul.user-tooltip {
     border: none; }
   @media (max-width: 1023px) {
     .course-module._small .favourites {
-      top: 6px; } }
+      top: 6px;
+      left: -28px } }
+  @media (max-width: 899px) {
+    .course-module._small .favourites {
+      left: 0; } }
     @media (max-width: 639px) {
       .course-module._small {
         padding-bottom: 15px; } }
@@ -5204,9 +5209,6 @@ ul.user-tooltip {
       @media (max-width: 639px) {
         .course-module._small .course-module__title {
           letter-spacing: -0.7px; } }
-    @media (max-width: 1023px) {
-      .course-module._small .favourites {
-        left: 0; } }
   .course-module__sources {
     padding-right: 16.666666%; }
   @media (max-width: 899px) {

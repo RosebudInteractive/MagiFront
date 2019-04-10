@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {errorMessageSelector, hideFeedbackResultMessage} from "../../ducks/message";
+import {errorMessageSelector, hideFeedbackResultMessage} from "ducks/message";
 
 class FeedbackResultMessage extends React.Component {
     render() {

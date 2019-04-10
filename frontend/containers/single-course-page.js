@@ -19,12 +19,8 @@ import PropTypes from 'prop-types';
 import $ from 'jquery'
 
 import {pages, getDomain, getPageUrl, getCoverPath, ImageSize,} from '../tools/page-tools';
-import {
-    addCourseToBookmarks,
-    userBookmarksSelector,
-    removeCourseFromBookmarks
-} from "../ducks/profile";
-import {facebookAppIdSelector} from "ducks/app";
+import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
+import {enabledPaidCoursesSelector, facebookAppIdSelector} from "ducks/app";
 
 class Main extends React.Component {
     constructor(props) {
@@ -128,13 +124,15 @@ class Main extends React.Component {
             course,
             fetching,
             courseUrl,
-            notFound,
+            notFound, enabledPaidCourse
         } = this.props;
+
+        const _needHide = course && course.IsPaid && !enabledPaidCourse
 
         return fetching ?
             <LoadingFrame/>
             :
-            notFound ?
+            notFound || _needHide ?
                 <NotFoundPage/>
                 :
                 course ?
@@ -328,6 +326,7 @@ function mapStateToProps(state, ownProps) {
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
         facebookAppID: facebookAppIdSelector(state),
+        enabledPaidCourse: enabledPaidCoursesSelector(state)
     }
 }
 
