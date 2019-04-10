@@ -13,6 +13,7 @@ const API_VERSION = "/api/v3/";
 const DEFAULT_TIMEOUT = require('http').createServer().timeout; // node's default timeout
 
 class YandexKassa extends Payment {
+
     constructor(options) {
         super(options);
 
@@ -23,12 +24,15 @@ class YandexKassa extends Payment {
             (opts.apiVer ? opts.apiVer : (config.billing.yandexKassa.apiVer ? config.billing.yandexKassa.apiVer : API_VERSION));
         this._timeout = opts.timeout ? opts.timeout : DEFAULT_TIMEOUT;
 
+        if (config.has("billing.yandexKassa.chequePendingPeriod"))
+            this._chequePendingPeriod = config.billing.yandexKassa.chequePendingPeriod;
+        
         if (opts.app) {
             if (config.has("billing.yandexKassa.callBack"))
                 opts.app.post(config.billing.yandexKassa.callBack, (req, res, next) => {
                     console.log(`### YandexKassa Callback: method: "${req.method}", data: ${JSON.stringify(req.body, null, 2)}`);
                     if (req.body && req.body.object && req.body.object.metadata && req.body.object.metadata.ChequeId)
-                        this.checkAndChangeState(parseInt(req.body.object.metadata.ChequeId),
+                        this.checkAndChangeState(req.body.object.id, // parseInt(req.body.object.metadata.ChequeId),
                             { CheckueStateId: Accounting.ChequeState.Pending })
                             .then(data => {
                                 console.log(`### YandexKassa Callback: method result: ${JSON.stringify(data, null, 2)}`);
@@ -247,7 +251,7 @@ class YandexKassa extends Payment {
                         cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
-                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                        return { isError: true, operation: op, req: paymentId, result: err, cheque: { chequeState: chequeState } };
                 });
             resolve(rc);
         });
@@ -272,7 +276,7 @@ class YandexKassa extends Payment {
                         cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
-                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                        return { isError: true, operation: op, req: paymentId, result: err, cheque: { chequeState: chequeState } };
                 });
             resolve(rc);
         });
@@ -297,7 +301,7 @@ class YandexKassa extends Payment {
                         cheque.isSaved = result.id === result.payment_method.id;
                     return rc;
                 }, err => {
-                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                        return { isError: true, operation: op, req: paymentId, result: err, cheque: { chequeState: chequeState } };
                 });
             resolve(rc);
         });
@@ -320,7 +324,7 @@ class YandexKassa extends Payment {
                     }
                     return rc;
                 }, err => {
-                    return { isError: true, operation: op, req: payment, result: err, cheque: { chequeState: chequeState } };
+                        return { isError: true, operation: op, req: refundId, result: err, cheque: { chequeState: chequeState } };
                 });
             resolve(rc);
         });

@@ -52,16 +52,22 @@ const GET_CHEQUE_MYSQL =
 const DRAFT_CHEQUE_ID = "00000000-0000-0000-0000-000000000000";
 const GUID_REG_EXP = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 const PAYMENT_CACHE_PREFIX = "pay:";
-const CHEQUE_PENDING_PERIOD = 15 * 60; // cheque pending period in sec - 15 min
+const DFLT_CHEQUE_PENDING_PERIOD = 15 * 60; // cheque pending period in sec - 15 min
 
 exports.Payment = class Payment extends DbObject {
-    
+
+    get chequePendingPeriod() {
+        return this._chequePendingPeriod;
+    }
+
     constructor(options) {
         let opts = _.cloneDeep(options || {});
         opts.cache = opts.cache ? opts.cache : {};
         if (!opts.cache.prefix)
             opts.cache.prefix = PAYMENT_CACHE_PREFIX;
+
         super(opts);
+        this._chequePendingPeriod = DFLT_CHEQUE_PENDING_PERIOD;
     }
 
     _getObjById(id, expression, options) {
@@ -388,8 +394,9 @@ exports.Payment = class Payment extends DbObject {
                         Request: JSON.stringify(reqResult.req),
                         Response: JSON.stringify(reqResult.result)
                     };
-                    if (reqResult.isErr)
-                        fields.ResultCode = reqResult.statusCode ? reqResult.statusCode : HttpCode.ERR_INTERNAL;
+                    if (reqResult.isError)
+                        fields.ResultCode = reqResult.statusCode ? reqResult.statusCode :
+                            (reqResult.result && reqResult.result.statusCode ? reqResult.result.statusCode : HttpCode.ERR_INTERNAL);
                     return root_item.newObject({
                         fields: fields
                     }, dbOpts);
@@ -762,7 +769,7 @@ exports.Payment = class Payment extends DbObject {
             }
             if (currList)
                 if (Object.keys(currList).length > 0)
-                    await this.cacheSet(key, currList, { json: true, ttlInSec: CHEQUE_PENDING_PERIOD })
+                    await this.cacheSet(key, currList, { json: true, ttlInSec: this.chequePendingPeriod })
                 else
                     await this.cacheDel(key);
         }
