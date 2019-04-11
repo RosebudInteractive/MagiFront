@@ -83,12 +83,14 @@ const COURSE_UPD_TREE = {
 
 const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
 const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
@@ -1560,6 +1562,26 @@ const DbCourse = class DbCourse extends DbObject {
 
                         if (typeof (inpFields["IsPaid"]) === "boolean")
                             crs_obj.isPaid(inpFields["IsPaid"]);
+                        if (typeof (inpFields["PaidTp"]) !== "undefined")
+                            crs_obj.paidTp(inpFields["PaidTp"]);
+                        if (typeof (inpFields["PaidDate"]) !== "undefined")
+                            crs_obj.paidDate(inpFields["PaidDate"]);
+                        if (typeof (inpFields["PaidRegDate"]) !== "undefined")
+                            crs_obj.paidRegDate(inpFields["PaidRegDate"]);
+                        if (crs_obj.isPaid()) {
+                            switch (crs_obj.paidTp()) {
+                                case 1:
+                                    break;
+                                case 2:
+                                    if (!crs_obj.paidRegDate())
+                                        throw new Error(`"PaidRegDate" can't be empty.`);
+                                    break;
+                                default:
+                                    throw new Error(`Invalid "PaidTp" = ${crs_obj.paidTp()}, only (1, 2) are allowed.`);
+                            }
+                        }
+                        else
+                            crs_obj.paidTp(null);
                         if (typeof (inpFields["IsSubsFree"]) === "boolean")
                             crs_obj.isSubsFree(inpFields["IsSubsFree"]);
 
@@ -1806,6 +1828,27 @@ const DbCourse = class DbCourse extends DbObject {
                         fields["IsPaid"] = false;
                         if (inpFields["IsPaid"])
                             fields["IsPaid"] = inpFields["IsPaid"];
+                        if (typeof (inpFields["PaidTp"]) !== "undefined")
+                            fields["PaidTp"] = inpFields["PaidTp"];
+                        if (typeof (inpFields["PaidDate"]) !== "undefined")
+                            fields["PaidDate"] = inpFields["PaidDate"];
+                        if (typeof (inpFields["PaidRegDate"]) !== "undefined")
+                            fields["PaidRegDate"] = inpFields["PaidRegDate"];
+                        if (fields["IsPaid"]) {
+                            switch (fields["PaidTp"]) {
+                                case 1:
+                                    break;
+                                case 2:
+                                    if (!fields["PaidRegDate"])
+                                        throw new Error(`"PaidRegDate" can't be empty.`);
+                                    break;
+                                default:
+                                    throw new Error(`Invalid "PaidTp" = ${fields["PaidTp"]}, only (1, 2) are allowed.`);
+                            }
+                        }
+                        else
+                            delete fields["PaidTp"];
+
                         fields["IsSubsFree"] = false;
                         if (typeof (inpFields["IsSubsFree"]) === "boolean")
                             fields["IsSubsFree"] = inpFields["IsSubsFree"];

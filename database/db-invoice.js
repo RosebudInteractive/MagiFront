@@ -366,6 +366,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                         invoiceObj.sum(sum);
                                         let ext = {
                                             prodType: p.ProductTypeId,
+                                            typeExt: p.TpExt,
                                             prod: p.ExtFields,
                                             vat: p.VatExtFields
                                         };
@@ -512,6 +513,7 @@ const DbInvoice = class DbInvoice extends DbObject {
                                             invoiceObj.sum(sum);
                                             let ext = {
                                                 prodType: p.ProductTypeId,
+                                                typeExt: p.TpExt,
                                                 prod: p.ExtFields,
                                                 vat: p.VatExtFields
                                             };

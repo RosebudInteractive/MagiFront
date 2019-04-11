@@ -38,7 +38,7 @@ const GET_PROD_MSSQL =
 
 const GET_PROD_DETAIL_MSSQL =
     "select p.[Id], p.[Code], p.[Name], p.[Discontinued], p.[Picture], p.[PictureMeta], p.[Description], p.[ExtFields],\n" +
-    "  p.[ProductTypeId], pt.[Code] as [TypeCode], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
+    "  p.[ProductTypeId], pt.[Code] as [TypeCode], pt.[ExtFields] as [TpExt], p.[VATTypeId], vt.[Code] as [VatCode], pl.[Id] as [PListId],\n" +
     "  pl.[Code] as [PListCode], vt.[ExtFields] as [VtExt], vr.[ExtFields] as [VrExt], vr.[Rate], pr.[Price],\n" +
     "  pl.[CurrencyId], c.[Code] as [Currency], d.[Perc], d.[FirstDate], d.[LastDate], d.[Description] as [DDescription]\n" +
     "from[Product] p\n" +
@@ -59,7 +59,7 @@ const GET_PROD_DETAIL_MSSQL =
 
 const GET_PROD_DETAIL_MYSQL =
     "select p.`Id`, p.`Code`, p.`Name`, p.`Discontinued`, p.`Picture`, p.`PictureMeta`, p.`Description`, p.`ExtFields`,\n" +
-    "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
+    "  p.`ProductTypeId`, pt.`Code` as `TypeCode`, pt.`ExtFields` as `TpExt`, p.`VATTypeId`, vt.`Code` as `VatCode`, pl.`Id` as `PListId`,\n" +
     "  pl.`Code` as `PListCode`, vt.`ExtFields` as `VtExt`, vr.`ExtFields` as `VrExt`, vr.`Rate`, pr.`Price`,\n" +
     "  pl.`CurrencyId`, c.`Code` as `Currency`, d.`Perc`, d.`FirstDate`, d.`LastDate`, d.`Description` as `DDescription`\n" +
     "from`Product` p\n" +
@@ -223,6 +223,8 @@ const DbProduct = class DbProduct extends DbObject {
                     result.detail.forEach(elem => {
                         if (elem.ExtFields)
                             elem.ExtFields = JSON.parse(elem.ExtFields);
+                        if (elem.TpExt)
+                            elem.TpExt = JSON.parse(elem.TpExt);
                         if (elem.VtExt) {
                             let ext = JSON.parse(elem.VtExt);
                             delete elem.VtExt;
