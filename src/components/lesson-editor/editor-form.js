@@ -25,6 +25,7 @@ import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
 import {setFixedLesson,} from "adm-ducks/params";
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from "../../constants/Common";
 import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
+import SavingBlock from "../common/saving-page";
 
 const TABS = {
     MAIN: 'main',
@@ -130,9 +131,10 @@ class LessonEditorForm extends React.Component {
 
 
     render() {
-        const {hasChanges} = this.props;
+        const {hasChanges, saving} = this.props;
 
         return <div className="editor course_editor">
+            <SavingBlock visible={saving}/>
             <Prompt when={hasChanges}
                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
             <div className='editor__head'>
@@ -411,6 +413,7 @@ function mapStateToProps(state) {
 
         course: state.singleCourse.current,
         lesson: state.singleLesson.current,
+        saving: state.singleLesson.saving,
 
         ogImageId: state.singleLesson.ogImageId,
         twitterImageId: state.singleLesson.twitterImageId,

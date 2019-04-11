@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import LoadingPage from '../../components/common/loading-page'
+import SavingBlock from '../../components/common/saving-page'
 import BottomControls from '../../components/bottom-contols/buttons'
 import ErrorDialog from '../../components/dialog/error-dialog'
 import CourseCategoryDialog from "../../components/course-editor/dialogs/category-dialog";
@@ -83,13 +84,14 @@ class CourseEditor extends React.Component {
     }
 
     render() {
-        const {fetching, hasChanges, courseId} = this.props;
+        const {fetching, hasChanges, courseId, savingCourse} = this.props;
 
         return (
             fetching ?
                 <LoadingPage/>
                 :
                 <div className="editor course_editor">
+                    <SavingBlock visible={savingCourse}/>
                     <Prompt when={hasChanges}
                             message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
                     <div className='editor__head'>
@@ -202,6 +204,8 @@ class CourseEditor extends React.Component {
             IsSubsFree: subscriptionValues.IsSubsFree, // признак бесплатности в рамках подписки
             Price: _roundNum(subscriptionValues.Price), // цена
             DPrice: subscriptionValues.DPrice, // цена со скидкой
+            PaidTp: subscriptionValues.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
+            PaidRegDate: (subscriptionValues.PaidTp === 2) ? subscriptionValues.PaidRegDate : null, // платный для пользователей зарегистрировавшихся после
         };
 
         if (subscriptionValues.Perc) {
