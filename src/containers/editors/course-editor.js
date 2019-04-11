@@ -204,8 +204,8 @@ class CourseEditor extends React.Component {
             IsSubsFree: subscriptionValues.IsSubsFree, // признак бесплатности в рамках подписки
             Price: _roundNum(subscriptionValues.Price), // цена
             DPrice: subscriptionValues.DPrice, // цена со скидкой
-            PaidTp: subscriptionValues.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
-            PaidRegDate: (subscriptionValues.PaidTp === 2) ? subscriptionValues.PaidRegDate : null, // платный для пользователей зарегистрировавшихся после
+            PaidTp: +subscriptionValues.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
+            PaidRegDate: (+subscriptionValues.PaidTp === 2) ? subscriptionValues.PaidRegDate : null, // платный для пользователей зарегистрировавшихся после
         };
 
         if (subscriptionValues.Perc) {

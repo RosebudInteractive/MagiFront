@@ -9,7 +9,7 @@ import '../../common/form.sass'
 import './subcription-tab.sass'
 import {bindActionCreators} from "redux";
 import moment from 'moment'
-import {enableButtonsSelector} from "adm-ducks/app";
+import {billingModeSelector, enableButtonsSelector} from "adm-ducks/app";
 
 const NON_CONDITIONALLY = 1,
     FREE_FOR_REG_USER = 2,
@@ -46,14 +46,22 @@ class CourseSubscriptionForm extends React.Component {
                         :
                         course.Discount.LastDate
                     :
+                    '',
+                _paidRegDate = course.PaidRegDate ?
+                    typeof course.PaidRegDate === 'string' ?
+                        moment(new Date(course.PaidRegDate))
+                        :
+                        course.PaidRegDate
+                    :
                     ''
+
 
 
             this.props.initialize({
                 IsPaid: course.IsPaid,
                 PaidTp: course.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
                 // PaidDate: course.PaidDate, // платный с даты
-                PaidRegDate: course.PaidRegDate, // платный для пользователей зарегистрировавшихся после
+                PaidRegDate: _paidRegDate, // платный для пользователей зарегистрировавшихся после
                 IsSubsFree: course.IsSubsFree,
                 Price: course.Price ? course.Price : '',
                 DPrice: course.DPrice,
@@ -92,34 +100,26 @@ class CourseSubscriptionForm extends React.Component {
     }
 
     render() {
-        let {visible, isPaid, percent, enableButtons, paidTp} = this.props;
+        let {visible, isPaid, percent, enableButtons, paidTp, billingMode} = this.props;
 
         const _disabled = !enableButtons,
-            _isPaidForReg = +paidTp === FREE_FOR_REG_USER
+            _isPaidForReg = +paidTp === FREE_FOR_REG_USER,
+            _enableSubscription = !!billingMode.subscription
 
         return <div className={"form-wrapper non-webix-form" + (visible ? '' : ' hidden')}>
             <form className="controls-wrapper course-subscription-tab">
                 <Field component={CheckBox} name="IsPaid" label="Платный" disabled={_disabled}/>
-                <Field component={Select} name="PaidTp" label="Тип платности" placeholder="Выберите тип"
-                       disabled={_disabled || !isPaid} options={PAID_TYPE_OPTIONS}/>
-                <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после"
-                       hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
-                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки"
-                       disabled={_disabled}/>
-                <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену"
-                       disabled={!isPaid || _disabled}/>
-                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену"
-                       disabled={true}/>
+                <Field component={Select} name="PaidTp" label="Тип платности" placeholder="Выберите тип" disabled={_disabled || !isPaid} options={PAID_TYPE_OPTIONS}/>
+                <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после" hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
+                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки" disabled={_disabled || !_enableSubscription}/>
+                <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену" disabled={!isPaid || _disabled}/>
+                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену" disabled={true}/>
                 <div className="group-box">
                     <div className="group-box__title">Скидка</div>
-                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание"
-                           disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение"
-                           disabled={!isPaid || _disabled}/>
-                    <Field component={Datepicker} name="FirstDate" label="Начало действия"
-                           disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={Datepicker} name="LastDate" label="Окончание действия"
-                           disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание" disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid || _disabled}/>
+                    <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid || _disabled}/>
                 </div>
             </form>
         </div>
@@ -193,6 +193,7 @@ function mapStateToProps(state) {
         courseSaving: state.singleCourse.saving,
         courseError: state.singleCourse.error,
         enableButtons: enableButtonsSelector(state),
+        billingMode: billingModeSelector(state)
     }
 }
 
