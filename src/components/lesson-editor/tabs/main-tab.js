@@ -30,7 +30,7 @@ class MainTab extends React.Component {
 
     render() {
         let { lesson, fixedLessonId, fixDescription, isSublesson, enableButtons} = this.props,
-            _fixed = (lesson && (lesson.id === fixedLessonId)),
+            _fixed = (lesson && (lesson.id !== undefined) && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
 
         let _disabled = !enableButtons;

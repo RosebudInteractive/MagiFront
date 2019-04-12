@@ -30,7 +30,7 @@ class CourseEditorForm extends React.Component {
 
     _init() {
         let {course, fixedCourseId, fixDescription,} = this.props,
-            _fixed = (course && (course.id === fixedCourseId)),
+            _fixed = (course && (course.id !== undefined) && (course.id === fixedCourseId)),
             _fixDescription = _fixed ? fixDescription : ''
 
         if (course) {

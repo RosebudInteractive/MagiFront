@@ -2,12 +2,21 @@ import React from 'react'
 import {connect} from "react-redux";
 import {reduxForm, Field, formValueSelector, change as changeFieldValue} from 'redux-form'
 import {CheckBox, TextBox,} from '../../common/input-controls'
+import Select from '../../common/select-control'
 import Datepicker from '../../common/date-time-control'
 import PropTypes from 'prop-types'
 import '../../common/form.sass'
+import './subcription-tab.sass'
 import {bindActionCreators} from "redux";
 import moment from 'moment'
-import {enableButtonsSelector} from "adm-ducks/app";
+import {billingModeSelector, enableButtonsSelector} from "adm-ducks/app";
+
+const NON_CONDITIONALLY = 1,
+    FREE_FOR_REG_USER = 2,
+    PAID_TYPE_OPTIONS = [
+        {id: NON_CONDITIONALLY, value: 'Безусловно платный'},
+        {id: FREE_FOR_REG_USER, value: 'Курс с преемственностью'},
+    ]
 
 class CourseSubscriptionForm extends React.Component {
 
@@ -37,11 +46,22 @@ class CourseSubscriptionForm extends React.Component {
                         :
                         course.Discount.LastDate
                     :
+                    '',
+                _paidRegDate = course.PaidRegDate ?
+                    typeof course.PaidRegDate === 'string' ?
+                        moment(new Date(course.PaidRegDate))
+                        :
+                        course.PaidRegDate
+                    :
                     ''
+
 
 
             this.props.initialize({
                 IsPaid: course.IsPaid,
+                PaidTp: course.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
+                // PaidDate: course.PaidDate, // платный с даты
+                PaidRegDate: _paidRegDate, // платный для пользователей зарегистрировавшихся после
                 IsSubsFree: course.IsSubsFree,
                 Price: course.Price ? course.Price : '',
                 DPrice: course.DPrice,
@@ -63,37 +83,43 @@ class CourseSubscriptionForm extends React.Component {
             this._init()
         }
 
-        if ((+prevProps.percent !== +this.props.percent) || (+prevProps.price !== +this.props.price)) {
+        if (prevProps.initialized && ((+prevProps.percent !== +this.props.percent) || (+prevProps.price !== +this.props.price))) {
             let _discountPrice = (this.props.percent && $.isNumeric(this.props.percent)) ? this.props.price * (1 - this.props.percent / 100) : this.props.price;
 
             _discountPrice = Math.trunc(_discountPrice);
 
             this.props.changeFieldValue('CourseSubscriptionForm', 'DPrice', _discountPrice);
         }
+
+        if (prevProps.initialized && ((prevProps.isPaid !== this.props.isPaid) || (prevProps.paidTp !== this.props.paidTp))) {
+            if ((+this.props.paidTp === FREE_FOR_REG_USER) && !this.props.paidRegDate) {
+                const _date = moment(new Date())
+                this.props.changeFieldValue('CourseSubscriptionForm', 'PaidRegDate', _date);
+            }
+        }
     }
 
     render() {
-        let {visible, isPaid, percent, enableButtons} = this.props;
+        let {visible, isPaid, percent, enableButtons, paidTp, billingMode} = this.props;
 
-        let _disabled = !enableButtons;
+        const _disabled = !enableButtons,
+            _isPaidForReg = +paidTp === FREE_FOR_REG_USER,
+            _enableSubscription = !!billingMode.subscription
 
         return <div className={"form-wrapper non-webix-form" + (visible ? '' : ' hidden')}>
-            <form className="controls-wrapper">
+            <form className="controls-wrapper course-subscription-tab">
                 <Field component={CheckBox} name="IsPaid" label="Платный" disabled={_disabled}/>
-                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки" disabled={_disabled}/>
+                <Field component={Select} name="PaidTp" label="Тип платности" placeholder="Выберите тип" disabled={_disabled || !isPaid} options={PAID_TYPE_OPTIONS}/>
+                <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после" hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
+                <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки" disabled={_disabled || !_enableSubscription}/>
                 <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену" disabled={!isPaid || _disabled}/>
-                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену"
-                       disabled={true}/>
+                <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену" disabled={true}/>
                 <div className="group-box">
                     <div className="group-box__title">Скидка</div>
-                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание"
-                           disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение"
-                           disabled={!isPaid || _disabled}/>
-                    <Field component={Datepicker} name="FirstDate" label="Начало действия"
-                           disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={Datepicker} name="LastDate" label="Окончание действия"
-                           disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание" disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid || _disabled}/>
+                    <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid || _disabled}/>
+                    <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid || _disabled}/>
                 </div>
             </form>
         </div>
@@ -109,6 +135,12 @@ const validate = (values) => {
             errors.Price = 'Значение должно быть числовым'
         } else if (!values.Price || !+values.Price) {
             errors.Price = 'Значение не может быть пустым'
+        }
+
+        if (values.PaidTp === FREE_FOR_REG_USER) {
+            if (!values.PaidRegDate) {
+                errors.PaidRegDate = 'Значение не может быть пустым'
+            }
         }
 
         if (values.Perc) {
@@ -150,6 +182,8 @@ CourseSubscriptionWrapper = connect(state => {
         isPaid: selector(state, 'IsPaid'),
         price: selector(state, 'Price'),
         percent: selector(state, 'Perc'),
+        paidTp: selector(state, 'PaidTp'),
+        paidRegDate: selector(state, 'PaidRegDate'),
     }
 })(CourseSubscriptionWrapper)
 
@@ -159,6 +193,7 @@ function mapStateToProps(state) {
         courseSaving: state.singleCourse.saving,
         courseError: state.singleCourse.error,
         enableButtons: enableButtonsSelector(state),
+        billingMode: billingModeSelector(state)
     }
 }
 

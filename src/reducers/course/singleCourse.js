@@ -30,7 +30,8 @@ export default function singleCourse(state = initialState, action) {
             let _newObject = {
                 LanguageId: 1,
                 State: 'D',
-                Mask: '_mask01'
+                Mask: '_mask01',
+                PaidTp: 1,
             };
 
             return {
