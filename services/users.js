@@ -64,7 +64,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getExtBookmarks(req.user.Id, req.query)
+                .getExtBookmarks(req.user, req.query)
                 .then(rows => {
                     res.send(rows);
                 })
@@ -78,7 +78,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getPaidCourses(req.user.Id, false, req.query)
+                .getPaidCourses(req.user, false, req.query)
                 .then(rows => {
                     res.send(rows);
                 })
@@ -92,7 +92,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getPaidCourses(req.user.Id, true, req.query)
+                .getPaidCourses(req.user, true, req.query)
                 .then(rows => {
                     res.send(rows);
                 })
@@ -162,7 +162,7 @@ function setupUsers(app) {
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
         else
             UsersService()
-                .getHistory(req.user.Id, null, req.query)
+                .getHistory(req.user, null, req.query)
                 .then(rows => {
                     res.send(rows);
                 })

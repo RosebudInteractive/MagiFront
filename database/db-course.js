@@ -211,6 +211,7 @@ const COURSE_LESSONS_MYSQL =
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
@@ -241,6 +242,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
@@ -271,6 +273,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -344,6 +347,7 @@ const COURSE_BOOKS_MSSQL_REQ =
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -651,6 +655,7 @@ const DbCourse = class DbCourse extends DbObject {
                             let curr_course;
                             let now = new Date();
                             let baseCourseUrl;
+
                             result.detail.forEach((elem) => {
                                 if (elem.Id !== crs_id) {
                                     crs_id = elem.Id;
@@ -667,7 +672,12 @@ const DbCourse = class DbCourse extends DbObject {
                                             URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
                                             OneLesson: elem.OneLesson ? true : false,
-                                            IsPaid: elem.IsPaid ? true : false,
+                                            IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                                || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                            PaidTp: elem.PaidTp,
+                                            PaidDate: elem.PaidDate,
+                                            IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                                && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                             IsBought: elem.Counter ? true : false,
                                             IsPending: pendingCourses[elem.Id] ? true : false,
                                             IsSubsFree: elem.IsSubsFree ? true : false,
@@ -875,7 +885,12 @@ const DbCourse = class DbCourse extends DbObject {
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
                                         IsBought: elem.Counter ? true : false,
-                                        IsPaid: elem.IsPaid ? true : false,
+                                        IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                            || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                        PaidTp: elem.PaidTp,
+                                        PaidDate: elem.PaidDate,
+                                        IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                            && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                         IsPending: pendingCourses[elem.Id] ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,

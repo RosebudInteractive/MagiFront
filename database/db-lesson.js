@@ -359,6 +359,7 @@ const LESSON_IMG_META_MSSQL_REQ =
 const PARENT_MSSQL_REQ =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], l.[IsFreeInPaidCourse],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -551,6 +552,7 @@ const LESSON_IMG_META_MYSQL_REQ =
 const PARENT_MYSQL_REQ =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -1225,6 +1227,7 @@ const DbLesson = class DbLesson extends DbObject {
             AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
         let IsFreeInPaidCourse;
         let pendingCourses = {};
+        let now = new Date();
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1251,7 +1254,12 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
-                                IsPaid: elem.IsPaid ? true : false,
+                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                    || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                PaidTp: elem.PaidTp,
+                                PaidDate: elem.PaidDate,
+                                IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                    && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
                                 IsBought: elem.Counter ? true : false,
@@ -1259,7 +1267,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 URL: elem.CURL
                             };
                             await CoursesService().getCoursePrice(data.Course);
-                            showTranscript = showTranscript || (!data.Course.IsPaid) || (data.Course.IsPaid && data.Course.IsBought);
+                            showTranscript = showTranscript || (!data.Course.IsPaid)
+                                || (data.Course.IsPaid && (data.Course.IsBought || data.Course.IsGift));
                         }
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, "Can't find lesson '" + course_url + "':'" + lesson_url + "'.");
@@ -1384,6 +1393,7 @@ const DbLesson = class DbLesson extends DbObject {
         let showTranscript = AccessRights.checkPermissions(user,
             AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
         let pendingCourses = {};
+        let now = new Date();
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
@@ -1439,7 +1449,12 @@ const DbLesson = class DbLesson extends DbObject {
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
                                 URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL,
-                                IsPaid: elem.IsPaid ? true : false,
+                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                    || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                PaidTp: elem.PaidTp,
+                                PaidDate: elem.PaidDate,
+                                IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                    && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
                                 IsBought: elem.Counter ? true : false,
@@ -1447,7 +1462,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 OneLesson: elem.OneLesson ? true : false
                             };
                             await CoursesService().getCoursePrice(data.Course);
-                            showTranscript = showTranscript || (!data.Course.IsPaid) || (data.Course.IsPaid && data.Course.IsBought);
+                            showTranscript = showTranscript || (!data.Course.IsPaid)
+                                || (data.Course.IsPaid && (data.Course.IsBought || data.Course.IsGift));
                         }
                         else
                             throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find lesson "${course_url}"${isInt ? "" : " : \"" + lesson_url + "\""}.`);

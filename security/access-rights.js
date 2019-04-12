@@ -7,7 +7,8 @@ const { AccessFlags } = require('../const/common');
 
 const LESSON_FILE_MSSQL_REQ =
     "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], l.[IsFreeInPaidCourse], pc.[CourseId]\n" +
+    "  c.[IsPaid], c.[IsSubsFree], l.[IsFreeInPaidCourse], pc.[CourseId],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate]\n" +
     "from [EpisodeLng] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
@@ -17,7 +18,8 @@ const LESSON_FILE_MSSQL_REQ =
     
 const LESSON_FILE_MYSQL_REQ =
     "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, l.`IsFreeInPaidCourse`, pc.`CourseId`\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, l.`IsFreeInPaidCourse`, pc.`CourseId`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`\n" +
     "from `EpisodeLng` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `Lesson` l on l.`Id` = e.`LessonId`\n" +
@@ -40,13 +42,29 @@ exports.AccessRights = class {
                     if (result && result.detail && (result.detail.length === 1)) {
                         let now = new Date();
                         let rec = result.detail[0];
-                        let needAuth = rec.IsAuthRequired || rec.IsSubsRequired || rec.IsPaid;
+                        let IsPaid = rec.IsPaid;
+                        if (IsPaid) {
+                            switch (rec.PaidTp) {
+                                case 1:
+                                    if (rec.PaidDate && ((rec.PaidDate - now) > 0))
+                                        IsPaid = false;
+                                    break;
+                                case 2:
+                                    if (user && user.RegDate && rec.PaidRegDate
+                                        && ((rec.PaidRegDate - user.RegDate) > 0))
+                                        IsPaid = false;
+                                    break;
+                                default:
+                                    IsPaid = false;
+                            }
+                        }
+                        let needAuth = rec.IsAuthRequired || rec.IsSubsRequired || IsPaid;
                         if (needAuth) {
                             if (user) {
-                                if (rec.IsSubsRequired || rec.IsPaid) {
-                                    res = rec.IsPaid && (rec.IsFreeInPaidCourse || rec.CourseId);
+                                if (rec.IsSubsRequired || IsPaid) {
+                                    res = IsPaid && (rec.IsFreeInPaidCourse || rec.CourseId);
                                     if (!res) {
-                                        if (rec.IsSubsRequired || (rec.IsPaid && rec.IsSubsFree)) {
+                                        if (rec.IsSubsRequired || (IsPaid && rec.IsSubsFree)) {
                                             res = rec.FreeExpDate && (now <= rec.FreeExpDate);
                                             res = res || (user.SubsExpDateExt && (now <= rec.SubsExpDateExt));
                                         }
