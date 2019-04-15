@@ -14,7 +14,7 @@ class UsersRedisCache extends UsersBaseCache {
 
     _storeUser(user) {
         return ConnectionWrapper(((connection) => {
-            return connection.setAsync("uid:" + user.Id, JSON.stringify(user), "px", this._userUpdTime)
+            return connection.setAsync("uid:" + user.Id, this._serializeFn(user), "px", this._userUpdTime)
                 .then(() => {
                     return user;
                 });
@@ -24,9 +24,9 @@ class UsersRedisCache extends UsersBaseCache {
     _getUser(id) {
         return ConnectionWrapper(((connection) => {
             return connection.getAsync("uid:" + id)
-            .then((result) => {
-                return result ? JSON.parse(result) : null;
-            });
+                .then((result) => {
+                    return result ? this._deSerializeFn(result) : null;
+                });
         }).bind(this));
     }
 

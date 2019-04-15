@@ -24,9 +24,11 @@ const SubsExtPeriod = config.has("billing.subsExtPeriod") ? config.get("billing.
 const TokenExpTime = config.has("authentication.tokenExpTime") ? config.get("authentication.tokenExpTime") : TOKEN_EXP_TIME;
 const TokenUpdTime = config.has("authentication.tokenUpdTime") ? config.get("authentication.tokenUpdTime") : TOKEN_UPD_TIME;
 
-const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
+const USER_FIELDS = ["Id", "Name", "DisplayName", "Email", "PData", "RegDate", "SubsExpDate", "SubsAutoPay", "SubsAutoPayId", "SubsProductId"];
 const CONV_USER_DATA_FN = (rawUser) => {
     rawUser.SubsExpDateExt = null;
+    if (rawUser.RegDate)
+        rawUser.RegDate = new Date(rawUser.RegDate);
     if (rawUser.SubsExpDate) {
         rawUser.SubsExpDateExt = new Date(rawUser.SubsExpDate);
         if (SubsExtPeriod)
@@ -40,6 +42,21 @@ const CONV_USER_DATA_FN = (rawUser) => {
     }
     return rawUser;
 };
+
+const DESER_USER_DATA_FN = (user_data) => {
+    let user = JSON.parse(user_data);
+    if (user.SubsExpDate)
+        user.SubsExpDate = new Date(user.SubsExpDate);
+    if (user.SubsExpDateExt)
+        user.SubsExpDateExt = new Date(user.SubsExpDateExt);
+    if (user.RegDate)
+        user.RegDate = new Date(user.RegDate);
+    return user;
+}
+
+const SER_USER_DATA_FN = (user_data) => {
+    return JSON.stringify(user_data);
+}
 
 const ALLOWED_TO_EDIT = {
     "Name": true,
@@ -82,6 +99,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         return {
             Id: user.Id,
             Name: user.Name,
+            Email: user.Email,
             DisplayName: user.DisplayName,
             SubsExpDate: user.SubsExpDate,
             SubsExpDateExt: user.SubsExpDateExt ? user.SubsExpDateExt : user.SubsExpDate,
@@ -98,6 +116,8 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         this._tokenUpdTime = options.tokenUpdTime ? options.tokenUpdTime : TokenUpdTime;
         this._userUpdTime = options.userUpdTime ? options.userUpdTime : USER_UPD_TIME;
         this._convUserDataFn = typeof (options.convUserDataFn) === "function" ? options.convUserDataFn : CONV_USER_DATA_FN;
+        this._serializeFn = typeof (options.serializeFn) === "function" ? options.serializeFn : SER_USER_DATA_FN;
+        this._deSerializeFn = typeof (options.deSerializeFn) === "function" ? options.deSerializeFn : DESER_USER_DATA_FN;
         this._afterUserCreateEvent = null;
         this._sNProviders = null;
         this._roles = null;

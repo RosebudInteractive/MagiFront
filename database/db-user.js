@@ -14,6 +14,7 @@ const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
     "from[Lesson] l\n" +
@@ -42,6 +43,7 @@ const GET_HISTORY_MYSQL =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
     "from`Lesson` l\n" +
@@ -140,14 +142,23 @@ const GET_COURSE_IDS_BKM_MSSQL =
     "order by b.[Id] desc";
 
 const GET_COURSES_BY_IDS_MSSQL =
-    "select c.[Id], pc.[Counter], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[URL], cl.[Name] from [Course] c\n" +
+    "select c.[Id], pc.[Counter], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[CoverMeta], c.[Mask], c.[URL], cl.[Name]\n" +
+    "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MSSQL =
     "select [CourseId] as [Id] from [UserPaidCourse]\n" +
-    "where [UserId] = <%= userId %>";
+    "where [UserId] = <%= userId %>\n" +
+    "order by [Id] desc";
+
+const GET_GIFT_COURSES_MSSQL =
+    "select[Id] from [Course]\n" +
+    "where ([PaidTp] = 2) and ([PaidRegDate] > convert(datetime, '<%= dt %>'))\n" +
+    "order by [PaidRegDate] desc";
 
 const GET_AUTHORS_BY_COURSE_IDS_MSSQL =
     "select a.[Id], ac.[CourseId], a.[Portrait], a.[PortraitMeta], a.[URL],\n" +
@@ -236,14 +247,23 @@ const GET_COURSE_IDS_BKM_MYSQL =
     "order by b.`Id` desc";
 
 const GET_COURSES_BY_IDS_MYSQL =
-    "select c.`Id`, pc.`Counter`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name` from `Course` c\n" +
+    "select c.`Id`, pc.`Counter`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name`\n" +
+    "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MYSQL =
     "select `CourseId` as `Id` from `UserPaidCourse`\n" +
-    "where `UserId` = <%= userId %>";
+    "where `UserId` = <%= userId %>\n" +
+    "order by `Id` desc";
+
+const GET_GIFT_COURSES_MYSQL =
+    "select`Id` from `Course`\n" +
+    "where (`PaidTp` = 2) and (`PaidRegDate` > '<%= dt %>')\n" +
+    "order by `PaidRegDate` desc";
 
 const GET_AUTHORS_BY_COURSE_IDS_MYSQL =
     "select a.`Id`, ac.`CourseId`, a.`Portrait`, a.`PortraitMeta`, a.`URL`,\n" +
@@ -335,13 +355,14 @@ const DbUser = class DbUser extends DbObject {
             })
     }
 
-    getHistory(id, lessonFilter, options) {
+    getHistory(user, lessonFilter, options) {
         let positions = {};
         let lessonIds = [];
         let history = { Lessons: [], Courses: {}, Authors: {} };
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let pendingCourses = {};
+        let id = user.Id;
 
         return new Promise((resolve, reject) => {
             resolve(PositionsService().getAllLessonPositions(id));
@@ -402,7 +423,12 @@ const DbUser = class DbUser extends DbObject {
                                                 Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
-                                                IsPaid: elem.IsPaid ? true : false,
+                                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                                    || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                                PaidTp: elem.PaidTp,
+                                                PaidDate: elem.PaidDate,
+                                                IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                                    && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                                 IsBought: elem.Counter ? true : false,
                                                 IsPending: pendingCourses[elem.Id] ? true : false,
                                                 IsSubsFree: elem.IsSubsFree ? true : false,
@@ -484,28 +510,69 @@ const DbUser = class DbUser extends DbObject {
         })
     }
 
-    async getPaidCourses(userId, isDetailed, options) {
+    async getPaidCourses(user_or_id, isDetailed, options) {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
-        let data = await $data.execSql({
-            dialect: {
-                mysql: _.template(GET_PAID_COURSES_MYSQL)({ userId: userId }),
-                mssql: _.template(GET_PAID_COURSES_MSSQL)({ userId: userId })
-            }
-        }, {});
+        let userId = user_or_id;
+        let user;
+        if (typeof (user_or_id) !== "number") {
+            userId = user_or_id.Id;
+            user = user_or_id;
+        }
+
+        let getPaid = (opts.paid === true) || (opts.paid === "true") ? true : false;
+        let getGift = (opts.gift === true) || (opts.gift === "true") ? true : false;
+        if (!(getPaid || getGift))
+            getPaid = true;
+
         let courseIds = [];
         let courseList = {};
-        if (data && data.detail && (data.detail.length > 0)) {
-            data.detail.forEach(elem => {
-                courseIds.push(elem.Id);
-                courseList[elem.Id] = true;
-            })
+        let courseBoookmarkOrder = {};
+        let i = 0;
+        for (let n = 0; n < 2; n++) {
+            let dialect;
+            switch (n) {
+                case 0:
+                    if (!getPaid)
+                        continue;
+                    dialect = {
+                        mysql: _.template(GET_PAID_COURSES_MYSQL)({ userId: userId }),
+                        mssql: _.template(GET_PAID_COURSES_MSSQL)({ userId: userId })
+                    }
+                    break;
+                case 1:
+                    if (!getGift)
+                        continue;
+                    if (!user)
+                        user = await this._usersCache.getUserInfoById(user_or_id);
+                    let dt = this._dateToString(user.RegDate, true);
+                    dialect = {
+                        mysql: _.template(GET_GIFT_COURSES_MYSQL)({ dt: dt }),
+                        mssql: _.template(GET_GIFT_COURSES_MSSQL)({ dt: dt })
+                    }
+                    break;
+                default:
+                    throw new Error(`DbUser::getPaidCourses: Invalid "n" value: ${n}.`);
+            }
+            let data = await $data.execSql({
+                dialect: dialect
+            }, {});
+            if (data && data.detail && (data.detail.length > 0)) {
+                data.detail.forEach(elem => {
+                    if (!courseList[elem.Id]) {
+                        courseIds.push(elem.Id);
+                        courseList[elem.Id] = true;
+                        courseBoookmarkOrder[elem.Id] = ++i;
+                    }
+                })
+            }
         }
         let result;
         if (isDetailed && (courseIds.length > 0)) {
             result = [];
             let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-            result = await this._getCoursesByIds(userId, { Authors: {}, Categories: {}, Courses: [] }, arrayOfIds, isAbsPath);
+            result = await this._getCoursesByIds(user ? user : user_or_id, { Authors: {}, Categories: {}, Courses: [] },
+                arrayOfIds, isAbsPath, courseBoookmarkOrder);
         }
         else
             if (opts.is_list)
@@ -515,9 +582,15 @@ const DbUser = class DbUser extends DbObject {
         return result;
     }
 
-    async _getCoursesByIds(userId, data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
+    async _getCoursesByIds(user_or_id, data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
         let courseList = {};
         let pendingCourses = {};
+        let user = user_or_id;
+        let userId = user_or_id;
+        if (typeof (user_or_id) === "number")
+            user = await this._usersCache.getUserInfoById(user_or_id)
+        else
+            userId = user.Id;
 
         if (arrayOfIds.length > 0) {
             await Utils.seqExec(arrayOfIds, (elem) => {
@@ -534,6 +607,7 @@ const DbUser = class DbUser extends DbObject {
                                 if (paymentService)
                                     pendingCourses = await paymentService.getPendingObjects(userId);
                             }
+                            let now = new Date();
                             result.detail.forEach((elem) => {
                                 let course = {
                                     Id: elem.Id,
@@ -543,7 +617,12 @@ const DbUser = class DbUser extends DbObject {
                                     CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                     Mask: elem.Mask,
                                     OneLesson: elem.OneLesson ? true : false,
-                                    IsPaid: elem.IsPaid ? true : false,
+                                    IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                        || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                    PaidTp: elem.PaidTp,
+                                    PaidDate: elem.PaidDate,
+                                    IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                        && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                     IsBought: elem.Counter ? true : false,
                                     IsPending: pendingCourses[elem.Id] ? true : false,
                                     IsSubsFree: elem.IsSubsFree ? true : false,
@@ -626,7 +705,7 @@ const DbUser = class DbUser extends DbObject {
         return data;
     }
 
-    getExtBookmarks(userId, options) {
+    getExtBookmarks(user, options) {
         let courseIds = [];
         let courseList = {};
         let bookmarks = { Authors: {}, Categories: {}, LessonCourses: {}, Courses: [], Lessons: [] };
@@ -635,7 +714,8 @@ const DbUser = class DbUser extends DbObject {
         let arrayOfIds = [];
         let lessonBoookmarkOrder = {};
         let courseBoookmarkOrder = {};
-        
+        let userId = user.Id;
+
         function getLessonIdsByBookmarks() {
             return new Promise((resolve, reject) => {
                 resolve($data.execSql({
@@ -658,8 +738,8 @@ const DbUser = class DbUser extends DbObject {
                 });
         };
 
-        return new Promise((resolve, reject) => {
-            resolve(this.getHistory(userId, getLessonIdsByBookmarks, opts))
+        return new Promise(resolve => {
+            resolve(this.getHistory(user, getLessonIdsByBookmarks, opts))
         })
             .then((result) => {
                 bookmarks.Authors = result.Authors;
@@ -686,7 +766,7 @@ const DbUser = class DbUser extends DbObject {
             })
             .then(async () => {
                 arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-                await this._getCoursesByIds(userId, bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
+                await this._getCoursesByIds(user, bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
                 return bookmarks;
             });
     }

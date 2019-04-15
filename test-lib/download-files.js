@@ -70,6 +70,86 @@ function makeDir(path) {
     });
 };
 
+async function getLessonSeq(id, isOld, baseUrl, baseDir) {
+    return new Promise(resolve => {
+        try {
+            let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
+            let stTime = new Date();
+            request({ url: url, json: true }, (error, res, body) => {
+                try {
+                    if (error)
+                        throw error;
+
+                    if (res.statusCode !== 200)
+                        throw new Error(`Lesson: "${url}": HTTP StatusCode: ${res.statusCode}`);
+
+                    let rc = new Promise((resolve, reject) => {
+                        let dir_path = `${(baseDir ? baseDir : BASE_DIR)}/${id}`;
+                        fs.stat(dir_path, (err, stats) => {
+                            if (err) {
+                                if (err.code === "ENOENT")
+                                    resolve(makeDir(dir_path))
+                                else
+                                    reject(err);
+                            }
+                            else
+                                if (stats.isDirectory())
+                                    resolve(dir_path)
+                                else
+                                    reject(new Error("Path \"" + dir_path + "\" exists, but it's not a directory."));
+                        });
+                    })
+                        .then(async (dir) => {
+                            let promises = [];
+                            if (body) {
+                                if (body.assets) {
+                                    for (let i = 0; i < body.assets.length; i++){
+                                        let elem = body.assets[i];
+                                        let parsed = path.parse(elem.file);
+                                        let fileName = `${dir}/${parsed.base}`;
+                                        let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
+                                        promises.push(await getFile(fileUrl, fileName));
+                                    }
+                                }
+                                if (body.episodes) {
+                                    for (let i = 0; i < body.episodes.length; i++) {
+                                        let elem = body.episodes[i];
+                                        let parsed = path.parse(elem.audio.file);
+                                        let fileName = `${dir}/${parsed.base}`;
+                                        let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
+                                        promises.push(await getFile(fileUrl, fileName));
+                                    }
+                                }
+                            }
+                            return promises;
+                        })
+                        .then(result => {
+                            let res = { isErr: true, result: result };
+                            if (result && Array.isArray(result)) {
+                                res.isErr = false;
+                                result.forEach(elem => {
+                                    if (elem.isErr)
+                                        res.isErr = true;
+                                })
+                            }
+                            return res;
+                        })
+                        .catch(err => {
+                            return { isErr: true, result: err };
+                        });
+                    resolve(rc);
+                }
+                catch (err) {
+                    resolve({ isErr: true, result: err });
+                }
+            })
+        }
+        catch (err) {
+            resolve({ isErr: true, result: err });
+        }
+    });
+}
+
 function getLesson(id, isOld, baseUrl, baseDir) {
     return new Promise(resolve => {
         try {
@@ -207,5 +287,6 @@ function getCourse(id, isOld, baseUrl, baseDir) {
 
 exports.DownloadFiles = {
     getCourse: getCourse,
-    getLesson: getLesson
+    getLesson: getLesson,
+    getLessonSeq: getLessonSeq
 };

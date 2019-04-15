@@ -4,6 +4,7 @@ const { InvoiceService } = require('../../database/db-invoice');
 const { UsersService } = require('../../database/db-user');
 const { Accounting } = require('../../const/accounting');
 const { Product } = require('../../const/product');
+const { HttpError } = require('../../errors/http-error');
 const { HttpCode } = require("../../const/http-codes");
 const { UsersCache } = require("../../security/users-cache");
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
@@ -359,12 +360,27 @@ exports.Payment = class Payment extends DbObject {
             });
     }
 
+    async _cachePendingCheque(id, cheque, raw_data) {
+        if (raw_data && raw_data.confirmationUrl) {
+            await this.cacheSet(`cheque:${id}`, { url: raw_data.confirmationUrl },
+                { json: true, ttlInSec: this.chequePendingPeriod });
+        }
+    }
+
+    async _getPendingChequeFromCache(id) {
+        return await this.cacheGet(`cheque:${id}`, { json: true });
+    }
+
+    async _delPendingChequeFromCache(id) {
+        await this.cacheDel(`cheque:${id}`);
+    }
+
     _updateChequeState(req_result, root_obj, cheque, dbOpts, memDbOptions, invoice_data) {
         let chequeObj = cheque.chequeObj;
         let parentCheque = cheque.parentCheque;
         let invoiceData = invoice_data;
 
-        function updateState(reqResult) {
+        let updateState = async (reqResult) => {
             let dbOptsInt;
             let root_item;
             let isStateChanged = false;
@@ -373,9 +389,15 @@ exports.Payment = class Payment extends DbObject {
                     if (parentCheque)
                         return parentCheque.edit();
                 })
-                .then(() => {
+                .then(async () => {
                     isStateChanged = chequeObj.stateId() !== reqResult.cheque.chequeState;
                     chequeObj.stateId(reqResult.cheque.chequeState);
+                    if (isStateChanged && (chequeObj.chequeTypeId() === Accounting.ChequeType.Payment)) {
+                        if (chequeObj.stateId() === Accounting.ChequeState.Pending)
+                            await this._cachePendingCheque(chequeObj.id(), chequeObj, reqResult)
+                        else
+                            await this._delPendingChequeFromCache(chequeObj.id());
+                    }
                     if (parentCheque && isStateChanged && (chequeObj.stateId() === Accounting.ChequeState.Succeeded))
                         parentCheque.refundSum(parentCheque.refundSum() + chequeObj.sum());
                     if (reqResult.cheque.chequeDate)
@@ -576,7 +598,7 @@ exports.Payment = class Payment extends DbObject {
                         await getInvoiceData(currDbOpts);
                         if (invoiceData) {
                             let flag = chequeObj.stateId() === Accounting.ChequeState.Pending;
-                            await this._setPendingObjects(invoiceData, flag);
+                            await this._setPendingObjects(chequeObj, invoiceData, flag);
                         }
                     }
                 }
@@ -712,6 +734,37 @@ exports.Payment = class Payment extends DbObject {
         return userPending ? userPending : {};
     }
 
+    async _getCheckueIdOfPendingCourse(user_id, course_id) {
+        let currList = await this.getPendingObjects(user_id);
+        let crs = currList[course_id];
+        return crs && crs.chequeId ? crs.chequeId : null;
+    }
+
+    async checkPendingCourse(user_id, course_id) {
+        let result;
+        let chequeId = await this._getCheckueIdOfPendingCourse(user_id, course_id);
+        if (chequeId) {
+            await this.checkAndChangeState(chequeId, { dbOptions: { userId: user_id } });
+            let currList = await this.getPendingObjects(user_id);
+            let crs = currList[course_id];
+            if (crs && crs.chequeId) {
+                let cheque = await this._getPendingChequeFromCache(crs.chequeId);
+                result = cheque ? { confirmationUrl: cheque.url } : null;
+            }
+        }
+        if (!result) {
+            let bought = {};
+            let userService = this.getService("users", true);
+            if (userService)
+                bought = await userService.getPaidCourses(user_id, false, { is_list: true });
+            if (bought[course_id])
+                throw new HttpError(HttpCode.ERR_CONFLICT, `Course "${course_id}" has been already bought.`)
+            else
+                throw new HttpError(HttpCode.ERR_NOT_FOUND, `Pending course "${course_id}" doesn't exist.`);
+        }
+        return result;           
+    }
+
     async _preCheckInvoice(invoice_data) {
         if (invoice_data.Items && (invoice_data.Items.length > 0)) {
             let inv_courses = [];
@@ -728,7 +781,7 @@ exports.Payment = class Payment extends DbObject {
             if (inv_courses.length > 0) {
                 let pending = await this.getPendingObjects(invoice_data.UserId);
                 let bought = {};
-                    let userService = this.getService("users", true);
+                let userService = this.getService("users", true);
                 if (userService)
                     bought = await userService.getPaidCourses(invoice_data.UserId, false, { is_list: true });
                 for (let i = 0; i < inv_courses.length; i++){
@@ -742,7 +795,7 @@ exports.Payment = class Payment extends DbObject {
         }
     }
 
-    async _setPendingObjects(invoice_data, flag) {
+    async _setPendingObjects(chequeObj, invoice_data, flag) {
         let currList = null;
         let key = `crs:${invoice_data.UserId}`;
         let self = this;
@@ -755,19 +808,22 @@ exports.Payment = class Payment extends DbObject {
             return currList;
         }
 
+        let isMdf = false;
         if (invoice_data.Items && (invoice_data.Items.length > 0)) {
             for (let i = 0; i < invoice_data.Items.length; i++) {
                 let item = invoice_data.Items[i];
                 if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
                     && item.ExtFields.prod && item.ExtFields.prod.courseId) {
                     await getCurrent();
+                    let exists = currList[item.ExtFields.prod.courseId] ? true : false;
+                    isMdf = isMdf || ((!exists) && flag) || (exists && (!flag));
                     if (flag)
-                        currList[item.ExtFields.prod.courseId] = 1
+                        currList[item.ExtFields.prod.courseId] = { chequeId: chequeObj.id() }
                     else
                         delete currList[item.ExtFields.prod.courseId];
                 }
             }
-            if (currList)
+            if (isMdf)
                 if (Object.keys(currList).length > 0)
                     await this.cacheSet(key, currList, { json: true, ttlInSec: this.chequePendingPeriod })
                 else
