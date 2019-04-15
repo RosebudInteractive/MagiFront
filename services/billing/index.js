@@ -36,6 +36,20 @@ exports.SetupRoute = (app) => {
                     res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });
             });
 
+            app.get("/api/payments/pending/course/:id", (req, res, next) => {
+                if (req.user) {
+                    paymentObject.checkPendingCourse(req.user.Id, parseInt(req.params.id))
+                        .then(data => {
+                            res.send(data);
+                        })
+                        .catch(err => {
+                            next(err);
+                        });
+                }
+                else
+                    res.status(HttpCode.ERR_UNAUTH).json({ result: "ERROR", message: "Authorization required." });;
+            });
+            
             app.get('/api/payments/:id', (req, res, next) => {
                 if (req.user) {
                     paymentObject.get(req.params.id, { debug: config.billing.debug ? true : false })

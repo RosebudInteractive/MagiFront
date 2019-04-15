@@ -110,7 +110,7 @@ module.exports = {
             secretKey: "test_iQPErgDbxTKcp1f3LqzgTjjz2by-Xavob1ZRX07QQOw",
             callBack: "/api/yandex-kassa/callback",
             returnUrl: "/",
-            chequePendingPeriod: 15 * 60 // cheque pending period in sec - 15 min
+            chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
         },
         productReqParams: {
             TypeCode: "SUBS",
