@@ -7,7 +7,7 @@ import * as appActions from '../../actions/app-actions'
 import {Link} from 'react-router-dom';
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import {OverflowHandler, widthLessThan900} from "../../tools/page-tools";
-import {enabledPaidCoursesSelector, enabledBillingSelector} from "ducks/app";
+import {enabledPaidCoursesSelector,} from "ducks/app";
 
 class UserBlock extends React.Component {
 
@@ -83,19 +83,8 @@ class UserBlock extends React.Component {
                 {
                     this.props.showUserBlock ?
                         <ul className="user-tooltip">
-                            {
-                                this.props.enabledBilling ?
-                                    <li>
-                                        <Link to={'/subscription'} onClick={::this._onProfileClick}>Платежи</Link>
-                                    </li>
-                                    :
-                                    null
-                            }
                             <li>
                                 <Link to={'/profile'} onClick={::this._onProfileClick}>Настройки</Link>
-                            </li>
-                            <li>
-                                <Link to={'/favorites'} onClick={::this._onProfileClick}>Закладки</Link>
                             </li>
                             <li>
                                 <Link to={'/history'} onClick={::this._onHistoryClick}>История</Link>
@@ -104,7 +93,7 @@ class UserBlock extends React.Component {
                                 this.props.enabledPaidCourses
                                     ?
                                     <li>
-                                        <Link to={'/purchases'} onClick={::this._onHistoryClick}>Покупки</Link>
+                                        <Link to={'/purchases'} onClick={::this._onHistoryClick}>Мои покупки</Link>
                                     </li>
                                     :
                                     null
@@ -129,7 +118,6 @@ function mapStateToProps(state) {
     return {
         user: state.user.user,
         showUserBlock: state.app.showUserBlock,
-        enabledBilling: enabledBillingSelector(state),
         enabledPaidCourses: enabledPaidCoursesSelector(state),
     }
 }

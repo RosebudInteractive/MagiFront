@@ -46,6 +46,7 @@ import CoursePaymentWrapper from "./components/messages/billing/course-payment-w
 import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions} from 'ducks/app'
+import {getScrollPage} from "./tools/page-tools";
 
 Polyfill.registry();
 
@@ -142,6 +143,10 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _nextLocation;
 
         if (_isNewLocation) {
+            if (!this.state.showHeader) {
+                this.setState({showHeader: true,});
+            }
+
             this.props.appActions.hideUserBlock()
             this.props.getUserPaidCourses()
 
@@ -224,16 +229,12 @@ class App extends Component {
         if ((_newScrollTop > 0) && (this._lastScrollPos > _newScrollTop)) {
             this._lastScrollPos = _newScrollTop
             if (!this.state.showHeader) {
-                this.setState({
-                    showHeader: true,
-                });
+                this.setState({ showHeader: true, });
             }
         } else if (this._lastScrollPos < _newScrollTop) {
             this._lastScrollPos = _newScrollTop
             if (this.state.showHeader) {
-                this.setState({
-                    showHeader: false,
-                });
+                this.setState({ showHeader: false, });
             }
         }
     }

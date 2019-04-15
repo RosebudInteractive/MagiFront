@@ -13,6 +13,7 @@ import {
 import StoredCard from "./stored-card";
 import {Alfa, AutosubscribeButton, Card, Mobile, Qiwi, Sberbank, WebMoney, Yandex,} from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
+import WaitingFrame from "./waiting-frame";
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -167,6 +168,7 @@ class PaymentForm extends React.Component {
         }
 
         return <div className="billing-steps__item js-billing-step active">
+            <WaitingFrame visible={this.props.loading}/>
             <div className="modal__header">
                 {paymentType === PAYMENT_TYPE.BILLING ?
                     <React.Fragment>
@@ -184,19 +186,21 @@ class PaymentForm extends React.Component {
             <div className="modal__body payment-methods">
                 <h3 className="payment-methods__title">Выберите способ оплаты</h3>
                 <form action="#" method="post" className="payment-form">
-                    <StoredCard onChange={::this._selectPayment}
-                                checked={this.state.selectedMethod === 'stored-card'}
-                                visible={this.state.showStoredMethod}/>
-                    <ul className="payment-methods__list">
-                        <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
-                        <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yandex_money'}/>
-                        <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
-                        <Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>
-                        <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
-                        <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
-                        <Mobile onClick={::this._selectPayment}
-                                checked={this.state.selectedMethod === 'mobile_balance'}/>
-                    </ul>
+                    <div className={"payment-methods__wrapper"}>
+                        <StoredCard onChange={::this._selectPayment}
+                                    checked={this.state.selectedMethod === 'stored-card'}
+                                    visible={this.state.showStoredMethod}/>
+                        <ul className="payment-methods__list">
+                            <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
+                            <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yandex_money'}/>
+                            <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
+                            <Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>
+                            <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
+                            <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
+                            <Mobile onClick={::this._selectPayment}
+                                    checked={this.state.selectedMethod === 'mobile_balance'}/>
+                        </ul>
+                    </div>
                     <div className="payment-form__footer subscription-form js-sticky sticky">
                         <AutosubscribeButton
                             visible={this.state.showSaveMethodButton}
