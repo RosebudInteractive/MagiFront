@@ -99,6 +99,7 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         return {
             Id: user.Id,
             Name: user.Name,
+            Email: user.Email,
             DisplayName: user.DisplayName,
             SubsExpDate: user.SubsExpDate,
             SubsExpDateExt: user.SubsExpDateExt ? user.SubsExpDateExt : user.SubsExpDate,
