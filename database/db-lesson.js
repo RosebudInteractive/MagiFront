@@ -170,7 +170,8 @@ const LESSON_MSSQL_CHLD_REQ =
     "  join [Course] co on co.[Id] = l.[CourseId]\n" +
     "  join [CourseLng] clo on co.[Id] = clo.[CourseId]\n" +
     "  join [LessonCourse] lcp on lc.[ParentId] = lcp.[Id]\n" +
-    "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>";
+    "where lcp.[LessonId] = <%= id %> and lcp.[CourseId] = <%= courseId %>\n" +
+    "order by lc.[Number]";
 
 const LESSON_MYSQL_ID_REQ =
     "select l.`Id`, l.`IsFreeInPaidCourse`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL`, ll.`Name`, ll.`LanguageId`, ll.`ShortDescription`, ll.`FullDescription`, cl.`Name` as `CourseName`, c.`Id` as `CourseId`,\n" +
@@ -202,7 +203,8 @@ const LESSON_MYSQL_CHLD_REQ =
     "  join `Course` co on co.`Id` = l.`CourseId`\n" +
     "  join `CourseLng` clo on co.`Id` = clo.`CourseId`\n" +
     "  join `LessonCourse` lcp on lc.`ParentId` = lcp.`Id`\n" +
-    "where lcp.`LessonId` = <%= id %> and lcp.`CourseId` = <%= courseId %>";
+    "where lcp.`LessonId` = <%= id %> and lcp.`CourseId` = <%= courseId %>\n" +
+    "order by lc.`Number`";
 
 const LESSON_MSSQL_EPISODE_REQ =
     "select e.[Id], epl.[Name], el.[Number], epl.[State], el.[Supp] from [EpisodeLesson] el\n" +
@@ -344,7 +346,7 @@ const LESSON_MSSQL_CHILDS_REQ =
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "where (lc.[ParentId] = <%= id %>) and (lc.[State] = 'R')\n" +
-    "order by l.[Id], el.[Number]";
+    "order by lc.[Number], l.[Id], el.[Number]";
 
 const LESSON_SHARE_COUNTERS_MSSQL_REQ =
     "select sp.[Code], cs.[Counter] from [LsnShareCounter] cs\n" +
@@ -537,7 +539,7 @@ const LESSON_MYSQL_CHILDS_REQ =
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "where (lc.`ParentId` = <%= id %>) and (lc.`State` = 'R')\n" +
-    "order by l.`Id`, el.`Number`";
+    "order by lc.`Number`, l.`Id`, el.`Number`";
 
 const LESSON_SHARE_COUNTERS_MYSQL_REQ =
     "select sp.`Code`, cs.`Counter` from `LsnShareCounter` cs\n" +
