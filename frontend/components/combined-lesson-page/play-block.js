@@ -23,7 +23,7 @@ class PlayBlock extends React.Component {
     }
 
     _play(e) {
-        e.preventDefault()
+        if (e) e.preventDefault()
 
         let {lesson, courseUrl, lessonUrl} = this.props,
             _audios = Object.values(lesson.Audios);
