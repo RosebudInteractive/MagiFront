@@ -10,13 +10,14 @@ import {
 import React from "react";
 import PropTypes from "prop-types";
 import * as userActions from "../../actions/user-actions"
+import {getCrownForCourse} from "../../tools/svg-paths";
 
 class Header extends React.Component {
 
     static  propTypes = {
         title: PropTypes.string.isRequired,
         url: PropTypes.string.isRequired,
-        isPaid: PropTypes.bool,
+        course: PropTypes.object,
     };
 
     _favoritesClick() {
@@ -38,19 +39,12 @@ class Header extends React.Component {
     }
 
     render() {
-        const _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
-
         return (
             <h1 className="course-module__title">
                 <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
                 <Link to={'/category/' + this.props.url}>
                     <p className="course-module__label">
-                        {
-                            this.props.isPaid ?
-                                <svg className="course-module__label-icon" width="18" height="18" dangerouslySetInnerHTML={{__html: _crown}}/>
-                                :
-                                null
-                        }
+                        { getCrownForCourse(this.props.course) }
                         Курс:
                     </p>
                     <span>{this.props.title}</span>

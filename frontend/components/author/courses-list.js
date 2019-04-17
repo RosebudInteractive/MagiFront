@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 import PriceBlock from "../common/price-block";
+import {getCrownForCourse} from "../../tools/svg-paths";
 
 export default class Courses extends React.Component {
 
@@ -72,7 +73,7 @@ class Course extends React.Component {
         let {course} = this.props,
             _cover = getCoverPath(course, ImageSize.medium)
         const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" width="574" height="503"/>';
-        const _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
+        const _button = <PriceBlock course={course}/>
 
         return (
             <div className="course-announce">
@@ -85,13 +86,7 @@ class Course extends React.Component {
                     <h3 className="course-announce__title">
                         <Link to={'/category/' + course.URL}>
                             <span className="course-announce__label">
-                                {
-                                    course.IsPaid ?
-                                        <svg className="course-module__label-icon" width="18" height="18"
-                                             dangerouslySetInnerHTML={{__html: _crown}}/>
-                                        :
-                                        null
-                                }
+                                { getCrownForCourse(course) }
                                 {"Курс: "}
                             </span>
                             <span
@@ -106,12 +101,11 @@ class Course extends React.Component {
                             <span className="course-announce__progress-total">{'/' + course.Total}</span>
                         </div>
                         {
-                            course.IsPaid ?
-                                <PriceBlock course={course}/>
-                                :
-                                <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
-                                    Подробнее о курсе
-                                </Link>
+                            _button
+                            ||
+                            <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
+                                Подробнее о курсе
+                            </Link>
                         }
                     </div>
                 </div>

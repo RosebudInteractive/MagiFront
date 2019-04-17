@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
-import * as svg from '../../tools/svg-paths';
 import {ImageSize, getCoverPath} from '../../tools/page-tools'
 import PriceBlock from "../common/price-block";
 import {connect} from 'react-redux';
 import {userPaidCoursesSelector} from "ducks/profile";
+import {getCrownForCourse} from "../../tools/svg-paths";
 
 class Item extends React.Component {
 
@@ -16,7 +16,6 @@ class Item extends React.Component {
 
     constructor(props) {
         super(props)
-        this._priceButton = null;
     }
 
     _favoritesClick() {
@@ -40,7 +39,6 @@ class Item extends React.Component {
         });
 
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
-            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
             _image = '<image preserveAspectRatio="xMidYMid slice" xlink:href="' + _cover + '" width="563" height="514"/>';
 
         let _priceButtonHidden = !(item && item.IsPaid) || userPaidCourses.includes(item.Id)
@@ -55,13 +53,7 @@ class Item extends React.Component {
                         <Link to={'/category/' + item.URL}>
                             <span className="fav-card__title-text">
                                 <p className="label course-module__label">
-                                    {
-                                        item.IsPaid ?
-                                            <svg className="course-module__label-icon" width="18" height="18"
-                                                 dangerouslySetInnerHTML={{__html: _crown}}/>
-                                            :
-                                            null
-                                    }
+                                    { getCrownForCourse(item) }
                                     Курс:
                                 </p>
                                 <span className='title'>{item.Name}</span>

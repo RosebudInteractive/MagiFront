@@ -41,6 +41,11 @@ export const GET_PAID_COURSE_INFO_START = `${prefix}/GET_PAID_COURSE_INFO_START`
 export const GET_PAID_COURSE_INFO_SUCCESS = `${prefix}/GET_PAID_COURSE_INFO_SUCCESS`
 export const GET_PAID_COURSE_INFO_FAIL = `${prefix}/GET_PAID_COURSE_INFO_FAIL`
 
+export const GET_PENDING_COURSE_INFO_REQUEST = `${prefix}/GET_PENDING_COURSE_INFO_REQUEST`
+export const GET_PENDING_COURSE_INFO_START = `${prefix}/GET_PENDING_COURSE_INFO_START`
+export const GET_PENDING_COURSE_INFO_SUCCESS = `${prefix}/GET_PENDING_COURSE_INFO_SUCCESS`
+export const GET_PENDING_COURSE_INFO_FAIL = `${prefix}/GET_PENDING_COURSE_INFO_FAIL`
+
 export const BillingStep = {
     subscription: 'subscription',
     payment: 'payment',
@@ -69,6 +74,7 @@ export default function reducer(state = new ReducerRecord(), action) {
     switch (type) {
         case GET_SUBSCRIPTION_TYPES_START:
         case GET_PAID_COURSE_INFO_START:
+        case GET_PENDING_COURSE_INFO_START:
         case SEND_PAYMENT_START:
             return state
                 .set('error', null)
@@ -86,6 +92,8 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_SUBSCRIPTION_TYPES_ERROR:
         case GET_PAID_COURSE_INFO_FAIL:
+        case GET_PENDING_COURSE_INFO_FAIL:
+        case GET_PENDING_COURSE_INFO_SUCCESS:
         case SEND_PAYMENT_ERROR:
             return state
                 .set('fetching', false)
@@ -124,7 +132,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case SEND_PAYMENT_SUCCESS: {
             let _state = state
-                .set('fetching', false)
+                .set('fetching', !!payload)
                 .set('showBillingWindow', false)
                 .set('showCoursePaymentWindow', false)
 
@@ -176,6 +184,10 @@ export const sendPayment = (values) => {
 
 export const getPaidCourseInfo = (data) => {
     return {type: GET_PAID_COURSE_INFO_REQUEST, payload: data}
+}
+
+export const getPendingCourseInfo = (data) => {
+    return {type: GET_PENDING_COURSE_INFO_REQUEST, payload: data}
 }
 
 export const showBillingWindow = () => {
@@ -253,6 +265,7 @@ function* watchPaidCourseInfoSaga(data) {
         }
 
         yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
+        yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
     } catch (error) {
         yield put({type: GET_PAID_COURSE_INFO_FAIL})
         yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
@@ -315,11 +328,52 @@ const _fetchSubscriptionTypes = (url) => {
         .then(parseJSON)
 }
 
+function* getPendingCourseInfoSaga(data){
+    yield put({type: GET_PENDING_COURSE_INFO_START})
+
+    try {
+        let _data = yield call(_fetchPendingCourseInfo, data.payload.courseId);
+
+        if (_data && _data.confirmationUrl) {
+            yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
+        } else {
+            yield put({type: GET_PENDING_COURSE_INFO_SUCCESS})
+        }
+    } catch (error) {
+        const COURSE_IS_BOUGHT = 'Этот курс уже куплен'
+        switch (+error.status) {
+            case 404 : {
+                yield put({type: GET_PAID_COURSE_INFO_REQUEST, payload: data.payload})
+                return
+            }
+
+            case 409: {
+                yield put({type: GET_PENDING_COURSE_INFO_FAIL})
+                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: new Error(COURSE_IS_BOUGHT)})
+                return
+            }
+
+            default: {
+                yield put({type: GET_PENDING_COURSE_INFO_FAIL})
+                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
+                return
+            }
+        }
+    }
+}
+
+const _fetchPendingCourseInfo = (courseId)  => {
+    return fetch(`/api/payments/pending/course/${courseId}`, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_PAID_COURSE_INFO_REQUEST, watchPaidCourseInfoSaga),
         takeEvery(GET_SUBSCRIPTION_TYPES_REQUEST, getSubscriptionTypesSaga),
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
+        takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
     ])
 }
 

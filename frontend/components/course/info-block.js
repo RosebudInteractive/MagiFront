@@ -20,7 +20,7 @@ export default class InfoBlock extends React.Component {
         return (
             <div className='course-module__info-block'>
                 <div className="course-module__header">
-                    <Header title={title} url={url} isPaid={course && course.IsPaid}/>
+                    <Header title={title} url={url} course={course}/>
                     <Info authors={course ? course.AuthorsObj : []}
                           categories={course ? course.CategoriesObj : []}/>
                     <PriceBlock course={course}/>

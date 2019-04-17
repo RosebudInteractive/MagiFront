@@ -14,6 +14,7 @@ import StoredCard from "./stored-card";
 import {Alfa, AutosubscribeButton, Card, Mobile, Qiwi, Sberbank, WebMoney, Yandex,} from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
 import WaitingFrame from "./waiting-frame";
+import EmailField from "./email-field";
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -62,7 +63,10 @@ class PaymentForm extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yandex_money')
+        // let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yandex_money')
+
+        // Пока не показываем эту кнопку, а всегда передаем true
+        let _newShowSaveMethodButton = false
         if (prevState.showSaveMethodButton !== _newShowSaveMethodButton) {
             this.setState({showSaveMethodButton: _newShowSaveMethodButton})
         }
@@ -75,8 +79,8 @@ class PaymentForm extends React.Component {
     _handleSubmit(event) {
         event.preventDefault();
 
-        let {selectedMethod, showSaveMethodButton, savePayment,} = this.state;
-        const {selectedSubscription} = this.props;
+        let {selectedMethod,} = this.state;
+        const {selectedSubscription, user} = this.props;
 
         if (this._isSendingEnable()) {
             // const data = new FormData(event.target);
@@ -88,10 +92,12 @@ class PaymentForm extends React.Component {
             } else {
                 data.Payment = {
                     returnUrl: selectedSubscription.ReturnUrl ? selectedSubscription.ReturnUrl : window.location.pathname,
-                    save_payment_method: showSaveMethodButton ? savePayment : false,
+                    // save_payment_method: showSaveMethodButton ? savePayment : false,
+                    save_payment_method: true,
                     payment_method_data: {
                         type: this.state.selectedMethod
-                    }
+                    },
+                    email: this.email.state.value,
                 }
             }
 
@@ -156,12 +162,12 @@ class PaymentForm extends React.Component {
     }
 
     _isSendingEnable() {
-        return !!this.state.selectedMethod && !this.props.loading && !this.props.needRedirect
+        return !!this.state.selectedMethod && !this.props.loading && !this.props.needRedirect && (this.email && !this.email.state.error)
     }
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
-        let {selectedSubscription, paymentType} = this.props;
+        let {selectedSubscription, paymentType, user} = this.props;
 
         if (!selectedSubscription) {
             return null
@@ -180,7 +186,7 @@ class PaymentForm extends React.Component {
                         </button>
                     </React.Fragment>
                     :
-                    <p className="modal__headline">{"Купить курс «" + selectedSubscription.Title + "»"}</p>
+                    <p className="modal__headline">{"Купить «" + selectedSubscription.Title + "»"}</p>
                 }
             </div>
             <div className="modal__body payment-methods">
@@ -194,13 +200,14 @@ class PaymentForm extends React.Component {
                             <Card onClick={::this._selectPayment} checked={this.state.selectedMethod === 'bank_card'}/>
                             <Yandex onClick={::this._selectPayment} checked={this.state.selectedMethod === 'yandex_money'}/>
                             <Sberbank onClick={::this._selectPayment} checked={this.state.selectedMethod === 'sberbank'}/>
-                            <Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>
+                            {/*<Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>*/}
                             <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
                             <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
                             <Mobile onClick={::this._selectPayment}
                                     checked={this.state.selectedMethod === 'mobile_balance'}/>
                         </ul>
                     </div>
+                    <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
                     <div className="payment-form__footer subscription-form js-sticky sticky">
                         <AutosubscribeButton
                             visible={this.state.showSaveMethodButton}

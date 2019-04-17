@@ -22,6 +22,8 @@ import {pages, getDomain, getPageUrl, getCoverPath, ImageSize,} from '../tools/p
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
 import {enabledPaidCoursesSelector, facebookAppIdSelector} from "ducks/app";
 
+import {getCrownForCourse} from "../tools/svg-paths"
+
 class Main extends React.Component {
     constructor(props) {
         super(props);
@@ -187,21 +189,13 @@ class TitleWrapper extends React.Component {
     render() {
         let {isFavorite, onFavoritesClick, course} = this.props;
 
-        const _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
-
         return (
             <div className="course-module__title-wrapper">
                 <h1 className="course-module__title no_underline">
                     <span className={"favourites" + (isFavorite ? ' active' : '')}
                           onClick={onFavoritesClick}>В закладки</span>
                     <p className="course-module__label">
-                        {
-                            course.IsPaid ?
-                                <svg className="course-module__label-icon" width="18" height="18"
-                                     dangerouslySetInnerHTML={{__html: _crown}}/>
-                                :
-                                null
-                        }
+                        { getCrownForCourse(course) }
                         Курс:
                     </p>
                     <span>{course.Name}</span>

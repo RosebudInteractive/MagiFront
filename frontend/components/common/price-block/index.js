@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {bindActionCreators} from "redux";
-import {showCoursePaymentWindow, getPaidCourseInfo} from "ducks/billing";
+import {
+    getPaidCourseInfo,
+    getPendingCourseInfo,
+    isRedirectActiveSelector,
+    loadingSelector,
+    showCoursePaymentWindow
+} from "ducks/billing";
 import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
@@ -15,23 +21,22 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse} = this.props
+        const {course, userPaidCourses, enabledPaidCourse, loading} = this.props
 
         if (!enabledPaidCourse) {
             return null
         }
 
-        if (!(course && course.IsPaid) || userPaidCourses.includes(course.Id)) {
+        if (!(course && (course.IsPaid && !course.IsGift && !course.IsBought)) || userPaidCourses.includes(course.Id)) {
             return null
         }
 
         let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description,
-            _disabled = !course || course.IsPending
+            _hasDiscountDescr = _hasDiscount && course.Discount.Description
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")}onClick={::this._onClick}>Купить</div>
+                <div className={"btn btn--brown course-module__price-btn" + (loading ? " disabled" : "")} onClick={::this._onClick}>Купить</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
@@ -67,8 +72,12 @@ class PriceBlock extends React.Component {
 
         const _returnUrl = '/category/' + course.URL;
 
-        this.props.getPaidCourseInfo({productId: course.ProductId, returnUrl: _returnUrl})
-        this.props.showPaymentWindow()
+        if (course.IsPending) {
+            this.props.getPendingCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
+        } else {
+            this.props.getPaidCourseInfo({productId: course.ProductId, returnUrl: _returnUrl})
+        }
+
     }
 }
 
@@ -76,7 +85,8 @@ function mapStateToProps(state) {
     return {
         userPaidCourses : userPaidCoursesSelector(state),
         authorized: !!state.user.user,
-        enabledPaidCourse: enabledPaidCoursesSelector(state)
+        enabledPaidCourse: enabledPaidCoursesSelector(state),
+        loading: isRedirectActiveSelector(state) || loadingSelector(state),
     }
 }
 
@@ -84,8 +94,9 @@ function mapDispatchToProps(dispatch) {
     return {
         showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
         showSignInForm: bindActionCreators(showSignInForm, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PriceBlock);
+export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(PriceBlock);
