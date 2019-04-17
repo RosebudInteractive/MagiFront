@@ -376,6 +376,7 @@ const PARENT_MSSQL_REQ =
 const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -569,6 +570,7 @@ const PARENT_MYSQL_REQ =
 const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
