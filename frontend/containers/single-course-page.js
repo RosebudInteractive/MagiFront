@@ -5,8 +5,7 @@ import MetaTags from 'react-meta-tags';
 
 import InfoBlock from '../components/course-extended/info-block/'
 import Content from '../components/course-extended/content-extended';
-import CourseLessons from '../components/course-extended/course-lessons';
-import CourseBooks from '../components/course-extended/course-books';
+import Tabs from '../components/course-extended/tabs';
 import NotFoundPage from '../components/not-found';
 import LoadingFrame from '../components/loading-frame';
 
@@ -122,12 +121,7 @@ class Main extends React.Component {
     }
 
     render() {
-        let {
-            course,
-            fetching,
-            courseUrl,
-            notFound, enabledPaidCourse
-        } = this.props;
+        let { course, fetching, notFound, enabledPaidCourse } = this.props;
 
         const _needHide = course && course.IsPaid && !enabledPaidCourse
 
@@ -147,10 +141,10 @@ class Main extends React.Component {
                                 shareUrl={window.location.href}
                                 course={course}
                             />
-                            <CourseTabs
+                            <Tabs
                                 lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                 books={{total: course.RefBooks.length}}
-                                courseUrl={courseUrl}
+                                course={course}
                             />
                         </div>
                     ]
@@ -212,101 +206,6 @@ class Inner extends React.Component {
                 <InfoBlock/>
                 <Content shareUrl={this.props.shareUrl} counter={this.props.counter}/>
             </div>
-        )
-    }
-}
-
-const CourseTabsName = {
-    lessons: 'lesson',
-    books: 'books'
-};
-
-class CourseTabs extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            activeTab: CourseTabsName.lessons
-        }
-    }
-
-    _onSetActiveTab(tabName) {
-        if (tabName !== this.state.activeTab) {
-            this.setState({activeTab: tabName})
-        }
-    }
-
-    _getList() {
-        return (
-            this.state.activeTab === CourseTabsName.lessons ? <CourseLessons courseUrl={this.props.courseUrl}/> :
-                <CourseBooks/>
-        )
-    }
-
-    render() {
-        return (
-            <div className="course-tabs">
-                <ul className="course-tab-controls">
-                    <LessonsTab
-                        total={this.props.lessons.total}
-                        ready={this.props.lessons.ready}
-                        onClick={::this._onSetActiveTab}
-                        active={this.state.activeTab === CourseTabsName.lessons}/>
-                    <BooksTab
-                        total={this.props.books.total}
-                        onClick={::this._onSetActiveTab}
-                        active={this.state.activeTab === CourseTabsName.books}/>
-                </ul>
-                <ul className="course-tabs-list">
-                    {this._getList()}
-                </ul>
-            </div>
-        )
-    }
-}
-
-class LessonsTab extends React.Component {
-    _onClick() {
-        this.props.onClick(CourseTabsName.lessons)
-    }
-
-    render() {
-        return (
-            <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
-                <span className="course-tab-control__title">Лекции</span>
-                <span className="course-tab-control__label">Вышло</span>
-                <span className="course-tab-control__actual">{this.props.ready}</span>
-                <span className="course-tab-control__total">/{this.props.total}</span>
-            </li>
-        )
-    }
-}
-
-class BooksTab extends React.Component {
-    _onClick() {
-        if ((this.props) && (this.props.total)) {
-            this.props.onClick(CourseTabsName.books)
-        }
-    }
-
-    render() {
-        return (
-            <li className={'course-tab-control' + (this.props.active ? ' active' : '')} onClick={::this._onClick}>
-                <span className="course-tab-control__title _desktop">Список для чтения:</span>
-                <span className="course-tab-control__title _mobile">Книги</span>
-                {
-                    this.props.total ?
-                        <div>
-                            <span className="course-tab-control__actual">{this.props.total + ' '}</span>
-                            <span className="course-tab-control__label">книги</span>
-                        </div>
-                        :
-                        <div className='course-tab-control__empty-container'>
-                            <span className="course-tab-control__empty _desktop">пока пуст</span>
-                            <span className="course-tab-control__empty _mobile">0</span>
-                        </div>
-                }
-            </li>
         )
     }
 }

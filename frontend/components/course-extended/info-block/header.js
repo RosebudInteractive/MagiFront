@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Info from '../../course/course-module-info';
 import PriceBlock from "../../common/price-block";
+import GiftBlock from './gift-block'
 
 export default class Header extends React.Component {
 
@@ -16,6 +17,7 @@ export default class Header extends React.Component {
             <div className="course-module__header">
                 <Info authors={this.props.authors} categories={this.props.categories} showPhoto={true}/>
                 <PriceBlock course={this.props.course}/>
+                <GiftBlock visible={this.props.course && this.props.course.IsGift}/>
             </div>
         )
     }

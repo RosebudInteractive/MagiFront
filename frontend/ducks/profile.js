@@ -665,7 +665,7 @@ const handleHistoryData = (data) => {
 
             lesson.courseUrl = _course ? _course.URL : null;
             lesson.courseName = _course ? _course.Name : null;
-            lesson.courseIsPaid = _course ? _course.IsPaid : false;
+            lesson.courseIsPaid = _course ? (_course.IsPaid && !_course.IsGift && !_course.IsBought) : false;
 
             let _author = data.Authors[lesson.AuthorId];
 
@@ -715,7 +715,7 @@ const handleBookmarksData = (data) => {
 
             lesson.courseUrl = _course ? _course.URL : null;
             lesson.courseName = _course ? _course.Name : null;
-            lesson.courseIsPaid = _course ? _course.IsPaid : false;
+            lesson.courseIsPaid = _course ? (_course.IsPaid && !_course.IsGift && !_course.IsBought) : false;
             lesson.singleLessonInCourse = _course ? _course.OneLesson : false;
 
             let _author = data.Authors[lesson.AuthorId];

@@ -73,7 +73,7 @@ class Course extends React.Component {
         let {course} = this.props,
             _cover = getCoverPath(course, ImageSize.medium)
         const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" width="574" height="503"/>';
-        const _button = <PriceBlock course={course}/>
+        const _needShowPriceButton = course && course.IsPaid && !course.IsGift && !course.IsBought
 
         return (
             <div className="course-announce">
@@ -86,7 +86,7 @@ class Course extends React.Component {
                     <h3 className="course-announce__title">
                         <Link to={'/category/' + course.URL}>
                             <span className="course-announce__label">
-                                { getCrownForCourse(course) }
+                                {getCrownForCourse(course)}
                                 {"Курс: "}
                             </span>
                             <span
@@ -101,11 +101,12 @@ class Course extends React.Component {
                             <span className="course-announce__progress-total">{'/' + course.Total}</span>
                         </div>
                         {
-                            _button
-                            ||
-                            <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
-                                Подробнее о курсе
-                            </Link>
+                            _needShowPriceButton ?
+                                <PriceBlock course={course}/>
+                                :
+                                <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
+                                    Подробнее о курсе
+                                </Link>
                         }
                     </div>
                 </div>

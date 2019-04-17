@@ -5544,7 +5544,8 @@ ul.user-tooltip {
       @media (max-width: 639px) {
         .course-module__description-block p {
           max-width: 545px; } }
-  .course-module__price-block {
+  .course-module__price-block,
+  .course-module__gift-block {
     margin-top: -4px;
     margin-bottom: 80px;
     font-family: "Fira Sans", Arial, sans-serif; }
@@ -5662,6 +5663,15 @@ ul.user-tooltip {
     min-width: 140px;
     font-size: 17px;
     font-weight: 400; }
+  .gift-block__text {
+    max-width: 337px;
+    position: absolute;
+    font-family: "Fira Sans", Arial, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: normal;
+    color: #F79F1A; }
   .author-page .course-module__price-btn {
     min-width: 216px; }
   .bookmarks-page .course-module__price-btn {

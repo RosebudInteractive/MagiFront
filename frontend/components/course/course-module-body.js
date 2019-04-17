@@ -15,7 +15,7 @@ class CourseModuleBody extends React.Component {
         let {course, isMobile, userPaidCourses, isAdmin} = this.props;
         let _lessonsCount = course.Lessons.length;
         let _current = course.readyLessonCount,
-            _isPaidCourse = (course.IsPaid && !userPaidCourses.includes(course.Id))
+            _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought) && !userPaidCourses.includes(course.Id)
 
         return (
             <div className='course-module__body'>

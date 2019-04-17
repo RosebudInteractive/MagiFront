@@ -41,7 +41,7 @@ class Item extends React.Component {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fav"/>',
             _image = '<image preserveAspectRatio="xMidYMid slice" xlink:href="' + _cover + '" width="563" height="514"/>';
 
-        let _priceButtonHidden = !(item && item.IsPaid) || userPaidCourses.includes(item.Id)
+        let _priceButtonHidden = !(item && item.IsPaid && !item.IsGift && !item.IsBought) || userPaidCourses.includes(item.Id)
 
         return (
             <div className="fav-card">
