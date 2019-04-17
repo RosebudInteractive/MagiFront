@@ -158,11 +158,13 @@ function (_Component) {
     key: "componentDidMount",
     value: function componentDidMount() {
       window.addEventListener("popstate", this.detectPop);
+      window.addEventListener("DOMContentLoaded", this.detectPop);
     }
   }, {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
       window.removeEventListener("popstate", this.detectPop);
+      window.removeEventListener("DOMContentLoaded", this.detectPop);
     }
   }, {
     key: "shouldComponentUpdate",
@@ -184,6 +186,8 @@ function (_Component) {
         // pass page or element scroll to top
           this.props.elementID ? scrollToElement(0, this.props.elementID) : scrollTo(0); // save scroll with key location
 
+          this._pageKey = actual.key || null;
+
           if (window.$overflowHandler && window.$overflowHandler.enable) {
               this.url.set(key, window.$overflowHandler.scrollPos);
           } else {
@@ -203,14 +207,14 @@ function (_Component) {
     key: "detectPop",
     value: function detectPop(location) {
       if (!isBrowser()) return;
-      var state = location.state; // key or enter page
+      var state = location && location.state; // key or enter page
 
       var key = state ? state.key : "enter"; // get the next for scroll position
 
       var nextFind = this.url.get(key); // if find in url map => scroll to position
 
       if (nextFind) {
-        this.props.elementID ? scrollToElement(nextFind, this.props.elementID) : scrollTo(nextFind);
+        this.props.elementID ? scrollToElement(nextFind, this.props.elementID) : setTimeout(() => {scrollTo(nextFind)}, 0);
       }
     }
   }, {

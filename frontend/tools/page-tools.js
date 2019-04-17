@@ -203,7 +203,7 @@ export class OverflowHandler {
     }
 }
 
-let getScrollPage = () => {
+export const getScrollPage = () => {
     let _docScrollTop = 0;
 
     if (document.documentElement && document.documentElement !== null) {

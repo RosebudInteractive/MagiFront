@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {hideFeedbackWindow, sendFeedback} from "../../ducks/message";
+import {hideFeedbackWindow, sendFeedback, loadingSelector} from "ducks/message";
 
 class FeedbackMessageBox extends React.Component {
 
@@ -39,7 +39,7 @@ class FeedbackMessageBox extends React.Component {
     }
 
     _isSendingEnable() {
-        return (this.state.message !== '') && (this.state.sender !== '')
+        return !this.props.loading && (this.state.message !== '') && (this.state.sender !== '')
     }
 
     render() {
@@ -69,6 +69,11 @@ class FeedbackMessageBox extends React.Component {
     }
 }
 
+function mapStateToProps(state) {
+    return {
+        loading: loadingSelector(state)
+    }
+}
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -77,4 +82,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(FeedbackMessageBox);
+export default connect(mapStateToProps, mapDispatchToProps)(FeedbackMessageBox);
