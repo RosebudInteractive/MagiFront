@@ -349,7 +349,7 @@ function* getPendingCourseInfoSaga(data){
 
             case 409: {
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
-                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: new Error(COURSE_IS_BOUGHT)})
+                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : COURSE_IS_BOUGHT}})
                 return
             }
 
