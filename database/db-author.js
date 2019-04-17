@@ -47,6 +47,7 @@ const AUTHOR_MSSQL_PUB_WHERE_ID = "where a.[Id] = <%= authorId %>";
 const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], pc.[Counter],\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
@@ -58,6 +59,7 @@ const AUTHOR_MSSQL_CL_PUB_REQ =
     "  join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "where(l.[AuthorId] = <%= authorId %>) and(lc.[State] = 'R')\n" +
     "order by c.[Id], lc.[ParentId], lc.[Number], el.[Number]";
 
@@ -110,6 +112,7 @@ const AUTHOR_MYSQL_PUB_WHERE_ID = "where a.`Id` = <%= authorId %>";
 const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, pc.`Counter`,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
@@ -121,6 +124,7 @@ const AUTHOR_MYSQL_CL_PUB_REQ =
     "  join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where(l.`AuthorId` = <%= authorId %>) and(lc.`State` = 'R')\n" +
     "order by c.`Id`, lc.`ParentId`, lc.`Number`, el.`Number`";
 
@@ -285,7 +289,7 @@ const DbAuthor = class DbAuthor extends DbObject {
             });
     }
 
-    getPublic(url, options) {
+    getPublic(url, user, options) {
         let author = {};
         let lsn_list = {};
         let lc_list = {};
@@ -293,6 +297,8 @@ const DbAuthor = class DbAuthor extends DbObject {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let paidCourses = [];
+        let userId = user ? user.Id : 0;
+        let pendingCourses = {};
 
         return new Promise(resolve => {
 
@@ -334,8 +340,8 @@ const DbAuthor = class DbAuthor extends DbObject {
 
                             return $data.execSql({
                                 dialect: {
-                                    mysql: _.template(AUTHOR_MYSQL_CL_PUB_REQ)({ authorId: author.Id }),
-                                    mssql: _.template(AUTHOR_MSSQL_CL_PUB_REQ)({ authorId: author.Id })
+                                    mysql: _.template(AUTHOR_MYSQL_CL_PUB_REQ)({ authorId: author.Id, user_id: userId }),
+                                    mssql: _.template(AUTHOR_MSSQL_CL_PUB_REQ)({ authorId: author.Id, user_id: userId })
                                 }
                             }, {})
                         }
@@ -349,6 +355,11 @@ const DbAuthor = class DbAuthor extends DbObject {
                             let course = null;
                             let now = new Date();
                             let courseUrl;
+                            if (userId) {
+                                let paymentService = this.getService("payments", true);
+                                if (paymentService)
+                                    pendingCourses = await paymentService.getPendingObjects(userId);
+                            }
                             result.detail.forEach((elem) => {
                                 if (courseId !== elem.Id) {
                                     courseId = elem.Id;
@@ -364,7 +375,13 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
-                                        IsPaid: elem.IsPaid ? true : false,
+                                        IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                            || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                                        PaidTp: elem.PaidTp,
+                                        PaidDate: elem.PaidDate,
+                                        IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                                            && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
+                                        IsBought: elem.Counter ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,
                                         Price: 0,
