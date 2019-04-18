@@ -45,8 +45,7 @@ import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import {getAppOptions} from 'ducks/app'
-import {getScrollPage} from "./tools/page-tools";
+import {getAppOptions,} from 'ducks/app'
 
 Polyfill.registry();
 
@@ -172,8 +171,6 @@ class App extends Component {
         if ((this.props.location.search !== '?play') && (nextProps.location.search === '?play')) {
             scroll()
         }
-
-
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -241,7 +238,7 @@ class App extends Component {
 
     _getMainDiv() {
         return (
-            <Switch>
+            <Switch >
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route exact path={_homePath + 'razdel/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>

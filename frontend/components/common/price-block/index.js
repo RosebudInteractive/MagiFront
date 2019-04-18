@@ -6,7 +6,8 @@ import {
     getPendingCourseInfo,
     isRedirectActiveSelector,
     loadingSelector,
-    showCoursePaymentWindow
+    loadingCourseIdSelector,
+    showCoursePaymentWindow,
 } from "ducks/billing";
 import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -21,7 +22,7 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading} = this.props
+        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -32,11 +33,12 @@ class PriceBlock extends React.Component {
         }
 
         let _hasDiscount = course.DPrice && course.Discount && course.Discount.Perc,
-            _hasDiscountDescr = _hasDiscount && course.Discount.Description
+            _hasDiscountDescr = _hasDiscount && course.Discount.Description,
+            _disabled = loading && (loadingCourseId === course.Id)
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <div className={"btn btn--brown course-module__price-btn" + (loading ? " disabled" : "")} onClick={::this._onClick}>Купить</div>
+                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>Купить</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
@@ -75,7 +77,7 @@ class PriceBlock extends React.Component {
         if (course.IsPending) {
             this.props.getPendingCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
         } else {
-            this.props.getPaidCourseInfo({productId: course.ProductId, returnUrl: _returnUrl})
+            this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
         }
 
     }
@@ -87,6 +89,7 @@ function mapStateToProps(state) {
         authorized: !!state.user.user,
         enabledPaidCourse: enabledPaidCoursesSelector(state),
         loading: isRedirectActiveSelector(state) || loadingSelector(state),
+        loadingCourseId: loadingCourseIdSelector(state)
     }
 }
 

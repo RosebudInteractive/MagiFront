@@ -20,6 +20,12 @@ export const CALC_BILLING_ENABLE_REQUEST = `${prefix}/CALC_BILLING_ENABLE_REQUES
 export const DISABLE_BILLING = `${prefix}/DISABLE_BILLING`
 export const ENABLE_BILLING = `${prefix}/ENABLE_BILLING`
 
+
+export const SET_CURRENT_PAGE = `${prefix}/SET_CURRENT_PAGE`
+export const RELOAD_CURRENT_PAGE_REQUEST = `${prefix}/RELOAD_CURRENT_PAGE_REQUEST`
+export const RELOAD_CURRENT_PAGE_START = `${prefix}/RELOAD_CURRENT_PAGE_START`
+export const RELOAD_CURRENT_PAGE_SUCCESS = `${prefix}/RELOAD_CURRENT_PAGE_SUCCESS`
+
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
@@ -34,6 +40,7 @@ export const ReducerRecord = Record({
     reCapture: '',
     enabledBilling: false,
     fetching: false,
+    currentPageRef: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -68,6 +75,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('enabledBilling', false)
 
+        case SET_CURRENT_PAGE:
+            return state
+                .set('currentPageRef', payload)
+
         default:
             return state
     }
@@ -96,6 +107,8 @@ export const enabledPaidCoursesSelector = createSelector(stateSelector, (state) 
     return _enable && _mode.courses
 })
 
+const currentPageRefSelector = createSelector(stateSelector, state => state.currentPageRef)
+
 
 /**
  * Action Creators
@@ -106,6 +119,18 @@ export const getAppOptions = () => {
 
 export const calcBillingEnable = () => {
     return {type: CALC_BILLING_ENABLE_REQUEST}
+}
+
+export const setCurrentPage = (instance) => {
+    return {type: SET_CURRENT_PAGE, payload: instance}
+}
+
+export const clearCurrentPage = () => {
+    return {type: SET_CURRENT_PAGE, payload: null}
+}
+
+export const reloadCurrentPage = () => {
+    return {type: RELOAD_CURRENT_PAGE_REQUEST}
 }
 
 
@@ -159,9 +184,21 @@ export function* calcBillingEnabledSaga() {
     }
 }
 
+function* reloadCurrentPageSaga() {
+    const _ref = yield select(currentPageRefSelector)
+
+    if (_ref && (typeof _ref === 'object') && _ref.reload) {
+        yield put({type: RELOAD_CURRENT_PAGE_START})
+        _ref.reload()
+
+        yield put({type: RELOAD_CURRENT_PAGE_SUCCESS})
+    }
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_OPTIONS_REQUEST, getOptionsSaga),
         takeEvery(CALC_BILLING_ENABLE_REQUEST, calcBillingEnabledSaga),
+        takeEvery(RELOAD_CURRENT_PAGE_REQUEST, reloadCurrentPageSaga),
     ])
 }

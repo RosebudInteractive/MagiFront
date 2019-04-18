@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux';
 import MetaTags from 'react-meta-tags';
 
 import {authorSelector, loadingSelector, notFoundSelector, getAuthor} from 'ducks/author'
-import {facebookAppIdSelector} from 'ducks/app'
+import {facebookAppIdSelector, setCurrentPage, clearCurrentPage} from 'ducks/app'
 import AuthorBlock from '../components/author/author-block';
 import CoursesBlock from '../components/author/courses-and-lessons';
 import NotFoundPage from '../components/not-found'
@@ -28,6 +28,10 @@ class AuthorPage extends React.Component {
         this.props.pageHeaderActions.setCurrentPage(pages.author);
     }
 
+    componentDidMount() {
+        this.props.setCurrentPage(this);
+    }
+
     componentDidUpdate() {
         if (this.props.author) {
             document.title = 'Автор : ' + this.props.author.FirstName + ' ' + this.props.author.LastName;
@@ -36,6 +40,12 @@ class AuthorPage extends React.Component {
 
     componentWillUnmount() {
         this._removeMetaTags();
+        this.props.clearCurrentPage()
+    }
+
+    reload() {
+        this.props.storageActions.refreshState();
+        this.props.getAuthor(this.props.authorUrl);
     }
 
     _getMetaTags() {
@@ -135,6 +145,8 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
         getAuthor: bindActionCreators(getAuthor, dispatch),
+        setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
+        clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
     }
 }
 

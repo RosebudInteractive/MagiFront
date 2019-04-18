@@ -28,7 +28,7 @@ import {isLandscape as isDesktopInLandscape} from '../components/combined-lesson
 import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
-import {facebookAppIdSelector} from "ducks/app";
+import {facebookAppIdSelector, setCurrentPage, clearCurrentPage,} from "ducks/app";
 
 let _scrollTop = 0;
 
@@ -173,6 +173,7 @@ class CombineLessonPage extends React.Component {
         $('body').addClass('_player');
         $('[data-fancybox]').fancybox();
         this._handleScroll();
+        this.props.setCurrentPage(this)
     }
 
     componentWillUnmount() {
@@ -180,6 +181,7 @@ class CombineLessonPage extends React.Component {
         this.props.lessonActions.clearLesson();
         this.props.playerStartActions.cancelStarting(this._getLesson().Id);
         this._removeMetaTags();
+        this.props.clearCurrentPage();
     }
 
     componentDidUpdate(prevProps) {
@@ -223,6 +225,16 @@ class CombineLessonPage extends React.Component {
         if ((!prevProps.playingLesson && this.props.playingLesson) || (prevProps.playingLesson && this.props.playingLesson && prevProps.playingLesson.LessonId !== this.props.playingLesson.LessonId)) {
             scroll()
         }
+    }
+
+    reload() {
+        let {courseUrl, lessonUrl} = this.props;
+
+        this.props.storageActions.refreshState();
+
+        this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
+        this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
     }
 
     _getLessonInfoByUrl(info, courseUrl, lessonUrl) {
@@ -588,6 +600,8 @@ function mapDispatchToProps(dispatch) {
         storageActions: bindActionCreators(storageActions, dispatch),
         appActions: bindActionCreators(appActions, dispatch),
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
+        setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
+        clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
     }
 }
 

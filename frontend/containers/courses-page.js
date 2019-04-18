@@ -17,9 +17,10 @@ import {
     loadingSelector,
     selectedFilterSelector,
     applyExternalFilter
-} from "../ducks/filters";
+} from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
+import {setCurrentPage, clearCurrentPage,} from "ducks/app";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -37,6 +38,12 @@ class CoursesPage extends React.Component {
 
     componentDidMount() {
         document.title = 'Магистерия'
+        this.props.setCurrentPage(this);
+    }
+
+    reload() {
+        this.props.coursesActions.getCourses();
+        this.props.storageActions.refreshState();
     }
 
     componentDidUpdate(prevProps) {
@@ -57,6 +64,10 @@ class CoursesPage extends React.Component {
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
             this.props.history.replace('/razdel/' + _filter.join('+'))
         }
+    }
+
+    componentWillUnmount() {
+        this.props.clearCurrentPage();
     }
 
     _getCoursesBundles() {
@@ -150,7 +161,9 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
         applyExternalFilter: bindActionCreators(applyExternalFilter, dispatch),
+        setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
+        clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);
+export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(CoursesPage);

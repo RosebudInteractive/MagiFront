@@ -19,7 +19,7 @@ import $ from 'jquery'
 
 import {pages, getDomain, getPageUrl, getCoverPath, ImageSize,} from '../tools/page-tools';
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
-import {enabledPaidCoursesSelector, facebookAppIdSelector} from "ducks/app";
+import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
 
 import {getCrownForCourse} from "../tools/svg-paths"
 
@@ -41,8 +41,18 @@ class Main extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.props.setCurrentPage(this);
+    }
+
+    reload() {
+        this.props.storageActions.refreshState();
+        this.props.coursesActions.getCourse(this.props.courseUrl);
+    }
+
     componentWillUnmount() {
         this._removeMetaTags();
+        this.props.clearCurrentPage();
     }
 
     _favoritesClick() {
@@ -231,6 +241,8 @@ function mapDispatchToProps(dispatch) {
         userActions: bindActionCreators(userActions, dispatch),
         addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
+        setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
+        clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
     }
 }
 

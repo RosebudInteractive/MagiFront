@@ -6,7 +6,7 @@ import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
-import {billingParamsSelector} from "ducks/app";
+import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST} from "ducks/app";
 
 /**
  * Constants
@@ -65,7 +65,8 @@ export const ReducerRecord = Record({
     fetching: false,
     processing: false,
     redirect: new Redirect(),
-    error: null
+    error: null,
+    fetchingCourseId: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -73,12 +74,18 @@ export default function reducer(state = new ReducerRecord(), action) {
 
     switch (type) {
         case GET_SUBSCRIPTION_TYPES_START:
-        case GET_PAID_COURSE_INFO_START:
-        case GET_PENDING_COURSE_INFO_START:
         case SEND_PAYMENT_START:
             return state
                 .set('error', null)
                 .set('fetching', true)
+                .set('fetchingCourseId', null)
+
+        case GET_PAID_COURSE_INFO_START:
+        case GET_PENDING_COURSE_INFO_START:
+            return state
+                .set('error', null)
+                .set('fetching', true)
+                .set('fetchingCourseId', payload)
 
         case GET_SUBSCRIPTION_TYPES_SUCCESS:
             return state
@@ -165,6 +172,7 @@ export const showCoursePaymentWindowSelector = createSelector(stateSelector, sta
 export const billingStepSelector = createSelector(stateSelector, state => state.step)
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
+export const loadingCourseIdSelector = createSelector(stateSelector, state => state.fetchingCourseId)
 export const typesSelector = createSelector(stateSelector, state => state.types)
 export const selectedTypeSelector = createSelector(stateSelector, state => state.selectedType)
 export const redirectSelector = createSelector(stateSelector, state => state.redirect)
@@ -250,7 +258,7 @@ export const redirectComplete = () => {
  * Sagas
  */
 function* watchPaidCourseInfoSaga(data) {
-    yield put({type: GET_PAID_COURSE_INFO_START})
+    yield put({type: GET_PAID_COURSE_INFO_START, payload: data.payload.courseId})
 
     try {
         let _data = yield call(_fetchPaidCourseInfo, data.payload.productId);
@@ -268,6 +276,8 @@ function* watchPaidCourseInfoSaga(data) {
         yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
     } catch (error) {
         yield put({type: GET_PAID_COURSE_INFO_FAIL})
+        yield put({type: HIDE_BILLING_WINDOW});
+        yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
         yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
@@ -287,6 +297,8 @@ function* sendPaymentSaga(data) {
         yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
     } catch (error) {
         yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
+        yield put({type: HIDE_BILLING_WINDOW});
+        yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
         yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
@@ -318,6 +330,8 @@ function* getSubscriptionTypesSaga() {
         yield put({ type: GET_SUBSCRIPTION_TYPES_SUCCESS, payload: _data })
     } catch (error) {
         yield put({type: GET_SUBSCRIPTION_TYPES_ERROR})
+        yield put({type: HIDE_BILLING_WINDOW});
+        yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
         yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
@@ -340,7 +354,7 @@ function* getPendingCourseInfoSaga(data){
             yield put({type: GET_PENDING_COURSE_INFO_SUCCESS})
         }
     } catch (error) {
-        const COURSE_IS_BOUGHT = 'Этот курс уже куплен'
+        const COURSE_IS_BOUGHT = 'Этот курс Вами уже куплен'
         switch (+error.status) {
             case 404 : {
                 yield put({type: GET_PAID_COURSE_INFO_REQUEST, payload: data.payload})
@@ -349,12 +363,17 @@ function* getPendingCourseInfoSaga(data){
 
             case 409: {
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
-                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : COURSE_IS_BOUGHT}})
+                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : new Error(COURSE_IS_BOUGHT)}})
+                yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
                 return
             }
 
             default: {
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
+                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
                 yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
                 return
             }

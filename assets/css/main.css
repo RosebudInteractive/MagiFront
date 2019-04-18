@@ -19333,9 +19333,9 @@ ul.lectures-tab {
   font-family: "Fira Sans", Arial, sans-serif;
   font-size: 14px;
   line-height: 18px; }
-  @media (max-width: 767px) {
+  @media (max-width: 899px) {
     .payment-form__label {
-      margin-top: -4px; } }
+      margin-top: 20px; } }
   .payment-form__label .total {
     margin-left: 3px;
     font-size: 28px;
@@ -19457,6 +19457,9 @@ ul.lectures-tab {
   font-size: 16px;
   -webkit-box-shadow: 0 5px 16px rgba(200, 104, 76, 0.2);
   box-shadow: 0 5px 16px rgba(200, 104, 76, 0.2); }
+  @media (max-width: 899px) {
+    .payment-form__submit {
+      padding-top: 20px } }
   @media (max-width: 767px) {
     .payment-form__submit {
       padding: 12px;
@@ -19655,6 +19658,15 @@ ul.lectures-tab {
       margin-right: auto;
       padding-bottom: 0;
       width: auto; }
+    @media (max-width: 899px) {
+      ._billing .subscription-form__check {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding-left: 0; } }
+    @media (max-width: 767px) {
+      ._billing .subscription-form__check {
+        padding-left: 20px; } }
   .subscription-form__actions {
     display: -webkit-box;
     display: -webkit-flex;

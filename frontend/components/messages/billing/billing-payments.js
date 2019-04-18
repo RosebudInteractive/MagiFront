@@ -38,7 +38,7 @@ class PaymentForm extends React.Component {
             selectedMethod: null,
             showStoredMethod: false,
             showSaveMethodButton: false,
-            savePayment: true,
+            savePayment: false,
         };
     }
 
@@ -63,10 +63,10 @@ class PaymentForm extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yandex_money')
+        let _newShowSaveMethodButton = (this.state.selectedMethod === 'bank_card') || (this.state.selectedMethod === 'yandex_money')
 
         // Пока не показываем эту кнопку, а всегда передаем true
-        let _newShowSaveMethodButton = false
+        // let _newShowSaveMethodButton = false
         if (prevState.showSaveMethodButton !== _newShowSaveMethodButton) {
             this.setState({showSaveMethodButton: _newShowSaveMethodButton})
         }
@@ -79,8 +79,8 @@ class PaymentForm extends React.Component {
     _handleSubmit(event) {
         event.preventDefault();
 
-        let {selectedMethod,} = this.state;
-        const {selectedSubscription, user} = this.props;
+        let {selectedMethod, showSaveMethodButton, savePayment} = this.state;
+        const {selectedSubscription,} = this.props;
 
         if (this._isSendingEnable()) {
             // const data = new FormData(event.target);
@@ -92,8 +92,7 @@ class PaymentForm extends React.Component {
             } else {
                 data.Payment = {
                     returnUrl: selectedSubscription.ReturnUrl ? selectedSubscription.ReturnUrl : window.location.pathname,
-                    // save_payment_method: showSaveMethodButton ? savePayment : false,
-                    save_payment_method: true,
+                    save_payment_method: showSaveMethodButton ? savePayment : false,
                     payment_method_data: {
                         type: this.state.selectedMethod
                     },
