@@ -14,6 +14,7 @@ const { AccessRights } = require('../security/access-rights');
 const { truncateHtml } = require('../utils');
 
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
+const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
 const {
     ACCOUNT_ID,
@@ -1232,6 +1233,8 @@ const DbLesson = class DbLesson extends DbObject {
         let IsFreeInPaidCourse;
         let pendingCourses = {};
         let now = new Date();
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1258,7 +1261,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 Id: elem.CId,
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
-                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                     || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                 PaidTp: elem.PaidTp,
                                 PaidDate: elem.PaidDate,
@@ -1398,6 +1401,8 @@ const DbLesson = class DbLesson extends DbObject {
             AccessFlags.Administrator + AccessFlags.ContentManager) !== 0 ? true : false;
         let pendingCourses = {};
         let now = new Date();
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise((resolve, reject) => {
             hostUrl = config.proxyServer.siteHost + "/";
@@ -1453,7 +1458,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 LanguageId: elem.LanguageId,
                                 Name: elem.CName,
                                 URL: isAbsPath ? this._absCourseUrl + elem.CURL : elem.CURL,
-                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                     || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                 PaidTp: elem.PaidTp,
                                 PaidDate: elem.PaidDate,

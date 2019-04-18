@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
@@ -7,7 +8,10 @@ const { HttpCode } = require("../const/http-codes");
 const { PartnerLink } = require('../utils/partner-link');
 const { Product } = require('../const/product');
 const { ProductService } = require('./db-product');
+const { AccessFlags } = require('../const/common');
+const { AccessRights } = require('../security/access-rights');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+
 const {
     ACCOUNT_ID,
     LANGUAGE_ID,
@@ -17,9 +21,9 @@ const {
     CHECK_IF_CAN_DEL_LESSON_MYSQL
 } = require('../const/sql-req-common');
 const { getTimeStr, buildLogString } = require('../utils');
-const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
-const _ = require('lodash');
+const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
+const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -634,6 +638,8 @@ const DbCourse = class DbCourse extends DbObject {
         let baseUrl;
         let productList = {};
         let pendingCourses = {};
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise((resolve, reject) => {
             baseUrl = config.proxyServer.siteHost + "/";
@@ -672,7 +678,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
                                             OneLesson: elem.OneLesson ? true : false,
-                                            IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                            IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                                 || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                             PaidTp: elem.PaidTp,
                                             PaidDate: elem.PaidDate,
@@ -825,6 +831,8 @@ const DbCourse = class DbCourse extends DbObject {
         let userId = user ? user.Id : 0;
         let baseUrl;
         let pendingCourses = {};
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise((resolve, reject) => {
             baseUrl = this._baseUrl;
@@ -885,7 +893,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
                                         IsBought: elem.Counter ? true : false,
-                                        IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                        IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                             || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                         PaidTp: elem.PaidTp,
                                         PaidDate: elem.PaidDate,
