@@ -6,8 +6,12 @@ const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { CoursesService } = require('./db-course');
+const { AccessFlags } = require('../const/common');
+const { AccessRights } = require('../security/access-rights');
 const { getTimeStr, buildLogString } = require('../utils');
+
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
+const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
 const AUTHOR_REQ_TREE = {
     expr: {
@@ -299,6 +303,8 @@ const DbAuthor = class DbAuthor extends DbObject {
         let paidCourses = [];
         let userId = user ? user.Id : 0;
         let pendingCourses = {};
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise(resolve => {
 
@@ -375,7 +381,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
-                                        IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                        IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                             || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                         PaidTp: elem.PaidTp,
                                         PaidDate: elem.PaidDate,

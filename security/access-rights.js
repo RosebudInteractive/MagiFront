@@ -1,5 +1,6 @@
 const mime = require('mime');
 const _ = require('lodash');
+const config = require('config');
 const { DbUtils } = require('../database/db-utils');
 const { ACCOUNT_ID } = require('../const/sql-req-common');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
@@ -27,6 +28,8 @@ const LESSON_FILE_MYSQL_REQ =
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= userId %>) and (pc.`CourseId` = c.`Id`)\n" +
     "where el.`Audio` = '<%= file %>'";
 
+const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
+
 exports.AccessRights = class {
 
     static _canAccessAudio(user, file) {
@@ -42,7 +45,7 @@ exports.AccessRights = class {
                     if (result && result.detail && (result.detail.length === 1)) {
                         let now = new Date();
                         let rec = result.detail[0];
-                        let IsPaid = rec.IsPaid;
+                        let IsPaid = rec.IsPaid && (!isBillingTest);
                         if (IsPaid) {
                             switch (rec.PaidTp) {
                                 case 1:

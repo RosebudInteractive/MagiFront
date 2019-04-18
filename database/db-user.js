@@ -9,6 +9,10 @@ const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { CoursesService } = require('./db-course');
 const { splitArray } = require('../utils');
+const { AccessFlags } = require('../const/common');
+const { AccessRights } = require('../security/access-rights');
+
+const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
@@ -363,6 +367,8 @@ const DbUser = class DbUser extends DbObject {
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let pendingCourses = {};
         let id = user.Id;
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         return new Promise((resolve, reject) => {
             resolve(PositionsService().getAllLessonPositions(id));
@@ -423,7 +429,7 @@ const DbUser = class DbUser extends DbObject {
                                                 Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
-                                                IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                                IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                                     || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                                 PaidTp: elem.PaidTp,
                                                 PaidDate: elem.PaidDate,
@@ -591,6 +597,8 @@ const DbUser = class DbUser extends DbObject {
             user = await this._usersCache.getUserInfoById(user_or_id)
         else
             userId = user.Id;
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
 
         if (arrayOfIds.length > 0) {
             await Utils.seqExec(arrayOfIds, (elem) => {
@@ -617,7 +625,7 @@ const DbUser = class DbUser extends DbObject {
                                     CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
                                     Mask: elem.Mask,
                                     OneLesson: elem.OneLesson ? true : false,
-                                    IsPaid: elem.IsPaid && ((elem.PaidTp === 2)
+                                    IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                         || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                     PaidTp: elem.PaidTp,
                                     PaidDate: elem.PaidDate,
