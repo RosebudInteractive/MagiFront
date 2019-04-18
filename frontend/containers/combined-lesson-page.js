@@ -524,7 +524,7 @@ class CombineLessonPage extends React.Component {
     get _isPaidCourse() {
         let {course, userPaidCourses,} = this.props;
 
-        return (course && course.IsPaid && !userPaidCourses.includes(course.Id))
+        return (course && course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
     }
 
     _needLockLessonAsPaid(lesson) {

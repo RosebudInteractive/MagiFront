@@ -24,7 +24,7 @@ class LessonsListWrapper extends React.Component {
         const {object: lessons, authors} = this.props.lessons;
         const {course, userPaidCourses} = this.props;
         let _needShowAuthor = (authors && (authors.length > 1)),
-            _isPaidCourse = (course.IsPaid && !userPaidCourses.includes(course.Id))
+            _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
 
         return lessons.map((lesson, index) => {
             lesson.Author = authors.find((author) => {
