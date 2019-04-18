@@ -6,6 +6,7 @@ import {Redirect} from 'react-router';
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
+import {whoAmI} from "../actions/user-actions";
 
 import * as tools from '../tools/page-tools';
 import CourseWrapper from '../components/course/item-wrapper';
@@ -32,6 +33,7 @@ class CoursesPage extends React.Component {
         if (!this.props.courses.loaded) {
             this.props.coursesActions.getCourses();
         }
+        this.props.whoAmI()
         this.props.storageActions.refreshState();
         this.props.pageHeaderActions.setCurrentPage(tools.pages.courses);
     }
@@ -42,6 +44,7 @@ class CoursesPage extends React.Component {
     }
 
     reload() {
+        this.props.whoAmI()
         this.props.coursesActions.getCourses();
         this.props.storageActions.refreshState();
     }
@@ -163,6 +166,7 @@ function mapDispatchToProps(dispatch) {
         applyExternalFilter: bindActionCreators(applyExternalFilter, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
+        whoAmI: bindActionCreators(whoAmI, dispatch),
     }
 }
 

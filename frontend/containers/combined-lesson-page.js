@@ -230,6 +230,7 @@ class CombineLessonPage extends React.Component {
     reload() {
         let {courseUrl, lessonUrl} = this.props;
 
+        this.props.userActions.whoAmI();
         this.props.storageActions.refreshState();
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);

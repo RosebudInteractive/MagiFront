@@ -46,6 +46,7 @@ class Main extends React.Component {
     }
 
     reload() {
+        this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.coursesActions.getCourse(this.props.courseUrl);
     }
