@@ -12,6 +12,7 @@ import {
 import {parseReadyDate} from "../tools/time-tools";
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SEND_PAYMENT_SUCCESS} from "ducks/billing";
+import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
 
 /**
  * Constants
@@ -67,10 +68,12 @@ export const REMOVE_LESSON_FROM_BOOKMARKS_START = `${prefix}/REMOVE_LESSON_FROM_
 export const REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_SUCCESS`
 export const REMOVE_LESSON_FROM_BOOKMARKS_ERROR = `${prefix}/REMOVE_LESSON_FROM_BOOKMARKS_ERROR`
 
+export const GET_TRANSACTIONS_REQUEST = `${prefix}/GET_TRANSACTIONS_REQUEST`
 export const GET_TRANSACTIONS_START = `${prefix}/GET_TRANSACTIONS_START`
 export const GET_TRANSACTIONS_SUCCESS = `${prefix}/GET_TRANSACTIONS_SUCCESS`
 export const GET_TRANSACTIONS_ERROR = `${prefix}/GET_TRANSACTIONS_ERROR`
 
+export const GET_SUBS_INFO_REQUEST = `${prefix}/GET_SUBS_INFO_REQUEST`
 export const GET_SUBS_INFO_START = `${prefix}/GET_SUBS_INFO_START`
 export const GET_SUBS_INFO_SUCCESS = `${prefix}/GET_SUBS_INFO_SUCCESS`
 export const GET_SUBS_INFO_ERROR = `${prefix}/GET_SUBS_INFO_ERROR`
@@ -78,6 +81,11 @@ export const GET_SUBS_INFO_ERROR = `${prefix}/GET_SUBS_INFO_ERROR`
 export const SWITCH_AUTOPAY_START = `${prefix}/SWITCH_AUTOPAY_START`
 export const SWITCH_AUTOPAY_SUCCESS = `${prefix}/SWITCH_AUTOPAY_SUCCESS`
 export const SWITCH_AUTOPAY_ERROR = `${prefix}/SWITCH_AUTOPAY_ERROR`
+
+export const CLEAR_STORED_CARD_REQUEST = `${prefix}/CLEAR_STORED_CARD_REQUEST`
+export const CLEAR_STORED_CARD_START = `${prefix}/CLEAR_STORED_CARD_START`
+export const CLEAR_STORED_CARD_SUCCESS = `${prefix}/CLEAR_STORED_CARD_SUCCESS`
+export const CLEAR_STORED_CARD_FAIL = `${prefix}/CLEAR_STORED_CARD_FAIL`
 
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
 
@@ -294,8 +302,20 @@ export const getUserPaidCourses = () => {
     return { type: GET_USER_PAID_COURSES_REQUEST }
 }
 
-export function getUserProfileFull() {
+export const getUserProfileFull = () => {
     return { type: GET_USER_PAID_COURSES_EXT_REQUEST, payload: null }
+}
+
+export const getTransactionHistory = () => {
+    return { type: GET_TRANSACTIONS_REQUEST }
+}
+
+export const getSubscriptionInfo = () => {
+    return { type: GET_SUBS_INFO_REQUEST }
+}
+
+export const clearStoredCard = () => {
+    return { type: CLEAR_STORED_CARD_REQUEST }
 }
 
 export function getUserHistory() {
@@ -349,60 +369,6 @@ export function getUserBookmarksFull() {
             .catch((error) => {
                 dispatch({
                     type: GET_BOOKMARKS_EXT_ERROR,
-                    payload: {error}
-                });
-            });
-    }
-}
-
-export function getTransactionHistory() {
-    return (dispatch) => {
-        dispatch({
-            type: GET_TRANSACTIONS_START,
-            payload: null
-        });
-
-        fetch("/api/users/invoice", {method: 'GET', credentials: 'include'})
-        // mockFetch(mockTransactions)
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                // handleBookmarksData(data);
-
-                dispatch({
-                    type: GET_TRANSACTIONS_SUCCESS,
-                    payload: data.data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: GET_TRANSACTIONS_ERROR,
-                    payload: {error}
-                });
-            });
-    }
-}
-
-export const getSubscriptionInfo = () => {
-    return (dispatch) => {
-        dispatch({
-            type: GET_SUBS_INFO_START,
-            payload: null
-        });
-
-        fetch("/api/users/subs-info", {method: 'GET', credentials: 'include'})
-        // mockFetch(mockSubsInfo)
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                dispatch({
-                    type: GET_SUBS_INFO_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((error) => {
-                dispatch({
-                    type: GET_SUBS_INFO_ERROR,
                     payload: {error}
                 });
             });
@@ -756,6 +722,10 @@ const _handlePaidCoursesData = (data) => {
                 course.categories.push(data.Categories[categoryId])
             })
         })
+
+        data.Courses.sort((a, b) => {
+            return a.Order - b.Order
+        })
     }
 }
 
@@ -851,6 +821,46 @@ function* getUserBookmarksSaga() {
     }
 }
 
+function* getTransactionHistorySaga() {
+    yield put({ type: GET_TRANSACTIONS_START });
+
+    try {
+        let _data = yield call(_fetchTransactionHistory)
+
+        yield put({ type: GET_TRANSACTIONS_SUCCESS, payload: _data.data })
+    } catch (error) {
+        yield put({
+            type: GET_TRANSACTIONS_ERROR,
+            payload: {error}
+        })
+    }
+}
+
+function* getSubscriptionInfoSaga(){
+    yield put ({ type: GET_SUBS_INFO_START });
+
+    try {
+        let _data = yield call(_fetchSubsInfo)
+
+        yield put({ type: GET_SUBS_INFO_SUCCESS, payload: _data })
+    } catch (error) {
+        yield put({ type: GET_SUBS_INFO_ERROR, payload: {error} })
+    }
+}
+
+function* clearStoredCardSaga() {
+    yield put({ type: CLEAR_STORED_CARD_START });
+
+    try {
+        yield call(_fetchClearStoredCard)
+        yield put({ type: CLEAR_STORED_CARD_SUCCESS })
+        yield put({ type: GET_SUBS_INFO_REQUEST })
+    } catch (error) {
+        yield put({ type: CLEAR_STORED_CARD_FAIL })
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
+    }
+}
+
 const _fetchPaidCourses = () => {
     return fetch("/api/users/paid/courses", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
@@ -858,13 +868,40 @@ const _fetchPaidCourses = () => {
 }
 
 const _fetchPaidCoursesExt = () => {
-    return fetch("/api/users/paid/courses-ext", {method: 'GET', credentials: 'include'})
+    return fetch("/api/users/paid/courses-ext?gift=true&paid=true", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
 
 const _fetchBookmarks = () => {
     return fetch("/api/users/bookmark", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _fetchTransactionHistory = () => {
+    return fetch("/api/users/invoice", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _fetchSubsInfo = () => {
+    return fetch("/api/users/subs-info", {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _fetchClearStoredCard = () => {
+    const _data = { alter:{ SubsAutoPayId:null } }
+
+    return fetch("/api/users", {
+        method: 'PUT',
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(_data),
+        credentials: 'include'
+    })
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -876,6 +913,9 @@ export const saga = function* () {
         takeEvery(GET_USER_PAID_COURSES_REQUEST, getUserPaidCoursesSaga),
         takeEvery(SEND_PAYMENT_SUCCESS, watchPaymentSuccess),
         takeEvery(GET_USER_PAID_COURSES_EXT_REQUEST, getUserPaidCoursesExtSaga),
+        takeEvery(GET_TRANSACTIONS_REQUEST, getTransactionHistorySaga),
+        takeEvery(GET_SUBS_INFO_REQUEST, getSubscriptionInfoSaga),
+        takeEvery(CLEAR_STORED_CARD_REQUEST, clearStoredCardSaga),
     ])
 }
 

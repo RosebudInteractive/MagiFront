@@ -13,7 +13,7 @@ import Item from "./transaction-item";
 import AutoPayHeader from "./auto-pay-header";
 import StatusHeader from "./status-header";
 
-const _pagingSize = 3;
+const PAGING_SIZE = 5;
 
 class SubscriptionBlock extends React.Component {
 
@@ -59,7 +59,7 @@ class SubscriptionBlock extends React.Component {
 
     _getMoreTransactions() {
         let {transactions} = this.props,
-            _newSize = this._visibleCount + _pagingSize,
+            _newSize = this._visibleCount + PAGING_SIZE,
             _oldSize = this._visibleCount;
 
         this._visibleCount = (_newSize) < transactions.size ? _newSize : transactions.size;
@@ -75,7 +75,7 @@ class SubscriptionBlock extends React.Component {
         return ((this._visibleCount < transactions.size) && (transactions.size > 0))
             ?
             <button className="btn btn--rounded subscription-history__btn"
-                    onClick={::this._getMoreTransactions}>{'Загрузить еще ' + _pagingSize}</button>
+                    onClick={::this._getMoreTransactions}>{'Загрузить еще ' + PAGING_SIZE}</button>
             :
             null
     }

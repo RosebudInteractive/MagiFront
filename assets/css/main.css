@@ -19109,7 +19109,7 @@ ul.lectures-tab {
   top: 0;
   width: 100%;
   height: 100%;
-  transition: opacity 2s ease;
+  transition: opacity 0.3s ease;
   opacity: 0; }
 .waiting-frame._visible{
   opacity: 1;
@@ -19485,6 +19485,10 @@ ul.lectures-tab {
     .subscription-info__header {
       margin-left: 0;
       width: 100%; } }
+  .subscription-info__header .subscription-form {
+    flex-direction: column; }
+  .subscription-info__header .subscription-form .form__row:last-child {
+    margin-bottom: 0; }
   .subscription-info__wrapper {
     margin: 0 auto;
     padding-left: 8.333333%;
@@ -19833,21 +19837,30 @@ ul.lectures-tab {
     display: -ms-flexbox;
     display: flex;
     -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
+    -webkit-align-items: flex-start;
+    -moz-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
     border-bottom: 1px solid rgba(47, 47, 47, 0.2); }
   .subscription-history__total {
     margin: 0 0 0 auto;
     padding: 18px 0;
     font-size: 28px;
     line-height: 34px;
-    color: rgba(47, 47, 47, 0.6); }
+    color: rgba(47, 47, 47, 0.6);
+    display: flex;
+    flex-direction: column;
+    text-align: right; }
     @media (max-width: 899px) {
       .subscription-history__total {
         padding: 14px 0 21px;
         font-size: 20px; } }
+  .refund__btn {
+    font-size: 12px;
+    line-height: normal;
+    font-weight: normal;
+    width: 80px;
+    padding: 8px; }
   .subscription-history__transaction {
     -webkit-box-flex: 1;
     -webkit-flex-grow: 1;
@@ -19862,7 +19875,8 @@ ul.lectures-tab {
     margin: 0;
     max-width: 67.5%;
     font-size: 17px;
-    line-height: 21px; }
+    line-height: 21px;
+    padding: 18px 0; }
     @media (max-width: 1399px) {
       .subscription-history__transaction {
         max-width: 71.5%; } }

@@ -1,6 +1,7 @@
 import React from "react";
+import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {loadingSubsInfoSelector, subscriptionInfoSelector} from "../../../ducks/profile";
+import {loadingSubsInfoSelector, subscriptionInfoSelector, clearStoredCard} from "ducks/profile";
 import PropTypes from "prop-types";
 
 class CardBlock extends React.Component {
@@ -23,7 +24,7 @@ class CardBlock extends React.Component {
         switch (_payment.get('type')) {
             case 'bank_card' : {
                 let _start = _payment.getIn(['card', 'first6']);
-                _start =  [_start.slice(0, 4), ' ', _start.slice(4)].join('');
+                _start = [_start.slice(0, 4), ' ', _start.slice(4)].join('');
 
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
@@ -31,7 +32,6 @@ class CardBlock extends React.Component {
                            readOnly=""/>
                 </div>
             }
-
 
 
             case 'yandex_money' :
@@ -86,21 +86,32 @@ class CardBlock extends React.Component {
 
 
     render() {
-        return (this._visible()
+        return this._visible()
             ?
-            <div className={this.props.parent + " card-block" + (this.props.showError ? " _error" : "")}>
-                {this._getCardHeader()}
-                {
-                    this.props.showError && (this.props.info.get('Error') !== null)
-                        ?
-                        <p className="card-block__error">Ошибка оплаты</p>
-                        :
-                        null
-                }
-                {this._getCardFooter()}
-            </div>
+            <React.Fragment>
+                <div className="form__row">
+                    <div className={this.props.parent + " card-block" + (this.props.showError ? " _error" : "")}>
+                        {this._getCardHeader()}
+                        {
+                            this.props.showError && (this.props.info.get('Error') !== null)
+                                ?
+                                <p className="card-block__error">Ошибка оплаты</p>
+                                :
+                                null
+                        }
+                        {this._getCardFooter()}
+                    </div>
+                </div>
+                <div className="form__row">
+                    <button className="form__submit btn btn--brown" onClick={::this._clearCard}>Больше не использовать</button>
+                </div>
+            </React.Fragment>
             :
-            null)
+            null
+    }
+
+    _clearCard() {
+        this.props.clearStoredCard()
     }
 }
 
@@ -111,4 +122,8 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(CardBlock);
+function mapDispatchToProps(dispatch) {
+    return {clearStoredCard : bindActionCreators(clearStoredCard, dispatch)}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CardBlock);

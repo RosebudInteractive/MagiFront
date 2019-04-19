@@ -7,6 +7,7 @@ import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
 import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST} from "ducks/app";
+import {GET_TRANSACTIONS_REQUEST} from "ducks/profile";
 
 /**
  * Constants
@@ -45,6 +46,11 @@ export const GET_PENDING_COURSE_INFO_REQUEST = `${prefix}/GET_PENDING_COURSE_INF
 export const GET_PENDING_COURSE_INFO_START = `${prefix}/GET_PENDING_COURSE_INFO_START`
 export const GET_PENDING_COURSE_INFO_SUCCESS = `${prefix}/GET_PENDING_COURSE_INFO_SUCCESS`
 export const GET_PENDING_COURSE_INFO_FAIL = `${prefix}/GET_PENDING_COURSE_INFO_FAIL`
+
+export const REFUND_PAYMENT_REQUEST = `${prefix}/REFUND_PAYMENT_REQUEST`
+export const REFUND_PAYMENT_START = `${prefix}/REFUND_PAYMENT_START`
+export const REFUND_PAYMENT_SUCCESS = `${prefix}/REFUND_PAYMENT_SUCCESS`
+export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -196,6 +202,10 @@ export const getPaidCourseInfo = (data) => {
 
 export const getPendingCourseInfo = (data) => {
     return {type: GET_PENDING_COURSE_INFO_REQUEST, payload: data}
+}
+
+export const refundPayment = (paimentId) => {
+    return {type: REFUND_PAYMENT_REQUEST, payload: paimentId}
 }
 
 export const showBillingWindow = () => {
@@ -387,12 +397,28 @@ const _fetchPendingCourseInfo = (courseId)  => {
         .then(parseJSON)
 }
 
+function* refundPaymentSaga(data) {
+    yield put({type: REFUND_PAYMENT_START})
+
+    try {
+        yield call(_fetchSendPayment, data.payload)
+
+        yield put({ type: REFUND_PAYMENT_SUCCESS })
+        yield put({ type: GET_TRANSACTIONS_REQUEST })
+    } catch (error) {
+        yield put({type: REFUND_PAYMENT_FAIL})
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
+    }
+}
+
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_PAID_COURSE_INFO_REQUEST, watchPaidCourseInfoSaga),
         takeEvery(GET_SUBSCRIPTION_TYPES_REQUEST, getSubscriptionTypesSaga),
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
+        takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
     ])
 }
 

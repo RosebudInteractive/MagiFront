@@ -185,7 +185,7 @@ class CombineLessonPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized, isAdmin} = this.props;
+        let {lessonInfo, playInfo, courseUrl, lessonUrl, authorized,} = this.props;
 
         if ((courseUrl !== prevProps.courseUrl) || (lessonUrl !== prevProps.lessonUrl)) {
             this.props.lessonActions.getLesson(courseUrl, lessonUrl);
