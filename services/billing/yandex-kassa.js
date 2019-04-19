@@ -23,6 +23,7 @@ class YandexKassa extends Payment {
         this._root = (opts.baseHost ? opts.baseHost : (config.billing.yandexKassa.baseHost ? config.billing.yandexKassa.baseHost : BASE_HOST)) +
             (opts.apiVer ? opts.apiVer : (config.billing.yandexKassa.apiVer ? config.billing.yandexKassa.apiVer : API_VERSION));
         this._timeout = opts.timeout ? opts.timeout : DEFAULT_TIMEOUT;
+        this._payment_mode = config.has("billing.yandexKassa.payment_mode") ? config.billing.yandexKassa.payment_mode : null;
 
         if (config.has("billing.yandexKassa.chequePendingPeriod"))
             this._chequePendingPeriod = config.billing.yandexKassa.chequePendingPeriod;
@@ -460,6 +461,10 @@ class YandexKassa extends Payment {
                             fields.ReceiptEmail = paymentObject.receipt.email;
                         };
                         delete paymentObject.email;
+
+                        let payment_mode = paymentObject.payment_mode ? paymentObject.payment_mode : this._payment_mode;
+                        delete paymentObject.payment_mode;
+
                         invoice.Items.forEach(elem => {
                             let item = {};
                             if (elem.ExtFields && elem.ExtFields.typeExt
@@ -474,6 +479,8 @@ class YandexKassa extends Payment {
                             item.description = elem.Name;
                             item.quantity = elem.Qty;
                             item.amount = { value: elem.Price, currency: curr };
+                            if (payment_mode)
+                                item.payment_mode = payment_mode;
                             items.push(item);
                         });
                     }
