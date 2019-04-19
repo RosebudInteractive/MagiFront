@@ -32,27 +32,21 @@ const _prodConfig = {
         new ExtractTextPlugin('player.css', {
             allChunks: true
         }),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false,
-                drop_console: true
-            }
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false,
+        //         drop_console: true
+        //     }
+        // }),
         new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
     module: {
         rules: [
             {
                 loaders: ['babel-loader'],
-                include: [
-                    path.resolve(__dirname, "src"),
-                    path.resolve(__dirname, "frontend"),
-                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
-                    path.resolve(__dirname, 'node_modules/swiper'),
-                    path.resolve(__dirname, 'node_modules/dom7'),
-                    path.resolve(__dirname, 'node_modules/fullpage.js'),
-                    path.resolve(__dirname, 'scripts/'),
-                    path.resolve(__dirname, 'static/'),
+                exclude: [
+                    path.resolve(__dirname, "node_modules/webix"),
+                    path.resolve(__dirname, "node_modules/react-dom"),
                 ],
                 // language=JSRegexp
                 test: /\.js$/
@@ -156,15 +150,9 @@ const _devConfig = {
         rules: [
             {
                 loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
-                include: [
-                    path.resolve(__dirname, "src"),
-                    path.resolve(__dirname, "frontend"),
-                    path.resolve(__dirname, 'node_modules/whatwg-fetch'),
-                    path.resolve(__dirname, 'node_modules/swiper'),
-                    path.resolve(__dirname, 'node_modules/dom7'),
-                    path.resolve(__dirname, 'node_modules/fullpage.js'),
-                    path.resolve(__dirname, 'scripts/'),
-                    path.resolve(__dirname, 'scripts/widgets/player.js'),
+                exclude: [
+                    path.resolve(__dirname, "node_modules/webix"),
+                    path.resolve(__dirname, "node_modules/react-dom"),
                 ],
                 test: /\.js$/
             },
