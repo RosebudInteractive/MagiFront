@@ -22,6 +22,7 @@ import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks,
 import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
 
 import {getCrownForCourse} from "../tools/svg-paths"
+import ScrollMemoryStorage from "../tools/scroll-memory-storage"
 
 class Main extends React.Component {
     constructor(props) {
@@ -35,9 +36,14 @@ class Main extends React.Component {
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         if (this.props.course) {
             document.title = 'Курс: ' + this.props.course.Name + ' - Магистерия'
+        }
+
+        if (prevProps.fetching && !this.props.fetching) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
         }
     }
 

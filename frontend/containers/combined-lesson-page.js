@@ -29,6 +29,7 @@ import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
 import {facebookAppIdSelector, setCurrentPage, clearCurrentPage,} from "ducks/app";
+import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 let _scrollTop = 0;
 
@@ -224,6 +225,11 @@ class CombineLessonPage extends React.Component {
 
         if ((!prevProps.playingLesson && this.props.playingLesson) || (prevProps.playingLesson && this.props.playingLesson && prevProps.playingLesson.LessonId !== this.props.playingLesson.LessonId)) {
             scroll()
+        }
+
+        if (prevProps.fetching && !this.props.fetching) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
         }
     }
 

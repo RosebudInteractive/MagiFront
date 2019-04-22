@@ -22,6 +22,7 @@ import {
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
 import {setCurrentPage, clearCurrentPage,} from "ducks/app";
+import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -66,6 +67,11 @@ class CoursesPage extends React.Component {
             let _filter = [];
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
             this.props.history.replace('/razdel/' + _filter.join('+'))
+        }
+
+        if (prevProps.fetching && !this.props.fetching) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
         }
     }
 

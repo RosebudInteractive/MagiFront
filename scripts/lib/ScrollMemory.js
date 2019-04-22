@@ -157,14 +157,12 @@ function (_Component) {
   _createClass(ScrollMemory, [{
     key: "componentDidMount",
     value: function componentDidMount() {
-      window.addEventListener("popstate", this.detectPop);
-      window.addEventListener("DOMContentLoaded", this.detectPop);
+      window.addEventListener("popstate", ScrollMemory.detectPop);
     }
   }, {
     key: "componentWillUnmount",
     value: function componentWillUnmount() {
-      window.removeEventListener("popstate", this.detectPop);
-      window.removeEventListener("DOMContentLoaded", this.detectPop);
+      window.removeEventListener("popstate", ScrollMemory.detectPop);
     }
   }, {
     key: "shouldComponentUpdate",
@@ -214,7 +212,14 @@ function (_Component) {
       var nextFind = this.url.get(key); // if find in url map => scroll to position
 
       if (nextFind) {
-        this.props.elementID ? scrollToElement(nextFind, this.props.elementID) : setTimeout(() => {scrollTo(nextFind)}, 0);
+        console.log(document.readyState)
+
+        window.addEventListener("DOMContentLoaded", () => {
+          this.props.elementID ? scrollToElement(nextFind, this.props.elementID) : setTimeout(() => {scrollTo(nextFind)}, 0);
+
+          window.removeEventListener("DOMContentLoaded", ScrollMemory.detectPop);
+        });
+
       }
     }
   }, {

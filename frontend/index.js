@@ -5,7 +5,8 @@ import {Provider} from 'react-redux';
 import App from './App';
 import {store} from './store/configureStore';
 import {Router} from 'react-router-dom';
-import ScrollMemory from 'script-lib/ScrollMemory';
+// import ScrollMemory from 'script-lib/ScrollMemory';
+import ScrollMemory from './components/scroll-memory';
 import history from "./history";
 
 ReactDOM.render(

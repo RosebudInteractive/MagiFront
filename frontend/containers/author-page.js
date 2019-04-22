@@ -15,6 +15,7 @@ import * as userActions from "../actions/user-actions";
 
 import {pages, getDomain, getPageUrl, getAuthorPortraitPath, ImageSize,} from '../tools/page-tools';
 import $ from 'jquery'
+import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 class AuthorPage extends React.Component {
     constructor(props) {
@@ -32,9 +33,14 @@ class AuthorPage extends React.Component {
         this.props.setCurrentPage(this);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         if (this.props.author) {
             document.title = 'Автор : ' + this.props.author.FirstName + ' ' + this.props.author.LastName;
+        }
+
+        if (prevProps.loading && !this.props.loading) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
         }
     }
 
