@@ -321,38 +321,40 @@ const DbProduct = class DbProduct extends DbObject {
         let firstDate = null;
         let lastDate = null;
 
-        if (!discount.DiscountTypeId)
-            throw new Error(`Invalid DiscountTypeId: "${discount.DiscountTypeId}".`);
+        let clearFlag = discount.Perc === null; // if null - remove current discount
+        if (!clearFlag) {
+            if (!discount.DiscountTypeId)
+                throw new Error(`Invalid DiscountTypeId: "${discount.DiscountTypeId}".`);
         
-        if (discount.FirstDate) {
-            if (discount.FirstDate instanceof Date)
-                firstDate = discount.FirstDate
-            else
-                if (typeof (discount.FirstDate) === "string")
-                    firstDate = new Date(discount.FirstDate)
+            if (discount.FirstDate) {
+                if (discount.FirstDate instanceof Date)
+                    firstDate = discount.FirstDate
                 else
-                    throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
-        }
-        else
-            throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
-        if (discount.LastDate) {
-            if (discount.LastDate instanceof Date)
-                lastDate = discount.LastDate
+                    if (typeof (discount.FirstDate) === "string")
+                        firstDate = new Date(discount.FirstDate)
+                    else
+                        throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
+            }
             else
-                if (typeof (discount.LastDate) === "string")
-                    lastDate = new Date(discount.LastDate)
+                throw new Error(`Invalid discount "FirstDate": "${discount.FirstDate}".`);
+            if (discount.LastDate) {
+                if (discount.LastDate instanceof Date)
+                    lastDate = discount.LastDate
                 else
-                    throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
+                    if (typeof (discount.LastDate) === "string")
+                        lastDate = new Date(discount.LastDate)
+                    else
+                        throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
+            }
+            else
+                throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
+        
+            if (lastDate && (lastDate <= firstDate))
+                throw new Error(`Invalid date range: ["${firstDate}".."${lastDate}"].`);
+        
+            if ((!discount.Perc) || (typeof (discount.Perc) !== "number") || (isNaN(discount.Perc)) || (discount.Perc > 100))
+                throw new Error(`Invalid discount: "${discount.Perc}".`);
         }
-        else
-            throw new Error(`Invalid discount "LastDate": "${discount.LastDate}".`);
-        
-        if (lastDate && (lastDate <= firstDate))
-            throw new Error(`Invalid date range: ["${firstDate}".."${lastDate}"].`);
-        
-        if ((!discount.Perc) || (typeof (discount.Perc) !== "number") || (isNaN(discount.Perc)) || (discount.Perc > 100))
-            throw new Error(`Invalid discount: "${discount.Perc}".`);
-
         let fields = {
             DiscountTypeId: discount.DiscountTypeId,
             PriceListId: discount.PriceListId ? discount.PriceListId : Product.DefaultPriceListId,
@@ -369,24 +371,31 @@ const DbProduct = class DbProduct extends DbObject {
                 && (!p.productTypeId()) && (!p.userId())) {
         
                 activePrice = p;
-                if ((p.perc() === fields.Perc) && (p.description() === fields.Description) &&
+                if ((!clearFlag) &&  (p.perc() === fields.Perc) && (p.description() === fields.Description) &&
                     (Math.abs(p.firstDate() - fields.FirstDate) < 500) && (Math.abs(p.lastDate() - fields.LastDate) < 500)) {
                     result = false;
-                    break;
                 }
+                break;
             }
         }
         if (result) {
-            if (activePrice) {
-                activePrice.description(fields.Description);
-                activePrice.firstDate(fields.FirstDate);
-                activePrice.lastDate(fields.LastDate);
-                activePrice.perc(fields.Perc)
+            if (clearFlag) {
+                if (activePrice)
+                    col._del(activePrice)
+                else
+                    result = false;
             }
             else
-                await root.newObject({
-                    fields: fields
-                }, dbOpts);
+                if (activePrice) {
+                    activePrice.description(fields.Description);
+                    activePrice.firstDate(fields.FirstDate);
+                    activePrice.lastDate(fields.LastDate);
+                    activePrice.perc(fields.Perc)
+                }
+                else
+                    await root.newObject({
+                        fields: fields
+                    }, dbOpts);
         }
         return result;
     }
