@@ -17,6 +17,7 @@ class Wrapper extends React.Component {
     static propTypes = {
         course: PropTypes.object,
         lazyload: PropTypes.bool,
+        index: PropTypes.number,
     };
 
     render() {
@@ -28,7 +29,7 @@ class Wrapper extends React.Component {
 
         return lazyload
             ?
-            <LazyItem course={course} isMobile={this._isMobile()} key={course.Id}/>
+            <LazyItem course={course} isMobile={this._isMobile()} key={course.Id} index={this.props.index}/>
             :
             <NotLazyItem course={course} isMobile={this._isMobile()} key={course.Id}/>
     }

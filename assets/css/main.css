@@ -5075,7 +5075,7 @@ ul.user-tooltip {
     border-left: none;
     border-top: none; }
 
-.course-module {
+.course-module, .course-module__placeholder {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -5084,18 +5084,18 @@ ul.user-tooltip {
   min-height: 635px;
   border-bottom: 1px solid rgba(47, 47, 47, 0.15); }
   @media (max-width: 1899px) {
-    .course-module {
+    .course-module, .course-module__placeholder {
       min-height: 635px; } }
   @media (max-width: 1279px) {
-    .course-module {
+    .course-module, .course-module__placeholder {
       /*min-height: 733px; */
       min-height: 685px; } }
   @media (max-width: 1023px) {
-    .course-module {
+    .course-module, .course-module__placeholder {
       /*min-height: 747px;*/
       min-height: 685px; } }
   @media (max-width: 899px) {
-    .course-module {
+    .course-module, .course-module__placeholder {
       /*border-bottom: none;*/
       /*min-height: 700px;*/
       min-height: 685px; } }

@@ -57,7 +57,7 @@ class PurchasesPage extends React.Component {
                             <div className="profile-block__tab-controls">
                                 <ul>
                                     <li className="profile-block__tab-control active">
-                                        <span className="text">Купленные курсы</span>
+                                        <span className="text">Доступные платные курсы</span>
                                         <span className="qty">{_count}</span>
                                         <span className="text">: </span>
                                     </li>

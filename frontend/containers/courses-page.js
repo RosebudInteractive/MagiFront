@@ -69,14 +69,15 @@ class CoursesPage extends React.Component {
             this.props.history.replace('/razdel/' + _filter.join('+'))
         }
 
-        if (prevProps.fetching && !this.props.fetching) {
+        // if (prevProps.courses.fetching && !this.props.courses.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
-        }
+        // }
     }
 
     componentWillUnmount() {
         this.props.clearCurrentPage();
+        ScrollMemoryStorage.saveCourseBundlesHeight($('.courses'))
     }
 
     _getCoursesBundles() {
@@ -116,7 +117,7 @@ class CoursesPage extends React.Component {
                         }
                     }
 
-                    _result.push(<CourseWrapper course={course} lazyload={isEmptyFilter} key={index}/>)
+                    _result.push(<CourseWrapper course={course} lazyload={isEmptyFilter} key={index} index={index}/>)
                 }
 
             }
@@ -138,7 +139,7 @@ class CoursesPage extends React.Component {
             fetching ?
                 <p>Загрузка...</p>
                 :
-                <div className={"courses" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')}>
+                <div className={"courses" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')} key={"courses-page"} id={"courses-page"}>
                     {this._getCoursesBundles()}
                 </div>
         )
