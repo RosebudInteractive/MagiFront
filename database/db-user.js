@@ -155,9 +155,9 @@ const GET_COURSES_BY_IDS_MSSQL =
     "where c.[Id] in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MSSQL =
-    "select [CourseId] as [Id] from [UserPaidCourse]\n" +
+    "select [CourseId] as [Id] from [UserPaidCourse] as p\n" +
     "where [UserId] = <%= userId %>\n" +
-    "order by [Id] desc";
+    "order by p.[Id] desc";
 
 const GET_GIFT_COURSES_MSSQL =
     "select[Id] from [Course]\n" +
@@ -260,9 +260,9 @@ const GET_COURSES_BY_IDS_MYSQL =
     "where c.`Id` in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MYSQL =
-    "select `CourseId` as `Id` from `UserPaidCourse`\n" +
+    "select `CourseId` as `Id` from `UserPaidCourse` as p\n" +
     "where `UserId` = <%= userId %>\n" +
-    "order by `Id` desc";
+    "order by p.`Id` desc";
 
 const GET_GIFT_COURSES_MYSQL =
     "select`Id` from `Course`\n" +
