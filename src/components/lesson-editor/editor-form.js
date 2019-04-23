@@ -288,7 +288,7 @@ class LessonEditorForm extends React.Component {
         this._fillReferences(_obj.References);
         this._fillResources(_obj.Resources);
         if (editorValues.subLessons.length > 0) {
-            this._fillChilds(_obj.Childs);
+            editorValues.subLessons.map(child => _obj.Childs.push(child));
         }
 
         this.props.save(_obj, this.props.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
@@ -354,10 +354,6 @@ class LessonEditorForm extends React.Component {
                 ShowInGalery: resource.ShowInGalery,
             })
         });
-    }
-
-    _fillChilds(array) {
-        this.props.subLessons.map(child => array.push(child));
     }
 
     hideAddAuthorDialog() {

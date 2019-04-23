@@ -353,7 +353,7 @@ const _fetchSubscriptionTypes = (url) => {
 }
 
 function* getPendingCourseInfoSaga(data){
-    yield put({type: GET_PENDING_COURSE_INFO_START})
+    yield put({type: GET_PENDING_COURSE_INFO_START, payload: data.payload.courseId})
 
     try {
         let _data = yield call(_fetchPendingCourseInfo, data.payload.courseId);

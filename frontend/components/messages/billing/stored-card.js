@@ -30,7 +30,7 @@ export default class StoredCard extends React.Component {
                         </label>
                     </div>
                     <div className="payment-methods__stored-col">
-                        <CardBlock parent="payment-methods__card-block"/>
+                        <CardBlock parent="payment-methods__card-block" showButton={false}/>
                     </div>
                 </div>
                 :

@@ -47,7 +47,7 @@ class AutoPayHeader extends React.Component {
             <div className="subscription-info__header">
                 {this._getDays()}
                 <form action="javascript:void(0);" method="post" className="subscription-form">
-                    <CardBlock parent="subscription-form__card-block"/>
+                    <CardBlock parent="subscription-form__card-block" showButton={true}/>
                     {
                         this.props.enabledSubscription ?
                             <div className="subscription-form__actions">
