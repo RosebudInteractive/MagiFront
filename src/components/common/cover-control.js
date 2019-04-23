@@ -16,6 +16,10 @@ class CoverControl extends React.Component {
         this._metaObj = null
     }
 
+    componentWillMount() {
+        this._metaObj = this.props.input.value.meta ? JSON.parse(this.props.input.value.meta) : null
+    }
+
     componentWillReceiveProps(nextProps) {
         if (!Object.is(this.props.input.value, nextProps.input.value)) {
             this._metaObj = nextProps.input.value.meta ? JSON.parse(nextProps.input.value.meta) : null

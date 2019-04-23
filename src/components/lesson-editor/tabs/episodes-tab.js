@@ -2,6 +2,7 @@ import React from 'react'
 import EpisodesGrid from '../grids/episodes'
 import SublessonsGrid from '../grids/subLessons'
 import PropTypes from 'prop-types'
+import {Field} from "redux-form";
 
 export default class EpisodesTab extends React.Component{
 
@@ -45,7 +46,8 @@ export default class EpisodesTab extends React.Component{
             <EpisodesGrid editMode={this.props.editMode}/>
             {
                 !this.props.isSublesson ?
-                    <SublessonsGrid editMode={this.props.editMode}/>
+                    <Field component={SublessonsGrid} name="subLessons" editMode={this.props.editMode}/>
+                    // <SublessonsGrid editMode={this.props.editMode}/>
                     :
                     null
             }

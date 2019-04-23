@@ -7,6 +7,7 @@ import {bindActionCreators} from "redux";
 import {select, remove,} from '../../../actions/subLessonsActions'
 import {set} from '../../../actions/lesson/parent-lesson-actions';
 import {enableButtonsSelector} from "adm-ducks/app";
+import {moveObjectUp, moveObjectDown} from "../../../reducers/tools";
 
 class SublessonsGrid extends React.Component {
 
@@ -14,29 +15,72 @@ class SublessonsGrid extends React.Component {
         editMode: PropTypes.bool,
     }
 
-    render() {
+    constructor(props) {
+        super(props)
+        this._seleted = null;
+    }
 
+    render() {
         return <div className="lesson-episodes">
             <label className="grid-label">Дополнительные лекции</label>
-            <SubLessons selectAction={::this.props.select}
+            <SubLessons selectAction={::this._select}
                         createAction={::this._create}
                         editAction={::SublessonsGrid._edit}
-                        removeAction={::this.props.remove}
-                        selected={this.props.selected}
+                        removeAction={::this._remove}
+                        selected={this._selected}
                         editMode={this.props.editMode}
-                        data={this.props.subLessons}
+                        moveUpAction={::this._moveUp}
+                        moveDownAction={::this._moveDown}
+                        data={this.props.input.value}
                         disabled={!this.props.enableButtons}/>
         </div>
 
     }
 
     _select(id) {
-        this.props.lessonMainEpisodesActions.select(id)
+        if (id !== this._seleted) {
+            this._seleted = id;
+            this.forceUpdate()
+        }
     }
 
     _create() {
         this.props.setParentLesson({id: this.props.lesson.id, name: this.props.lesson.Name});
         history.push(window.location.pathname + '/sub-lessons/new')
+    }
+
+    _remove(id) {
+        let _array = [...this.props.input.value],
+            _index = _array.findIndex((item) => {
+                return item.id === +id
+            })
+
+        if (_index >= 0) {
+            _array.splice(_index, 1)
+        }
+
+        this.props.input.onChange(_array)
+    }
+
+    _moveUp(id) {
+        this._selected = id
+        let _array = [];
+        this.props.input.value.forEach((item) => {_array.push(Object.assign({}, item))});
+
+        let  {resultArray} = moveObjectUp(_array, id)
+
+        this.props.input.onChange(resultArray)
+    }
+
+    _moveDown(id) {
+        this._selected = id
+
+        let _array = [];
+        this.props.input.value.forEach((item) => {_array.push(Object.assign({}, item))});
+
+        let {resultArray} = moveObjectDown(_array, id)
+
+        this.props.input.onChange(resultArray)
     }
 
     static _edit(id) {
@@ -70,8 +114,6 @@ class SubLessons extends GridControl {
 
 function mapStateToProps(state) {
     return {
-        subLessons: state.subLessons.current,
-        selected: state.subLessons.selected,
         lesson: state.singleLesson.current,
 
         enableButtons: enableButtonsSelector(state),

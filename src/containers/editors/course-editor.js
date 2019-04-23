@@ -215,6 +215,10 @@ class CourseEditor extends React.Component {
                 FirstDate: subscriptionValues.FirstDate, // начало действия
                 LastDate: subscriptionValues.LastDate, // конец действия
             }
+        } else if (subscriptionValues.Perc === null) {
+            _obj.Discount = {
+                Perc: null
+            }
         }
 
 

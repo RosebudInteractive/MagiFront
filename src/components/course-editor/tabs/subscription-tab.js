@@ -117,12 +117,21 @@ class CourseSubscriptionForm extends React.Component {
                 <div className="group-box">
                     <div className="group-box__title">Скидка</div>
                     <Field component={TextBox} name="Description" label="Описание скидки" placeholder="Введите описание" disabled={!percent || !isPaid || _disabled}/>
-                    <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid || _disabled}/>
+                    <div className="discount-percent__wrapper">
+                        <Field component={TextBox} name="Perc" label="Процент скидки" placeholder="Введите значение" disabled={!isPaid || _disabled}/>
+                        <button className='tool-btn del discount-percent__button' onClick={::this._clearDiscount} disabled={!isPaid || !percent || _disabled}/>
+                    </div>
                     <Field component={Datepicker} name="FirstDate" label="Начало действия" disabled={!percent || !isPaid || _disabled}/>
                     <Field component={Datepicker} name="LastDate" label="Окончание действия" disabled={!percent || !isPaid || _disabled}/>
                 </div>
             </form>
         </div>
+    }
+
+    _clearDiscount(e) {
+        e.preventDefault();
+
+        this.props.changeFieldValue('CourseSubscriptionForm', 'Perc', null);
     }
 }
 

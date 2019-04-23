@@ -30,10 +30,32 @@ export default class GridControl extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this._selected = nextProps.selected
+        const _data = nextProps.data;
+        if (_data && Array.isArray(_data) && _data.length > 0) {
+            const _selected = nextProps.selected;
+            if (_selected) {
+                this._select({
+                    isFirst: _data[0].id === _selected,
+                    isLast: _data[_data.length - 1].id === _selected,
+                    id: _selected,
+                })
+            }
+        }
+    }
+
+    componentDidMount() {
+        if (this.props.data && Array.isArray(this.props.data) && this.props.data.length > 0) {
+            this._selected = this.props.data[0].Id
+            this.forceUpdate()
+        }
     }
 
     _select(selectedObj) {
+        this._selectNoRefresh(selectedObj)
+        this.forceUpdate()
+    }
+
+    _selectNoRefresh(selectedObj) {
         this._isFirstSelected = selectedObj.isFirst;
         this._isLastSelected = selectedObj.isLast;
         this._selected = selectedObj.id;
@@ -191,6 +213,14 @@ export default class GridControl extends Component {
                     let _selectedId = parseInt(_selected ? _selected.id : null);
                     if ((that._selected) && this.getItem(that._selected) && (that._selected !== _selectedId)) {
                         this.select(that._selected)
+
+                        let _obj = {
+                            isFirst: this.getFirstId() === that._selected,
+                            isLast: this.getLastId() === that._selected,
+                            id: that._selected,
+                        };
+
+                        that._selectNoRefresh(_obj);
                     }
                 }
             },

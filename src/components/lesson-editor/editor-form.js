@@ -62,8 +62,12 @@ class LessonEditorForm extends React.Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this._init()
+    }
+
+    componentDidMount() {
+        // this._init()
 
         let _activeTab = this.props.activeTabs.get(this.props.isSublesson ? 'SublessonEditor' : 'LessonEditor')
         if (_activeTab) {
@@ -78,7 +82,7 @@ class LessonEditorForm extends React.Component {
     }
 
     _init() {
-        let {lesson, fixedLessonId, fixDescription} = this.props,
+        let {lesson, fixedLessonId, fixDescription, isSublesson, subLessons} = this.props,
             _lesson = lesson ? lesson : this._getNewLesson(),
             _fixed = (lesson && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
@@ -112,6 +116,7 @@ class LessonEditorForm extends React.Component {
                 isFreeInPaidCourse: _lesson.IsFreeInPaidCourse,
                 fixed: _fixed,
                 fixDescription: _fixDescription,
+                subLessons: !isSublesson ? subLessons : []
             });
         }
     }
@@ -282,7 +287,7 @@ class LessonEditorForm extends React.Component {
         this._fillEpisodes(_obj.Episodes);
         this._fillReferences(_obj.References);
         this._fillResources(_obj.Resources);
-        if (this.props.subLessons.length > 0) {
+        if (editorValues.subLessons.length > 0) {
             this._fillChilds(_obj.Childs);
         }
 

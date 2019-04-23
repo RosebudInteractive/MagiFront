@@ -120,7 +120,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
 export const stateSelector = state => state[moduleName]
 export const parametersSelector = createSelector(stateSelector, state => state.parameters)
-export const parametersFetchingSelector = createSelector(stateSelector, state => state.parameters.get('fetching'))
+export const parametersFetchingSelector = createSelector(stateSelector, state => state.parameters ? state.parameters.get('fetching') : false)
 
 export const fixedCourseIdSelector = createSelector(parametersSelector, params => params ? params.getIn(['fixedCourseId', 'Value']): null)
 export const fixedLessonIdSelector = createSelector(parametersSelector, params => params ? params.getIn(['fixedLessonId', 'Value']): null)
