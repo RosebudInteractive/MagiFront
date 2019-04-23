@@ -4,6 +4,16 @@ import {connect} from "react-redux";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, clearStoredCard} from "ducks/profile";
 import PropTypes from "prop-types";
 
+const PAYMENT_SYSTEM_NAME = {
+    MASTERCARD: "MasterCard",
+    MAESTRO: "Maestro",
+    VISA: "Visa",
+    VISA_ELECTRON: "VisaElectron",
+    AMERICAN_EXPRESS: "AmericanExpress",
+    JCB: "JCB",
+    DINERS_CLUB: "DinersClub",
+}
+
 class CardBlock extends React.Component {
 
     static propTypes = {
@@ -51,8 +61,42 @@ class CardBlock extends React.Component {
         }
     }
 
+    _getIcon(systemName) {
+        const _american_express = '<use xlink:href="#american-express"/>',
+            _diners_club = '<use xlink:href="#diners-club"/>',
+            _jcb = '<use xlink:href="#jcb-logo"/>',
+            _maestro = '<use xlink:href="#maestro"/>',
+            _mastercard = '<use xlink:href="#mastercard"/>',
+            _mir = '<use xlink:href="#mir-logo"/>',
+            _visa = '<use xlink:href="#visa"/>';
+
+        switch (systemName) {
+            case PAYMENT_SYSTEM_NAME.AMERICAN_EXPRESS:
+                return <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _american_express}}/>
+
+            case PAYMENT_SYSTEM_NAME.DINERS_CLUB:
+                return <svg width="20" height="17" dangerouslySetInnerHTML={{__html: _diners_club}}/>
+
+            case PAYMENT_SYSTEM_NAME.JCB:
+                return <svg width="20" height="15" dangerouslySetInnerHTML={{__html: _jcb}}/>
+
+            case PAYMENT_SYSTEM_NAME.MAESTRO:
+                return <svg width="17" height="10" dangerouslySetInnerHTML={{__html: _maestro}}/>
+
+            case PAYMENT_SYSTEM_NAME.MASTERCARD :
+                return <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _mastercard}}/>
+
+            case PAYMENT_SYSTEM_NAME.VISA:
+            case PAYMENT_SYSTEM_NAME.VISA_ELECTRON:
+                return <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _visa}}/>
+
+            default:
+                return <svg width="16" height="5" dangerouslySetInnerHTML={{__html: _mir}}/>
+        }
+    }
+
     _getCardFooter() {
-        const _visa = '<use xlink:href="#visa"/>';
+        const _yandex_money = '<use xlink:href="#yandex-money"/>';
 
         let {info} = this.props,
             _payment = info.get('Payment');
@@ -60,7 +104,8 @@ class CardBlock extends React.Component {
         switch (_payment.get('type')) {
             case 'bank_card' : {
                 let _exprDate = _payment.getIn(['card', 'expiry_month']) + "/",
-                    _year = _payment.getIn(['card', 'expiry_year']);
+                    _year = _payment.getIn(['card', 'expiry_year']),
+                    _cardType = _payment.getIn(['card', 'card_type']);
 
                 _year = _year.substr(_year.length - 2, 2);
                 _exprDate += _year;
@@ -69,7 +114,7 @@ class CardBlock extends React.Component {
                     <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue={_exprDate}
                            readOnly=""/>
                     <div className="card-block__type">
-                        <svg width="32" height="10" dangerouslySetInnerHTML={{__html: _visa}}/>
+                        {this._getIcon(_cardType)}
                     </div>
                 </div>
             }
@@ -80,7 +125,7 @@ class CardBlock extends React.Component {
                     <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue=""
                            readOnly=""/>
                     <div className="card-block__type">
-                        <svg width="32" height="10" dangerouslySetInnerHTML={{__html: _visa}}/>
+                        <svg width="16" height="19" dangerouslySetInnerHTML={{__html: _yandex_money}}/>
                     </div>
                 </div>
 
@@ -93,10 +138,10 @@ class CardBlock extends React.Component {
     render() {
         return this._visible()
             ?
-                this.props.showButton ?
-                    this._getCardBlockWithButton()
-                    :
-                    this._getCardBlock()
+            this.props.showButton ?
+                this._getCardBlockWithButton()
+                :
+                this._getCardBlock()
             :
             null
     }

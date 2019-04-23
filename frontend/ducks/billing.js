@@ -84,7 +84,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 .set('fetching', true)
-                .set('fetchingCourseId', null)
+                // .set('fetchingCourseId', null)
 
         case GET_PAID_COURSE_INFO_START:
         case GET_PENDING_COURSE_INFO_START:

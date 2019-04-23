@@ -161,7 +161,7 @@ class PaymentForm extends React.Component {
     }
 
     _isSendingEnable() {
-        return !!this.state.selectedMethod && !this.props.loading && !this.props.needRedirect && (this.email && !this.email.state.error)
+        return !!this.state.selectedMethod && !this.props.loading && (this.email && !this.email.state.error)
     }
 
     render() {
