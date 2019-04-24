@@ -6,7 +6,7 @@ import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
-import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST} from "ducks/app";
+import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST, SHOW_WAITING_FORM} from "ducks/app";
 import {GET_TRANSACTIONS_REQUEST} from "ducks/profile";
 
 /**
@@ -84,7 +84,6 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 .set('fetching', true)
-                // .set('fetchingCourseId', null)
 
         case GET_PAID_COURSE_INFO_START:
         case GET_PENDING_COURSE_INFO_START:
@@ -353,6 +352,7 @@ const _fetchSubscriptionTypes = (url) => {
 }
 
 function* getPendingCourseInfoSaga(data){
+    yield put({type: SHOW_WAITING_FORM})
     yield put({type: GET_PENDING_COURSE_INFO_START, payload: data.payload.courseId})
 
     try {
@@ -362,12 +362,14 @@ function* getPendingCourseInfoSaga(data){
             yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
         } else {
             yield put({type: GET_PENDING_COURSE_INFO_SUCCESS})
+            yield put({type: HIDE_BILLING_WINDOW})
         }
     } catch (error) {
         const COURSE_IS_BOUGHT = 'Этот курс Вами уже куплен'
         switch (+error.status) {
             case 404 : {
                 yield put({type: GET_PAID_COURSE_INFO_REQUEST, payload: data.payload})
+                yield put({type: HIDE_BILLING_WINDOW})
                 return
             }
 
@@ -375,6 +377,7 @@ function* getPendingCourseInfoSaga(data){
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
                 yield put({type: HIDE_BILLING_WINDOW});
                 yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+                yield put({type: HIDE_BILLING_WINDOW})
                 yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : new Error(COURSE_IS_BOUGHT)}})
                 yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
                 return
@@ -384,6 +387,7 @@ function* getPendingCourseInfoSaga(data){
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
                 yield put({type: HIDE_BILLING_WINDOW});
                 yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+                yield put({type: HIDE_BILLING_WINDOW})
                 yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
                 return
             }

@@ -4,6 +4,7 @@ let webpack = require('webpack');
 let NpmInstallPlugin = require('npm-install-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
@@ -29,17 +30,25 @@ const _prodConfig = {
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
         }),
-        new ExtractTextPlugin('player.css', {
+        new ExtractTextPlugin('[name].css', {
             allChunks: true
         }),
-        // new webpack.optimize.UglifyJsPlugin({
-        //     compress: {
-        //         warnings: false,
-        //         drop_console: true
-        //     }
-        // }),
         new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}])
     ],
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                // test: /\.js(\?.*)?$/i,
+                parallel: true,
+                uglifyOptions: {
+                    warnings: false,
+                    parse: {},
+                    compress: {},
+                    output: null,
+                },
+            })
+        ],
+    },
     module: {
         rules: [
             {
@@ -113,17 +122,20 @@ const _prodConfig = {
     }
 };
 
+
+const hotMiddlewareScript = 'webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000&reload=true';
 const _devConfig = {
+    mode: 'development',
     devtool: 'cheap-module-eval-source-map',
     entry: {
         'babel-polyfill': '@babel/polyfill',
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
-        main: './frontend/index',
-        adm: './src/index',
-        'player-main': './scripts/player-main',
-        'player-app': './scripts/native-app-player/player-app',
-        'player-app-test': './scripts/native-app-player/example',
-        'workshop-main': './scripts/workshop-main',
+        main: ['./frontend/index', hotMiddlewareScript],
+        adm: ['./src/index', hotMiddlewareScript],
+        'player-main': ['./scripts/player-main', hotMiddlewareScript],
+        'player-app': ['./scripts/native-app-player/player-app', hotMiddlewareScript],
+        'player-app-test': ['./scripts/native-app-player/example', hotMiddlewareScript],
+        'workshop-main': ['./scripts/workshop-main', hotMiddlewareScript],
     },
     output: {
         path: path.join(__dirname, 'static'),
@@ -133,7 +145,8 @@ const _devConfig = {
     plugins: [
         new webpack.optimize.OccurrenceOrderPlugin(),
         new webpack.HotModuleReplacementPlugin(),
-        new NpmInstallPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),
+        // new NpmInstallPlugin(),
         new webpack.ProvidePlugin({
             $: "jquery",
             jQuery: "jquery",
@@ -141,7 +154,7 @@ const _devConfig = {
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV)
         }),
-        new ExtractTextPlugin('player.css', {
+        new ExtractTextPlugin('[name].css', {
             allChunks: true
         }),
         new CopyWebpackPlugin([{from: './frontend/version.json', to: './version.json'}]),
@@ -149,7 +162,7 @@ const _devConfig = {
     module: {
         rules: [
             {
-                loaders: ['react-hot-loader/webpack', 'babel-loader'], //добавили loader 'react-hot'
+                loaders: ['babel-loader'], //добавили loader 'react-hot'
                 exclude: [
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
@@ -159,10 +172,6 @@ const _devConfig = {
             {
                 loader: 'json-loader',
                 test: /\.json$/,
-                // use: ExtractTextPlugin.extract({
-                //     fallback: "style-loader",
-                    // use: "json-loader"
-                // })
             },
             {
                 test: /\.sass$/,

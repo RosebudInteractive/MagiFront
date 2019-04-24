@@ -20,11 +20,13 @@ export const CALC_BILLING_ENABLE_REQUEST = `${prefix}/CALC_BILLING_ENABLE_REQUES
 export const DISABLE_BILLING = `${prefix}/DISABLE_BILLING`
 export const ENABLE_BILLING = `${prefix}/ENABLE_BILLING`
 
-
 export const SET_CURRENT_PAGE = `${prefix}/SET_CURRENT_PAGE`
 export const RELOAD_CURRENT_PAGE_REQUEST = `${prefix}/RELOAD_CURRENT_PAGE_REQUEST`
 export const RELOAD_CURRENT_PAGE_START = `${prefix}/RELOAD_CURRENT_PAGE_START`
 export const RELOAD_CURRENT_PAGE_SUCCESS = `${prefix}/RELOAD_CURRENT_PAGE_SUCCESS`
+
+export const SHOW_WAITING_FORM = `${prefix}/SHOW_WAITING_FORM`
+export const HIDE_WAITING_FORM = `${prefix}/HIDE_WAITING_FORM`
 
 const Billing = Record({
     mode: {courses: false, subscription: false},
@@ -41,6 +43,7 @@ export const ReducerRecord = Record({
     enabledBilling: false,
     fetching: false,
     currentPageRef: null,
+    isWaiting: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -79,6 +82,14 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('currentPageRef', payload)
 
+        case SHOW_WAITING_FORM:
+            return state
+                .set('isWaiting', true)
+
+        case HIDE_WAITING_FORM:
+            return state
+                .set('isWaiting', false)
+
         default:
             return state
     }
@@ -108,6 +119,7 @@ export const enabledPaidCoursesSelector = createSelector(stateSelector, (state) 
 })
 
 const currentPageRefSelector = createSelector(stateSelector, state => state.currentPageRef)
+export const waitingSelector = createSelector(stateSelector, state => state.isWaiting)
 
 
 /**

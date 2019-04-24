@@ -173,7 +173,7 @@ class PaymentForm extends React.Component {
         }
 
         return <div className="billing-steps__item js-billing-step active">
-            <WaitingFrame visible={this.props.loading}/>
+            <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка платежа..."}/>
             <div className="modal__header">
                 {paymentType === PAYMENT_TYPE.BILLING ?
                     <React.Fragment>

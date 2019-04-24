@@ -1,3 +1,4 @@
+import { hot } from 'react-hot-loader/root'
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
@@ -45,7 +46,8 @@ import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
 
-import {getAppOptions,} from 'ducks/app'
+import {getAppOptions, waitingSelector} from 'ducks/app'
+import ModalWaiting from "./components/messages/modal-waiting";
 
 Polyfill.registry();
 
@@ -279,7 +281,8 @@ class App extends Component {
             showSignInForm,
             showSizeInfo,
             showFeedbackWindow,
-            showFeedbackResultMessage
+            showFeedbackResultMessage,
+            isWaiting
         } = this.props;
 
         return <div className="App global-wrapper" onScroll={this._handleScroll}>
@@ -294,6 +297,7 @@ class App extends Component {
                 <BillingWrapper/>
                 <CoursePaymentWrapper/>
                 <CookiesMessage/>
+                <ModalWaiting visible={isWaiting}/>
             </div>
 
     }
@@ -317,6 +321,7 @@ function mapStateToProps(state, ownProps) {
         showSignInForm: state.app.showSignInForm,
         showFeedbackWindow: showFeedbackWindowSelector(state),
         showFeedbackResultMessage: showFeedbackResultMessageSelector(state),
+        isWaiting: waitingSelector(state),
         ownProps,
     }
 }
@@ -335,4 +340,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App))
+export default hot(withRouter(connect(mapStateToProps, mapDispatchToProps)(App)))

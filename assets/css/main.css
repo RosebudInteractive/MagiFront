@@ -5109,16 +5109,16 @@ ul.user-tooltip {
       -ms-flex-direction: column;
       flex-direction: column;
       padding-bottom: 13px; } }
-  @media (max-width: 899px) {
-    .course-module:not(._small).course-module--extended .course-module__info-block {
-      padding-top: 18px; } }
+  /*@media (max-width: 899px) {*/
+  /*  .course-module:not(._small).course-module--extended .course-module__info-block {*/
+  /*    padding-top: 18px; } }*/
   @media (max-width: 768px) {
     .course-module:not(._small) .course-module .favourites {
       top: 8px; }
-    .course-module:not(._small) .course-module__info-block {
-      padding-left: 32px;
-      padding-top: 37px;
-      width: 50%; }
+    /*.course-module:not(._small) .course-module__info-block {*/
+    /*  padding-left: 32px;*/
+    /*  padding-top: 37px;*/
+    /*  width: 50%; }*/
     .course-module:not(._small) .course-module__title {
       margin-bottom: 18px;
       font-size: 25px;
@@ -5266,6 +5266,8 @@ ul.user-tooltip {
       vertical-align: middle;
       margin-top: -2px;
       margin-right: 6px; }
+    .course-module--extended .course-module__label-icon {
+      margin-left: 6px; }
       /*fill: #c8684c; }*/
     .course-announce__label .course-module__label-icon {
       margin-top:  -8px; }
@@ -5672,6 +5674,12 @@ ul.user-tooltip {
     font-size: 14px;
     line-height: normal;
     color: #F79F1A; }
+  @media (max-width: 767px) {
+    .gift-block__text {
+      max-width: 300px; } }
+  @media (max-width: 639px) {
+    .gift-block__text {
+      max-width: 337px; } }
   .author-page .course-module__price-btn {
     min-width: 216px; }
   .bookmarks-page .course-module__price-btn {
@@ -5821,7 +5829,7 @@ ul.user-tooltip {
       top: 14px; } }
   @media (max-width: 1279px) {
   .course-module .favourites {
-      top: 8px; } }
+      top: 13px; } }
   @media (max-width: 1023px) {
     .course-module .favourites {
       left: -5px;
@@ -5832,9 +5840,10 @@ ul.user-tooltip {
     left: -4px;
     top: 6px; } }
   .course-module--extended .favourites {
-    top: 12px; }
-  .course-module--extended .favourites {
-    left: -27px; }
+    top: 12px;
+    width: 16px;
+    height: 30px;
+    left: -37px; }
   @media (max-width: 899px) {
     .course-module--extended .favourites {
       top: 4px;
@@ -6083,7 +6092,8 @@ ul.user-tooltip {
       margin-bottom: 20px; }
     .course-module--extended .course-module__info-block {
       padding: 0;
-      width: 50%; }
+      /*width: 50%; */
+    }
       @media (max-width: 639px) {
         .course-module--extended .course-module__info-block {
           width: 100%; } }
@@ -6111,7 +6121,7 @@ ul.user-tooltip {
         @media (max-width: 767px) {
           .course-module--extended .course-module__info-block:nth-child(2) {
             margin-top: 0;
-            padding-top: 18px; } }
+            padding-top: 15px; } }
         @media (max-width: 639px) {
           .course-module--extended .course-module__info-block:nth-child(2) {
             padding-top: 45px;
@@ -6153,7 +6163,7 @@ ul.user-tooltip {
 .course-module--extended .course-module__label {
       font-style: italic !important;
       font-size: inherit !important;
-      padding-right: 14px; }
+      padding-right: 10px; }
       @media (max-width: 1023px) {
         .course-module--extended .course-module__label{
           padding-left: 0; } }
@@ -19101,6 +19111,9 @@ ul.lectures-tab {
     font-weight: normal;
   }
 
+.waiting-form {
+  background: rgba(255, 255, 255, 0.5); }
+
 .waiting-frame {
   position: absolute;
   z-index: -1;
@@ -19138,6 +19151,22 @@ ul.lectures-tab {
 @media (max-width: 767px) {
   .waiting-frame__title {
     top: 238px; } }
+.waiting-form .waiting-frame._visible {
+  width: 400px;
+  height: 150px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /*border: 1px solid #C8684C;*/
+  box-shadow: 0 6px 64px rgba(0, 0, 0, 0.6); }
+
+.waiting-form .waiting-frame__title {
+  position: relative;
+  /*margin-top: 35px;*/
+  left: auto;
+  right: auto;
+  height: auto;
+  top: auto; }
 
 .billing-steps__item {
   max-height: 0;
