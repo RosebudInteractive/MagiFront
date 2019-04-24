@@ -6092,8 +6092,7 @@ ul.user-tooltip {
       margin-bottom: 20px; }
     .course-module--extended .course-module__info-block {
       padding: 0;
-      /*width: 50%; */
-    }
+      width: 50%; }
       @media (max-width: 639px) {
         .course-module--extended .course-module__info-block {
           width: 100%; } }
