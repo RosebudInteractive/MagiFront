@@ -87,7 +87,8 @@ class PaymentForm extends React.Component {
             const data = new FormData();
             if (selectedMethod === 'stored-card') {
                 data.Payment = {
-                    cheque_id: this.props.info.get('SubsAutoPayId')
+                    cheque_id: this.props.info.get('SubsAutoPayId'),
+                    email: this.email.state.value,
                 }
             } else {
                 data.Payment = {

@@ -47,12 +47,13 @@ export default class EmailField extends React.Component {
             this.setState({error : 'Required'})
         } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(e.target.value)) {
             this.setState({error :  'Invalid email address'})
-        } else if (this.state.error) {
+        } else {
             this.setState({error: '', value: e.target.value})
         }
     }
 
     _onChange(e) {
         this._validate(e)
+        this.props.onChange()
     }
 }
