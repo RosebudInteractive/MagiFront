@@ -71,6 +71,9 @@ module.exports = {
             testrecovery: false
         }
     },
+    general: {
+        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }
+    },
     billing: {
         module: "./yandex-kassa",
         enabled: true,
@@ -82,7 +85,9 @@ module.exports = {
             shopId: pk.billing.yandexKassa.shopId,
             secretKey: pk.billing.yandexKassa.secretKey,
             callBack: "/api/yandex-kassa/callback",
-            returnUrl: "/"
+            returnUrl: "/",
+            payment_mode: "full_payment",
+            chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
         }
     },
     authentication: {

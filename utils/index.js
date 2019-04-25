@@ -1,6 +1,7 @@
 'use strict';
 const _ = require('lodash');
 const truncate = require('truncate-html');
+const config = require('config');
 
 function getTimeStr(ts) {
     let now = ts ? new Date(ts) : new Date();
@@ -41,10 +42,12 @@ function splitArray(in_array, max_size) {
     return arrayOfIds;
 }
 
-const TRANCATE_HTML_DFLTS = { length: 30, inPerc: true, reserveLastWord: 25 }; // keep 30% jf initial html
+const TRANCATE_HTML_DFLTS = { length: 30, inPerc: true, reserveLastWord: 25 }; // keep 30% of initial html
+const _truncate_html_dflts = config.has("general.paid_truncate") ?
+    _.defaultsDeep(config.general.paid_truncate, TRANCATE_HTML_DFLTS) : TRANCATE_HTML_DFLTS;
 
 function truncateHtml(str, length, options) {
-    let opts = _.defaultsDeep(options, TRANCATE_HTML_DFLTS);
+    let opts = _.defaultsDeep(options, _truncate_html_dflts);
     let len = length;
     if (opts.inPerc) {
         opts.byWords = false;
