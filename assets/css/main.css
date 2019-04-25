@@ -19161,11 +19161,13 @@ ul.lectures-tab {
 
 .waiting-form .waiting-frame__title {
   position: relative;
-  /*margin-top: 35px;*/
+  margin-top: 35px;
   left: auto;
   right: auto;
   height: auto;
   top: auto; }
+.waiting-form .waiting-frame_loader {
+  margin-top: 15px; }
 
 .billing-steps__item {
   max-height: 0;

@@ -6,7 +6,7 @@ import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
-import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST, SHOW_WAITING_FORM} from "ducks/app";
+import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST, SHOW_WAITING_FORM, HIDE_WAITING_FORM} from "ducks/app";
 import {GET_TRANSACTIONS_REQUEST} from "ducks/profile";
 
 /**
@@ -369,13 +369,13 @@ function* getPendingCourseInfoSaga(data){
         switch (+error.status) {
             case 404 : {
                 yield put({type: GET_PAID_COURSE_INFO_REQUEST, payload: data.payload})
-                yield put({type: HIDE_BILLING_WINDOW})
+                yield put({type: HIDE_WAITING_FORM})
                 return
             }
 
             case 409: {
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
-                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_WAITING_FORM});
                 yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
                 yield put({type: HIDE_BILLING_WINDOW})
                 yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : new Error(COURSE_IS_BOUGHT)}})
@@ -385,7 +385,7 @@ function* getPendingCourseInfoSaga(data){
 
             default: {
                 yield put({type: GET_PENDING_COURSE_INFO_FAIL})
-                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_WAITING_FORM});
                 yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
                 yield put({type: HIDE_BILLING_WINDOW})
                 yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
