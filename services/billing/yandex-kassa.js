@@ -397,10 +397,15 @@ class YandexKassa extends Payment {
                     rc = this.get(paymentObject.cheque_id, options)
                         .then(cheque => {
                             if (cheque && cheque.data && (cheque.data.length === 1)) {
-                                if (!cheque.data[0].IsSaved)
+                                let chequeData = cheque.data[0];
+                                if (!chequeData.IsSaved)
                                     throw new Error(`Cheque "cheque_id": "${paymentObject.cheque_id}" isn't saved.`);
-                                paymentObject.payment_method_id = cheque.data[0].ChequeNum;
+                                paymentObject.payment_method_id = chequeData.ChequeNum;
                                 delete paymentObject.cheque_id;
+                                if ((!paymentObject.phone) && chequeData.ReceiptPhone)
+                                    paymentObject.phone = chequeData.ReceiptPhone;
+                                if ((!paymentObject.email) && chequeData.ReceiptEmail)
+                                    paymentObject.email = chequeData.ReceiptEmail;
                             }
                             else
                                 throw new Error(`Cheque "cheque_id": "${paymentObject.cheque_id}" doesn't exist.`);

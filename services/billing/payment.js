@@ -29,6 +29,7 @@ const CHEQUE_REQ_TREE = {
 const GET_CHEQUE_MSSQL =
     "select c.[Id], c.[UserId], c.[ParentId], c.[ChequeTypeId], ct.[Name] as [TypeName], c.[StateId], cs.[Name] as [StateName], c.[CurrencyId], c.[InvoiceId],\n" +
     "  c.[ReceiptStateId], rs.[Name] as [RcpName], c.[Name], c.[ChequeNum], c.[ChequeDate], c.[ChequeData], c.[IsSaved], c.[Sum], c.[RefundSum],\n" +
+    "  c.[ReceiptEmail], c.[ReceiptPhone],\n" +
     "  cl.[Id] as [LogId], cl.[ResultCode], cl.[Operation], cl.[Request], cl.[Response], cl.[TimeCr]\n" +
     "from[Cheque] c\n" +
     "  left join[ChequeLog] cl on cl.[ChequeId] = c.[Id]\n" +
@@ -41,6 +42,7 @@ const GET_CHEQUE_MSSQL =
 const GET_CHEQUE_MYSQL =
     "select c.`Id`, c.`UserId`, c.`ParentId`, c.`ChequeTypeId`, ct.`Name` as `TypeName`, c.`StateId`, cs.`Name` as `StateName`, c.`CurrencyId`, c.`InvoiceId`,\n" +
     "  c.`ReceiptStateId`, rs.`Name` as `RcpName`, c.`Name`, c.`ChequeNum`, c.`ChequeDate`, c.`ChequeData`, c.`IsSaved`, c.`Sum`, c.`RefundSum`,\n" +
+    "  c.`ReceiptEmail`, c.`ReceiptPhone`,\n" +
     "  cl.`Id` as `LogId`, cl.`ResultCode`, cl.`Operation`, cl.`Request`, cl.`Response`, cl.`TimeCr`\n" +
     "from`Cheque` c\n" +
     "  left join`ChequeLog` cl on cl.`ChequeId` = c.`Id`\n" +
@@ -213,6 +215,8 @@ exports.Payment = class Payment extends DbObject {
                             currObj.ChequeNum = elem.ChequeNum;
                             currObj.ChequeDate = elem.ChequeDate;
                             currObj.IsSaved = elem.IsSaved ? true : false;
+                            currObj.ReceiptEmail = elem.ReceiptEmail;
+                            currObj.ReceiptPhone = elem.ReceiptPhone;
                             currObj.Sum = elem.Sum;
                             currObj.RefundSum = elem.RefundSum;
                             currObj.ChequeData = elem.ChequeData;
@@ -644,6 +648,10 @@ exports.Payment = class Payment extends DbObject {
                             data.Refund.payment_id = parentCheque.chequeNum();
                             if (parentCheque.stateId() !== Accounting.ChequeState.Succeeded)
                                 throw new Error(`To create refund cheque "${parentCheque.id()}" should be in "Succeeded" state.`);
+                            if ((!data.Refund.phone) && parentCheque.receiptPhone())
+                                data.Refund.phone = parentCheque.receiptPhone();
+                            if ((!data.Refund.email) && parentCheque.receiptEmail())
+                                data.Refund.email = parentCheque.receiptEmail();
                             if (parentCheque.invoiceId()) {
                                 let inv = { ParentId: parentCheque.invoiceId(), InvoiceTypeId: Accounting.InvoiceType.Refund };
                                 if (data.Invoice && data.Invoice.Items)
