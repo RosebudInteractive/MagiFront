@@ -98,6 +98,9 @@ module.exports = {
             pushtest: true,
             testrecovery: true        }
     },
+    general: {
+        paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        
+    },
     billing: {
         module: "./yandex-kassa",
         enabled: false,
