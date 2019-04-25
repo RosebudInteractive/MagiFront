@@ -12,6 +12,8 @@ const PAYMENT_SYSTEM_NAME = {
     AMERICAN_EXPRESS: "AmericanExpress",
     JCB: "JCB",
     DINERS_CLUB: "DinersClub",
+    MIR: "Mir",
+    UNION_PAY: "UnionPay",
 }
 
 class CardBlock extends React.Component {
@@ -68,7 +70,9 @@ class CardBlock extends React.Component {
             _maestro = '<use xlink:href="#maestro"/>',
             _mastercard = '<use xlink:href="#mastercard"/>',
             _mir = '<use xlink:href="#mir-logo"/>',
-            _visa = '<use xlink:href="#visa"/>';
+            _union_pay = '<use xlink:href="#union-pay"/>',
+            _visa = '<use xlink:href="#visa"/>',
+            _default = '<use xlink:href="#default-card"/>';
 
         switch (systemName) {
             case PAYMENT_SYSTEM_NAME.AMERICAN_EXPRESS:
@@ -83,15 +87,21 @@ class CardBlock extends React.Component {
             case PAYMENT_SYSTEM_NAME.MAESTRO:
                 return <svg width="17" height="10" dangerouslySetInnerHTML={{__html: _maestro}}/>
 
+            case PAYMENT_SYSTEM_NAME.MIR:
+                return <svg width="16" height="5" dangerouslySetInnerHTML={{__html: _mir}}/>
+
             case PAYMENT_SYSTEM_NAME.MASTERCARD :
                 return <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _mastercard}}/>
+
+            case PAYMENT_SYSTEM_NAME.UNION_PAY:
+                return <svg width="20" height="13" dangerouslySetInnerHTML={{__html: _union_pay}}/>
 
             case PAYMENT_SYSTEM_NAME.VISA:
             case PAYMENT_SYSTEM_NAME.VISA_ELECTRON:
                 return <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _visa}}/>
 
             default:
-                return <svg width="16" height="5" dangerouslySetInnerHTML={{__html: _mir}}/>
+                return <svg width="19" height="12" dangerouslySetInnerHTML={{__html: _default}}/>
         }
     }
 
