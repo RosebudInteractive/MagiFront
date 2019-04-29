@@ -30,7 +30,7 @@ export default class SelectControl extends React.Component {
                             {this._getOptions()}
                         </select>
                         :
-                        <select {...input} id={id} className={_inputClass} placeholder={placeholder}>
+                        <select {...input} id={id} className={_inputClass} placeholder={placeholder} onFocus={::this._onFocus} onBlur={::this._onBlur}>
                             {this._getOptions()}
                         </select>
                     }
@@ -51,5 +51,15 @@ export default class SelectControl extends React.Component {
                                  hidden>{this.props.placeholder}</option>)
 
         return _options
+    }
+
+    _onFocus(e) {
+        e.target.classList.remove("select__empty_value")
+    }
+
+    _onBlur(e) {
+        if (!this.props.input.value && !e.target.classList.contains("select__empty_value")  ) {
+            e.target.classList.add("select__empty_value")
+        }
     }
 }
