@@ -1,16 +1,18 @@
-require("@babel/polyfill");
+require("babel-polyfill");
 let path = require('path');
 let webpack = require('webpack');
-let NpmInstallPlugin = require('npm-install-webpack-plugin');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
+const _hotLoaderPath = path.join(__dirname, 'node_modules', 'react-hot-loader')
+console.log(_hotLoaderPath)
+
 const _prodConfig = {
     entry: {
-        "babel-polyfill": "@babel/polyfill",
+        "babel-polyfill": "babel-polyfill",
         main: './frontend/index',
         adm: './src/index',
         'player-main': './scripts/player-main',
@@ -38,7 +40,7 @@ const _prodConfig = {
     optimization: {
         minimizer: [
             new UglifyJsPlugin({
-                // test: /\.js(\?.*)?$/i,
+                test: /\.js(\?.*)?$/i,
                 parallel: true,
                 uglifyOptions: {
                     warnings: false,
@@ -57,6 +59,15 @@ const _prodConfig = {
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
                 ],
+                // include: [
+                //     path.resolve(__dirname, "src"),
+                //     path.resolve(__dirname, "frontend"),
+                //     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                //     path.resolve(__dirname, 'node_modules/swiper'),
+                //     path.resolve(__dirname, 'node_modules/dom7'),
+                //     path.resolve(__dirname, 'scripts/'),
+                //     path.resolve(__dirname, 'static/'),
+                // ],
                 // language=JSRegexp
                 test: /\.js$/
             },
@@ -128,7 +139,7 @@ const _devConfig = {
     mode: 'development',
     devtool: 'cheap-module-eval-source-map',
     entry: {
-        'babel-polyfill': '@babel/polyfill',
+        'babel-polyfill': 'babel-polyfill',
         'webpack-hot-middleware/client': 'webpack-hot-middleware/client',
         main: ['./frontend/index', hotMiddlewareScript],
         adm: ['./src/index', hotMiddlewareScript],
@@ -162,13 +173,37 @@ const _devConfig = {
     module: {
         rules: [
             {
-                loaders: ['babel-loader'], //добавили loader 'react-hot'
+                test: /\.js$/,
+                loader: 'babel-loader',
                 exclude: [
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
                 ],
-                test: /\.js$/
+                // include: [
+                //     path.resolve(__dirname, "src"),
+                //     path.resolve(__dirname, "frontend"),
+                //     path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
+                //     path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
+                //     // path.resolve(__dirname, 'node_modules/whatwg-fetch'),
+                //     path.resolve(_hotLoaderPath),
+                //     path.resolve(__dirname, 'scripts/'),
+                // ],
+                // exclude: [
+                //     path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
+                //     path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
+                // ],
             },
+            // {
+            //     test: /\.js$/,
+            //     loader: 'babel-loader',
+            //     include: [
+            //         path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
+            //         path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
+            //     ],
+            //     options: {
+            //         presets: ["@babel/preset-es2015"]
+            //     },
+            // },
             {
                 loader: 'json-loader',
                 test: /\.json$/,
