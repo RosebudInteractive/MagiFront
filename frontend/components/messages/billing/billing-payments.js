@@ -11,7 +11,17 @@ import {
     isRedirectActiveSelector
 } from "ducks/billing";
 import StoredCard from "./stored-card";
-import {Alfa, AutosubscribeButton, Card, Mobile, Qiwi, Sberbank, WebMoney, Yandex,} from "./payment-items";
+import {
+    Alfa,
+    AutosubscribeButton,
+    Card,
+    Mobile,
+    OfferMessage,
+    Qiwi,
+    Sberbank,
+    WebMoney,
+    Yandex,
+} from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
 import WaitingFrame from "./waiting-frame";
 import EmailField from "./email-field";
@@ -203,23 +213,24 @@ class PaymentForm extends React.Component {
                             {/*<Alfa onClick={::this._selectPayment} checked={this.state.selectedMethod === 'alfaban'}/>*/}
                             <Qiwi onClick={::this._selectPayment} checked={this.state.selectedMethod === 'qiwi'}/>
                             <WebMoney onClick={::this._selectPayment} checked={this.state.selectedMethod === 'webmoney'}/>
-                            <Mobile onClick={::this._selectPayment}
-                                    checked={this.state.selectedMethod === 'mobile_balance'}/>
+                            {/*<Mobile onClick={::this._selectPayment}*/}
+                            {/*        checked={this.state.selectedMethod === 'mobile_balance'}/>*/}
                         </ul>
                     </div>
-                    <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
-                    <div className="payment-form__footer subscription-form js-sticky sticky">
-                        <AutosubscribeButton
-                            visible={this.state.showSaveMethodButton}
-                            checked={this.state.savePayment}
-                            onChange={::this._changeSavePayment}/>
-                        <p className="payment-form__label">Всего к оплате:
-                            <span className="total">{selectedSubscription.Price}<span className="cur">₽</span></span>
-                        </p>
-                        <button className={"payment-form__submit btn btn--brown" + (_disabledBtn ? ' disabled' : '')}
-                                onClick={::this._handleSubmit}>
-                            Оплатить →
-                        </button>
+                    <div className="payment-form__footer-wrapper">
+                        <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
+                        <div className="payment-form__footer subscription-form js-sticky sticky">
+                            <AutosubscribeButton
+                                visible={this.state.showSaveMethodButton}
+                                checked={this.state.savePayment}
+                                onChange={::this._changeSavePayment}/>
+                            <OfferMessage/>
+                            <button className={"payment-form__submit btn btn--brown" + (_disabledBtn ? ' disabled' : '')}
+                                    onClick={::this._handleSubmit}>
+                                Оплатить
+                                <span className="total">{selectedSubscription.Price}<span className="cur">₽</span></span>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

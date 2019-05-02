@@ -1,4 +1,5 @@
 import React from "react";
+import {Link} from "react-router-dom"
 
 export const Card = (props) => {
     return <li className="payment-method">
@@ -114,4 +115,11 @@ export const AutosubscribeButton = (props) => {
         </div>
         :
         null
+}
+
+export const OfferMessage = () => {
+    return <div className="subscription-form__offer">
+        {"Нажимая на кнопку «Оплатить» вы принимаете условия "}
+            <Link to={"/doc/oferta.pdf"} target="_blank">договора-оферты</Link>
+        </div>
 }
