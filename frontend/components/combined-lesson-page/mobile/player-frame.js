@@ -218,7 +218,8 @@ class PlayerFrame extends Component {
             _invisibleStyle = {
                 opacity: 0,
                 zIndex: -100,
-                display: "flex",
+                display: "contents",
+                visibility: "hidden",
             }
 
         let _lessonInfo = this.props.lessonInfoStorage.lessons.get(_id),
