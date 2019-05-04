@@ -5099,7 +5099,7 @@ ul.user-tooltip {
       /*border-bottom: none;*/
       /*min-height: 700px;*/
       min-height: 685px; } }
-  @media (max-width: 639px) {.payment-form__label .cur
+  @media (max-width: 639px) {
     .course-module {
       -webkit-box-orient: vertical;
       -webkit-box-direction: normal;
@@ -6188,7 +6188,7 @@ ul.user-tooltip {
             background-image: url("../images/svg/flag.svg");
             opacity: 0.2; } }
     .fav-card__title .course-module__label {
-      position: unset;
+      position: inherit;
       padding-left: 0; }
     .fav-card__title .course-module__label-icon {
       padding-right: 5px;
@@ -14151,6 +14151,7 @@ ul.lectures-tab {
   .subscribe-form__field-wrapper {
     position: relative; }
   .subscribe-form__field {
+    height: 2.77em;
     padding: 0;
     background-color: rgba(255, 255, 255, 0);
     border: none;
@@ -19334,6 +19335,7 @@ ul.lectures-tab {
         text-align: right;
         margin: 10px; }
       .email__field-wrapper .form__field {
+        height: 2.77em;
         text-align: left;
         padding-left: 16px;
         border: 1px solid rgba(47, 47, 74, 0.2);

@@ -38,6 +38,10 @@ class ImageLink extends React.Component {
         this._name = '';
     }
 
+    componentWillMount() {
+        this._name = this._getResourceName(this.props.input.value)
+    }
+
     componentWillReceiveProps(nextProps) {
         if (this.props.input.value !== nextProps.input.value) {
             this._name = this._getResourceName(nextProps.input.value)

@@ -272,15 +272,15 @@ class LessonEditorForm extends React.Component {
             hasTwitterImage,
         } = this.props;
 
-        if (ogImageResourceId || twitterImageResourceId || hasOgImage || hasTwitterImage) {
+        if (editorValues.ogImageResourceId || editorValues.twitterImageResourceId || hasOgImage || hasTwitterImage) {
             _obj.Images = [];
 
-            if (ogImageResourceId) {
-                _obj.Images.push({Id: ogImageId, Type: 'og', ResourceId: ogImageResourceId})
+            if (editorValues.ogImageResourceId) {
+                _obj.Images.push({Id: ogImageId, Type: 'og', ResourceId: editorValues.ogImageResourceId})
             }
 
-            if (twitterImageResourceId) {
-                _obj.Images.push({Id: twitterImageId, Type: 'twitter', ResourceId: twitterImageResourceId})
+            if (editorValues.twitterImageResourceId) {
+                _obj.Images.push({Id: twitterImageId, Type: 'twitter', ResourceId: editorValues.twitterImageResourceId})
             }
         }
 
@@ -386,14 +386,6 @@ const validate = (values) => {
         errors.authorId = 'Значение не может быть пустым'
     }
 
-    if (!values.description) {
-        errors.description = 'Значение не может быть пустым'
-    }
-    //
-    // if (!values.cover || !values.cover.file) {
-    //     errors.cover = 'Значение не может быть пустым'
-    // }
-
     if (values.fixed && !values.fixDescription) {
         errors.fixDescription = 'Значение не может быть пустым'
     }
@@ -408,7 +400,13 @@ let LessonEditorWrapper = reduxForm({
 
 function mapStateToProps(state) {
     return {
-        hasChanges: isDirty('LessonEditor')(state),
+        hasChanges: state.singleLesson.hasChanges ||
+            state.subLessons.hasChanges ||
+            state.lessonResources.hasChanges ||
+            state.lessonMainEpisodes.hasChanges ||
+            state.lessonCommonRefs.hasChanges ||
+            state.lessonRecommendedRefs.hasChanges ||
+            isDirty('LessonEditor')(state),
         editorValues: getFormValues('LessonEditor')(state),
         editorValid: isValid('LessonEditor')(state),
 
