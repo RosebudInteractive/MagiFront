@@ -16341,6 +16341,11 @@ ul.lectures-tab {
       width: calc(100% - 88px);
       margin-top: 0; } }
   @media (max-width: 767px) {
+    .ms-based .modal._donation{
+      top: 25px;
+      width: calc(100% - 122px);
+      transform: translateX(-50%) } }
+  @media (max-width: 767px) {
     .modal._billing {
       max-height: calc(100% - 50px); } }
   .modal__close {
