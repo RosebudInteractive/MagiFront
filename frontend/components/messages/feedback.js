@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {hideFeedbackWindow, sendFeedback, loadingSelector} from "ducks/message";
+import Platform from "platform";
 
 class FeedbackMessageBox extends React.Component {
 
@@ -45,7 +46,10 @@ class FeedbackMessageBox extends React.Component {
     render() {
         let _disabledBtn = !this._isSendingEnable()
 
-        return <div className="modal-overlay modal-wrapper js-modal-wrapper" data-name="donation">
+        const _isIE = Platform.name === 'IE',
+            _className = "modal-overlay modal-wrapper js-modal-wrapper" + (_isIE ? ' ms-based' : '')
+
+        return <div className={_className} data-name="donation">
             <div className="modal _donation" id="donation">
                 <button type="button" className="modal__close js-modal-close" data-target="#donation"
                         onClick={::this._close}>Закрыть

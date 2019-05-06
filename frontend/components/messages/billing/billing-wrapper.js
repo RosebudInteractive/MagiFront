@@ -17,6 +17,7 @@ import Subscription from './billing-subscription'
 import Payment from './billing-payments'
 import $ from "jquery";
 import {enabledSubscriptionSelector} from "ducks/app";
+import Platform from "platform";
 
 class BillingWrapper extends React.Component {
     constructor(props) {
@@ -24,6 +25,7 @@ class BillingWrapper extends React.Component {
 
         this.state = {
             opened: false,
+            isIE: Platform.name === 'IE',
         }
     }
 
@@ -94,9 +96,12 @@ class BillingWrapper extends React.Component {
     render() {
         let {showBillingWindow, enabledBilling, showSignInForm} = this.props;
 
+        const _className = "modal-overlay modal-wrapper js-modal-wrapper" +
+            (this.state.isIE ? ' ms-based' : '') +
+            (this.state.opened ? ' is-opened' : ' invisible')
+
         return (showBillingWindow && enabledBilling && !showSignInForm) ?
-            <div
-                className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
+            <div className={_className}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
                             onClick={::this._onCloseClick}>Закрыть

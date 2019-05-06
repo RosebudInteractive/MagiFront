@@ -1,6 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
+import Platform from 'platform';
 
 import {
     showCoursePaymentWindowSelector,
@@ -22,7 +23,10 @@ class CoursePaymentWrapper extends React.Component {
 
         this.state = {
             opened: false,
+            isIE: Platform.name === 'IE',
         }
+
+        console.log(Platform)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -77,9 +81,12 @@ class CoursePaymentWrapper extends React.Component {
     render() {
         let {showWindow, enabledPaidCourses, showSignInForm, fetching} = this.props;
 
+        const _className = "modal-overlay modal-wrapper js-modal-wrapper" +
+            (this.state.isIE ? ' ms-based' : '') +
+            (this.state.opened ? ' is-opened' : ' invisible')
+
         return (showWindow && enabledPaidCourses && !showSignInForm) ?
-            <div
-                className={"modal-overlay modal-wrapper js-modal-wrapper" + (this.state.opened ? ' is-opened' : ' invisible')}>
+            <div className={_className}>
                 <div className="modal _billing billing-steps is-opened" id="billing">
                     <button type="button" className="modal__close js-modal-close" data-target="billing"
                             onClick={::this._onCloseClick} disabled={fetching}>Закрыть

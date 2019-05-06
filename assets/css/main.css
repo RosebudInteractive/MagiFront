@@ -16204,6 +16204,7 @@ ul.lectures-tab {
   -webkit-transition: opacity .3s ease-in-out;
   transition: opacity .3s ease-in-out; }
   .modal-open .modal-overlay {
+    flex-direction: column;
     opacity: 1;
     pointer-events: initial;
     z-index: 10000; }
@@ -16323,6 +16324,11 @@ ul.lectures-tab {
   background-color: #fff;
   -webkit-box-shadow: 0 6px 64px rgba(0, 0, 0, 0.6);
   box-shadow: 0 6px 64px rgba(0, 0, 0, 0.6); }
+.ms-based .modal{
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%)}
   @media (max-width: 899px) {
     .modal {
       width: 600px; } }
@@ -16429,6 +16435,9 @@ ul.lectures-tab {
           padding-right: 30px; } }
     .modal__headline span {
       white-space: nowrap; }
+    @media (max-width: 767px) {
+      .ms-based .modal__headline {
+        max-width: calc(100% - 1px); } }
   .modal__descr {
     margin: 0;
     max-width: 200px;
@@ -16467,6 +16476,8 @@ ul.lectures-tab {
       height: 50px;
       font-weight: 400;
       font-size: 18px; }
+    .ms-based .modal__message .btn {
+      width: 227px; }
       @media (max-width: 767px) {
         .modal__message .btn {
           margin-left: 0;
@@ -19516,6 +19527,9 @@ ul.lectures-tab {
       /*-webkit-box-shadow: 0 -4px 4px 0 rgba(0, 0, 0, 0.05);*/
       /*box-shadow: 0 -4px 4px 0 rgba(0, 0, 0, 0.05); */
     } }
+  .ms-based .payment-form__footer {
+    position: relative;
+    top: 0; }
 
 .payment-form__submit {
   padding: 15px;
@@ -19751,12 +19765,23 @@ ul.lectures-tab {
       margin-right: auto;
       padding-bottom: 0;
       width: auto; }
+    .ms-based ._billing .subscription-form__check {
+      -ms-transform: translateX(-70%);
+      margin-right: 0; }
+    @media (max-width: 899px) {
+      .ms-based ._billing .subscription-form__check {
+        -ms-transform: none; } }
     @media (max-width: 899px) {
       ._billing .subscription-form__check {
         position: absolute;
         top: 0;
         left: 0;
         padding-left: 0; } }
+    @media (max-width: 767px) {
+      .ms-based ._billing .subscription-form__check {
+        width: 100%;
+        top: 0;
+        margin-bottom: 0; } }
     @media (max-width: 767px) {
       ._billing .subscription-form__check {
         position: relative;
@@ -19775,6 +19800,14 @@ ul.lectures-tab {
       text-align: left;
       max-width: initial;
       margin: auto; } }
+  @media (max-width: 899px) {
+    .ms-based .subscription-form__offer {
+      margin: 0 21px 0 0;
+      max-width: none} }
+  @media (max-width: 767px) {
+    .ms-based .subscription-form__offer {
+      margin: 0;
+      max-width: calc(100% - 1px); } }
   @media (max-width: 767px) {
     .subscription-form__offer {
       order: 3; } }
