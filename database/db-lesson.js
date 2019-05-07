@@ -339,7 +339,7 @@ const LESSON_MSSQL_CHILDS_REQ =
     "select l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
     "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired],\n" +
     "  l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
-    "  ell.[Audio]\n" +
+    "  ell.[Audio], l.[IsFreeInPaidCourse]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
@@ -533,7 +533,7 @@ const LESSON_MYSQL_CHILDS_REQ =
     "select l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
     "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`,\n" +
     "  l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
-    "  ell.`Audio`\n" +
+    "  ell.`Audio`, l.`IsFreeInPaidCourse`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
@@ -1547,6 +1547,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     child.URL = isAbsPath ? courseUrl + elem.URL : elem.URL;
                                     child.IsAuthRequired = elem.IsAuthRequired ? true : false;
                                     child.IsSubsRequired = elem.IsSubsRequired ? true : false;
+                                    child.IsFreeInPaidCourse = elem.IsFreeInPaidCourse ? true : false;
                                     child.Number = elem.Number;
                                     child.ShortDescription = elem.ShortDescription;
                                     if (child.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
