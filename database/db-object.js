@@ -93,8 +93,14 @@ exports.DbObject = class DbObject extends CacheableObject {
 
             if (simple_condition) {
                 let predicate = new Predicate(this._db, {});
-                predicate
-                    .addCondition(simple_condition);
+                let conds = [];
+                if (Array.isArray(simple_condition))
+                    conds = simple_condition
+                else
+                    conds.push(simple_condition);
+                conds.forEach(elem=>{
+                    predicate.addCondition(elem);
+                })
                 exp_filtered.expr.predicate = predicate.serialize(true);
                 this._db._deleteRoot(predicate.getRoot());
             }

@@ -49,6 +49,10 @@ class AuthVK {
                     }
                 }
             }
+
+            if (req.campaignId)
+                profile.CampaignId = req.campaignId;
+
             this._usersCache.getUserByProfile(profile)
                 .then((user) => {
                     done(null, user ? user : false);
