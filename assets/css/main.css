@@ -3712,6 +3712,8 @@ li.fancybox-thumbs-loading {
       line-height: 17px;
       color: rgba(47, 47, 47, 0.6); }
     .page-footer__copyright a {
+      white-space: pre-line;
+      display: inline-block;
       -webkit-transition: opacity 0.3s ease;
       transition: opacity 0.3s ease;
       color: rgba(47, 47, 47, 0.6); }
