@@ -192,8 +192,11 @@ class Copyright extends React.Component {
             <div className="page-footer__copyright">
                 <div className="page-footer__wrapper ">
                     <p>{'© Magisteria 2016 - 2019. All rights reserved. '}
-                            <Link to={'/doc/privacy.pdf'} target="_blank">Политика конфиденциальности</Link> / <Link to={'/doc/terms.pdf'} target="_blank">Пользовательское
-                            соглашение</Link>
+                        <Link to={'/doc/privacy.pdf'} target="_blank">Политика конфиденциальности</Link>
+                        {" / "}
+                        <Link to={'/doc/terms.pdf'} target="_blank">Пользовательское соглашение</Link>
+                        {" / "}
+                        <Link to={'/doc/oferta.pdf'} target="_blank">Публичная оферта</Link>
                     </p>
                 </div>
             </div>
