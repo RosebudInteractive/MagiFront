@@ -4,7 +4,7 @@ const fs = require('fs');
 const config = require('config');
 const _ = require('lodash');
 const randomstring = require('randomstring');
-
+const { validateEmail } = require('../utils');
 const { Activation } = require('../const/activation');
 const { SendMail } = require('../mail');
 
@@ -59,7 +59,7 @@ exports.UserRegister = (password, data, userCache) => {
         data.Name = data.Name ? data.Name : data.Login;
         data.DisplayName = data.DisplayName ? data.DisplayName : data.Name;
         data.Email = data.Email ? data.Email : data.Login;
-        if (!/^[-.\w]+@([\w-]+\.)+[\w-]{2,12}$/.test(data.Email))
+        if (!validateEmail(data.Email))
             throw new Error("Email \"" + data.Email + "\"has incorrect format.");
         data.RegDate = new Date();
         data.ExpDate = new Date(data.RegDate - 0 + (Activation.EXP_PERIOD_SEC * 1000));
