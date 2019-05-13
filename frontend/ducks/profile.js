@@ -88,6 +88,7 @@ export const CLEAR_STORED_CARD_SUCCESS = `${prefix}/CLEAR_STORED_CARD_SUCCESS`
 export const CLEAR_STORED_CARD_FAIL = `${prefix}/CLEAR_STORED_CARD_FAIL`
 
 export const CLEAR_ERROR = `${prefix}/CLEAR_ERROR`
+export const FINISH_LOAD_PROFILE = `${prefix}/FINISH_LOAD_PROFILE`
 
 /**
  * Reducer
@@ -733,8 +734,11 @@ const _handlePaidCoursesData = (data) => {
  * Sagas watcher
  */
 function* watchGetUserProfile() {
-    yield fork(getUserProfileSaga);
-    yield fork(getUserPaidCoursesSaga);
+    yield call(getUserProfileSaga);
+    yield call(getUserPaidCoursesSaga);
+    yield call(getUserBookmarksSaga);
+
+    yield put({type: FINISH_LOAD_PROFILE})
 }
 
 function* watchPaymentSuccess() {

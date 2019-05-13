@@ -50,7 +50,6 @@ class AuthConfirmForm extends React.Component {
         let {email, msgUrl} = this.props
 
         return (
-
             <div className="register-block-wrapper">
                 <div className='register-block-wrapper__logo'/>
                 <div className="success-message">

@@ -1,45 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types';
 import ReactDatetime from 'react-datetime'
-// import styled, { injectGlobal } from 'styled-components'
-// import { Label, Info, Error, Wrapper } from '../themes/default'
 import './date-time-control.sass'
-
-// injectGlobal`${vendorCss}`
-//
-// const StyledPicker = styled(ReactDatetime)`
-//   input {
-//     border: 1px solid ${props => props.error ? props.theme.danger : props.theme.gray};
-//     border-radius: ${props => props.theme.radius};
-//     height: ${props => props.theme.height};
-//     padding: ${props => props.theme.padding};
-//     width: 100%;
-//   }
-//   .rdtPicker {
-//     padding: 0;
-//   }
-//
-//   table {
-//     border-collapse: collapse;
-//     border-spacing: 0;
-//     margin-top: 3px;
-//   }
-//   th, td {
-//     border: 0;
-//     padding: 0;
-//     margin: 0;
-//   }
-//   thead {
-//     background: ${props => props.theme.lightgray}
-//   }
-//   &:focus {
-//     border-color: ${props => props.error ? props.theme.danger : props.theme.primary};
-//     outline: none;
-//   }
-//   &:hover {
-//     cursor: pointer;
-//   }
-// `
 
 class Datepicker extends React.Component {
     static propTypes = {
@@ -49,6 +11,11 @@ class Datepicker extends React.Component {
         input: PropTypes.object, // passed in by redux-form
         className: PropTypes.string,
         placeholder: PropTypes.string,
+        showTime: PropTypes.bool,
+    }
+
+    static defaultProps = {
+        showTime: false,
     }
 
     handleChange(args) {
@@ -70,7 +37,7 @@ class Datepicker extends React.Component {
     }
 
     render() {
-        const {error, value, input, className, label, info, meta, placeholder, hidden, disabled, id} = this.props
+        const {error, value, input, className, label, info, meta, placeholder, hidden, disabled, id, showTime} = this.props
         const reduxFormError = (meta) => (meta && meta.invalid && meta.touched) ? meta.error : null
         const currentValue = input ? input.value : value
         const errorMessage = input ? reduxFormError(meta) : error
@@ -94,7 +61,7 @@ class Datepicker extends React.Component {
                         onFocus={this.handleFocus.bind(this)}
                         onBlur={::this.handleBlur}
                         closeOnSelect={true}
-                        dateFormat={"DD MMMM YYYY"}
+                        dateFormat={showTime ? "DD MMMM YYYY hh:mm:ss" : "DD MMMM YYYY"}
                         locale={"ru-ru"}
                         timeFormat={false}
                         value={currentValue}
