@@ -1,6 +1,11 @@
 import React from "react";
 import {Link} from "react-router-dom"
 
+const CHECKBOX_TITLE = {
+    UNCHECKED: 'Запомнить реквизиты',
+    CHECKED: 'Не запоминать реквизиты',
+}
+
 export const Card = (props) => {
     return <li className="payment-method">
         <input type="radio" className="payment-form__option" name="payment-type" id="card"
@@ -110,8 +115,9 @@ export const AutosubscribeButton = (props) => {
         <div className="subscription-form__check">
             <input type="checkbox" id="autosubscribe" className="visually-hidden"
                    checked={props.checked} onChange={props.onChange}/>
-            <label htmlFor="autosubscribe" className="subscription-form__label">Запомнить
-                реквизиты</label>
+            <label htmlFor="autosubscribe" className="subscription-form__label">
+                {props.checked ? CHECKBOX_TITLE.CHECKED : CHECKBOX_TITLE.UNCHECKED}
+            </label>
         </div>
         :
         null
@@ -120,6 +126,6 @@ export const AutosubscribeButton = (props) => {
 export const OfferMessage = () => {
     return <div className="subscription-form__offer">
         {"Нажимая на кнопку «Оплатить» вы принимаете условия "}
-            <Link to={"/doc/oferta.pdf"} target="_blank">договора-оферты</Link>
-        </div>
+        <Link to={"/doc/oferta.pdf"} target="_blank">договора-оферты</Link>
+    </div>
 }

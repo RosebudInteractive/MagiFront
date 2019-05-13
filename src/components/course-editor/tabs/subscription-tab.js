@@ -110,7 +110,7 @@ class CourseSubscriptionForm extends React.Component {
             <form className="controls-wrapper course-subscription-tab">
                 <Field component={CheckBox} name="IsPaid" label="Платный" disabled={_disabled}/>
                 <Field component={Select} name="PaidTp" label="Тип платности" placeholder="Выберите тип" disabled={_disabled || !isPaid} options={PAID_TYPE_OPTIONS}/>
-                <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после" hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
+                <Field component={Datepicker} name="PaidRegDate" label="Платный для зарегистрировавшихся после" showTime={true} hidden={!_isPaidForReg || !isPaid} disabled={_disabled}/>
                 <Field component={CheckBox} name="IsSubsFree" label="Бесплатный в рамках подписки" disabled={_disabled || !_enableSubscription}/>
                 <Field component={TextBox} name="Price" label="Цена" placeholder="Введите цену" disabled={!isPaid || _disabled}/>
                 <Field component={TextBox} name="DPrice" label="Цена со скидкой" placeholder="Введите цену" disabled={true}/>

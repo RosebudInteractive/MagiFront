@@ -66,9 +66,9 @@ class PriceBlock extends React.Component {
     }
 
     _onClick() {
-        if (!this.props.authorized) {
-            this.props.showSignInForm();
-        }
+        // if (!this.props.authorized) {
+        //     this.props.showSignInForm();
+        // }
 
         const {course} = this.props;
 
@@ -79,7 +79,6 @@ class PriceBlock extends React.Component {
         } else {
             this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
         }
-
     }
 }
 

@@ -6,8 +6,14 @@ import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import $ from 'jquery'
 import {all, takeEvery, select, take, put, apply, call, fork} from 'redux-saga/effects'
 import {SHOW_MODAL_MESSAGE_ERROR} from "ducks/message";
-import {billingParamsSelector, RELOAD_CURRENT_PAGE_REQUEST, SHOW_WAITING_FORM, HIDE_WAITING_FORM} from "ducks/app";
-import {GET_TRANSACTIONS_REQUEST} from "ducks/profile";
+import {
+    billingParamsSelector,
+    RELOAD_CURRENT_PAGE_REQUEST,
+    SHOW_WAITING_FORM,
+    HIDE_WAITING_FORM,
+} from "ducks/app";
+import {FINISH_LOAD_PROFILE, GET_TRANSACTIONS_REQUEST, userPaidCoursesSelector} from "ducks/profile";
+import {SHOW_SIGN_IN_FORM,} from "../constants/user";
 
 /**
  * Constants
@@ -52,15 +58,24 @@ export const REFUND_PAYMENT_START = `${prefix}/REFUND_PAYMENT_START`
 export const REFUND_PAYMENT_SUCCESS = `${prefix}/REFUND_PAYMENT_SUCCESS`
 export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 
+export const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
+export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+
 export const BillingStep = {
     subscription: 'subscription',
     payment: 'payment',
+}
+
+const STATE = {
+    NONE : 'NONE',
+    WAITING_AUTHORIZE : 'WAITING_AUTHORIZE'
 }
 
 /**
  * Reducer
  * */
 const Redirect = Record({url: '', active: false})
+const Waiting = Record({data: null, active: false})
 
 export const ReducerRecord = Record({
     showBillingWindow: false,
@@ -73,6 +88,7 @@ export const ReducerRecord = Record({
     redirect: new Redirect(),
     error: null,
     fetchingCourseId: null,
+    waiting: new Waiting(),
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -87,10 +103,13 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case GET_PAID_COURSE_INFO_START:
         case GET_PENDING_COURSE_INFO_START:
+        case CLEAR_WAITING_AUTHORIZE:
             return state
                 .set('error', null)
                 .set('fetching', true)
                 .set('fetchingCourseId', payload)
+                .setIn(['waiting', 'data'], null)
+                .setIn(['waiting', 'active'], false)
 
         case GET_SUBSCRIPTION_TYPES_SUCCESS:
             return state
@@ -162,6 +181,11 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['redirect', 'url'], '')
                 .setIn(['redirect', 'active'], false)
 
+        case SET_WAITING_AUTHORIZE:
+            return state
+                .setIn(['waiting', 'data'], Object.assign({}, payload))
+                .setIn(['waiting', 'active'], true)
+
         default:
             return state
     }
@@ -183,6 +207,8 @@ export const selectedTypeSelector = createSelector(stateSelector, state => state
 export const redirectSelector = createSelector(stateSelector, state => state.redirect)
 export const isRedirectActiveSelector = createSelector(redirectSelector, redirect => redirect.get('active'))
 export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
+
+const isWaitingAuthorize = createSelector(stateSelector, state => state.waiting)
 
 /**
  * Action Creators
@@ -267,27 +293,51 @@ export const redirectComplete = () => {
  * Sagas
  */
 function* watchPaidCourseInfoSaga(data) {
-    yield put({type: GET_PAID_COURSE_INFO_START, payload: data.payload.courseId})
+    const _state = yield select(state => state),
+        _authorized = !!_state.user.user;
 
-    try {
-        let _data = yield call(_fetchPaidCourseInfo, data.payload.productId);
+    if (!_authorized) {
+        yield call(_setWaitingAuthorize, data.payload)
+    } else {
+        yield call(_getPaidCourseInfoSaga, data.payload)
+    }
+}
 
-        _data = _data ? _data[0] : null;
+function* _setWaitingAuthorize(data) {
+    yield put({type: SET_WAITING_AUTHORIZE, payload: data})
+    yield put({type: SHOW_SIGN_IN_FORM})
+}
 
-        let _price = {
-            Price: _data.DPrice ? _data.DPrice : _data.Price,
-            Id: _data.Id,
-            Title: _data.Name,
-            ReturnUrl: data.payload.returnUrl,
+function* _getPaidCourseInfoSaga(data) {
+    const _waiting = yield select(isWaitingAuthorize),
+        _data = _waiting.active ? _waiting.data : data,
+        _userPaidCourses = yield select(userPaidCoursesSelector)
+
+    if (_userPaidCourses.contains(_data.courseId)) {
+        yield put({type: CLEAR_WAITING_AUTHORIZE})
+    } else {
+        yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
+
+        try {
+            let _fetchResult = yield call(_fetchPaidCourseInfo, _data.productId);
+
+            _fetchResult = _fetchResult ? _fetchResult[0] : null;
+
+            let _price = {
+                Price: _fetchResult.DPrice ? _fetchResult.DPrice : _fetchResult.Price,
+                Id: _fetchResult.Id,
+                Title: _fetchResult.Name,
+                ReturnUrl: _data.returnUrl,
+            }
+
+            yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
+            yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
+        } catch (error) {
+            yield put({type: GET_PAID_COURSE_INFO_FAIL})
+            yield put({type: HIDE_BILLING_WINDOW});
+            yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+            yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
         }
-
-        yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
-        yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
-    } catch (error) {
-        yield put({type: GET_PAID_COURSE_INFO_FAIL})
-        yield put({type: HIDE_BILLING_WINDOW});
-        yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
-        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
 
@@ -423,6 +473,7 @@ export const saga = function* () {
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
+        takeEvery(FINISH_LOAD_PROFILE, watchPaidCourseInfoSaga),
     ])
 }
 
