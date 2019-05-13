@@ -18,11 +18,16 @@ class PriceBlock extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+        title: PropTypes.string,
+    }
+
+    static defaultProps = {
+        title: 'Купить'
     }
 
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId} = this.props
+        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title} = this.props
 
         if (!enabledPaidCourse) {
             return null
@@ -38,7 +43,7 @@ class PriceBlock extends React.Component {
 
         return <div className="course-module__price-block">
             <div className="course-module__price-block-wrapper">
-                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>Купить</div>
+                <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?

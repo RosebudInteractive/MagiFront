@@ -254,7 +254,7 @@ class TextBlock extends React.Component {
                         {this._getText()}
                         {
                             this.props.isPaidCourse && !lesson.IsFreeInPaidCourse ?
-                                <PriceBlock course={this.props.course}/>
+                                <PriceBlock course={this.props.course} title={"Купить курс"}/>
                                 :
                                 null
                         }
