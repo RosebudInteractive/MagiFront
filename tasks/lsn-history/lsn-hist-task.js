@@ -72,7 +72,7 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                                     let now = (new Date()) - 0;
                                     if (((now - hstElem.ts) / 1000) > this._settings.maxIdle) {
                                         let flds = elem.split(":");
-                                        if (flds.length === 4) {
+                                        if (flds.length >= 4) {
                                             let ts_start = +flds[3];
                                             hstElem.ts_start = ts_start;
 
@@ -85,7 +85,10 @@ exports.LsnHistTask = class LsnHistTask extends Task {
                                                 UserTime: hstElem.ut,
                                                 RawData: JSON.stringify(hstElem)
                                             };
-                                        
+
+                                            if ((flds.length > 4) && flds[4])
+                                                data.CampaignId = +flds[4];
+                                            
                                             totUsers[data.UserId] = true;
                                             totLessons[data.LessonId] = true;
                                             totTime += data.LsnTime;

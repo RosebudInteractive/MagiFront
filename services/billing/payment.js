@@ -624,10 +624,14 @@ exports.Payment = class Payment extends DbObject {
         let chequeTypeId;
         let refundInvoiceId;
         let isRefund = false;
+        let campaignId = null;
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
                 let rc;
+
+                campaignId = data && data.campaignId ? data.campaignId : null;
+
                 if (!(data.Payment || data.Refund))
                     throw new Error(`Missing "Payment" or "Refund" object.`);
                 
@@ -683,7 +687,7 @@ exports.Payment = class Payment extends DbObject {
                 })
                 .then(() => {
                     return root_obj.newObject({
-                        fields: { IsSaved: false, RefundSum: 0 }
+                        fields: { IsSaved: false, RefundSum: 0, CampaignId: campaignId }
                     }, dbOpts);
                 })
                 .then(result => {

@@ -79,7 +79,8 @@ if (config.has("tasks")) {
                                                 taskDsc.lastFinish = finDt;
                                                 taskDsc.error = err;
                                                 let dt = (finDt - startDt) / 1000;
-                                                console.error(buildLogString(`#### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt, true)}. Error: ${err}`), finDt);
+                                                console.error(buildLogString(`#### "${taskName}" failed. ${getStatStr(taskDsc, dt, dfmt, true)}. ` +
+                                                    `Error: ${err && err.message ? err.message : err}`), finDt);
                                             });
                                     }
                                     else

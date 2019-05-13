@@ -53,6 +53,8 @@ exports.SetupRoute = (app) => {
                 let errMsg;
                 let data = { lsn: {} };
                 try {
+                    if (req.campaignId)
+                        data.campaignId = req.campaignId;
                     let ts = (req.query && req.query.ts) ? parseInt(req.query.ts) : null;
                     if ((typeof (ts) !== "number") || isNaN(ts))
                         throw new Error(`Invalid or missing parameter "ts": "${req.query.ts}"`);
@@ -108,13 +110,16 @@ exports.SetupRoute = (app) => {
 
     app.post("/api/lsnpos", (req, res, next) => {
         if (req.user) {
-            positionsService().setLessonPositions(req.user.Id, req.body)
-                .then((result) => {
-                    res.send(result);
-                })
-                .catch((err) => {
-                    next(err);
-                });
+            if (req.body && req.campaignId) {
+                req.body.campaignId = req.campaignId;
+                positionsService().setLessonPositions(req.user.Id, req.body)
+                    .then((result) => {
+                        res.send(result);
+                    })
+                    .catch((err) => {
+                        next(err);
+                    });
+            }
         }
         else
             res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
@@ -152,14 +157,17 @@ exports.SetupRoute = (app) => {
     });
 
     app.post("/api/adm/lsnpos", (req, res, next) => {
-        if (req.body && req.body.userId)
+        if (req.body && req.body.userId) {
+            if (req.body && req.campaignId)
+                req.body.campaignId = req.campaignId;
             positionsService().setLessonPositions(req.body.userId, req.body)
-            .then((result) => {
-                res.send(result);
-            })
-            .catch((err) => {
-                next(err);
-            })
+                .then((result) => {
+                    res.send(result);
+                })
+                .catch((err) => {
+                    next(err);
+                })
+        }
         else
             res.status(HttpCode.ERR_BAD_REQ).json({ message: "Missing \"userId\" field." });
     });

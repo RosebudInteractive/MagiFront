@@ -37,6 +37,9 @@ class AuthGoogle {
             profile.lastName = profile.name.familyName;
             profile.identifier = profile.id;
 
+            if (req.campaignId)
+                profile.CampaignId = req.campaignId;
+
             this._usersCache.getUserByProfile(profile)
                 .then((user) => {
                     done(null, user ? user : false);

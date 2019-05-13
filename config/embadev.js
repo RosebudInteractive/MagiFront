@@ -80,7 +80,7 @@ let options = {
         module: "./yandex-kassa",
         enabled: true,
         debug: true,
-        billing_test: true,
+        billing_test: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {

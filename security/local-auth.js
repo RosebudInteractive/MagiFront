@@ -24,7 +24,7 @@ class AuthLocal {
     static getTokenFromReq(req) { return req.headers["authorization"] || (req.query["token"] ? ("JWT " + req.query["token"]) : null) }
 
     static destroySession(req) {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             if (req.session)
                 req.session.destroy((err) => {
                     if (err) reject(err)
@@ -32,6 +32,19 @@ class AuthLocal {
                 });
             else
                 resolve();
+        })
+            .then(() => {
+                let token = this.getTokenFromReq(req);
+                if (token)
+                    return usersCache.destroyToken(token);
+            });
+    }
+
+    static StdLogout(req) {
+        return new Promise(resolve => {
+            if (req.user && (typeof (req.logOut) === "function"))
+                req.logOut();
+            resolve();
         })
             .then(() => {
                 let token = this.getTokenFromReq(req);
@@ -51,7 +64,7 @@ class AuthLocal {
 
     static setupLogOut(app) {
         app.get("/api/logout", (req, res) => {
-            this.destroySession(req)
+            this.StdLogout(req)
                 .then(() => {
                     res.status(HttpCode.OK).json({ message: "OK" });
                 })
@@ -158,7 +171,9 @@ class AuthLocal {
                     {
                         Login: req.body.login,
                         Name: (req.body.name && (req.body.name.trim().length > 0)) ? req.body.name.trim() : req.body.login
-                    };
+                };
+                if (req.campaignId)
+                    data.CampaignId = req.campaignId;
                 let password = req.body.password;
                 UserRegister(password, data, this._usersCache)
                     .then((user) => {
@@ -214,7 +229,7 @@ let buildRedirectUrl = (redirectUrl, errMsg) => {
 
 let StdLogin = (req, res, user, info, redirectUrl, genTokenFunc) => {
     if (!user) {
-        AuthLocal.destroySession(req)
+        AuthLocal.StdLogout(req)
             .then(() => {
                 if (redirectUrl)
                     res.redirect(buildRedirectUrl(redirectUrl, (info && info.message) ? info.message : JSON.stringify(info)))
@@ -286,7 +301,7 @@ let chechRecapture = (hasCapture, req, res, processor) => {
 const getAuthProcessor = (req, res, next, redirectUrl, genTokenFunc) => {
     return (err, user, info) => {
         if (err || !user) {
-            AuthLocal.destroySession(req)
+            AuthLocal.StdLogout(req)
                 .then(() => {
                     if (err) {
                         if (redirectUrl)
@@ -363,6 +378,7 @@ exports.DestroySession = AuthLocal.destroySession.bind(AuthLocal);
 exports.StdLoginProcessor = StdLoginProcessor;
 exports.AuthByToken = AuthByToken;
 exports.StdLogin = StdLogin;
+exports.StdLogout = AuthLocal.StdLogout.bind(AuthLocal);
 exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {
     AuthLocalInit(app);
     return (req, res, next) => {

@@ -109,6 +109,15 @@ function setupAPI(express, app) {
         }
     };
 
+    app.use("/", sessionMiddleware.express);
+    app.use("/", sessionMiddleware.passportInit);
+    app.use("/", sessionMiddleware.passportSession);
+    if (sessionMiddleware.rollSession)
+        app.use("/", sessionMiddleware.rollSession);
+    
+    const campaignMiddle = require('../middleware/campaign');
+    app.use("/", campaignMiddle);
+
     let publicEnabled = config.has("server.publicEnabled") && (config.server.publicEnabled === true) ? true : false;
     let adminEnabled = config.has("server.adminEnabled") && (config.server.adminEnabled === true) ? true : false;
     app.use("/api", (req, res, next) => {
@@ -124,19 +133,7 @@ function setupAPI(express, app) {
             next(new HttpError(HttpCode.ERR_NIMPL, "Feature is disabled."));
     });
 
-    app.use("/api", sessionMiddleware.express);
-    app.use("/api", sessionMiddleware.passportInit);
-    app.use("/api", sessionMiddleware.passportSession);   
-    if (sessionMiddleware.rollSession)
-        app.use("/api", sessionMiddleware.rollSession);   
-
     app.use("/api", methodOverride()); // поддержка put и delete
-
-    app.use("/data", sessionMiddleware.express);
-    app.use("/data", sessionMiddleware.passportInit);
-    app.use("/data", sessionMiddleware.passportSession);
-    if (sessionMiddleware.rollSession)
-        app.use("/data", sessionMiddleware.rollSession);   
 
     let useJWT = config.has('authentication.useJWT') ? config.authentication.useJWT : false;
     AuthLocalInit(app);

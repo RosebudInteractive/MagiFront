@@ -66,6 +66,8 @@ exports.SetupRoute = (app) => {
 
             app.post('/api/payments', (req, res, next) => {
                 if (req.user) {
+                    if (req.body && req.campaignId)
+                        req.body.campaignId = req.campaignId;
                     paymentObject.insert(req.body, { debug: config.billing.debug ? true : false, dbOptions: { userId: req.user.Id } })
                         .then(result => {
                             if (result && result.confirmationUrl)

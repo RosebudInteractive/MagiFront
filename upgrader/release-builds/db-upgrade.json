@@ -55,6 +55,24 @@
                 "mysql": "./build_7/upgrade_7_mysql.sql"
             },
             "upgrader": "./build_7"
+        },
+        "8": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_8/upgrade_8_mssql.sql",
+                "mysql": "./build_8/upgrade_8_mysql.sql"
+            },
+            "upgrader": "./build_8"
+        },
+        "9": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_9/upgrade_9_mssql.sql",
+                "mysql": "./build_9/upgrade_9_mysql.sql"
+            },
+            "upgrader": "./build_9"
         }
     }
 }

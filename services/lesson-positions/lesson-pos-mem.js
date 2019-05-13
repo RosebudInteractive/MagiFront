@@ -24,11 +24,11 @@ const LessonPositionsMem = class LessonPositionsMem extends LessonPositionsBase 
         });
     }
 
-    _getHist(userId, lsnId, ts) {
+    _getHist(userId, lsnId, ts, campaignId) {
         return Promise.resolve();
     }
 
-    _setHist(userId, lsnId, ts, data, ttl) {
+    _setHist(userId, lsnId, ts, campaignId, data, ttl) {
         return Promise.resolve();
     }
 };

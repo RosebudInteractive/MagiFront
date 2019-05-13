@@ -34,10 +34,12 @@ const LessonPositionsRedis = class LessonPositionsRedis extends LessonPositionsB
         }).bind(this));
     }
 
-    _getHist(userId, lsnId, ts) {
+    _getHist(userId, lsnId, ts, campaignId) {
         return new Promise(resolve => {
             let rc;
             let id = this.keyHistPrefix + userId + ":" + lsnId + ":" + ts;
+            if (campaignId)
+                id += ":" + campaignId;
             rc = ConnectionWrapper((connection) => {
                 return connection.getAsync(id)
                     .then(result => {
@@ -48,10 +50,12 @@ const LessonPositionsRedis = class LessonPositionsRedis extends LessonPositionsB
         });
     }
 
-    _setHist(userId, lsnId, ts, data, ttl) {
+    _setHist(userId, lsnId, ts, campaignId, data, ttl) {
         return new Promise(resolve => {
             let rc;
             let id = this.keyHistPrefix + userId + ":" + lsnId + ":" + ts;
+            if (campaignId)
+                id += ":" + campaignId;
             rc = ConnectionWrapper((connection) => {
                 let args = [id, JSON.stringify(data)];
                 if ((typeof (ttl) === "number") && (ttl > 0)) {

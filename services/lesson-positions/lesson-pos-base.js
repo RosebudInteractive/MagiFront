@@ -98,6 +98,8 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                         let result = resData;
 
                         let positions = pos || {};
+                        let campaignId = positions.campaignId ? positions.campaignId : null;
+                        delete positions.campaignId;
                         let ts = positions.ts ? positions.ts : 0;
                         let lessons = positions.lsn ? positions.lsn : {};
                         resData.ts = ts;
@@ -146,13 +148,13 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                         
                         if (newPos.length > 0) {
                             result = Utils.seqExec(newPos, (elem) => {
-                                return this._getHist(userId, elem.id, elem.data.ts_start)
+                                return this._getHist(userId, elem.id, elem.data.ts_start, campaignId)
                                     .then(histRes => {
                                         if (histRes) {
                                             elem.hist.t += histRes.t ? histRes.t : 0;
                                             elem.hist.ut += histRes.ut ? histRes.ut : 0;
                                         }
-                                        return this._setHist(userId, elem.id, elem.data.ts_start, elem.hist, this.histTTL)
+                                        return this._setHist(userId, elem.id, elem.data.ts_start, campaignId, elem.hist, this.histTTL)
                                     })
                                     .then(() => {
                                         return this._setPos(userId, elem);
@@ -176,11 +178,11 @@ exports.LessonPositionsBase = class LessonPositionsBase {
         return Promise.reject(new Error("LessonPositionsBase::_getAllPos: Not implemented."));
     }
 
-    _getHist(userId, lsnId, ts) {
+    _getHist(userId, lsnId, ts, campaignId) {
         return Promise.reject(new Error("LessonPositionsBase::_getHist: Not implemented."));
     }
 
-    _setHist(userId, lsnId, ts, data, ttl) {
+    _setHist(userId, lsnId, ts, campaignId, data, ttl) {
         return Promise.reject(new Error("LessonPositionsBase::_setHist: Not implemented."));
     }
 }
