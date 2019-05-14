@@ -71,10 +71,6 @@ class PriceBlock extends React.Component {
     }
 
     _onClick() {
-        // if (!this.props.authorized) {
-        //     this.props.showSignInForm();
-        // }
-
         const {course} = this.props;
 
         const _returnUrl = '/category/' + course.URL;
