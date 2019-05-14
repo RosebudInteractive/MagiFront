@@ -7,11 +7,6 @@ const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
 
-let webpack = require('webpack')
-let webpackDevMiddleware = require('webpack-dev-middleware');
-let webpackHotMiddleware = require('webpack-hot-middleware');
-let webpackConfig = require('./webpack.config');
-
 const NODE_ENV = process.env.NODE_ENV || 'production';
 
 // init DB if needed
@@ -61,6 +56,11 @@ Promise.resolve()
         if (NODE_ENV === 'development') {
             app.use(require('morgan')('dev')); // log HTTP requests
             if (config.has("client.devHotReload") && (config.client.devHotReload === true)) {
+                let webpack = require('webpack')
+                let webpackDevMiddleware = require('webpack-dev-middleware');
+                let webpackHotMiddleware = require('webpack-hot-middleware');
+                let webpackConfig = require('./webpack.config');
+
                 let compiler = webpack(webpackConfig);
                 try {
                     app.use(webpackDevMiddleware(compiler, { noInfo: true, publicPath: webpackConfig.output.publicPath }));
