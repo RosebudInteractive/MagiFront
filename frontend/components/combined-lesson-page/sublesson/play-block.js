@@ -7,20 +7,33 @@ import {connect} from 'react-redux';
 import * as playerStartActions from '../../../actions/player-start-actions'
 import * as userActions from "../../../actions/user-actions";
 import $ from "jquery";
-import {TooltipTitles} from "../../../tools/page-tools";
-import {FINISH_DELTA_TIME} from "../../../constants/player";
+import {
+    _calcLessonProps,
+    _getTooltip,
+    _goToLesson,
+    _isLocationPlayerPage,
+    _isPaidCourse
+} from "../../common/small-play-block-functions";
+import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {SVG} from "../../common/play-block-functions";
 
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
         lesson: PropTypes.object,
-        isPaidCourse: PropTypes.bool,
+        course: PropTypes.object,
     };
 
     constructor(props) {
         super(props)
 
         this._redirect = false
+
+        this._goToLesson = _goToLesson.bind(this)
+        this._getTooltip = _getTooltip.bind(this)
+        this._calcLessonProps = _calcLessonProps.bind(this)
+        this._isLocationPlayerPage = _isLocationPlayerPage.bind(this)
+        this._isPaidCourse = _isPaidCourse.bind(this)
     }
 
     _play() {
@@ -46,48 +59,43 @@ class PlayBlock extends React.Component {
         }
     }
 
-    _isLocationPlayerPage() {
-        let _currentLocation = window.location.pathname + window.location.search,
-            _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL + '?play'
-
-        return _currentLocation === _needLocation;
-    }
+    // _isLocationPlayerPage() {
+    //     let _currentLocation = window.location.pathname + window.location.search,
+    //         _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL + '?play'
+    //
+    //     return _currentLocation === _needLocation;
+    // }
 
     _unlock() {
         this.props.userActions.showSignInForm();
     }
 
-    _goToLesson(isThisLessonPlaying) {
-        if (this.needLockLessonAsPaid) {
-            let _currentLocation = window.location.pathname + window.location.search,
-                _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL
-
-            if (_currentLocation !== _needLocation) {
-                this._redirectWithoutPlay = true
-                this.forceUpdate()
-            }
-        } else {
-            if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
-        }
-    }
+    // _goToLesson(isThisLessonPlaying) {
+    //     if (this.needLockLessonAsPaid) {
+    //         let _currentLocation = window.location.pathname + window.location.search,
+    //             _needLocation = '/' + this.props.lesson.courseUrl + '/' + this.props.lesson.URL
+    //
+    //         if (_currentLocation !== _needLocation) {
+    //             this._redirectWithoutPlay = true
+    //             this.forceUpdate()
+    //         }
+    //     } else {
+    //         if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
+    //     }
+    // }
 
     _getButton(isThisLessonPlaying, isFinished) {
-        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
-            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
-            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
-
-        let {authorized, lesson, isPaidCourse} = this.props,
+        let {authorized, lesson,} = this.props,
             _isAuthRequired = lesson.IsAuthRequired,
             _button = null;
 
-        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+        if (this._isPaidCourse && !lesson.IsFreeInPaidCourse) {
             return <button className="lecture__btn paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
-                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.CROWN}}/>
             </button>
         } else if (_isAuthRequired && !authorized) {
             _button = <button className="lecture__btn paused" onClick={::this._unlock}>
-                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.LOCK}}/>
             </button>
         } else {
             _button = (
@@ -95,12 +103,12 @@ class PlayBlock extends React.Component {
                     ?
                     <button type="button" className="lecture__btn paused"
                             onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: SVG.REPLAY}}/>
                     </button>
                     :
                     <button type="button" className="lecture__btn"
                             onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: SVG.PLAY}}/>
                     </button>
             )
         }
@@ -108,24 +116,24 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
-    _getTooltip(isThisLessonPlaying, isFinished) {
-        let {lesson, authorized, paused, isPaidCourse} = this.props,
-            {IsAuthRequired} = lesson,
-            _tooltip = null;
-
-        if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
-            _tooltip = TooltipTitles.IS_PAID
-        } else if (IsAuthRequired && !authorized) {
-            _tooltip = TooltipTitles.locked
-        } else {
-            _tooltip = isThisLessonPlaying ?
-                (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
-                :
-                (isFinished ? TooltipTitles.replay : TooltipTitles.play);
-        }
-
-        return _tooltip;
-    }
+    // _getTooltip(isThisLessonPlaying, isFinished) {
+    //     let {lesson, authorized, paused, isPaidCourse} = this.props,
+    //         {IsAuthRequired} = lesson,
+    //         _tooltip = null;
+    //
+    //     if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
+    //         _tooltip = TooltipTitles.IS_PAID
+    //     } else if (IsAuthRequired && !authorized) {
+    //         _tooltip = TooltipTitles.locked
+    //     } else {
+    //         _tooltip = isThisLessonPlaying ?
+    //             (paused ? (isFinished ? TooltipTitles.replay : TooltipTitles.play) : TooltipTitles.pause)
+    //             :
+    //             (isFinished ? TooltipTitles.replay : TooltipTitles.play);
+    //     }
+    //
+    //     return _tooltip;
+    // }
 
     render() {
         const _pause = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#pause"/>',
@@ -188,27 +196,27 @@ class PlayBlock extends React.Component {
         )
     }
 
-    _calcLessonProps(lesson) {
-        let {lessonInfoStorage,} = this.props,
-            {Id: id, Duration: totalDuration} = lesson;
-
-        let _lessonInfo = lessonInfoStorage.lessons.get(id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
-
-        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
-            _deltaTime = Math.round(totalDuration - _currentTime);
-
-        let result = {};
-
-        result.playedPart = _playedPart;
-        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
-
-        return result
-    }
-
-    get needLockLessonAsPaid() {
-        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
-    }
+    // _calcLessonProps(lesson) {
+    //     let {lessonInfoStorage,} = this.props,
+    //         {Id: id, Duration: totalDuration} = lesson;
+    //
+    //     let _lessonInfo = lessonInfoStorage.lessons.get(id),
+    //         _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
+    //
+    //     let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
+    //         _deltaTime = Math.round(totalDuration - _currentTime);
+    //
+    //     let result = {};
+    //
+    //     result.playedPart = _playedPart;
+    //     result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
+    //
+    //     return result
+    // }
+    //
+    // get needLockLessonAsPaid() {
+    //     return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
+    // }
 }
 
 function mapStateToProps(state) {
@@ -225,6 +233,8 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

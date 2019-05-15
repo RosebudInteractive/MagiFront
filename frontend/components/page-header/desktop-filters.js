@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
-import {clear, filtersSelector, switchFilter} from "../../ducks/filters";
+import {clear, filtersSelector, switchFilter} from "ducks/filters";
 
 class FiltersRow extends React.Component {
 

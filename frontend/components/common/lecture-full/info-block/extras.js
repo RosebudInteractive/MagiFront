@@ -8,10 +8,8 @@ export default class Extras extends React.Component {
 
     static propTypes = {
         subLessons: PropTypes.array,
+        course: PropTypes.object,
         parentNumber: PropTypes.number,
-        isLessonInBookmarks: PropTypes.func,
-        onSwitchFavorites: PropTypes.func,
-        courseUrl: PropTypes.string,
         isPaidCourse: PropTypes.bool,
     }
 
@@ -31,9 +29,9 @@ export default class Extras extends React.Component {
 
     _getList() {
         return this.props.subLessons.map((lesson, index) => {
-            let url = '/' + this.props.courseUrl + '/' + lesson.URL;
+            let url = '/' + this.props.course.URL + '/' + lesson.URL;
 
-            lesson.courseUrl = this.props.courseUrl;
+            lesson.courseUrl = this.props.course.URL;
 
             return <li key={index}>
                 <Link to={url} className="extras-list__item">
@@ -42,7 +40,7 @@ export default class Extras extends React.Component {
                     {lesson.Name + ' '}
                     <span className="duration">{lesson.DurationFmt}</span>
                 </Link>
-                <LessonPlayBlockSmall lesson={lesson} isPaidCourse={this.props.isPaidCourse}/>
+                <LessonPlayBlockSmall lesson={lesson} course={this.props.course} isPaidCourse={this.props.isPaidCourse}/>
                 <FavoritesButton className={"extras-list__fav"} courseUrl={lesson.courseUrl} lessonUrl={lesson.URL}/>
             </li>
         })

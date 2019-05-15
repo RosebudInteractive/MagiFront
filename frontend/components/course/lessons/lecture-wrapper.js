@@ -6,23 +6,22 @@ import LecturesList from './lectures-list'
 export default class Wrapper extends React.Component {
 
     static propTypes = {
-        courseUrl: PropTypes.string.isRequired,
         lessons: PropTypes.array.isRequired,
+        course: PropTypes.object,
         isMobile: PropTypes.bool.isRequired,
-        isPaidCourse: PropTypes.bool,
         isAdmin: PropTypes.bool,
     };
 
     render() {
-        let {lessons, isMobile, isPaidCourse} = this.props;
+        let {lessons, course, isMobile, isAdmin,} = this.props;
 
         return (
             <div className='lectures-wrapper'>
                 {
                     isMobile ?
-                        <LecturesList lessons={lessons} courseUrl={this.props.courseUrl} isPaidCourse={isPaidCourse}/>
+                        <LecturesList lessons={lessons} course={course} isAdmin={isAdmin}/>
                         :
-                        <SingleLecture lesson={lessons[0]} courseUrl={this.props.courseUrl} isPaidCourse={isPaidCourse}/>
+                        <SingleLecture lesson={lessons[0]} course={course} isAdmin={isAdmin}/>
                 }
             </div>
         )

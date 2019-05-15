@@ -346,6 +346,7 @@ class CombineLessonPage extends React.Component {
 
         return (isMobileApp) ?
             <MobileLessonWrapper lesson={lesson}
+                                 course={course}
                                  courseUrl={this.props.courseUrl}
                                  lessonUrl={lesson.URL}
                                  isPlayer={(_playingLessonUrl || _lessonInPlayer) && !lessonEnded}
@@ -360,6 +361,7 @@ class CombineLessonPage extends React.Component {
             />
             :
             <DesktopLessonWrapper lesson={lesson}
+                                  course={course}
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={lesson.Id}
@@ -518,7 +520,7 @@ class CombineLessonPage extends React.Component {
                             {lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null}
                             {this._getLessonsBundles()}
                             <Sources lesson={_lesson}/>
-                            <LessonInfo lesson={_lesson} isPaidCourse={this._isPaidCourse}/>
+                            <LessonInfo lesson={_lesson} course={course}/>
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}
                                             gallery={lessonText.gallery}

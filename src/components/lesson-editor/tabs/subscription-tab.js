@@ -30,7 +30,7 @@ class SubscriptionTab extends React.Component {
             _enableSubscription = !!billingMode.subscription;
 
         return <div className={"tab-wrapper controls-wrapper lesson-subscription-tab" + (this.props.visible ? '' : ' hidden')}>
-            <Field component={CheckBox} name="isAuthRequired" label="Требуется авторизация" disabled={_disabled || isSubsRequired || !_enableSubscription}/>
+            <Field component={CheckBox} name="isAuthRequired" label="Требуется авторизация" disabled={_disabled || isSubsRequired}/>
             <Field component={CheckBox} name="isSubsRequired" label="Требуется подписка на лекцию" disabled={_disabled || !_enableSubscription}/>
             <Field component={Datepicker} name="freeExpDate" label="Дата окончания бесплатного периода" disabled={_disabled || !isSubsRequired || !_enableSubscription}/>
             <Field component={CheckBox} name="isFreeInPaidCourse" label="Бесплатная лекция в рамках платного курса" disabled={_disabled}/>

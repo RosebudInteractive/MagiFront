@@ -8,6 +8,8 @@ export default class LessonFull extends React.Component {
         courseUrl: PropTypes.string,
         needShowAuthors: PropTypes.bool,
         lesson: PropTypes.object,
+        course: PropTypes.object,
+        isAdmin: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
     };
 

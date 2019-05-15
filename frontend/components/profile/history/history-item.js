@@ -13,7 +13,8 @@ export default class Item extends React.Component {
     render() {
         const _ep = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ep"/>';
 
-        let {item, isPaidCourse} = this.props;
+        let {item,} = this.props,
+            _courseInfo = Object.assign({}, item.courseBillingInfo)
 
         return (
             <div className="history-item">
@@ -48,9 +49,7 @@ export default class Item extends React.Component {
                         <p className="history-item__author">{item.authorName}</p>
                     </Link>
                 </div>
-                <LessonPlayBlockSmall duration={item.DurationFmt} lessonUrl={item.URL}
-                                      courseUrl={item.courseUrl} audios={item.Audios} id={item.Id}
-                                      totalDuration={item.Duration} lesson={item} showRestTime={true} isPaidCourse={isPaidCourse}/>
+                <LessonPlayBlockSmall lesson={item} course={_courseInfo} showRestTime={true}/>
             </div>
         )
     }

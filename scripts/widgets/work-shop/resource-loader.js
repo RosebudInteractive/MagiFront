@@ -627,13 +627,13 @@ export default class CWSResourceLoader {
     }
 
     _broadcastError(err) {
-        if (this._options.onError) {
+        if (this._options && this._options.onError) {
             this._options.onError(err)
         }
     }
 
     _broadcastAssetMissing(data) {
-        if (this._options.onAssetMissing) {
+        if (this._options && this._options.onAssetMissing) {
             this._options.onAssetMissing(data)
         }
     }

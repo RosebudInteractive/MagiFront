@@ -9,7 +9,7 @@ export default class InfoBlock extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
-        courseUrl: PropTypes.string,
+        course: PropTypes.object,
         needShowAuthors: PropTypes.bool,
         isSingleLesson: PropTypes.object,
         isPaidCourse: PropTypes.bool,
@@ -21,25 +21,27 @@ export default class InfoBlock extends React.Component {
     };
 
     render() {
-        let {lesson, courseUrl, needShowAuthors, isSingleLesson, isPaidCourse} = this.props;
+        const {lesson, course, needShowAuthors, isSingleLesson,} = this.props;
+
+        let _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought)
 
         return (
             <div className="lecture-full__info-block">
                 {isSingleLesson ?
-                    <SingleLessonTextBlock courseUrl={courseUrl} lesson={lesson} needShowAuthors={needShowAuthors}/>
+                    <SingleLessonTextBlock courseUrl={course.URL} lesson={lesson} needShowAuthors={needShowAuthors}/>
                     :
                     <TextBlock needShowAuthors={needShowAuthors}
                                title={lesson.Name}
                                authorName={lesson.authorName}
                                descr={lesson.ShortDescription}
                                lessonUrl={lesson.URL}
-                               courseUrl={courseUrl}/>
+                               courseUrl={course.URL}/>
                 }
                 {!isSingleLesson ?
                     <Extras subLessons={lesson.Lessons}
                             parentNumber={lesson.Number}
-                            courseUrl={courseUrl}
-                            isPaidCourse={isPaidCourse}/>
+                            course={course}
+                            isPaidCourse={_isPaidCourse}/>
                     :
                     null
                 }

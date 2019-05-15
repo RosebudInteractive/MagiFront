@@ -17,7 +17,7 @@ import {
     isEmptyFilterSelector,
     loadingSelector,
     selectedFilterSelector,
-    applyExternalFilter
+    applyExternalFilter, clear
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -57,6 +57,10 @@ class CoursesPage extends React.Component {
             if (hasExternalFilter) {
                 this.props.applyExternalFilter(externalFilter)
             }
+        }
+
+        if (!hasExternalFilter && (prevProps.selectedFilter.size > 0)) {
+            this.props.clearFilter()
         }
 
         if (!prevProps.isEmptyFilter && isEmptyFilter) {
@@ -171,6 +175,7 @@ function mapDispatchToProps(dispatch) {
         pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
         applyExternalFilter: bindActionCreators(applyExternalFilter, dispatch),
+        clearFilter: bindActionCreators(clear, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         whoAmI: bindActionCreators(whoAmI, dispatch),
