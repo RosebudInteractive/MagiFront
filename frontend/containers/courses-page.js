@@ -31,9 +31,9 @@ class CoursesPage extends React.Component {
     }
 
     componentWillMount() {
-        if (!this.props.courses.loaded) {
-            this.props.coursesActions.getCourses();
-        }
+        // if (!this.props.courses.loaded) {
+        this.props.coursesActions.getCourses();
+        // }
         this.props.whoAmI()
         this.props.storageActions.refreshState();
         this.props.pageHeaderActions.setCurrentPage(tools.pages.courses);
