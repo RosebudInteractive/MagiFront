@@ -116,19 +116,30 @@ exports.PrerenderInit = (app) => {
                 let userAgent = req.headers['user-agent'];
                 if (logRequest)
                     console.log(buildLogString(`Prerender: url:"${req.url}", userAgent:"${userAgent}"`));
-                // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
-                if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
-                    req.forceRender = true;
-                    done(null, null);
+                function cb() {
+                    // console.log(`${(new Date()).toLocaleString()} ==> ${userAgent}`);
+                    if (userAgent === SEO.FORCE_RENDER_USER_AGENT) {
+                        req.forceRender = true;
+                        done(null, null);
+                    }
+                    else
+                        prerenderCache.get(req.path)
+                            .then((res) => {
+                                done(null, res);
+                            }).catch((err) => {
+                                console.error(buildLogString(`prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`));
+                                done(null, null);
+                            });
                 }
+                if (req.session)
+                    // We don't need session when bot requests server
+                    req.session.destroy((err) => {
+                        if (err)
+                            console.error(buildLogString(`Prerender:beforeRender: ${err.message ? err.message : err}`));
+                        cb();
+                    })
                 else
-                    prerenderCache.get(req.path)
-                        .then((res) => {
-                            done(null, res);
-                        }).catch((err) => {
-                            console.error(buildLogString(`prerender:beforeRender::${err && err.message ? err.message : JSON.stringify(err)}`));
-                            done(null, null);
-                        });
+                    cb();
             })
             .set('afterRender', function (err, req, prerender_res) {
                 // do whatever you need to do

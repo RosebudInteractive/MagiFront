@@ -12,7 +12,8 @@ module.exports = {
             module: "./lsn-history",
             type: "scheduled-task",
             disabled: false,
-            schedule: "0 33 1 * * *", // run at 01:33
+            // schedule: "0 33 1 * * *", // run at 01:33
+            schedule: "0 27 * * * *", // run every hour
             options: {
                 maxInsertNum: 10,
                 logStat: true
