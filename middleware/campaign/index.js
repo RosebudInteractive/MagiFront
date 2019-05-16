@@ -12,7 +12,7 @@ async function _processor(req, res, next) {
             (req.headers['user-agent'].indexOf(PRERENDER_USER_AGENT_KEYWORD)) >= 0 ? true : false;
         if (!isPrerender) {
             // Ignore if prerender requests server
-            if (req.session && req.query.utm_source && req.query.utm_medium && req.query.utm_campaign) {
+            if (req.session && req.query && req.query.utm_source && req.query.utm_medium && req.query.utm_campaign) {
                 let opts = req.user ? { dbOptions: { userId: req.user.Id } } : {};
                 let campaignId = await CampaignService().getOrCreateByCode({
                     Source: req.query.utm_source,

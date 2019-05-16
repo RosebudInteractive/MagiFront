@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportVKontakte = require('passport-vkontakte');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { StdLoginProcessor, AuthByToken, DestroySession } = require('./local-auth');
+const { StdLoginProcessor, AuthByToken, AuthRedirectWrapper } = require('./local-auth');
 const { GenTokenFunc } = require('./jwt-auth');
 
 class AuthVK {
@@ -74,10 +74,10 @@ class AuthVK {
                 app.use(config.snets.vk.callBack, sessionMiddleware.rollSession);   
         }
 
-        app.get('/api/vklogin', passport.authenticate('vkontakte', config.snets.vk.passportOptions));
+        app.get('/api/vklogin', AuthRedirectWrapper(passport.authenticate('vkontakte', config.snets.vk.passportOptions)));
         app.get('/api/app-vklogin', AuthByToken(strategy.userProfile.bind(strategy), processUserProfile, null, GenTokenFunc));
-        let processor = (!config.snets.vk.redirectURL) ? StdLoginProcessor('vkontakte') :
-            StdLoginProcessor('vkontakte', false, config.snets.vk.redirectURL);
+        let processor = (!config.snets.vk.redirectURL) ? StdLoginProcessor('vkontakte', false, null, null, true) :
+            StdLoginProcessor('vkontakte', false, config.snets.vk.redirectURL, null, true);
         app.get(config.snets.vk.callBack, processor);
     }
 };

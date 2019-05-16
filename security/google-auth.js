@@ -4,7 +4,7 @@ const passport = require("passport");
 const passportGoogle = require('passport-google-oauth20');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { StdLoginProcessor, AuthByToken, DestroySession } = require('./local-auth');
+const { StdLoginProcessor, AuthByToken, AuthRedirectWrapper } = require('./local-auth');
 const { GenTokenFunc } = require('./jwt-auth');
 
 const GOOGLE_USER_INFO = "https://www.googleapis.com/oauth2/v3/userinfo"; // https://developers.google.com/identity/protocols/OpenIDConnect
@@ -61,10 +61,10 @@ class AuthGoogle {
                 app.use(config.snets.google.callBack, sessionMiddleware.rollSession);   
         }
 
-        app.get('/api/googlelogin', passport.authenticate('google', config.snets.google.passportOptions));
+        app.get('/api/googlelogin', AuthRedirectWrapper(passport.authenticate('google', config.snets.google.passportOptions)));
         app.get('/api/app-googlelogin', AuthByToken(strategy.userProfile.bind(strategy), processUserProfile, null, GenTokenFunc));
-        let processor = (!config.snets.google.redirectURL) ? StdLoginProcessor('google') :
-            StdLoginProcessor('google', false, config.snets.google.redirectURL);
+        let processor = (!config.snets.google.redirectURL) ? StdLoginProcessor('google', false, null, null, true) :
+            StdLoginProcessor('google', false, config.snets.google.redirectURL, null, true);
         app.get(config.snets.google.callBack, processor);
     }
 };

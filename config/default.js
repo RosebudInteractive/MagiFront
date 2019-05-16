@@ -139,6 +139,7 @@ module.exports = {
         appLoginUrl: "magisteria://signin",
         activationRoute: "/activation-confirm",
         recoveryRoute: "/recovery",
+        redirectParam: "redirect",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
         tokenExpTime: SESSION_MAX_AGE,
