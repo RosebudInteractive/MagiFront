@@ -289,6 +289,10 @@ export const redirectComplete = () => {
     }
 }
 
+export const clearWaitingAuthorize = () => {
+    return {type: CLEAR_WAITING_AUTHORIZE}
+}
+
 /**
  * Sagas
  */

@@ -101,19 +101,23 @@ class LessonFrame extends React.Component {
     }
 
     _crownButtonClick() {
-        const {lesson, course,} = this.props,
-            _needLocation = '/' + course.URL + '/' + lesson.URL
+        if (this.props.needLockLessonAsPaid) {
+            const {lesson, course,} = this.props,
+                _needLocation = '/' + course.URL + '/' + lesson.URL
 
-        let _courseInfo = {
-            courseId: course.Id,
-            productId: course.ProductId,
-            returnUrl: _needLocation
-        }
+            let _courseInfo = {
+                courseId: course.Id,
+                productId: course.ProductId,
+                returnUrl: _needLocation
+            }
 
-        if (course.IsPending) {
-            this.props.getPendingCourseInfo(_courseInfo)
+            if (course.IsPending) {
+                this.props.getPendingCourseInfo(_courseInfo)
+            } else {
+                this.props.getPaidCourseInfo(_courseInfo)
+            }
         } else {
-            this.props.getPaidCourseInfo(_courseInfo)
+            this._play()
         }
     }
 
