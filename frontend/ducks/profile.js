@@ -891,7 +891,7 @@ function* clearStoredCardSaga() {
 }
 
 const _fetchPaidCourses = () => {
-    return fetch("/api/users/paid/courses", {method: 'GET', credentials: 'include'})
+    return fetch("/api/users/paid/courses?gift=true&paid=true", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }

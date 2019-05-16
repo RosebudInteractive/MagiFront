@@ -30,7 +30,8 @@ export function _goToLesson() {
             let _courseInfo = {
                 courseId: course.Id,
                 productId: course.ProductId,
-                returnUrl: _needLocation
+                returnUrl: _needLocation,
+                firedByPlayerBlock: true,
             }
 
             if (course.IsPending) {

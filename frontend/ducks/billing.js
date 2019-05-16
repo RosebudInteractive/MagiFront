@@ -328,6 +328,14 @@ function* _getPaidCourseInfoSaga(data) {
     if (_userPaidCourses.contains(_data.courseId)) {
         yield put({type: CLEAR_WAITING_AUTHORIZE})
     } else {
+        if (_data && _data.firedByPlayerBlock) {
+            let _user = yield select(state => state.user)
+            if (_user.isAdmin) {
+                yield put({type: CLEAR_WAITING_AUTHORIZE})
+                return
+            }
+        }
+
         yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
 
         try {
