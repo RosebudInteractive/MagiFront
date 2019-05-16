@@ -8,11 +8,12 @@ import {getCoverPath, ImageSize} from "../../../tools/page-tools";
 export default class LessonFullWrapper extends React.Component {
 
     static propTypes = {
-        courseUrl: PropTypes.string,
-        needShowAuthors: PropTypes.bool,
         lesson: PropTypes.object,
+        course: PropTypes.object,
+        isAdmin: PropTypes.bool,
+
+        needShowAuthors: PropTypes.bool,
         isSingleLesson: PropTypes.bool,
-        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -21,15 +22,12 @@ export default class LessonFullWrapper extends React.Component {
     };
 
     render() {
-        let {lesson, courseUrl, isPaidCourse,} = this.props,
+        let {lesson, course, isAdmin,} = this.props,
             _cover = getCoverPath(lesson, ImageSize.small)
 
         return (
             <div className="lecture-full__wrapper">
-                <PlayBlock id={lesson.Id} courseUrl={courseUrl} lessonUrl={lesson.URL}
-                           isAuthRequired={lesson.IsAuthRequired} audios={lesson.Audios} cover={_cover}
-                           duration={lesson.DurationFmt} totalDuration={lesson.Duration}
-                           isPaidCourse={isPaidCourse} isLessonFree={lesson.IsFreeInPaidCourse}/>
+                <PlayBlock lesson={lesson} course={course} cover={_cover} isAdmin={isAdmin}/>
                 <InfoBlock {...this.props}/>
             </div>
         )

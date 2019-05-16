@@ -20,14 +20,14 @@ class LessonInfo extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
-        isPaidCourse: PropTypes.bool,
+        course: PropTypes.object,
     }
 
     _favoritesClick(courseUrl, lessonUrl) {
         if (!this.props.authorized) {
             this.props.userActions.showSignInForm();
         } else {
-            if (this._isLessonInBookmarks()) {
+            if (this._isLessonInBookmarks(courseUrl, lessonUrl)) {
                 this.props.removeLessonFromBookmarks(courseUrl, lessonUrl)
             } else {
                 this.props.addLessonToBookmarks(courseUrl, lessonUrl)
@@ -45,7 +45,7 @@ class LessonInfo extends React.Component {
         const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>';
 
-        let {lesson, isPaidCourse} = this.props
+        let {lesson,} = this.props
 
         return lesson.Childs.map((item) => {
             let _cover = getCoverPath(item, ImageSize.icon),
@@ -58,8 +58,8 @@ class LessonInfo extends React.Component {
                         {item.Name + ' '}
                         <span className="duration">{item.DurationFmt}</span>
                     </Link>
-                    <PlayBlockSmall lesson={item} cover={_cover} isPaidCourse={isPaidCourse}/>
-                    <PlayBlock lesson={item} cover={_cover} isPaidCourse={isPaidCourse}/>
+                    <PlayBlockSmall lesson={item} course={this.props.course}/>
+                    <PlayBlock lesson={item} cover={_cover} course={this.props.course}/>
                     <button className="extras-list__fav" type="button"
                             onClick={() => {
                                 this._favoritesClick(item.courseUrl, item.URL)

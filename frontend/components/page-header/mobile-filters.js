@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import * as pageHeaderActions from "../../actions/page-header-actions";
 
 import * as svg from '../../tools/svg-paths';
-import {filtersSelector, switchFilter, clear} from "../../ducks/filters";
+import {filtersSelector, switchFilter, clear} from "ducks/filters";
 
 class FiltersRow extends React.Component {
 

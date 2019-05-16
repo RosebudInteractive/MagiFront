@@ -8,8 +8,8 @@ import {AUTHORIZATION_STATE} from '../constants/user'
 import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
-import $ from "jquery";
 import {OverflowHandler} from "../tools/page-tools";
+import {clearWaitingAuthorize} from "ducks/billing";
 
 class AuthPopup extends React.Component {
 
@@ -62,6 +62,7 @@ class AuthPopup extends React.Component {
         }
 
         this.props.userActions.closeSignInForm()
+        this.props.clearWaitingAuthorize()
     }
 
     render() {
@@ -101,6 +102,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         userActions: bindActionCreators(userActions, dispatch),
+        clearWaitingAuthorize: bindActionCreators(clearWaitingAuthorize, dispatch)
     }
 }
 

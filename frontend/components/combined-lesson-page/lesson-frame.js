@@ -22,6 +22,7 @@ import {
 import {setScrollTop} from "../../containers/combined-lesson-page";
 import {getLessonNumber} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
+import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -99,6 +100,28 @@ class LessonFrame extends React.Component {
         this.props.playerStartActions.startPlay(this.props.lesson.Id)
     }
 
+    _crownButtonClick() {
+        if (this.props.needLockLessonAsPaid) {
+            const {lesson, course,} = this.props,
+                _needLocation = '/' + course.URL + '/' + lesson.URL
+
+            let _courseInfo = {
+                courseId: course.Id,
+                productId: course.ProductId,
+                returnUrl: _needLocation,
+                firedByPlayerBlock: true,
+            }
+
+            if (course.IsPending) {
+                this.props.getPendingCourseInfo(_courseInfo)
+            } else {
+                this.props.getPaidCourseInfo(_courseInfo)
+            }
+        } else {
+            this._play()
+        }
+    }
+
     _unlock() {
         this.props.userActions.showSignInForm();
     }
@@ -115,7 +138,7 @@ class LessonFrame extends React.Component {
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
             _button = (
-                <div style={_style} onClick={::this._play}>
+                <div style={_style} onClick={::this._crownButtonClick}>
                     <span className="play-btn-big lecture-frame__play-btn lock">
                         <svg width="102" height="90" fill="#fff" dangerouslySetInnerHTML={{__html: _playCrown}}/>
                         Воспроизвести
@@ -314,6 +337,8 @@ function mapDispatchToProps(dispatch) {
         getUserBookmarks: bindActionCreators(getUserBookmarks, dispatch),
         addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
         removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
+        getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

@@ -111,10 +111,7 @@ export const selectedFilterSelector = createSelector(filtersSelector, filter => 
  * */
 
 export const clear = () => {
-    return {
-        type: CLEAR_FILTERS,
-        payload: null
-    }
+    return {type: CLEAR_FILTERS}
 };
 
 export const switchFilter = (id) => {

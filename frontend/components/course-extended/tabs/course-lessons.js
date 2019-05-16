@@ -8,9 +8,7 @@ import {userPaidCoursesSelector} from "ducks/profile";
 class CourseLessons extends React.Component {
 
     static propTypes = {
-        // courseUrl: PropTypes.string.isRequired,
         course: PropTypes.object,
-        needShowAuthors: PropTypes.bool,
     };
 
     _getAuthor(authorId) {
@@ -22,16 +20,15 @@ class CourseLessons extends React.Component {
     }
 
     _getList() {
-        let {course, userPaidCourses} = this.props,
-            _needShowAuthors = (course.Authors && course.Authors.length > 1),
-            _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
+        let {course, isAdmin} = this.props,
+            _needShowAuthors = (course.Authors && course.Authors.length > 1)
 
         return course.Lessons.map((lesson, index) => {
 
             lesson.authorName = _needShowAuthors ? this._getAuthor(lesson.AuthorId) : '';
 
             return lesson.State === 'R' ?
-                <LessonFull lesson={lesson} courseUrl={this.props.course.URL} needShowAuthors={_needShowAuthors} isPaidCourse={_isPaidCourse}/>
+                <LessonFull lesson={lesson} course={course} courseUrl={this.props.course.URL} isAdmin={isAdmin} needShowAuthors={_needShowAuthors}/>
                 :
                 <LessonPreview
                     title={lesson.Name}
@@ -56,8 +53,7 @@ class CourseLessons extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        // course: state.singleCourse.object,
-        userPaidCourses : userPaidCoursesSelector(state),
+        isAdmin: !!state.user.user && state.user.isAdmin,
     }
 }
 

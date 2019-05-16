@@ -6,8 +6,8 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
-import {TooltipTitles} from "../../tools/page-tools";
-import {FINISH_DELTA_TIME} from "../../constants/player";
+import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {_calcIsFinishedAndPlayedPart, _getTooltip, _goToLesson, _play, SVG} from "../common/play-block-functions";
 
 class PlayBlock extends React.Component {
 
@@ -16,60 +16,38 @@ class PlayBlock extends React.Component {
 
         this._redirect = false
         this._redirectWithoutPlay = false
+
+        this._play = _play.bind(this);
+        this._goToLesson = _goToLesson.bind(this)
+        this._getTooltip = _getTooltip.bind(this)
+        this._calcIsFinishedAndPlayedPart = _calcIsFinishedAndPlayedPart.bind(this)
     }
 
     static propTypes = {
-        lessonUrl: PropTypes.string,
-        courseUrl: PropTypes.string,
-        audios: PropTypes.array,
-        isAuthRequired: PropTypes.bool,
-        isPaidCourse: PropTypes.bool,
-        isLessonFree: PropTypes.bool,
-        needLockLessonAsPaid: PropTypes.bool,
-    }
-
-    _play() {
-        this.props.playerStartActions.preinitAudios(this.props.audios);
-        this._redirect = true;
-        this.forceUpdate()
-        this.props.playerStartActions.startPlay(this.props.id)
+        lesson: PropTypes.object,
+        course: PropTypes.object,
+        cover: PropTypes.string,
+        isAdmin: PropTypes.bool,
     }
 
     _unlock() {
         this.props.userActions.showSignInForm();
     }
 
-    _goToLesson() {
-        if (this.props.needLockLessonAsPaid) {
-            let _currentLocation = window.location.pathname + window.location.search,
-                _needLocation = '/' + this.props.courseUrl + '/' + this.props.lessonUrl
-
-            if (_currentLocation !== _needLocation) {
-                this._redirectWithoutPlay = true
-                this.forceUpdate()
-            } else {
-                this._play()
-            }
-        }
-    }
-
     _getButton(isFinished) {
-        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
-            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
-            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
+        const {lesson, course, authorized} = this.props;
 
-        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
+        let _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought),
             _button = null;
 
-        if (isPaidCourse && !isLessonFree) {
+        if (_isPaidCourse && !lesson.IsFreeInPaidCourse) {
             return <button className="lecture__btn paused" onClick={::this._goToLesson}>
-                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.CROWN}}/>
             </button>
-        } else if (isAuthRequired && !authorized) {
+        } else if (lesson.IsAuthRequired && !authorized) {
             _button = (
                 <button type="button" className="lecture__btn paused" onClick={::this._unlock}>
-                    <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+                    <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.LOCK}}/>
                 </button>
             )
         } else {
@@ -77,11 +55,11 @@ class PlayBlock extends React.Component {
                 isFinished
                     ?
                     <button type="button" className="lecture__btn paused" onClick={::this._play}>
-                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: SVG.REPLAY}}/>
                     </button>
                     :
                     <button type="button" className="lecture__btn" onClick={::this._play}>
-                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: SVG.PLAY}}/>
                     </button>
             )
         }
@@ -89,43 +67,27 @@ class PlayBlock extends React.Component {
         return _button;
     }
 
-    _getTooltip(isFinished) {
-        let {isAuthRequired, authorized, isPaidCourse, isLessonFree} = this.props,
-            _tooltip = null;
-
-        if (isPaidCourse && !isLessonFree) {
-            _tooltip = TooltipTitles.IS_PAID
-        } else if (isAuthRequired && !authorized) {
-            _tooltip = TooltipTitles.locked
-        } else {
-            _tooltip = isFinished ? TooltipTitles.replay : TooltipTitles.play;
-        }
-
-        return _tooltip;
-    }
-
     render() {
-        const _radius = 97.25;
-
-        let {isAuthRequired, authorized, cover} = this.props,
-            _lessonLocked = (isAuthRequired && !authorized);
-
-        let {isFinished : _isFinished, playedPart : _playedPart} = this._calcIsFinishedAndPlayedPart(),
-            _fullLineLength = 2 * 3.14 * _radius,
-            _timeLineLength = 2 * 3.14 * _playedPart * _radius,
-            _offset = 2 * 3.14 * 0.25 * _radius;
-
-        const _imgStyle = {backgroundImage: "url(" + cover + ")"}
+        const {lesson, course, cover, authorized,} = this.props;
 
         if (this._redirect) {
             this._redirect = false;
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
+            return <Redirect push to={'/' + course.URL + '/' + lesson.URL + '?play'}/>;
         }
 
         if (this._redirectWithoutPlay) {
             this._redirectWithoutPlay = false;
-            return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl}/>;
+            return <Redirect push to={'/' + course.URL + '/' + lesson.URL}/>;
         }
+
+        const _lessonLocked = (lesson.IsAuthRequired && !authorized),
+            _imgStyle = {backgroundImage: "url(" + cover + ")"},
+            _radius = 97.25;
+
+        let {isFinished: _isFinished, playedPart: _playedPart} = this._calcIsFinishedAndPlayedPart(),
+            _fullLineLength = 2 * 3.14 * _radius,
+            _timeLineLength = 2 * 3.14 * _playedPart * _radius,
+            _offset = 2 * 3.14 * 0.25 * _radius;
 
         return (
             <div className='lecture__play-block'>
@@ -133,7 +95,8 @@ class PlayBlock extends React.Component {
                 {
                     !_lessonLocked ?
                         <div className="lecture__loader" id="cont" data-pct="100">
-                            <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200" version="1.1"
+                            <svg className="svg-loader" id="svg" width="200" height="200" viewBox="0 0 200 200"
+                                 version="1.1"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <circle className="bar" id="bar" r={_radius} cx="100" cy="100" fill="transparent"
                                         strokeDasharray={[_timeLineLength, _fullLineLength - _timeLineLength]}
@@ -145,26 +108,9 @@ class PlayBlock extends React.Component {
                 }
                 {this._getButton(_isFinished)}
                 <div className="lecture__tooltip">{this._getTooltip(_isFinished)}</div>
-                <div className='duration'>{this.props.duration}</div>
+                <div className='duration'>{lesson.DurationFmt}</div>
             </div>
         )
-    }
-
-    _calcIsFinishedAndPlayedPart() {
-        let {id, totalDuration, lessonInfoStorage} = this.props;
-
-        let _lessonInfo = lessonInfoStorage.lessons.get(id),
-            _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0;
-
-        let _playedPart = totalDuration ? ((_currentTime) / totalDuration) : 0,
-            _deltaTime = Math.round(totalDuration - _currentTime);
-
-        let result = {};
-
-        result.playedPart = _playedPart;
-        result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
-
-        return result
     }
 }
 
@@ -181,6 +127,8 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

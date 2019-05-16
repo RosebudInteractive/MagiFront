@@ -9,11 +9,14 @@ import $ from "jquery";
 import history from '../../history';
 import {TooltipTitles} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
+import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {SVG} from "../common/play-block-functions";
 
 class PlayBlock extends React.Component {
     static propTypes = {
         cover: PropTypes.string,
         lesson: PropTypes.object,
+        course: PropTypes.object,
         extClass: PropTypes.string,
         isPaidCourse: PropTypes.bool,
     };
@@ -59,14 +62,22 @@ class PlayBlock extends React.Component {
     }
 
     _goToLesson(isThisLessonPlaying) {
+        const {course} = this.props;
+
         if (this.needLockLessonAsPaid) {
-            let _currentLocation = window.location.pathname + window.location.search,
-                _needLocation = '/' + this.props.courseUrl + '/' + this.props.lesson.URL
+            let _needLocation = '/' + this.props.courseUrl + '/' + this.props.lesson.URL
 
-            if (_currentLocation !== _needLocation) {
-                let _url = '/' + this.props.courseUrl + '/' + this.props.lesson.URL;
+            let _courseInfo = {
+                courseId: course.Id,
+                productId: course.ProductId,
+                returnUrl: _needLocation,
+                firedByPlayerBlock: true,
+            }
 
-                history.push({pathname: _url})
+            if (course.IsPending) {
+                this.props.getPendingCourseInfo(_courseInfo)
+            } else {
+                this.props.getPaidCourseInfo(_courseInfo)
             }
         } else {
             if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
@@ -74,22 +85,20 @@ class PlayBlock extends React.Component {
     }
 
     _getButton(isThisLessonPlaying, isFinished) {
-        const _play = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#play"/>',
-            _replay = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>',
-            _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>',
-            _lock = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#lock"/>'
-
         let {lesson, authorized, isPaidCourse,} = this.props,
             {IsAuthRequired} = lesson,
             _button = null;
 
         if (isPaidCourse && !lesson.IsFreeInPaidCourse) {
-            return <button className="lecture__btn paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
-                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _crown}}/>
+            return <button className="lecture__btn paused" onClick={(e) => {
+                e.preventDefault();
+                this._goToLesson(isThisLessonPlaying)
+            }}>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.CROWN}}/>
             </button>
         } else if (IsAuthRequired && !authorized) {
             _button = <button className="lecture__btn paused" onClick={::this._unlock}>
-                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: _lock}}/>
+                <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.LOCK}}/>
             </button>
         } else {
             _button = (
@@ -97,12 +106,12 @@ class PlayBlock extends React.Component {
                     ?
                     <button type="button" className="lecture__btn paused"
                             onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: _replay}}/>
+                        <svg width="34" height="34" dangerouslySetInnerHTML={{__html: SVG.REPLAY}}/>
                     </button>
                     :
                     <button type="button" className="lecture__btn play"
                             onClick={isThisLessonPlaying ? ::this._startPlay : ::this._play}>
-                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: _play}}/>
+                        <svg width="41" height="36" dangerouslySetInnerHTML={{__html: SVG.PLAY}}/>
                     </button>
             )
         }
@@ -253,6 +262,8 @@ function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

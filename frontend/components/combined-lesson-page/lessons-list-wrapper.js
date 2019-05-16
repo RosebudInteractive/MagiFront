@@ -37,7 +37,7 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}/>
+            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}/>
         });
     }
 
@@ -94,6 +94,7 @@ class ListItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        course: PropTypes.object,
         active: PropTypes.string,
         showAuthor: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
@@ -115,7 +116,7 @@ class ListItem extends React.Component {
                     <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} isPaidCourse={this.props.isPaidCourse}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} active={this.props.active} courseUrl={this.props.courseUrl} isPaidCourse={this.props.isPaidCourse} />
+                <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active}/>
             </li>
         )
     }
@@ -166,25 +167,22 @@ class SubList extends React.Component {
 
     static propTypes = {
         subLessons: PropTypes.array.isRequired,
-        courseUrl: PropTypes.string.isRequired,
+        course: PropTypes.object,
         active: PropTypes.string.isRequired,
-        isPaidCourse: PropTypes.bool,
     };
 
     _getItems() {
-        const {active, isPaidCourse} = this.props;
-
         return this.props.subLessons.map((lesson, index) => {
-            let _isActive = lesson.Id === active;
-            lesson.courseUrl = this.props.courseUrl;
+            let _isActive = lesson.Id === this.props.active;
+            lesson.courseUrl = this.props.course.URL;
 
             return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}
                        id={'lesson-' + lesson.Id}>
-                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-sublist__title">
+                <Link to={'/' + this.props.course.URL + '/' + lesson.URL} className="lectures-sublist__title">
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
-                    <SubLessonPlayBlock lesson={lesson} isPaidCourse={isPaidCourse}/>
+                    <SubLessonPlayBlock lesson={lesson} course={this.props.course}/>
                 </div>
             </li>
         })

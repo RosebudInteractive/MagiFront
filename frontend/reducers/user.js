@@ -86,7 +86,13 @@ export default function app(state = initialState, action) {
             let _user = Object.assign({}, payload)
             
             _user.isAdmin = _isUserAdmin(payload)
-            return {...state, loading: false, user: _user, email: _user.Email, msgUrl: payload.PData ? payload.PData.msgUrl : '#',}
+            return {...state,
+                loading: false,
+                user: _user,
+                email: _user.Email,
+                msgUrl: payload.PData ? payload.PData.msgUrl : '#',
+                isAdmin: _user.isAdmin,
+            }
         }
 
         case RECOVERY_PASSWORD_SUCCESS:

@@ -22,7 +22,7 @@ import VersionMiddleware from './version-middleware';
 export const store = configureStore();
 
 function configureStore(initialState) {
-    const logger = NODE_ENV === 'development' ? createLogger() : null;
+    // const logger = NODE_ENV === 'development' ? createLogger() : null;
     const routerMiddl = routerMiddleware(history);
     const sagaMiddleware = createSagaMiddleware()
 
@@ -33,7 +33,7 @@ function configureStore(initialState) {
             compose(
                 // responsiveStoreEnhancer,
                 applyMiddleware(sagaMiddleware),
-                applyMiddleware(thunk, logger),
+                applyMiddleware(thunk),
                 applyMiddleware(routerMiddl),
                 applyMiddleware(playerMiddleware),
                 applyMiddleware(loaderMiddleware),

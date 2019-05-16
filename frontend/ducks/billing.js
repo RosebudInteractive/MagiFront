@@ -289,9 +289,21 @@ export const redirectComplete = () => {
     }
 }
 
+export const clearWaitingAuthorize = () => {
+    return {type: CLEAR_WAITING_AUTHORIZE}
+}
+
 /**
  * Sagas
  */
+function* onFinishLoadProfileSaga(data) {
+    const _waiting = yield select(isWaitingAuthorize)
+
+    if (_waiting.active) {
+        yield call(watchPaidCourseInfoSaga, data)
+    }
+}
+
 function* watchPaidCourseInfoSaga(data) {
     const _state = yield select(state => state),
         _authorized = !!_state.user.user;
@@ -316,6 +328,14 @@ function* _getPaidCourseInfoSaga(data) {
     if (_userPaidCourses.contains(_data.courseId)) {
         yield put({type: CLEAR_WAITING_AUTHORIZE})
     } else {
+        if (_data && _data.firedByPlayerBlock) {
+            let _user = yield select(state => state.user)
+            if (_user.isAdmin) {
+                yield put({type: CLEAR_WAITING_AUTHORIZE})
+                return
+            }
+        }
+
         yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
 
         try {
@@ -354,6 +374,7 @@ function* sendPaymentSaga(data) {
         let _data = yield call(_fetchSendPayment, data.payload);
 
         yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
+        yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
     } catch (error) {
         yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
         yield put({type: HIDE_BILLING_WINDOW});
@@ -473,7 +494,7 @@ export const saga = function* () {
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
-        takeEvery(FINISH_LOAD_PROFILE, watchPaidCourseInfoSaga),
+        takeEvery(FINISH_LOAD_PROFILE, onFinishLoadProfileSaga),
     ])
 }
 

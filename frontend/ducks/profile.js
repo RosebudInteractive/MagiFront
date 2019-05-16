@@ -634,6 +634,19 @@ const handleHistoryData = (data) => {
             lesson.courseName = _course ? _course.Name : null;
             lesson.courseIsPaid = _course ? (_course.IsPaid && !_course.IsGift && !_course.IsBought) : false;
 
+            lesson.courseBillingInfo = _course ?
+                {
+                    Id: _course.Id,
+                    ProductId: _course.ProductId,
+                    IsPending : _course.IsPending,
+                    IsPaid: _course.IsPaid,
+                    IsGift : _course.IsGift,
+                    IsBought: _course.IsBought,
+                    URL: _course.URL
+                }
+                :
+                null;
+
             let _author = data.Authors[lesson.AuthorId];
 
             lesson.authorUrl = _author ? _author.URL : null;
@@ -681,6 +694,18 @@ const handleBookmarksData = (data) => {
                 lesson.Order;
 
             lesson.courseUrl = _course ? _course.URL : null;
+            lesson.courseBillingInfo = _course ?
+                {
+                    Id: _course.Id,
+                    ProductId: _course.ProductId,
+                    IsPending : _course.IsPending,
+                    IsPaid: _course.IsPaid,
+                    IsGift : _course.IsGift,
+                    IsBought: _course.IsBought,
+                    URL: _course.URL
+                }
+                :
+                null;
             lesson.courseName = _course ? _course.Name : null;
             lesson.courseIsPaid = _course ? (_course.IsPaid && !_course.IsGift && !_course.IsBought) : false;
             lesson.singleLessonInCourse = _course ? _course.OneLesson : false;
@@ -866,7 +891,7 @@ function* clearStoredCardSaga() {
 }
 
 const _fetchPaidCourses = () => {
-    return fetch("/api/users/paid/courses", {method: 'GET', credentials: 'include'})
+    return fetch("/api/users/paid/courses?gift=true&paid=true", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
