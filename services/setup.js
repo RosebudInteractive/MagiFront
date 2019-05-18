@@ -34,6 +34,7 @@ const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
+const { SetupRoute: setupSessions } = require('./sessions');
 const { setupPrerender } = require('../prerender');
 const { setupCache } = require('./cache');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
@@ -176,7 +177,8 @@ function setupAPI(express, app) {
     setupLanguages(app);
     setupLessons(app);
     setupParameters(app);
-
+    setupSessions(app);
+    
     //
     // Common API options
     //
