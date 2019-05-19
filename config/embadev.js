@@ -52,7 +52,8 @@ let options = {
         name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        logCampaign: true
     },
     redisSession: {
         enabled: true,

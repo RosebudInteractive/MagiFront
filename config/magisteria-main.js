@@ -37,7 +37,8 @@ module.exports = {
         name: 'magisteria.sid',
         secret: pk.session.secret,
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        logCampaign: false
     },
     redisSession: {
         enabled: true,
