@@ -25,6 +25,7 @@ import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
+import {setWaitingAuthorizeData, startBillingByRedirect} from "./ducks/billing";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 import {loadVersion} from "ducks/version"
@@ -136,6 +137,34 @@ class App extends Component {
         });
 
         this.props.playerActions.startInit()
+
+        this._parseSearch()
+    }
+
+    _parseSearch() {
+        if (!this.props.location.search) return
+
+        const _params = new URLSearchParams(this.props.location.search),
+            _isBilling = _params.get('b');
+
+        if (_isBilling) {
+            this.props.history.replace(this.props.location.pathname)
+
+            const _inKey = _params.get('p1'),
+                _savedKey = localStorage.getItem('s1'),
+                _courseInfo = {
+                    productId: +_params.get('productId'),
+                    courseId: +_params.get('courseId'),
+                    returnUrl: _params.get('returnUrl'),
+                    firedByPlayerBlock: _params.get('firedByPlayerBlock') ? _params.get('firedByPlayerBlock') === 'true' : false
+                }
+
+            if (_inKey === _savedKey) {
+                localStorage.removeItem('s1');
+                this.props.setWaitingAuthorizeData(_courseInfo)
+                // this.props.startBillingByRedirect()
+            }
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -337,6 +366,8 @@ function mapDispatchToProps(dispatch) {
         getUserPaidCourses: bindActionCreators(getUserPaidCourses, dispatch),
         loadVersion: bindActionCreators(loadVersion, dispatch),
         getAppOptions: bindActionCreators(getAppOptions, dispatch),
+        setWaitingAuthorizeData: bindActionCreators(setWaitingAuthorizeData, dispatch),
+        startBillingByRedirect: bindActionCreators(startBillingByRedirect, dispatch),
     }
 }
 
