@@ -25,8 +25,6 @@ class CoursePaymentWrapper extends React.Component {
             opened: false,
             isIE: Platform.name === 'IE',
         }
-
-        console.log(Platform)
     }
 
     componentWillReceiveProps(nextProps) {

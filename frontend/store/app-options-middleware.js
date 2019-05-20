@@ -8,9 +8,16 @@ const AppOptionsMiddleware = store => next => action => {
     switch (action.type) {
 
         case WHO_AM_I_SUCCESS: {
+            const _authorizedOld = !!store.getState().user.user
+
             let result = next(action)
 
+            const _authorizedNew = !!store.getState().user.user
+
             dispatchCalcBillingEnabled()
+            if (!_authorizedOld && _authorizedNew) {
+                dispatchLoadUserProfile()
+            }
 
             return result
         }

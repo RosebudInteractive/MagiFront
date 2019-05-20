@@ -61,6 +61,8 @@ export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 export const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
 export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
 
+export const START_BILLING_BY_REDIRECT = `${prefix}/START_BILLING_BY_REDIRECT`
+
 export const BillingStep = {
     subscription: 'subscription',
     payment: 'payment',
@@ -209,6 +211,9 @@ export const isRedirectActiveSelector = createSelector(redirectSelector, redirec
 export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
 
 const isWaitingAuthorize = createSelector(stateSelector, state => state.waiting)
+export const waitingDataSelector = createSelector(isWaitingAuthorize, (waiting) => {
+    return waiting.active ? waiting.data : null
+})
 
 /**
  * Action Creators
@@ -293,10 +298,20 @@ export const clearWaitingAuthorize = () => {
     return {type: CLEAR_WAITING_AUTHORIZE}
 }
 
+export const setWaitingAuthorizeData = (data) => {
+    return {type: SET_WAITING_AUTHORIZE, payload: data}
+}
+
+export const startBillingByRedirect = () => {
+    return {type : START_BILLING_BY_REDIRECT}
+}
+
 /**
  * Sagas
  */
 function* onFinishLoadProfileSaga(data) {
+    console.log(data)
+
     const _waiting = yield select(isWaitingAuthorize)
 
     if (_waiting.active) {
@@ -307,6 +322,8 @@ function* onFinishLoadProfileSaga(data) {
 function* watchPaidCourseInfoSaga(data) {
     const _state = yield select(state => state),
         _authorized = !!_state.user.user;
+
+    console.log(_state.user)
 
     if (!_authorized) {
         yield call(_setWaitingAuthorize, data.payload)
@@ -494,7 +511,7 @@ export const saga = function* () {
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
-        takeEvery(FINISH_LOAD_PROFILE, onFinishLoadProfileSaga),
+        takeEvery([FINISH_LOAD_PROFILE, START_BILLING_BY_REDIRECT], onFinishLoadProfileSaga),
     ])
 }
 

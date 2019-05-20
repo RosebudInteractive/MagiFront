@@ -214,11 +214,3 @@ export const getScrollPage = () => {
 };
 
 window.$overflowHandler = OverflowHandler;
-
-
-
-
-
-
-
-
