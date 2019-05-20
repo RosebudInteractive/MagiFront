@@ -63,7 +63,8 @@ module.exports = {
         },
         appSettings: {
             updPeriod: SESSION_UPD_TIME
-        }
+        },
+        logCampaign: false
     },
     redisSession: {
         enabled: false,

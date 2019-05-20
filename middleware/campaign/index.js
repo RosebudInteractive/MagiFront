@@ -4,7 +4,10 @@ const config = require('config');
 const { HttpCode } = require("../../const/http-codes");
 const { buildLogString } = require('../../utils');
 const { CampaignService } = require('../../database/db-campaign');
+const { SessionLogService } = require('../../database/db-session');
 const PRERENDER_USER_AGENT_KEYWORD = 'prerender';
+
+const logCampaign = config.has("session.logCampaign") ? config.session.logCampaign : false;
 
 async function _processor(req, res, next) {
     try {
@@ -20,6 +23,13 @@ async function _processor(req, res, next) {
                     Campaign: req.query.utm_campaign
                 }, opts);
                 if (campaignId && (campaignId !== req.session.campaignId)) {
+                    if (logCampaign && (!req.session.campaignId)) {
+                        await SessionLogService().addlogRec(req.session.id, {
+                            ts: new Date(),
+                            userAgent: req.headers['user-agent'],
+                            url: req.url
+                        })
+                    }
                     req.session.campaignId = campaignId;
                 }
             }
