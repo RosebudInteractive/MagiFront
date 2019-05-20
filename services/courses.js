@@ -8,6 +8,17 @@ function setupCourses(app) {
     global.$Services.courses = CoursesService;
     
     if (app) {
+        app.get('/api/courses/price-info/:url', (req, res, next) => {
+            CoursesService()
+                .getPriceInfo(req.params.url, req.user, req.query)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+        });
+
         // app.get('/api/courses-lng/:lessonId', (req, res, next) => {
         app.get('/api/courses', (req, res, next) => {
             CoursesService()
