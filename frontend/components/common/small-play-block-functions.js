@@ -45,11 +45,7 @@ export function _goToLesson(isThisLessonPlaying) {
             firedByPlayerBlock: true,
         }
 
-        if (course.IsPending) {
-            this.props.getPendingCourseInfo(_courseInfo)
-        } else {
-            this.props.getPaidCourseInfo(_courseInfo)
-        }
+        this.props.getPaidCourseInfo(_courseInfo)
     } else {
         if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
     }

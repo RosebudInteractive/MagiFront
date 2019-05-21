@@ -9,7 +9,7 @@ import $ from "jquery";
 import history from '../../history';
 import {TooltipTitles} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {getPaidCourseInfo,} from "ducks/billing";
 import {SVG} from "../common/play-block-functions";
 
 class PlayBlock extends React.Component {
@@ -74,11 +74,7 @@ class PlayBlock extends React.Component {
                 firedByPlayerBlock: true,
             }
 
-            if (course.IsPending) {
-                this.props.getPendingCourseInfo(_courseInfo)
-            } else {
-                this.props.getPaidCourseInfo(_courseInfo)
-            }
+            this.props.getPaidCourseInfo(_courseInfo)
         } else {
             if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
         }
@@ -263,7 +259,6 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

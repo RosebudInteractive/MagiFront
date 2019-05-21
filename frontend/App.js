@@ -146,7 +146,8 @@ class App extends Component {
         if (!this.props.location.search) return
 
         const _params = new URLSearchParams(this.props.location.search),
-            _isBilling = _params.get('b') ? _params.get('b') === 'true' : false;
+            _isBilling = _params.get('b') ? _params.get('b') === 'true' : false,
+            _isAuth = _params.get('a') ? _params.get('a') === 'true' : false;
 
         this._scrollPosition = +_params.get('pos');
 
@@ -165,8 +166,11 @@ class App extends Component {
             if (_inKey === _savedKey) {
                 localStorage.removeItem('s1');
                 this.props.setWaitingAuthorizeData(_courseInfo)
-                // this.props.startBillingByRedirect()
             }
+        }
+
+        if (_isAuth) {
+            this.props.history.replace(this.props.location.pathname)
         }
 
         if (this._scrollPosition) {

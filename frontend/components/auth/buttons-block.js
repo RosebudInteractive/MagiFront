@@ -6,7 +6,6 @@ import {AUTHORIZATION_STATE} from '../../constants/user'
 import * as userActions from '../../actions/user-actions'
 import {waitingDataSelector} from 'ducks/billing'
 import $ from "jquery";
-import ScrollMemoryStorage from "../../tools/scroll-memory-storage";
 
 class ButtonsBlock extends React.Component {
 
@@ -50,19 +49,22 @@ class ButtonsBlock extends React.Component {
     }
 
     _getRedirectParams() {
-        let _params = '';
+        let _data;
 
         if (this.props.waitingData) {
             let _key = Math.random().toString(36).substring(7)
             localStorage.setItem('s1', _key)
 
-            let _data = Object.assign({}, this.props.waitingData)
+            _data = Object.assign({}, this.props.waitingData)
             _data.p1 = _key
             _data.b = true
-            _data.pos = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
-
-            _params = '?' + $.param(_data)
+        } else {
+            _data = {a: true}
         }
+
+        _data.pos = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
+
+        let _params = '?' + $.param(_data)
         const _current = window.location.protocol + '//' + window.location.host + window.location.pathname;
 
         return '?redirect=' + encodeURIComponent(_current + _params)

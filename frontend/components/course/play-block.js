@@ -6,7 +6,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
 import * as userActions from "../../actions/user-actions"
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {getPaidCourseInfo,} from "ducks/billing";
 import {_calcIsFinishedAndPlayedPart, _getTooltip, _goToLesson, _play, SVG} from "../common/play-block-functions";
 
 class PlayBlock extends React.Component {
@@ -128,7 +128,6 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

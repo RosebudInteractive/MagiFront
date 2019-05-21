@@ -16,7 +16,7 @@ import {
     _isLocationPlayerPage,
     _isPaidCourse,
 } from "./small-play-block-functions";
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {getPaidCourseInfo,} from "ducks/billing";
 
 class LessonPlayBlockSmall extends React.Component {
     static propTypes = {
@@ -50,7 +50,7 @@ class LessonPlayBlockSmall extends React.Component {
             {IsAuthRequired} = lesson,
             _button = null;
 
-        if (this._isPaidCourse && !lesson.IsFreeInPaidCourse) {
+        if (this._isPaidCourse() && !lesson.IsFreeInPaidCourse) {
             return <button className="play-btn-small paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="18" height="20" dangerouslySetInnerHTML={{__html: SMALL_SVG.CROWN}}/>
                 <div className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</div>
@@ -158,7 +158,6 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
     }
 }
 

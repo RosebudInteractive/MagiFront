@@ -99,6 +99,7 @@ class PaymentForm extends React.Component {
                 data.Payment = {
                     cheque_id: this.props.info.get('SubsAutoPayId'),
                     email: this.email.state.value,
+                    returnUrl: selectedSubscription.ReturnUrl ? selectedSubscription.ReturnUrl : window.location.pathname,
                 }
             } else {
                 data.Payment = {
@@ -111,7 +112,6 @@ class PaymentForm extends React.Component {
                 }
             }
 
-
             data.Invoice = {
                 UserId: this.props.user.Id,
                 InvoiceTypeId: 1,
@@ -121,6 +121,10 @@ class PaymentForm extends React.Component {
                         Price: this.props.selectedSubscription.Price,
                     }
                 ]
+            }
+
+            if (selectedSubscription.CourseId) {
+                data.courseId = selectedSubscription.CourseId
             }
 
             this.props.sendPayment(data)

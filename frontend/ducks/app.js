@@ -31,6 +31,7 @@ export const HIDE_WAITING_FORM = `${prefix}/HIDE_WAITING_FORM`
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
+    self_refund: false,
     productReqParams: null,
 })
 /**
@@ -100,6 +101,7 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 export const stateSelector = state => state[moduleName]
 export const billingTestModeSelector = createSelector(stateSelector, state => state.getIn(['billing', 'billing_test']))
+export const enableRefundSelector = createSelector(stateSelector, state => state.getIn(['billing', 'self_refund']))
 export const billingParamsSelector = createSelector(stateSelector, state => state.getIn(['billing', 'productReqParams']))
 export const enabledBillingSelector = createSelector(stateSelector, state => state.enabledBilling)
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
