@@ -294,9 +294,10 @@ const COURSE_MSSQL_PUBLIC_REQ =
 const COURSE_MSSQL_PRICE_REQ =
     "select c.[Id], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate]\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], p.[Name] as [ProductName]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  left join [Product] p on p.[Id] = c.[ProductId]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "<%= where %>";
 const COURSE_MSSQL_PUBLIC_WHERE_URL =
@@ -376,9 +377,10 @@ const COURSE_MYSQL_PUBLIC_REQ =
 const COURSE_MYSQL_PRICE_REQ =
     "select c.`Id`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, p.`Name` as `ProductName`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  left join `Product` p on p.`Id` = c.`ProductId`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "<%= where %>";
 const COURSE_MYSQL_PUBLIC_WHERE_URL =
@@ -893,6 +895,7 @@ const DbCourse = class DbCourse extends DbObject {
                         IsPending: pendingCourses[elem.Id] ? true : false,
                         IsSubsFree: elem.IsSubsFree ? true : false,
                         ProductId: elem.ProductId,
+                        ProductName: elem.ProductName,
                         Price: 0,
                         DPrice: 0,
                     };

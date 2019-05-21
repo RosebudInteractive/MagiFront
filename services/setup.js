@@ -213,6 +213,8 @@ function setupAPI(express, app) {
                     options.billing.mode = config.billing.mode;
                 if (config.has('billing.productReqParams'))
                     options.billing.productReqParams = config.billing.productReqParams;
+                if (config.has('billing.self_refund') && (config.billing.self_refund === true))
+                    options.billing.self_refund = true;
                 if (config.has('lessonPositions.debug'))
                     options.debug.lsnPositions = config.lessonPositions.debug;
                 return ParametersService().getAllParameters(true)
