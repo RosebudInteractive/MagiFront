@@ -342,6 +342,10 @@ function* _getPaidCourseInfoSaga(data) {
         _data = _waiting.active ? _waiting.data : data,
         _userPaidCourses = yield select(userPaidCoursesSelector)
 
+
+    let _courseBillingStatus = yield call(_fetchCourseBillingStatus, _data.courseId)
+    console.log(_courseBillingStatus)
+
     if (_userPaidCourses.contains(_data.courseId)) {
         yield put({type: CLEAR_WAITING_AUTHORIZE})
     } else {
@@ -353,33 +357,43 @@ function* _getPaidCourseInfoSaga(data) {
             }
         }
 
-        yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
+        if (_courseBillingStatus.IsPending) {
+            yield put({type: GET_PENDING_COURSE_INFO_REQUEST, payload: _data})
+        } else {
+            yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
 
-        try {
-            let _fetchResult = yield call(_fetchPaidCourseInfo, _data.productId);
+            try {
+                let _fetchResult = yield call(_fetchPaidCourseInfo, _data.productId);
 
-            _fetchResult = _fetchResult ? _fetchResult[0] : null;
+                _fetchResult = _fetchResult ? _fetchResult[0] : null;
 
-            let _price = {
-                Price: _fetchResult.DPrice ? _fetchResult.DPrice : _fetchResult.Price,
-                Id: _fetchResult.Id,
-                Title: _fetchResult.Name,
-                ReturnUrl: _data.returnUrl,
+                let _price = {
+                    Price: _fetchResult.DPrice ? _fetchResult.DPrice : _fetchResult.Price,
+                    Id: _fetchResult.Id,
+                    Title: _fetchResult.Name,
+                    ReturnUrl: _data.returnUrl,
+                }
+
+                yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
+                yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
+            } catch (error) {
+                yield put({type: GET_PAID_COURSE_INFO_FAIL})
+                yield put({type: HIDE_BILLING_WINDOW});
+                yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+                yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
             }
-
-            yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
-            yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
-        } catch (error) {
-            yield put({type: GET_PAID_COURSE_INFO_FAIL})
-            yield put({type: HIDE_BILLING_WINDOW});
-            yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
-            yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
         }
     }
 }
 
 const _fetchPaidCourseInfo = (productId) => {
     return fetch(`/api/products?Id=${productId}&Detail=true&Truncate=true`, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+const _fetchCourseBillingStatus = (courseId) => {
+    return fetch(`/api/courses/price-info/${courseId}`, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }

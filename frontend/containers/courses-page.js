@@ -73,10 +73,10 @@ class CoursesPage extends React.Component {
             this.props.history.replace('/razdel/' + _filter.join('+'))
         }
 
-        // if (prevProps.courses.fetching && !this.props.courses.fetching) {
+        if (prevProps.courses.fetching && !this.props.courses.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
-        // }
+        }
     }
 
     componentWillUnmount() {
