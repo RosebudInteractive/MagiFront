@@ -6,6 +6,7 @@ import {AUTHORIZATION_STATE} from '../../constants/user'
 import * as userActions from '../../actions/user-actions'
 import {waitingDataSelector} from 'ducks/billing'
 import $ from "jquery";
+import ScrollMemoryStorage from "../../tools/scroll-memory-storage";
 
 class ButtonsBlock extends React.Component {
 
@@ -25,21 +26,21 @@ class ButtonsBlock extends React.Component {
             }
 
             <a href={'/api/googlelogin' + _params}
-                  className="btn btn--white register-block__btn">
+               className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _google}}/>
                         </span>
                 <span className="text">Google</span>
             </a>
             <a href={'/api/vklogin' + _params}
-                  className="btn btn--white register-block__btn">
+               className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </span>
                 <span className="text">Вконтакте</span>
             </a>
             <a href={'/api/fblogin' + _params}
-                  className="btn btn--white register-block__btn register-block__btn--fullwidth">
+               className="btn btn--white register-block__btn register-block__btn--fullwidth">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
                         </span>
@@ -57,7 +58,8 @@ class ButtonsBlock extends React.Component {
 
             let _data = Object.assign({}, this.props.waitingData)
             _data.p1 = _key
-            _data.b=true
+            _data.b = true
+            _data.pos = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
 
             _params = '?' + $.param(_data)
         }
@@ -67,11 +69,21 @@ class ButtonsBlock extends React.Component {
     }
 }
 
+const getScrollPage = () => {
+    let docScrollTop = 0;
+
+    if (document.documentElement) {
+        docScrollTop = document.documentElement.scrollTop;
+    }
+
+    return window.pageYOffset || docScrollTop;
+};
+
 
 function mapStateToProps(state) {
     return {
         authorizationState: state.user.authorizationState,
-        waitingData : waitingDataSelector(state)
+        waitingData: waitingDataSelector(state)
     }
 }
 

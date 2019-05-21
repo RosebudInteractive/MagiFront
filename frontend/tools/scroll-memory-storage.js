@@ -1,4 +1,5 @@
-const ENTER = 'enter'
+const ENTER = 'enter',
+    INIT = 'INIT'
 
 export default class ScrollMemoryStorage {
     constructor() {
@@ -28,12 +29,23 @@ export default class ScrollMemoryStorage {
     }
 
     static scrollPage(key) {
+        _instance._trySetInitialScrollPos();
+
         let _key = key || ENTER,
             _object = _instance._url.get(_key)
 
         if (_object && _object.active) {
             scrollTo(_object.position)
             _instance._hasBeenScrolled(_key)
+        }
+    }
+
+    _trySetInitialScrollPos() {
+        let _object = this._url.get(INIT)
+
+        if (_object && _object.active) {
+            scrollTo(_object.position)
+            _instance._hasBeenScrolled(INIT)
         }
     }
 

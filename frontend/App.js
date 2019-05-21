@@ -49,6 +49,7 @@ import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions, waitingSelector} from 'ducks/app'
 import ModalWaiting from "./components/messages/modal-waiting";
+import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 
 Polyfill.registry();
 
@@ -145,7 +146,9 @@ class App extends Component {
         if (!this.props.location.search) return
 
         const _params = new URLSearchParams(this.props.location.search),
-            _isBilling = _params.get('b');
+            _isBilling = _params.get('b') ? _params.get('b') === 'true' : false;
+
+        this._scrollPosition = +_params.get('pos');
 
         if (_isBilling) {
             this.props.history.replace(this.props.location.pathname)
@@ -164,6 +167,11 @@ class App extends Component {
                 this.props.setWaitingAuthorizeData(_courseInfo)
                 // this.props.startBillingByRedirect()
             }
+        }
+
+        if (this._scrollPosition) {
+            ScrollMemoryStorage.setUrlPosition('INIT', this._scrollPosition)
+            ScrollMemoryStorage.setKeyActive('INIT')
         }
     }
 
