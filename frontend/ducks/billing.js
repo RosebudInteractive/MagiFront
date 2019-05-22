@@ -312,8 +312,6 @@ export const startBillingByRedirect = () => {
  * Sagas
  */
 function* onFinishLoadProfileSaga(data) {
-    console.log(data)
-
     const _waiting = yield select(isWaitingAuthorize)
 
     if (_waiting.active) {

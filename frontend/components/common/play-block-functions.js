@@ -61,7 +61,7 @@ export function _getTooltip(isFinished) {
 export function _calcIsFinishedAndPlayedPart() {
     const {lesson, lessonInfoStorage} = this.props;
 
-    let _lessonInfo = lessonInfoStorage.lessons.get(lesson.id),
+    let _lessonInfo = lessonInfoStorage.lessons.get(lesson.Id),
         _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
         _totalDuration = lesson.Duration
 
