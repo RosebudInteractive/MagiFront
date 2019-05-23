@@ -25,7 +25,8 @@ import * as playerActions from './actions/player-actions';
 import * as playerStartActions from './actions/player-start-actions';
 import {getUserBookmarks, getUserPaidCourses} from "./ducks/profile";
 import {getParameters} from "./ducks/params";
-import {setWaitingAuthorizeData, startBillingByRedirect} from "./ducks/billing";
+import {setWaitingAuthorizeData as setBillingWaitingAuthorizeData,} from "./ducks/billing";
+import {setWaitingAuthorizeData as setPlayerWaitingAuthorizeData,} from "./ducks/player";
 import {showFeedbackWindowSelector} from "./ducks/message";
 import {showFeedbackResultMessageSelector} from "./ducks/message";
 import {loadVersion} from "ducks/version"
@@ -146,8 +147,9 @@ class App extends Component {
         if (!this.props.location.search) return
 
         const _params = new URLSearchParams(this.props.location.search),
-            _isBilling = _params.get('b') ? _params.get('b') === 'true' : false,
-            _isAuth = _params.get('a') ? _params.get('a') === 'true' : false;
+            _isBilling = _params.get('t') ? _params.get('t') === 'b' : false,
+            _isPlayer= _params.get('t') ? _params.get('t') === 'p' : false,
+            _isAuth = _params.get('t') ? _params.get('t') === 'a' : false;
 
         this._scrollPosition = +_params.get('pos');
 
@@ -165,7 +167,19 @@ class App extends Component {
 
             if (_inKey === _savedKey) {
                 localStorage.removeItem('s1');
-                this.props.setWaitingAuthorizeData(_courseInfo)
+                this.props.setBillingWaitingAuthorizeData(_courseInfo)
+            }
+        }
+
+        if (_isPlayer) {
+            this.props.history.replace(this.props.location.pathname)
+
+            const _inKey = _params.get('p1'),
+                _savedKey = localStorage.getItem('s1')
+
+            if (_inKey === _savedKey) {
+                localStorage.removeItem('s1');
+                this.props.setPlayerWaitingAuthorizeData({returnUrl: _params.get('returnUrl')})
             }
         }
 
@@ -378,8 +392,8 @@ function mapDispatchToProps(dispatch) {
         getUserPaidCourses: bindActionCreators(getUserPaidCourses, dispatch),
         loadVersion: bindActionCreators(loadVersion, dispatch),
         getAppOptions: bindActionCreators(getAppOptions, dispatch),
-        setWaitingAuthorizeData: bindActionCreators(setWaitingAuthorizeData, dispatch),
-        startBillingByRedirect: bindActionCreators(startBillingByRedirect, dispatch),
+        setBillingWaitingAuthorizeData: bindActionCreators(setBillingWaitingAuthorizeData, dispatch),
+        setPlayerWaitingAuthorizeData: bindActionCreators(setPlayerWaitingAuthorizeData, dispatch),
     }
 }
 

@@ -4,7 +4,11 @@ import {connect} from 'react-redux';
 import {AUTHORIZATION_STATE} from '../../constants/user'
 
 import * as userActions from '../../actions/user-actions'
-import {waitingDataSelector} from 'ducks/billing'
+import {waitingDataSelector as billingWaitingAuthData} from 'ducks/billing'
+import {
+    isWaitingAuthorize as isPlayerWaitingAuthorize,
+    waitingDataSelector as playerWaitingAuthData,
+} from 'ducks/player'
 import $ from "jquery";
 
 class ButtonsBlock extends React.Component {
@@ -51,15 +55,22 @@ class ButtonsBlock extends React.Component {
     _getRedirectParams() {
         let _data;
 
-        if (this.props.waitingData) {
+        if (this.props.billingWaitingAuthData) {
             let _key = Math.random().toString(36).substring(7)
             localStorage.setItem('s1', _key)
 
-            _data = Object.assign({}, this.props.waitingData)
+            _data = Object.assign({}, this.props.billingWaitingAuthData)
             _data.p1 = _key
-            _data.b = true
+            _data.t = 'b'
+        } else if (this.props.isPlayerWaitingAuthorize) {
+            let _key = Math.random().toString(36).substring(7)
+            localStorage.setItem('s1', _key)
+
+            _data = Object.assign({}, this.props.playerWaitingAuthData)
+            _data.p1 = _key
+            _data.t = 'p'
         } else {
-            _data = {a: true}
+            _data = {t: 'a'}
         }
 
         _data.pos = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
@@ -85,7 +96,9 @@ const getScrollPage = () => {
 function mapStateToProps(state) {
     return {
         authorizationState: state.user.authorizationState,
-        waitingData: waitingDataSelector(state)
+        billingWaitingAuthData: billingWaitingAuthData(state),
+        isPlayerWaitingAuthorize: isPlayerWaitingAuthorize(state),
+        playerWaitingAuthData: playerWaitingAuthData(state),
     }
 }
 

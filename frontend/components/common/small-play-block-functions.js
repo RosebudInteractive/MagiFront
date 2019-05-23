@@ -106,3 +106,7 @@ export function _isLocationPlayerPage() {
 export function _isPaidCourse() {
     return this.props.course.IsPaid && !this.props.course.IsGift && !this.props.course.IsBought
 }
+
+export function _unlock() {
+    this.props.unlockLesson({redirectUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
+}

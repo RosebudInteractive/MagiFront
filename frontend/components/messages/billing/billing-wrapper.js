@@ -6,11 +6,11 @@ import {
     showBillingWindowSelector,
     billingStepSelector,
     loadingSelector,
-    isRedirectActiveSelector,
+    // isRedirectActiveSelector,
     BillingStep,
     hideBillingWindow,
     redirectComplete,
-    isRedirectUrlSelector
+    // isRedirectUrlSelector
 } from "../../../ducks/billing";
 
 import Subscription from './billing-subscription'
@@ -29,13 +29,13 @@ class BillingWrapper extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
-
-            this.props.complete();
-            window.location = nextProps.redirectUrl;
-        }
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
+    //
+    //         this.props.complete();
+    //         window.location = nextProps.redirectUrl;
+    //     }
+    // }
 
     componentDidUpdate(prevProps) {
         if (!prevProps.showBillingWindow && this.props.showBillingWindow) {
@@ -120,8 +120,8 @@ function mapStateToProps(state) {
         showBillingWindow: showBillingWindowSelector(state),
         billingStep: billingStepSelector(state),
         loading: loadingSelector(state),
-        needRedirect: isRedirectActiveSelector(state),
-        redirectUrl: isRedirectUrlSelector(state),
+        // needRedirect: isRedirectActiveSelector(state),
+        // redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
         enabledBilling: enabledSubscriptionSelector(state),
 

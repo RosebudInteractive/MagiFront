@@ -8,7 +8,6 @@ import {
     selectedTypeSelector,
     sendPayment,
     switchToSubscription,
-    isRedirectActiveSelector
 } from "ducks/billing";
 import StoredCard from "./stored-card";
 import {
@@ -248,7 +247,6 @@ function mapStateToProps(state) {
         info: subscriptionInfoSelector(state),
         loading: billingFetching(state),
         selectedSubscription: selectedTypeSelector(state),
-        needRedirect: isRedirectActiveSelector(state),
         error: errorSelector(state),
         user: state.user.user,
     }

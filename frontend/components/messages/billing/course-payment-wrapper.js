@@ -7,10 +7,10 @@ import {
     showCoursePaymentWindowSelector,
     billingStepSelector,
     loadingSelector as billingFetching,
-    isRedirectActiveSelector,
+    // isRedirectActiveSelector,
     hideCoursePaymentWindow,
     redirectComplete,
-    isRedirectUrlSelector
+    // isRedirectUrlSelector
 } from "ducks/billing";
 
 import Payment, {PAYMENT_TYPE} from './billing-payments'
@@ -27,13 +27,13 @@ class CoursePaymentWrapper extends React.Component {
         }
     }
 
-    componentWillReceiveProps(nextProps) {
-        if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
-
-            this.props.complete();
-            window.location = nextProps.redirectUrl;
-        }
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     if ((nextProps.needRedirect) && (!this.props.needRedirect)) {
+    //
+    //         this.props.complete();
+    //         window.location = nextProps.redirectUrl;
+    //     }
+    // }
 
     componentDidUpdate(prevProps) {
         if (!prevProps.showWindow && this.props.showWindow) {
@@ -103,8 +103,8 @@ function mapStateToProps(state) {
         showWindow: showCoursePaymentWindowSelector(state),
         billingStep: billingStepSelector(state),
         fetching: billingFetching(state),
-        needRedirect: isRedirectActiveSelector(state),
-        redirectUrl: isRedirectUrlSelector(state),
+        // needRedirect: isRedirectActiveSelector(state),
+        // redirectUrl: isRedirectUrlSelector(state),
         authorized: !!state.user.user,
         enabledPaidCourses: enabledPaidCoursesSelector(state),
 

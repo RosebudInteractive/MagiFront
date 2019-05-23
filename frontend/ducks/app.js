@@ -28,6 +28,8 @@ export const RELOAD_CURRENT_PAGE_SUCCESS = `${prefix}/RELOAD_CURRENT_PAGE_SUCCES
 export const SHOW_WAITING_FORM = `${prefix}/SHOW_WAITING_FORM`
 export const HIDE_WAITING_FORM = `${prefix}/HIDE_WAITING_FORM`
 
+export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
@@ -145,6 +147,10 @@ export const clearCurrentPage = () => {
 
 export const reloadCurrentPage = () => {
     return {type: RELOAD_CURRENT_PAGE_REQUEST}
+}
+
+export const clearWaitingAuthorize = () => {
+    return {type: CLEAR_WAITING_AUTHORIZE}
 }
 
 

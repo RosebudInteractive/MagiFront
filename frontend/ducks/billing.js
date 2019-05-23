@@ -12,8 +12,9 @@ import {
     SHOW_WAITING_FORM,
     HIDE_WAITING_FORM,
 } from "ducks/app";
-import {FINISH_LOAD_PROFILE, GET_TRANSACTIONS_REQUEST, userPaidCoursesSelector} from "ducks/profile";
+import {FINISH_LOAD_PROFILE, GET_TRANSACTIONS_REQUEST,} from "ducks/profile";
 import {SHOW_SIGN_IN_FORM,} from "../constants/user";
+import {CLEAR_WAITING_AUTHORIZE,} from "ducks/app";
 
 /**
  * Constants
@@ -60,7 +61,7 @@ export const REFUND_PAYMENT_SUCCESS = `${prefix}/REFUND_PAYMENT_SUCCESS`
 export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 
 export const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
-export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+// export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
 
 export const START_BILLING_BY_REDIRECT = `${prefix}/START_BILLING_BY_REDIRECT`
 
@@ -198,7 +199,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Selectors
  * */
-
 export const stateSelector = state => state[moduleName]
 export const showBillingWindowSelector = createSelector(stateSelector, state => state.showBillingWindow)
 export const showCoursePaymentWindowSelector = createSelector(stateSelector, state => state.showCoursePaymentWindow)
@@ -296,9 +296,9 @@ export const redirectComplete = () => {
     }
 }
 
-export const clearWaitingAuthorize = () => {
-    return {type: CLEAR_WAITING_AUTHORIZE}
-}
+// export const clearWaitingAuthorize = () => {
+//     return {type: CLEAR_WAITING_AUTHORIZE}
+// }
 
 export const setWaitingAuthorizeData = (data) => {
     return {type: SET_WAITING_AUTHORIZE, payload: data}

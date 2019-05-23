@@ -75,3 +75,7 @@ export function _calcIsFinishedAndPlayedPart() {
 
     return result
 }
+
+export function _unlock() {
+    this.props.unlockLesson({returnUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
+}
