@@ -66,7 +66,7 @@ class PlayBlock extends React.Component {
             _isAuthRequired = lesson.IsAuthRequired,
             _button = null;
 
-        if (this._isPaidCourse && !lesson.IsFreeInPaidCourse) {
+        if (this._isPaidCourse() && !lesson.IsFreeInPaidCourse) {
             return <button className="lecture__btn paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="27" height="30" dangerouslySetInnerHTML={{__html: SVG.CROWN}}/>
             </button>

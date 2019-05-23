@@ -61,7 +61,7 @@ exports.AccessRights = class {
                                     IsPaid = false;
                             }
                         }
-                        let needAuth = rec.IsAuthRequired || rec.IsSubsRequired || IsPaid;
+                        let needAuth = rec.IsAuthRequired || rec.IsSubsRequired || (IsPaid && (!rec.IsFreeInPaidCourse));
                         if (needAuth) {
                             if (user) {
                                 if (rec.IsSubsRequired || IsPaid) {
