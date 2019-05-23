@@ -67,7 +67,7 @@ export const isRedirectActiveSelector = createSelector(redirectSelector, redirec
 export const redirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
 
 const waitingAuth = createSelector(stateSelector, state => state.waiting)
-export const isWaitingAuthorize = createSelector(waitingAuth, (waiting) => {return waiting.active})
+export const isWaitingAuthorize = createSelector(waitingAuth, waiting => waiting.active)
 export const waitingDataSelector = createSelector(waitingAuth, (waiting) => {
     return waiting.active ? waiting.data : null
 })
@@ -97,6 +97,8 @@ function* unlockLessonSaga(data) {
     const _state = yield select(state => state),
         _authorized = !!_state.user.user;
 
+    console.log(data)
+
     if (!_authorized) {
         yield call(_setWaitingAuthorize, data.payload)
     }
@@ -108,7 +110,7 @@ function* _setWaitingAuthorize(data) {
 }
 
 function* onFinishLoadProfileSaga() {
-    const _waiting = yield select(isWaitingAuthorize)
+    const _waiting = yield select(waitingAuth)
 
     console.log(_waiting)
 

@@ -108,5 +108,5 @@ export function _isPaidCourse() {
 }
 
 export function _unlock() {
-    this.props.unlockLesson({redirectUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
+    this.props.unlockLesson({returnUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
 }

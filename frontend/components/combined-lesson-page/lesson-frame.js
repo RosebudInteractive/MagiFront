@@ -23,6 +23,7 @@ import {setScrollTop} from "../../containers/combined-lesson-page";
 import {getLessonNumber} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
+import {unlockLesson,} from "ducks/player";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -119,7 +120,7 @@ class LessonFrame extends React.Component {
     }
 
     _unlock() {
-        this.props.userActions.showSignInForm();
+        this.props.unlockLesson({returnUrl: `/${this.props.courseUrl}/${this.props.lesson.URL}`});
     }
 
     _getButton(isFinished) {
@@ -334,6 +335,7 @@ function mapDispatchToProps(dispatch) {
         addLessonToBookmarks: bindActionCreators(addLessonToBookmarks, dispatch),
         removeLessonFromBookmarks: bindActionCreators(removeLessonFromBookmarks, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
+        unlockLesson: bindActionCreators(unlockLesson, dispatch),
     }
 }
 
