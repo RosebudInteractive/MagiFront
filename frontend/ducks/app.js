@@ -164,10 +164,6 @@ function* getOptionsSaga() {
 
         yield put({type: GET_OPTIONS_SUCCESS, payload: _options})
 
-        let _state = yield select(stateSelector)
-        console.log(_state);
-
-
         yield fork(calcBillingEnabledSaga)
     } catch (error) {
         yield put({type: GET_OPTIONS_FAIL, payload: {error}})

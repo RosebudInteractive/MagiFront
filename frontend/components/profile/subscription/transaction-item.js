@@ -5,6 +5,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {enableRefundSelector} from "ducks/app";
 import {refundPayment} from "ducks/billing";
+import {getCurrencySign} from "../../../tools/page-tools";
 
 class Item extends React.Component {
 
@@ -13,7 +14,8 @@ class Item extends React.Component {
     }
 
     render() {
-        let {item} = this.props;
+        let {item} = this.props,
+            _currency = getCurrencySign()
 
         return (
             item
@@ -22,7 +24,7 @@ class Item extends React.Component {
                     <p className="subscription-history__transaction">{this._getName()}<span
                         className="subscription-history__date">{this._getDate()}</span></p>
                     <p className="subscription-history__total">
-                        {item.Sum + '₽'}
+                        {item.Sum + _currency}
                         {this._getRefundButton()}
                     </p>
                 </li>

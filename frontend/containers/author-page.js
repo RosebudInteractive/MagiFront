@@ -23,6 +23,7 @@ class AuthorPage extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getAuthor(this.props.authorUrl);

@@ -156,6 +156,7 @@ class CombineLessonPage extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.userActions.whoAmI();
@@ -180,7 +181,10 @@ class CombineLessonPage extends React.Component {
     componentWillUnmount() {
         this._removeEventListeners();
         this.props.lessonActions.clearLesson();
-        this.props.playerStartActions.cancelStarting(this._getLesson().Id);
+        let _lesson = this._getLesson()
+        if (_lesson) {
+            this.props.playerStartActions.cancelStarting(_lesson.Id);
+        }
         this._removeMetaTags();
         this.props.clearCurrentPage();
     }
@@ -261,7 +265,11 @@ class CombineLessonPage extends React.Component {
         if ((this.props.courseUrl !== nextProps.courseUrl) || (this.props.lessonUrl !== nextProps.lessonUrl)) {
             this.props.lessonActions.getLesson(nextProps.courseUrl, nextProps.lessonUrl);
             this.props.lessonActions.getLessonText(nextProps.courseUrl, nextProps.lessonUrl);
-            this.props.playerStartActions.cancelStarting(this._getLesson().Id);
+
+            let _lesson = this._getLesson()
+            if (_lesson) {
+                this.props.playerStartActions.cancelStarting(_lesson.Id);
+            }
         }
 
         if (this.state.redirectToPlayer) {
@@ -311,6 +319,8 @@ class CombineLessonPage extends React.Component {
     _getLesson() {
         let {lessonUrl, lessonInfo} = this.props,
             lesson = lessonInfo.object;
+
+        if (!lesson) {return null}
 
         let _lesson = (lesson.URL === lessonUrl) ? lesson : lesson.Childs.find((subLesson) => {
             return subLesson.URL === lessonUrl
