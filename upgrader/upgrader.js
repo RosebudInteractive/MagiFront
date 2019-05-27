@@ -372,7 +372,8 @@ class Upgrader{
         });
 
         let verInfo = await this._resMan.getVersionInfo();
-        let builds = Object.keys(this._buildInfo.builds).map((elem => { return parseInt(elem) })).sort();
+        let builds = Object.keys(this._buildInfo.builds).map((elem => { return parseInt(elem) }))
+            .sort((a, b) => { return a > b ? 1 : (a < b ? -1 : 0) });
         if (verInfo.product.Code !== this._buildInfo.product)
             throw new Error(`Current product code "${verInfo.product.Code}" doesn't match upgraded product code "${this._buildInfo.product}".`);
         if (verInfo.version.Code !== this._buildInfo.version)

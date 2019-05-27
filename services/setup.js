@@ -30,6 +30,7 @@ const { setupParameters } = require('./parameters');
 const { setupProducts } = require('./products');
 const { setupInvoices } = require('./invoices');
 const { setupBooks } = require('./books');
+const { setupPromoCodes } = require('./promo-codes');
 const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
@@ -169,6 +170,7 @@ function setupAPI(express, app) {
     setupProducts(app);
     setupInvoices(app);
     setupBooks(app);
+    setupPromoCodes(app);
     setupEpisodes(app);
     setupUsers(app);
     setupAuthors(app);
