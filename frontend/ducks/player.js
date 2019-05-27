@@ -97,8 +97,6 @@ function* unlockLessonSaga(data) {
     const _state = yield select(state => state),
         _authorized = !!_state.user.user;
 
-    console.log(data)
-
     if (!_authorized) {
         yield call(_setWaitingAuthorize, data.payload)
     }
@@ -111,8 +109,6 @@ function* _setWaitingAuthorize(data) {
 
 function* onFinishLoadProfileSaga() {
     const _waiting = yield select(waitingAuth)
-
-    console.log(_waiting)
 
     if (_waiting.active && _waiting.data && (_waiting.data.returnUrl)) {
         yield put({type: REDIRECT_TO_UNLOCKED_LESSON, payload: _waiting.data.returnUrl})

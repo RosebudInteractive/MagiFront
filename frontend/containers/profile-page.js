@@ -31,6 +31,7 @@ class ProfilePage extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         this.props.getUserProfile();
         this.props.pageHeaderActions.setCurrentPage(pages.profile);
     }
