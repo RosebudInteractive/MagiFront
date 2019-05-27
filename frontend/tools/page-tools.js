@@ -1,4 +1,5 @@
 import $ from "jquery";
+import Platform from 'platform'
 
 export const Size = {
     xxl: {width: 1900, name: 'xxl-size'},
@@ -214,3 +215,14 @@ export const getScrollPage = () => {
 };
 
 window.$overflowHandler = OverflowHandler;
+
+export const getCurrencySign = () => {
+    if (Platform.os.family === "Android") {
+        let _version = Platform.os.version.split('.')
+        if (+_version[0] < 5) {
+            return "Р"
+        }
+    }
+
+    return "₽"
+}

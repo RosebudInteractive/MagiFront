@@ -24,6 +24,7 @@ import {
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
 import WaitingFrame from "./waiting-frame";
 import EmailField from "./email-field";
+import {getCurrencySign} from "../../../tools/page-tools";
 
 export const PAYMENT_TYPE = {
     BILLING: 'BILLING',
@@ -181,6 +182,7 @@ class PaymentForm extends React.Component {
     render() {
         let _disabledBtn = !this._isSendingEnable()
         let {selectedSubscription, paymentType, user} = this.props;
+        let _currency = getCurrencySign()
 
         if (!selectedSubscription) {
             return null
@@ -231,7 +233,7 @@ class PaymentForm extends React.Component {
                             <button className={"payment-form__submit btn btn--brown" + (_disabledBtn ? ' disabled' : '')}
                                     onClick={::this._handleSubmit}>
                                 Оплатить
-                                <span className="total">{selectedSubscription.Price}<span className="cur">₽</span></span>
+                                <span className="total">{selectedSubscription.Price}<span className="cur">{_currency}</span></span>
                             </button>
                         </div>
                     </div>

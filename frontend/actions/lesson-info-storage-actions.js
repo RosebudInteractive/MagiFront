@@ -210,7 +210,6 @@ const _getDebugLsnPosPath = (state, params) => {
 
     _params.ver = '2.0'
 
-    console.log(`lsnpos ${$.param(_params)}`)
     return '/api/lsnposdbg?' + $.param(_params)
 }
 

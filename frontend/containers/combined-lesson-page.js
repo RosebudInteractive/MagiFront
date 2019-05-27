@@ -156,6 +156,7 @@ class CombineLessonPage extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         let {courseUrl, lessonUrl} = this.props;
 
         this.props.userActions.whoAmI();

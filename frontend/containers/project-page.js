@@ -1,6 +1,9 @@
 import React from "react";
 
 export default class ProjectPage extends React.Component {
+    componentWillMount() {
+        window.scrollTo(0, 0)
+    }
 
     render() {
         const _symbol = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#c"/>',

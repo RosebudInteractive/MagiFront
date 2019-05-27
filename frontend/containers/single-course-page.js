@@ -30,6 +30,7 @@ class Main extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.coursesActions.getCourse(this.props.courseUrl);

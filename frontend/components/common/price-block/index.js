@@ -12,6 +12,7 @@ import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
 import {connect} from 'react-redux';
+import {getCurrencySign} from "../../../tools/page-tools";
 
 class PriceBlock extends React.Component {
 
@@ -26,7 +27,8 @@ class PriceBlock extends React.Component {
 
 
     render() {
-        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title} = this.props
+        const {course, userPaidCourses, enabledPaidCourse, loading, loadingCourseId, title} = this.props,
+            _currency = getCurrencySign()
 
         if (!enabledPaidCourse) {
             return null
@@ -47,11 +49,11 @@ class PriceBlock extends React.Component {
                     {
                         _hasDiscount ?
                             <React.Fragment>
-                                <p className="course-module__price">{course.DPrice + "₽ "}<span className="discount">{`-${course.Discount.Perc}%`}</span></p>
-                                <p className="course-module__old-price">{course.Price + "₽"}</p>
+                                <p className="course-module__price">{course.DPrice + _currency + " "}<span className="discount">{`-${course.Discount.Perc}%`}</span></p>
+                                <p className="course-module__old-price">{course.Price + _currency}</p>
                             </React.Fragment>
                             :
-                            <p className="course-module__price">{course.Price + "₽"}</p>
+                            <p className="course-module__price">{course.Price + _currency}</p>
                     }
                 </div>
             </div>

@@ -14,6 +14,7 @@ import * as storageActions from "../actions/lesson-info-storage-actions";
 import LessonsBlock from '../components/bookmarks/lessons-block'
 import CoursesBlock from '../components/bookmarks/courses-block'
 import {Redirect} from 'react-router';
+import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 class BookmarksPage extends React.Component {
     constructor(props) {
@@ -28,6 +29,7 @@ class BookmarksPage extends React.Component {
     }
 
     componentWillMount() {
+        window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
         this.props.getUserBookmarksFull();
@@ -62,6 +64,13 @@ class BookmarksPage extends React.Component {
                 this.props.appActions.showLessonsBookmarks();
                 this.props.history.replace('/favorites/lessons')
             }
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.loading && !this.props.loading) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
         }
     }
 

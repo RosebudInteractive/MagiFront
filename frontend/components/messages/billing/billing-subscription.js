@@ -11,6 +11,7 @@ import {
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {billingTestModeSelector} from "ducks/app";
+import {getCurrencySign} from "../../../tools/page-tools";
 
 class SubscriptionForm extends React.Component {
 
@@ -55,6 +56,8 @@ class SubscriptionForm extends React.Component {
     }
 
     _getSubscriptionList() {
+        let _currency = getCurrencySign()
+
         return this.props.subscriptionList ?
             this.props.subscriptionList.map((item, index) => {
                 let _monthCount = (item.ExtFields.units === 'y') ? item.ExtFields.duration * 12 : item.ExtFields.duration,
@@ -62,12 +65,15 @@ class SubscriptionForm extends React.Component {
 
                 return <li className="subscription-item" key={index}>
                     {this._getDescription(item.ExtFields)}
-                    <p className="subscription-item__descr">При разовой оплате <span
-                        className="emph">{item.Price + '₽'}</span></p>
+                    <p className="subscription-item__descr">При разовой оплате
+                        <span className="emph">
+                            {item.Price + _currency}
+                        </span>
+                    </p>
                     <div className="subscription-item__price-block">
                         <div className="subscription-item__price">
                             <span className="amount">{_price}</span>
-                            <span className="currency">₽</span>
+                            <span className="currency">{_currency}</span>
                             <span className="period">/ месяц</span>
                         </div>
                         <div className="btn btn--rounded subscription-item__btn js-subscribe" onClick={() => {this._setSubscriptionType(item)}}>

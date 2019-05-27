@@ -30,6 +30,7 @@ class PurchasesPage extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if ((this.props.loading) && (!nextProps.loading)) {
+            window.requestAnimationFrame(() => {window.scrollTo(0, 0) });
             if (!nextProps.authorized || !nextProps.enabledPaidCourses) {
                 this._redirect = true;
                 this.forceUpdate();

@@ -86,7 +86,7 @@ export default class ScrollMemoryStorage {
  */
 
 const scrollTo = (position) => {
-    window.requestAnimationFrame(() => {window.scrollTo(500, position) });
+    window.requestAnimationFrame(() => {window.scrollTo(0, position) });
 };
 
 let _instance = new ScrollMemoryStorage()
