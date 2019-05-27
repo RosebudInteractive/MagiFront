@@ -4,8 +4,9 @@ import {connect} from "react-redux";
 import ImportButton from "./import-buttom"
 import {bindActionCreators} from 'redux';
 import {Field} from "redux-form";
-import {TextBox} from "../../../common/input-controls";
+import {CheckBox, TextBox} from "../../../common/input-controls";
 import Select from "../../../common/select-control";
+import TextArea from "../../../common/text-area";
 
 const EPISODE_TYPES = [
         {id: 'L', value: 'Лекция'},
@@ -40,8 +41,10 @@ class MainTab extends React.Component {
                 <Field component={TextBox} name="number" label="Номер эпизода" disabled={true}/>
                 <Field component={Select} name="episodeType" label="Тип эпизода" placeholder="Выберите тип эпизода"
                        options={EPISODE_TYPES} disabled={_disabled}/>
+                <Field component={CheckBox} name="supp" label="Дополнительный материал" disabled={true}/>
                 <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние"
                        options={EPISODE_STATE} disabled={_disabled}/>
+                <Field component={TextArea} name="transcript" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
             </div>
         </div>
 

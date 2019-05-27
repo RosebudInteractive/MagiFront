@@ -1,25 +1,140 @@
 import React from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import {reduxForm} from "redux-form";
+import {getFormValues, isDirty, isValid, reduxForm} from "redux-form";
 import SavingBlock from "../common/saving-page";
 import {Prompt} from "react-router-dom";
+import BottomControls from "../bottom-contols/buttons";
+import MainTab from "./tabs/main-tab";
+import TocTab from "./tabs/toc-tab";
+import ContentTab from "./tabs/content-tab";
+import history from "../../history";
+import {activeTabsSelector} from "adm-ducks/app";
+
+const TABS = {
+    MAIN: 'MAIN',
+    TOC: 'TOC',
+    CONTENT: 'CONTENT',
+}
 
 class EpisodeEditorForm extends React.Component {
 
-    render(){
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            currentTab: TABS.MAIN,
+        }
+    }
+
+    componentWillMount() {
+        this._init()
+    }
+
+    componentDidMount() {
+        let _activeTab = this.props.activeTabs.get('EpisodeEditor')
+        if (_activeTab) {
+            this.setState({
+                currentTab: _activeTab,
+            })
+        }
+    }
+
+
+    render() {
         const {hasChanges, saving} = this.props;
 
-        return <div className="editor course_editor">
+        return <React.Fragment>
             <SavingBlock visible={saving}/>
             <Prompt when={hasChanges}
                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
             <div className='editor__head'>
                 <div className="tabs tabs-1" key='tab1'>
-
+                    <div className="tab-links">
+                        <div
+                            className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
+                            onClick={() => { this._switchTo(TABS.MAIN) }}>Основные
+                        </div>
+                        <div
+                            className={"tabs-1 tab-link" + (this.state.currentTab === TABS.TOC ? ' tab-link-active' : '')}
+                            onClick={() => { this._switchTo(TABS.TOC) }}>Оглавление эпизода
+                        </div>
+                        <div
+                            className={"tabs-1 tab-link" + (this.state.currentTab === TABS.CONTENT ? ' tab-link-active' : '')}
+                            onClick={() => { this._switchTo(TABS.CONTENT) }}>Компоненты
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div className="editor__main-area">
+                <div className="main-area__container">
+                    <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
+                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}/>
+                        <TocTab visible={this.state.currentTab === TABS.TOC} editMode={this.props.editMode}/>
+                        <ContentTab visible={this.state.currentTab === TABS.CONTENT} editMode={this.props.editMode} lessonId={1}/>
+                    </form>
+                </div>
+            </div>
+            <div className="editor__footer">
+                <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
+                                onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
+            </div>
+        </React.Fragment>
+    }
+
+    _init() {
+        let {episode,} = this.props,
+            _episode = episode ? episode : this._getNewEpisode()
+
+        if (_episode) {
+            this.props.initialize({
+                name: _episode.Name,
+                number: _episode.Number,
+                episodeType: _episode.EpisodeType,
+
+                supp: _episode.Supp,
+                state: _episode.State,
+                transcript: _episode.Transcript,
+
+            })
+        }
+    }
+
+    _getNewEpisode() {
+        return {}
+    }
+
+    _switchTo(tabName) {
+        if (this.state.currentTab !== tabName) {
+            this.setState({
+                currentTab: tabName
+            })
+        }
+    }
+
+    _enableApplyChanges() {
+        return this.props.editorValid
+    }
+
+    _goBack() {
+        // if (this.props.isSublesson) {
+        //     history.push(`/adm/courses/edit/${this.props.course.id}/lessons/edit/${this.props.lesson.CurrParentId}`);
+        // } else {
+        //     history.push(`/adm/courses/edit/${this.props.course.id}`);
+        // }
+    }
+
+    _cancel() {
+        this.props.resetReduxForm('EpisodeEditor')
+        this.props.cancelChanges()
+    }
+
+    _save() {
+        let {editorValues, editorValid} = this.props;
+
+        if (!editorValid) {
+            return
+        }
     }
 }
 
@@ -31,8 +146,8 @@ const validate = (values) => {
         errors.name = 'Значение не может быть пустым'
     }
 
-    if (!values.lessonType) {
-        errors.lessonType = 'Значение не может быть пустым'
+    if (!values.episodeType) {
+        errors.episodeType = 'Значение не может быть пустым'
     }
 
     if (!values.URL) {
@@ -56,7 +171,22 @@ let EpisodeEditorWrapper = reduxForm({
 })(EpisodeEditorForm);
 
 function mapStateToProps(state) {
-    return {}
+    return {
+        hasChanges: state.singleEpisode.hasChanges ||
+            state.episodeToc.hasChanges ||
+            state.episodeContent.hasChanges ||
+            isDirty('EpisodeEditor')(state),
+
+        editorValues: getFormValues('EpisodeEditor')(state),
+        editorValid: isValid('EpisodeEditor')(state),
+
+        episode: state.singleEpisode.current,
+        lesson: state.singleLesson.current,
+
+
+
+        activeTabs: activeTabsSelector(state),
+    }
 }
 
 function mapDispatchToProps(dispatch) {

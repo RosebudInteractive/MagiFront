@@ -13,7 +13,7 @@ import Courses from './lists/courses';
 import CourseEditor from './editors/course-editor';
 import LessonEditor from './editors/lesson-editor';
 import SubLessonEditor from './editors/sublesson-editor';
-import EpisodeEditor from './episode-editor';
+import EpisodeEditor from './editors/episode-editor';
 import BooksPage from './lists/books-list-page';
 import WorkShop from './work-shop';
 import SignInForm from './sign-in-form';

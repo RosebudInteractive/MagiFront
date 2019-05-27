@@ -138,7 +138,7 @@ class LessonEditorForm extends React.Component {
     render() {
         const {hasChanges, saving} = this.props;
 
-        return <div className="editor course_editor">
+        return <React.Fragment>
             <SavingBlock visible={saving}/>
             <Prompt when={hasChanges}
                     message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
@@ -188,7 +188,7 @@ class LessonEditorForm extends React.Component {
                 <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
                                 onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
             </div>
-        </div>
+        </React.Fragment>
     }
 
     _switchTo(tabName) {
@@ -354,10 +354,6 @@ class LessonEditorForm extends React.Component {
                 ShowInGalery: resource.ShowInGalery,
             })
         });
-    }
-
-    hideAddAuthorDialog() {
-        this.props.courseActions.hideAddAuthorDialog()
     }
 
     _enableApplyChanges() {

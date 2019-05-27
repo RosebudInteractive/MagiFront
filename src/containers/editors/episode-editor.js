@@ -4,6 +4,8 @@ import {bindActionCreators} from 'redux';
 import {get as getEpisode, create as createEpisode} from "../../actions/episode/episode-actions";
 import {get as getLesson} from "../../actions/lesson/lesson-actions";
 import LoadingPage from "../../components/common/loading-page";
+import EditorForm from "../../components/episode-editor/editor-form";
+import ErrorDialog from "../../components/dialog/error-dialog";
 
 class EpisodeEditor extends React.Component {
 
@@ -57,7 +59,8 @@ class EpisodeEditor extends React.Component {
             <LoadingPage/>
             :
             <div className="editor episode_editor">
-
+                <EditorForm editMode={this.state.editMode}/>
+                <ErrorDialog/>
             </div>
     }
 
