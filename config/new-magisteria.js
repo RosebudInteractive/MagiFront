@@ -37,7 +37,8 @@ module.exports = {
         name: 'magisteria.sid',
         secret: 'vdsadfrwer46546fdgrtj',
         resave: false,
-        saveUninitialized: false
+        saveUninitialized: false,
+        logCampaign: true
     },
     redisSession: {
         enabled: true,
@@ -78,7 +79,8 @@ module.exports = {
         module: "./yandex-kassa",
         enabled: true,
         debug: true,
-        billing_test: true,
+        billing_test: false,
+        self_refund: true,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {

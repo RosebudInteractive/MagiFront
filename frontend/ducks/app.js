@@ -28,9 +28,12 @@ export const RELOAD_CURRENT_PAGE_SUCCESS = `${prefix}/RELOAD_CURRENT_PAGE_SUCCES
 export const SHOW_WAITING_FORM = `${prefix}/SHOW_WAITING_FORM`
 export const HIDE_WAITING_FORM = `${prefix}/HIDE_WAITING_FORM`
 
+export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+
 const Billing = Record({
     mode: {courses: false, subscription: false},
     billing_test: false,
+    self_refund: false,
     productReqParams: null,
 })
 /**
@@ -100,6 +103,7 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 export const stateSelector = state => state[moduleName]
 export const billingTestModeSelector = createSelector(stateSelector, state => state.getIn(['billing', 'billing_test']))
+export const enableRefundSelector = createSelector(stateSelector, state => state.getIn(['billing', 'self_refund']))
 export const billingParamsSelector = createSelector(stateSelector, state => state.getIn(['billing', 'productReqParams']))
 export const enabledBillingSelector = createSelector(stateSelector, state => state.enabledBilling)
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
@@ -143,6 +147,10 @@ export const clearCurrentPage = () => {
 
 export const reloadCurrentPage = () => {
     return {type: RELOAD_CURRENT_PAGE_REQUEST}
+}
+
+export const clearWaitingAuthorize = () => {
+    return {type: CLEAR_WAITING_AUTHORIZE}
 }
 
 

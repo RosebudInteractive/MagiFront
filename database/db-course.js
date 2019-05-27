@@ -291,6 +291,15 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "<%= where %>\n" +
     "order by lc.[ParentId], lc.[Number], el.[Number]";
+const COURSE_MSSQL_PRICE_REQ =
+    "select c.[Id], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], p.[Name] as [ProductName]\n" +
+    "from [Course] c\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
+    "  left join [Product] p on p.[Id] = c.[ProductId]\n" +
+    "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "<%= where %>";
 const COURSE_MSSQL_PUBLIC_WHERE_URL =
     "where c.[URL] = '<%= courseUrl %>'";
 const COURSE_MSSQL_PUBLIC_WHERE_ID =
@@ -365,6 +374,15 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "<%= where %>\n" +
     "order by lc.`ParentId`, lc.`Number`, el.`Number`";
+const COURSE_MYSQL_PRICE_REQ =
+    "select c.`Id`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, p.`Name` as `ProductName`\n" +
+    "from `Course` c\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
+    "  left join `Product` p on p.`Id` = c.`ProductId`\n" +
+    "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "<%= where %>";
 const COURSE_MYSQL_PUBLIC_WHERE_URL =
     "where c.`URL` = '<%= courseUrl %>'";
 const COURSE_MYSQL_PUBLIC_WHERE_ID =
@@ -818,6 +836,76 @@ const DbCourse = class DbCourse extends DbObject {
                     })
             );
         })
+    }
+
+    async getPriceInfo(url, user, options) {
+        let course = null;
+        let opts = options || {};
+        let userId = user ? user.Id : 0;
+        let pendingCourses = {};
+        let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
+        show_paid = show_paid || (!isBillingTest);
+
+        let id = url;
+        let isInt = (typeof (id) === "number");
+        if (isInt && isNaN(id))
+            throw new Error(`Invalid argument "url": ${url}.`);
+        if (!isInt)
+            if (typeof (id) === "string") {
+                let res = id.match(/[0-9]*/);
+                if (res && (id.length > 0) && (res[0].length === id.length)) {
+                    id = parseInt(id);
+                    isInt = true;
+                }
+            }
+            else
+                throw new Error(`Invalid argument "url": ${url}.`);
+
+        let whereMSSQL = isInt ? _.template(COURSE_MSSQL_PUBLIC_WHERE_ID)({ id: id })
+            : _.template(COURSE_MSSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
+        let whereMYSQL = isInt ? _.template(COURSE_MYSQL_PUBLIC_WHERE_ID)({ id: id })
+            : _.template(COURSE_MYSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(COURSE_MYSQL_PRICE_REQ)({ user_id: userId, where: whereMYSQL }),
+                mssql: _.template(COURSE_MSSQL_PRICE_REQ)({ user_id: userId, where: whereMSSQL })
+            }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            if (userId) {
+                let paymentService = this.getService("payments", true);
+                if (paymentService)
+                    pendingCourses = await paymentService.getPendingObjects(userId);
+            }
+            let isFirst = true;
+            let now = new Date();
+            result.detail.forEach((elem) => {
+                if (isFirst) {
+                    isFirst = false;
+                    course = {
+                        Id: elem.Id,
+                        IsSubsRequired: false,
+                        IsBought: elem.Counter ? true : false,
+                        IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
+                            || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
+                        PaidTp: elem.PaidTp,
+                        PaidDate: elem.PaidDate,
+                        IsGift: (elem.PaidTp === 2) && user && user.RegDate
+                            && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
+                        IsPending: pendingCourses[elem.Id] ? true : false,
+                        IsSubsFree: elem.IsSubsFree ? true : false,
+                        ProductId: elem.ProductId,
+                        ProductName: elem.ProductName,
+                        Price: 0,
+                        DPrice: 0,
+                    };
+                };
+            })
+            await this.getCoursePrice(course);
+            return course;
+        }
+        else
+            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "${url}".`);                            
     }
 
     getPublic(url, user, options) {

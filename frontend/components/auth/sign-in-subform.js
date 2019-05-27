@@ -5,6 +5,7 @@ import Captcha from './captcha'
 import ButtonsBlock from './buttons-block'
 import {LoginEdit, PasswordEdit, LoginButton} from './editors'
 import Warning from "./warning";
+import ScrollMemoryStorage from "../../tools/scroll-memory-storage";
 
 const validate = values => {
     const errors = {}
@@ -36,6 +37,11 @@ class SignInForm extends React.Component {
     };
 
     _handleSubmit(values) {
+        const _scrollPosition = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
+
+        ScrollMemoryStorage.setUrlPosition('INIT', _scrollPosition)
+        ScrollMemoryStorage.setKeyActive('INIT')
+
         this.props.onSubmit({
             login: values.login,
             password: values.password,
@@ -92,3 +98,13 @@ export default reduxForm({
     form: 'SignInForm',
     validate
 })(SignInForm);
+
+const getScrollPage = () => {
+    let docScrollTop = 0;
+
+    if (document.documentElement) {
+        docScrollTop = document.documentElement.scrollTop;
+    }
+
+    return window.pageYOffset || docScrollTop;
+};

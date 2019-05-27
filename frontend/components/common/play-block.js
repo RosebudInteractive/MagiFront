@@ -5,9 +5,9 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
-import * as userActions from '../../actions/user-actions'
-import {_play, _goToLesson, _getTooltip, _calcIsFinishedAndPlayedPart, SVG} from "./play-block-functions";
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {_play, _goToLesson, _getTooltip, _calcIsFinishedAndPlayedPart, _unlock, SVG} from "./play-block-functions";
+import {getPaidCourseInfo,} from "ducks/billing";
+import {unlockLesson,} from "ducks/player";
 
 class PlayBlock extends React.Component {
 
@@ -27,11 +27,8 @@ class PlayBlock extends React.Component {
         this._play = _play.bind(this);
         this._goToLesson = _goToLesson.bind(this)
         this._getTooltip = _getTooltip.bind(this)
+        this._unlock = _unlock.bind(this)
         this._calcIsFinishedAndPlayedPart = _calcIsFinishedAndPlayedPart.bind(this)
-    }
-
-    _unlock() {
-        this.props.userActions.showSignInForm();
     }
 
     _getButton(isFinished) {
@@ -119,9 +116,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
-        userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
+        unlockLesson: bindActionCreators(unlockLesson, dispatch),
     }
 }
 

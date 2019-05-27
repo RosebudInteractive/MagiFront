@@ -5,7 +5,6 @@ import {Redirect} from 'react-router';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
-import * as userActions from "../../actions/user-actions";
 import {
     _calcLessonProps,
     _getTooltip,
@@ -13,9 +12,12 @@ import {
     _isLocationPlayerPage,
     _isPaidCourse,
     _play,
-    _startPlay, SMALL_SVG
+    _startPlay,
+    _unlock,
+    SMALL_SVG
 } from "../common/small-play-block-functions";
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
+import {getPaidCourseInfo,} from "ducks/billing";
+import {unlockLesson} from "ducks/player";
 
 class SubLessonPlayBlock extends React.Component {
     static propTypes = {
@@ -36,10 +38,7 @@ class SubLessonPlayBlock extends React.Component {
         this._calcLessonProps = _calcLessonProps.bind(this)
         this._isLocationPlayerPage = _isLocationPlayerPage.bind(this)
         this._isPaidCourse = _isPaidCourse.bind(this)
-    }
-
-    _unlock() {
-        this.props.userActions.showSignInForm();
+        this._unlock = _unlock.bind(this)
     }
 
     _getSmallButton(isThisLessonPlaying, isFinished) {
@@ -47,7 +46,7 @@ class SubLessonPlayBlock extends React.Component {
             {IsAuthRequired} = lesson,
             _button = null;
 
-        if (this._isPaidCourse && !lesson.IsFreeInPaidCourse) {
+        if (this._isPaidCourse() && !lesson.IsFreeInPaidCourse) {
             return <button className="play-btn-small paused" onClick={() => {this._goToLesson(isThisLessonPlaying)}}>
                 <svg width="18" height="20" dangerouslySetInnerHTML={{__html: SMALL_SVG.CROWN}}/>
                 <span className="play-block__tooltip">{this._getTooltip(isThisLessonPlaying, isFinished)}</span>
@@ -152,9 +151,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
-        userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
+        unlockLesson: bindActionCreators(unlockLesson, dispatch),
     }
 }
 

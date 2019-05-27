@@ -12,8 +12,9 @@ import {
     SHOW_WAITING_FORM,
     HIDE_WAITING_FORM,
 } from "ducks/app";
-import {FINISH_LOAD_PROFILE, GET_TRANSACTIONS_REQUEST, userPaidCoursesSelector} from "ducks/profile";
+import {FINISH_LOAD_PROFILE, GET_TRANSACTIONS_REQUEST,} from "ducks/profile";
 import {SHOW_SIGN_IN_FORM,} from "../constants/user";
+import {CLEAR_WAITING_AUTHORIZE,} from "ducks/app";
 
 /**
  * Constants
@@ -41,6 +42,7 @@ export const SEND_PAYMENT_START = `${prefix}/SEND_PAYMENT_START`
 export const SEND_PAYMENT_SUCCESS = `${prefix}/SEND_PAYMENT_SUCCESS`
 export const SEND_PAYMENT_ERROR = `${prefix}/SEND_PAYMENT_ERROR`
 
+export const REDIRECT_TO_BOUGHT_COURSE = `${prefix}/REDIRECT_TO_BOUGHT_COURSE`
 export const REDIRECT_COMPLETE = `${prefix}/REDIRECT_COMPLETE`
 
 export const GET_PAID_COURSE_INFO_REQUEST = `${prefix}/GET_PAID_COURSE_INFO_REQUEST`
@@ -59,7 +61,9 @@ export const REFUND_PAYMENT_SUCCESS = `${prefix}/REFUND_PAYMENT_SUCCESS`
 export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 
 export const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
-export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+// export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
+
+export const START_BILLING_BY_REDIRECT = `${prefix}/START_BILLING_BY_REDIRECT`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -161,7 +165,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('selectedType', payload)
 
-        case SEND_PAYMENT_SUCCESS: {
+        case SEND_PAYMENT_SUCCESS:
+        case REDIRECT_TO_BOUGHT_COURSE: {
             let _state = state
                 .set('fetching', !!payload)
                 .set('showBillingWindow', false)
@@ -194,7 +199,6 @@ export default function reducer(state = new ReducerRecord(), action) {
 /**
  * Selectors
  * */
-
 export const stateSelector = state => state[moduleName]
 export const showBillingWindowSelector = createSelector(stateSelector, state => state.showBillingWindow)
 export const showCoursePaymentWindowSelector = createSelector(stateSelector, state => state.showCoursePaymentWindow)
@@ -209,6 +213,9 @@ export const isRedirectActiveSelector = createSelector(redirectSelector, redirec
 export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
 
 const isWaitingAuthorize = createSelector(stateSelector, state => state.waiting)
+export const waitingDataSelector = createSelector(isWaitingAuthorize, (waiting) => {
+    return waiting.active ? waiting.data : null
+})
 
 /**
  * Action Creators
@@ -289,8 +296,16 @@ export const redirectComplete = () => {
     }
 }
 
-export const clearWaitingAuthorize = () => {
-    return {type: CLEAR_WAITING_AUTHORIZE}
+// export const clearWaitingAuthorize = () => {
+//     return {type: CLEAR_WAITING_AUTHORIZE}
+// }
+
+export const setWaitingAuthorizeData = (data) => {
+    return {type: SET_WAITING_AUTHORIZE, payload: data}
+}
+
+export const startBillingByRedirect = () => {
+    return {type : START_BILLING_BY_REDIRECT}
 }
 
 /**
@@ -323,46 +338,45 @@ function* _setWaitingAuthorize(data) {
 function* _getPaidCourseInfoSaga(data) {
     const _waiting = yield select(isWaitingAuthorize),
         _data = _waiting.active ? _waiting.data : data,
-        _userPaidCourses = yield select(userPaidCoursesSelector)
+        _user = yield select(state => state.user)
 
-    if (_userPaidCourses.contains(_data.courseId)) {
-        yield put({type: CLEAR_WAITING_AUTHORIZE})
-    } else {
-        if (_data && _data.firedByPlayerBlock) {
-            let _user = yield select(state => state.user)
-            if (_user.isAdmin) {
-                yield put({type: CLEAR_WAITING_AUTHORIZE})
-                return
+    try {
+        let _course = yield call(_fetchCoursePriceInfo, _data.courseId)
+
+        const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought),
+            _eventFiredByPlayer = _data && _data.firedByPlayerBlock,
+            _needClearAuthWaiting = !_isPaidCourse || (_eventFiredByPlayer && _user.isAdmin)
+
+        if (_needClearAuthWaiting) {
+            yield put({type: CLEAR_WAITING_AUTHORIZE})
+            yield put({type: REDIRECT_TO_BOUGHT_COURSE, payload: _data.returnUrl})
+        } else {
+            if (_course.IsPending) {
+                yield put({type: GET_PENDING_COURSE_INFO_REQUEST, payload: _data})
+            } else {
+                yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
+                let _offer = {
+                    Price: _course.DPrice ? _course.DPrice : _course.Price,
+                    Id: _course.ProductId,
+                    Title: _course.ProductName,
+                    ReturnUrl: _data.returnUrl,
+                    CourseId: _course.Id,
+                }
+
+                yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _offer})
+                yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
             }
         }
-
-        yield put({type: GET_PAID_COURSE_INFO_START, payload: _data.courseId})
-
-        try {
-            let _fetchResult = yield call(_fetchPaidCourseInfo, _data.productId);
-
-            _fetchResult = _fetchResult ? _fetchResult[0] : null;
-
-            let _price = {
-                Price: _fetchResult.DPrice ? _fetchResult.DPrice : _fetchResult.Price,
-                Id: _fetchResult.Id,
-                Title: _fetchResult.Name,
-                ReturnUrl: _data.returnUrl,
-            }
-
-            yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _price})
-            yield put({type: SHOW_COURSE_PAYMENT_WINDOW})
-        } catch (error) {
-            yield put({type: GET_PAID_COURSE_INFO_FAIL})
-            yield put({type: HIDE_BILLING_WINDOW});
-            yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
-            yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
-        }
+    } catch (error) {
+        yield put({type: GET_PAID_COURSE_INFO_FAIL})
+        yield put({type: HIDE_BILLING_WINDOW});
+        yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
+        yield put({type: SHOW_MODAL_MESSAGE_ERROR, payload: {error}})
     }
 }
 
-const _fetchPaidCourseInfo = (productId) => {
-    return fetch(`/api/products?Id=${productId}&Detail=true&Truncate=true`, {method: 'GET', credentials: 'include'})
+const _fetchCoursePriceInfo = (courseId) => {
+    return fetch(`/api/courses/price-info/${courseId}`, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -371,9 +385,16 @@ function* sendPaymentSaga(data) {
     yield put({type: SEND_PAYMENT_START});
 
     try {
+        if (data.payload.courseId) {
+            let _course = yield call(_fetchCoursePriceInfo, data.payload.courseId)
+            const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought)
+            if (!_isPaidCourse) {return}
+        }
+
         let _data = yield call(_fetchSendPayment, data.payload);
 
-        yield put({type: SEND_PAYMENT_SUCCESS, payload: _data.confirmationUrl})
+        let _redirectUrl = (_data && _data.confirmationUrl) ? _data.confirmationUrl : data.payload.Payment.returnUrl
+        yield put({type: SEND_PAYMENT_SUCCESS, payload: _redirectUrl})
         yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
     } catch (error) {
         yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
@@ -494,7 +515,7 @@ export const saga = function* () {
         takeEvery(SEND_PAYMENT_REQUEST, sendPaymentSaga),
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
-        takeEvery(FINISH_LOAD_PROFILE, onFinishLoadProfileSaga),
+        takeEvery([FINISH_LOAD_PROFILE, START_BILLING_BY_REDIRECT], onFinishLoadProfileSaga),
     ])
 }
 

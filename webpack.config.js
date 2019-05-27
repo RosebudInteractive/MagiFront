@@ -7,9 +7,6 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'prod';
 
-const _hotLoaderPath = path.join(__dirname, 'node_modules', 'react-hot-loader')
-console.log(_hotLoaderPath)
-
 const _prodConfig = {
     entry: {
         "babel-polyfill": "babel-polyfill",

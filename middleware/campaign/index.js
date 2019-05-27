@@ -4,7 +4,10 @@ const config = require('config');
 const { HttpCode } = require("../../const/http-codes");
 const { buildLogString } = require('../../utils');
 const { CampaignService } = require('../../database/db-campaign');
+const { SessionLogService } = require('../../database/db-session');
 const PRERENDER_USER_AGENT_KEYWORD = 'prerender';
+
+const logCampaign = config.has("session.logCampaign") ? config.session.logCampaign : false;
 
 async function _processor(req, res, next) {
     try {
@@ -12,7 +15,7 @@ async function _processor(req, res, next) {
             (req.headers['user-agent'].indexOf(PRERENDER_USER_AGENT_KEYWORD)) >= 0 ? true : false;
         if (!isPrerender) {
             // Ignore if prerender requests server
-            if (req.session && req.query.utm_source && req.query.utm_medium && req.query.utm_campaign) {
+            if (req.session && req.query && req.query.utm_source && req.query.utm_medium && req.query.utm_campaign) {
                 let opts = req.user ? { dbOptions: { userId: req.user.Id } } : {};
                 let campaignId = await CampaignService().getOrCreateByCode({
                     Source: req.query.utm_source,
@@ -20,6 +23,13 @@ async function _processor(req, res, next) {
                     Campaign: req.query.utm_campaign
                 }, opts);
                 if (campaignId && (campaignId !== req.session.campaignId)) {
+                    if (logCampaign && (!req.session.campaignId)) {
+                        await SessionLogService().addlogRec(req.session.id, {
+                            ts: new Date(),
+                            userAgent: req.headers['user-agent'],
+                            url: req.url
+                        })
+                    }
                     req.session.campaignId = campaignId;
                 }
             }

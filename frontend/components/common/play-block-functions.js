@@ -34,11 +34,7 @@ export function _goToLesson() {
                 firedByPlayerBlock: true,
             }
 
-            if (course.IsPending) {
-                this.props.getPendingCourseInfo(_courseInfo)
-            } else {
-                this.props.getPaidCourseInfo(_courseInfo)
-            }
+            this.props.getPaidCourseInfo(_courseInfo)
         }
     } else {
         this._play()
@@ -65,7 +61,7 @@ export function _getTooltip(isFinished) {
 export function _calcIsFinishedAndPlayedPart() {
     const {lesson, lessonInfoStorage} = this.props;
 
-    let _lessonInfo = lessonInfoStorage.lessons.get(lesson.id),
+    let _lessonInfo = lessonInfoStorage.lessons.get(lesson.Id),
         _currentTime = _lessonInfo ? _lessonInfo.currentTime : 0,
         _totalDuration = lesson.Duration
 
@@ -78,4 +74,8 @@ export function _calcIsFinishedAndPlayedPart() {
     result.isFinished = _lessonInfo ? (_lessonInfo.isFinished || (_deltaTime <= FINISH_DELTA_TIME)) : false;
 
     return result
+}
+
+export function _unlock() {
+    this.props.unlockLesson({returnUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
 }

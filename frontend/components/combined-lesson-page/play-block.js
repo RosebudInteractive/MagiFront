@@ -4,13 +4,13 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import * as playerStartActions from '../../actions/player-start-actions'
-import * as userActions from "../../actions/user-actions";
 import $ from "jquery";
 import history from '../../history';
 import {TooltipTitles} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
-import {getPaidCourseInfo, getPendingCourseInfo} from "ducks/billing";
-import {SVG} from "../common/play-block-functions";
+import {getPaidCourseInfo,} from "ducks/billing";
+import {_unlock, SVG} from "../common/play-block-functions";
+import {unlockLesson} from "ducks/player";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -23,6 +23,8 @@ class PlayBlock extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this._unlock = _unlock.bind(this)
     }
 
     _play(e) {
@@ -57,10 +59,6 @@ class PlayBlock extends React.Component {
         });
     }
 
-    _unlock() {
-        this.props.userActions.showSignInForm();
-    }
-
     _goToLesson(isThisLessonPlaying) {
         const {course} = this.props;
 
@@ -74,11 +72,7 @@ class PlayBlock extends React.Component {
                 firedByPlayerBlock: true,
             }
 
-            if (course.IsPending) {
-                this.props.getPendingCourseInfo(_courseInfo)
-            } else {
-                this.props.getPaidCourseInfo(_courseInfo)
-            }
+            this.props.getPaidCourseInfo(_courseInfo)
         } else {
             if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
         }
@@ -261,9 +255,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
-        userActions: bindActionCreators(userActions, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
+        unlockLesson: bindActionCreators(unlockLesson, dispatch),
     }
 }
 

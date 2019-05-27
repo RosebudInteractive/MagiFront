@@ -9,7 +9,7 @@ import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
 import {OverflowHandler} from "../tools/page-tools";
-import {clearWaitingAuthorize} from "ducks/billing";
+import {clearWaitingAuthorize} from "ducks/app";
 
 class AuthPopup extends React.Component {
 

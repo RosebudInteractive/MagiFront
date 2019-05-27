@@ -22,6 +22,7 @@ import billingReducer, {moduleName as billingModule} from 'ducks/billing'
 import paramsReducer, {moduleName as paramsModule} from 'ducks/params'
 import versionReducer, {moduleName as versionModule} from 'ducks/version'
 import appReducer, {moduleName as appModule} from 'ducks/app'
+import playerReducer, {moduleName as playerModule} from 'ducks/player'
 
 export default combineReducers({
 
@@ -46,6 +47,7 @@ export default combineReducers({
     [paramsModule]: paramsReducer,
     [versionModule]: versionReducer,
     [appModule]: appReducer,
+    [playerModule]: playerReducer,
     routing: routerReducer,
     form: formReducer,
 })

@@ -5,7 +5,7 @@ const passport = require("passport");
 const passportFacebook = require('passport-facebook');
 const { HttpCode } = require("../const/http-codes");
 const { UsersCache } = require("./users-cache");
-const { StdLoginProcessor, AuthByToken, DestroySession } = require('./local-auth');
+const { StdLoginProcessor, AuthByToken, AuthRedirectWrapper } = require('./local-auth');
 const { GenTokenFunc } = require('./jwt-auth');
 
 class AuthFB {
@@ -83,10 +83,10 @@ class AuthFB {
                 app.use(config.snets.facebook.callBack, sessionMiddleware.rollSession);   
         }
 
-        app.get('/api/fblogin', passport.authenticate('facebook', config.snets.facebook.passportOptions));
+        app.get('/api/fblogin', AuthRedirectWrapper(passport.authenticate('facebook', config.snets.facebook.passportOptions)));
         app.get('/api/app-fblogin', AuthByToken(strategy.userProfile.bind(strategy), processUserProfile, null, GenTokenFunc));
-        let processor = (!config.snets.facebook.redirectURL) ? StdLoginProcessor('facebook') :
-            StdLoginProcessor('facebook', false, config.snets.facebook.redirectURL);
+        let processor = (!config.snets.facebook.redirectURL) ? StdLoginProcessor('facebook', false, null, null, true) :
+            StdLoginProcessor('facebook', false, config.snets.facebook.redirectURL, null, true);
         app.get(config.snets.facebook.callBack, processor);
     }
 };

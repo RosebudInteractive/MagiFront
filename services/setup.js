@@ -34,6 +34,7 @@ const { setupProtectedStatic } = require('./protected-static');
 const RedisStoreSession = require('../security/session-storage/redis-storage');
 const { SetupRoute: setupLessonPositions } = require('./lesson-positions');
 const { SetupRoute: setupDebugRoutes } = require('./debug');
+const { SetupRoute: setupSessions } = require('./sessions');
 const { setupPrerender } = require('../prerender');
 const { setupCache } = require('./cache');
 const { SetupRoute: setupMailSubscription } = require('./mail-subscription');
@@ -176,7 +177,8 @@ function setupAPI(express, app) {
     setupLanguages(app);
     setupLessons(app);
     setupParameters(app);
-
+    setupSessions(app);
+    
     //
     // Common API options
     //
@@ -211,6 +213,8 @@ function setupAPI(express, app) {
                     options.billing.mode = config.billing.mode;
                 if (config.has('billing.productReqParams'))
                     options.billing.productReqParams = config.billing.productReqParams;
+                if (config.has('billing.self_refund') && (config.billing.self_refund === true))
+                    options.billing.self_refund = true;
                 if (config.has('lessonPositions.debug'))
                     options.debug.lsnPositions = config.lessonPositions.debug;
                 return ParametersService().getAllParameters(true)

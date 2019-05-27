@@ -1,22 +1,24 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import {Link} from 'react-router-dom';
 import {AUTHORIZATION_STATE} from '../../constants/user'
 
 import * as userActions from '../../actions/user-actions'
+import {waitingDataSelector as billingWaitingAuthData} from 'ducks/billing'
+import {
+    isWaitingAuthorize as isPlayerWaitingAuthorize,
+    waitingDataSelector as playerWaitingAuthData,
+} from 'ducks/player'
+import $ from "jquery";
 
 class ButtonsBlock extends React.Component {
-
-    _responseFacebook(response) {
-        console.log(response);
-    }
-
 
     render() {
         const _google = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#google"/>',
             _vk = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#vk-blue"/>',
             _facebook = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#facebook"/>';
+
+        const _params = this._getRedirectParams();
 
         return <div className="register-block">
             {
@@ -26,35 +28,77 @@ class ButtonsBlock extends React.Component {
                     <p className="register-block__title">Регистрация с помощью</p>
             }
 
-            <Link to={'/api/googlelogin'} target={"_blank"}
-                  className="btn btn--white register-block__btn">
+            <a href={'/api/googlelogin' + _params}
+               className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _google}}/>
                         </span>
                 <span className="text">Google</span>
-            </Link>
-            <Link to={'/api/vklogin'} target={"_blank"}
-                  className="btn btn--white register-block__btn">
+            </a>
+            <a href={'/api/vklogin' + _params}
+               className="btn btn--white register-block__btn">
                         <span className="icon">
                             <svg width="18" height="11" dangerouslySetInnerHTML={{__html: _vk}}/>
                         </span>
                 <span className="text">Вконтакте</span>
-            </Link>
-            <Link to={'/api/fblogin'} target={"_blank"}
-                  className="btn btn--white register-block__btn register-block__btn--fullwidth">
+            </a>
+            <a href={'/api/fblogin' + _params}
+               className="btn btn--white register-block__btn register-block__btn--fullwidth">
                         <span className="icon">
                             <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _facebook}}/>
                         </span>
                 <span className="text">Facebook</span>
-            </Link>
+            </a>
         </div>
     }
+
+    _getRedirectParams() {
+        let _data;
+
+        if (this.props.billingWaitingAuthData) {
+            let _key = Math.random().toString(36).substring(7)
+            localStorage.setItem('s1', _key)
+
+            _data = Object.assign({}, this.props.billingWaitingAuthData)
+            _data.p1 = _key
+            _data.t = 'b'
+        } else if (this.props.isPlayerWaitingAuthorize) {
+            let _key = Math.random().toString(36).substring(7)
+            localStorage.setItem('s1', _key)
+
+            _data = Object.assign({}, this.props.playerWaitingAuthData)
+            _data.p1 = _key
+            _data.t = 'p'
+        } else {
+            _data = {t: 'a'}
+        }
+
+        _data.pos = (window.$overflowHandler && window.$overflowHandler.enable) ? window.$overflowHandler.scrollPos : getScrollPage()
+
+        let _params = '?' + $.param(_data)
+        const _current = window.location.protocol + '//' + window.location.host + window.location.pathname;
+
+        return '?redirect=' + encodeURIComponent(_current + _params)
+    }
 }
+
+const getScrollPage = () => {
+    let docScrollTop = 0;
+
+    if (document.documentElement) {
+        docScrollTop = document.documentElement.scrollTop;
+    }
+
+    return window.pageYOffset || docScrollTop;
+};
 
 
 function mapStateToProps(state) {
     return {
         authorizationState: state.user.authorizationState,
+        billingWaitingAuthData: billingWaitingAuthData(state),
+        isPlayerWaitingAuthorize: isPlayerWaitingAuthorize(state),
+        playerWaitingAuthData: playerWaitingAuthData(state),
     }
 }
 

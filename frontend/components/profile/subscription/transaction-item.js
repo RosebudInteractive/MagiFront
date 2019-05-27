@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {getHistoryFormatDate} from "../../../tools/time-tools";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {billingTestModeSelector} from "ducks/app";
+import {enableRefundSelector} from "ducks/app";
 import {refundPayment} from "ducks/billing";
 
 class Item extends React.Component {
@@ -46,9 +46,9 @@ class Item extends React.Component {
     }
 
     _getRefundButton() {
-        let {item, billingInTestMode, isAdmin} = this.props
+        let {item, enableRefund,} = this.props
 
-        return billingInTestMode && isAdmin && (item.InvoiceTypeId === 1 && item.RefundSum === 0)
+        return enableRefund && (item.InvoiceTypeId === 1 && item.RefundSum === 0)
             ?
             <button className="btn btn--rounded refund__btn" onClick={::this._requestRefund}>Возврат</button>
             :
@@ -67,8 +67,7 @@ class Item extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        billingInTestMode: billingTestModeSelector(state),
-        isAdmin: !!state.user.user && state.user.user.isAdmin,
+        enableRefund: enableRefundSelector(state),
     }
 }
 

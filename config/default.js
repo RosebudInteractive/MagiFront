@@ -63,7 +63,8 @@ module.exports = {
         },
         appSettings: {
             updPeriod: SESSION_UPD_TIME
-        }
+        },
+        logCampaign: false
     },
     redisSession: {
         enabled: false,
@@ -106,6 +107,7 @@ module.exports = {
         enabled: false,
         debug: false,
         billing_test: true,
+        self_refund: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after suscription has expired in HOURS
         yandexKassa: {
@@ -139,6 +141,7 @@ module.exports = {
         appLoginUrl: "magisteria://signin",
         activationRoute: "/activation-confirm",
         recoveryRoute: "/recovery",
+        redirectParam: "redirect",
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'redis',// 'redis' or  'local' (not applicable for cluster mode)
         tokenExpTime: SESSION_MAX_AGE,

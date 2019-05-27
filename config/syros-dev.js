@@ -15,6 +15,7 @@ module.exports = {
         enabled: true,
         debug: true,
         billing_test: false,
+        self_refund: false,
         mode: { courses: true, subscription: false },
         subsExtPeriod: 6, // free period after subscription has expired in HOURS
         yandexKassa: {

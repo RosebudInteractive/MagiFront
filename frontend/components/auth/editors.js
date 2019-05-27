@@ -114,8 +114,8 @@ export class LoginButton extends React.Component {
                     type={'submit'}>
                 <span className="text">{this.props.caption}</span>
                 <span className="icon">
-                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _login}}/>
-                            </span>
+                    <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _login}}/>
+                </span>
             </button>
         </div>
     }

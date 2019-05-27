@@ -45,11 +45,7 @@ export function _goToLesson(isThisLessonPlaying) {
             firedByPlayerBlock: true,
         }
 
-        if (course.IsPending) {
-            this.props.getPendingCourseInfo(_courseInfo)
-        } else {
-            this.props.getPaidCourseInfo(_courseInfo)
-        }
+        this.props.getPaidCourseInfo(_courseInfo)
     } else {
         if (isThisLessonPlaying) {this._startPlay()} else {this._play()}
     }
@@ -109,4 +105,8 @@ export function _isLocationPlayerPage() {
 
 export function _isPaidCourse() {
     return this.props.course.IsPaid && !this.props.course.IsGift && !this.props.course.IsBought
+}
+
+export function _unlock() {
+    this.props.unlockLesson({returnUrl: `/${this.props.course.URL}/${this.props.lesson.URL}`});
 }

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from "redux";
 import {
     getPaidCourseInfo,
-    getPendingCourseInfo,
     isRedirectActiveSelector,
     loadingSelector,
     loadingCourseIdSelector,
@@ -71,15 +70,10 @@ class PriceBlock extends React.Component {
     }
 
     _onClick() {
-        const {course} = this.props;
+        const {course} = this.props,
+            _returnUrl = '/category/' + course.URL;
 
-        const _returnUrl = '/category/' + course.URL;
-
-        if (course.IsPending) {
-            this.props.getPendingCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
-        } else {
-            this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
-        }
+        this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
     }
 }
 
@@ -97,7 +91,6 @@ function mapDispatchToProps(dispatch) {
     return {
         showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
-        getPendingCourseInfo: bindActionCreators(getPendingCourseInfo, dispatch),
         showSignInForm: bindActionCreators(showSignInForm, dispatch),
     }
 }
