@@ -4,6 +4,7 @@ import ReactDatetime from 'react-datetime'
 import './date-time-control.sass'
 
 class Datepicker extends React.Component {
+
     static propTypes = {
         error: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
         label: PropTypes.string,
@@ -61,9 +62,9 @@ class Datepicker extends React.Component {
                         onFocus={this.handleFocus.bind(this)}
                         onBlur={::this.handleBlur}
                         closeOnSelect={true}
-                        dateFormat={showTime ? "DD MMMM YYYY hh:mm:ss" : "DD MMMM YYYY"}
+                        dateFormat="DD MMMM YYYY"
+                        timeFormat={showTime ? "H:mm:ss" : false}
                         locale={"ru-ru"}
-                        timeFormat={false}
                         value={currentValue}
                         defaultValue={currentValue}
                         error={!!errorMessage}/>

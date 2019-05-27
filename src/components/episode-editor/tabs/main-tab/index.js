@@ -7,6 +7,8 @@ import {Field} from "redux-form";
 import {CheckBox, TextBox} from "../../../common/input-controls";
 import Select from "../../../common/select-control";
 import TextArea from "../../../common/text-area";
+import history from "../../../../history";
+import './main-tab.sass'
 
 const EPISODE_TYPES = [
         {id: 'L', value: 'Лекция'},
@@ -37,15 +39,13 @@ class MainTab extends React.Component {
                 <button className="adm__button bottom-controls__button" onClick={::this._openWorkshop}>Перейти в
                     монтажный стол
                 </button>
-                <Field component={TextBox} name="name" label="Название эпизода" placeholder="Введите название эпизода" disabled={_disabled}/>
-                <Field component={TextBox} name="number" label="Номер эпизода" disabled={true}/>
-                <Field component={Select} name="episodeType" label="Тип эпизода" placeholder="Выберите тип эпизода"
-                       options={EPISODE_TYPES} disabled={_disabled}/>
-                <Field component={CheckBox} name="supp" label="Дополнительный материал" disabled={true}/>
-                <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние"
-                       options={EPISODE_STATE} disabled={_disabled}/>
-                <Field component={TextArea} name="transcript" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
             </div>
+            <Field component={TextBox} name="name" label="Название эпизода" placeholder="Введите название эпизода" disabled={_disabled}/>
+            <Field component={TextBox} name="number" label="Номер эпизода" disabled={true}/>
+            <Field component={Select} name="episodeType" label="Тип эпизода" placeholder="Выберите тип эпизода" options={EPISODE_TYPES} disabled={_disabled}/>
+            <Field component={CheckBox} name="supp" label="Дополнительный материал" disabled={true}/>
+            <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние" options={EPISODE_STATE} disabled={_disabled}/>
+            <Field component={TextArea} name="transcript" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
         </div>
 
     }
@@ -54,7 +54,7 @@ class MainTab extends React.Component {
         e.preventDefault();
 
         if (!this.props.isWorkshop) {
-            this.props.history.push(window.location.pathname + '?workshop')
+            history.push(window.location.pathname + '?workshop')
         }
     }
 

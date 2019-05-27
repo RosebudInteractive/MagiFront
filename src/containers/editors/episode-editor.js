@@ -3,6 +3,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {get as getEpisode, create as createEpisode} from "../../actions/episode/episode-actions";
 import {get as getLesson} from "../../actions/lesson/lesson-actions";
+import {loadData as loadWorkShopData} from '../../actions/work-shop-actions';
 import LoadingPage from "../../components/common/loading-page";
 import EditorForm from "../../components/episode-editor/editor-form";
 import ErrorDialog from "../../components/dialog/error-dialog";
@@ -46,6 +47,20 @@ class EpisodeEditor extends React.Component {
 
                 this.setState({loading : false})
             })
+
+        if (this.props.isWorkshop) {
+            this._openWorkshop()
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.isWorkshop && !prevProps.isWorkshop) {
+            this._openWorkshop()
+        }
+
+        if (!this.props.fetching && prevProps.fetching) {
+            this._fillFileId()
+        }
     }
 
     componentWillReceiveProps(next) {
@@ -53,13 +68,13 @@ class EpisodeEditor extends React.Component {
     }
 
     render() {
-        let {fetching,} = this.props
+        let {fetching, courseId, lessonId, subLessonId,} = this.props
 
         return fetching || this.state.loading ?
             <LoadingPage/>
             :
             <div className="editor episode_editor">
-                <EditorForm editMode={this.state.editMode}/>
+                <EditorForm editMode={this.state.editMode} courseId={courseId} lessonId={lessonId} sublessonId={subLessonId}/>
                 <ErrorDialog/>
             </div>
     }
@@ -90,7 +105,31 @@ class EpisodeEditor extends React.Component {
         }
     }
 
+    _fillFileId() {
+        let {content, resources} = this.props;
 
+        content.forEach((item) => {
+            let _resource = resources.find((resource) => {
+                return resource.Id === item.ResourceId
+            })
+
+            item.FileId = _resource ? _resource.FileId : null;
+        })
+    }
+
+    _openWorkshop() {
+        let {episodeId, location, subLessonId, lessonId} = this.props;
+
+        if (this.lessonId && episodeId) {
+            let _object = {
+                lessonId: subLessonId ? subLessonId : lessonId,
+                episodeId: episodeId,
+                callingRoute: location.pathname,
+            }
+
+            this.props.loadWorkShopData(_object)
+        }
+    }
 
 }
 
@@ -105,12 +144,15 @@ function mapStateToProps(state, ownProps) {
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
 
+        content: state.episodeContent.current,
+        resources: state.lessonResources.current,
+
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching || state.lessonResources.fetching,
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({getLesson, getEpisode, createEpisode}, dispatch)
+    return bindActionCreators({getLesson, getEpisode, createEpisode, loadWorkShopData}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EpisodeEditor)

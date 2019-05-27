@@ -1,7 +1,7 @@
 import React from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import {getFormValues, isDirty, isValid, reduxForm} from "redux-form";
+import {getFormValues, isDirty, isValid, reduxForm, reset} from "redux-form";
 import SavingBlock from "../common/saving-page";
 import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
@@ -10,6 +10,8 @@ import TocTab from "./tabs/toc-tab";
 import ContentTab from "./tabs/content-tab";
 import history from "../../history";
 import {activeTabsSelector} from "adm-ducks/app";
+import {cancelChanges, save} from "../../actions/episode/episode-actions";
+import PropTypes from "prop-types";
 
 const TABS = {
     MAIN: 'MAIN',
@@ -18,6 +20,13 @@ const TABS = {
 }
 
 class EpisodeEditorForm extends React.Component {
+
+    static propTypes = {
+        editMode: PropTypes.bool,
+        courseId: PropTypes.number,
+        lessonId: PropTypes.number,
+        sublessonId: PropTypes.number,
+    }
 
     constructor(props) {
         super(props)
@@ -117,11 +126,14 @@ class EpisodeEditorForm extends React.Component {
     }
 
     _goBack() {
-        // if (this.props.isSublesson) {
-        //     history.push(`/adm/courses/edit/${this.props.course.id}/lessons/edit/${this.props.lesson.CurrParentId}`);
-        // } else {
-        //     history.push(`/adm/courses/edit/${this.props.course.id}`);
-        // }
+        const {courseId, lessonId, sublessonId} = this.props,
+            _isSublesson = !!sublessonId
+
+        if (_isSublesson) {
+            history.push(`/adm/courses/edit/${courseId}/lessons/edit/${lessonId}/sub-lessons/edit/${sublessonId}`);
+        } else {
+            history.push(`/adm/courses/edit/${courseId}/lessons/edit/${lessonId}`);
+        }
     }
 
     _cancel() {
@@ -190,7 +202,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({}, dispatch)
+    return bindActionCreators({resetReduxForm: reset, cancelChanges}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EpisodeEditorWrapper)
