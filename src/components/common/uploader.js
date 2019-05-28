@@ -57,11 +57,24 @@ export default class Uploader extends React.Component {
             let formData = new FormData();
             formData.append('file', _files[i]);
 
+            // let ajax = new XMLHttpRequest();
+            // ajax.upload.addEventListener("progress", progressHandler, false);
+            // ajax.addEventListener("load", (e) => {
+            //     console.log(e)
+            //     _count--
+            //     _checkFinished()
+            // }, false);
+            // ajax.addEventListener("error", errorHandler, false);
+            // ajax.addEventListener("abort", abortHandler, false);
+            // ajax.open("POST", "file_upload_parser.php"); // http://www.developphp.com/video/JavaScript/File-Upload-Progress-Bar-Meter-Tutorial-Ajax-PHP
+            // //use file_upload_parser.php from above url
+            // ajax.send(formdata);
+
             fetch(this.props.upload, {
                 method: 'POST',
                 body: formData,
             })
-                .then(readResponseBody)
+                .then(this._readResponse)
                 .then((data) => {
                     if (this.props.onUploadFile) {
                         this.props.onUploadFile(data)
@@ -79,4 +92,25 @@ export default class Uploader extends React.Component {
                 })
         }
     }
+
+    _readResponse(response) {
+        let _reader = response.body.getReader();
+        let _data = '',
+            _bytesReceived = 0;
+
+        return _reader.read().then(function processText({done, value}) {
+            if (done) {
+                return _data;
+            }
+
+            _bytesReceived += value.length;
+            console.log(_bytesReceived)
+
+            const chunk = new TextDecoder("utf-8").decode(value);
+            _data += chunk;
+            // Read some more, and call this function again
+            return _reader.read().then(processText);
+        })
+    }
 }
+

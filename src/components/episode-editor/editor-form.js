@@ -9,7 +9,7 @@ import MainTab from "./tabs/main-tab";
 import TocTab from "./tabs/toc-tab";
 import ContentTab from "./tabs/content-tab";
 import history from "../../history";
-import {activeTabsSelector} from "adm-ducks/app";
+import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
 import {cancelChanges, save} from "../../actions/episode/episode-actions";
 import PropTypes from "prop-types";
 
@@ -47,6 +47,10 @@ class EpisodeEditorForm extends React.Component {
                 currentTab: _activeTab,
             })
         }
+    }
+
+    componentWillUnmount() {
+        this.props.setActiveTab({page: 'EpisodeEditor', value: this.state.currentTab})
     }
 
 
@@ -202,7 +206,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({resetReduxForm: reset, cancelChanges}, dispatch)
+    return bindActionCreators({resetReduxForm: reset, cancelChanges, setActiveTab}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EpisodeEditorWrapper)
