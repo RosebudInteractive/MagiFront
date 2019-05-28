@@ -119,7 +119,7 @@ function mapStateToProps(state) {
     return {
         content: state.episodeContent.current,
         selected: state.episodeContent.selected,
-        resources: state.lessonResources.current,
+        contentItem: state.content.object,
 
         enableButtons: enableButtonsSelector(state),
     }
