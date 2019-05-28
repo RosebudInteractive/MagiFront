@@ -9,13 +9,14 @@ import {
     CLEAR_EPISODE,
     IMPORT_EPISODE_START,
     IMPORT_EPISODE_SUCCESS,
-    IMPORT_EPISODE_FAIL,
+    IMPORT_EPISODE_FAIL, SAVE_EPISODE_START, SAVE_EPISODE_FAIL,
 } from '../../constants/episode/singleEpisode'
 
 const initialState = {
     initial: null,
     current: null,
     fetching: false,
+    saving: false,
     hasChanges: false,
     packageUploadProcess: false,
 };
@@ -53,7 +54,6 @@ export default function singleEpisode(state = initialState, action) {
                 fetching: false,
                 hasChanges: false,
             };
-
         }
 
         case GET_SINGLE_EPISODE_FAIL:
@@ -65,6 +65,10 @@ export default function singleEpisode(state = initialState, action) {
             hasChanges: false,
         };
 
+        case SAVE_EPISODE_START: {
+            return {...state, fetching: false, saving: true, error: null,}
+        }
+
         case SAVE_EPISODE_SUCCESS: {
             let _id = action.payload.id ? action.payload.id : state.current.id;
             state.current.id = _id;
@@ -75,7 +79,12 @@ export default function singleEpisode(state = initialState, action) {
                 initial: Object.assign({}, state.current),
                 fetching: false,
                 hasChanges: false,
+                saving: false,
             };
+        }
+
+        case SAVE_EPISODE_FAIL: {
+            return {...state, fetching: false, saving: false, error: action.payload,}
         }
 
         case CHANGE_EPISODE_DATA : {

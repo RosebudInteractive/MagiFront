@@ -12,11 +12,18 @@ import history from "../../history";
 import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
 import {cancelChanges, save} from "../../actions/episode/episode-actions";
 import PropTypes from "prop-types";
+import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from "../../constants/Common";
 
 const TABS = {
     MAIN: 'MAIN',
     TOC: 'TOC',
     CONTENT: 'CONTENT',
+}
+
+const NEW_EPISODE = {
+    EpisodeType: 'L',
+    Supp: false,
+    State: 'D',
 }
 
 class EpisodeEditorForm extends React.Component {
@@ -82,7 +89,8 @@ class EpisodeEditorForm extends React.Component {
             <div className="editor__main-area">
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
-                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}/>
+                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}
+                                 lessonId={this.props.lessonId} episodeId={this.props.episode.Id}/>
                         <TocTab visible={this.state.currentTab === TABS.TOC} editMode={this.props.editMode}/>
                         <ContentTab visible={this.state.currentTab === TABS.CONTENT} editMode={this.props.editMode} lessonId={1}/>
                     </form>
@@ -104,17 +112,28 @@ class EpisodeEditorForm extends React.Component {
                 name: _episode.Name,
                 number: _episode.Number,
                 episodeType: _episode.EpisodeType,
-
+                audio: {
+                    file: _episode.Audio,
+                    meta: _episode.AudioMeta,
+                },
                 supp: _episode.Supp,
                 state: _episode.State,
                 transcript: _episode.Transcript,
-
             })
         }
     }
 
     _getNewEpisode() {
-        return {}
+        const { lesson } = this.props;
+
+        let _episode = Object.assign({}, NEW_EPISODE),
+            _number = lesson ? lesson.mainEpisodes.length : 0;
+
+        _number++;
+        _episode.Number = _number
+        _episode.Name = lesson.Name + '.' + 'Эпизод ' + _number
+
+        return _episode
     }
 
     _switchTo(tabName) {
@@ -146,11 +165,56 @@ class EpisodeEditorForm extends React.Component {
     }
 
     _save() {
-        let {editorValues, editorValid} = this.props;
+        let {editorValues, editorValid, episode, lesson} = this.props;
 
         if (!editorValid) {
             return
         }
+
+        let _obj = {
+            id: episode.Id,
+            LessonId: lesson.Id,
+            Number: editorValues.number,
+            Id: episode.Id,
+            Name: editorValues.name,
+            State: editorValues.state,
+            Audio: editorValues.audio.file,
+            AudioMeta: JSON.stringify(editorValues.audio.meta),
+            EpisodeType: editorValues.episodeType,
+            Transcript: editorValues.transcript,
+            Supp: !!+editorValues.supp,
+            Toc: [],
+            Content: [],
+        };
+
+        this._fillToc(_obj.Toc);
+        this._fillContent(_obj.Content);
+
+        this.props.save(_obj, this.props.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
+    }
+
+    _fillToc(array) {
+        this.props.episodeToc.map((item) => {
+            array.push({
+                Id: item.Id,
+                Number: item.Number,
+                StartTime: item.StartTime,
+                Topic: item.Topic,
+            })
+        });
+    }
+
+    _fillContent(array) {
+        this.props.content.map((item) => {
+            array.push({
+                Id: item.Id,
+                Content: item.Content,
+                StartTime: item.StartTime,
+                Duration: item.Duration,
+                Topic: item.Topic,
+                ResourceId: item.ResourceId,
+            })
+        });
     }
 }
 
@@ -198,15 +262,17 @@ function mapStateToProps(state) {
 
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
+        saving: state.singleEpisode.saving,
 
-
+        content: state.episodeContent.current,
+        episodeToc: state.episodeToc.current,
 
         activeTabs: activeTabsSelector(state),
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({resetReduxForm: reset, cancelChanges, setActiveTab}, dispatch)
+    return bindActionCreators({resetReduxForm: reset, cancelChanges, setActiveTab, save}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EpisodeEditorWrapper)

@@ -8,6 +8,7 @@ import {CheckBox, TextBox} from "../../../common/input-controls";
 import Select from "../../../common/select-control";
 import TextArea from "../../../common/text-area";
 import history from "../../../../history";
+import AudioLink from "./audio-link-control"
 import './main-tab.sass'
 
 const EPISODE_TYPES = [
@@ -25,6 +26,8 @@ class MainTab extends React.Component {
         editMode: PropTypes.bool,
         visible: PropTypes.bool,
         isWorkshop: PropTypes.bool,
+        lessonId: PropTypes.number,
+        episodeId: PropTypes.number,
     }
 
     render() {
@@ -35,7 +38,7 @@ class MainTab extends React.Component {
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <div className="main-tab__buttons-wrapper">
-                <ImportButton/>
+                <ImportButton episodeId={this.props.episodeId} lessonId={this.props.lessonId}/>
                 <button className="adm__button bottom-controls__button" onClick={::this._openWorkshop}>Перейти в
                     монтажный стол
                 </button>
@@ -45,6 +48,7 @@ class MainTab extends React.Component {
             <Field component={Select} name="episodeType" label="Тип эпизода" placeholder="Выберите тип эпизода" options={EPISODE_TYPES} disabled={_disabled}/>
             <Field component={CheckBox} name="supp" label="Дополнительный материал" disabled={true}/>
             <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние" options={EPISODE_STATE} disabled={_disabled}/>
+            <Field component={AudioLink} name="audio" label="Аудио-контент" placeholder="Выберите аудио файл" disabled={_disabled}/>
             <Field component={TextArea} name="transcript" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
         </div>
 

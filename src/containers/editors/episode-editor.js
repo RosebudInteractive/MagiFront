@@ -35,12 +35,12 @@ class EpisodeEditor extends React.Component {
     }
 
     componentDidMount() {
-        let {lessonId, episodeId} = this.props
+        let {episodeId} = this.props
 
         this._loadLessonInfo()
             .then(() => {
                 if (this.state.editMode) {
-                    this.props.getEpisode(episodeId, lessonId)
+                    this.props.getEpisode(episodeId, this.lessonId)
                 } else {
                     this.props.createEpisode(this._getNewEpisode())
                 }
@@ -53,7 +53,28 @@ class EpisodeEditor extends React.Component {
         }
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
+        let {courseId, lessonId, subLessonId,} = this.props
+
+        let _needRefreshAfterSave = prevProps.savingEpisode && !this.props.savingEpisode && !this.props.episodeError,
+            _needSwitchToEditMode = !prevState.editMode && _needRefreshAfterSave
+
+        if (_needSwitchToEditMode) {
+            let _newRout = `/adm/courses/edit/${courseId}/lessons/edit/${lessonId}`;
+            if (subLessonId) {
+                _newRout += `/sub-lessons/edit${subLessonId}`
+            }
+            _newRout += `/episodes/edit/${this.props.episode.id}`
+
+            this.props.history.push(_newRout);
+            this.setState({editMode: true})
+        }
+
+        if (_needRefreshAfterSave) {
+            this.props.getEpisode(this.props.episode.id, this.lessonId)
+        }
+
+
         if (this.props.isWorkshop && !prevProps.isWorkshop) {
             this._openWorkshop()
         }
@@ -118,11 +139,11 @@ class EpisodeEditor extends React.Component {
     }
 
     _openWorkshop() {
-        let {episodeId, location, subLessonId, lessonId} = this.props;
+        let {episodeId, location} = this.props;
 
         if (this.lessonId && episodeId) {
             let _object = {
-                lessonId: subLessonId ? subLessonId : lessonId,
+                lessonId: this.lessonId,
                 episodeId: episodeId,
                 callingRoute: location.pathname,
             }
@@ -143,6 +164,9 @@ function mapStateToProps(state, ownProps) {
 
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
+
+        savingEpisode: state.singleEpisode.saving,
+        episodeError: state.singleEpisode.error,
 
         content: state.episodeContent.current,
         resources: state.lessonResources.current,
