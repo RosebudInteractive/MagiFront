@@ -51,7 +51,7 @@ const AUTHOR_MSSQL_PUB_WHERE_ID = "where a.[Id] = <%= authorId %>";
 const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], pc.[Counter],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], pc.[Counter], gc.[Id] GiftId,\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
@@ -64,6 +64,7 @@ const AUTHOR_MSSQL_CL_PUB_REQ =
     "  join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "where(l.[AuthorId] = <%= authorId %>) and(lc.[State] = 'R')\n" +
     "order by c.[Id], lc.[ParentId], lc.[Number], el.[Number]";
 
@@ -116,7 +117,7 @@ const AUTHOR_MYSQL_PUB_WHERE_ID = "where a.`Id` = <%= authorId %>";
 const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, pc.`Counter`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, pc.`Counter`, gc.`Id` GiftId,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
@@ -129,6 +130,7 @@ const AUTHOR_MYSQL_CL_PUB_REQ =
     "  join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "where(l.`AuthorId` = <%= authorId %>) and(lc.`State` = 'R')\n" +
     "order by c.`Id`, lc.`ParentId`, lc.`Number`, el.`Number`";
 
@@ -387,7 +389,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         PaidDate: elem.PaidDate,
                                         IsGift: (elem.PaidTp === 2) && user && user.RegDate
                                             && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
-                                        IsBought: elem.Counter ? true : false,
+                                        IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,
                                         Price: 0,

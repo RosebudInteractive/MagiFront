@@ -215,7 +215,7 @@ const COURSE_LESSONS_MYSQL =
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
@@ -223,6 +223,7 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
@@ -246,7 +247,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
@@ -254,6 +255,7 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
@@ -277,7 +279,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -286,6 +288,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
     "  left join[Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  left join[EpisodeLng] ell on ell.[EpisodeId] = e.[Id]\n" +
@@ -293,12 +296,13 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "order by lc.[ParentId], lc.[Number], el.[Number]";
 const COURSE_MSSQL_PRICE_REQ =
     "select c.[Id], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], gc.[Id] GiftId,\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], p.[Name] as [ProductName]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  left join [Product] p on p.[Id] = c.[ProductId]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "<%= where %>";
 const COURSE_MSSQL_PUBLIC_WHERE_URL =
     "where c.[URL] = '<%= courseUrl %>'";
@@ -360,7 +364,7 @@ const COURSE_BOOKS_MSSQL_REQ =
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -369,6 +373,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
     "  left join`Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  left join`EpisodeLng` ell on ell.`EpisodeId` = e.`Id`\n" +
@@ -376,12 +381,13 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "order by lc.`ParentId`, lc.`Number`, el.`Number`";
 const COURSE_MYSQL_PRICE_REQ =
     "select c.`Id`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, gc.`Id` GiftId,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, p.`Name` as `ProductName`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  left join `Product` p on p.`Id` = c.`ProductId`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "<%= where %>";
 const COURSE_MYSQL_PUBLIC_WHERE_URL =
     "where c.`URL` = '<%= courseUrl %>'";
@@ -702,7 +708,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             PaidDate: elem.PaidDate,
                                             IsGift: (elem.PaidTp === 2) && user && user.RegDate
                                                 && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
-                                            IsBought: elem.Counter ? true : false,
+                                            IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                             IsPending: pendingCourses[elem.Id] ? true : false,
                                             IsSubsFree: elem.IsSubsFree ? true : false,
                                             ProductId: elem.ProductId,
@@ -885,7 +891,7 @@ const DbCourse = class DbCourse extends DbObject {
                     course = {
                         Id: elem.Id,
                         IsSubsRequired: false,
-                        IsBought: elem.Counter ? true : false,
+                        IsBought: (elem.Counter || elem.GiftId) ? true : false,
                         IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                             || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                         PaidTp: elem.PaidTp,
@@ -902,6 +908,30 @@ const DbCourse = class DbCourse extends DbObject {
                 };
             })
             await this.getCoursePrice(course);
+            if (opts.promo && course.ProductId) {
+                let promoService = this.getService("promo", true);
+                if (promoService) {
+                    let promos = await promoService.get({ code: opts.promo, prodList: true });
+                    if (promos.length = 1) {
+                        let promo = promos[0];
+                        let isValid = (!promo.Products) || promo.Products[course.ProductId] ? true : false;
+                        if (promo.Counter)
+                            isValid = isValid && (promo.Rest > 0);
+                        if (promo.FirstDate)
+                            isValid = isValid && ((now - promo.FirstDate) >= 0) && ((!promo.LastDate) || ((now - promo.LastDate) < 0));
+                        if (isValid) {
+                            course.Promo = {
+                                Id: promo.Id,
+                                Description: promo.Description,
+                                Perc: promo.Perc
+                            };
+                            let dprice = course.Price * (1 - promo.Perc / 100);
+                            course.Promo.Sum = Math.trunc(dprice);
+                            course.Promo.PromoSum = course.Price - course.Promo.Sum;
+                        }
+                    }
+                }
+            }
             return course;
         }
         else
@@ -980,7 +1010,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
-                                        IsBought: elem.Counter ? true : false,
+                                        IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                         IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                             || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,
                                         PaidTp: elem.PaidTp,

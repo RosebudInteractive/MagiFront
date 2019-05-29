@@ -362,7 +362,7 @@ const LESSON_IMG_META_MSSQL_REQ =
 const PARENT_MSSQL_REQ =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], l.[IsFreeInPaidCourse],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -372,12 +372,13 @@ const PARENT_MSSQL_REQ =
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
     "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const PARENT_MSSQL_REQ_COND =
     "select lp.[URL], lcp.[Number], l.[Id], lp.[Id] as[ParentId],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  c.[Id] as[CId], c.[URL] as[CURL], c.[OneLesson], cl.[LanguageId], cl.[Name] as[CName], llp.[Name]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Course] c on c.[Id] = lc.[CourseId]\n" +
@@ -387,6 +388,7 @@ const PARENT_MSSQL_REQ_COND =
     "  left join[Lesson] lp on lp.[Id] = lcp.[LessonId]\n" +
     "  left join[LessonLng] llp on lp.[Id] = llp.[LessonId]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "<%= cond %>";
 const PARENT_MSSQL_COND_ID =
     "where l.[Id] = <%= id %>";
@@ -556,7 +558,7 @@ const LESSON_IMG_META_MYSQL_REQ =
 const PARENT_MYSQL_REQ =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, l.`IsFreeInPaidCourse`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -566,12 +568,13 @@ const PARENT_MYSQL_REQ =
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
     "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const PARENT_MYSQL_REQ_COND =
     "select lp.`URL`, lcp.`Number`, l.`Id`, lp.`Id` as`ParentId`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  c.`Id` as`CId`, c.`URL` as`CURL`, c.`OneLesson`, cl.`LanguageId`, cl.`Name` as`CName`, llp.`Name`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Course` c on c.`Id` = lc.`CourseId`\n" +
@@ -581,6 +584,7 @@ const PARENT_MYSQL_REQ_COND =
     "  left join`Lesson` lp on lp.`Id` = lcp.`LessonId`\n" +
     "  left join`LessonLng` llp on lp.`Id` = llp.`LessonId`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "<%= cond %>";
 const PARENT_MYSQL_COND_ID =
     "where l.`Id` = <%= id %>";
@@ -1269,7 +1273,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
-                                IsBought: elem.Counter ? true : false,
+                                IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                 IsPending: pendingCourses[elem.CId] ? true : false,
                                 URL: elem.CURL
                             };
@@ -1466,7 +1470,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                 ProductId: elem.ProductId,
-                                IsBought: elem.Counter ? true : false,
+                                IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                 IsPending: pendingCourses[elem.CId] ? true : false,
                                 OneLesson: elem.OneLesson ? true : false
                             };

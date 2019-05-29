@@ -383,6 +383,7 @@ exports.Payment = class Payment extends DbObject {
         let chequeObj = cheque.chequeObj;
         let parentCheque = cheque.parentCheque;
         let invoiceData = invoice_data;
+        let self = this;
 
         let updateState = async (reqResult) => {
             let dbOptsInt;
@@ -486,7 +487,13 @@ exports.Payment = class Payment extends DbObject {
                 rci = $data.tranCommit(transactionId);
             };
             rci = rci
-                .then(() => {
+                .then(async () => {
+                    if (!isRefund) {
+                        let promoId = chequeObj.promoCodeId();
+                        let promoService = self.getService("promo", true);
+                        if (promoId && promoService)
+                            await promoService.receive(promoId);
+                    }
                     return getInvoiceData();
                 })
                 .then(() => {
@@ -620,7 +627,6 @@ exports.Payment = class Payment extends DbObject {
         let chequeObj = null;
         let parentCheque = null;
         let newId;
-        let dbOptsInt;
         let chequeTypeId;
         let refundInvoiceId;
         let isRefund = false;
@@ -671,6 +677,7 @@ exports.Payment = class Payment extends DbObject {
                 resolve(rc);
             })
                 .then(async (invoice) => {
+
                     if (invoice && invoice.data && (invoice.data.length === 1)) {
                         invoiceData = invoice.data[0];
                         if (isRefund)
@@ -678,41 +685,68 @@ exports.Payment = class Payment extends DbObject {
                         else
                             await this._preCheckInvoice(invoiceData);
                     }
-                    return this._getObjById(-1, null, dbOpts);
-                })
-                .then(result => {
-                    root_obj = result;
+
+                    root_obj = await this._getObjById(-1, null, dbOpts);
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-                    return root_obj.edit();
-                })
-                .then(() => {
-                    return root_obj.newObject({
-                        fields: { IsSaved: false, RefundSum: 0, CampaignId: campaignId }
-                    }, dbOpts);
-                })
-                .then(result => {
-                    newId = result.keyValue;
-                    chequeObj = this._db.getObj(result.newObject);
-                    return this._onPreparePaymentFields(chequeObj.id(), chequeTypeId,
-                        data.Payment ? data.Payment : data.Refund, invoiceData, invoiceData ? invoiceData.UserId : data.UserId, options);
-                })
-                .then(result => {
-                    if (parentCheque)
-                        chequeObj.parentId(parentCheque.id());
-                    chequeObj.chequeNum(DRAFT_CHEQUE_ID);
-                    chequeObj.stateId(Accounting.ChequeState.Draft);
-                    for (let key in result.fields) {
-                        chequeObj[this._genGetterName(key)](result.fields[key]);
+
+                    if ((!isRefund) && invoiceData && (invoiceData.Sum === 0) && data.Promo) {
+                        let giftCourses = [];
+                        for (let i = 0; i < invoiceData.Items.length; i++) {
+                            let itm = invoiceData.Items[i];
+                            if (itm.ExtFields && itm.ExtFields.prod) {
+                                switch (itm.ExtFields.prodType) {
+                                    case Product.ProductTypes.Subscription:
+                                        if (!duration) {
+                                            duration = itm.ExtFields.prod;
+                                            prod = itm;
+                                        }
+                                        break;
+                                    case Product.ProductTypes.CourseOnLine:
+                                        giftCourses.push(itm.ExtFields.prod.courseId)
+                                        break;
+                                }
+                            }
+                        }
+                        if (giftCourses.length > 0) {
+                            for (let i = 0; i < giftCourses.length; i++)
+                                await UsersService().insBookmark(invoiceData.UserId, giftCourses[i]);
+                            await UsersCache().giftCourses(invoiceData.UserId,
+                                { added: giftCourses }, data.Promo.Id, data.Promo.PromoSum, dbOpts);
+                        }
+                            
+                        return { result: { isGift: true } };
                     }
-                    return root_obj.save(dbOpts)
-                        .then(() => result.paymentObject);
-                })
-                .then(paymentObject => {
-                    return chequeTypeId === Accounting.ChequeType.Payment ?
-                        this._onCreatePayment(paymentObject) : this._onCreateRefund(paymentObject);
-                })
-                .then(result => {
-                    return this._updateChequeState(result, root_obj, { chequeObj: chequeObj, parentCheque: parentCheque }, dbOpts, memDbOptions);
+                    else {
+                        await root_obj.edit();
+
+                        let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId };
+                        if ((!isRefund) && data.Promo && data.Promo.Id) {
+                            fields.PromoCodeId = data.Promo.Id;
+                            fields.PromoSum = data.Promo.PromoSum ? data.Promo.PromoSum : 0;
+                        }
+                        let result = await root_obj.newObject({
+                            fields: fields
+                        }, dbOpts);
+
+                        newId = result.keyValue;
+                        chequeObj = this._db.getObj(result.newObject);
+                        result = await this._onPreparePaymentFields(chequeObj.id(), chequeTypeId,
+                            data.Payment ? data.Payment : data.Refund, invoiceData, invoiceData ? invoiceData.UserId : data.UserId, options);
+                    
+                        if (parentCheque)
+                            chequeObj.parentId(parentCheque.id());
+                        chequeObj.chequeNum(DRAFT_CHEQUE_ID);
+                        chequeObj.stateId(Accounting.ChequeState.Draft);
+                        for (let key in result.fields) {
+                            chequeObj[this._genGetterName(key)](result.fields[key]);
+                        }
+                        await root_obj.save(dbOpts);
+
+                        result = await (chequeTypeId === Accounting.ChequeType.Payment ?
+                            this._onCreatePayment(result.paymentObject) : this._onCreateRefund(result.paymentObject));
+
+                        return this._updateChequeState(result, root_obj, { chequeObj: chequeObj, parentCheque: parentCheque }, dbOpts, memDbOptions);
+                    }
                 })
         }, memDbOptions)
             .then(async (result) => {
@@ -734,7 +768,7 @@ exports.Payment = class Payment extends DbObject {
                 }
                 else {
                     rc = opts.fullResult ? result.result : (result.confirmationUrl ? { confirmationUrl: result.confirmationUrl } :
-                        (opts.debug ? result.result : { result: "OK" }));
+                        (opts.debug ? result.result : {}));
                 }
                 return rc;
             });
@@ -756,7 +790,7 @@ exports.Payment = class Payment extends DbObject {
         let result;
         let chequeId = await this._getCheckueIdOfPendingCourse(user_id, course_id);
         if (chequeId) {
-            await this.checkAndChangeState(chequeId, { dbOptions: { userId: user_id } });
+            await this.checkAndChangeState(chequeId, null, { dbOptions: { userId: user_id } });
             let currList = await this.getPendingObjects(user_id);
             let crs = currList[course_id];
             if (crs && crs.chequeId) {
@@ -795,11 +829,11 @@ exports.Payment = class Payment extends DbObject {
                 let bought = {};
                 let userService = this.getService("users", true);
                 if (userService)
-                    bought = await userService.getPaidCourses(invoice_data.UserId, false, { is_list: true });
+                    bought = await userService.getPaidCourses(invoice_data.UserId, false, { paid: true, gift: true, is_list: true });
                 for (let i = 0; i < inv_courses.length; i++){
                     let crs = inv_courses[i];
                     if (bought[crs.id])
-                        throw new Error(`${crs.name} уже куплен.`);
+                        throw new Error(`${crs.name} уже доступен для использования.`);
                     if (pending[crs.id])
                         throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
                 }
