@@ -18,7 +18,7 @@ const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], al.[FirstName], al.[LastName], a.[URL] AURL\n" +
     "from[Lesson] l\n" +
@@ -32,6 +32,7 @@ const GET_HISTORY_MSSQL =
     "  join[Author] a on a.[Id] = l.[AuthorId]\n" +
     "  join[AuthorLng] al on al.[AuthorId] = a.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "where l.[Id] in\n" +
     "  (\n" +
     "    select distinct lc.[LessonId] from LessonCourse lc\n" +
@@ -47,7 +48,7 @@ const GET_HISTORY_MYSQL =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, al.`FirstName`, al.`LastName`, a.`URL` AURL\n" +
     "from`Lesson` l\n" +
@@ -61,6 +62,7 @@ const GET_HISTORY_MYSQL =
     "  join`Author` a on a.`Id` = l.`AuthorId`\n" +
     "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "where l.`Id` in\n" +
     "  (\n" +
     "    select distinct lc.`LessonId` from LessonCourse lc\n" +
@@ -147,22 +149,35 @@ const GET_COURSE_IDS_BKM_MSSQL =
 
 const GET_COURSES_BY_IDS_MSSQL =
     "select c.[Id], pc.[Counter], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  c.[CoverMeta], c.[Mask], c.[URL], cl.[Name]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "where c.[Id] in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MSSQL =
-    "select [CourseId] as [Id] from [UserPaidCourse] as p\n" +
+    "select [CourseId] as [Id], [TimeCr] from [UserPaidCourse]\n" +
     "where [UserId] = <%= userId %>\n" +
-    "order by p.[Id] desc";
+    "union all\n" +
+    "select [CourseId] as [Id], [TimeCr] from [UserGiftCourse]\n" +
+    "where [UserId] = <%= userId %>\n" +
+    "order by 2 desc";
 
 const GET_GIFT_COURSES_MSSQL =
     "select[Id] from [Course]\n" +
     "where ([PaidTp] = 2) and ([PaidRegDate] > convert(datetime, '<%= dt %>'))\n" +
     "order by [PaidRegDate] desc";
+
+    // "select t.[Id], min(t.dt) dt\n" +
+    // "from (select [Id], [PaidRegDate] as dt from [Course]\n" +
+    // "where ([PaidTp] = 2) and ([PaidRegDate] > convert(datetime, '<%= dt %>'))\n" +
+    // "union all\n" +
+    // "select [CourseId], [TimeCr] from [UserGiftCourse]\n" +
+    // "where [UserId] = <%= userId %>) as t\n" +
+    // "group by t.[Id]\n" +
+    // "order by 2 desc";
 
 const GET_AUTHORS_BY_COURSE_IDS_MSSQL =
     "select a.[Id], ac.[CourseId], a.[Portrait], a.[PortraitMeta], a.[URL],\n" +
@@ -252,22 +267,35 @@ const GET_COURSE_IDS_BKM_MYSQL =
 
 const GET_COURSES_BY_IDS_MYSQL =
     "select c.`Id`, pc.`Counter`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "where c.`Id` in (<%= courseIds %>)";
 
 const GET_PAID_COURSES_MYSQL =
-    "select `CourseId` as `Id` from `UserPaidCourse` as p\n" +
+    "select `CourseId` as `Id`, `TimeCr` from `UserPaidCourse`\n" +
     "where `UserId` = <%= userId %>\n" +
-    "order by p.`Id` desc";
+    "union all\n" +
+    "select `CourseId` as `Id`, `TimeCr` from `UserGiftCourse`\n" +
+    "where `UserId` = <%= userId %>\n" +
+    "order by 2 desc";
 
 const GET_GIFT_COURSES_MYSQL =
     "select`Id` from `Course`\n" +
     "where (`PaidTp` = 2) and (`PaidRegDate` > '<%= dt %>')\n" +
-    "order by `PaidRegDate` desc";
+    "order by `PaidRegDate` desc";    
+    
+    // "select t.`Id`, min(t.dt) dt\n" +
+    // "from (select `Id`, `PaidRegDate` as dt from `Course`\n" +
+    // "where (`PaidTp` = 2) and (`PaidRegDate` > '<%= dt %>')\n" +
+    // "union all\n" +
+    // "select `CourseId`, `TimeCr` from `UserGiftCourse`\n" +
+    // "where `UserId` = <%= userId %>) as t\n" +
+    // "group by t.`Id`\n" +
+    // "order by 2 desc";
 
 const GET_AUTHORS_BY_COURSE_IDS_MYSQL =
     "select a.`Id`, ac.`CourseId`, a.`Portrait`, a.`PortraitMeta`, a.`URL`,\n" +
@@ -435,7 +463,7 @@ const DbUser = class DbUser extends DbObject {
                                                 PaidDate: elem.PaidDate,
                                                 IsGift: (elem.PaidTp === 2) && user && user.RegDate
                                                     && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
-                                                IsBought: elem.Counter ? true : false,
+                                                IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                                 IsPending: pendingCourses[elem.Id] ? true : false,
                                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                                 ProductId: elem.ProductId,
@@ -553,8 +581,8 @@ const DbUser = class DbUser extends DbObject {
                         user = await this._usersCache.getUserInfoById(user_or_id);
                     let dt = this._dateToString(user.RegDate, true);
                     dialect = {
-                        mysql: _.template(GET_GIFT_COURSES_MYSQL)({ dt: dt }),
-                        mssql: _.template(GET_GIFT_COURSES_MSSQL)({ dt: dt })
+                        mysql: _.template(GET_GIFT_COURSES_MYSQL)({ userId: userId, dt: dt }),
+                        mssql: _.template(GET_GIFT_COURSES_MSSQL)({ userId: userId, dt: dt })
                     }
                     break;
                 default:
@@ -631,7 +659,7 @@ const DbUser = class DbUser extends DbObject {
                                     PaidDate: elem.PaidDate,
                                     IsGift: (elem.PaidTp === 2) && user && user.RegDate
                                         && elem.PaidRegDate && ((elem.PaidRegDate - user.RegDate) > 0) ? true : false,
-                                    IsBought: elem.Counter ? true : false,
+                                    IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                     IsPending: pendingCourses[elem.Id] ? true : false,
                                     IsSubsFree: elem.IsSubsFree ? true : false,
                                     ProductId: elem.ProductId,

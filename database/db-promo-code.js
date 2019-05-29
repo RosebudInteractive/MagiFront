@@ -25,15 +25,21 @@ const PROMO_REQ_TREE = {
     }
 };
 
+const RECEIVE_PROMO_MSSQL =
+    "update [PromoCode] set [Rest] = [Rest] - 1 where ([Id] = <%= id %>) and (coalesce([Counter], 0)> 0) and (coalesce([Rest], 0)> 0)";
+
+const RECEIVE_PROMO_MYSQL =
+    "update `PromoCode` set `Rest` = `Rest` - 1 where (`Id` = <%= id %>) and (coalesce(`Counter`, 0)> 0) and (coalesce(`Rest`, 0)> 0)";
+
 const GET_PROMO_MSSQL =
-    "select c.[Id], c.[Code], c.[Description], c.[Perc], c.[Counter], c.[FirstDate], c.[LastDate],\n" +
+    "select c.[Id], c.[Code], c.[Description], c.[Perc], c.[Counter], c.[Rest], c.[FirstDate], c.[LastDate],\n" +
     "  p.[Id] as [pId], p.[ProductId]\n" +
     "from [PromoCode] c\n" +
     "  left join [PromoCodeProduct] p on p.[PromoCodeId] = c.[Id]<%= where %>\n" +
     "order by c.[Id]";
 
 const GET_PROMO_MYSQL =
-    "select c.`Id`, c.`Code`, c.`Description`, c.`Perc`, c.`Counter`, c.`FirstDate`, c.`LastDate`,\n" +
+    "select c.`Id`, c.`Code`, c.`Description`, c.`Perc`, c.`Counter`, c.`Rest`, c.`FirstDate`, c.`LastDate`,\n" +
     "  p.`Id` as `pId`, p.`ProductId`\n" +
     "from `PromoCode` c\n" +
     "  left join `PromoCodeProduct` p on p.`PromoCodeId` = c.`Id`<%= where %>\n" +
@@ -51,6 +57,18 @@ const DbPromoCode = class DbPromoCode extends DbObject {
     _getObjById(id, expression, options) {
         var exp = expression || PROMO_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    async receive(id, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+
+        await $data.execSql({
+            dialect: {
+                mysql: _.template(RECEIVE_PROMO_MYSQL)({ id: id }),
+                mssql: _.template(RECEIVE_PROMO_MSSQL)({ id: id })
+            }
+        }, dbOpts);
     }
 
     async get(options) {
@@ -80,18 +98,26 @@ const DbPromoCode = class DbPromoCode extends DbObject {
             let currObj;
             result.detail.forEach(elem => {
                 if (currId !== elem.Id) {
-                    currObj = { Products: [] };
+                    currObj = { Products: opts.prodList ? null : [] };
                     currObj.Id = currId = elem.Id;
                     currObj.Code = elem.Code;
                     currObj.Description = elem.Description;
                     currObj.Perc = elem.Perc;
                     currObj.Counter = elem.Counter;
+                    currObj.Rest = elem.Rest;
                     currObj.FirstDate = elem.FirstDate;
                     currObj.LastDate = elem.LastDate;
                     promo.push(currObj);
                 }
-                if (elem.pId)
-                    currObj.Products.push(elem.ProductId);
+                if (elem.pId) {
+                    if (opts.prodList) {
+                        if (!currObj.Products)
+                            currObj.Products = {};
+                        currObj.Products[elem.ProductId] = true
+                    }
+                    else
+                        currObj.Products.push(elem.ProductId);
+                }
             });
         };
         return promo;
@@ -130,9 +156,12 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     }
 
                     if (typeof (inpFields.Counter) !== "undefined") {
+                        let old_counter = promoObj.counter();
                         promoObj.counter(+inpFields.Counter);
                         if ((typeof (promoObj.counter()) !== "number") || (promoObj.counter() <= 0) && (promoObj.counter() > 1000000))
                             throw new Error(`Invalid field value "Counter": ${promoObj.counter()}`);
+                        let new_rest = promoObj.rest() + promoObj.counter() - old_counter;
+                        promoObj.rest(new_rest > 0 ? new_rest : 0);
                     }
 
                     if (inpFields.FirstDate) {
@@ -218,7 +247,9 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     await root_obj.edit();
 
                     let fields = {
-                        PriceListId: Product.DefaultPriceListId
+                        PriceListId: Product.DefaultPriceListId,
+                        Counter: 0,
+                        Rest: 0
                     };
 
                     if (typeof (inpFields.Code) !== "undefined")
@@ -229,7 +260,7 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     if (typeof (inpFields.Perc) !== "undefined") {
                         let perc = +inpFields.Perc;
                         if ((typeof (perc) === "number") && (perc > 0) && (perc <= 100))
-                            fields.ProductTypeId = perc
+                            fields.Perc = perc
                         else
                             throw new Error(`Invalid field value "Perc": ${perc}`);
                     }
@@ -238,8 +269,9 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
                     if (typeof (inpFields.Counter) !== "undefined") {
                         let counter = +inpFields.Counter;
-                        if ((typeof (counter) === "number") && (counter > 0) && (counter <= 1000000))
-                            fields.Counter = counter
+                        if ((typeof (counter) === "number") && (counter > 0) && (counter <= 1000000)) {
+                            fields.Counter = fields.Rest = counter
+                        }
                         else
                             throw new Error(`Invalid field value "Counter": ${counter}`);
                     }

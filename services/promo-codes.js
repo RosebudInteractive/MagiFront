@@ -5,7 +5,7 @@ function setupPromoCodes(app) {
 
     if (!global.$Services)
         global.$Services = {};
-    global.$Services.promoCodes = PromoCodeService;
+    global.$Services.promo = PromoCodeService;
 
     app.get('/api/promo-codes', (req, res, next) => {
         PromoCodeService()

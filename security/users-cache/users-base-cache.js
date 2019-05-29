@@ -597,7 +597,24 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         }).bind(this), memDbOptions);
     }
 
+    async giftCourses(id, courses, promoId, promoSum, options) {
+        let sum = promoSum;
+        await this._paidOrGiftCourses(id, courses, "UserGiftCourse", false, (fields) => {
+            fields.PromoCodeId = promoId;
+            fields.Sum = sum;
+            sum = 0;
+            return fields;
+        }, options);
+        let promoService = this.getService("promo", true);
+        if (promoService)
+            await promoService.receive(promoId, { dbOptions: options });
+    }
+
     paidCourses(id, courses, options) {
+        return this._paidOrGiftCourses(id, courses, "UserPaidCourse", true, null, options);
+    }
+
+    _paidOrGiftCourses(id, courses, table, hasCounter, newFunc, options) {
         let memDbOptions = { dbRoots: [] };
         let root_obj;
         let dbopts = options || {};
@@ -605,13 +622,13 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
         return Utils.editDataWrapper((() => {
             return new MemDbPromise(this._db, (resolve => {
                 if (!courses)
-                    throw new Error("UsersBaseCache::paidCourses: Empty \"courses\" argument.");
+                    throw new Error("UsersBaseCache::_paidOrGiftCourses: Empty \"courses\" argument.");
 
                 let predicate = new Predicate(this._db, {});
                 predicate
                     .addCondition({ field: "UserId", op: "=", value: id });
 
-                let exp_filtered = { expr: { model: { name: "UserPaidCourse" } } };
+                let exp_filtered = { expr: { model: { name: table } } };
                 exp_filtered.expr.predicate = predicate.serialize(true);
                 this._db._deleteRoot(predicate.getRoot());
 
@@ -621,10 +638,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     if (result && result.guids && (result.guids.length === 1)) {
                         root_obj = this._db.getObj(result.guids[0]);
                         if (!root_obj)
-                            throw new Error("UsersBaseCache::paidCourses: Object doesn't exist: " + result.guids[0]);
+                            throw new Error("UsersBaseCache::_paidOrGiftCourses: Object doesn't exist: " + result.guids[0]);
                     }
                     else
-                        throw new Error("UsersBaseCache::paidCourses: Invalid result of \"getData\": " + JSON.stringify(result));
+                        throw new Error("UsersBaseCache::_paidOrGiftCourses: Invalid result of \"getData\": " + JSON.stringify(result));
 
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
                     await root_obj.edit();
@@ -652,11 +669,12 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                         let courseId = obj.courseId();
                         let item = courseList[courseId];
                         if (typeof (item) === "number") {
-                            let newCnt = obj.counter() + item;
+                            let newCnt = (hasCounter ? obj.counter() : 1) + item;
                             if (newCnt <= 0)
                                 itemsToDelete.push(obj)
                             else
-                                obj.counter(newCnt);
+                                if (hasCounter)
+                                    obj.counter(newCnt);
                             delete courseList[courseId];
                         }
                     }
@@ -664,10 +682,16 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                         collection._del(itemsToDelete[i]);
                     for (let cid in courseList) {
                         let cnt = courseList[cid];
-                        if ((+cid) > 0)
+                        if ((+cid) > 0) {
+                            let fields = { UserId: id, CourseId: +cid};
+                            if (hasCounter)
+                                fields.Counter = cnt;
+                            if (newFunc)
+                                fields = newFunc(fields);
                             await root_obj.newObject({
-                                fields: { UserId: id, CourseId: +cid, Counter: cnt }
+                                fields: fields
                             }, dbopts);
+                        }
                     }
                     return root_obj.save(dbopts);
                 })
