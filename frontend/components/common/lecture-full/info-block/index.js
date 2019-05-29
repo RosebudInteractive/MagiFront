@@ -12,7 +12,6 @@ export default class InfoBlock extends React.Component {
         course: PropTypes.object,
         needShowAuthors: PropTypes.bool,
         isSingleLesson: PropTypes.object,
-        isPaidCourse: PropTypes.bool,
     };
 
     static defaultProps = {

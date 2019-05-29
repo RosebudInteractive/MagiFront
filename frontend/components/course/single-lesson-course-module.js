@@ -25,7 +25,7 @@ export default class SingleLessonCourseModule extends React.Component {
         }
 
         return <div className="lecture-full _single js-lecture-full">
-            <LessonFullWrapper courseUrl={course.URL} lesson={_lesson} isSingleLesson={true} needShowAuthors={needShowAuthors} isPaid={_isPaid}/>
+            <LessonFullWrapper course={course} lesson={_lesson} isSingleLesson={true} needShowAuthors={needShowAuthors} isPaid={_isPaid}/>
         </div>
     }
 }
