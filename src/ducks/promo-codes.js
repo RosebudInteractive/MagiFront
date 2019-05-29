@@ -20,7 +20,10 @@ export const GET_PROMO_CODES_SUCCESS = `${prefix}/GET_PROMO_CODES_SUCCESS`
 export const GET_PROMO_CODES_FAIL = `${prefix}/GET_PROMO_CODES_FAIL`
 
 export const CREATE_NEW_PROMO_REQUEST = `${prefix}/CREATE_NEW_PROMO_REQUEST`
+export const CREATE_NEW_PROMO_START = `${prefix}/CREATE_NEW_PROMO_START`
+
 export const EDIT_CURRENT_PROMO_REQUEST = `${prefix}/EDIT_CURRENT_PROMO_REQUEST`
+export const EDIT_CURRENT_PROMO_START = `${prefix}/EDIT_CURRENT_PROMO_START`
 
 export const SHOW_EDITOR = `${prefix}/SHOW_EDITOR`
 export const CLOSE_EDITOR = `${prefix}/CLOSE_EDITOR`
@@ -40,6 +43,7 @@ const ReducerRecord = Record({
 
 const PromoRecord = Record({
     Code: null,
+    Description: null,
     Perc: null,
     Counter: 0,
     FirstDate: null,
@@ -71,13 +75,19 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
         }
 
+        case CREATE_NEW_PROMO_START:
+            return state.set('editMode', false)
+
+        case EDIT_CURRENT_PROMO_START:
+            return state
+                .set('selected', payload)
+                .set('editMode', true)
+
         case SHOW_EDITOR:
             return state.set('showEditor', true)
 
         case CLOSE_EDITOR:
             return state.set('showEditor', false)
-
-
 
         default:
             return state
@@ -104,6 +114,8 @@ export const promosSelector = createSelector(entriesSelector, (entries) => {
     })
 })
 export const showEditorSelector = createSelector(stateSelector, state => state.showEditor)
+export const editModeSelector = createSelector(stateSelector, state => state.editMode)
+export const selectedIdSelector = createSelector(stateSelector, state => state.selected)
 
 /**
  * Action Creators
@@ -132,7 +144,7 @@ function* getPromoCodesSaga() {
     yield put({type: GET_PROMO_CODES_START})
 
     try {
-        const _promos = call(_fetchPromoCodes)
+        const _promos = yield call(_fetchPromoCodes)
 
         yield put( {type: GET_PROMO_CODES_SUCCESS, payload: _promos} )
     } catch (e) {
@@ -150,7 +162,7 @@ function* getPromoCodesSaga() {
 }
 
 const _fetchPromoCodes = () => {
-    return fetch("/api/adm/promo-codes", {method: 'GET', credentials: 'include'})
+    return fetch("/api/promo-codes", {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -158,19 +170,31 @@ const _fetchPromoCodes = () => {
 function* createPromoCodeSaga(){
     yield put(replace('/adm/promos/new'))
 
+    yield put({type: CREATE_NEW_PROMO_START})
     yield put({type: SHOW_EDITOR})
+}
+
+function* editPromoSaga(data) {
+    yield put(replace('/adm/promos/edit/' + data.payload))
+
+    yield put({type: SHOW_EDITOR})
+}
+
+function* closeEditorSaga() {
+    yield put(replace('/adm/promos'))
 }
 
 export const saga = function* () {
     yield all([
         takeEvery(GET_PROMO_CODES_REQUEST, getPromoCodesSaga),
         takeEvery(CREATE_NEW_PROMO_REQUEST, createPromoCodeSaga),
+        takeEvery(EDIT_CURRENT_PROMO_REQUEST, editPromoSaga),
+        takeEvery(CLOSE_EDITOR, closeEditorSaga),
     ])
 }
 
 const dataToEntries = (values, DataRecord) => {
-    return Object.values(values)
-        .reduce(
+    return values.reduce(
             (acc, value) => acc.set(value.Id, new DataRecord(value)),
             new OrderedMap({})
         )

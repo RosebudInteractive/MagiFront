@@ -11,9 +11,9 @@ import {
     loadingSelector,
     loadedSelector,
     showEditorSelector,
-} from "../../ducks/promo-codes";
+} from "adm-ducks/promo-codes";
 import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
-import BookEditor from '../../components/books/editor'
+import PromoEditor from '../../components/promos/editor'
 
 import Webix from '../../components/Webix';
 import YesNoDialog from "../../components/dialog/yes-no-dialog";
@@ -39,9 +39,9 @@ class PromosPage extends React.Component {
     componentWillMount() {
         if (this.props.showEditor) {
             if (this.props.editMode) {
-                this.props.actions.editCurrentBook(this.props.bookId)
+                this.props.editCurrentPromo(this.props.promoId)
             } else {
-                this.props.actions.createBook();
+                this.props.createPromo();
             }
 
         }
@@ -51,7 +51,7 @@ class PromosPage extends React.Component {
     }
 
     componentWillUnmount() {
-        this.props.actions.saveChanges()
+        // this.props.actions.saveChanges()
     }
 
 
@@ -96,7 +96,7 @@ class PromosPage extends React.Component {
             promos,
             loading,
             deleteDlgShown,
-            showBookEditor,
+            showPromoEditor,
         } = this.props;
 
         return loading ?
@@ -126,7 +126,7 @@ class PromosPage extends React.Component {
                     </div>
                 </div>
                 {
-                    (deleteDlgShown && !showBookEditor)?
+                    (deleteDlgShown && !showPromoEditor)?
                         <YesNoDialog
                             yesAction={::this._deleteBook}
                             noAction={::this._cancelDelete}
@@ -135,10 +135,10 @@ class PromosPage extends React.Component {
                         :
                         null
                 }
-                { !showBookEditor ? <ErrorDialog/> : null }
-                <BookEditor/>
-                <Route path={'/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
-                <Route path={'/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
+                { !showPromoEditor ? <ErrorDialog/> : null }
+                <PromoEditor/>
+                {/*<Route path={'/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>*/}
+                {/*<Route path={'/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>*/}
             </div>
     }
 
@@ -198,7 +198,7 @@ function mapStateToProps(state, ownProps) {
         promos: promosSelector(state),
 
         deleteDlgShown: state.commonDlg.deleteDlgShown,
-        showBookEditor: showEditorSelector(state),
+        showPromoEditor: showEditorSelector(state),
 
         promoId: ownProps.match ? Number(ownProps.match.params.id) : null,
     }

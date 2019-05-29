@@ -104,9 +104,11 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
                             <Route path={_homePath + '/courses'} component={Courses}/>
-                            {/*<Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>*/}
-                            {/*<Route path={_homePath + '/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>*/}
+                            <Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>
+                            <Route path={_homePath + '/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>
                             <Route path={_homePath + '/books'} component={BooksPage}/>
+                            <Route path={_homePath + '/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>
+                            <Route path={_homePath + '/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>
                             <Route path={_homePath + '/promos'} component={PromosPage}/>
                         </Switch>
                     </div>

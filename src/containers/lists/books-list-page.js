@@ -171,8 +171,8 @@ class BooksPage extends React.Component {
                 }
                 { !showBookEditor ? <ErrorDialog/> : null }
                 <BookEditor/>
-                <Route path={'/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>
-                <Route path={'/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>
+                {/*<Route path={'/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>*/}
+                {/*<Route path={'/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>*/}
             </div>
     }
 
