@@ -15,6 +15,7 @@ import LessonEditor from './editors/lesson-editor';
 import SubLessonEditor from './editors/sublesson-editor';
 import EpisodeEditor from './editors/episode-editor';
 import BooksPage from './lists/books-list-page';
+import PromosPage from './lists/promo-codes-page';
 import WorkShop from './work-shop';
 import SignInForm from './sign-in-form';
 
@@ -103,9 +104,10 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
                             <Route path={_homePath + '/courses'} component={Courses}/>
-                            <Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>
-                            <Route path={_homePath + '/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>
+                            {/*<Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>*/}
+                            {/*<Route path={_homePath + '/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>*/}
                             <Route path={_homePath + '/books'} component={BooksPage}/>
+                            <Route path={_homePath + '/promos'} component={PromosPage}/>
                         </Switch>
                     </div>
                 </div>

@@ -87,29 +87,7 @@ export default class Uploader extends React.Component {
                 console.log(e)
             }, false);
             xhr.open("POST", this.props.upload);
-            //use file_upload_parser.php from above url
             xhr.send(formData);
-
-            // fetch(this.props.upload, {
-            //     method: 'POST',
-            //     body: formData,
-            // })
-            //     .then(this._readResponse)
-            //     .then((data) => {
-            //         if (this.props.onUploadFile) {
-            //             this.props.onUploadFile(data)
-            //         }
-            //         _count--
-            //         _checkFinished()
-            //
-            //     })
-            //     .catch(error => {
-            //         if (this.props.onFileUploadError) {
-            //             this.props.onFileUploadError(error)
-            //         }
-            //         _count--
-            //         _checkFinished()
-            //     })
         }
     }
 }
