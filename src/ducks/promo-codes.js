@@ -245,7 +245,7 @@ function* insertPromoSaga(action) {
 
         yield put({
             type: SHOW_ERROR_DIALOG,
-            payload: {error}
+            payload: error.message
         })
     }
 }

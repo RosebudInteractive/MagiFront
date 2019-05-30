@@ -46,6 +46,7 @@ const NEW_LESSON = {
     AuthorId: null,
     State: 'D',
     IsAuthRequired: true,
+    ShortDescription: " ",
 }
 
 class LessonEditorForm extends React.Component {

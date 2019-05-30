@@ -26,7 +26,7 @@ const NEW_PROMO = {
     Code: '',
     Description: null,
     Perc: null,
-    Counter: 0,
+    Counter: null,
     FirstDate: null,
     LastDate: null,
     Products: [],
@@ -128,6 +128,12 @@ class PromoEditorForm extends React.Component {
     _save() {
         let {editorValues, editMode, promoId,} = this.props,
             _values = Object.assign({}, editorValues)
+
+        if (!+_values.counter && !_values.firstDate && !_values.lastDate) {
+            const _message = 'Одно из полей "Счетчик", "Дата начала" или "Дата окончания" должно быть заполнено'
+            this.props.showErrorDialog(_message)
+            return
+        }
 
         if (!_values.description) {
             _values.description = `Промокод "${_values.code}"`
