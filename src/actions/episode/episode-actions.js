@@ -7,7 +7,7 @@ import {
     CANCEL_CHANGE_EPISODE_DATA,
     SAVE_EPISODE_SUCCESS,
     CLEAR_EPISODE,
-    IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_START, IMPORT_EPISODE_FAIL,
+    IMPORT_EPISODE_SUCCESS, IMPORT_EPISODE_START, IMPORT_EPISODE_FAIL, SAVE_EPISODE_START, SAVE_EPISODE_FAIL,
 } from '../../constants/episode/singleEpisode'
 
 import {
@@ -19,6 +19,7 @@ import {
 
 import 'whatwg-fetch';
 import {checkStatus, parseJSON, handleJsonError, NOT_FOUND_ERR} from "../../tools/fetch-tools";
+import {reset} from "redux-form";
 
 export const get = (id, lessonId) => {
     return (dispatch) => {
@@ -67,6 +68,8 @@ export const create = (obj) => {
 export const save = (values, mode) => {
 
     return (dispatch) => {
+        dispatch({ type: SAVE_EPISODE_START })
+
         let _type = mode === EDIT_MODE_INSERT ? "POST" : "PUT";
         let _url = "/api/episodes";
         if (mode === EDIT_MODE_EDIT) {
@@ -86,6 +89,8 @@ export const save = (values, mode) => {
             .then(checkStatus)
             .then(parseJSON)
             .then((data) => {
+                dispatch(reset('EpisodeEditor'));
+
                 dispatch({
                     type: SAVE_EPISODE_SUCCESS,
                     payload: data
@@ -99,6 +104,8 @@ export const save = (values, mode) => {
             .catch((err) => {
                 handleJsonError(err)
                     .then((message) => {
+                        dispatch({ type: SAVE_EPISODE_FAIL, payload: message })
+
                         dispatch({
                             type: SHOW_ERROR_DIALOG,
                             payload: message

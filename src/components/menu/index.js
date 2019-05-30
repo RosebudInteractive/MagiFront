@@ -7,6 +7,7 @@ const items = [
     {id: 'categories', name : 'Категории' , url : '/adm/categories'},
     {id: 'courses', name : 'Курсы' , url : '/adm/courses'},
     {id: 'books', name : 'Книги' , url : '/adm/books'},
+    {id: 'promos', name : 'Промокоды' , url : '/adm/promos'},
 ]
 
 export default class Menu extends React.Component {

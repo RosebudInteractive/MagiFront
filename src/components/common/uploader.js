@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './controls.sass'
-import {readResponseBody} from "../../tools/fetch-tools";
 
 export default class Uploader extends React.Component {
 
@@ -12,7 +11,9 @@ export default class Uploader extends React.Component {
         onUploadComplete: PropTypes.func,
         onUploadFile: PropTypes.func,
         onFileUploadError: PropTypes.func,
+        onProgress: PropTypes.func,
         disabled: PropTypes.bool,
+        acceptType: PropTypes.string,
     }
 
     constructor(props) {
@@ -23,7 +24,7 @@ export default class Uploader extends React.Component {
 
     render() {
         return <form method="#" encType="multipart/form-data">
-            <input ref={e => this._uploader = e} multiple type="file" accept="image/*" hidden
+            <input ref={e => this._uploader = e} multiple type="file" accept={this.props.acceptType ? this.props.acceptType : "image/*"} hidden
                    onChange={::this._uploadFiles}/>
             <button className="cover-control cover-control__btn upload" onClick={::this._upload} disabled={this.props.disabled}/>
         </form>
@@ -57,26 +58,37 @@ export default class Uploader extends React.Component {
             let formData = new FormData();
             formData.append('file', _files[i]);
 
-            fetch(this.props.upload, {
-                method: 'POST',
-                body: formData,
-            })
-                .then(readResponseBody)
-                .then((data) => {
-                    if (this.props.onUploadFile) {
-                        this.props.onUploadFile(data)
+            let xhr = new XMLHttpRequest();
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    let _percentComplete = Math.round(100 *(event.loaded / event.total));
+                    if (this.props.onProgress) {
+                        this.props.onProgress({file: _files[i], percent: _percentComplete})
                     }
-                    _count--
-                    _checkFinished()
+                }
+            };
 
-                })
-                .catch(error => {
-                    if (this.props.onFileUploadError) {
-                        this.props.onFileUploadError(error)
+            xhr.onload = xhr.onerror = (event) => {
+                if (event.target.status === 200) {
+                    if (this.props.onUploadFile) {
+                        this.props.onUploadFile(event.target.response)
                     }
-                    _count--
-                    _checkFinished()
-                })
+                } else {
+                    if (this.props.onFileUploadError) {
+                        this.props.onFileUploadError(event.target.responseText)
+                    }
+                }
+
+                _count--
+                _checkFinished()
+            }
+
+            xhr.addEventListener("abort", (e) => {
+                console.log(e)
+            }, false);
+            xhr.open("POST", this.props.upload);
+            xhr.send(formData);
         }
     }
 }
+

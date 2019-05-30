@@ -11,32 +11,6 @@ import ParamsMiddleware from '../middlewares/params-middleware'
 import rootReducer from '../reducers'
 import rootSaga from './saga'
 
-
-// const sagaMiddleware = createSagaMiddleware()
-
-// const enhancer = applyMiddleware(sagaMiddleware,
-//     routerMiddleware(history),
-//     thunk,
-//     workShopMiddleware,
-//     ButtonsMiddleware,
-//     ParamsMiddleware)
-//
-// const store = createStore(rootReducer, enhancer)
-//
-// sagaMiddleware.run(rootSaga)
-//
-// if (module.hot) {
-//     module.hot.accept('../reducers', () => {
-//         const nextRootReducer = require('../reducers');
-//         store.replaceReducer(nextRootReducer)
-//     })
-// }
-//
-//
-// window.store = store
-//
-// export default store
-
 export const store = configureStore();
 
 function configureStore(initialState) {

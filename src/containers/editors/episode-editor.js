@@ -3,7 +3,10 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import {get as getEpisode, create as createEpisode} from "../../actions/episode/episode-actions";
 import {get as getLesson} from "../../actions/lesson/lesson-actions";
+import {loadData as loadWorkShopData} from '../../actions/work-shop-actions';
 import LoadingPage from "../../components/common/loading-page";
+import EditorForm from "../../components/episode-editor/editor-form";
+import ErrorDialog from "../../components/dialog/error-dialog";
 
 class EpisodeEditor extends React.Component {
 
@@ -32,18 +35,53 @@ class EpisodeEditor extends React.Component {
     }
 
     componentDidMount() {
-        let {lessonId, episodeId} = this.props
+        let {episodeId} = this.props
 
         this._loadLessonInfo()
             .then(() => {
                 if (this.state.editMode) {
-                    this.props.getEpisode(episodeId, lessonId)
+                    this.props.getEpisode(episodeId, this.lessonId)
                 } else {
                     this.props.createEpisode(this._getNewEpisode())
                 }
 
                 this.setState({loading : false})
             })
+
+        if (this.props.isWorkshop) {
+            this._openWorkshop()
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        let {courseId, lessonId, subLessonId,} = this.props
+
+        let _needRefreshAfterSave = prevProps.savingEpisode && !this.props.savingEpisode && !this.props.episodeError,
+            _needSwitchToEditMode = !prevState.editMode && _needRefreshAfterSave
+
+        if (_needSwitchToEditMode) {
+            let _newRout = `/adm/courses/edit/${courseId}/lessons/edit/${lessonId}`;
+            if (subLessonId) {
+                _newRout += `/sub-lessons/edit${subLessonId}`
+            }
+            _newRout += `/episodes/edit/${this.props.episode.id}`
+
+            this.props.history.push(_newRout);
+            this.setState({editMode: true})
+        }
+
+        if (_needRefreshAfterSave) {
+            this.props.getEpisode(this.props.episode.id, this.lessonId)
+        }
+
+
+        if (this.props.isWorkshop && !prevProps.isWorkshop) {
+            this._openWorkshop()
+        }
+
+        if (!this.props.fetching && prevProps.fetching) {
+            this._fillFileId()
+        }
     }
 
     componentWillReceiveProps(next) {
@@ -51,13 +89,14 @@ class EpisodeEditor extends React.Component {
     }
 
     render() {
-        let {fetching,} = this.props
+        let {fetching, courseId, lessonId, subLessonId,} = this.props
 
         return fetching || this.state.loading ?
             <LoadingPage/>
             :
             <div className="editor episode_editor">
-
+                <EditorForm editMode={this.state.editMode} courseId={courseId} lessonId={lessonId} sublessonId={subLessonId}/>
+                <ErrorDialog/>
             </div>
     }
 
@@ -87,7 +126,31 @@ class EpisodeEditor extends React.Component {
         }
     }
 
+    _fillFileId() {
+        let {content, resources} = this.props;
 
+        content.forEach((item) => {
+            let _resource = resources.find((resource) => {
+                return resource.Id === item.ResourceId
+            })
+
+            item.FileId = _resource ? _resource.FileId : null;
+        })
+    }
+
+    _openWorkshop() {
+        let {episodeId, location} = this.props;
+
+        if (this.lessonId && episodeId) {
+            let _object = {
+                lessonId: this.lessonId,
+                episodeId: episodeId,
+                callingRoute: location.pathname,
+            }
+
+            this.props.loadWorkShopData(_object)
+        }
+    }
 
 }
 
@@ -102,12 +165,18 @@ function mapStateToProps(state, ownProps) {
         episode: state.singleEpisode.current,
         lesson: state.singleLesson.current,
 
+        savingEpisode: state.singleEpisode.saving,
+        episodeError: state.singleEpisode.error,
+
+        content: state.episodeContent.current,
+        resources: state.lessonResources.current,
+
         fetching: state.singleLesson.fetching || state.singleEpisode.fetching || state.lessonResources.fetching,
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({getLesson, getEpisode, createEpisode}, dispatch)
+    return bindActionCreators({getLesson, getEpisode, createEpisode, loadWorkShopData}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EpisodeEditor)

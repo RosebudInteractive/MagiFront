@@ -3,30 +3,25 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
 import {
-    getBooks,
-    createBook,
-    editCurrentBook,
-    deleteBook,
-    moveUp,
-    moveDown,
-    saveChanges,
-    booksSelector,
+    getPromoCodes,
+    createPromo,
+    editCurrentPromo,
+    deletePromo,
+    promosSelector,
     loadingSelector,
-    loadedSelector, showEditorSelector,
-} from "../../ducks/books";
+    loadedSelector,
+    showEditorSelector,
+} from "adm-ducks/promo-codes";
 import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
-import BookEditor from '../../components/books/editor'
+import PromoEditor from '../../components/promos/editor'
 
 import Webix from '../../components/Webix';
 import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
-import {Route,} from "react-router-dom";
 
-const TIMEOUT = 500;
-
-class BooksPage extends React.Component {
+class PromosPage extends React.Component {
 
     static propTypes = {
         showEditor: PropTypes.bool,
@@ -38,67 +33,36 @@ class BooksPage extends React.Component {
 
         this._isFirstSelected = false;
         this._isLastSelected = false;
-
-        this._timer = null
     }
 
     componentWillMount() {
         if (this.props.showEditor) {
             if (this.props.editMode) {
-                this.props.actions.editCurrentBook(this.props.bookId)
+                this.props.editCurrentPromo(this.props.promoId)
             } else {
-                this.props.actions.createBook();
+                this.props.createPromo();
             }
 
         }
 
-        this.props.actions.getBooks();
+        this.props.getPromoCodes();
         this._selected = null;
     }
 
-    componentWillUnmount() {
-        this.props.actions.saveChanges()
-    }
-
-    _onAddBtnClick() {
-        this.props.actions.createBook();
-    }
-
     _onEditBtnClick() {
-        this.props.actions.editCurrentBook(this._selected);
+        this.props.editCurrentPromo(this._selected);
     }
 
-    _deleteBook() {
-        // let _index = this.props.courses.findIndex((item) => {
-        //     return item.id === this._selected
-        // })
-        //
-        this.props.actions.deleteBook(this._selected)
-
-        //     .then(({courses}) => {
-        //         this._selected =
-        //             ((courses.length > 0) && (_index > -1))
-        //                 ?
-        //                 (_index < courses.length)
-        //                     ?
-        //                     courses[_index].id
-        //                     :
-        //                     courses[courses.length - 1].id
-        //                 :
-        //                 null;
-        //
-        //         this.forceUpdate();
-        //     })
-        //     .catch(() => {
-        //     })
+    _deletePromo() {
+        this.props.deletePromo(this._selected)
     }
 
     _confirmDelete() {
-        this.props.actions.showDeleteConfirmation(this._selected)
+        this.props.showDeleteConfirmation()
     }
 
     _cancelDelete() {
-        this.props.actions.cancelDelete()
+        this.props.cancelDelete()
     }
 
     _select(selectedObj) {
@@ -116,17 +80,17 @@ class BooksPage extends React.Component {
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
-            this._selected = (nextProps.books.length > 0) ? nextProps.books[0].id : null;
+            this._selected = (nextProps.promos.length > 0) ? nextProps.promos[0].id : null;
             this._isFirstSelected = !!this._selected
         }
     }
 
     render() {
         const {
-            books,
+            promos,
             loading,
             deleteDlgShown,
-            showBookEditor,
+            showPromoEditor,
         } = this.props;
 
         return loading ?
@@ -136,7 +100,7 @@ class BooksPage extends React.Component {
                 <div className="courses-content">
                     <div className="action-bar">
                         <button className='tool-btn new'
-                                onClick={::this._onAddBtnClick}
+                                onClick={::this.props.createPromo}
                         />
                         <button
                             className={'tool-btn edit' + (this._selected === null ? " disabled" : "")}
@@ -148,65 +112,38 @@ class BooksPage extends React.Component {
                             onClick={::this._confirmDelete}
                             disabled={(this._selected === null)}
                         />
-                        <button key='btnUp' className='tool-btn up'
-                                disabled={(!this._selected) || (this._isFirstSelected)} onClick={::this._moveUp}/>
-                        <button key='btnDown' className='tool-btn down'
-                                disabled={(!this._selected) || (this._isLastSelected)} onClick={::this._moveDown}/>
                     </div>
                     <div className="grid-container">
                         <div className="webix-grid-wrapper">
-                            <Webix ui={::this.getUI(::this._select)} data={books}/>
+                            <Webix ui={::this.getUI(::this._select)} data={promos}/>
                         </div>
                     </div>
                 </div>
                 {
-                    (deleteDlgShown && !showBookEditor)?
+                    (deleteDlgShown && !showPromoEditor)?
                         <YesNoDialog
-                            yesAction={::this._deleteBook}
+                            yesAction={::this._deletePromo}
                             noAction={::this._cancelDelete}
-                            message={"Удалить книгу" + this._getSelectedBooksName() + "?"}
+                            message={"Удалить промокод" + this._getSelectedBooksName() + "?"}
                         />
                         :
                         null
                 }
-                { !showBookEditor ? <ErrorDialog/> : null }
-                <BookEditor/>
-                {/*<Route path={'/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>*/}
-                {/*<Route path={'/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>*/}
+                { !showPromoEditor ? <ErrorDialog/> : null }
+                <PromoEditor/>
             </div>
     }
 
     _getSelectedBooksName() {
-        let _book = null;
+        let _promo = null;
 
         if (this._selected) {
-            _book = this.props.books.find((item) => {
+            _promo = this.props.promos.find((item) => {
                 return item.id === this._selected
             })
         }
 
-        return _book ? ' "' + _book.Name + '"' : ''
-    }
-
-    _moveUp() {
-        this.props.actions.moveUp(this._selected);
-        this._restartTimeout()
-    }
-
-    _moveDown() {
-        this.props.actions.moveDown(this._selected);
-        this._restartTimeout()
-    }
-
-    _restartTimeout() {
-        if (this._timer) {
-            clearTimeout(this._timer)
-        }
-
-        this._timer = setTimeout(() => {
-            clearTimeout(this._timer)
-            this.props.actions.saveChanges()
-        }, TIMEOUT)
+        return _promo ? ' "' + _promo.Code + '"' : ''
     }
 
     getUI() {
@@ -214,14 +151,14 @@ class BooksPage extends React.Component {
 
         return {
             view: "datatable",
-            id: 'courses-grid',
+            id: 'promos-grid',
             scroll: false,
             autoheight: true,
             select: 'row',
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название книги', width: 230},
-                {id: "Description", header: "Описание курса", fillspace: true},
+                {id: 'Code', header: 'Код', width: 230},
+                {id: "Description", header: "Описание", fillspace: true},
             ],
             on: {
                 onAfterSelect: function (selObj) {
@@ -250,29 +187,17 @@ function mapStateToProps(state, ownProps) {
     return {
         loaded: loadedSelector(state),
         loading: loadingSelector(state),
-        books: booksSelector(state),
+        promos: promosSelector(state),
 
         deleteDlgShown: state.commonDlg.deleteDlgShown,
-        showBookEditor: showEditorSelector(state),
+        showPromoEditor: showEditorSelector(state),
 
-        bookId: ownProps.match ? Number(ownProps.match.params.id) : null,
+        promoId: ownProps.match ? Number(ownProps.match.params.id) : null,
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return {
-        actions: bindActionCreators({
-            getBooks,
-            createBook,
-            editCurrentBook,
-            deleteBook,
-            showDeleteConfirmation,
-            cancelDelete,
-            moveUp,
-            moveDown,
-            saveChanges,
-        }, dispatch)
-    };
+    return bindActionCreators({ getPromoCodes, createPromo, editCurrentPromo, deletePromo, showDeleteConfirmation, cancelDelete, }, dispatch)
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(BooksPage);
+export default connect(mapStateToProps, mapDispatchToProps)(PromosPage);

@@ -73,7 +73,7 @@ export const get = (id, courseId) => {
             payload: null
         });
 
-        fetch("/api/adm/lessons/" + id + '/' + courseId, {method: 'GET', credentials: 'include'})
+        return fetch("/api/adm/lessons/" + id + '/' + courseId, {method: 'GET', credentials: 'include'})
             .then(checkStatus)
             .then(parseJSON)
             .then(data => {

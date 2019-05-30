@@ -3,7 +3,7 @@ import {createSelector} from 'reselect'
 import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
-import {checkStatus, parseJSON} from "../tools/fetch-tools";
+import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {reset,} from 'redux-form'
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, select, take, put, apply, call} from 'redux-saga/effects'
@@ -78,6 +78,12 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('loaded', true)
                 .set('entries', dataToEntries(payload, BookRecord))
+
+        case GET_BOOKS_FAIL: {
+            return state
+                .set('loaded', false)
+                .set('loading', false)
+        }
 
         case SHOW_EDITOR:
             return state.set('showEditor', true)
@@ -231,6 +237,15 @@ export function* getBooksSaga() {
             type: GET_BOOKS_FAIL,
             payload: {error}
         })
+
+        let _message
+        if (error.response) {
+            _message = yield call(handleJsonError, error)
+        } else {
+            _message = error.message ? error.message : "unknown error"
+        }
+
+        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
     }
 }
 
