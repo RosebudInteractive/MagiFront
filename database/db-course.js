@@ -926,7 +926,7 @@ const DbCourse = class DbCourse extends DbObject {
                                 Perc: promo.Perc
                             };
                             let dprice = course.Price * (1 - promo.Perc / 100);
-                            course.Promo.Sum = Math.trunc(dprice);
+                            course.Promo.Sum = Math.trunc(dprice / 10) * 10;
                             course.Promo.PromoSum = course.Price - course.Promo.Sum;
                         }
                     }

@@ -246,7 +246,7 @@ const DbProduct = class DbProduct extends DbObject {
                             let prec = Accounting.SumPrecision;
                             let isDone = false;
                             if ((opts.Truncate === "true") || (opts.Truncate === true)) {
-                                elem.DPrice = Math.trunc(dprice);
+                                elem.DPrice = Math.trunc(dprice / 10) * 10;
                                 isDone = true;
                             }
                             else {
