@@ -12,10 +12,10 @@ import MainTab from './tabs/main-tab'
 import '../common/form.sass'
 import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
-import {promosSelector, selectedIdSelector, editModeSelector, closeEditor, insertBook, updateBook} from "adm-ducks/promo-codes"
-// import AuthorsTab from "./tabs/authors-tab";
+import {promosSelector, selectedIdSelector, editModeSelector, closeEditor, insertPromo, updatePromo} from "adm-ducks/promo-codes"
+import ProductTab from "./tabs/product-tab";
 import {showErrorDialog} from "../../actions/app-actions";
-// import moment from "../course-editor/tabs/subscription-tab";
+import moment from "moment";
 
 const TABS = {
     MAIN: 'main',
@@ -23,7 +23,7 @@ const TABS = {
 }
 
 const NEW_PROMO = {
-    Code: 'null',
+    Code: '',
     Description: null,
     Perc: null,
     Counter: 0,
@@ -46,28 +46,6 @@ class PromoEditorForm extends React.Component {
         this._init()
     }
 
-    componentDidUpdate(prevProps) {
-        // if (prevProps.courseSaving && !this.props.courseSaving && !this.props.courseError) {
-        //     this.props.destroy();
-        //     this._init()
-        // }
-
-        // if (prevProps.initialized && ((+prevProps.percent !== +this.props.percent) || (+prevProps.price !== +this.props.price))) {
-        //     let _discountPrice = (this.props.percent && $.isNumeric(this.props.percent)) ? this.props.price * (1 - this.props.percent / 100) : this.props.price;
-        //
-        //     _discountPrice = Math.trunc(_discountPrice);
-        //
-        //     this.props.changeFieldValue('PromoEditor', 'perc', _discountPrice);
-        // }
-
-        // if (prevProps.initialized && ((prevProps.isPaid !== this.props.isPaid) || (prevProps.paidTp !== this.props.paidTp))) {
-        //     if ((+this.props.paidTp === FREE_FOR_REG_USER) && !this.props.paidRegDate) {
-        //         const _date = moment(new Date())
-        //         this.props.changeFieldValue('CourseSubscriptionForm', 'PaidRegDate', _date);
-        //     }
-        // }
-    }
-
     _init() {
         let {editMode, promos, promoId} = this.props,
             _promo = editMode ?
@@ -76,13 +54,29 @@ class PromoEditorForm extends React.Component {
                 NEW_PROMO
 
         if (_promo) {
+            let _firstDate = _promo.FirstDate ?
+                typeof _promo.FirstDate === 'string' ?
+                    moment(new Date(_promo.FirstDate))
+                    :
+                    _promo.FirstDate
+                :
+                '',
+                _lastDate = _promo.LastDate ?
+                    typeof _promo.LastDate === 'string' ?
+                        moment(new Date(_promo.LastDate))
+                        :
+                        _promo.LastDate
+                    :
+                    ''
+
+
             this.props.initialize({
                 code: _promo.Code,
                 description: _promo.Description,
                 perc: _promo.Perc,
                 counter: _promo.Counter,
-                firstDate: _promo.FirstDate,
-                lastDate: _promo.LastDate,
+                firstDate: _firstDate,
+                lastDate: _lastDate,
                 products: _promo.Products,
             });
         }
@@ -112,7 +106,7 @@ class PromoEditorForm extends React.Component {
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
                         <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.state.editMode}/>
-                        {/*<AuthorsTab visible={this.state.currentTab === TABS.AUTHORS} editMode={this.state.editMode}/>*/}
+                        <ProductTab visible={this.state.currentTab === TABS.PRODUCTS} editMode={this.state.editMode}/>
                     </form>
                 </div>
             </div>
@@ -132,33 +126,29 @@ class PromoEditorForm extends React.Component {
     }
 
     _save() {
-        // let {editorValues, editMode, bookId,} = this.props,
-        //     _values = Object.assign({}, editorValues)
-        //
-        // let _checkResult = checkBookExtLinks(_values.extLinksValues)
-        //
-        // if (_checkResult && _checkResult.length) {
-        //     let _message = 'Недопустимые ссылки:\n' + _checkResult.join('\n')
-        //     this.props.showErrorDialog(_message)
-        //     return
-        // }
-        //
-        // _values.extLinksValues = getExtLinks(_values.extLinksValues)
-        // _values.course = (_values.course && +_values.course) ? +_values.course : null
-        //
-        // if (!editMode) {
-        //     this.props.insertBook(_values)
-        // } else {
-        //     _values.Id = bookId;
-        //     _values.Order = this._order
-        //
-        //     this.props.updateBook(_values)
-        // }
+        let {editorValues, editMode, promoId,} = this.props,
+            _values = Object.assign({}, editorValues)
+
+        if (!_values.description) {
+            _values.description = `Промокод "${_values.code}"`
+            _values.description += _values.perc ? ` в ${_values.perc}%` : ''
+            _values.description += _values.counter ? ` количеством ${_values.counter}шт.` : ''
+            _values.description += _values.firstDate ? ` c ${_values.firstDate.format("D.MM.YY")}` : ''
+            _values.description += _values.lastDate ? ` по ${_values.lastDate.format("D.MM.YY")}` : ''
+        }
+
+        if (!editMode) {
+            this.props.insertPromo(_values)
+        } else {
+            _values.Id = promoId;
+
+            this.props.updatePromo(_values)
+        }
 
     }
 
     _cancel() {
-        this.props.resetReduxForm('BookEditor')
+        this.props.resetReduxForm('PromoEditor')
     }
 
     _enableApplyChanges() {
@@ -215,7 +205,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog}, dispatch);
+    return bindActionCreators({closeEditor, insertPromo, updatePromo, resetReduxForm: reset, showErrorDialog}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PromoEditorWrapper)

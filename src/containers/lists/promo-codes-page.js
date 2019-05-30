@@ -6,7 +6,7 @@ import {
     getPromoCodes,
     createPromo,
     editCurrentPromo,
-    deleteBook,
+    deletePromo,
     promosSelector,
     loadingSelector,
     loadedSelector,
@@ -20,7 +20,6 @@ import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
-import {Route} from "react-router-dom";
 
 class PromosPage extends React.Component {
 
@@ -50,25 +49,20 @@ class PromosPage extends React.Component {
         this._selected = null;
     }
 
-    componentWillUnmount() {
-        // this.props.actions.saveChanges()
-    }
-
-
     _onEditBtnClick() {
         this.props.editCurrentPromo(this._selected);
     }
 
-    _deleteBook() {
-        // this.props.actions.deleteBook(this._selected)
+    _deletePromo() {
+        this.props.deletePromo(this._selected)
     }
 
     _confirmDelete() {
-        // this.props.actions.showDeleteConfirmation(this._selected)
+        this.props.showDeleteConfirmation()
     }
 
     _cancelDelete() {
-        // this.props.actions.cancelDelete()
+        this.props.cancelDelete()
     }
 
     _select(selectedObj) {
@@ -128,7 +122,7 @@ class PromosPage extends React.Component {
                 {
                     (deleteDlgShown && !showPromoEditor)?
                         <YesNoDialog
-                            yesAction={::this._deleteBook}
+                            yesAction={::this._deletePromo}
                             noAction={::this._cancelDelete}
                             message={"Удалить промокод" + this._getSelectedBooksName() + "?"}
                         />
@@ -137,8 +131,6 @@ class PromosPage extends React.Component {
                 }
                 { !showPromoEditor ? <ErrorDialog/> : null }
                 <PromoEditor/>
-                {/*<Route path={'/promos/new'} render={(props) => <PromosPage {...props} showEditor={true} editMode={false}/>}/>*/}
-                {/*<Route path={'/promos/edit/:id'} render={(props) => <PromosPage {...props} showEditor={true} editMode={true}/>}/>*/}
             </div>
     }
 
@@ -159,7 +151,7 @@ class PromosPage extends React.Component {
 
         return {
             view: "datatable",
-            id: 'courses-grid',
+            id: 'promos-grid',
             scroll: false,
             autoheight: true,
             select: 'row',
@@ -205,14 +197,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ getPromoCodes, createPromo, editCurrentPromo,
-            // deleteBook,
-            showDeleteConfirmation,
-            cancelDelete,
-            // moveUp,
-            // moveDown,
-            // saveChanges,
-        }, dispatch)
+    return bindActionCreators({ getPromoCodes, createPromo, editCurrentPromo, deletePromo, showDeleteConfirmation, cancelDelete, }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PromosPage);
