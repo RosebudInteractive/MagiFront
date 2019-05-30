@@ -83,7 +83,7 @@ class Lesson extends React.Component {
         let {course, lesson, needShowAuthors} = this.props;
 
         return <div className="lecture-full">
-            <LessonFullWrapper courseUrl={course.URL} lesson={lesson} isSingleLesson={true} needShowAuthors={needShowAuthors}/>
+            <LessonFullWrapper course={course} lesson={lesson} isSingleLesson={true} needShowAuthors={needShowAuthors}/>
         </div>
     }
 }

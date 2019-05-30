@@ -55,7 +55,7 @@ class AuthConfirmForm extends React.Component {
                 <div className="success-message">
                     <p className="success-message__text">{'Мы отправили письмо с дальнешими инструкциями на почту' + (email ? (' ' + email) : '')}</p>
                     {
-                        NODE_ENV === 'development' ?
+                        msgUrl !== '#' ?
                             <a href={msgUrl} className="success-message__check-link">Открыть тестовое письмо</a>
                             :
                             null
