@@ -23,6 +23,8 @@ import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
 import {setCurrentPage, clearCurrentPage,} from "ducks/app";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
+import MetaTags from 'react-meta-tags';
+import $ from "jquery";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -79,6 +81,7 @@ class CoursesPage extends React.Component {
     }
 
     componentWillUnmount() {
+        this._removeMetaTags();
         this.props.clearCurrentPage();
         ScrollMemoryStorage.saveCourseBundlesHeight($('.courses'))
     }
@@ -142,10 +145,24 @@ class CoursesPage extends React.Component {
             fetching ?
                 <p>Загрузка...</p>
                 :
-                <div className={"courses" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')} key={"courses-page"} id={"courses-page"}>
-                    {this._getCoursesBundles()}
-                </div>
+                <React.Fragment>
+                    {this._getMetaTags()}
+                    <div className={"courses" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')}
+                         key={"courses-page"} id={"courses-page"}>
+                        {this._getCoursesBundles()}
+                    </div>
+                </React.Fragment>
         )
+    }
+
+    _getMetaTags() {
+        return <MetaTags>
+            <meta name="description" content="Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом."/>
+        </MetaTags>
+    }
+
+    _removeMetaTags() {
+        $('meta[name="description"]').remove();
     }
 }
 
