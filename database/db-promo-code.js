@@ -149,6 +149,9 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     if (typeof (inpFields.Code) !== "undefined")
                         promoObj.code(inpFields.Code);
 
+                    if (typeof (inpFields.Description) !== "undefined")
+                        promoObj.description(inpFields.Description);
+
                     if (typeof (inpFields.Perc) !== "undefined") {
                         promoObj.perc(+inpFields.Perc);
                         if ((typeof (promoObj.perc()) !== "number") || (promoObj.perc() <= 0) || (promoObj.perc() > 100))
@@ -195,7 +198,7 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                             throw new Error(`Invalid date range: ["${promoObj.firstDate()}".."${promoObj.lastDate()}"].`);
                     }
 
-                    if (inpFields.Products && (inpFields.Products.length > 0)) {
+                    if (inpFields.Products) {
                         let root_prod = promoObj.getDataRoot("PromoCodeProduct");
                         let prod_col = root_prod.getCol("DataElements");
                         let prodList = {};
@@ -256,6 +259,9 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                         fields.Code = inpFields.Code
                     else
                         throw new Error(`Missing field "Code"`);
+
+                    if (typeof (inpFields.Description) !== "undefined")
+                        fields.Description = inpFields.Description;
 
                     if (typeof (inpFields.Perc) !== "undefined") {
                         let perc = +inpFields.Perc;
