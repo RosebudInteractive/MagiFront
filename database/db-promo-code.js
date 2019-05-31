@@ -161,7 +161,7 @@ const DbPromoCode = class DbPromoCode extends DbObject {
                     if (typeof (inpFields.Counter) !== "undefined") {
                         let old_counter = promoObj.counter();
                         promoObj.counter(+inpFields.Counter);
-                        if ((typeof (promoObj.counter()) !== "number") || (promoObj.counter() <= 0) && (promoObj.counter() > 1000000))
+                        if ((typeof (promoObj.counter()) !== "number") || (promoObj.counter() < 0) && (promoObj.counter() > 1000000))
                             throw new Error(`Invalid field value "Counter": ${promoObj.counter()}`);
                         let new_rest = promoObj.rest() + promoObj.counter() - old_counter;
                         promoObj.rest(new_rest > 0 ? new_rest : 0);
@@ -275,7 +275,7 @@ const DbPromoCode = class DbPromoCode extends DbObject {
 
                     if (typeof (inpFields.Counter) !== "undefined") {
                         let counter = +inpFields.Counter;
-                        if ((typeof (counter) === "number") && (counter > 0) && (counter <= 1000000)) {
+                        if ((typeof (counter) === "number") && (counter >= 0) && (counter <= 1000000)) {
                             fields.Counter = fields.Rest = counter
                         }
                         else
