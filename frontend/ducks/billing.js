@@ -68,6 +68,10 @@ export const APPLY_PROMO_REQUEST = `${prefix}/APPLY_PROMO_REQUEST`
 export const APPLY_PROMO_START = `${prefix}/APPLY_PROMO_START`
 export const APPLY_PROMO_SUCCESS = `${prefix}/APPLY_PROMO_SUCCESS`
 export const APPLY_PROMO_FAIL = `${prefix}/APPLY_PROMO_FAIL`
+export const APPLY_PROMO_ERROR = `${prefix}/APPLY_PROMO_ERROR`
+
+export const CLEAR_PROMO = `${prefix}/CLEAR_PROMO`
+
 export const SET_PRODUCT_PRICE = `${prefix}/SET_PRODUCT_PRICE`
 
 export const BillingStep = {
@@ -92,7 +96,7 @@ const Promo = Record({
     id: null,
     perc: 0,
     sum: 0,
-    message: ''
+    error: ''
 })
 
 export const ReducerRecord = Record({
@@ -167,6 +171,7 @@ export default function reducer(state = new ReducerRecord(), action) {
         case HIDE_COURSE_PAYMENT_WINDOW:
             return state
                 .set('showCoursePaymentWindow', false)
+                .set('promo', new Promo())
 
         case SWITCH_TO_PAYMENT:
             return state
@@ -211,6 +216,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['promo', 'checkingValue'], payload)
                 .setIn(['promo', 'checked'], false)
                 .setIn(['promo', 'fetching'], true)
+                .setIn(['promo', 'error'], false)
 
         case APPLY_PROMO_SUCCESS:
             return state
@@ -219,6 +225,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['promo', 'checked'], true)
                 .setIn(['promo', 'perc'], payload.perc ? payload.perc : null)
                 .setIn(['promo', 'sum'], payload.sum ? payload.sum : null)
+                .setIn(['promo', 'error'], false)
 
         case APPLY_PROMO_FAIL:
             return state
@@ -226,11 +233,33 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['promo', 'checked'], true)
                 .setIn(['promo', 'fetching'], false)
 
+        case APPLY_PROMO_ERROR:
+            return state
+                .setIn(['promo', 'checkingValue'], "")
+                .setIn(['promo', 'checked'], true)
+                .setIn(['promo', 'fetching'], false)
+                .setIn(['promo', 'error'], true)
+                .setIn(['promo', 'perc'], null)
+                .setIn(['promo', 'sum'], null)
+
+        case CLEAR_PROMO:
+            return state
+                .set('promo', new Promo())
+                .update('selectedType', (selected) => {
+                    if (selected.Promo) {
+                        let _new = Object.assign({}, selected)
+                        _new.Promo = null
+                        return _new
+                    } else {
+                        return selected
+                    }
+                })
+
         case SET_PRODUCT_PRICE:
             return state
                 .update('selectedType', (selected) => {
                     let _new = Object.assign({}, selected)
-                    _new.Price = payload
+                    _new.Promo = Object.assign({}, payload)
                     return _new
                 })
 
@@ -251,6 +280,12 @@ export const loadingSelector = createSelector(stateSelector, state => state.fetc
 export const loadingCourseIdSelector = createSelector(stateSelector, state => state.fetchingCourseId)
 export const typesSelector = createSelector(stateSelector, state => state.types)
 export const selectedTypeSelector = createSelector(stateSelector, state => state.selectedType)
+export const priceSelector = createSelector(selectedTypeSelector, (selected) => {
+    return selected.Promo ?
+        selected.Promo.Sum < selected.Price ? selected.Promo.Sum : selected.Price
+        :
+        selected.Price
+})
 export const redirectSelector = createSelector(stateSelector, state => state.redirect)
 export const isRedirectActiveSelector = createSelector(redirectSelector, redirect => redirect.get('active'))
 export const isRedirectUrlSelector = createSelector(redirectSelector, redirect => redirect.get('url'))
@@ -267,9 +302,10 @@ export const promoValuesSelector = createSelector(promoSelector, (promo) => {
         checked : promo.checked,
         percent: promo.perc,
         sum: promo.sum,
-        message: promo.message,
+        error: promo.error,
     }
 })
+export const promoFetchingSelector = createSelector(promoSelector, promo => promo.fetching)
 
 /**
  * Action Creators
@@ -350,10 +386,6 @@ export const redirectComplete = () => {
     }
 }
 
-// export const clearWaitingAuthorize = () => {
-//     return {type: CLEAR_WAITING_AUTHORIZE}
-// }
-
 export const setWaitingAuthorizeData = (data) => {
     return {type: SET_WAITING_AUTHORIZE, payload: data}
 }
@@ -364,6 +396,10 @@ export const startBillingByRedirect = () => {
 
 export const applyPromo = (data) => {
     return {type: APPLY_PROMO_REQUEST, payload: data}
+}
+
+export const clearPromo = () => {
+    return {type: CLEAR_PROMO}
 }
 
 /**
@@ -444,11 +480,14 @@ const _fetchCoursePriceInfo = ({courseId, promo}) => {
 }
 
 function* sendPaymentSaga(data) {
+
+    console.log(data)
+
     yield put({type: SEND_PAYMENT_START});
 
     try {
         if (data.payload.courseId) {
-            let _course = yield call(_fetchCoursePriceInfo, data.payload.courseId)
+            let _course = yield call(_fetchCoursePriceInfo, {courseId : data.payload.courseId})
             const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought)
             if (!_isPaidCourse) {return}
         }
@@ -459,6 +498,8 @@ function* sendPaymentSaga(data) {
         yield put({type: SEND_PAYMENT_SUCCESS, payload: _redirectUrl})
         yield put({type: RELOAD_CURRENT_PAGE_REQUEST})
     } catch (error) {
+        console.log(data)
+
         yield put({type: SEND_PAYMENT_ERROR, payload: {error}});
         yield put({type: HIDE_BILLING_WINDOW});
         yield put({type: HIDE_COURSE_PAYMENT_WINDOW});
@@ -583,20 +624,25 @@ function* applyPromoSaga(action) {
         const _checkingValue = yield select(promoCheckingValueSelector)
 
         if (_checkingValue === action.payload) {
-            console.log(_data)
-            const _coursePrice = _data.DPrice ? _data.DPrice : _data.Price,
-                _promoPrice = _data.Promo ? _data.Promo.PromoSum : undefined;
 
-            let _promo = {}
-            if ((_promoPrice !== undefined) && (_promoPrice < _coursePrice)) {
-                _promo.perc = _data.Promo.Perc
-                _promo.sum = _data.Promo.Sum
-                _promo.message = ''
 
-                yield put({type: SET_PRODUCT_PRICE, payload: _promoPrice})
+            if (_data.Promo) {
+                const _coursePrice = _data.DPrice ? _data.DPrice : _data.Price,
+                    _promoPrice = _data.Promo ? _data.Promo.Sum : undefined;
+
+                let _promo = {}
+
+                if ((_promoPrice !== undefined) && (_promoPrice < _coursePrice)) {
+                    _promo.perc = _data.Promo.Perc
+                    _promo.sum = _data.Promo.PromoSum
+
+                    yield put({type: SET_PRODUCT_PRICE, payload: _data.Promo})
+                }
+
+                yield put({type: APPLY_PROMO_SUCCESS, payload: _promo})
+            } else {
+                yield put({type: APPLY_PROMO_ERROR})
             }
-
-            yield put({type: APPLY_PROMO_SUCCESS, payload: _promo})
         }
     } catch (error) {
         const _checkingValue = yield select(promoCheckingValueSelector)

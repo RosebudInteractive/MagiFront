@@ -19335,6 +19335,8 @@ ul.lectures-tab {
       margin-right: 18px;
       display: flex;
       position: relative; }
+    .promo__field-wrapper.error input{
+      color: #E21836 }
     @media (max-width: 767px) {
       .promo__field-wrapper {
         margin: 0 12px 9px 0; } }
@@ -19349,12 +19351,18 @@ ul.lectures-tab {
       border: 1px solid rgba(47, 47, 74, 0.2);
       line-height: 34px;
       font-size: 14px; }
-    .promo__field-wrapper .status-icon {
+    .promo__field-wrapper .status-icon .success {
       position: absolute;
       right: 12px;
       top: 13px;
       width: 17px;
       height: 12px; }
+    .promo__field-wrapper .status-icon .fail {
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      width: 18px;
+      height: 18px; }
     .promo__message-wrapper {
       width: 50%;
       font-family: "Fira Sans", Arial, sans-serif; }
@@ -19371,6 +19379,21 @@ ul.lectures-tab {
     .promo__message-wrapper .sum {
       font-weight: bolder;
     }
+    .promo__message-wrapper.error {
+      font-size: 14px;
+      line-height: 17px;
+      padding: 3px 0 3px 0;
+      color: #EB001B; }
+    @media (max-width: 767px) {
+      .promo__message-wrapper.error {
+        font-size: 12px;
+        line-height: 14px;
+        padding: 6px 0 6px 0;} }
+    .promo__message-wrapper.error .error-message{
+      width: 148px; }
+    @media (max-width: 767px) {
+      .promo__message-wrapper.error .error-message{
+        width: 120px; } }
 
     .email__wrapper {
       padding-top: 30px;

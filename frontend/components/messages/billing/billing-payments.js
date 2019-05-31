@@ -4,8 +4,10 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {
     loadingSelector as billingFetching,
+    promoFetchingSelector as promoFetching,
     errorSelector,
     selectedTypeSelector,
+    priceSelector,
     sendPayment,
     switchToSubscription,
 } from "ducks/billing";
@@ -119,13 +121,17 @@ class PaymentForm extends React.Component {
                 Items: [
                     {
                         ProductId: this.props.selectedSubscription.Id,
-                        Price: this.props.selectedSubscription.Price,
+                        Price: this.props.price,
                     }
                 ]
             }
 
             if (selectedSubscription.CourseId) {
                 data.courseId = selectedSubscription.CourseId
+            }
+
+            if (selectedSubscription.Promo) {
+                data.Promo = Object.assign({}, selectedSubscription.Promo)
             }
 
             this.props.sendPayment(data)
@@ -235,7 +241,7 @@ class PaymentForm extends React.Component {
                             <button className={"payment-form__submit btn btn--brown" + (_disabledBtn ? ' disabled' : '')}
                                     onClick={::this._handleSubmit}>
                                 Оплатить
-                                <span className="total">{selectedSubscription.Price}<span className="cur">{_currency}</span></span>
+                                <span className="total">{this.props.price}<span className="cur">{_currency}</span></span>
                             </button>
                         </div>
                     </div>
@@ -247,9 +253,10 @@ class PaymentForm extends React.Component {
 
 function mapStateToProps(state) {
     return {
+        price: priceSelector(state),
         loadingSubsInfo: loadingSubsInfoSelector(state),
         info: subscriptionInfoSelector(state),
-        loading: billingFetching(state),
+        loading: billingFetching(state) || promoFetching(state),
         selectedSubscription: selectedTypeSelector(state),
         error: errorSelector(state),
         user: state.user.user,
