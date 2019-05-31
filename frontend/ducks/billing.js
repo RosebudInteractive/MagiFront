@@ -61,9 +61,14 @@ export const REFUND_PAYMENT_SUCCESS = `${prefix}/REFUND_PAYMENT_SUCCESS`
 export const REFUND_PAYMENT_FAIL = `${prefix}/REFUND_PAYMENT_FAIL`
 
 export const SET_WAITING_AUTHORIZE = `${prefix}/SET_WAITING_AUTHORIZE`
-// export const CLEAR_WAITING_AUTHORIZE = `${prefix}/CLEAR_WAITING_AUTHORIZE`
 
 export const START_BILLING_BY_REDIRECT = `${prefix}/START_BILLING_BY_REDIRECT`
+
+export const APPLY_PROMO_REQUEST = `${prefix}/APPLY_PROMO_REQUEST`
+export const APPLY_PROMO_START = `${prefix}/APPLY_PROMO_START`
+export const APPLY_PROMO_SUCCESS = `${prefix}/APPLY_PROMO_SUCCESS`
+export const APPLY_PROMO_FAIL = `${prefix}/APPLY_PROMO_FAIL`
+export const SET_PRODUCT_PRICE = `${prefix}/SET_PRODUCT_PRICE`
 
 export const BillingStep = {
     subscription: 'subscription',
@@ -80,6 +85,15 @@ const STATE = {
  * */
 const Redirect = Record({url: '', active: false})
 const Waiting = Record({data: null, active: false})
+const Promo = Record({
+    checkingValue: '',
+    checked: false,
+    fetching: false,
+    id: null,
+    perc: 0,
+    sum: 0,
+    message: ''
+})
 
 export const ReducerRecord = Record({
     showBillingWindow: false,
@@ -93,6 +107,7 @@ export const ReducerRecord = Record({
     error: null,
     fetchingCourseId: null,
     waiting: new Waiting(),
+    promo: new Promo()
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -191,6 +206,34 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .setIn(['waiting', 'data'], Object.assign({}, payload))
                 .setIn(['waiting', 'active'], true)
 
+        case APPLY_PROMO_START:
+            return state
+                .setIn(['promo', 'checkingValue'], payload)
+                .setIn(['promo', 'checked'], false)
+                .setIn(['promo', 'fetching'], true)
+
+        case APPLY_PROMO_SUCCESS:
+            return state
+                // .setIn(['promo', 'checkingValue'], payload.promo)
+                .setIn(['promo', 'fetching'], false)
+                .setIn(['promo', 'checked'], true)
+                .setIn(['promo', 'perc'], payload.perc ? payload.perc : null)
+                .setIn(['promo', 'sum'], payload.sum ? payload.sum : null)
+
+        case APPLY_PROMO_FAIL:
+            return state
+                .setIn(['promo', 'checkingValue'], "")
+                .setIn(['promo', 'checked'], true)
+                .setIn(['promo', 'fetching'], false)
+
+        case SET_PRODUCT_PRICE:
+            return state
+                .update('selectedType', (selected) => {
+                    let _new = Object.assign({}, selected)
+                    _new.Price = payload
+                    return _new
+                })
+
         default:
             return state
     }
@@ -215,6 +258,17 @@ export const isRedirectUrlSelector = createSelector(redirectSelector, redirect =
 const isWaitingAuthorize = createSelector(stateSelector, state => state.waiting)
 export const waitingDataSelector = createSelector(isWaitingAuthorize, (waiting) => {
     return waiting.active ? waiting.data : null
+})
+
+const promoSelector = createSelector(stateSelector, state => state.promo)
+const promoCheckingValueSelector = createSelector(promoSelector, promo => promo.checkingValue)
+export const promoValuesSelector = createSelector(promoSelector, (promo) => {
+    return {
+        checked : promo.checked,
+        percent: promo.perc,
+        sum: promo.sum,
+        message: promo.message,
+    }
 })
 
 /**
@@ -308,6 +362,10 @@ export const startBillingByRedirect = () => {
     return {type : START_BILLING_BY_REDIRECT}
 }
 
+export const applyPromo = (data) => {
+    return {type: APPLY_PROMO_REQUEST, payload: data}
+}
+
 /**
  * Sagas
  */
@@ -341,7 +399,7 @@ function* _getPaidCourseInfoSaga(data) {
         _user = yield select(state => state.user)
 
     try {
-        let _course = yield call(_fetchCoursePriceInfo, _data.courseId)
+        let _course = yield call(_fetchCoursePriceInfo, {courseId : _data.courseId})
 
         const _isPaidCourse = (_course.IsPaid && !_course.IsGift && !_course.IsBought),
             _eventFiredByPlayer = _data && _data.firedByPlayerBlock,
@@ -375,8 +433,12 @@ function* _getPaidCourseInfoSaga(data) {
     }
 }
 
-const _fetchCoursePriceInfo = (courseId) => {
-    return fetch(`/api/courses/price-info/${courseId}`, {method: 'GET', credentials: 'include'})
+const _fetchCoursePriceInfo = ({courseId, promo}) => {
+    let _url = `/api/courses/price-info/${courseId}`
+
+    _url += promo ? `?promo=${promo}` : ''
+
+    return fetch(_url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
 }
@@ -507,6 +569,44 @@ function* refundPaymentSaga(data) {
     }
 }
 
+function* applyPromoSaga(action) {
+    const _selectedMethod = yield select(selectedTypeSelector)
+
+    if (!_selectedMethod.CourseId) {
+        return
+    }
+
+    yield put({type: APPLY_PROMO_START, payload: action.payload})
+
+    try {
+        let _data = yield call(_fetchCoursePriceInfo, {courseId: _selectedMethod.CourseId, promo: action.payload})
+        const _checkingValue = yield select(promoCheckingValueSelector)
+
+        if (_checkingValue === action.payload) {
+            console.log(_data)
+            const _coursePrice = _data.DPrice ? _data.DPrice : _data.Price,
+                _promoPrice = _data.Promo ? _data.Promo.PromoSum : undefined;
+
+            let _promo = {}
+            if ((_promoPrice !== undefined) && (_promoPrice < _coursePrice)) {
+                _promo.perc = _data.Promo.Perc
+                _promo.sum = _data.Promo.Sum
+                _promo.message = ''
+
+                yield put({type: SET_PRODUCT_PRICE, payload: _promoPrice})
+            }
+
+            yield put({type: APPLY_PROMO_SUCCESS, payload: _promo})
+        }
+    } catch (error) {
+        const _checkingValue = yield select(promoCheckingValueSelector)
+
+        if (_checkingValue === action.payload) {
+            yield put({type: APPLY_PROMO_FAIL})
+        }
+    }
+}
+
 
 export const saga = function* () {
     yield all([
@@ -516,6 +616,7 @@ export const saga = function* () {
         takeEvery(GET_PENDING_COURSE_INFO_REQUEST, getPendingCourseInfoSaga),
         takeEvery(REFUND_PAYMENT_REQUEST, refundPaymentSaga),
         takeEvery([FINISH_LOAD_PROFILE, START_BILLING_BY_REDIRECT], onFinishLoadProfileSaga),
+        takeEvery(APPLY_PROMO_REQUEST, applyPromoSaga),
     ])
 }
 

@@ -21,9 +21,10 @@ import {
     WebMoney,
     Yandex,
 } from "./payment-items";
-import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo} from "ducks/profile";
+import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
 import WaitingFrame from "./waiting-frame";
 import EmailField from "./email-field";
+import PromoField from "./promo-field";
 import {getCurrencySign} from "../../../tools/page-tools";
 
 export const PAYMENT_TYPE = {
@@ -224,6 +225,7 @@ class PaymentForm extends React.Component {
                     </div>
                     <div className="payment-form__footer-wrapper">
                         <EmailField ref={(input) => { this.email = input; }} defaultValue={user.Email} onChange={() => {this.forceUpdate()}}/>
+                        <PromoField ref={(input) => { this.promo = input; }} defaultValue={""} onChange={() => {this.forceUpdate()}}/>
                         <div className="payment-form__footer subscription-form js-sticky sticky">
                             <AutosubscribeButton
                                 visible={this.state.showSaveMethodButton}

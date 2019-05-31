@@ -19321,14 +19321,63 @@ ul.lectures-tab {
     .payment-methods__stored .payment-form__text {
       padding-right: 0; }
 
-    .email__wrapper {
+    .promo__wrapper {
       padding-top: 30px;
-      padding-bottom: 23px;
+      padding-bottom: 30px;
       display: flex;
       border-bottom: 1px solid rgba(47, 47, 74, 0.2); }
     @media (max-width: 767px) {
-      .email__wrapper {
+      .promo__wrapper {
         padding: 20px;
+        background-color: #fff; } }
+    .promo__field-wrapper {
+      width: 50%;
+      margin-right: 18px;
+      display: flex;
+      position: relative; }
+    @media (max-width: 767px) {
+      .promo__field-wrapper {
+        margin: 0 12px 9px 0; } }
+    .promo__field-wrapper .form__field-label {
+      width: 50%;
+      text-align: right;
+      margin: 10px; }
+    .promo__field-wrapper .form__field {
+      height: 2.77em;
+      text-align: left;
+      padding-left: 16px;
+      border: 1px solid rgba(47, 47, 74, 0.2);
+      line-height: 34px;
+      font-size: 14px; }
+    .promo__field-wrapper .status-icon {
+      position: absolute;
+      right: 12px;
+      top: 13px;
+      width: 17px;
+      height: 12px; }
+    .promo__message-wrapper {
+      width: 50%;
+      font-family: "Fira Sans", Arial, sans-serif; }
+    .promo__message-wrapper.success {
+      font-size: 17px;
+      line-height: 40px;
+      color: #000000;}
+    @media (max-width: 767px) {
+      .promo__message-wrapper.success {
+        display: flex;
+        font-size: 15px;
+        line-height: 18px;
+        flex-direction: column; } }
+    .promo__message-wrapper .sum {
+      font-weight: bolder;
+    }
+
+    .email__wrapper {
+      padding-top: 30px;
+      display: flex; }
+    @media (max-width: 767px) {
+      .email__wrapper {
+        padding: 20px 20px 0 20px;
         background-color: #fff;
         flex-direction: column; } }
     .email__info {
@@ -19342,7 +19391,7 @@ ul.lectures-tab {
         width: auto; } }
     .email__field-wrapper {
       width: 50%;
-      margin-right: 24px;
+      margin-right: 18px;
       display: flex;
       position: relative; }
     @media (max-width: 767px) {
