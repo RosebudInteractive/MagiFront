@@ -912,7 +912,7 @@ const DbCourse = class DbCourse extends DbObject {
                 let promoService = this.getService("promo", true);
                 if (promoService) {
                     let promos = await promoService.get({ code: opts.promo, prodList: true });
-                    if (promos.length = 1) {
+                    if (promos.length === 1) {
                         let promo = promos[0];
                         let isValid = (!promo.Products) || promo.Products[course.ProductId] ? true : false;
                         if (promo.Counter)
