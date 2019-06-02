@@ -183,20 +183,22 @@ class PaymentForm extends React.Component {
     }
 
     _isSendingEnable() {
-        return !!this.state.selectedMethod && !this.props.loading && (this.email && !this.email.state.error)
+        return !!this.state.selectedMethod && !this.props.loading && !this.props.promoLoading && (this.email && !this.email.state.error)
     }
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
         let {selectedSubscription, paymentType, user} = this.props;
-        let _currency = getCurrencySign()
 
         if (!selectedSubscription) {
             return null
         }
 
+        const _isFullDiscount = !this.props.price,
+            _currency = getCurrencySign()
+
         return <div className="billing-steps__item js-billing-step active">
-            <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка платежа..."}/>
+            <WaitingFrame visible={this.props.loading} message={"Подождите, идет подготовка " + (_isFullDiscount ? "операции " : "платежа ") + "..."}/>
             <div className="modal__header">
                 {paymentType === PAYMENT_TYPE.BILLING ?
                     <React.Fragment>
@@ -208,7 +210,7 @@ class PaymentForm extends React.Component {
                         </button>
                     </React.Fragment>
                     :
-                    <p className="modal__headline">{"Купить «" + selectedSubscription.Title + "»"}</p>
+                    <p className="modal__headline">{(_isFullDiscount ? "Получить " : "Купить ") + "«" + selectedSubscription.Title + "»"}</p>
                 }
             </div>
             <div className="modal__body payment-methods">
@@ -237,11 +239,16 @@ class PaymentForm extends React.Component {
                                 visible={this.state.showSaveMethodButton}
                                 checked={this.state.savePayment}
                                 onChange={::this._changeSavePayment}/>
-                            <OfferMessage/>
+                            <OfferMessage isGift={_isFullDiscount}/>
                             <button className={"payment-form__submit btn btn--brown" + (_disabledBtn ? ' disabled' : '')}
                                     onClick={::this._handleSubmit}>
-                                Оплатить
-                                <span className="total">{this.props.price}<span className="cur">{_currency}</span></span>
+                                {_isFullDiscount ? "Получить" : "Оплатить"}
+                                {
+                                    !_isFullDiscount ?
+                                        <span className="total">{this.props.price}<span className="cur">{_currency}</span></span>
+                                        :
+                                        null
+                                }
                             </button>
                         </div>
                     </div>
@@ -256,7 +263,8 @@ function mapStateToProps(state) {
         price: priceSelector(state),
         loadingSubsInfo: loadingSubsInfoSelector(state),
         info: subscriptionInfoSelector(state),
-        loading: billingFetching(state) || promoFetching(state),
+        loading: billingFetching(state),
+        promoLoading: promoFetching(state),
         selectedSubscription: selectedTypeSelector(state),
         error: errorSelector(state),
         user: state.user.user,

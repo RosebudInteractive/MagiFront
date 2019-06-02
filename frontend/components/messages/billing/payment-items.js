@@ -123,9 +123,9 @@ export const AutosubscribeButton = (props) => {
         null
 }
 
-export const OfferMessage = () => {
+export const OfferMessage = (props) => {
     return <div className="subscription-form__offer">
-        {"Нажимая на кнопку «Оплатить» вы принимаете условия "}
+        {"Нажимая на кнопку «" + (props.isGift ? "Получить" : "Оплатить") + "» вы принимаете условия "}
         <Link to={"/doc/oferta.pdf"} target="_blank">договора-оферты</Link>
     </div>
 }
