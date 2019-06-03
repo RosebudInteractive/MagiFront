@@ -1,3 +1,4 @@
+const { URL, URLSearchParams } = require('url');
 const _ = require('lodash');
 const config = require('config');
 const request = require('request');
@@ -427,10 +428,17 @@ class YandexKassa extends Payment {
                     paymentObject.capture = false;
                     if (!paymentObject.payment_method_id) {
                         if (!paymentObject.confirmation) {
+                            let return_url = new URL(config.billing.yandexKassa.returnUrl, config.proxyServer.siteHost).href;
+                            try {
+                                if (paymentObject.returnUrl)
+                                    return_url = new URL(paymentObject.returnUrl, config.proxyServer.siteHost).href;
+                            }
+                            catch (err) {
+                                console.error(buildLogString(`YandexKassa::_onPreparePaymentFields: ${err && err.message ? err.message : err}`));
+                            }
                             paymentObject.confirmation = {
                                 type: "redirect",
-                                return_url: config.proxyServer.siteHost +
-                                    (paymentObject.returnUrl ? paymentObject.returnUrl : config.billing.yandexKassa.returnUrl)
+                                return_url: return_url
                             };
                             delete paymentObject.returnUrl;
                         }
