@@ -22,7 +22,6 @@ import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
-import {Route,} from "react-router-dom";
 
 const TIMEOUT = 500;
 
@@ -69,28 +68,7 @@ class BooksPage extends React.Component {
     }
 
     _deleteBook() {
-        // let _index = this.props.courses.findIndex((item) => {
-        //     return item.id === this._selected
-        // })
-        //
         this.props.actions.deleteBook(this._selected)
-
-        //     .then(({courses}) => {
-        //         this._selected =
-        //             ((courses.length > 0) && (_index > -1))
-        //                 ?
-        //                 (_index < courses.length)
-        //                     ?
-        //                     courses[_index].id
-        //                     :
-        //                     courses[courses.length - 1].id
-        //                 :
-        //                 null;
-        //
-        //         this.forceUpdate();
-        //     })
-        //     .catch(() => {
-        //     })
     }
 
     _confirmDelete() {
@@ -171,8 +149,6 @@ class BooksPage extends React.Component {
                 }
                 { !showBookEditor ? <ErrorDialog/> : null }
                 <BookEditor/>
-                {/*<Route path={'/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>*/}
-                {/*<Route path={'/books/edit/:id'} render={(props) => <BooksPage {...props} showEditor={true} editMode={true}/>}/>*/}
             </div>
     }
 

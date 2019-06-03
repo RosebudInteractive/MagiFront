@@ -16,10 +16,14 @@ export default class ProductTab extends React.Component {
 
         this._resizeHandler = () => {
             let _products = window.$$('promo-products'),
-                _width = $('.modal-editor').width() - 17
+                _width = $('.modal-editor').width() - 2
+
+            let _actionBarHeight = $('.promo-products .action-bar').height()
+
+            let _height = $('.editor__main-area').height() - _actionBarHeight - 14
 
             if (_products) {
-                _products.$setSize(_width, _products.height);
+                _products.$setSize(_width, _height);
             }
         }
     }
@@ -28,6 +32,12 @@ export default class ProductTab extends React.Component {
         $(window).bind('resize', this._resizeHandler)
 
         this._resizeHandler();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            this._resizeHandler();
+        }
     }
 
     componentWillUnmount() {

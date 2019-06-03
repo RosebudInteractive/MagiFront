@@ -5,7 +5,7 @@ import PromoProductDialog from "./product-dialog";
 import {connect} from "react-redux";
 import {productsSelector} from "adm-ducks/products";
 
-export class AuthorsGrid extends GridControl {
+export class ProductsGrid extends GridControl {
 
     constructor(props) {
         super(props)
@@ -41,8 +41,6 @@ class PromoProductsGrid extends React.Component {
     constructor(props) {
         super(props)
 
-        this._newId = 0;
-
         this.state = {
             showDialog: false
         }
@@ -51,12 +49,11 @@ class PromoProductsGrid extends React.Component {
     render() {
         let _promoProducts = this._getPromoProducts()
 
-        return <div className="books-authors">
-            <AuthorsGrid addAction={::this._showProductsLookup}
-                         removeAction={::this._remove}
-                         selectAction={::this._select}
-                         // editMode={this.props.editMode}
-                         data={_promoProducts}/>
+        return <div className="promo-products">
+            <ProductsGrid addAction={::this._showProductsLookup}
+                          removeAction={::this._remove}
+                          editMode={this.props.editMode}
+                          data={_promoProducts}/>
             {
                 this.state.showDialog
                     ?
@@ -100,9 +97,6 @@ class PromoProductsGrid extends React.Component {
         }
 
         this.props.input.onChange(_array)
-    }
-
-    _select() {
     }
 
     _getPromoProducts() {
