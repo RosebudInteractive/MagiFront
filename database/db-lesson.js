@@ -2033,7 +2033,7 @@ const DbLesson = class DbLesson extends DbObject {
                                                 mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
                                                 mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
                                             }
-                                        }, {})
+                                        }, opts)
                                             .then((result) => {
                                                 if (result && result.detail && (result.detail.length > 0))
                                                     throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
@@ -2580,7 +2580,7 @@ const DbLesson = class DbLesson extends DbObject {
                                             mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
                                             mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
                                         }
-                                    }, {})
+                                    }, opts)
                                         .then((result) => {
                                             if (result && result.detail && (result.detail.length > 0))
                                                 throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
@@ -2612,7 +2612,7 @@ const DbLesson = class DbLesson extends DbObject {
                                             mysql: _.template(CHECK_IF_CAN_DEL_EPI_MYSQL)({ id: id }),
                                             mssql: _.template(CHECK_IF_CAN_DEL_EPI_MSSQL)({ id: id })
                                         }
-                                    }, {})
+                                    }, opts)
                                         .then((result) => {
                                             if (result && result.detail && (result.detail.length > 0))
                                                 throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete episode (Id: "${id}") which is "READY".`);

@@ -1850,7 +1850,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         mysql: _.template(CHECK_IF_CAN_DEL_LESSON_MYSQL)({ id: id }),
                                         mssql: _.template(CHECK_IF_CAN_DEL_LESSON_MSSQL)({ id: id })
                                     }
-                                }, {})
+                                }, opts)
                                     .then((result) => {
                                         if (result && result.detail && (result.detail.length > 0))
                                             throw new HttpError(HttpCode.ERR_CONFLICT, `Can't delete lesson (Id: "${id}") which is "READY" or has "READY" episodes.`);
