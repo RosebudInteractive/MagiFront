@@ -495,7 +495,6 @@ const CHECKIF_CAN_DEL_MYSQL =
     "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
-let { LessonsService } = require('./db-lesson');
 
 const URL_PREFIX = "category";
 
@@ -1481,7 +1480,9 @@ const DbCourse = class DbCourse extends DbObject {
                                 let rc = Promise.resolve(result);
                                 if (urls_to_clear.length > 0) {
                                     rc = Utils.seqExec(urls_to_clear, (url) => {
-                                        return LessonsService().clearCache(url);
+                                        let lessonService = this.getService("lesson", true);
+                                        if (lessonService)
+                                            return lessonService.clearCache(url);
                                     })
                                         .then(() => result);
                                 }
@@ -1809,6 +1810,17 @@ const DbCourse = class DbCourse extends DbObject {
                             });
                         }
                     })
+                    .then(async () => {
+                        if (Object.keys(lc_deleted).length > 0) {
+                            let lessonService = this.getService("lesson", true);
+                            if (lessonService) {
+                                for (let key in lc_deleted) {
+                                    let links = await lessonService.clearCache(+key, true, opts);
+                                    Array.prototype.push.apply(urls_to_delete, links);
+                                }
+                            }
+                        }
+                    })
                     .then(() => {
                         isModified = needToDeleteOwn;
                         return $data.tranStart({})
@@ -1826,19 +1838,6 @@ const DbCourse = class DbCourse extends DbObject {
                                         isModified = isModified || (result && result.detail && (result.detail.length > 0));
                                     });
                             });
-                    })
-                    .then(() => {
-                        if (Object.keys(lc_deleted).length > 0)
-                            return crs_obj.edit()
-                                .then(() => {
-                                    for (let key in lc_deleted) {
-                                        ls_collection._del(lc_deleted[key]);
-                                    }
-                                    return crs_obj.save(opts)
-                                        .then((result) => {
-                                            isModified = isModified || (result && result.detail && (result.detail.length > 0));
-                                        });
-                                });
                     })
                     .then(() => {
                         if (needToDeleteOwn) {
@@ -1871,14 +1870,6 @@ const DbCourse = class DbCourse extends DbObject {
                             return Utils.seqExec(lsn_child_deleted, lesson_del_func)
                                 .then(() => {
                                     return Utils.seqExec(lsn_deleted, lesson_del_func);
-                                })
-                                .then(() => {
-                                    return Utils.seqExec(lesson_ids, (id) => {
-                                        return LessonsService().clearCache(id, true, opts)
-                                            .then((links) => {
-                                                Array.prototype.push.apply(urls_to_delete, links);
-                                            });
-                                    });
                                 });
                         }
                     })
@@ -1908,7 +1899,9 @@ const DbCourse = class DbCourse extends DbObject {
                                 .then(() => {
                                     if (urls_to_delete.length > 0)
                                         return Utils.seqExec(urls_to_delete, (url) => {
-                                            return LessonsService().clearCache(url);
+                                            let lessonService = this.getService("lesson", true);
+                                            if (lessonService)
+                                                return lessonService.clearCache(url);
                                         });
                                 })
                                 .then(() => {
