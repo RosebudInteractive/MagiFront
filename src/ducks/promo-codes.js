@@ -65,6 +65,7 @@ const PromoRecord = Record({
     FirstDate: null,
     LastDate: null,
     Products: [],
+    Rest: null,
 })
 
 

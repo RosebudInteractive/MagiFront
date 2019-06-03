@@ -18,6 +18,7 @@ export default class MainTab extends React.Component {
             <Field component={TextArea} name="description" label="Описание промокода" enableHtml={false}/>
             <Field component={TextBox} name="perc" label="Скидка"/>
             <Field component={TextBox} name="counter" label="Счетчик"/>
+            <Field component={TextBox} name="rest" label="Осталось" disabled={true}/>
             <Field component={Datepicker} name="firstDate" label="Дата начала" showTime={true}/>
             <Field component={Datepicker} name="lastDate" label="Дата окончания" showTime={true}/>
         </div>

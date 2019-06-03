@@ -87,7 +87,6 @@ class PromosPage extends React.Component {
 
     render() {
         const {
-            promos,
             loading,
             deleteDlgShown,
             showPromoEditor,
@@ -115,7 +114,7 @@ class PromosPage extends React.Component {
                     </div>
                     <div className="grid-container">
                         <div className="webix-grid-wrapper">
-                            <Webix ui={::this.getUI(::this._select)} data={promos}/>
+                            <Webix ui={::this.getUI(::this._select)} data={this._getData()}/>
                         </div>
                     </div>
                 </div>
@@ -132,6 +131,16 @@ class PromosPage extends React.Component {
                 { !showPromoEditor ? <ErrorDialog/> : null }
                 <PromoEditor/>
             </div>
+    }
+
+    _getData() {
+        return this.props.promos.map((item) => {
+            let _data = Object.assign({}, item)
+
+            _data.Rest = item.Counter ? item.Counter : '-'
+
+            return _data
+        })
     }
 
     _getSelectedBooksName() {
@@ -159,6 +168,7 @@ class PromosPage extends React.Component {
             columns: [
                 {id: 'Code', header: 'Код', width: 230},
                 {id: "Description", header: "Описание", fillspace: true},
+                {id: "Rest", header: "Осталось", width: 150},
             ],
             on: {
                 onAfterSelect: function (selObj) {
@@ -177,7 +187,7 @@ class PromosPage extends React.Component {
                             this.select(that._selected)
                         }
                     }
-                }
+                },
             }
         };
     }

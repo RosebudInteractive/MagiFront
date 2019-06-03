@@ -30,6 +30,7 @@ const NEW_PROMO = {
     FirstDate: null,
     LastDate: null,
     Products: [],
+    Rest: null,
 }
 
 class PromoEditorForm extends React.Component {
@@ -78,6 +79,7 @@ class PromoEditorForm extends React.Component {
                 firstDate: _firstDate,
                 lastDate: _lastDate,
                 products: _promo.Products,
+                rest: _promo.Rest,
             });
         }
     }
@@ -181,14 +183,6 @@ const validate = (values) => {
             errors.perc = 'Скидка не может быть более 100%'
         }
     }
-
-    // if (!values.counter && values.counter !== undefined &&
-    //     !values.firstDate && values.firstDate !== undefined &&
-    //     !values.lastDate && values.lastDate !== undefined) {
-    //     errors.counter = 'Одно из полей должно быть заполнено'
-    //     errors.firstDate = 'Одно из полей должно быть заполнено'
-    //     errors.lastDate = 'Одно из полей должно быть заполнено'
-    // }
 
     return errors
 }
