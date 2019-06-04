@@ -9,9 +9,11 @@ import ErrorDialog from '../../components/dialog/error-dialog'
 import CourseCategoryDialog from "../../components/course-editor/dialogs/category-dialog";
 import CourseFormWrapper from '../../components/course-editor/form-wrapper'
 import CourseAuthorDialog from '../../components/course-editor/dialogs/author-dialog'
+import SocialNetworkTab from "../../components/course-editor/tabs/social-network-tab";
 import SubscriptionTab from '../../components/course-editor/tabs/subscription-tab'
 import AuthorsTab from '../../components/course-editor/tabs/authors-and-categories'
 import LessonsTab from '../../components/course-editor/tabs/lessons'
+
 
 import * as singleCourseActions from "../../actions/course/courseActions";
 import {showErrorDialog} from '../../actions/app-actions';
@@ -26,8 +28,10 @@ import {Prompt} from "react-router-dom";
 
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../../constants/Common'
 
+
 const TABS = {
     MAIN: 'MAIN',
+    SOCIAL_NETWORKS: 'SOCIAL_NETWORKS',
     SUBSCRIPTION: 'SUBSCRIPTION',
     AUTHORS: 'AUTHORS',
     LESSONS: 'LESSONS'
@@ -99,41 +103,34 @@ class CourseEditor extends React.Component {
                             <div className="tab-links">
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
-                                    onClick={() => {
-                                        this._switchTo(TABS.MAIN)
-                                    }}>Основные
+                                    onClick={() => { this._switchTo(TABS.MAIN) }}>Основные
+                                </div>
+                                <div
+                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL_NETWORKS ? ' tab-link-active' : '')}
+                                    onClick={() => {this._switchTo(TABS.SOCIAL_NETWORKS)}}>Социальные сети
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SUBSCRIPTION ? ' tab-link-active' : '')}
-                                    onClick={() => {
-                                        this._switchTo(TABS.SUBSCRIPTION)
-                                    }}>Подписка
+                                    onClick={() => { this._switchTo(TABS.SUBSCRIPTION) }}>Подписка
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.AUTHORS ? ' tab-link-active' : '')}
-                                    onClick={() => {
-                                        this._switchTo(TABS.AUTHORS)
-                                    }}>Авторы и категории
+                                    onClick={() => { this._switchTo(TABS.AUTHORS) }}>Авторы и категории
                                 </div>
                                 <div
                                     className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LESSONS ? ' tab-link-active' : '')}
-                                    onClick={() => {
-                                        this._switchTo(TABS.LESSONS)
-                                    }}>Лекции
+                                    onClick={() => { this._switchTo(TABS.LESSONS) }}>Лекции
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div className="editor__main-area">
                         <div className="main-area__container">
-                            <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN}
-                                               editMode={this.state.editMode}/>
-                            <SubscriptionTab editMode={this.state.editMode}
-                                             visible={this.state.currentTab === TABS.SUBSCRIPTION}/>
-                            <AuthorsTab editMode={this.state.editMode}
-                                        visible={this.state.currentTab === TABS.AUTHORS}/>
-                            <LessonsTab editMode={this.state.editMode} courseId={courseId}
-                                        visible={this.state.currentTab === TABS.LESSONS}/>
+                            <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN} editMode={this.state.editMode}/>
+                            <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
+                            <SubscriptionTab editMode={this.state.editMode} visible={this.state.currentTab === TABS.SUBSCRIPTION}/>
+                            <AuthorsTab editMode={this.state.editMode} visible={this.state.currentTab === TABS.AUTHORS}/>
+                            <LessonsTab editMode={this.state.editMode} courseId={courseId} visible={this.state.currentTab === TABS.LESSONS}/>
                         </div>
 
                         <ErrorDialog/>
@@ -162,7 +159,7 @@ class CourseEditor extends React.Component {
 
 
     _save() {
-        let {editorValues, subscriptionValues, editorValid, courseId} = this.props;
+        let {editorValues, subscriptionValues, snValues, editorValid, courseId} = this.props;
 
         if (!editorValid) {
             return
@@ -206,6 +203,9 @@ class CourseEditor extends React.Component {
             DPrice: subscriptionValues.DPrice, // цена со скидкой
             PaidTp: +subscriptionValues.PaidTp, // 1-безусловно платный, 2-платный для зарегистрировавшихся после "PaidRegDate"
             PaidRegDate: (+subscriptionValues.PaidTp === 2) ? subscriptionValues.PaidRegDate : null, // платный для пользователей зарегистрировавшихся после
+            SnName: snValues.snName,
+            SnDescription: snValues.snDescription,
+            SnPost: snValues.snPost,
         };
 
         if (subscriptionValues.Perc) {
@@ -237,6 +237,7 @@ class CourseEditor extends React.Component {
         this.props.courseActions.cancelChanges()
         this.props.resetReduxForm('CourseEditor')
         this.props.resetReduxForm('CourseSubscriptionForm')
+        this.props.resetReduxForm('CourseSocialNetworkForm')
     }
 
     _fillLessons(array) {
@@ -277,7 +278,8 @@ function mapStateToProps(state, ownProps) {
             state.courseCategories.hasChanges ||
             state.courseLessons.hasChanges ||
             isDirty('CourseEditor')(state) ||
-            isDirty('CourseSubscriptionForm')(state),
+            isDirty('CourseSubscriptionForm')(state) ||
+            isDirty('CourseSocialNetworkForm')(state),
 
         fetching: state.authorsList.fetching ||
             state.categoriesList.fetching ||
@@ -287,7 +289,8 @@ function mapStateToProps(state, ownProps) {
 
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
-        editorValid: isValid('CourseEditor')(state) && isValid('CourseSubscriptionForm')(state),
+        snValues: getFormValues('CourseSocialNetworkForm')(state),
+        editorValid: isValid('CourseEditor')(state) && isValid('CourseSubscriptionForm')(state) && isValid('CourseSocialNetworkForm')(state),
         activeTabs: activeTabsSelector(state)
     }
 }

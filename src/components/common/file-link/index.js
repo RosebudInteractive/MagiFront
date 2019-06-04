@@ -1,24 +1,26 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import '../../../common/controls.sass'
-import './audion-link.sass'
+import '../controls.sass'
+import './file-link.sass'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import Uploader from "../../../common/uploader";
-import {showErrorDialog} from "../../../../actions/app-actions";
+import Uploader from "../uploader";
+import {showErrorDialog} from "../../../actions/app-actions";
 import {disableButtons, enableButtons} from "adm-ducks/app";
 
-class AudioLink extends React.Component {
+class FileLink extends React.Component {
 
     static propTypes = {
         id: PropTypes.string,
         label: PropTypes.string,
         placeholder: PropTypes.string,
         disabled: PropTypes.bool,
+        acceptType: PropTypes.string,
     };
 
     static defaultProps = {
-        id : 'file-name'
+        id : 'file-name',
+        acceptType: '*'
     }
 
     constructor(props) {
@@ -55,7 +57,7 @@ class AudioLink extends React.Component {
                                   onFileUploadError={::this._showError}
                                   onUploadFile={::this._handleFileUpload}
                                   onProgress={::this._handleProgress}
-                                  acceptType={"audio/*"}
+                                  acceptType={this.props.acceptType}
                                   disabled={disabled}/>
                     </div>
                     {_errorText}
@@ -96,4 +98,4 @@ function mapDispatchToProps(dispatch) {
     };
 }
 
-export default connect(null, mapDispatchToProps)(AudioLink);
+export default connect(null, mapDispatchToProps)(FileLink);

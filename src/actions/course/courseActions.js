@@ -100,6 +100,8 @@ export const save = (values, mode) => {
             .then(parseJSON)
             .then((id) => {
                 dispatch(reset('CourseEditor'));
+                dispatch(reset('CourseSubscriptionForm'));
+                dispatch(reset('CourseSocialNetworkForm'));
 
                 dispatch({
                     type: SAVE_COURSE_SUCCESS,

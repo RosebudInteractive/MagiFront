@@ -447,9 +447,9 @@ class CombineLessonPage extends React.Component {
                 <meta name="twitter:title" content={lesson.PageMeta.Name}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 {
-                    lesson.PageMeta && lesson.PageMeta.Images && lesson.PageMeta.Images.tw
+                    lesson.PageMeta && lesson.PageMeta.Images && lesson.PageMeta.Images.twitter
                         ?
-                        <meta name="twitter:image" content={_imagePath + lesson.PageMeta.Images.tw.FileName}/>
+                        <meta name="twitter:image" content={_imagePath + lesson.PageMeta.Images.twitter.FileName}/>
                         :
                         null
                 }
