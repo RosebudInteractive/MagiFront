@@ -3,6 +3,10 @@ let { LessonsService } = require('./../database/db-lesson');
 
 function setupLessons(app) {
 
+    if (!global.$Services)
+        global.$Services = {};
+    global.$Services.lesson = LessonsService;
+
     app.get('/api/adm/lessons/resources/:id', (req, res, next) => {
         LessonsService()
             .getResources(parseInt(req.params.id))
