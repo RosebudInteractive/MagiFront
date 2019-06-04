@@ -62,7 +62,7 @@ class EpisodeEditor extends React.Component {
         if (_needSwitchToEditMode) {
             let _newRout = `/adm/courses/edit/${courseId}/lessons/edit/${lessonId}`;
             if (subLessonId) {
-                _newRout += `/sub-lessons/edit${subLessonId}`
+                _newRout += `/sub-lessons/edit/${subLessonId}`
             }
             _newRout += `/episodes/edit/${this.props.episode.id}`
 

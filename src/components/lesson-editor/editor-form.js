@@ -85,7 +85,7 @@ class LessonEditorForm extends React.Component {
     _init() {
         let {lesson, fixedLessonId, fixDescription, isSublesson, subLessons} = this.props,
             _lesson = lesson ? lesson : this._getNewLesson(),
-            _fixed = (lesson && (lesson.id === fixedLessonId)),
+            _fixed = (lesson && (lesson.id) && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
 
         if (_lesson) {

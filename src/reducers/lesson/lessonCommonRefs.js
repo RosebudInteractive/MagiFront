@@ -97,7 +97,7 @@ export default function lessonCommonRefs(state = initialState, action) {
             let _result = tools.removeObject(state.current, action.payload);
             return {
                 ...state,
-                current: _result.resultArray,
+                current: _result.resultArray.splice(0),
                 hasChanges: _result.modified ? true : state.hasChanges,
                 selected: _result.selected ? _result.selected : state.selected
             };

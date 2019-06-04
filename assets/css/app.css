@@ -1502,7 +1502,7 @@ html,
     left: 0;
     height: calc(100vh - 110px);
     width: 100%;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 /*.courses {*/

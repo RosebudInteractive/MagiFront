@@ -17,14 +17,13 @@ class Courses extends React.Component {
         super(props)
 
         this._resizeHandler = () => {
-            // let _height = $(window).height() - $('.top-bar-size').innerHeight() + $('.action-bar').innerHeight()
-            //     _widht = $('.grid-container').innerWidth();
-            //
-            // $('.webix-grid-wrapper').innerHeight(_height);
+            const _main = $('.main-area'),
+                _height = _main.height() - 14,
+                _width = _main.width()
 
-            // if (window.$$('courses-grid')) {
-            //     window.$$('courses-grid').$setSize(_widht, _height)
-            // }
+            if (window.$$('courses-grid')) {
+                window.$$('courses-grid').$setSize(_width, _height)
+            }
         }
     }
 
@@ -90,6 +89,12 @@ class Courses extends React.Component {
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
             this._selected = (nextProps.courses.length > 0) ? nextProps.courses[0].id : null;
+        }
+    }
+
+    componentDidUpdate(prevProps,) {
+        if (!prevProps.loaded && this.props.loaded) {
+            this._resizeHandler()
         }
     }
 
@@ -176,8 +181,8 @@ class Courses extends React.Component {
         return {
             view: "datatable",
             id: 'courses-grid',
-            scroll: false,
-            autoheight: true,
+            scroll: 'y',
+            height: 500,
             select: true,
             editable: false,
             columns: [

@@ -14,8 +14,8 @@ export default class ReferencesTab extends React.Component{
 
         this._resizeHandler = () => {
             let _resources = window.$$('lesson-resources'),
-                _width = $('.editor__main-area').width() - 20,
-                _height = $('.editor__main-area').height() - $('.action-bar').height() - 14
+                _width = $('.editor__main-area').width() - 2,
+                _height = $('.editor__main-area').height() - $('.lesson-resources .action-bar').height() - 14
 
             if (_resources) {
                 _resources.$setSize(_width, _height);
@@ -27,6 +27,12 @@ export default class ReferencesTab extends React.Component{
         $(window).bind('resize', this._resizeHandler)
 
         this._resizeHandler();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            this._resizeHandler();
+        }
     }
 
     componentWillUnmount() {

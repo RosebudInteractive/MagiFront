@@ -41,6 +41,15 @@ export default class GridControl extends Component {
                 })
             }
         }
+
+        this._saveScrollPos()
+    }
+
+    _saveScrollPos() {
+        const _grid = window.$$(this._getId())
+        if (_grid) {
+            this.scroll = window.$$(this._getId()).getScrollState()
+        }
     }
 
     componentDidMount() {
@@ -50,8 +59,16 @@ export default class GridControl extends Component {
         }
     }
 
+    componentDidUpdate() {
+        const _grid = window.$$(this._getId())
+        if (_grid && this.scroll && (this.scroll.x || this.scroll.y)) {
+            _grid.scrollTo(this.scroll.x, this.scroll.y)
+        }
+    }
+
     _select(selectedObj) {
         this._selectNoRefresh(selectedObj)
+        this._saveScrollPos()
         this.forceUpdate()
     }
 

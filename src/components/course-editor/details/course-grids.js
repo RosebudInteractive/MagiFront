@@ -41,10 +41,6 @@ export class CourseLessons extends GridControl{
         return 'course-lessons';
     }
 
-    _getScroll() {
-        return false;
-    }
-
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
