@@ -46,7 +46,7 @@ class CardBlock extends React.Component {
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
                            defaultValue={_start + '** **** ' + _payment.getIn(['card', 'last4'])}
-                           readOnly=""/>
+                           disabled/>
                 </div>
             }
 
@@ -55,7 +55,7 @@ class CardBlock extends React.Component {
                 return <div className="card-block__header">
                     <input type="text" className="card-block__number" id="cardnumber"
                            defaultValue={_payment.get('account_number')}
-                           readOnly=""/>
+                           disabled/>
                 </div>
 
             default :
@@ -122,7 +122,7 @@ class CardBlock extends React.Component {
 
                 return <div className="card-block__footer">
                     <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue={_exprDate}
-                           readOnly=""/>
+                           disabled/>
                     <div className="card-block__type">
                         {this._getIcon(_cardType)}
                     </div>
@@ -133,7 +133,7 @@ class CardBlock extends React.Component {
             case 'yandex_money' :
                 return <div className="card-block__footer">
                     <input type="text" className="card-block__valid-through" id="cardvalid" defaultValue=""
-                           readOnly=""/>
+                           disabled/>
                     <div className="card-block__type">
                         <svg width="16" height="19" dangerouslySetInnerHTML={{__html: _yandex_money}}/>
                     </div>
