@@ -72,7 +72,7 @@ class CourseSocialNetworkForm extends React.Component {
     }
 
     _getImage(type) {
-        return this.props.course ? this.props.course.Images.find(image => image.Type === type) : null
+        return (this.props.course && this.props.course.Images) ? this.props.course.Images.find(image => image.Type === type) : null
     }
 }
 
