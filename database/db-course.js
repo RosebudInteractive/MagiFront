@@ -2114,7 +2114,7 @@ const DbCourse = class DbCourse extends DbObject {
                         }
                     })
                     .then(() => {
-                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
+                        let root_img = new_lng_obj.getDataRoot("CourseMetaImage");
                         if (inpFields.Images && (inpFields.Images.length > 0)) {
                             return Utils.seqExec(inpFields.Images, (elem) => {
                                 let fields = {};
