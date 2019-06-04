@@ -85,9 +85,6 @@ class Main extends React.Component {
         let {course, facebookAppID} = this.props,
             _url = getPageUrl(),
             _domain = getDomain(),
-            _title = course ? (course.Name + ' - Магистерия') : '',
-            _coverPath = getCoverPath(course, ImageSize.small),
-            _cover = _coverPath ? '/data/' + _coverPath : null,
             _imagePath = _domain + '/data/';
 
         let _getWidth = (meta) => {
@@ -105,13 +102,13 @@ class Main extends React.Component {
         return course
             ?
             <MetaTags>
-                <meta name="description" content={course.Description}/>
+                <meta name="description" content={course.PageMeta.Post}/>
                 <link rel="canonical" href={_url}/>
                 <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
-                <meta property="og:type" content="object"/>
-                <meta property="og:title" content={_title}/>
-                <meta property="og:description" content={course.Description}/>
+                <meta property="og:type" content="article"/>
+                <meta property="og:title" content={course.PageMeta.Name}/>
+                <meta property="og:description" content={course.PageMeta.Description}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
@@ -128,10 +125,9 @@ class Main extends React.Component {
                         :
                         null
                 }
-                <meta property="og:image:secure_url" content={_domain + _cover}/>
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:description" content={course.Description}/>
-                <meta name="twitter:title" content={_title}/>
+                <meta name="twitter:title" content={course.PageMeta.Name}/>
+                <meta name="twitter:description" content={course.PageMeta.Description}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 {
                     course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.twitter
