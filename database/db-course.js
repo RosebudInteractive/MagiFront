@@ -1886,7 +1886,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
                             }
                         if (img_new && (img_new.length > 0)) {
-                            for (let i; i < img_new.length; i++)
+                            for (let i = 0; i < img_new.length; i++)
                                 await root_img.newObject({
                                     fields: img_new[i]
                                 }, opts);
