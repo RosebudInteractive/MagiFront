@@ -17,7 +17,7 @@ import PropTypes from 'prop-types';
 
 import $ from 'jquery'
 
-import {pages, getDomain, getPageUrl, getCoverPath, ImageSize,} from '../tools/page-tools';
+import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
 import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
 
