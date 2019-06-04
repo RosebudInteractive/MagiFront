@@ -32,37 +32,14 @@ const COURSE_REQ_TREE = {
             childs: [
                 {
                     dataObject: {
-                        name: "CourseLng"
-                    }
-                },
-                {
-                    dataObject: {
-                        name: "CourseCategory"
-                    }
-                },
-                {
-                    dataObject: {
-                        name: "LessonCourse"
-                    }
-                },
-                {
-                    dataObject: {
-                        name: "AuthorToCourse"
-                    }
-                }
-            ]
-        }
-    }
-};
-
-const COURSE_UPD_TREE = {
-    expr: {
-        model: {
-            name: "Course",
-            childs: [
-                {
-                    dataObject: {
-                        name: "CourseLng"
+                        name: "CourseLng",
+                        childs: [
+                            {
+                                dataObject: {
+                                    name: "CourseMetaImage"
+                                }
+                            }
+                        ]
                     }
                 },
                 {
@@ -87,17 +64,27 @@ const COURSE_UPD_TREE = {
 
 const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate],\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
 
+const COURSE_MSSQL_IMG_REQ =
+    "select i.[Id], i.[Type], i.[FileName], i.[MetaData] from [CourseMetaImage] i\n" +
+    "  join [CourseLng] l on l.[Id] = i.[CourseLngId]\n" +
+    "where l.[CourseId] = <%= id %>";
+
 const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
+
+const COURSE_MYSQL_IMG_REQ =
+    "select i.`Id`, i.`Type`, i.`FileName`, i.`MetaData` from `CourseMetaImage` i\n" +
+    "  join `CourseLng` l on l.`Id` = i.`CourseLngId`\n" +
+    "where l.`CourseId` = <%= id %>";
 
 const COURSE_MSSQL_ID_REQ = COURSE_MSSQL_ALL_REQ + "\nwhere c.[Id] = <%= id %>";
 const COURSE_MYSQL_ID_REQ = COURSE_MYSQL_ALL_REQ + "\nwhere c.`Id` = <%= id %>";
@@ -279,7 +266,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -364,7 +351,7 @@ const COURSE_BOOKS_MSSQL_REQ =
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -1026,9 +1013,16 @@ const DbCourse = class DbCourse extends DbObject {
                                         Lessons: [],
                                         Books: [],
                                         RefBooks: [],
-                                        ShareCounters: {}
+                                        ShareCounters: {},
+                                        PageMeta: {}
                                     };
-                               };
+                                    if (elem.SnName)
+                                        course.PageMeta.Name = elem.SnName;
+                                    if (elem.SnDescription)
+                                        course.PageMeta.Description = elem.SnDescription;
+                                    if (elem.SnPost)
+                                        course.PageMeta.Post = elem.SnPost;
+                                };
                                 let lsn = lsn_list[elem.LessonId];
                                 if (!lsn) {
                                     lsn = {
@@ -1100,7 +1094,7 @@ const DbCourse = class DbCourse extends DbObject {
                             }, {});
                         }
                         else
-                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "${url}".`);                            
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "${url}".`);
                     })
                     .then((result) => {
                         if (course && result && result.detail && (result.detail.length > 0)) {
@@ -1239,6 +1233,25 @@ const DbCourse = class DbCourse extends DbObject {
                             Array.prototype.push.apply(course.Books, couseBooks);
                             Array.prototype.push.apply(course.Books, otherBooks);
                         }
+                    })
+                    .then(async () => {
+                        if (course) {
+                            let result = await $data.execSql({
+                                dialect: {
+                                    mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: courseId }),
+                                    mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: courseId })
+                                }
+                            }, {});
+                            if (result && result.detail && (result.detail.length > 0)) {
+                                course.PageMeta.Images = {};
+                                result.detail.forEach((elem) => {
+                                    course.PageMeta.Images[elem.Type] = {
+                                        FileName: isAbsPath ? this._absDataUrl + elem.FileName : elem.FileName,
+                                        MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
+                                    };
+                                })
+                            }
+                        }
                         return course;
                     })
             );
@@ -1325,7 +1338,7 @@ const DbCourse = class DbCourse extends DbObject {
                             await this.getCoursePrice(course, true, true);
                         }
                         else
-                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "Id" = ${id}.`);                            
+                            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find course "Id" = ${id}.`);
                         return $data.execSql({
                             dialect: {
                                 mysql: _.template(COURSE_MYSQL_AUTHOR_REQ)({ id: id }),
@@ -1371,7 +1384,20 @@ const DbCourse = class DbCourse extends DbObject {
                                 elem.IsAuthRequired = elem.IsAuthRequired ? true : false;
                                 elem.IsSubsRequired = elem.IsSubsRequired ? true : false;
                             });
-                            course.Lessons = result.detail;
+                        course.Lessons = result.detail;
+                    })
+                    .then(async () => {
+                        let result = await $data.execSql({
+                            dialect: {
+                                mysql: _.template(COURSE_MYSQL_IMG_REQ)({ id: id }),
+                                mssql: _.template(COURSE_MSSQL_IMG_REQ)({ id: id })
+                            }
+                        }, {});
+                        let images = [];
+                        if (result && result.detail && (result.detail.length > 0)) {
+                            images = result.detail;
+                        }
+                        course.Images = images;
                         return course;
                     })
             );
@@ -1545,6 +1571,11 @@ const DbCourse = class DbCourse extends DbObject {
             let auth_list = {};
             let ctg_list = {};
             let ls_list = {};
+            let root_img;
+            let img_collection;
+            let img_list = {};
+            let img_new = [];
+
             let opts = options || {};
             let inpFields = data || {};
             
@@ -1613,6 +1644,8 @@ const DbCourse = class DbCourse extends DbObject {
                         ctg_collection = root_ctg.getCol("DataElements");
                         root_ls = crs_obj.getDataRoot("LessonCourse");
                         ls_collection = root_ls.getCol("DataElements");
+                        root_img = crs_lng_obj.getDataRoot("CourseMetaImage");
+                        img_collection = root_img.getCol("DataElements");
 
                         if (inpFields.Authors && (typeof (inpFields.Authors.length) === "number")) {
                             for (let i = 0; i < auth_collection.count(); i++) {
@@ -1671,6 +1704,34 @@ const DbCourse = class DbCourse extends DbObject {
                                 }
                                 else
                                     ls_new.push(data);
+                            })
+                        }
+
+                        if (inpFields.Images && (typeof (inpFields.Images.length) === "number")) {
+                            for (let i = 0; i < img_collection.count(); i++) {
+                                let obj = img_collection.get(i);
+                                img_list[obj.id()] = { deleted: true, obj: obj };
+                            }
+
+                            inpFields.Images.forEach((elem) => {
+                                let data = {
+                                    Type: elem.Type,
+                                    FileName: elem.FileName,
+                                    MetaData: typeof (elem.MetaData) === "string" ? elem.MetaData : JSON.stringify(elem.MetaData)
+                                };
+                                if (typeof (elem.Id) === "number") {
+                                    if (img_list[elem.Id]) {
+                                        img_list[elem.Id].deleted = false;
+                                        img_list[elem.Id].data = data;
+                                    }
+                                    else {
+                                        //throw new Error("Unknown reference item (Id = " + elem.Id + ").");
+                                        delete elem.Id;
+                                        img_new.push(data);
+                                    }
+                                }
+                                else
+                                    img_new.push(data);
                             })
                         }
 
@@ -1735,6 +1796,12 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.description(inpFields["Description"]);
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
                             crs_lng_obj.extLinks(this._partnerLink.processLinks(inpFields["ExtLinks"]));
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            crs_lng_obj.snPost(inpFields["SnPost"]);
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            crs_lng_obj.snName(inpFields["SnName"]);
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            crs_lng_obj.snDescription(inpFields["SnDescription"]);
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -1808,6 +1875,21 @@ const DbCourse = class DbCourse extends DbObject {
                                     fields: fields
                                 }, opts);
                             });
+                        }
+                    })
+                    .then(async () => {
+                        for (let key in img_list)
+                            if (img_list[key].deleted)
+                                img_collection._del(img_list[key].obj)
+                            else {
+                                for (let field in img_list[key].data)
+                                    img_list[key].obj[self._genGetterName(field)](img_list[key].data[field]);
+                            }
+                        if (img_new && (img_new.length > 0)) {
+                            for (let i; i < img_new.length; i++)
+                                await root_img.newObject({
+                                    fields: img_new[i]
+                                }, opts);
                         }
                     })
                     .then(async () => {
@@ -1927,6 +2009,7 @@ const DbCourse = class DbCourse extends DbObject {
             let isOneLessonCourse;
             let isNotDraft = false;
             let transactionId = null;
+            let new_lng_obj;
             resolve(
                 this._getObjById(-1)
                     .then((result) => {
@@ -2008,17 +2091,42 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["Description"] = inpFields["Description"];
                         if (typeof (inpFields["ExtLinks"]) !== "undefined")
                             fields["ExtLinks"] = this._partnerLink.processLinks(inpFields["ExtLinks"]);
+                        if (typeof (inpFields["SnPost"]) !== "undefined")
+                            fields["SnPost"] = inpFields["SnPost"];
+                        if (typeof (inpFields["SnName"]) !== "undefined")
+                            fields["SnName"] = inpFields["SnName"];
+                        if (typeof (inpFields["SnDescription"]) !== "undefined")
+                            fields["SnDescription"] = inpFields["SnDescription"];
 
                         return root_lng.newObject({
                             fields: fields
                         }, opts);
                     })
-                    .then(() => {
+                    .then(result => {
+                        new_lng_obj = this._db.getObj(result.newObject);
                         let root_auth = new_obj.getDataRoot("AuthorToCourse");
                         if (inpFields.Authors && (inpFields.Authors.length > 0)) {
                             return Utils.seqExec(inpFields.Authors, (elem) => {
                                 return root_auth.newObject({
                                     fields: { AuthorId: elem }
+                                }, opts);
+                            });
+                        }
+                    })
+                    .then(() => {
+                        let root_img = new_lng_obj.getDataRoot("LessonMetaImage");
+                        if (inpFields.Images && (inpFields.Images.length > 0)) {
+                            return Utils.seqExec(inpFields.Images, (elem) => {
+                                let fields = {};
+                                if (typeof (elem["Type"]) !== "undefined")
+                                    fields["Type"] = elem["Type"];
+                                if (typeof (elem["FileName"]) !== "undefined")
+                                    fields["FileName"] = elem["FileName"];
+                                if (typeof (elem["MetaData"]) !== "undefined")
+                                    fields["MetaData"] = typeof (elem["MetaData"]) === "string" ?
+                                        elem["MetaData"] : JSON.stringify(elem["MetaData"]);
+                                return root_img.newObject({
+                                    fields: fields
                                 }, opts);
                             });
                         }
