@@ -87,7 +87,20 @@ class Main extends React.Component {
             _domain = getDomain(),
             _title = course ? (course.Name + ' - Магистерия') : '',
             _coverPath = getCoverPath(course, ImageSize.small),
-            _cover = _coverPath ? '/data/' + _coverPath : null;
+            _cover = _coverPath ? '/data/' + _coverPath : null,
+            _imagePath = _domain + '/data/';
+
+        let _getWidth = (meta) => {
+            let _data = JSON.parse(meta);
+
+            return _data ? _data.size.width : 0
+        }
+
+        let _getHeight = (meta) => {
+            let _data = JSON.parse(meta);
+
+            return _data ? _data.size.height : 0
+        }
 
         return course
             ?
@@ -102,15 +115,35 @@ class Main extends React.Component {
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
-                <meta property="og:image" content={_domain + _cover}/>
+                {
+                    course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.og
+                        ?
+                        [
+                            <meta property="og:image" content={_imagePath + course.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:secure_url"
+                                  content={_imagePath + course.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:width" content={_getWidth(course.PageMeta.Images.og.MetaData)}/>,
+                            <meta property="og:image:height" content={_getHeight(course.PageMeta.Images.og.MetaData)}/>
+                        ]
+                        :
+                        null
+                }
                 <meta property="og:image:secure_url" content={_domain + _cover}/>
                 <meta name="twitter:card" content="summary_large_image"/>
                 <meta name="twitter:description" content={course.Description}/>
                 <meta name="twitter:title" content={_title}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                <meta name="twitter:image" content={_domain + _cover}/>
+                {
+                    course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.twitter
+                        ?
+                        <meta name="twitter:image" content={_imagePath + course.PageMeta.Images.twitter.FileName}/>
+                        :
+                        null
+                }
+                <meta name="twitter:creator" content="@MagisteriaRu"/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
+
             </MetaTags>
             :
             null

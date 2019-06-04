@@ -37,6 +37,11 @@ const TABS = {
     LESSONS: 'LESSONS'
 }
 
+const IMAGE_TYPE = {
+    OG: 'og',
+    TWITTER: 'twitter',
+}
+
 class CourseEditor extends React.Component {
 
     constructor(props) {
@@ -208,6 +213,32 @@ class CourseEditor extends React.Component {
             SnPost: snValues.snPost,
         };
 
+
+        const _ogImage = this._getImage(IMAGE_TYPE.OG),
+            _twitterImage = this._getImage(IMAGE_TYPE.TWITTER)
+
+        if (snValues.ogImage.file || snValues.twitterImage.file || _ogImage || _twitterImage) {
+            _obj.Images = [];
+
+            if (snValues.ogImage.file) {
+                _obj.Images.push({
+                    Id: _ogImage ? _ogImage.Id : -1,
+                    Type: IMAGE_TYPE.OG,
+                    FileName: snValues.ogImage.file,
+                    MetaData: JSON.stringify(snValues.ogImage.meta)
+                })
+            }
+
+            if (snValues.twitterImage.file) {
+                _obj.Images.push({
+                    Id: _twitterImage ? _twitterImage.Id : -2,
+                    Type: IMAGE_TYPE.TWITTER,
+                    FileName: snValues.twitterImage.file,
+                    MetaData: JSON.stringify(snValues.twitterImage.meta)
+                })
+            }
+        }
+
         if (subscriptionValues.Perc) {
             _obj.Discount = { // скидка
                 Description: subscriptionValues.Description, // описание скидки
@@ -231,6 +262,10 @@ class CourseEditor extends React.Component {
         this._fillLessons(_obj.Lessons);
 
         this.props.courseActions.save(_obj, this.state.editMode ? EDIT_MODE_EDIT : EDIT_MODE_INSERT);
+    }
+
+    _getImage(type) {
+        return this.props.course.Images.find(image => image.Type === type)
     }
 
     _cancel() {

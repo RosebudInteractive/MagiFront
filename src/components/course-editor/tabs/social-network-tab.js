@@ -6,7 +6,11 @@ import FileLink from "../../common/file-link";
 import PropTypes from "prop-types";
 import {enableButtonsSelector} from "adm-ducks/app";
 import {connect} from "react-redux";
-import moment from "./subscription-tab";
+
+const IMAGE_TYPE = {
+    OG: 'og',
+    TWITTER: 'twitter',
+}
 
 class CourseSocialNetworkForm extends React.Component {
 
@@ -22,18 +26,21 @@ class CourseSocialNetworkForm extends React.Component {
     _init() {
         let {course,} = this.props
 
+        const _ogImage = this._getImage(IMAGE_TYPE.OG),
+            _twitterImage = this._getImage(IMAGE_TYPE.TWITTER)
+
         if (course) {
             this.props.initialize({
                 snName: course.SnName,
                 snDescription: course.SnDescription,
                 snPost: course.SnPost,
                 ogImage: {
-                    file: null,
-                    meta: null,
+                    file: _ogImage ? _ogImage.FileName : '',
+                    meta: _ogImage ? JSON.parse(_ogImage.MetaData) : '',
                 },
                 twitterImage : {
-                    file: null,
-                    meta: null,
+                    file: _twitterImage ? _twitterImage.FileName : '',
+                    meta: _twitterImage ? JSON.parse(_twitterImage.MetaData) : '',
                 },
             });
         }
@@ -62,6 +69,10 @@ class CourseSocialNetworkForm extends React.Component {
                 <Field component={FileLink} acceptType="image/*" id="twitter-image" name="twitterImage" label="Изображение для Twitter" disabled={_disabled}/>
             </form>
         </div>
+    }
+
+    _getImage(type) {
+        return this.props.course ? this.props.course.Images.find(image => image.Type === type) : null
     }
 }
 
