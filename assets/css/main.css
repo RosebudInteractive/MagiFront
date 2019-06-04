@@ -6633,7 +6633,7 @@ ul.user-tooltip {
     display: inline-block;
     vertical-align: bottom;
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: "Fira Sans", Arial, sans-serif;
     font-size: 49px;
     line-height: 40px;
     padding-left: 7px;
@@ -6651,7 +6651,7 @@ ul.user-tooltip {
         padding-right: 0;
         line-height: 56px; } }
   .lectures-counter .total {
-    font-family: Arial, sans-serif;
+    font-family: "Fira Sans", Arial, sans-serif;
     font-size: 15px;
     line-height: 17px;
     color: rgba(47, 47, 47, 0.6);
