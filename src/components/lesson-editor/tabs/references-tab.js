@@ -14,9 +14,17 @@ export default class ReferencesTab extends React.Component{
         super(props)
 
         this._resizeHandler = () => {
+            let _main = $('.main-area__container'),
+                _rightPadding = 20;
+
+            if (_main) {
+                const _hasScrollBar = _main.get(0).scrollHeight > _main.height()
+                _rightPadding = _hasScrollBar ? 20 : 2
+            }
+
             let _commonRefs = window.$$('common-refs'),
                 _recommendedRefs = window.$$('recommended-refs'),
-                _width = $('.editor__main-area').width() - 20
+                _width = $('.editor__main-area').width() - _rightPadding
 
             if (_commonRefs) {
                 _commonRefs.$setSize(_width, _commonRefs.height);

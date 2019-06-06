@@ -7,6 +7,7 @@ export default class ReferencesTab extends React.Component{
     static propTypes = {
         editMode : PropTypes.bool,
         visible: PropTypes.bool,
+        resources: PropTypes.array,
     }
 
     constructor(props) {

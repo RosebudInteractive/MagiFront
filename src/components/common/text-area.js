@@ -82,10 +82,10 @@ class HtmlTextArea extends React.Component {
 
         return (
             disabled ?
-                <div dangerouslySetInnerHTML={{__html: input.value}} {...input} id={id}
+                <div dangerouslySetInnerHTML={{__html: input.value}} id={id}
                      className="field-textarea disabled"/>
                 :
-                <div contentEditable={true} dangerouslySetInnerHTML={{__html: input.value}} {...input}
+                <div contentEditable={true} dangerouslySetInnerHTML={{__html: input.value}}
                      id={id} className="field-textarea" onBlur={::this._onChange}/>
         )
     }

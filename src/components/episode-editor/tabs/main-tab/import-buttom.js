@@ -8,6 +8,7 @@ class ImportButton extends React.Component {
     static propTypes = {
         lessonId: PropTypes.number,
         episodeId: PropTypes.number,
+        disabled: PropTypes.bool,
     }
 
     render() {
@@ -18,7 +19,7 @@ class ImportButton extends React.Component {
         return <React.Fragment>
             <input style={_inputStyle} type="file" id="file-dialog" accept=".xml"/>
             <button className="adm__button bottom-controls__button"
-                    onClick={::this._execImport}>{_importButtonCaption}</button>
+                    onClick={::this._execImport} disabled={this.props.disabled}>{_importButtonCaption}</button>
         </React.Fragment>
 
     }

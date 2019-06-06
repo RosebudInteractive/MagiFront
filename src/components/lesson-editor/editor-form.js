@@ -137,7 +137,7 @@ class LessonEditorForm extends React.Component {
 
 
     render() {
-        const {hasChanges, saving} = this.props;
+        const {hasChanges, saving, course} = this.props;
 
         return <React.Fragment>
             <SavingBlock visible={saving}/>
@@ -181,7 +181,7 @@ class LessonEditorForm extends React.Component {
                         <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
                         <EpisodesTab visible={this.state.currentTab === TABS.EPISODES_AND_SUBS} editMode={this.props.editMode} isSublesson={this.props.isSublesson}/>
                         <ReferencesTab visible={this.state.currentTab === TABS.REFERENCES} editMode={this.props.editMode}/>
-                        <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode}/>
+                        <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode} resources={course.Resources} />
                     </form>
                 </div>
             </div>

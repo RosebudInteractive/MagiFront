@@ -95,12 +95,14 @@ export default function lessonCommonRefs(state = initialState, action) {
 
         case REMOVE_COMMON_REFERENCE: {
             let _result = tools.removeObject(state.current, action.payload);
-            return {
+
+            const _newState = {
                 ...state,
                 current: _result.resultArray.splice(0),
                 hasChanges: _result.modified ? true : state.hasChanges,
                 selected: _result.selected ? _result.selected : state.selected
             };
+            return _newState
         }
 
         case MOVE_COMMON_REFERENCE_UP: {

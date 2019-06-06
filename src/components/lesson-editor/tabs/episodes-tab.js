@@ -16,9 +16,17 @@ export default class EpisodesTab extends React.Component{
         super(props)
 
         this._resizeHandler = () => {
+            let _main = $('.main-area__container'),
+                _rightPadding = 20;
+
+            if (_main) {
+                const _hasScrollBar = _main.get(0).scrollHeight > _main.height()
+                _rightPadding = _hasScrollBar ? 20 : 2
+            }
+
             let _episodes = window.$$('lesson-episodes'),
                 _subs = window.$$('lesson-subs'),
-                _width = $('.editor__main-area').width() - 20
+                _width = $('.editor__main-area').width() - _rightPadding
 
             if (_episodes) {
                 _episodes.$setSize(_width, _episodes.height);

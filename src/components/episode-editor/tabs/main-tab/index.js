@@ -2,8 +2,7 @@ import React from 'react'
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
 import ImportButton from "./import-buttom"
-import {bindActionCreators} from 'redux';
-import {Field} from "redux-form";
+import {Field, isDirty} from "redux-form";
 import {CheckBox, TextBox} from "../../../common/input-controls";
 import Select from "../../../common/select-control";
 import TextArea from "../../../common/text-area";
@@ -31,16 +30,15 @@ class MainTab extends React.Component {
     }
 
     render() {
-
-        // const {} = this.props;
+        const {editMode, hasChanges} = this.props;
 
         const _disabled = false;
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <div className="main-tab__buttons-wrapper">
-                <ImportButton episodeId={this.props.episodeId} lessonId={this.props.lessonId}/>
-                <button className="adm__button bottom-controls__button" onClick={::this._openWorkshop}>Перейти в
-                    монтажный стол
+                <ImportButton episodeId={this.props.episodeId} lessonId={this.props.lessonId} disabled={_disabled || !editMode || hasChanges}/>
+                <button className="adm__button bottom-controls__button" onClick={::this._openWorkshop} disabled={_disabled || !editMode}>
+                    Перейти в монтажный стол
                 </button>
             </div>
             <Field component={TextBox} name="name" label="Название эпизода" placeholder="Введите название эпизода" disabled={_disabled}/>
@@ -67,6 +65,7 @@ class MainTab extends React.Component {
 function mapStateToProps(state) {
     return {
         packageUploadProcess: state.singleEpisode.packageUploadProcess,
+        hasChanges: isDirty('EpisodeEditor')(state)
     }
 }
 
