@@ -120,12 +120,14 @@ exports.DbObject = class DbObject extends CacheableObject {
         });
     }
 
-    _dateToString(dt, withTime) {
+    _dateToString(dt, withTime, withTimeMs) {
+        let timeMsFlag = typeof (withTimeMs) === "boolean" ? withTimeMs : true;
         let result = "" + dt.getFullYear() + "-" +
             intFmtWithLeadingZeros((dt.getMonth() + 1), 2) + "-" + intFmtWithLeadingZeros(dt.getDate(), 2);
         if (withTime)
             result = result + " " + intFmtWithLeadingZeros(dt.getHours(), 2) + ":" + intFmtWithLeadingZeros(dt.getMinutes(), 2) +
-                ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) + "." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3);
+                ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) +
+                (timeMsFlag ? ("." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3)) : '');
         return result;
     }
 
