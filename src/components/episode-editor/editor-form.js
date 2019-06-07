@@ -119,6 +119,8 @@ class EpisodeEditorForm extends React.Component {
                 supp: _episode.Supp,
                 state: _episode.State,
                 transcript: _episode.Transcript,
+                toc: _episode.Toc ? _episode.Toc : [],
+                content: _episode.Content ? _episode.Content : []
             })
         }
     }
@@ -194,7 +196,7 @@ class EpisodeEditorForm extends React.Component {
     }
 
     _fillToc(array) {
-        this.props.episodeToc.map((item) => {
+        this.props.editorValues.toc.map((item) => {
             array.push({
                 Id: item.Id,
                 Number: item.Number,
@@ -205,7 +207,7 @@ class EpisodeEditorForm extends React.Component {
     }
 
     _fillContent(array) {
-        this.props.content.map((item) => {
+        this.props.editorValues.content.map((item) => {
             array.push({
                 Id: item.Id,
                 Content: item.Content,

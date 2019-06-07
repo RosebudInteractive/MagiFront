@@ -1,6 +1,7 @@
 import React from 'react'
 import ContentGrid from '../grids/content'
 import PropTypes from 'prop-types'
+import {Field} from "redux-form";
 
 export default class ReferencesTab extends React.Component{
 
@@ -15,8 +16,8 @@ export default class ReferencesTab extends React.Component{
 
         this._resizeHandler = () => {
             let _toc = window.$$('episode-content'),
-                _width = $('.editor__main-area').width() - 20,
-                _height = $('.editor__main-area').height() - $('.action-bar').height() - 14
+                _width = $('.editor__main-area').width() - 2,
+                _height = $('.editor__main-area').height() - $('.episode-content .action-bar').height() - 14
 
             if (_toc) {
                 _toc.$setSize(_width, _height);
@@ -42,7 +43,7 @@ export default class ReferencesTab extends React.Component{
 
     render() {
         return <div className={"tab-wrapper tab-wrapper__episode-content" + (this.props.visible ? '' : ' hidden')}>
-            <ContentGrid editMode={this.props.editMode} lessonId={this.props.lessonId}/>
+            <Field component={ContentGrid} name="content" editMode={this.props.editMode}/>
         </div>
     }
 }

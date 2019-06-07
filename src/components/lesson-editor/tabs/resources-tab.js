@@ -1,6 +1,7 @@
 import React from 'react'
 import ResourcesGrid from '../grids/resources'
 import PropTypes from 'prop-types'
+import {Field} from "redux-form";
 
 export default class ReferencesTab extends React.Component{
 
@@ -42,7 +43,7 @@ export default class ReferencesTab extends React.Component{
 
     render() {
         return <div className={"tab-wrapper tab-wrapper__authors-and-categories" + (this.props.visible ? '' : ' hidden')}>
-            <ResourcesGrid editMode={this.props.editMode}/>
+            <Field component={ResourcesGrid} name="resources" editMode={this.props.editMode}/>
         </div>
     }
 }

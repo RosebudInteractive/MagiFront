@@ -1,27 +1,30 @@
 import React from "react";
-import PropTypes from "prop-types";
-import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import EpisodeTocForm from "../../episode-toc-form";
+import PropTypes from "prop-types";
+import ReferenceDialog from "../dialogs/reference-dialog";
+import {createNewReference, editReference, clearReference} from '../../../actions/references-actions';
 import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import {enableButtonsSelector} from "adm-ducks/app";
-import * as tocActions from "../../../actions/toc-actions";
+import GridControl from "../../gridControl";
 
-class TocGrid extends React.Component {
+class ReferencesGrid extends React.Component {
 
     static propTypes = {
         editMode: PropTypes.bool,
+        title: PropTypes.string,
+        viewId: PropTypes.string,
+        isRecommended: PropTypes.bool,
     }
 
     constructor(props) {
         super(props)
 
         this.state = {
-            showDialog: false,
+            showEditor: false,
         }
 
-        this._selected = null
+        this._selected = null;
     }
 
     componentWillReceiveProps(nextProps) {
@@ -31,23 +34,26 @@ class TocGrid extends React.Component {
     }
 
     render() {
+        const {editMode, title, viewId, input} = this.props
 
-        return <div className="episode-toc">
-            <EpisodeToc createAction={::this._create}
-                        editAction={::this._edit}
-                        removeAction={::this._remove}
-                        moveUpAction={::this._moveUp}
-                        moveDownAction={::this._moveDown}
-                        editMode={this.props.editMode}
-                        selected={this._selected}
-                        data={this.props.input.value}
-                        disabled={!this.props.enableButtons}/>
+        return <div className="lesson-common-refs">
+            <label className="grid-label">{title}</label>
+            <LessonReferences createAction={::this._create}
+                              editAction={::this._edit}
+                              removeAction={::this._remove}
+                              moveUpAction={::this._moveUp}
+                              moveDownAction={::this._moveDown}
+                              editMode={editMode}
+                              selected={this._selected}
+                              data={input.value}
+                              viewId={viewId}
+                              disabled={!this.props.enableButtons}/>
             {
-                this.state.showDialog ?
-                    <EpisodeTocForm
-                        cancel={::this._cancel}
-                        save={::this._save}
-                        data={this.props.toc}
+                this.state.showEditor ?
+                    <ReferenceDialog
+                        cancel={::this._cancelEditReference}
+                        save={::this._saveReference}
+                        data={this.props.reference}
                     />
                     :
                     null
@@ -64,28 +70,33 @@ class TocGrid extends React.Component {
     }
 
     _create() {
-        this.props.tocActions.create()
-        this.setState({showDialog: true})
+        this.props.actions.createNewReference(this.props.isRecommended);
+        this.setState({showEditor: true})
     }
 
-    _edit(id) {
-        let _toc = this.props.input.value.find((item) => {
-            return item.id === parseInt(id)
+    _edit(refId) {
+        let _ref = this.props.input.value.find((item) => {
+            return item.id === parseInt(refId)
         });
 
-        this.props.tocActions.edit(_toc);
-        this.setState({showDialog: true})
+        this.props.actions.editReference(_ref);
+        this.setState({showEditor: true})
     }
 
-    _save(value) {
-        if (this.props.tocEditMode === EDIT_MODE_EDIT) {
+    _cancelEditReference() {
+        this.props.actions.clearReference();
+        this.setState({showEditor: false})
+    }
+
+    _saveReference(value) {
+        if (this.props.referenceEditMode === EDIT_MODE_EDIT) {
             this._update(value)
         } else {
             this._insert(value)
         }
 
-        this.setState({showDialog: false})
-        this.props.tocActions.clear();
+        this.props.actions.clearReference();
+        this.setState({showEditor: false})
     }
 
     _insert(data) {
@@ -112,11 +123,6 @@ class TocGrid extends React.Component {
         this.props.input.onChange(_array)
     }
 
-    _cancel() {
-        this.setState({showDialog: false})
-        this.props.tocActions.clear();
-    }
-
     _remove(id) {
         let _array = [...this.props.input.value],
             _index = _array.findIndex((item) => {
@@ -129,6 +135,14 @@ class TocGrid extends React.Component {
 
         this._setObjectsRank(_array)
         this.props.input.onChange(_array)
+    }
+
+    _setObjectsRank(array) {
+        array.forEach((item, index) => {
+            if (typeof item === "object") {
+                item.Number = index + 1
+            }
+        })
     }
 
     _moveUp(id) {
@@ -170,28 +184,19 @@ class TocGrid extends React.Component {
             this.props.input.onChange(_array)
         }
     }
-
-    _setObjectsRank(array) {
-        array.forEach((item, index) => {
-            if (typeof item === "object") {
-                item.Number = index + 1
-            }
-        })
-    }
 }
 
-
-class EpisodeToc extends GridControl {
+class LessonReferences extends GridControl {
 
     _getId() {
-        return 'episode-toc';
+        return this.props.viewId ? this.props.viewId : 'lesson-refs';
     }
 
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Topic', header: 'Название', fillspace: true},
-            {id: 'StartTime', header: 'Метка времени', width: 200,},
+            {id: 'Description', header: 'Описание', fillspace: true},
+            {id: 'URL', header: 'URL', width: 120},
         ];
 
         _columns.push(...super._getColumns());
@@ -202,8 +207,8 @@ class EpisodeToc extends GridControl {
 
 function mapStateToProps(state) {
     return {
-        toc: state.toc.object,
-        tocEditMode: state.toc.editMode,
+        reference: state.references.reference,
+        referenceEditMode: state.references.editMode,
 
         enableButtons: enableButtonsSelector(state),
     }
@@ -211,8 +216,11 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        tocActions: bindActionCreators(tocActions, dispatch),
-    };
+        actions: bindActionCreators({createNewReference, editReference, clearReference,}, dispatch)
+    }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TocGrid);
+export default connect(mapStateToProps, mapDispatchToProps)(ReferencesGrid);
+
+
+

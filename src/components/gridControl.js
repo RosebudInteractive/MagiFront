@@ -6,7 +6,6 @@ import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../constants/Common'
 export default class GridControl extends Component {
 
     static propTypes = {
-        selectAction: PropTypes.func.isRequired,
         createAction: PropTypes.func,
         addAction: PropTypes.func,
         editAction: PropTypes.func,

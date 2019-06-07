@@ -45,6 +45,12 @@ export default class EpisodesTab extends React.Component{
         this._resizeHandler();
     }
 
+    componentDidUpdate(prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            this._resizeHandler();
+        }
+    }
+
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler)
     }

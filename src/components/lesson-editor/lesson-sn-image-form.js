@@ -1,11 +1,12 @@
 import React from 'react'
 import Webix from '../Webix';
-import * as lessonActions from '../../actions/lesson/lesson-actions'
+import PropTypes from "prop-types";
 
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
+export default class SnImageSelectForm extends React.Component {
 
-class SnImageSelectForm extends React.Component {
+    static propTypes = {
+        resources: PropTypes.array,
+    };
 
     constructor(props) {
         super(props);
@@ -31,10 +32,6 @@ class SnImageSelectForm extends React.Component {
                 </div>
             </div>
         )
-    }
-
-    _refreshResources(){
-        this.props.lessonActions.getResources(this.props.lessonId);
     }
 
     _getResourceArray() {
@@ -80,19 +77,3 @@ class SnImageSelectForm extends React.Component {
         }
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        resources: state.lessonResources.current,
-
-        fetching: state.lessonResources.fetching
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        lessonActions: bindActionCreators(lessonActions, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SnImageSelectForm);

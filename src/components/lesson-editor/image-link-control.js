@@ -5,10 +5,8 @@ import './image-link.sass'
 import SnImageSelectForm from "./lesson-sn-image-form";
 import ResourceForm from "../resource-form";
 import {bindActionCreators} from "redux";
-import * as lessonResourcesActions from "../../actions/lesson/lesson-resources-actions";
 import * as resourcesActions from "../../actions/resources-actions";
 import {connect} from "react-redux";
-import {EDIT_MODE_EDIT} from "../../constants/Common";
 import * as singleLessonActions from "../../actions/lesson/lesson-actions";
 
 export const IMAGE_TYPE = {
@@ -22,7 +20,7 @@ class ImageLink extends React.Component {
         id: PropTypes.string,
         label: PropTypes.string,
         placeholder: PropTypes.string,
-        // resources: PropTypes.array,
+        resources: PropTypes.array,
         imageType: PropTypes.string,
         disabled: PropTypes.bool,
     };
@@ -42,13 +40,20 @@ class ImageLink extends React.Component {
         this._name = this._getResourceName(this.props.input.value)
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.input.value !== nextProps.input.value) {
-            this._name = this._getResourceName(nextProps.input.value)
+    componentDidUpdate(prevProps) {
+        if (this.props.input.value !== prevProps.input.value) {
+            this._name = this._getResourceName(this.props.input.value)
+            this.forceUpdate()
         }
     }
 
     _getResourceName(resourceId) {
+        const _id = +resourceId
+
+        if (!_id || !this.props.resources || !this.props.resources.length) {
+            return ''
+        }
+
         let _resource = this.props.resources.find((item) => {
             return item.Id === resourceId
         })
@@ -57,7 +62,7 @@ class ImageLink extends React.Component {
     }
 
     render() {
-        const {input, meta: {error, touched}, id, label, placeholder, disabled, hidden,} = this.props;
+        const {meta: {error, touched}, id, label, placeholder, disabled, hidden,} = this.props;
         const _errorText = touched && error &&
             <p className="form__error-message" style={{display: "block"}}>{error}</p>
 
@@ -79,7 +84,7 @@ class ImageLink extends React.Component {
                     <SnImageSelectForm
                         cancel={::this._closeSelectDialog}
                         save={::this._selectImage}
-                        lessonId={this.props.lessonId}
+                        resources={this.props.resources}
                     />
                     :
                     null
@@ -134,11 +139,7 @@ class ImageLink extends React.Component {
     }
 
     _saveResource(value) {
-        if (this.props.resourceEditMode === EDIT_MODE_EDIT) {
-            this.props.lessonResourcesActions.update(value)
-        } else {
-            this.props.lessonResourcesActions.insert(value);
-        }
+        this.props.resources.push({...value, id: value.Id})
 
         if (this.props.imageType === IMAGE_TYPE.OG) {
             this.props.lessonActions.setOgImage(value.Id);
@@ -157,7 +158,7 @@ class ImageLink extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        resources: state.lessonResources.current,
+        // resources: state.lessonResources.current,
         // selected: state.lessonResources.selected,
         // resourceEditMode: state.resources.editMode,
         resource: state.resources.object,
@@ -166,7 +167,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
+        // lessonResourcesActions: bindActionCreators(lessonResourcesActions, dispatch),
         resourcesActions: bindActionCreators(resourcesActions, dispatch),
         lessonActions: bindActionCreators(singleLessonActions, dispatch),
     };

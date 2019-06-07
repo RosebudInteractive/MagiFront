@@ -17,21 +17,6 @@ class EpisodeEditor extends React.Component {
             editMode: this.props.episodeId > 0,
             loading: true,
         }
-
-        window.webix.protoUI({
-                name: 'myUploader',
-                $updateProgress: (size, percent) => {
-                    if (percent < 100) {
-                        window.$$('file-name').getInputNode().style.background = "linear-gradient(to left, #f1f7ff " + (100 - percent) + "%, #75b5ff 0%)"
-                    } else {
-                        window.$$('file-name').getInputNode().style.background = "none"
-                    }
-
-                }
-            },
-            window.webix.ui.uploader)
-
-        this._isWorkShopRout = false;
     }
 
     componentDidMount() {
@@ -84,10 +69,6 @@ class EpisodeEditor extends React.Component {
         }
     }
 
-    componentWillReceiveProps(next) {
-        this._isWorkShopRout = this.props.isWorkshop || next.isWorkshop;
-    }
-
     render() {
         let {fetching, courseId, lessonId, subLessonId,} = this.props
 
@@ -127,10 +108,10 @@ class EpisodeEditor extends React.Component {
     }
 
     _fillFileId() {
-        let {content, resources} = this.props;
+        let {episode, lesson} = this.props;
 
-        content.forEach((item) => {
-            let _resource = resources.find((resource) => {
+        episode.Content.forEach((item) => {
+            let _resource = lesson.Resources.find((resource) => {
                 return resource.Id === item.ResourceId
             })
 
@@ -171,7 +152,7 @@ function mapStateToProps(state, ownProps) {
         content: state.episodeContent.current,
         resources: state.lessonResources.current,
 
-        fetching: state.singleLesson.fetching || state.singleEpisode.fetching || state.lessonResources.fetching,
+        fetching: state.singleEpisode.fetching,
     }
 }
 

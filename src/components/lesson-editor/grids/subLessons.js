@@ -115,7 +115,6 @@ class SubLessons extends GridControl {
 function mapStateToProps(state) {
     return {
         lesson: state.singleLesson.current,
-
         enableButtons: enableButtonsSelector(state),
     }
 }

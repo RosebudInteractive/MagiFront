@@ -1,7 +1,7 @@
 import React from 'react'
-import CommonRefsGrid from '../grids/common-refs'
-import RecommendedRefsGrid from '../grids/recommended-refs'
+import ReferencesGrid from '../grids/references'
 import PropTypes from 'prop-types'
+import {Field} from "redux-form";
 
 export default class ReferencesTab extends React.Component{
 
@@ -42,14 +42,20 @@ export default class ReferencesTab extends React.Component{
         this._resizeHandler();
     }
 
+    componentDidUpdate(prevProps) {
+        if (!prevProps.visible && this.props.visible) {
+            this._resizeHandler();
+        }
+    }
+
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler)
     }
 
     render() {
         return <div className={"tab-wrapper tab-wrapper__authors-and-categories" + (this.props.visible ? '' : ' hidden')}>
-            <CommonRefsGrid editMode={this.props.editMode}/>
-            <RecommendedRefsGrid editMode={this.props.editMode}/>
+            <Field component={ReferencesGrid} name="commonRef" editMode={this.props.editMode} viewId={'common-refs'} title={'Список литературы'} isRecommended={false}/>
+            <Field component={ReferencesGrid} name="recommendedRef" editMode={this.props.editMode} viewId={'recommended-refs'} title={'Рекомендуемая литература'} isRecommended={true}/>
         </div>
     }
 }

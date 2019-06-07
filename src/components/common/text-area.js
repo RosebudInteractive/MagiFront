@@ -73,7 +73,7 @@ function normalizeHtml(str) {
 }
 
 function normalizeText(str) {
-    return str && str.replace(/[^\x20-\xFF]/gi, '');
+    return str && str.replace(/[\x00-\x1F]/gi, '');
 }
 
 class HtmlTextArea extends React.Component {

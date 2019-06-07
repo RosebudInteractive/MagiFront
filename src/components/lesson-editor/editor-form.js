@@ -68,8 +68,6 @@ class LessonEditorForm extends React.Component {
     }
 
     componentDidMount() {
-        // this._init()
-
         let _activeTab = this.props.activeTabs.get(this.props.isSublesson ? 'SublessonEditor' : 'LessonEditor')
         if (_activeTab) {
             this.setState({
@@ -83,7 +81,7 @@ class LessonEditorForm extends React.Component {
     }
 
     _init() {
-        let {lesson, fixedLessonId, fixDescription, isSublesson, subLessons} = this.props,
+        let {lesson, fixedLessonId, fixDescription, isSublesson,} = this.props,
             _lesson = lesson ? lesson : this._getNewLesson(),
             _fixed = (lesson && (lesson.id) && (lesson.id === fixedLessonId)),
             _fixDescription = _fixed ? fixDescription : ''
@@ -117,7 +115,10 @@ class LessonEditorForm extends React.Component {
                 isFreeInPaidCourse: _lesson.IsFreeInPaidCourse,
                 fixed: _fixed,
                 fixDescription: _fixDescription,
-                subLessons: !isSublesson ? subLessons : []
+                subLessons: !isSublesson ? (_lesson.Childs ? _lesson.Childs : []) : [],
+                resources: _lesson.Resources ? _lesson.Resources : [],
+                commonRef: _lesson.commonRef ? _lesson.commonRef : [],
+                recommendedRef: _lesson.recommendedRef ? _lesson.recommendedRef : []
             });
         }
     }
@@ -137,7 +138,7 @@ class LessonEditorForm extends React.Component {
 
 
     render() {
-        const {hasChanges, saving, course} = this.props;
+        const {hasChanges, saving,} = this.props;
 
         return <React.Fragment>
             <SavingBlock visible={saving}/>
@@ -181,7 +182,7 @@ class LessonEditorForm extends React.Component {
                         <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
                         <EpisodesTab visible={this.state.currentTab === TABS.EPISODES_AND_SUBS} editMode={this.props.editMode} isSublesson={this.props.isSublesson}/>
                         <ReferencesTab visible={this.state.currentTab === TABS.REFERENCES} editMode={this.props.editMode}/>
-                        <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode} resources={course.Resources} />
+                        <ResourcesTab visible={this.state.currentTab === TABS.RESOURCES} editMode={this.props.editMode}/>
                     </form>
                 </div>
             </div>
@@ -256,7 +257,7 @@ class LessonEditorForm extends React.Component {
             Episodes: [],
             References: [],
             Resources: [],
-            Childs: (this.props.subLessons && this.props.subLessons.length > 0) ? [] : null,
+            Childs: (editorValues.subLessons && editorValues.subLessons.length > 0) ? [] : null,
             SnName: editorValues.snName,
             SnDescription: editorValues.snDescription,
             SnPost: editorValues.snPost,
@@ -266,9 +267,7 @@ class LessonEditorForm extends React.Component {
 
         let {
             ogImageId,
-            ogImageResourceId,
             twitterImageId,
-            twitterImageResourceId,
             hasOgImage,
             hasTwitterImage,
         } = this.props;
@@ -308,7 +307,7 @@ class LessonEditorForm extends React.Component {
     }
 
     _fillReferences(array) {
-        this.props.recommendedRef.map((reference) => {
+        this.props.editorValues.recommendedRef.map((reference) => {
             let _obj = {};
             if (reference.Id > 0) {
                 _obj.Id = reference.Id
@@ -321,7 +320,7 @@ class LessonEditorForm extends React.Component {
             array.push(_obj);
         });
 
-        this.props.commonRef.map((reference) => {
+        this.props.editorValues.commonRef.map((reference) => {
             let _obj = {};
             if (reference.Id > 0) {
                 _obj.Id = reference.Id
@@ -336,7 +335,7 @@ class LessonEditorForm extends React.Component {
     }
 
     _fillResources(array) {
-        this.props.resources.map((resource) => {
+        this.props.editorValues.resources.map((resource) => {
             if (resource.FileId) {
                 let _meta = JSON.parse(resource.MetaData);
                 _meta.fileId = resource.FileId;
@@ -398,11 +397,7 @@ let LessonEditorWrapper = reduxForm({
 function mapStateToProps(state) {
     return {
         hasChanges: state.singleLesson.hasChanges ||
-            state.subLessons.hasChanges ||
-            state.lessonResources.hasChanges ||
             state.lessonMainEpisodes.hasChanges ||
-            state.lessonCommonRefs.hasChanges ||
-            state.lessonRecommendedRefs.hasChanges ||
             isDirty('LessonEditor')(state),
         editorValues: getFormValues('LessonEditor')(state),
         editorValid: isValid('LessonEditor')(state),
@@ -421,8 +416,6 @@ function mapStateToProps(state) {
         mainEpisodes: state.lessonMainEpisodes.current,
         recommendedRef: state.lessonRecommendedRefs.current,
         commonRef: state.lessonCommonRefs.current,
-        subLessons: state.subLessons.current,
-        resources: state.lessonResources.current,
 
         fixedLessonId: fixedLessonIdSelector(state),
         fixDescription: fixedObjDescrSelector(state),

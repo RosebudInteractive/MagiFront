@@ -7,7 +7,6 @@ import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import {enableButtonsSelector} from "adm-ducks/app";
 import * as contentActions from "../../../actions/content-actions";
 import EpisodeResourceForm from "../../episode-content-form";
-import * as episodeContentActions from "../../../actions/episode/episode-contents-actions";
 
 class TocGrid extends React.Component {
 
@@ -22,20 +21,19 @@ class TocGrid extends React.Component {
         this.state = {
             showDialog: false,
         }
+
+        this._selected = null
     }
 
     render() {
 
         return <div className="episode-content">
-            <EpisodeContent selectAction={::this.props.episodeContentActions.select}
-                            createAction={::this._create}
+            <EpisodeContent createAction={::this._create}
                             editAction={::this._edit}
-                            removeAction={::this.props.episodeContentActions.remove}
-                            moveUpAction={::this.props.episodeContentActions.moveUp}
-                            moveDownAction={::this.props.episodeContentActions.moveDown}
+                            removeAction={::this._remove}
                             editMode={this.props.editMode}
-                            selected={this.props.selected}
-                            data={this.props.content}
+                            selected={this._selected}
+                            data={this.props.input.value}
                             disabled={!this.props.enableButtons}/>
             {
                 this.state.showDialog ?
@@ -52,13 +50,20 @@ class TocGrid extends React.Component {
 
     }
 
+    _select(id) {
+        if (id !== this._selected) {
+            this._selected = id;
+            this.forceUpdate()
+        }
+    }
+
     _create() {
         this.props.contentActions.create()
         this.setState({showDialog: true})
     }
 
     _edit(id) {
-        let _contentItem = this.props.content.find(item => item.id === +id);
+        let _contentItem = this.props.input.value.find(item => item.id === +id);
 
         this.props.contentActions.edit(_contentItem);
         this.setState({showDialog: true})
@@ -66,9 +71,9 @@ class TocGrid extends React.Component {
 
     _save(value) {
         if (this.props.resourceEditMode === EDIT_MODE_EDIT) {
-            this.props.episodeContentActions.update(value)
+            this._update(value)
         } else {
-            this.props.episodeContentActions.insert(value);
+            this._insert(value)
         }
 
         this.props.contentActions.clear();
@@ -78,6 +83,43 @@ class TocGrid extends React.Component {
     _cancel() {
         this.setState({showDialog: false})
         this.props.contentActions.clear();
+    }
+
+    _insert(data) {
+        let _array = [...this.props.input.value]
+
+        _array.push({...data, id: data.Id});
+
+        this.props.input.onChange(_array)
+
+        this._select(data.Id)
+    }
+
+    _update(data) {
+        let _array = [...this.props.input.value],
+            _index = _array.findIndex((item) => {
+                return item.id === +data.id
+            })
+
+        if (_index >= 0) {
+            _array[_index] = Object.assign({}, data);
+        }
+
+        this.props.input.onChange(_array)
+    }
+
+    _remove(id) {
+        let _array = [...this.props.input.value],
+            _index = _array.findIndex((item) => {
+                return item.id === +id
+            })
+
+        if (_index >= 0) {
+            _array.splice(_index, 1)
+        }
+
+        this._setObjectsRank(_array)
+        this.props.input.onChange(_array)
     }
 }
 
@@ -117,10 +159,7 @@ class EpisodeContent extends GridControl {
 
 function mapStateToProps(state) {
     return {
-        content: state.episodeContent.current,
-        selected: state.episodeContent.selected,
         contentItem: state.content.object,
-
         enableButtons: enableButtonsSelector(state),
     }
 }
@@ -128,7 +167,6 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         contentActions: bindActionCreators(contentActions, dispatch),
-        episodeContentActions: bindActionCreators(episodeContentActions, dispatch),
     };
 }
 
