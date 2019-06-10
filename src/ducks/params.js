@@ -177,7 +177,7 @@ export const setFixedCourse = (data) => {
 
         let _needSave = (
             (!_courseId && data.active) ||
-            (_courseId && (_courseId !== data.courseId)) ||
+            (_courseId && (_courseId !== data.courseId) && data.active) ||
             ((_courseId === data.courseId) && ((data.description !== _descr) || !data.active))
         )
 
@@ -217,7 +217,7 @@ export const setFixedLesson = (data) => {
 
         let _needSave = (
             (!_lessonId && data.active) ||
-            (_lessonId && (_lessonId !== data.lessonId)) ||
+            (_lessonId && (_lessonId !== data.lessonId) && data.active) ||
             ((_lessonId === data.lessonId) && ((data.description !== _descr) || !data.active))
         )
 

@@ -56,15 +56,6 @@ const _prodConfig = {
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
                 ],
-                // include: [
-                //     path.resolve(__dirname, "src"),
-                //     path.resolve(__dirname, "frontend"),
-                //     path.resolve(__dirname, 'node_modules/whatwg-fetch'),
-                //     path.resolve(__dirname, 'node_modules/swiper'),
-                //     path.resolve(__dirname, 'node_modules/dom7'),
-                //     path.resolve(__dirname, 'scripts/'),
-                //     path.resolve(__dirname, 'static/'),
-                // ],
                 // language=JSRegexp
                 test: /\.js$/
             },
@@ -176,31 +167,7 @@ const _devConfig = {
                     path.resolve(__dirname, "node_modules/webix"),
                     path.resolve(__dirname, "node_modules/react-dom"),
                 ],
-                // include: [
-                //     path.resolve(__dirname, "src"),
-                //     path.resolve(__dirname, "frontend"),
-                //     path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
-                //     path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
-                //     // path.resolve(__dirname, 'node_modules/whatwg-fetch'),
-                //     path.resolve(_hotLoaderPath),
-                //     path.resolve(__dirname, 'scripts/'),
-                // ],
-                // exclude: [
-                //     path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
-                //     path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
-                // ],
             },
-            // {
-            //     test: /\.js$/,
-            //     loader: 'babel-loader',
-            //     include: [
-            //         path.resolve(path.join(__dirname, 'node_modules', 'swiper')),
-            //         path.resolve(path.join(__dirname, 'node_modules', 'dom7')),
-            //     ],
-            //     options: {
-            //         presets: ["@babel/preset-es2015"]
-            //     },
-            // },
             {
                 loader: 'json-loader',
                 test: /\.json$/,

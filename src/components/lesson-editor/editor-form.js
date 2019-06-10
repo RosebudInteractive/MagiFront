@@ -249,7 +249,7 @@ class LessonEditorForm extends React.Component {
             URL: editorValues.URL,
             LessonType: editorValues.lessonType,
             ReadyDate: editorValues.readyDate,
-            ShortDescription: editorValues.description,
+            ShortDescription: editorValues.description ? editorValues.description : " ",
             ParentId: this.props.isSublesson ? this.props.lesson.CurrParentId : null,
             IsAuthRequired: editorValues.isAuthRequired,
             IsSubsRequired: editorValues.isSubsRequired,
