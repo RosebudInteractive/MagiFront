@@ -9,23 +9,25 @@ const { AccessFlags } = require('../const/common');
 const LESSON_FILE_MSSQL_REQ =
     "select l.[Id], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], l.[IsFreeInPaidCourse], pc.[CourseId],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate]\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId\n" +
     "from [EpisodeLng] el\n" +
     "  join [Episode] e on e.[Id] = el.[EpisodeId]\n" +
     "  join [Lesson] l on l.[Id] = e.[LessonId]\n" +
     "  join [Course] c on c.[Id] = l.[CourseId]\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= userId %>) and (pc.[CourseId] = c.[Id])\n" +
+    "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= userId %>) and (gc.[CourseId] = c.[Id])\n" +
     "where el.[Audio] = '<%= file %>'";
     
 const LESSON_FILE_MYSQL_REQ =
     "select l.`Id`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, l.`IsFreeInPaidCourse`, pc.`CourseId`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId\n" +
     "from `EpisodeLng` el\n" +
     "  join `Episode` e on e.`Id` = el.`EpisodeId`\n" +
     "  join `Lesson` l on l.`Id` = e.`LessonId`\n" +
     "  join `Course` c on c.`Id` = l.`CourseId`\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= userId %>) and (pc.`CourseId` = c.`Id`)\n" +
+    "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= userId %>) and (gc.`CourseId` = c.`Id`)\n" +
     "where el.`Audio` = '<%= file %>'";
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
@@ -65,7 +67,7 @@ exports.AccessRights = class {
                         if (needAuth) {
                             if (user) {
                                 if (rec.IsSubsRequired || IsPaid) {
-                                    res = IsPaid && (rec.IsFreeInPaidCourse || rec.CourseId);
+                                    res = IsPaid && (rec.IsFreeInPaidCourse || rec.CourseId || rec.GiftId);
                                     if (!res) {
                                         if (rec.IsSubsRequired || (IsPaid && rec.IsSubsFree)) {
                                             res = rec.FreeExpDate && (now <= rec.FreeExpDate);
