@@ -25,12 +25,14 @@ class DesktopHeaderRow extends React.Component {
     }
 
     render() {
+        const _isCoursesPage = this.props.currentPage.name === pages.courses.name;
+
         return (
             <div className={"page-header__wrapper menu-mobile"}>
                 <Logo/>
                 <Navigator {...this.props}/>
                 <Languages/>
-                <FiltersRow/>
+                {_isCoursesPage ? <FiltersRow/> : null}
                 <Search/>
                 <SubscriptionButton isMobile={false}/>
                 {
