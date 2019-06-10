@@ -1,4 +1,5 @@
 import { hot } from 'react-hot-loader/root'
+import 'url-search-params-polyfill';
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";

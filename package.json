@@ -132,6 +132,7 @@
     "transliteration": "^1.6.2",
     "truncate-html": "^1.0.1",
     "url-loader": "^0.6.2",
+    "url-search-params-polyfill": "^6.0.0",
     "uuid": "^3.3.2",
     "webix": "^5.1.1",
     "whatwg-fetch": "^2.0.3",
