@@ -43,6 +43,8 @@ async function _processor(req, res, next) {
     next();   
 }
 
-module.exports = (req, res, next) => {
-    _processor(req, res, next);
+module.exports = (options) => {
+    return function (req, res, next) {
+        _processor(req, res, next);
+    };
 };

@@ -119,7 +119,7 @@ function setupAPI(express, app) {
         app.use("/", sessionMiddleware.rollSession);
     
     const campaignMiddle = require('../middleware/campaign');
-    app.use("/", campaignMiddle);
+    app.use("/", campaignMiddle());
 
     let publicEnabled = config.has("server.publicEnabled") && (config.server.publicEnabled === true) ? true : false;
     let adminEnabled = config.has("server.adminEnabled") && (config.server.adminEnabled === true) ? true : false;
@@ -137,6 +137,14 @@ function setupAPI(express, app) {
     });
 
     app.use("/api", methodOverride()); // поддержка put и delete
+
+    // Set "Cache-Control: must-revalidate" for all API calls
+    const headersMiddle = require('../middleware/headers');
+    app.use("/api", headersMiddle({
+        headers: {
+            "Cache-Control": "must-revalidate"
+        }
+    }));
 
     let useJWT = config.has('authentication.useJWT') ? config.authentication.useJWT : false;
     AuthLocalInit(app);
