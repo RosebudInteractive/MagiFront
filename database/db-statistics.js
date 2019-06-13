@@ -27,8 +27,8 @@ const GET_USER_PURCHASE_MSSQL =
     "select c.[ChequeDate], u.[RegDate], c.[UserId], u.[DisplayName],\n" +
     "  u.[Email], ii.[Name] Course, p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price],\n" +
     "  coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign, coalesce(pc.[Code], '') as Promo,\n" +
-    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600, 2) as LsnTime, round(sum(lg.[Duration]) / 3600, 2) as CourseDuration,\n" +
-    "  round(coalesce(sum(h.[LsnTime]), 0) / sum(lg.[Duration]), 2) as LsnPart\n" +
+    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
+    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0 / cd.[Duration], 2) as LsnPart\n" +
     "from[Cheque] c\n" +
     "  join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
     "  join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
@@ -39,20 +39,22 @@ const GET_USER_PURCHASE_MSSQL =
     "  left join[PromoCode] pc on pc.[Id] = c.[PromoCodeId]\n" +
     "  join[Course] cs on cs.[ProductId] = ii.[ProductId]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = cs.[Id]\n" +
-    "  join[LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
+    "  join ( select lc.[CourseId], round(sum(coalesce(lg.[Duration], 0)) / 3600.0, 2) Duration from [LessonCourse] lc\n" +
+    "      join [LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
+    "    group by lc.[CourseId]) cd on cd.[CourseId] = cs.[Id]\n" +
     "  left join[LsnHistory] h on h.[UserId] = c.[UserId] and h.[LessonId] = lc.[LessonId]\n" +
     "where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "  and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
     "group by c.[ChequeDate], u.[RegDate], c.[UserId], u.[DisplayName], u.[Email], ii.[Name],\n" +
-    "  p.[Price], ii.[Price], g.[Campaign], g.[Source], g.[Medium], pc.[Code]\n" +
+    "  p.[Price], ii.[Price], g.[Campaign], g.[Source], g.[Medium], pc.[Code], cd.[Duration]\n" +
     "order by c.[ChequeDate] desc";
 
 const GET_USER_PURCHASE_MYSQL =
     "select c.`ChequeDate`, u.`RegDate`, c.`UserId`, u.`DisplayName`,\n" +
     "  u.`Email`, ii.`Name` Course, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
     "  coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign, coalesce(pc.`Code`, '') as Promo,\n" +
-    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600, 2) as LsnTime, round(sum(lg.`Duration`) / 3600, 2) as CourseDuration,\n" +
-    "  round(coalesce(sum(h.`LsnTime`), 0) / sum(lg.`Duration`), 2) as LsnPart\n" +
+    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
+    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart\n" +
     "from`Cheque` c\n" +
     "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
     "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
@@ -63,11 +65,13 @@ const GET_USER_PURCHASE_MYSQL =
     "  left join`PromoCode` pc on pc.`Id` = c.`PromoCodeId`\n" +
     "  join`Course` cs on cs.`ProductId` = ii.`ProductId`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = cs.`Id`\n" +
-    "  join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
+    "  join ( select lc.`CourseId`, round(sum(coalesce(lg.`Duration`, 0)) / 3600.0, 2) Duration from`LessonCourse` lc\n" +
+    "      join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
+    "    group by lc.`CourseId`) cd on cd.`CourseId` = cs.`Id`\n" +
     "  left join`LsnHistory` h on h.`UserId` = c.`UserId` and h.`LessonId` = lc.`LessonId`\n" +
     "where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>') and(c.`ChequeDate` < '<%= last_date %>')\n" +
     "group by c.`ChequeDate`, u.`RegDate`, c.`UserId`, u.`DisplayName`, u.`Email`, ii.`Name`,\n" +
-    "  p.`Price`, ii.`Price`, g.`Campaign`, g.`Source`, g.`Medium`, pc.`Code`\n" +
+    "  p.`Price`, ii.`Price`, g.`Campaign`, g.`Source`, g.`Medium`, pc.`Code`, cd.`Duration`\n" +
     "order by c.`ChequeDate` desc";
 
 const GET_COURSE_PURCHASE_MSSQL =
