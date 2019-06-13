@@ -32,7 +32,8 @@ export const ReducerRecord = Record({
     reCapture: '',
     enableButtons: true,
     activeTabs: new Map(),
-    billing: new Billing()
+    billing: new Billing(),
+    fetching: false,
 })
 
 
@@ -40,14 +41,20 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
+        case GET_OPTIONS_START:
+            return state
+                .set('fetching', true)
+
         case GET_OPTIONS_SUCCESS:
             return state
                 .set('reCapture', payload.siteKey.reCapture)
                 .set('billing', new Billing(payload.billing))
+                .set('fetching', false)
 
         case GET_OPTIONS_FAIL:
             return state
                 .set('reCapture', '')
+                .set('fetching', false)
 
         case DISABLE_BUTTONS:
             return state
@@ -71,6 +78,7 @@ export default function reducer(state = new ReducerRecord(), action) {
  * */
 
 export const stateSelector = state => state[moduleName]
+export const fetchingSelector = createSelector(stateSelector, state => state.fetching)
 export const reCaptureSelector = createSelector(stateSelector, state => state.reCapture)
 export const enableButtonsSelector = createSelector(stateSelector, state => state.enableButtons)
 export const activeTabsSelector = createSelector(stateSelector, state => state.activeTabs)

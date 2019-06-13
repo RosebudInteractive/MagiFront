@@ -69,8 +69,8 @@ module.exports = {
         secret: 'zxcvv8708xulsajfois23h32',
         storage: 'local',// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
         reCapture: {
-            siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",//"6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t",
-            secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"//"6LfobE8UAAAAAOIpLL4jothsvn8IgogqdkM8ie0r"
+            siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
+            secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
         }
     },
     mail: {

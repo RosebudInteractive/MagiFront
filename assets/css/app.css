@@ -147,6 +147,10 @@
     vertical-align: top;
 }
 
+.grecaptcha-badge{
+    display: none;
+}
+
 .cover {
     width: 360px;
     /*height: auto;*/
