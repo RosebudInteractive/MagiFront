@@ -1,21 +1,22 @@
 import React from 'react';
 import {reduxForm, Field} from 'redux-form';
 import {LoginEdit, PasswordEdit, LoginButton} from '../components/auth/editors'
-import Captcha from '../components/auth/captcha'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {userAuthSelector, errorSelector, loadingSelector, initializedSelector, login} from "../ducks/auth";
+import Recaptcha from 'react-google-invisible-recaptcha';
+import {reCaptureSelector, fetchingSelector} from "adm-ducks/app";
 
 const validate = values => {
     const errors = {}
 
     if (!values.login) {
-        errors.login = 'Required'
+        errors.login = 'Не может быть пустым'
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.login)) {
-        errors.login = 'Invalid email address'
+        errors.login = 'Недопустимый email'
     }
     if (!values.password) {
-        errors.password = 'Required'
+        errors.password = 'Не может быть пустым'
     }
     return errors
 }
@@ -25,56 +26,74 @@ let SignInForm = class SignInForm extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            captcha: null
+            captcha: null,
+            login: null,
+            password: null,
+            captchaError: false
         }
     }
 
     _handleSubmit(values) {
-        this.props.login({
-            login: values.login,
-            password: values.password,
-            'g-recaptcha-response': this.state.captcha
-        })
-    }
-
-
-    _onSetCaptcha(value) {
-        this.setState({captcha: value});
-    }
-
-    _onClearCaptcha() {
-        this.setState({captcha: null});
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.serverError) {
-            this.setState({captcha: null})
-            Captcha.reset();
+        if (this.state.captchaError) {
+            this.setState({
+                captchaError: false
+            })
         }
+
+        if (values.login && values.password) {
+            this.setState({
+                login: values.login,
+                    password: values.password,
+            })
+            this.recaptcha.execute();
+        } else {
+            this.recaptcha.reset();
+        }
+    }
+
+    _onResolved() {
+        this.props.login({
+            login: this.state.login,
+            password: this.state.password,
+            'g-recaptcha-response': this.recaptcha.getResponse()
+        })
     }
 
     componentDidMount() {
         this.props.reset();
-        Captcha.reset();
     }
 
     render() {
-        const {invalid, serverError, loading, isUserAuthorized, authInitialized} = this.props;
+        const {invalid, serverError, loading, isUserAuthorized, authInitialized, fetching} = this.props;
         const _errorText = serverError &&
             <p className="form__error-message" style={{display: "block"}}>{serverError}</p>
 
-        return authInitialized ?
+        const _captchaError = this.state.captchaError &&
+            <p className="form__error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
+
+        return authInitialized && !fetching ?
             <div className={"auth-wrapper" + (!isUserAuthorized ? " opened" : "")}>
                 <form className="sign-in-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="login" component={LoginEdit} id={'email'}/>
                     <Field name="password" component={PasswordEdit}/>
                     {_errorText}
-                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
-                    <LoginButton disabled={invalid || !this.state.captcha || loading} caption={'Войти'}/>
+                    <Recaptcha
+                        ref={ ref => this.recaptcha = ref }
+                        sitekey={this.props.reCapture}
+                        onResolved={ ::this._onResolved }
+                        onError={::this._onCaptchaError}/>
+                    {_captchaError}
+                    <LoginButton disabled={invalid || loading} caption={'Войти'}/>
                 </form>
             </div>
             :
             null
+    }
+
+    _onCaptchaError() {
+        this.setState({
+            captchaError: true
+        })
     }
 }
 
@@ -89,6 +108,8 @@ function mapStateToProps(state) {
         serverError: errorSelector(state),
         loading: loadingSelector(state),
         authInitialized: initializedSelector(state),
+        reCapture: reCaptureSelector(state),
+        fetching: fetchingSelector(state)
     }
 }
 

@@ -67,7 +67,11 @@ module.exports = {
         useCapture: true,
         appLoginUrl: "https://magisteria.ru",
         secret: 'zxcvv8708xulsajfois23h32',
-        storage: 'local'// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
+        storage: 'local',// Use 'redis' for production! Also can be 'local' (not applicable for cluster mode)
+        reCapture: {
+            siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
+            secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
+        }
     },
     mail: {
         autosubscribe: {

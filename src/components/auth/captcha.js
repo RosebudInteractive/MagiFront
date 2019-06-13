@@ -48,6 +48,7 @@ class Captcha extends React.Component {
                 verifyCallback={::this._verifyCallback}
                 expiredCallback={::this._expiredCallback}
                 // theme="dark"
+                size={'invisible'}
                 onloadCallback={::this._onLoadCallback}
                 hl={'ru'}
             />

@@ -183,6 +183,9 @@ ul {
   font-weight: 700;
   font-style: normal; }
 
+.grecaptcha-badge{
+  display: none; }
+
 ._mask01 image {
   /*-webkit-clip-path: url("#clipping01");*/
   clip-path: url("#clipping01");

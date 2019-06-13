@@ -147,8 +147,8 @@ module.exports = {
         tokenExpTime: SESSION_MAX_AGE,
         tokenUpdTime: SESSION_UPD_TIME,
         reCapture: {
-            siteKey: "6LfobE8UAAAAAMR-Sj4I2ZYe_N74atRFN5jqhk6t",
-            secretKey: "6LfobE8UAAAAAOIpLL4jothsvn8IgogqdkM8ie0r"
+            siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
+            secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
         }
     },
     mail: {

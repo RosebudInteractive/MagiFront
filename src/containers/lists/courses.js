@@ -18,15 +18,16 @@ class Courses extends React.Component {
 
         this._resizeHandler = () => {
             const _main = $('.main-area'),
-                _height = _main.height() - 14,
+                _height = _main.height(),
                 _width = _main.width()
 
             if (window.$$('courses-grid')) {
-                window.$$('courses-grid').$setSize(_width, _height)
+                const _headerHeight = window.$$('courses-grid').config.headerRowHeight
+
+                window.$$('courses-grid').$setSize(_width, _height - _headerHeight)
             }
         }
     }
-
 
     componentWillMount() {
         this.props.coursesActions.getCourses();
