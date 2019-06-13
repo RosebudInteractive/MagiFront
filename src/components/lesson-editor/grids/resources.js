@@ -11,6 +11,11 @@ import MultiResourceForm from "../../multi-resource-form";
 import {enableButtonsSelector} from "adm-ducks/app";
 import {formValueSelector} from "redux-form";
 
+const NEW_RESOURCE = {
+    Id: null,
+    ShowInGalery: false,
+}
+
 class ResourcesGrid extends React.Component {
 
     static propTypes = {
@@ -25,7 +30,10 @@ class ResourcesGrid extends React.Component {
             showMultipleUploadDialog: false,
         }
 
-        this._selected = null;
+        this._selected = null
+        this._resource = null
+        this._internalId = -1
+        this._resourceEditMode = false
     }
 
     render() {
@@ -45,7 +53,7 @@ class ResourcesGrid extends React.Component {
                     <ResourceForm
                         cancel={::this._cancel}
                         save={::this._save}
-                        data={this.props.resource}
+                        data={this._resource}
                     />
                     :
                     null
@@ -71,8 +79,13 @@ class ResourcesGrid extends React.Component {
     }
 
     _create() {
-        this.props.resourcesActions.create({ShowInGalery: false})
-        this.setState({ showResourceDialog: true })
+        this._resource = Object.assign({}, NEW_RESOURCE)
+        this._resource.Id = this._internalId
+        this._internalId--;
+        this._resourceEditMode = false
+
+        // this.props.resourcesActions.create({ShowInGalery: false})
+        this.setState({showResourceDialog: true})
     }
 
     _remove(id) {
@@ -101,19 +114,20 @@ class ResourcesGrid extends React.Component {
             return item.id === +id
         });
 
-        this.props.resourcesActions.edit(_resource);
-        this.setState({ showResourceDialog: true })
+        this._resource = Object.assign({}, _resource);
+        this._resourceEditMode = true
+        this.setState({showResourceDialog: true})
     }
 
     _save(value) {
-        if (this.props.resourceEditMode === EDIT_MODE_EDIT) {
+        if (this._resourceEditMode) {
             this._update(value)
         } else {
             this._insert(value);
         }
 
         this.props.resourcesActions.clear();
-        this.setState({ showResourceDialog: false })
+        this.setState({showResourceDialog: false})
     }
 
     _insert(data) {
@@ -139,29 +153,38 @@ class ResourcesGrid extends React.Component {
     }
 
     _cancel() {
-        this.setState({ showResourceDialog: false })
+        this.setState({showResourceDialog: false})
         this.props.resourcesActions.clear();
     }
 
     _multiUpload() {
-        this.setState({ showMultipleUploadDialog: true })
+        this.setState({showMultipleUploadDialog: true})
         this.props.resourcesActions.multiUpload()
     }
 
     _finishUpload(resources) {
         this._multipleInsert(resources);
         this.props.resourcesActions.finishUpload();
-        this.setState({ showMultipleUploadDialog: false })
+        this.setState({showMultipleUploadDialog: false})
     }
 
     _multipleInsert(resources) {
+        if (resources) {
+            resources.forEach(item => {
+                if (!item.Id) {
+                    item.ShowInGalery = true
+                    item.Id = this._internalId--
+                }
+            })
+        }
+
         let _array = [...this.props.input.value]
         this.props.input.onChange(_array.concat(resources))
     }
 
     _cancelUpload() {
         this.props.resourcesActions.cancelUpload();
-        this.setState({ showMultipleUploadDialog: false })
+        this.setState({showMultipleUploadDialog: false})
     }
 }
 
@@ -196,9 +219,6 @@ const _ResourcesGrid = connect(state => {
 
 function mapStateToProps(state) {
     return {
-        resourceEditMode: state.resources.editMode,
-        resource: state.resources.object,
-
         enableButtons: enableButtonsSelector(state),
     }
 }

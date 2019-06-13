@@ -70,7 +70,7 @@ class TocGrid extends React.Component {
     }
 
     _save(value) {
-        if (this.props.resourceEditMode === EDIT_MODE_EDIT) {
+        if (this.props.contentEditMode === EDIT_MODE_EDIT) {
             this._update(value)
         } else {
             this._insert(value)
@@ -118,7 +118,6 @@ class TocGrid extends React.Component {
             _array.splice(_index, 1)
         }
 
-        this._setObjectsRank(_array)
         this.props.input.onChange(_array)
     }
 }
@@ -160,6 +159,7 @@ class EpisodeContent extends GridControl {
 function mapStateToProps(state) {
     return {
         contentItem: state.content.object,
+        contentEditMode: state.content.editMode,
         enableButtons: enableButtonsSelector(state),
     }
 }
