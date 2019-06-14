@@ -65,6 +65,7 @@ const COURSE_REQ_TREE = {
 const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
+    "  cl.[VideoIntwLink], cl.[VideoIntroLink],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
@@ -77,6 +78,7 @@ const COURSE_MSSQL_IMG_REQ =
 const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
+    "  cl.`VideoIntwLink`, cl.`VideoIntroLink`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
@@ -267,6 +269,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
+    "  cl.[VideoIntwLink], cl.[VideoIntroLink],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -352,6 +355,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
+    "  cl.`VideoIntwLink`, cl.`VideoIntroLink`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -994,6 +998,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                                        VideoIntwLink: elem.VideoIntwLink,
+                                        VideoIntroLink: elem.VideoIntroLink,
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
                                         IsBought: (elem.Counter || elem.GiftId) ? true : false,
@@ -1802,6 +1808,10 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.snName(inpFields["SnName"]);
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             crs_lng_obj.snDescription(inpFields["SnDescription"]);
+                        if (typeof (inpFields["VideoIntwLink"]) !== "undefined")
+                            crs_lng_obj.videoIntwLink(inpFields["VideoIntwLink"]);
+                        if (typeof (inpFields["VideoIntroLink"]) !== "undefined")
+                            crs_lng_obj.videoIntroLink(inpFields["VideoIntroLink"]);
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -2097,6 +2107,10 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["SnName"] = inpFields["SnName"];
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             fields["SnDescription"] = inpFields["SnDescription"];
+                        if (typeof (inpFields["VideoIntwLink"]) !== "undefined")
+                            fields["VideoIntwLink"] = inpFields["VideoIntwLink"];
+                        if (typeof (inpFields["VideoIntroLink"]) !== "undefined")
+                            fields["VideoIntroLink"] = inpFields["VideoIntroLink"];
 
                         return root_lng.newObject({
                             fields: fields

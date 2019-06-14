@@ -91,6 +91,15 @@
                 "mysql": "./build_11/upgrade_11_mysql.sql"
             },
             "upgrader": "./build_11"
+        },
+        "12": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_12/upgrade_12_mssql.sql",
+                "mysql": "./build_12/upgrade_12_mysql.sql"
+            },
+            "upgrader": "./build_12"
         }
     }
 }
