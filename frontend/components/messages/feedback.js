@@ -55,12 +55,12 @@ class FeedbackMessageBox extends React.Component {
                         onClick={::this._close}>Закрыть
                 </button>
                 <div className="modal__header">
-                    <p className="modal__headline">Хотите помочь проекту?</p>
+                    <p className="modal__headline">Напишите нам, если у Вас есть вопросы или хотите помочь проекту</p>
                 </div>
                 <div className="modal__body">
                     <form className="form modal-form" onSubmit={::this._handleSubmit}>
                         <textarea onChange={::this._changeMessage} name="message" id="message" className="form__message"
-                                  placeholder="Если не хотите помочь не пишите."/>
+                                  placeholder="Ваше сообщение"/>
                         <div className="modal-form__row">
                             <input onChange={::this._changeSender} type="text" id="contacts" className="form__field"
                                    placeholder="Как с вами связаться?"/>
