@@ -4,6 +4,6 @@
 //
 exports.upgradeDb = async (schema) => {
     schema.getModel("CourseLng")
-        .addField("VideoIntwLink ", { type: "string", allowNull: true })
-        .addField("VideoIntroLink ", { type: "string", allowNull: true });
+        .addField("VideoIntwLink", { type: "string", allowNull: true })
+        .addField("VideoIntroLink", { type: "string", allowNull: true });
 };
