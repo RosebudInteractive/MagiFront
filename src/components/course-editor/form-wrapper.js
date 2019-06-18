@@ -10,6 +10,7 @@ import PropTypes from 'prop-types'
 import {fixedCourseIdSelector, fixedObjDescrSelector, parametersFetchingSelector,} from "adm-ducks/params"
 import '../common/form.sass'
 import {enableButtonsSelector} from "adm-ducks/app";
+import {ExtLinkObject} from '../../tools/link-tools'
 
 const STATE_OPTIONS = [
     {id: 'D', value: 'Черновик'},
@@ -49,6 +50,9 @@ class CourseEditorForm extends React.Component {
                 oneLesson: course.OneLesson,
                 fixed: _fixed,
                 fixDescription: _fixDescription,
+                videoIntroLink: course.VideoIntroLink,
+                videoIntwLink: course.VideoIntwLink,
+
             });
         }
     }
@@ -88,6 +92,10 @@ class CourseEditorForm extends React.Component {
                 <Field component={Cover} name="cover" label="Обложка курса" disabled={_disabled}/>
                 <Field component={CheckBox} name="oneLesson" label="Курс с одиночной лекцией"
                        disabled={_oneLessonDisable}/>
+                <Field component={TextBox} name="videoIntroLink" label="Презентация курса" placeholder="Введите URL YouTube"
+                       disabled={_disabled}/>
+                <Field component={TextBox} name="videoIntwLink" label="Интервью с автором" placeholder="Введите URL YouTube"
+                       disabled={_disabled}/>
                 <Field component={CheckBox} name="fixed" label="Зафиксировать курс" disabled={!this._canFixCourse() || _disabled}/>
                 <Field component={TextArea} enableHtml={true} name="fixDescription" label="Описание" hidden={!this.props.isFixedActive}
                        value={_fixDescription} disabled={_disabled}/>
@@ -136,7 +144,21 @@ const validate = (values, props) => {
         errors.fixDescription = 'Значение не может быть пустым'
     }
 
+    if (values.videoIntroLink && !_isYoutubeLink(values.videoIntroLink)) {
+        errors.videoIntroLink = 'Необходима ссылка на YouTube'
+    }
+
+    if (values.videoIntwLink && !_isYoutubeLink(values.videoIntwLink)) {
+        errors.videoIntwLink = 'Необходима ссылка на YouTube'
+    }
+
     return errors
+}
+
+function _isYoutubeLink(link) {
+    const _link = new ExtLinkObject(link)
+
+    return (_link.isValid() && (_link.host() === 'www.youtube.com'))
 }
 
 function _checkLessonsState(newState, courseLessons) {

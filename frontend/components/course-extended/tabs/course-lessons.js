@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import LessonFull from "../../common/lecture-full-list-item";
 import LessonPreview from '../lesson/lesson-preview';
-import {userPaidCoursesSelector} from "ducks/profile";
 
 class CourseLessons extends React.Component {
 
