@@ -207,6 +207,9 @@ module.exports = {
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
         }
     },
+    authentication: {
+        googleAppId: pk.authentication.googleAppId
+    },
     debug: {
         routes: {
             "set-user-subscription": false,
