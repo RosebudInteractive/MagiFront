@@ -39,8 +39,8 @@ export default class VideoBlock extends React.Component {
     render() {
         const _visible = this.props.course && (this.props.course.VideoIntroLink || this.props.course.VideoIntwLink),
             _bothVideoExists = this.props.course.VideoIntroLink && this.props.course.VideoIntwLink,
-            _introDuration = this.props.course && this.props.course.IntroDFmt && <span className="duration">{this.props.course.IntroDFmt}</span>,
-            _interviewDuration = this.props.course && this.props.course.IntwDFmt && <span className="duration">{this.props.course.IntwDFmt}</span>
+            _introDuration = this.props.course && this.props.course.IntroDFmt && <span className="duration">{this.props.course.IntroDFmt}<span className="arrow">→</span></span>,
+            _interviewDuration = this.props.course && this.props.course.IntwDFmt && <span className="duration">{this.props.course.IntwDFmt}<span className="arrow">→</span></span>
 
         return _visible ?
             <div className={"course__video-block" + (!_bothVideoExists ? " _single" : "")}>
@@ -57,7 +57,6 @@ export default class VideoBlock extends React.Component {
                                 <div className="title__wrapper">
                                     <span className="title">Презентация курса</span>
                                     {_introDuration}
-                                    <span className="arrow">→</span>
                                 </div>
                             </div>
                         </div>
@@ -77,7 +76,7 @@ export default class VideoBlock extends React.Component {
                                 <div className="title__wrapper">
                                     <span className="title">Интервью с автором</span>
                                     {_interviewDuration}
-                                    <span className="arrow">→</span>
+
                                 </div>
                             </div>
                         </div>
