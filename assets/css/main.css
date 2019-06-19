@@ -10669,9 +10669,10 @@ body[data-page="fullpage-player"] .lectures-menu {
 .course__video-block._single .video-frame__title {
   order: 0;
   margin-left: 111px;
-  margin-bottom: 45px;
+  margin-bottom: 35px;
   align-self: flex-end;
   flex-basis: 466px;
+  min-width: 466px;
   font-family: "PT Serif", serif;
   font-style: normal;
   font-weight: normal;
@@ -10702,6 +10703,7 @@ body[data-page="fullpage-player"] .lectures-menu {
 
   .course__video-block._single .video-frame__title {
     flex-basis: 300px;
+    min-width: 300px;
     margin-bottom: 35px;
     margin-left: 70px; }
 
@@ -10710,8 +10712,9 @@ body[data-page="fullpage-player"] .lectures-menu {
 
 @media (max-width: 899px) {
   .course__video-block._single .video-frame__title {
-    flex-basis: 360px;
-    margin-bottom: 26px;
+    flex-basis: 356px;
+    min-width: unset;
+    margin-bottom: 27px;
     margin-left: 47px;
     font-size: 25px;
     line-height: 31px; }
@@ -10731,15 +10734,18 @@ body[data-page="fullpage-player"] .lectures-menu {
     font-size: 15px; }
 
   .course__video-block._single .video-frame__wrapper {
+    max-width: 393px;
     margin: 36px 46px 35px 42px; } }
 
 @media (max-width: 640px) {
   .course__video-block._single .video-frame__title {
     flex-basis: 252px;
+    min-width: 252px;
     margin-bottom: 27px;
     margin-left: 35px; }
 
   .course__video-block._single .video-frame__wrapper {
+    max-width: none;
     margin: 36px 35px 36px 36px; } }
 
 @media (max-width: 639px) {
@@ -10758,6 +10764,12 @@ body[data-page="fullpage-player"] .lectures-menu {
 
   .course__video-block._single .video-frame__title .arrow {
     display: none; }
+
+  .course__video-block._single .video-frame__title .title {
+    display: inline; }
+
+  .course__video-block._single .video-frame__title .duration {
+    margin-left: 5px; }
 
   .course__video-block._single .video-frame__wrapper {
     width: auto;
