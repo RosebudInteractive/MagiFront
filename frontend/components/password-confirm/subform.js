@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {reduxForm, Field} from 'redux-form';
-import Captcha from './../auth/captcha'
 import {PasswordEdit, SignUpButton} from './../auth/editors'
 import PasswordValidator from 'password-validator';
+import {reCaptureSelector} from "ducks/app";
+import Recaptcha from 'react-google-invisible-recaptcha';
+import {connect} from 'react-redux'
 
 let schema = new PasswordValidator();
 schema
@@ -42,25 +44,11 @@ class PasswordConfirmSubform extends React.Component {
         onSubmit: PropTypes.func.require,
     };
 
-    _handleSubmit(values) {
-        this.props.onSubmit({
-            password: values.password1,
-            activationKey: this.props.activationKey,
-            'g-recaptcha-response': this.state.captcha
-        })
-    }
-
-    _onSetCaptcha(value) {
-        this.setState({captcha : value});
-    }
-
-    _onClearCaptcha() {
-        this.setState({captcha : null});
-    }
-
     render() {
         const {invalid, serverError, user, loading} = this.props;
         const _errorText = serverError && <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
+        const _captchaError = this.state.captchaError &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
 
         return (
             <div className="register-block-wrapper">
@@ -70,18 +58,62 @@ class PasswordConfirmSubform extends React.Component {
                     <Field name="password1" component={PasswordEdit} id={'password1'} disabled = {!!serverError}/>
                     <Field name="password2" component={PasswordEdit} id={'password2'} disabled = {!!serverError}/>
                     {_errorText}
-                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <Recaptcha
+                        ref={ ref => this.recaptcha = ref }
+                        sitekey={this.props.reCapture}
+                        onResolved={ ::this._onResolved }
+                        onError={::this._onCaptchaError}/>
+                    {_captchaError}
                     <div className="register-form__buttons">
-                        <SignUpButton disabled={invalid || !this.state.captcha || loading || !!serverError} caption={'Отправить'}
+                        <SignUpButton disabled={invalid || loading || !!serverError} caption={'Отправить'}
                                       type={'submit'}/>
                     </div>
                 </form>
             </div>
         )
     }
+
+    _handleSubmit(values) {
+        if (this.state.captchaError) {
+            this.setState({
+                captchaError: false
+            })
+        }
+
+        if (values.password1) {
+            this.setState({
+                password: values.password1,
+            })
+            this.recaptcha.execute();
+        } else {
+            this.recaptcha.reset();
+        }
+    }
+
+    _onResolved() {
+        this.props.onSubmit({
+            password: this.state.password,
+            activationKey: this.props.activationKey,
+            'g-recaptcha-response': this.recaptcha.getResponse()
+        })
+    }
+
+    _onCaptchaError() {
+        this.setState({
+            captchaError: true
+        })
+    }
 }
 
-export default reduxForm({
+const _PasswordConfirmSubform = reduxForm({
     form: 'PasswordConfirmSubform',
     validate
 })(PasswordConfirmSubform);
+
+function mapStateToProps(state) {
+    return {
+        reCapture: reCaptureSelector(state),
+    }
+}
+
+export default connect(mapStateToProps)(_PasswordConfirmSubform)

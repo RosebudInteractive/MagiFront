@@ -1,8 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {reduxForm, Field, change } from 'redux-form';
-import Captcha from './captcha'
 import {LoginEdit, SignUpButton} from './editors'
+import {reCaptureSelector} from "ducks/app";
+import Recaptcha from 'react-google-invisible-recaptcha';
+import {connect} from 'react-redux'
 
 const validate = values => {
     const errors = {}
@@ -21,7 +23,8 @@ class PwdRecoveryForm extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            captcha: null
+            email: null,
+            captchaError: false
         }
     }
 
@@ -29,21 +32,6 @@ class PwdRecoveryForm extends React.Component {
         onSubmit: PropTypes.func,
         email: PropTypes.string,
     };
-
-    _handleSubmit(values) {
-        this.props.onSubmit({
-            email: values.login,
-            'g-recaptcha-response': this.state.captcha
-        })
-    }
-
-    _onSetCaptcha(value) {
-        this.setState({captcha: value});
-    }
-
-    _onClearCaptcha() {
-        this.setState({captcha: null});
-    }
 
     componentDidMount() {
         if (this.props.email)
@@ -55,6 +43,9 @@ class PwdRecoveryForm extends React.Component {
         const _errorText = serverError &&
             <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
 
+        const _captchaError = this.state.captchaError &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
+
         return (
             <div className="register-block-wrapper">
                 <div className='register-block-wrapper__logo'/>
@@ -63,17 +54,60 @@ class PwdRecoveryForm extends React.Component {
                 <form className="form register-form" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
                     <Field name="login" component={LoginEdit} id={'email'} disabled={!!email}/>
                     {_errorText}
-                    <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                    <Recaptcha
+                        ref={ ref => this.recaptcha = ref }
+                        sitekey={this.props.reCapture}
+                        onResolved={ ::this._onResolved }
+                        onError={::this._onCaptchaError}/>
+                    {_captchaError}
                     <div className="register-form__buttons">
-                        <SignUpButton disabled={(!email && invalid) || !this.state.captcha} caption={'Отправить'} type={'submit'}/>
+                        <SignUpButton disabled={!email && invalid} caption={'Отправить'} type={'submit'}/>
                     </div>
                 </form>
             </div>
         )
     }
+
+    _handleSubmit(values) {
+        if (this.state.captchaError) {
+            this.setState({
+                captchaError: false
+            })
+        }
+
+        if (values.login) {
+            this.setState({
+                email: values.login,
+            })
+            this.recaptcha.execute();
+        } else {
+            this.recaptcha.reset();
+        }
+    }
+
+    _onResolved() {
+        this.props.onSubmit({
+            email: this.state.email,
+            'g-recaptcha-response': this.recaptcha.getResponse()
+        })
+    }
+
+    _onCaptchaError() {
+        this.setState({
+            captchaError: true
+        })
+    }
 }
 
-export default reduxForm({
+const _PwdRecoveryForm = reduxForm({
     form: 'PasswordRecoveryForm',
     validate
 })(PwdRecoveryForm);
+
+function mapStateToProps(state) {
+    return {
+        reCapture: reCaptureSelector(state),
+    }
+}
+
+export default connect(mapStateToProps)(_PwdRecoveryForm)
