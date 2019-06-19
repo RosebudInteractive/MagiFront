@@ -28,7 +28,8 @@ class SignInForm extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            captchaError: false
+            captchaError: false,
+            captchaReloading: false
         }
     }
 
@@ -37,9 +38,12 @@ class SignInForm extends React.Component {
     };
 
     _handleSubmit(values) {
-        if (this.state.captchaError) {
+        if (this.state.captchaError || this.props.serverError) {
+            this.recaptcha.reset();
+
             this.setState({
-                captchaError: false
+                captchaError: false,
+                captchaReloading: true
             })
         }
 
@@ -59,6 +63,11 @@ class SignInForm extends React.Component {
 
         ScrollMemoryStorage.setUrlPosition('INIT', _scrollPosition)
         ScrollMemoryStorage.setKeyActive('INIT')
+
+        this.setState({
+            captchaError: false,
+            captchaReloading: false
+        })
 
         this.props.onSubmit({
             login: this.state.login,
@@ -90,7 +99,7 @@ class SignInForm extends React.Component {
                         onResolved={ ::this._onResolved }
                         onError={::this._onCaptchaError}/>
                     {_captchaError}
-                    <LoginButton disabled={invalid || loading} caption={'Войти'}
+                    <LoginButton disabled={invalid || this.state.captchaReloading || loading} caption={'Войти'}
                                  onStartRecovery={::this.props.onStartRecovery}/>
                 </form>
                 <Warning/>
