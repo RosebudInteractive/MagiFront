@@ -65,6 +65,7 @@ const COURSE_REQ_TREE = {
 const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
+    "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
@@ -77,6 +78,7 @@ const COURSE_MSSQL_IMG_REQ =
 const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
+    "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
@@ -267,6 +269,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
+    "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -352,6 +355,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
+    "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -482,6 +486,8 @@ const CHECKIF_CAN_DEL_MYSQL =
     "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
+const request = require('request');
+const { URL, URLSearchParams } = require('url');
 
 const URL_PREFIX = "category";
 
@@ -492,6 +498,70 @@ const DbCourse = class DbCourse extends DbObject {
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
         this._productService = ProductService();
+    }
+
+    async _getVideoInfo(url) {
+        const TIME_REGEXP = /PT(([0-9]+)H)*(([0-9]+)M)*(([0-9]+)S)*/i;
+        const ID_REGEXP = /https:\/\/www.youtube.com\/embed\/(.+)/i;
+        const YOUTUBE_API_VIDEO_BASE_URL = "https://www.googleapis.com/youtube/v3/videos";
+
+        let res = { fmt: "", sec: 0 };
+        if (url) {
+            let match = url.toString().match(ID_REGEXP);
+            if (match && Array.isArray(match) && (match.length === 2)) {
+                let id = match[1];
+                return new Promise((resolve, reject) => {
+                    let reqUrl = new URL(YOUTUBE_API_VIDEO_BASE_URL);
+                    reqUrl.searchParams.append('id', id);
+                    reqUrl.searchParams.append('part', 'contentDetails');
+                    reqUrl.searchParams.append('fields', 'items(contentDetails(duration))');
+                    reqUrl.searchParams.append('key', config.authentication.googleAppId);
+                    request(reqUrl.href, (error, response, body) => {
+                        if (error) {
+                            console.error(buildLogString(`YouTube request error: "${error.message}"` +
+                                ` API: "${reqUrl.href}"`));
+                            reject(error);
+                        }
+                        else {
+                            if (response.statusCode === HttpCode.OK) {
+                                try {
+                                    let result = JSON.parse(body);
+                                    if (result && result.items && (result.items.length > 0)
+                                        && result.items[0].contentDetails && result.items[0].contentDetails.duration) {
+                                        let timeString = "" + result.items[0].contentDetails.duration;
+                                        match = timeString.match(TIME_REGEXP);
+                                        if (match && Array.isArray(match) && (match.length === 7)) {
+                                            if (match[2])
+                                                res.sec += (+match[2]) * 3600;
+                                            if (match[4])
+                                                res.sec += (+match[4]) * 60;
+                                            if (match[6])
+                                                res.sec += (+match[6]);
+                                            if (res.sec > 1)
+                                                res.sec--;
+                                            res.fmt = DbUtils.fmtDuration(res.sec);
+                                            resolve(res);
+                                        }
+                                        throw new Error(`Incorrect duration format: "${timeString}"`);
+                                    }
+                                    else
+                                        throw new Error(`Incorrect result of YouTube request: "${body}"`);
+                                }
+                                catch (err) {
+                                    reject(err);
+                                };
+                            }
+                            else
+                                reject(new Error(`YouTube request error: HttpCode: ${response.statusCode}, Body: ${body}`));
+                        }
+                    });
+                
+                });
+            }
+            else
+                throw new Error(`Invalid video URL: "${url}"`);
+        }
+        return res;
     }
 
     _isNumericString(str) {
@@ -994,6 +1064,12 @@ const DbCourse = class DbCourse extends DbObject {
                                         Name: elem.Name,
                                         Description: elem.Description,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                                        VideoIntwLink: elem.VideoIntwLink,
+                                        VideoIntroLink: elem.VideoIntroLink,
+                                        IntwD: elem.IntwD,
+                                        IntwDFmt: elem.IntwDFmt,
+                                        IntroD: elem.IntroD,
+                                        IntroDFmt: elem.IntroDFmt,
                                         IsSubsRequired: false,
                                         ExtLinks: elem.ExtLinks,
                                         IsBought: (elem.Counter || elem.GiftId) ? true : false,
@@ -1737,7 +1813,7 @@ const DbCourse = class DbCourse extends DbObject {
 
                         return crs_obj.edit()
                     })
-                    .then(() => {
+                    .then(async () => {
 
                         if (typeof (inpFields["Color"]) !== "undefined")
                             crs_obj.color(inpFields["Color"]);
@@ -1802,6 +1878,18 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.snName(inpFields["SnName"]);
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             crs_lng_obj.snDescription(inpFields["SnDescription"]);
+                        if (typeof (inpFields["VideoIntwLink"]) !== "undefined") {
+                            crs_lng_obj.videoIntwLink(inpFields["VideoIntwLink"]);
+                            let { fmt, sec } = await this._getVideoInfo(crs_lng_obj.videoIntwLink());
+                            crs_lng_obj.intwD(sec);
+                            crs_lng_obj.intwDFmt(fmt);
+                        }
+                        if (typeof (inpFields["VideoIntroLink"]) !== "undefined") {
+                            crs_lng_obj.videoIntroLink(inpFields["VideoIntroLink"]);
+                            let { fmt, sec } = await this._getVideoInfo(crs_lng_obj.videoIntroLink());
+                            crs_lng_obj.introD(sec);
+                            crs_lng_obj.introDFmt(fmt);
+                        }
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -2076,7 +2164,7 @@ const DbCourse = class DbCourse extends DbObject {
                             fields: fields
                         }, opts);
                     })
-                    .then((result) => {
+                    .then(async (result) => {
                         newId = result.keyValue;
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("CourseLng");
@@ -2097,6 +2185,18 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["SnName"] = inpFields["SnName"];
                         if (typeof (inpFields["SnDescription"]) !== "undefined")
                             fields["SnDescription"] = inpFields["SnDescription"];
+                        if (typeof (inpFields["VideoIntwLink"]) !== "undefined") {
+                            fields["VideoIntwLink"] = inpFields["VideoIntwLink"];
+                            let { fmt, sec } = await this._getVideoInfo(fields["VideoIntwLink"]);
+                            fields["IntwD"] = sec;
+                            fields["IntwDFmt"] = fmt;
+                        }
+                        if (typeof (inpFields["VideoIntroLink"]) !== "undefined") {
+                            fields["VideoIntroLink"] = inpFields["VideoIntroLink"];
+                            let { fmt, sec } = await this._getVideoInfo(fields["VideoIntroLink"]);
+                            fields["IntroD"] = sec;
+                            fields["IntroDFmt"] = fmt;
+                        }
 
                         return root_lng.newObject({
                             fields: fields

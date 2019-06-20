@@ -4,6 +4,7 @@ import LessonsTab from "./lessons-tab"
 import BooksTab from "./books-tab"
 import CourseLessons from "./course-lessons";
 import CourseBooks from "./course-books";
+import VideoBlock from "./video-block";
 
 const TABS_NAME = {
     LESSONS: 'LESSONS',
@@ -35,7 +36,10 @@ export default class TabsWrapper extends React.Component {
     _getList() {
         return (
             this.state.activeTab === TABS_NAME.LESSONS ?
-                <CourseLessons course={this.props.course}/>
+                <React.Fragment>
+                    <VideoBlock course={this.props.course}/>
+                    <CourseLessons course={this.props.course}/>
+                </React.Fragment>
                 :
                 <CourseBooks/>
         )

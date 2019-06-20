@@ -81,6 +81,7 @@ class ResourcesGrid extends React.Component {
     _create() {
         this._resource = Object.assign({}, NEW_RESOURCE)
         this._resource.Id = this._internalId
+        this._resource.id = this._resource.Id
         this._internalId--;
         this._resourceEditMode = false
 
@@ -174,6 +175,7 @@ class ResourcesGrid extends React.Component {
                 if (!item.Id) {
                     item.ShowInGalery = true
                     item.Id = this._internalId--
+                    item.id = item.Id
                 }
             })
         }

@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from "prop-types";
 import {connect} from "react-redux";
-import ImportButton from "./import-buttom"
+import ImportButton from "./import-button"
 import {Field, isDirty} from "redux-form";
 import {CheckBox, TextBox} from "../../../common/input-controls";
 import Select from "../../../common/select-control";

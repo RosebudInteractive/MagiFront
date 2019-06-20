@@ -102,7 +102,8 @@ module.exports = {
         reCapture: {
             siteKey: pk.authentication.reCapture.siteKey,
             secretKey: pk.authentication.reCapture.secretKey
-        }
+        },
+        googleAppId: pk.authentication.googleAppId
     },
     mail: {
         autosubscribe: {

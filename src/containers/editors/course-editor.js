@@ -20,7 +20,7 @@ import {showErrorDialog} from '../../actions/app-actions';
 import {getAuthors} from "../../actions/authorsListActions";
 import {getCategories} from "../../actions/categoriesListActions";
 import {getLanguages} from "../../actions/languages-actions";
-import {checkExtLinks, getExtLinks} from "../../tools/link-tools";
+import {checkExtLinks, convertYouTubeWatchLinkToEmbed, getExtLinks} from "../../tools/link-tools";
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
 import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
@@ -202,6 +202,8 @@ class CourseEditor extends React.Component {
             Lessons: [],
             ExtLinks: getExtLinks(editorValues.extLinksValues),
             OneLesson: !!editorValues.oneLesson,
+            VideoIntroLink: convertYouTubeWatchLinkToEmbed(editorValues.videoIntroLink),
+            VideoIntwLink: convertYouTubeWatchLinkToEmbed(editorValues.videoIntwLink),
             IsPaid: subscriptionValues.IsPaid, // признак платности
             IsSubsFree: subscriptionValues.IsSubsFree, // признак бесплатности в рамках подписки
             Price: _roundNum(subscriptionValues.Price), // цена

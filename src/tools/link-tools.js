@@ -134,3 +134,24 @@ export const convertLinksToString = (data) => {
         return null
     }
 }
+
+export const convertYouTubeWatchLinkToEmbed = (link) => {
+    if (!link) return null
+
+    let _link = null
+
+    try {
+        _link = new URL(link);
+    } catch (e) {
+        _link = null;
+    }
+
+    if (_link && (_link.pathname === '/watch')) {
+        let _id = _link.searchParams.get('v')
+        if (_id) {
+            return _link.protocol + '//' + _link.host + '/embed/' + _id
+        }
+    }
+
+    return link
+}
