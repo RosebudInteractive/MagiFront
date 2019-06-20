@@ -1,5 +1,5 @@
 import React from 'react';
-import {reduxForm, Field} from 'redux-form';
+import {reduxForm, Field, clearSubmitErrors} from 'redux-form';
 import {LoginEdit, PasswordEdit, LoginButton} from '../components/auth/editors'
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -29,14 +29,19 @@ let SignInForm = class SignInForm extends React.Component {
             captcha: null,
             login: null,
             password: null,
-            captchaError: false
+            captchaError: false,
+            captchaReloading: false
         }
     }
 
     _handleSubmit(values) {
-        if (this.state.captchaError) {
+        if (this.state.captchaError || this.props.serverError) {
+            this.recaptcha.reset();
+            this.props.clearSubmitErrors('SignInForm')
+
             this.setState({
-                captchaError: false
+                captchaError: false,
+                captchaReloading: true
             })
         }
 
@@ -52,6 +57,11 @@ let SignInForm = class SignInForm extends React.Component {
     }
 
     _onResolved() {
+        this.setState({
+            captchaError: false,
+            captchaReloading: false
+        })
+
         this.props.login({
             login: this.state.login,
             password: this.state.password,
@@ -83,7 +93,7 @@ let SignInForm = class SignInForm extends React.Component {
                         onResolved={ ::this._onResolved }
                         onError={::this._onCaptchaError}/>
                     {_captchaError}
-                    <LoginButton disabled={invalid || loading} caption={'Войти'}/>
+                    <LoginButton disabled={invalid || this.state.captchaReloading || loading} caption={'Войти'}/>
                 </form>
             </div>
             :
@@ -116,6 +126,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         login: bindActionCreators(login, dispatch),
+        clearSubmitErrors: bindActionCreators(clearSubmitErrors, dispatch),
     }
 }
 

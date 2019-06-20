@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {reduxForm, Field, formValueSelector} from 'redux-form';
 import ButtonsBlock from './buttons-block'
-import Captcha from './captcha'
+import Recaptcha from 'react-google-invisible-recaptcha';
 import {connect} from 'react-redux'
 import PasswordValidator from 'password-validator';
 import {LoginEdit, PasswordEdit, UserNameEdit, BackButton, SignUpButton} from './editors'
 import Warning from "./warning";
+import {reCaptureSelector} from "ducks/app";
 
 let schema = new PasswordValidator();
 schema
@@ -50,10 +51,10 @@ let SignUpForm = class SignUpForm extends React.Component {
         super(props)
         this.state = {
             screen: screens.email,
-            // login: null,
+            login: null,
             password1: null,
             password2: null,
-            captcha: false
+            captchaError: false
         }
     }
 
@@ -62,20 +63,31 @@ let SignUpForm = class SignUpForm extends React.Component {
     };
 
     _handleSubmit(values) {
+        if (this.state.captchaError) {
+            this.setState({
+                captchaError: false
+            })
+        }
+
+        if (values.login && values.password1) {
+            this.setState({
+                login: values.login,
+                name: values.username,
+                password: values.password1,
+            })
+            this.recaptcha.execute();
+        } else {
+            this.recaptcha.reset();
+        }
+    }
+
+    _onResolved() {
         this.props.onSubmit({
-            login: values.login,
-            name: values.username,
-            password: values.password1,
-            'g-recaptcha-response': this.state.captcha
+            login: this.state.login,
+            name: this.state.name,
+            password: this.state.password,
+            'g-recaptcha-response': this.recaptcha.getResponse()
         })
-    }
-
-    _onSetCaptcha(value) {
-        this.setState({captcha: value});
-    }
-
-    _onClearCaptcha() {
-        this.setState({captcha: null});
     }
 
     _onBackward() {
@@ -90,6 +102,9 @@ let SignUpForm = class SignUpForm extends React.Component {
         const {invalid, serverError, loading} = this.props;
         const _errorText = serverError &&
             <p className="form__error-message js-error-message" style={{display: "block"}}>{serverError}</p>
+
+        const _captchaError = this.state.captchaError &&
+            <p className="form__error-message js-error-message" style={{display: "block"}}>Ошибка проверки captcha</p>
 
         return (
             <form className="register-block-wrapper" onSubmit={this.props.handleSubmit(::this._handleSubmit)}>
@@ -116,10 +131,15 @@ let SignUpForm = class SignUpForm extends React.Component {
                             <Field name="password1" component={PasswordEdit}/>
                             <Field name="password2" component={PasswordEdit}/>
                             {_errorText}
-                            <Captcha onSetCapture={::this._onSetCaptcha} onClearCaptcha={::this._onClearCaptcha}/>
+                            <Recaptcha
+                                ref={ ref => this.recaptcha = ref }
+                                sitekey={this.props.reCapture}
+                                onResolved={ ::this._onResolved }
+                                onError={::this._onCaptchaError}/>
+                            {_captchaError}
                             <div className="register-form__buttons">
                                 <BackButton onBackward={::this._onBackward}/>
-                                <SignUpButton disabled={invalid || !this.state.captcha || loading}
+                                <SignUpButton disabled={invalid || loading}
                                               caption={'Зарегистрироваться'} type={'submit'}/>
                             </div>
                         </div>
@@ -127,22 +147,32 @@ let SignUpForm = class SignUpForm extends React.Component {
                 <Warning/>
             </form>
         )
+    }
 
-
+    _onCaptchaError() {
+        this.setState({
+            captchaError: true
+        })
     }
 }
 
-SignUpForm = reduxForm({
+let _SignUpForm = reduxForm({
     form: 'SignUpForm',
     validate
 })(SignUpForm)
 
 const selector = formValueSelector('SignUpForm')
-SignUpForm = connect(
+_SignUpForm = connect(
     state => {
         const login = selector(state, 'login')
         return {login}
     }
-)(SignUpForm)
+)(_SignUpForm)
 
-export default SignUpForm;
+function mapStateToProps(state) {
+    return {
+        reCapture: reCaptureSelector(state),
+    }
+}
+
+export default connect(mapStateToProps)(_SignUpForm);

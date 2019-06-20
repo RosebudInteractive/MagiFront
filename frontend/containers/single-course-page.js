@@ -23,6 +23,7 @@ import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clear
 
 import {getCrownForCourse} from "../tools/svg-paths"
 import ScrollMemoryStorage from "../tools/scroll-memory-storage"
+import VideoBlock from "../components/course-extended/video-block";
 
 class Main extends React.Component {
     constructor(props) {
@@ -188,6 +189,7 @@ class Main extends React.Component {
                                 shareUrl={window.location.href}
                                 course={course}
                             />
+                            <VideoBlock course={course}/>
                             <Tabs
                                 lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
                                 books={{total: course.RefBooks.length}}

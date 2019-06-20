@@ -90,7 +90,7 @@ class EpisodeEditorForm extends React.Component {
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
                         <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}
-                                 lessonId={this.props.lessonId} episodeId={this.props.episode.Id}/>
+                                 lessonId={this.lessonIdForImport} episodeId={this.props.episode.Id}/>
                         <TocTab visible={this.state.currentTab === TABS.TOC} editMode={this.props.editMode}/>
                         <ContentTab visible={this.state.currentTab === TABS.CONTENT} editMode={this.props.editMode} lessonId={1}/>
                     </form>
@@ -101,6 +101,12 @@ class EpisodeEditorForm extends React.Component {
                                 onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
             </div>
         </React.Fragment>
+    }
+
+    get lessonIdForImport() {
+        let {sublessonId, lessonId}  = this.props;
+
+        return sublessonId ? sublessonId : lessonId
     }
 
     _init() {
