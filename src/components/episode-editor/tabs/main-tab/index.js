@@ -47,7 +47,7 @@ class MainTab extends React.Component {
             <Field component={CheckBox} name="supp" label="Дополнительный материал" disabled={true}/>
             <Field component={Select} name="state" label="Состояние" placeholder="Выберите состояние" options={EPISODE_STATE} disabled={_disabled}/>
             <Field component={AudioLink} name="audio" label="Аудио-контент" placeholder="Выберите аудио файл" disabled={_disabled}/>
-            <Field component={TextArea} name="transcript" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
+            <Field component={TextArea} name="transcript" label="Транскрипт" enableHtml={true} disabled={_disabled}/>
         </div>
 
     }
@@ -69,8 +69,4 @@ function mapStateToProps(state) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {}
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainTab)
+export default connect(mapStateToProps)(MainTab)
