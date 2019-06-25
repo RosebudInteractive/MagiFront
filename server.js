@@ -127,6 +127,10 @@ Promise.resolve()
             });
         }
 
+        app.get('/player-app', function (req, res) {
+            res.render('player-app.html', {});
+        });
+
         // обработчик файлов html будет шаблонизатор ejs
         app.engine('html', require('ejs').renderFile);
 
@@ -139,9 +143,6 @@ Promise.resolve()
             });
             app.get('/player', function (req, res) {
                 res.render('player.html', {});
-            });
-            app.get('/player-app', function (req, res) {
-                res.render('player-app.html', {});
             });
             app.get('/player-app-test', function (req, res) {
                 res.render('player-app-test.html', {});
