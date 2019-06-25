@@ -41,7 +41,7 @@ export const getCrownForCourse = (course) => {
         return null
     }
 
-    const _fill = course.IsGift ? "#F79F1A" : "#C8684C"
+    const _fill = (course.IsGift || course.IsBought) ? "#C8684C" : "#F79F1A"
 
     return course.IsPaid ?
             <svg className="course-module__label-icon" width="18" height="18" fill={_fill}
