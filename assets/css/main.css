@@ -6056,19 +6056,22 @@ ul.user-tooltip {
           background-image: -webkit-gradient(linear, left bottom, left top, from(#fff), to(rgba(255, 255, 255, 0)));
           background-image: -webkit-linear-gradient(bottom, #fff, rgba(255, 255, 255, 0));
           background-image: linear-gradient(to top, #fff, rgba(255, 255, 255, 0)); } }
-    .course-module__course-descr p {
+    .course-module__course-descr > p {
       margin: 0;
       padding-right: 16.666666%;
       font-size: 20px;
       line-height: 26px; }
-    .course-module__course-descr > * span {
-      font-size: 20px !important;
-      font-family: "PT Serif", serif !important;
-    }
       @media (max-width: 899px) {
-        .course-module__course-descr p {
+        .course-module__course-descr > p {
           font-size: 15px;
           line-height: 19px; } }
+    .course-module__course-descr > * span {
+        font-size: 20px !important;
+        font-family: "PT Serif", serif !important; }
+    @media (max-width: 899px) {
+        .course-module__course-descr > * span {
+            font-size: 15px !important;
+            line-height: 19px !important; } }
     .course-module__course-descr .cur {
       font-style: italic; }
     .course-module__course-descr a {
