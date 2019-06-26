@@ -343,8 +343,8 @@ const GET_NOT_SENT_TRANS_MSSQL =
 
 const GET_NOT_SENT_TRANS_MYSQL =
     "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
-    "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price``Sum`,\n" +
-    "  ii.`Qty` * round(ii.`Price` * ii.`VATRate` / (100 + ii.`VATRate`), 2)`Tax`, g.`Code``Coupon`\n" +
+    "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price` `Sum`,\n" +
+    "  ii.`Qty` * round(ii.`Price` * ii.`VATRate` / (100 + ii.`VATRate`), 2) `Tax`, g.`Code` `Coupon`\n" +
     "from`Cheque` c\n" +
     "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
     "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
