@@ -229,6 +229,9 @@ function setupAPI(express, app) {
                     options.billing.self_refund = true;
                 if (config.has('lessonPositions.debug'))
                     options.debug.lsnPositions = config.lessonPositions.debug;
+                if (config.has('debug.clientTrace.gtm'))
+                    options.debug.gtm = config.debug.clientTrace.gtm;
+
                 return ParametersService().getAllParameters(true)
                     .then(params => { options.parameters = params })
             })

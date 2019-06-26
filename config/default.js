@@ -87,6 +87,9 @@ module.exports = {
         maxInterval: 1 * 60 * 60 // 1 hour
     },
     debug: {
+        clientTrace: {
+            gtm: true  
+        },
         routes: {
             "set-user-subscription": false,
             player: true,
@@ -97,7 +100,8 @@ module.exports = {
             paymenttest: true,
             regtest: true,
             pushtest: true,
-            testrecovery: true        }
+            testrecovery: true
+        }
     },
     general: {
         paid_truncate: { length: 30, inPerc: true, reserveLastWord: 25 }        

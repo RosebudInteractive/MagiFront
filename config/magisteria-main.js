@@ -59,6 +59,9 @@ module.exports = {
         maxInterval: 1 * 60 * 60 // 1 hour
     },
     debug: {
+        clientTrace: {
+            gtm: false
+        },
         routes: {
             "set-user-subscription": false,
             player: false,
