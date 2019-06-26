@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const config = require('config');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 const { DbObject } = require('./db-object');
 const { UsersCache } = require('../security/users-cache');
 const { PositionsService } = require('../services/lesson-positions');
@@ -322,20 +323,151 @@ const GET_SUBS_INFO_MYSQL =
     "  left join`AutoSubscription` a on a.`UserId` = u.`SysParentId` and a.`SubsExpDate` = u.`SubsExpDate`\n" +
     "where u.`SysParentId` = <%= id %>";
 
+const GET_NOT_SENT_TRANS_MSSQL =
+    "select c.[Id] [TranId], ii.[Id] [ItemId], cc.[CourseId], al.[FirstName]+ ' ' + al.[LastName][Author],\n" +
+    "  ct.[Name] [Category], cl.[Name], ii.[Price], ii.[Qty], ii.[Qty] * ii.[Price][Sum],\n" +
+    "  ii.[Qty] * round(ii.[Price] * ii.[VATRate] / (100 + ii.[VATRate]), 2)[Tax], g.[Code][Coupon]\n" +
+    "from[Cheque] c\n" +
+    "  join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
+    "  join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
+    "  join[Product] p on p.[Id] = ii.[ProductId]\n" +
+    "  join[Course] cr on cr.[ProductId] = p.[Id]\n" +
+    "  join[CourseLng] cl on cl.[CourseId] = cr.[Id]\n" +
+    "  join[CourseCategory] cc on cc.[CourseId] = cr.[Id]\n" +
+    "  join[CategoryLng] ct on ct.[CategoryId] = cc.[CategoryId]\n" +
+    "  join[AuthorToCourse] ac on ac.[CourseId] = cc.[CourseId]\n" +
+    "  join[AuthorLng] al on ac.[AuthorId] = al.[AuthorId]\n" +
+    "  left join[PromoCode] g on g.[Id] = c.[PromoCodeId]\n" +
+    "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)\n" +
+    "order by c.[Id], ii.[Id]";
+
+const GET_NOT_SENT_TRANS_MYSQL =
+    "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
+    "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price``Sum`,\n" +
+    "  ii.`Qty` * round(ii.`Price` * ii.`VATRate` / (100 + ii.`VATRate`), 2)`Tax`, g.`Code``Coupon`\n" +
+    "from`Cheque` c\n" +
+    "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
+    "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
+    "  join`Product` p on p.`Id` = ii.`ProductId`\n" +
+    "  join`Course` cr on cr.`ProductId` = p.`Id`\n" +
+    "  join`CourseLng` cl on cl.`CourseId` = cr.`Id`\n" +
+    "  join`CourseCategory` cc on cc.`CourseId` = cr.`Id`\n" +
+    "  join`CategoryLng` ct on ct.`CategoryId` = cc.`CategoryId`\n" +
+    "  join`AuthorToCourse` ac on ac.`CourseId` = cc.`CourseId`\n" +
+    "  join`AuthorLng` al on ac.`AuthorId` = al.`AuthorId`\n" +
+    "  left join`PromoCode` g on g.`Id` = c.`PromoCodeId`\n" +
+    "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)\n" +
+    "order by c.`Id`, ii.`Id`";
+
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
+const CACHE_PREFIX = "user:";
+const LOCK_TIMEOUT_SEC = 5 * 60; // 5 min lock
 
 const DbUser = class DbUser extends DbObject {
 
     constructor(options) {
-        super(options);
+        let opts = _.cloneDeep(options || {});
+        opts.cache = opts.cache ? opts.cache : {};
+        if (!opts.cache.prefix)
+            opts.cache.prefix = CACHE_PREFIX;
+        super(opts);
         this._usersCache = UsersCache();
         this._coursesService = CoursesService();
     }
 
-    _getObjById(id, expression, options) {
-        var exp = expression || USER_REQ_TREE;
-        return super._getObjById(id, exp, options);
+    _getTranLockKey(userId) {
+        return `tranlock:${userId}`;
+    }
+
+    async getNotSentTrans(userId) {
+        let trans = [];
+        let key = this._getTranLockKey(userId);
+        let lockRes = await this.cacheSet(key, "1", {
+            ttlInSec: LOCK_TIMEOUT_SEC,
+            nx: true
+        });
+        if (lockRes === "OK") {
+            let result = await $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_NOT_SENT_TRANS_MYSQL)({ user_id: userId }),
+                    mssql: _.template(GET_NOT_SENT_TRANS_MSSQL)({ user_id: userId })
+                }
+            }, {});
+            
+            if (result && result.detail && (result.detail.length > 0)) {
+                let currTranId = -1;
+                let cuttItemId = -1;
+                let currTran;
+                result.detail.forEach(elem => {
+                    if (elem.TranId !== currTranId) {
+                        currTran = { id: elem.TranId, currencyCode: "RUB", revenue: 0, tax: 0, coupon: elem.Coupon, products: [] };
+                        trans.push(currTran);
+                        currTranId = elem.TranId;
+                    }
+                    if (cuttItemId !== elem.ItemId) {
+                        let currItem = {
+                            id: elem.CourseId,
+                            name: elem.Name,
+                            price: elem.Price,
+                            brand: elem.Author,
+                            category: elem.Category,
+                            quantity: elem.Qty
+                        };
+                        currTran.products.push(currItem);
+                        currTran.revenue += elem.Sum;
+                        currTran.tax += elem.Tax;
+                        cuttItemId = elem.ItemId;
+                    }
+                })
+            }
+
+            if (trans.length === 0)
+                await this.cacheDel(key);
+        }
+        return trans;
+    }
+
+    async markTransAsSent(userId, data, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let trans = data || {};
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjects({ expr: { model: { name: "Cheque" } } },
+                    [
+                        { field: "UserId", op: "=", value: userId },
+                        { field: "StateId", op: "=", value: 4 },
+                        { field: "ChequeTypeId", op: "=", value: 1 },
+                        { field: "SendStatus", op: "=", value: 0 }
+                    ], dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    let col = root_obj.getCol("DataElements");
+                    let chequeList = {};
+                    for (let i = 0; i < col.count(); i++){
+                        let obj = col.get(i);
+                        chequeList[obj.id()] = obj;
+                    }
+                    for (let i = 0; i < trans.length; i++){
+                        let obj = chequeList[trans[i]];
+                        if (obj)
+                            obj.sendStatus(1);
+                    }
+                    
+                    await root_obj.save(dbOpts);
+                    await this.cacheDel(this._getTranLockKey(userId));
+                    return { result: "OK" };
+                })
+        }, memDbOptions);
     }
 
     getPublic(user) {

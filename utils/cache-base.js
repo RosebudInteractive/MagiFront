@@ -139,6 +139,13 @@ exports.CacheableObject = class CacheableObject {
                             args.push("EX");
                             args.push(opts.ttlInSec);
                         }
+                    if ((typeof (opts.nx) === "boolean") && opts.nx) {
+                        args.push("NX");
+                    }
+                    else
+                        if ((typeof (opts.xx) === "boolean") && opts.xx) {
+                            args.push("XX");
+                        }
                     return connection.setAsync(args);
                 });
             }

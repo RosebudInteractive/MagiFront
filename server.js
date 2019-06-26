@@ -2,7 +2,6 @@
  * Created by levan.kiknadze on 05/11/2017.
  */
 
-//var webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
@@ -23,7 +22,7 @@ const { getTimeStr, buildLogString } = require('./utils');
 
 const PRODUCT_CODE = "ProtoOne";
 const VERSION_CODE = "1.0.0.1";
-const BUILD_NUM = 13;
+const BUILD_NUM = 14;
 
 //bld.initDatabase()
 Promise.resolve()

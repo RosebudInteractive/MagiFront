@@ -719,7 +719,7 @@ exports.Payment = class Payment extends DbObject {
                     else {
                         await root_obj.edit();
 
-                        let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId };
+                        let fields = { IsSaved: false, RefundSum: 0, CampaignId: campaignId, SendStatus: 0 };
                         if ((!isRefund) && data.Promo && data.Promo.Id) {
                             fields.PromoCodeId = data.Promo.Id;
                             fields.PromoSum = data.Promo.PromoSum ? data.Promo.PromoSum : 0;

@@ -17,6 +17,34 @@ function setupUsers(app) {
         global.$Services = {};
     global.$Services.users = UsersService;
 
+    app.get('/api/users/not-sent-trans', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .getNotSentTrans(req.user.Id)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.post('/api/users/send-trans', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            UsersService()
+                .markTransAsSent(req.user.Id, req.body)
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
     app.get('/api/users/invoice', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
