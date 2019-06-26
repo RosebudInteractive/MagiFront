@@ -5679,7 +5679,7 @@ ul.user-tooltip {
     font-weight: normal;
     font-size: 14px;
     line-height: normal;
-    color: #F79F1A; }
+    color: #C8684C; }
   @media (max-width: 767px) {
     .gift-block__text {
       max-width: 300px; } }
@@ -10569,11 +10569,11 @@ body[data-page="fullpage-player"] .lectures-menu {
   -webkit-align-items: center;
   -moz-box-align: center;
   -ms-flex-align: center;
-  align-items: center; }
+  align-items: center;
+  border-top: 1px solid rgba(47, 47, 47, 0.15); }
 
 .course__video-block {
   display: flex;
-  border-bottom: 1px solid rgba(47, 47, 47, 0.15);
   justify-content: space-between; }
 
 .course__video-block .video-block__item:first-child {
