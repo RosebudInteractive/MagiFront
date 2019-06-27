@@ -132,6 +132,14 @@ export default class CWSPlayer extends CWSBase {
 
     _onResize() {
         this._setRatio(this._container.children());
+        this._resizeChildren()
+    }
+
+    _resizeChildren() {
+        this._elements.array.forEach((elem) => {
+            if (elem.Id in this._audioState.playingNow)
+                elem.resize();
+        })
     }
 
     _broadcastChangeContent(content) {
@@ -174,7 +182,10 @@ export default class CWSPlayer extends CWSBase {
             item.width(contW);
         } else if (contRatio < playerRatio) {
             item.height(contH);
-            item.width(contH / playerRatio);
+            item.width(contW);
+
+            // item.height(contH);
+            // item.width(contH / playerRatio);
 
             // if (this._audioState.externalPlayer && item.parent()) {
             //     $(window).unbind("resize")
@@ -182,8 +193,11 @@ export default class CWSPlayer extends CWSBase {
             //     $(window).bind("resize", ::this._onResize)
             // }
         } else {
+            item.height(contH);
             item.width(contW);
-            item.height(contW * playerRatio);
+
+            // item.width(contW);
+            // item.height(contW * playerRatio);
 
             // if (this._audioState.externalPlayer && item.parent()) {
             //     $(window).unbind("resize")

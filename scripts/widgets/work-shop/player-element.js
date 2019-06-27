@@ -230,6 +230,21 @@ export default class CWSPlayerElement extends CWSBase {
         this.play();
     }
 
+    resize() {
+        this._calcMaxSize();
+
+        let _item = $(`#${this.Id}`);
+        if (_item && _item.length) {
+            _item.css({
+                left: this._options.data.content.position.left + "%",
+                top: this._options.data.content.position.top + "%",
+                bottom: this._options.data.content.position.bottom + "%",
+                right: this._options.data.content.position.right + "%",
+                "z-index": this._options.data.zIndex,
+            });
+        }
+    }
+
     initContainer(cont) {
         this._container = cont;
         let item = $("#" + this.Id);
