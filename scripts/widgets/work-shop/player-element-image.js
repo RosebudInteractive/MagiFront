@@ -64,6 +64,11 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
     _calcMaxSize() {
         let ass = this.Asset;
 
+        const _ratio = this._container.width() / this._container.height()
+
+        const ratioX = (_ratio >= 1) ? _ratio * 100 : 100, //16 * 10,
+            ratioY = (_ratio < 1) ? (1/_ratio) * 100 : 100//9 * 10
+
         if (!ass || !ass.info) {
             this._options.data.content.position.bottom = 0;
             this._options.data.content.position.right = 0;
@@ -74,16 +79,16 @@ export default class CWSPlayerElementImage extends CWSPlayerElement {
                 w = ass.info.size.width;
             let pictRatio = w ? h / w : 1;
             w = 100;
-            let actualWidth = 160; // * 1;
+            let actualWidth = ratioX; // * 1;
             let actualHeight = actualWidth * pictRatio;
             // calculate actualHeight's %
-            h = actualHeight / 90 * 100;
+            h = actualHeight / ratioY * 100;
 
             if (h > 100) {
                 h = 100;
-                actualHeight = 90; // * 1;
+                actualHeight = ratioY; // * 1;
                 actualWidth = actualHeight / pictRatio;
-                w = actualWidth / 160 * 100;
+                w = actualWidth / ratioX * 100;
             }
             if (!this._options.data.content.position)
                 this._options.data.content.position = {};
