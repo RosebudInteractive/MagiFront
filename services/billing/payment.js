@@ -57,6 +57,11 @@ const GUID_REG_EXP = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 const PAYMENT_CACHE_PREFIX = "pay:";
 const DFLT_CHEQUE_PENDING_PERIOD = 15 * 60; // cheque pending period in sec - 15 min
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Currently we are ignoring payments which aren't completed. Potentially it can result in duplicate payments !!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+const IGNORE_PENDING_PAYMENTS = true;
+
 exports.Payment = class Payment extends DbObject {
 
     get chequePendingPeriod() {
@@ -365,10 +370,11 @@ exports.Payment = class Payment extends DbObject {
     }
 
     async _cachePendingCheque(id, cheque, raw_data) {
-        if (raw_data && raw_data.confirmationUrl) {
-            await this.cacheSet(`cheque:${id}`, { url: raw_data.confirmationUrl },
-                { json: true, ttlInSec: this.chequePendingPeriod });
-        }
+        if (!IGNORE_PENDING_PAYMENTS)
+            if (raw_data && raw_data.confirmationUrl) {
+                await this.cacheSet(`cheque:${id}`, { url: raw_data.confirmationUrl },
+                    { json: true, ttlInSec: this.chequePendingPeriod });
+            }
     }
 
     async _getPendingChequeFromCache(id) {
@@ -842,38 +848,40 @@ exports.Payment = class Payment extends DbObject {
     }
 
     async _setPendingObjects(chequeObj, invoice_data, flag) {
-        let currList = null;
-        let key = `crs:${invoice_data.UserId}`;
-        let self = this;
+        if (!IGNORE_PENDING_PAYMENTS) {
+            let currList = null;
+            let key = `crs:${invoice_data.UserId}`;
+            let self = this;
 
-        async function getCurrent() {
-            if (!currList) {
-                let userPending = await self.cacheGet(key, { json: true });
-                currList = userPending ? userPending : {};
-            }
-            return currList;
-        }
-
-        let isMdf = false;
-        if (invoice_data.Items && (invoice_data.Items.length > 0)) {
-            for (let i = 0; i < invoice_data.Items.length; i++) {
-                let item = invoice_data.Items[i];
-                if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
-                    && item.ExtFields.prod && item.ExtFields.prod.courseId) {
-                    await getCurrent();
-                    let exists = currList[item.ExtFields.prod.courseId] ? true : false;
-                    isMdf = isMdf || ((!exists) && flag) || (exists && (!flag));
-                    if (flag)
-                        currList[item.ExtFields.prod.courseId] = { chequeId: chequeObj.id() }
-                    else
-                        delete currList[item.ExtFields.prod.courseId];
+            async function getCurrent() {
+                if (!currList) {
+                    let userPending = await self.cacheGet(key, { json: true });
+                    currList = userPending ? userPending : {};
                 }
+                return currList;
             }
-            if (isMdf)
-                if (Object.keys(currList).length > 0)
-                    await this.cacheSet(key, currList, { json: true, ttlInSec: this.chequePendingPeriod })
-                else
-                    await this.cacheDel(key);
+
+            let isMdf = false;
+            if (invoice_data.Items && (invoice_data.Items.length > 0)) {
+                for (let i = 0; i < invoice_data.Items.length; i++) {
+                    let item = invoice_data.Items[i];
+                    if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
+                        && item.ExtFields.prod && item.ExtFields.prod.courseId) {
+                        await getCurrent();
+                        let exists = currList[item.ExtFields.prod.courseId] ? true : false;
+                        isMdf = isMdf || ((!exists) && flag) || (exists && (!flag));
+                        if (flag)
+                            currList[item.ExtFields.prod.courseId] = { chequeId: chequeObj.id() }
+                        else
+                            delete currList[item.ExtFields.prod.courseId];
+                    }
+                }
+                if (isMdf)
+                    if (Object.keys(currList).length > 0)
+                        await this.cacheSet(key, currList, { json: true, ttlInSec: this.chequePendingPeriod })
+                    else
+                        await this.cacheDel(key);
+            }
         }
     }
 }
