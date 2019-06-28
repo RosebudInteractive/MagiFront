@@ -1,13 +1,29 @@
-import {SIGN_UP_SUCCESS,} from "../constants/user";
+import {SIGN_IN_SUCCESS, SIGN_UP_SUCCESS, WHO_AM_I_SUCCESS,} from "../constants/user";
 import {PLAYER_PLAYED, PLAYER_SET_CURRENT_TIME, PLAYER_SET_PROGRESS_PERCENT} from '../constants/player'
 import {APP_CHANGE_PAGE} from "../constants/app";
 
 import {setProgressPercent} from "../actions/player-actions";
 import {MAIL_SUBSCRIBE_SUCCESS} from "../ducks/message";
+import {store} from "./configureStore";
+import {getNonRegisterTransaction} from "ducks/google-analytics";
 
 const GoogleAnalyticsMiddleware = store => next => action => {
 
     switch (action.type) {
+
+        case SIGN_IN_SUCCESS:
+        case WHO_AM_I_SUCCESS: {
+            let _prevState = store.getState().user
+
+            let result = next(action)
+            let _nextState = store.getState().user
+
+            if ((!_prevState.user && _nextState.user) || (_prevState.user && _nextState.user && _prevState.user.Id !== _nextState.user.Id)) {
+                Analytics.getInstance().loadNonRegisterTransactions()
+            }
+
+            return result
+        }
 
         case APP_CHANGE_PAGE: {
             let _pathPrefix = window.location.protocol + '//' + window.location.host;
@@ -126,6 +142,23 @@ const GoogleAnalyticsMiddleware = store => next => action => {
 
         default:
             return next(action)
+    }
+}
+
+let _instance = null;
+
+class Analytics {
+
+    static getInstance() {
+        if (!_instance) {
+            _instance = new Analytics()
+        }
+
+        return _instance
+    }
+
+    loadNonRegisterTransactions() {
+        store.dispatch(getNonRegisterTransaction());
     }
 }
 

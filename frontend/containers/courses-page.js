@@ -7,6 +7,7 @@ import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
 import * as storageActions from '../actions/lesson-info-storage-actions';
 import {whoAmI} from "../actions/user-actions";
+import {notifyCoursesShowed} from "ducks/google-analytics";
 
 import * as tools from '../tools/page-tools';
 import CourseWrapper from '../components/course/item-wrapper';
@@ -72,11 +73,13 @@ class CoursesPage extends React.Component {
             let _filter = [];
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
             this.props.history.replace('/razdel/' + _filter.join('+'))
+            this.props.notifyCoursesShowed(this._courses)
         }
 
         if (prevProps.courses.fetching && !this.props.courses.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
+            this.props.notifyCoursesShowed(this._courses)
         }
     }
 
@@ -87,10 +90,11 @@ class CoursesPage extends React.Component {
     }
 
     _getCoursesBundles() {
-
         let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId, userPaidCourses} = this.props,
             _courses = this.props.courses.items,
             _result = [];
+
+        this._courses = []
 
         _courses.forEach((course, index) => {
             let _inFilter = false;
@@ -106,6 +110,9 @@ class CoursesPage extends React.Component {
             }
 
             if (_inFilter) {
+
+                this._courses.push(course)
+
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
                 } else {
@@ -195,6 +202,7 @@ function mapDispatchToProps(dispatch) {
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         whoAmI: bindActionCreators(whoAmI, dispatch),
+        notifyCoursesShowed: bindActionCreators(notifyCoursesShowed, dispatch),
     }
 }
 
