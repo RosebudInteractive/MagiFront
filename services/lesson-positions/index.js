@@ -110,8 +110,9 @@ exports.SetupRoute = (app) => {
 
     app.post("/api/lsnpos", (req, res, next) => {
         if (req.user) {
-            if (req.body && req.campaignId) {
-                req.body.campaignId = req.campaignId;
+            if (req.body) {
+                if (req.campaignId)
+                    req.body.campaignId = req.campaignId;
                 positionsService().setLessonPositions(req.user.Id, req.body)
                     .then((result) => {
                         res.send(result);
@@ -120,6 +121,8 @@ exports.SetupRoute = (app) => {
                         next(err);
                     });
             }
+            else
+                res.status(HttpCode.ERR_BAD_REQ).json({ message: "Request body is empty." });
         }
         else
             res.status(HttpCode.ERR_UNAUTH).json({ message: "Not authorized." });
