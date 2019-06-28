@@ -4,7 +4,6 @@ import {Record, OrderedMap} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
-import {OrderedMap} from "../../_node_modules/immutable/dist/immutable";
 import {BookRecord} from "adm-ducks/books";
 import {GET_PAID_COURSE_INFO_REQUEST} from "ducks/billing";
 
@@ -85,6 +84,10 @@ export const getNonRegisterTransaction = () => {
     return { type: GET_NON_REGISTER_TRANSACTION_REQUEST }
 }
 
+export const notifyCoursesShowed = (courses) => {
+    return { type: COURSES_PAGE_SHOWED, payload: courses }
+}
+
 /**
  * Sagas
  */
@@ -92,6 +95,7 @@ export const saga = function* () {
     yield all([
         takeEvery(GET_NON_REGISTER_TRANSACTION_REQUEST, getNonRegisterTransactionSaga),
         takeEvery(SET_TRANSACTION_REGISTERED_REQUEST, registerTransactionsSaga),
+        takeEvery(COURSES_PAGE_SHOWED, addCoursesPageShowedSaga),
     ])
 }
 
@@ -100,6 +104,9 @@ function* getNonRegisterTransactionSaga() {
 
     try {
         let _data = yield call(_fetchNonRegisterTransactions)
+
+        console.log(_data)
+
         yield put({type: GET_NON_REGISTER_TRANSACTION_SUCCESS, payload: _data})
         yield put({type: SET_TRANSACTION_REGISTERED_REQUEST})
     } catch (error) {
@@ -132,35 +139,31 @@ function* registerTransactionsSaga() {
 const _registerTransactions = (data) => {
     let _result = []
 
-    if (window.dataLayer) {
+    if (window.dataLayer && data.size > 0) {
         data.forEach((item) => {
             _result.push(item.id)
-            window.dataLayer.push({
+            let _obj = {
                 'ecommerce': {
                     'currencyCode': 'RUB',
                     'purchase': {
                         'actionField': {
                             'id': item.id,     //'id заказа',
                             'revenue': item.revenue, // '91.4', //полная сумма транзакции
-                            'tax': '9.4', //сумма всех налогов транзакции
-                            'coupon': 'Coupon 1' //промокод, использовавшийся при оформлении заказа
+                            'tax': item.tax, // '9.4', //сумма всех налогов транзакции
+                            'coupon': item.coupon // 'Coupon 1' //промокод, использовавшийся при оформлении заказа
                         },
-                        'products': [{
-                            'name': 'Название курса',
-                            'id': 'ID1',
-                            'price': '91.4',
-                            'brand': 'Имя автора',
-                            'category': 'Категория курса',
-                            'quantity': 1
-                        }]
-
+                        'products': []
                     },
                     'event': 'gtm-ee-event',
                     'gtm-ee-event-category': 'Enhanced Ecommerce',
                     'gtm-ee-event-action': 'Purchase',
                     'gtm-ee-event-non-interaction': 'False',
                 }
-            })
+            }
+            _obj.ecommerce.purchase.products = item.products.slice()
+
+            window.dataLayer.push(_obj)
+            console.log(_obj)
         })
     }
 
@@ -181,11 +184,47 @@ const _fetchSetRegisterTransactions = (values) => {
         .then(parseJSON)
 }
 
+function* addCoursesPageShowedSaga(data) {
+    let _data = {
+        ecommerce: {
+            currencyCode: 'RUB',
+            impressions: []
+        },
+        'event': 'gtm-ee-event',
+        'gtm-ee-event-category': 'Enhanced Ecommerce',
+        'gtm-ee-event-action': 'Product Impressions',
+        'gtm-ee-event-non-interaction': 'True',
+    }
+
+    data.payload.forEach((course, index) => {
+        let _author = course.AuthorsObj && course.AuthorsObj[0] ? course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName : '',
+            _category = course.CategoriesObj && course.CategoriesObj[0] ? course.CategoriesObj[0].Name : '',
+            _price = course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+
+        _data.ecommerce.impressions.push({
+            'name': course.Name,
+            'id': course.Id,
+            'price': _price,
+            'brand': _author,
+            'category': _category,
+            'position': index + 1
+        })
+    })
+
+    yield call(_pushAnalyticsData, _data)
+}
+
+const _pushAnalyticsData = (data) => {
+    if (window.dataLayer && data) {
+        window.dataLayer.push(data)
+        console.log(data)
+    }
+}
 
 const dataToEntries = (values, DataRecord) => {
     return Object.values(values)
         .reduce(
-            (acc, value) => acc.set(value.Id, new DataRecord(value)),
+            (acc, value) => acc.set(value.id, new DataRecord(value)),
             new OrderedMap({})
         )
 }

@@ -18,7 +18,7 @@ const GoogleAnalyticsMiddleware = store => next => action => {
             let result = next(action)
             let _nextState = store.getState().user
 
-            if (_prevState.user !== _nextState.user) {
+            if ((!_prevState.user && _nextState.user) || (_prevState.user && _nextState.user && _prevState.user.Id !== _nextState.user.Id)) {
                 Analytics.getInstance().loadNonRegisterTransactions()
             }
 
