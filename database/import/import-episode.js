@@ -386,7 +386,7 @@ exports.ImportEpisode = class ImportEpisode {
         docData.Rows.forEach((row) => {
             if ((!isFirst) && (row.cells.length > 0)) {
                 let item = getCellText(row.cells[0]);
-                let match = item.match(/(.*?)\[(.*?)\]/i);
+                let match = item.match(/(.*?)\[\[(.*?)\]\]/i);
                 if (match && (match.length === 3))
                     item = { text: match[1].trim(), url: match[2].trim() }
                 else

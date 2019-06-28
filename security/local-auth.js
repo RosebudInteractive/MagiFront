@@ -234,6 +234,17 @@ let buildRedirectUrl = (redirectUrl, errMsg) => {
     return url.href;
 };
 
+let addNewUserFlag = (user, in_url) => {
+    let result = in_url;
+    if (user && user._isNew) {
+        delete user._isNew;
+        let url = new URL(result);
+        url.searchParams.append('_is_new_user', 'true');
+        result = url.href;
+    }
+    return result;
+}
+
 let StdLogin = (req, res, user, info, redirectUrl, genTokenFunc, redirectBySes) => {
     let redirect_url = redirectBySes && req.session && req.session.afterAuthUrl ? req.session.afterAuthUrl : redirectUrl;
     if (!user) {
@@ -277,7 +288,7 @@ let StdLogin = (req, res, user, info, redirectUrl, genTokenFunc, redirectBySes) 
             }
             else
                 if (redirect_url)
-                    res.redirect(buildRedirectUrl(redirect_url))
+                    res.redirect(addNewUserFlag(user, buildRedirectUrl(redirect_url)))
                 else {
                     let userData = usersCache.userToClientJSON(user);
                     if (token)

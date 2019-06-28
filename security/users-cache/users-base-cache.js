@@ -855,8 +855,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     return this.getUserInfoById(user.id(), true);
                 })
                 .then(result => {
-                    if (isNewUser && this._afterUserCreateEvent)
+                    if (isNewUser && this._afterUserCreateEvent) {
+                        result._isNew = true;
                         return this._afterUserCreateEvent(result);
+                    }
                     return result;
                 });
         }).bind(this);
