@@ -29,6 +29,7 @@ import '@fancyapps/fancybox/dist/jquery.fancybox.js';
 import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
 import {facebookAppIdSelector, setCurrentPage, clearCurrentPage,} from "ducks/app";
+import {notifyLessonShowed,} from "ducks/google-analytics";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 let _scrollTop = 0;
@@ -234,6 +235,9 @@ class CombineLessonPage extends React.Component {
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
+
+
+            this.props.notifyLessonShowed({...this.props.course, lessonName : this.props.lesson.Name, author: this.props.lesson.Author.FirstName + ' ' + this.props.lesson.Author.LastName})
         }
     }
 
@@ -621,6 +625,7 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
+        notifyLessonShowed: bindActionCreators(notifyLessonShowed, dispatch),
     }
 }
 

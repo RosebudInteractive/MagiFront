@@ -237,6 +237,8 @@ class TextBlock extends React.Component {
 
         let _transcriptClassName = "transcript-page _nested" + (singleLesson ? ' _single' : '')
 
+        const _authorName = lesson.Author.FirstName + ' ' + lesson.Author.LastName
+
         return (
             <div className={_transcriptClassName} id="transcript">
                 <section className="text-block js-social-start">
@@ -254,7 +256,7 @@ class TextBlock extends React.Component {
                         {this._getText()}
                         {
                             this.props.isPaidCourse && !lesson.IsFreeInPaidCourse ?
-                                <PriceBlock course={this.props.course} title={"Купить курс"}/>
+                                <PriceBlock course={{...this.props.course, author: _authorName}} title={"Купить курс"}/>
                                 :
                                 null
                         }

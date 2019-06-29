@@ -455,6 +455,9 @@ function* _getPaidCourseInfoSaga(data) {
                     Title: _course.ProductName,
                     ReturnUrl: _data.returnUrl,
                     CourseId: _course.Id,
+                    CourseName: _data.name,
+                    Author: _data.author,
+                    Category: _data.category,
                 }
 
                 yield put({type: GET_PAID_COURSE_INFO_SUCCESS, payload: _offer})

@@ -24,6 +24,7 @@ import {
     Yandex,
 } from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
+import {notifyPaymentButtonClicked} from "ducks/google-analytics";
 import WaitingFrame from "./waiting-frame";
 import EmailField from "./email-field";
 import PromoField from "./promo-field";
@@ -135,6 +136,13 @@ class PaymentForm extends React.Component {
             }
 
             this.props.sendPayment(data)
+            this.props.notifyPaymentButtonClicked({
+                id: selectedSubscription.CourseId,
+                author: selectedSubscription.Author,
+                category: selectedSubscription.Category,
+                name: selectedSubscription.CourseName,
+                price: this.props.price,
+            })
         }
     }
 
@@ -276,6 +284,7 @@ function mapDispatchToProps(dispatch) {
         sendPayment: bindActionCreators(sendPayment, dispatch),
         switchToSubscription: bindActionCreators(switchToSubscription, dispatch),
         getSubscriptionInfo: bindActionCreators(getSubscriptionInfo, dispatch),
+        notifyPaymentButtonClicked: bindActionCreators(notifyPaymentButtonClicked, dispatch),
     }
 }
 
