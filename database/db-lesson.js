@@ -1472,7 +1472,8 @@ const DbLesson = class DbLesson extends DbObject {
                                 ProductId: elem.ProductId,
                                 IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                 IsPending: pendingCourses[elem.CId] ? true : false,
-                                OneLesson: elem.OneLesson ? true : false
+                                OneLesson: elem.OneLesson ? true : false,
+                                Categories: []
                             };
                             await CoursesService().getCoursePrice(data.Course);
                             showTranscript = showTranscript || (!data.Course.IsPaid)
@@ -1699,7 +1700,7 @@ const DbLesson = class DbLesson extends DbObject {
                             }
                         }, {});
                     })
-                    .then(result => {
+                    .then(async (result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let couseBooks = [];
                             let otherBooks = [];
@@ -1736,6 +1737,14 @@ const DbLesson = class DbLesson extends DbObject {
                             })
                             Array.prototype.push.apply(data.Books, couseBooks);
                             Array.prototype.push.apply(data.Books, otherBooks);
+                        }
+                        if (data.Course) {
+                            let ctgService = this.getService("categories", true);
+                            if (ctgService) {
+                                let cats = await ctgService.getCourseCategories([data.Course.Id], isAbsPath);
+                                for (let cat in cats.Categories)
+                                    data.Course.Categories.push(cats.Categories[cat]);
+                            }
                         }
                         return data;
                     })
