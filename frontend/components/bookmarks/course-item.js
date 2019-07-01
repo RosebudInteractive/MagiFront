@@ -24,7 +24,7 @@ class Item extends React.Component {
 
             this.props.notifyCourseLinkClicked({
                 ...course,
-                author: course.authors[0].FirstName + course.authors[0].LastName,
+                author: course.authors[0].FirstName + " " + course.authors[0].LastName,
                 category: course.categories[0].Name,
                 price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
             })

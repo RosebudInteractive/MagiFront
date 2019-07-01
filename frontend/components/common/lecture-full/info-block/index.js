@@ -27,14 +27,11 @@ export default class InfoBlock extends React.Component {
         return (
             <div className="lecture-full__info-block">
                 {isSingleLesson ?
-                    <SingleLessonTextBlock courseUrl={course.URL} lesson={lesson} needShowAuthors={needShowAuthors}/>
+                    <SingleLessonTextBlock course={course} lesson={lesson} needShowAuthors={needShowAuthors}/>
                     :
                     <TextBlock needShowAuthors={needShowAuthors}
-                               title={lesson.Name}
-                               authorName={lesson.authorName}
-                               descr={lesson.ShortDescription}
-                               lessonUrl={lesson.URL}
-                               courseUrl={course.URL}/>
+                               lesson={lesson}
+                               course={course}/>
                 }
                 {!isSingleLesson ?
                     <Extras subLessons={lesson.Lessons}

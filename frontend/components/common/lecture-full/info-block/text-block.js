@@ -2,33 +2,74 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import FavoritesButton from "./favorites-button";
+import {notifyLessonLinkClicked} from "ducks/google-analytics";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
-export default class TextBlock extends React.Component {
+class TextBlock extends React.Component {
 
     static propTypes = {
-        lessonUrl: PropTypes.string,
-        courseUrl: PropTypes.string,
-        title: PropTypes.string,
-        descr: PropTypes.string,
-        authorName: PropTypes.string,
+        course: PropTypes.object,
+        lesson: PropTypes.object,
         needShowAuthors: PropTypes.bool,
     };
 
-    render() {
-        let {title, descr, authorName, lessonUrl, courseUrl, needShowAuthors,} = this.props,
-            _linkUrl = '/' + courseUrl + '/' + lessonUrl;
+    constructor(props) {
+        super(props)
 
-        let _title = title.match(/[-.?!)(,:]$/g) ? title : (title + '.');
+        this._onLessonLinkClickHandler = () => {
+            const {lesson, course,} = this.props;
+
+            this.props.notifyLessonLinkClicked({
+                Id: course.Id,
+                Name: course.Name,
+                author: course.Authors[0].FirstName + course.Authors[0].LastName,
+                category: course.Categories[0].Name,
+                lessonName: lesson.Name,
+                price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
+            })
+        }
+    }
+
+    componentDidMount() {
+        $(`#lesson-link${this.props.lesson.Id}`).bind("click", this._onLessonLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        $(`#lesson-link${this.props.lesson.Id}`).unbind("click", this._onLessonLinkClickHandler)
+    }
+
+    render() {
+        const {course, lesson, needShowAuthors} = this.props;
+
+        let _title = lesson.Name,
+            _authorName = lesson.authorName,
+            _descr = lesson.ShortDescription,
+            _lessonUrl = lesson.URL,
+            _courseUrl = course.URL,
+            _linkUrl = '/' + _courseUrl + '/' + _lessonUrl;
+
+        _title = _title.match(/[-.?!)(,:]$/g) ? _title : (_title + '.');
 
         return (
             <div className="lecture-full__text-block">
-                <FavoritesButton className={"lecture-full__fav"} courseUrl={courseUrl} lessonUrl={lessonUrl}/>
-                <h3 className="lecture-full__title"><Link to={_linkUrl}>{_title}</Link></h3>
+                <FavoritesButton className={"lecture-full__fav"} courseUrl={_courseUrl} lessonUrl={_lessonUrl}/>
+                <h3 className="lecture-full__title">
+                    <Link to={_linkUrl} id={`lesson-link${lesson.Id}`}>{_title}</Link>
+                </h3>
                 <p className="lecture-full__descr">
-                    {' ' + descr + ' '}
-                    {needShowAuthors ? <p className="lecture-full__author">{authorName}</p> : null}
+                    {' ' + _descr + ' '}
+                    {needShowAuthors ? <p className="lecture-full__author">{_authorName}</p> : null}
                 </p>
             </div>
         )
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        notifyLessonLinkClicked: bindActionCreators(notifyLessonLinkClicked, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(TextBlock)

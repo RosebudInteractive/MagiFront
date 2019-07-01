@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import {Link} from "react-router-dom";
 import {fixedObjDescrSelector} from 'ducks/params'
 import {addCourseToBookmarks, getUserBookmarks, removeCourseFromBookmarks, userBookmarksSelector} from "ducks/profile";
+import {notifyCourseLinkClicked, } from "ducks/google-analytics";
 import {bindActionCreators} from "redux";
 import * as userActions from "actions/user-actions";
 import PriceBlock from "../../common/price-block";
@@ -25,7 +26,7 @@ class Wrapper extends React.Component {
 
             this.props.notifyCourseLinkClicked({
                 ...course,
-                author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+                author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
                 category: course.CategoriesObj[0].Name,
                 price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
             })
@@ -62,7 +63,7 @@ class Wrapper extends React.Component {
         const _analytics = {
             Name: course.Name,
             Id: course.Id,
-            author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+            author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
             category: course.CategoriesObj[0].Name,
             price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
         }
@@ -134,6 +135,7 @@ function mapDispatchToProps(dispatch) {
         addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        notifyCourseLinkClicked: bindActionCreators(notifyCourseLinkClicked, dispatch),
     }
 }
 

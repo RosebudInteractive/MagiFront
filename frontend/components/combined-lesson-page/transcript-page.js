@@ -96,7 +96,6 @@ class TextBlock extends React.Component {
             })
 
             if (data && data.div) {
-                console.log(data)
                 _div.push(data.div)
             }
         }

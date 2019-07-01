@@ -105,7 +105,22 @@ export function getAuthor(url) {
 
 const handleData = (data) => {
     if (data.Courses) {
-        data.Courses.forEach(course => handleCourse(course))
+        data.Courses.forEach((course) => {
+            if (course.CoverMeta) {
+                course.CoverMeta = JSON.parse(course.CoverMeta)
+                course.Mask = course.Mask ? course.Mask : '_mask01';
+            }
+
+            if (!course.CategoriesObj) { course.CategoriesObj = [] }
+            course.Categories.forEach((category) => {
+                let _category = data.Categories[category];
+                if (_category) {
+                    course.CategoriesObj.push(_category)
+                }
+            });
+
+            course.author = data.FirstName + " " + data.LastName
+        })
     }
 
     if (data.Lessons) {
@@ -132,13 +147,6 @@ const handleData = (data) => {
         })
     }
 }
-
-const handleCourse = (data) => {
-    if (data.CoverMeta) {
-        data.CoverMeta = JSON.parse(data.CoverMeta)
-        data.Mask = data.Mask ? data.Mask : '_mask01';
-    }
-};
 
 const handleLesson = (lesson) => {
     let _readyDate = new Date(lesson.ReadyDate);

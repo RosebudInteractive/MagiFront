@@ -2,12 +2,41 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import LessonPlayBlockSmall from '../../common/small-play-block'
+import {notifyCourseLinkClicked, notifyLessonLinkClicked} from "ducks/google-analytics";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
 
-export default class Item extends React.Component {
+class Item extends React.Component {
 
     static propTypes = {
         item: PropTypes.object,
         isPaidCourse: PropTypes.bool,
+    }
+
+    constructor(props) {
+        super(props)
+
+        this._onCourseLinkClickHandler = () => {
+            this.props.notifyCourseLinkClicked(this.props.item.analyticsInfo)
+        }
+
+        this._onLessonLinkClickHandler = () => {
+            this.props.notifyLessonLinkClicked(this.props.item.analyticsInfo)
+        }
+    }
+
+    componentDidMount() {
+        const {item} = this.props
+
+        $(`#course-link${item.CourseId}`).bind("click", this._onCourseLinkClickHandler)
+        $(`#lesson-link${item.Id}`).bind("click", this._onLessonLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        const {item} = this.props
+
+        $(`#course-link${item.CourseId}`).unbind("click", this._onCourseLinkClickHandler)
+        $(`#lesson-link${item.Id}`).unbind("click", this._onLessonLinkClickHandler)
     }
 
     render() {
@@ -32,7 +61,7 @@ export default class Item extends React.Component {
                 </div>
                 <div className="history-item__info-block">
                     <h3 className="history-item__title">
-                        <Link to={'/category/' + item.courseUrl}>
+                        <Link to={'/category/' + item.courseUrl} id={`course-link${item.CourseId}`}>
                             <span className="history-item__title-text">
                                 <span className="label">{'Курс: '}</span>
                                 <span className="history-item__title-text__text">{item.courseName}</span>
@@ -40,7 +69,7 @@ export default class Item extends React.Component {
                         </Link>
                     </h3>
                     <h4 className="history-item__lecture">
-                        <Link to={'/' + item.courseUrl + '/' + item.URL}>
+                        <Link to={'/' + item.courseUrl + '/' + item.URL} id={`lesson-link${item.Id}`}>
                             <span className="history-item__lecture__num">{item.Number + '. '}</span>
                             <span className="history-item__lecture__text">{item.Name}</span>
                         </Link>
@@ -54,3 +83,12 @@ export default class Item extends React.Component {
         )
     }
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        notifyCourseLinkClicked: bindActionCreators(notifyCourseLinkClicked, dispatch),
+        notifyLessonLinkClicked: bindActionCreators(notifyLessonLinkClicked, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(Item)

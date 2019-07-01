@@ -3,14 +3,51 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import LessonPlayBlockSmall from '../../small-play-block';
 import FavoritesButton from "./favorites-button";
+import {notifyLessonLinkClicked} from "ducks/google-analytics";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
-export default class Extras extends React.Component {
+class Extras extends React.Component {
 
     static propTypes = {
         subLessons: PropTypes.array,
         course: PropTypes.object,
         parentNumber: PropTypes.number,
         isPaidCourse: PropTypes.bool,
+    }
+
+    constructor(props) {
+        super(props)
+
+        this._onLessonLinkClickHandler = (e) => {
+
+            const _lessonId = +e.target.dataset.id
+
+            if (_lessonId) {
+                const {course, subLessons} = this.props
+
+                let _lesson = subLessons.find((item) => {return item.Id === _lessonId})
+
+                if (_lesson) {
+                    this.props.notifyLessonLinkClicked({
+                        Id: course.Id,
+                        Name: course.Name,
+                        author: course.Authors[0].FirstName + course.Authors[0].LastName,
+                        category: course.Categories[0].Name,
+                        lessonName: _lesson.Name,
+                        price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
+                    })
+                }
+            }
+        }
+    }
+
+    componentDidMount() {
+        $('.js-sublesson-link').bind("click", this._onLessonLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        $('.js-sublesson-link').unbind("click", this._onLessonLinkClickHandler)
     }
 
     render() {
@@ -34,7 +71,7 @@ export default class Extras extends React.Component {
             lesson.courseUrl = this.props.course.URL;
 
             return <li key={index}>
-                <Link to={url} className="extras-list__item">
+                <Link to={url} className="extras-list__item js-sublesson-link" data-id={lesson.Id}>
                     <span className="counter">{this.props.parentNumber + '.'}</span>
                     <span className="inner-counter">{lesson.Number}</span>
                     {lesson.Name + ' '}
@@ -45,6 +82,12 @@ export default class Extras extends React.Component {
             </li>
         })
     }
-
-
 }
+
+function mapDispatchToProps(dispatch) {
+    return {
+        notifyLessonLinkClicked: bindActionCreators(notifyLessonLinkClicked, dispatch),
+    }
+}
+
+export default connect(null, mapDispatchToProps)(Extras)

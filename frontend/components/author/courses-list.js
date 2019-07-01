@@ -1,10 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import {Link} from 'react-router-dom';
-
-import {ImageSize, getCoverPath} from '../../tools/page-tools'
-import PriceBlock from "../common/price-block";
-import {getCrownForCourse} from "../../tools/svg-paths";
+import Course from './course-item';
 
 export default class Courses extends React.Component {
 
@@ -59,59 +55,3 @@ export default class Courses extends React.Component {
     }
 }
 
-class Course extends React.Component {
-
-    static propTypes = {
-        course: PropTypes.object,
-    };
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        let {course} = this.props,
-            _cover = getCoverPath(course, ImageSize.medium)
-        const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" width="574" height="503"/>';
-        const _needShowPriceButton = course && course.IsPaid && !course.IsGift && !course.IsBought
-
-        return (
-            <div className="course-announce">
-                <div className="course-announce__col">
-                    <Link to={'/category/' + course.URL} className={'course-announce__image ' + course.Mask}>
-                        <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
-                    </Link>
-                </div>
-                <div className="course-announce__col">
-                    <h3 className="course-announce__title">
-                        <Link to={'/category/' + course.URL}>
-                            <span className="course-announce__label">
-                                {getCrownForCourse(course)}
-                                {"Курс: "}
-                            </span>
-                            <span
-                                className="course-announce__caption">{course.Name}
-                            </span>
-                        </Link>
-                    </h3>
-                    <div className="course-announce__row">
-                        <div className="course-announce__progress">
-                            <span className="course-announce__progress-label">Вышло</span>
-                            <span className="course-announce__progress-actual">{course.Ready}</span>
-                            <span className="course-announce__progress-total">{'/' + course.Total}</span>
-                        </div>
-                        {
-                            _needShowPriceButton ?
-                                <PriceBlock course={course}/>
-                                :
-                                <Link to={'/category/' + course.URL} className="btn btn--gray course-announce__btn">
-                                    Подробнее о курсе
-                                </Link>
-                        }
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-}

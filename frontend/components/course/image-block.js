@@ -20,7 +20,7 @@ class ImageBlock extends React.Component {
 
             this.props.notifyCourseLinkClicked({
                 ...course,
-                author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+                author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
                 category: course.CategoriesObj[0].Name,
                 price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
             })

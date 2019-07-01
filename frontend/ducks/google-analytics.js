@@ -123,6 +123,7 @@ export const saga = function* () {
         takeEvery(CONCRETE_COURSE_PAGE_SHOWED, addConcreteCoursePageShowedSaga),
         takeEvery(CONCRETE_COURSE_LINK_CLICKED, addConcreteCourseLinkClickedSaga),
         takeEvery(LESSON_PAGE_SHOWED, addLessonPageShowedSaga),
+        takeEvery(LESSON_LINK_CLICKED, addLessonClickedSaga),
         takeEvery(PRICE_BUTTON_CLICKED, addPriceButtonClickedSaga),
         takeEvery(PAYMENT_BUTTON_CLICKED, addPaymentButtonClickedSaga),
     ])
@@ -133,8 +134,6 @@ function* getNonRegisterTransactionSaga() {
 
     try {
         let _data = yield call(_fetchNonRegisterTransactions)
-
-        console.log(_data)
 
         yield put({type: GET_NON_REGISTER_TRANSACTION_SUCCESS, payload: _data})
         yield put({type: SET_TRANSACTION_REGISTERED_REQUEST})
@@ -404,6 +403,38 @@ function* addConcreteCourseLinkClickedSaga(data) {
     }
 
     yield call(_pushAnalyticsData, _data)
+}
+
+function* addLessonClickedSaga(data) {
+    if (!data.payload) return
+
+    const _analyticsData = data.payload
+
+    let _data = {
+        'ecommerce': {
+            'currencyCode': 'RUB',
+            'click': {
+                'actionField': {'list': ''},
+                'products': [{
+                    'name': _analyticsData.Name, // 'Название курса',
+                    'id': _analyticsData.Id, // 'ID1',
+                    'price': _analyticsData.price, // '23.5',
+                    'brand': _analyticsData.author, // 'Имя автора',
+                    'category': _analyticsData.category, // 'Категория курса',
+                    'variant': _analyticsData.lessonName, // 'Название лекции',
+                    'position': 1
+                }]
+
+            },
+            'event': 'gtm-ee-event',
+            'gtm-ee-event-category': 'Enhanced Ecommerce',
+            'gtm-ee-event-action': 'Product Clicks',
+            'gtm-ee-event-non-interaction': 'False',
+        }
+    }
+
+    yield call(_pushAnalyticsData, _data)
+
 }
 
 const _pushAnalyticsData = (data) => {

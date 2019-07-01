@@ -651,6 +651,18 @@ const handleHistoryData = (data) => {
 
             lesson.authorUrl = _author ? _author.URL : null;
             lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
+
+            lesson.analyticsInfo = _course ?
+                {
+                    Id: _course.Id,
+                    Name: _course.Name,
+                    author: lesson.authorName,
+                    category : data.Categories[_course.Categories[0]].Name,
+                    price: _course.IsPaid ? (_course.DPrice ? _course.DPrice : _course.Price) : 0,
+                    lessonName: lesson.Name
+                }
+                :
+                null;
         })
 
         data.Lessons.sort((a, b) => {
@@ -714,6 +726,18 @@ const handleBookmarksData = (data) => {
 
             lesson.authorUrl = _author ? _author.URL : null;
             lesson.authorName = _author ? _author.FirstName + ' ' + _author.LastName : null;
+
+            lesson.analyticsInfo = _course ?
+                {
+                    Id: _course.Id,
+                    Name: _course.Name,
+                    author: lesson.authorName,
+                    category : data.Categories[_course.Categories[0]].Name,
+                    price: _course.IsPaid ? (_course.DPrice ? _course.DPrice : _course.Price) : 0,
+                    lessonName: lesson.Name
+                }
+                :
+                null;
         })
 
         data.Lessons.sort((a, b) => {

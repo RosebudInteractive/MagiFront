@@ -10,6 +10,7 @@ import * as lessonActions from '../../actions/lesson-actions';
 import {ImageSize, getCoverPath, OverflowHandler} from '../../tools/page-tools'
 import $ from 'jquery'
 import {userPaidCoursesSelector} from "ducks/profile";
+import {notifyLessonLinkClicked} from "ducks/google-analytics";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -37,7 +38,8 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}/>
+            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}
+                             onLinkClick={this.props.notifyLessonLinkClicked}/>
         });
     }
 
@@ -98,25 +100,36 @@ class ListItem extends React.Component {
         active: PropTypes.string,
         showAuthor: PropTypes.bool,
         isPaidCourse: PropTypes.bool,
+        onLinkClick: PropTypes.func,
     };
 
     render() {
-        let {lesson} = this.props;
+        let {lesson,} = this.props;
 
         return lesson.State !== 'D' ? this._getReadyLesson(lesson) : this._getDraftLesson(lesson)
     }
 
     _getReadyLesson(lesson) {
         let _isActive = this.props.active === this.props.lesson.Id,
-            _cover = getCoverPath(lesson, ImageSize.icon);
+            _cover = getCoverPath(lesson, ImageSize.icon),
+            {course} = this.props;
 
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={'lesson-' + lesson.Id}>
-                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header">
+                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header" onClick={() => {
+                    this.props.onLinkClick({
+                            Id: course.Id,
+                            Name: course.Name,
+                            author: lesson.Author.FirstName + lesson.Author.LastName,
+                            category: course.Categories[0].Name,
+                            lessonName: lesson.Name,
+                            price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
+                        })
+                }}>
                     <ListItemInfo title={lesson.Name} author={lesson.Author} showAuthor={this.props.showAuthor}/>
                     <PlayBlock {...this.props} lesson={lesson} cover={_cover} isPaidCourse={this.props.isPaidCourse}/>
                 </Link>
-                <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active}/>
+                <SubList subLessons={lesson.Lessons} course={this.props.course} active={this.props.active} onLinkClick={this.props.onLinkClick}/>
             </li>
         )
     }
@@ -169,16 +182,28 @@ class SubList extends React.Component {
         subLessons: PropTypes.array.isRequired,
         course: PropTypes.object,
         active: PropTypes.string.isRequired,
+        onLinkClick: PropTypes.func,
     };
 
     _getItems() {
+        let {course} = this.props
+
         return this.props.subLessons.map((lesson, index) => {
             let _isActive = lesson.Id === this.props.active;
             lesson.courseUrl = this.props.course.URL;
 
             return <li className={"lectures-sublist__item" + (_isActive ? ' active' : '')} key={index}
                        id={'lesson-' + lesson.Id}>
-                <Link to={'/' + this.props.course.URL + '/' + lesson.URL} className="lectures-sublist__title">
+                <Link to={'/' + this.props.course.URL + '/' + lesson.URL} className="lectures-sublist__title" onClick={() => {
+                    this.props.onLinkClick({
+                        Id: course.Id,
+                        Name: course.Name,
+                        author: lesson.Author.FirstName + lesson.Author.LastName,
+                        category: course.Categories[0].Name,
+                        lessonName: lesson.Name,
+                        price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
+                    })
+                }}>
                     <span className="sublist-num">{lesson.Number}</span>{lesson.Name}
                 </Link>
                 <div className="lectures-sublist__item-info">
@@ -209,6 +234,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
     return {
         lessonActions: bindActionCreators(lessonActions, dispatch),
+        notifyLessonLinkClicked: bindActionCreators(notifyLessonLinkClicked, dispatch),
     }
 }
 

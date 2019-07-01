@@ -28,7 +28,7 @@ class Wrapper extends React.Component {
         const _analytics = {
             Name: course.Name,
             Id: course.Id,
-            author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+            author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
             category: course.CategoriesObj[0].Name,
             lessonName: lesson.Name,
             price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
