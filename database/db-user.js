@@ -663,6 +663,10 @@ const DbUser = class DbUser extends DbObject {
                                                 course.Categories = cat_course.Categories;
                                         }
                                     }
+                                    if (Object.keys(history.Courses).length > 0) {
+                                        for (let courseId in history.Courses)
+                                            await this._coursesService.getCoursePrice(history.Courses[courseId]);
+                                    }
                                 }
                             })
                     });
