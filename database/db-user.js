@@ -187,12 +187,6 @@ const GET_AUTHORS_BY_COURSE_IDS_MSSQL =
     "  join[AuthorToCourse] ac on ac.[AuthorId] = a.[Id]\n" +
     "where ac.[CourseId] in (<%= courseIds %>)";
 
-const GET_CATEGORIES_BY_COURSE_IDS_MSSQL =
-    "select c.[Id], cc.[CourseId], c.[URL], cl.[Name] from [Category] c\n" +
-    "  join[CategoryLng] cl on cl.[CategoryId] = c.[Id]\n" +
-    "  join[CourseCategory] cc on cc.[CategoryId] = c.[Id]\n" +
-    "where cc.[CourseId] in (<%= courseIds %>)";
-
 const GET_COURSE_ID_MYSQL =
     "select `Id` from `Course` where `URL` = '<%= courseUrl %>'";
 
@@ -304,12 +298,6 @@ const GET_AUTHORS_BY_COURSE_IDS_MYSQL =
     "  join`AuthorLng` al on al.`AuthorId` = a.`Id`\n" +
     "  join`AuthorToCourse` ac on ac.`AuthorId` = a.`Id`\n" +
     "where ac.`CourseId` in (<%= courseIds %>)";
-
-const GET_CATEGORIES_BY_COURSE_IDS_MYSQL =
-    "select c.`Id`, cc.`CourseId`, c.`URL`, cl.`Name` from `Category` c\n" +
-    "  join`CategoryLng` cl on cl.`CategoryId` = c.`Id`\n" +
-    "  join`CourseCategory` cc on cc.`CategoryId` = c.`Id`\n" +
-    "where cc.`CourseId` in (<%= courseIds %>)";
 
 const GET_SUBS_INFO_MSSQL =
     "select u.[SysParentId] as [Id], u.[SubsAutoPayId], u.[SubsExpDate], u.[SubsAutoPay], c.[ChequeData], a.[Error] from [User] u\n" +
@@ -522,7 +510,7 @@ const DbUser = class DbUser extends DbObject {
     getHistory(user, lessonFilter, options) {
         let positions = {};
         let lessonIds = [];
-        let history = { Lessons: [], Courses: {}, Authors: {} };
+        let history = { Lessons: [], Courses: {}, Authors: {}, Categories: {} };
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
         let pendingCourses = {};
@@ -600,7 +588,8 @@ const DbUser = class DbUser extends DbObject {
                                                 IsSubsFree: elem.IsSubsFree ? true : false,
                                                 ProductId: elem.ProductId,
                                                 URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
-                                                OneLesson: elem.OneLesson ? true : false
+                                                OneLesson: elem.OneLesson ? true : false,
+                                                Categories: []
                                             };
                                             history.Courses[elem.Id] = course;
                                         };
@@ -660,6 +649,20 @@ const DbUser = class DbUser extends DbObject {
                                         }
                                         lsn.Audios.push(isAbsPath ? (elem.Audio ? this._absDataUrl + elem.Audio : null) : elem.Audio);
                                     })
+                                    let courseIds = [];
+                                    let ctgService = this.getService("categories", true);
+                                    if (ctgService) {
+                                        for (let courseId in history.Courses)
+                                            courseIds.push(+courseId);
+                                        let cats = await ctgService.getCourseCategories(courseIds, isAbsPath);
+                                        history.Categories = cats.Categories;
+                                        for (let courseId in history.Courses) {
+                                            let course = history.Courses[courseId];
+                                            let cat_course = cats.Courses[courseId];
+                                            if (cat_course)
+                                                course.Categories = cat_course.Categories;
+                                        }
+                                    }
                                 }
                             })
                     });
@@ -843,12 +846,7 @@ const DbUser = class DbUser extends DbObject {
                 })
                 .then(() => {
                     return Utils.seqExec(arrayOfIds, (elem) => {
-                        return $data.execSql({
-                            dialect: {
-                                mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: elem.join() }),
-                                mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: elem.join() })
-                            }
-                        }, {})
+                        return this.getService("categories", true).reqCourseCategories(elem)
                             .then((result) => {
                                 if (result && result.detail && (result.detail.length > 0)) {
                                     result.detail.forEach((elem) => {

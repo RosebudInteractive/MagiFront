@@ -3,6 +3,7 @@ const config = require('config');
 const { DbObject } = require('./db-object');
 const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
 const { getTimeStr, buildLogString } = require('../utils');
+const { splitArray } = require('../utils');
 const logModif = config.has("admin.logModif") ? config.get("admin.logModif") : false;
 
 const CATEGORY_REQ_TREE = {
@@ -32,8 +33,21 @@ const CATEGORY_MYSQL_ALL_REQ =
     "  left join `CategoryLng` lp on c.`ParentId` = lp.`CategoryId` and lp.`LanguageId` = l.`LanguageId`\n" +
     "where c.`AccountId` = <%= accountId %>";
 
+const GET_CATEGORIES_BY_COURSE_IDS_MSSQL =
+    "select c.[Id], cc.[CourseId], c.[URL], cl.[Name] from [Category] c\n" +
+    "  join[CategoryLng] cl on cl.[CategoryId] = c.[Id]\n" +
+    "  join[CourseCategory] cc on cc.[CategoryId] = c.[Id]\n" +
+    "where cc.[CourseId] in (<%= courseIds %>)";
+
+const GET_CATEGORIES_BY_COURSE_IDS_MYSQL =
+    "select c.`Id`, cc.`CourseId`, c.`URL`, cl.`Name` from `Category` c\n" +
+    "  join`CategoryLng` cl on cl.`CategoryId` = c.`Id`\n" +
+    "  join`CourseCategory` cc on cc.`CategoryId` = c.`Id`\n" +
+    "where cc.`CourseId` in (<%= courseIds %>)";
+
 const CATEGORY_MSSQL_ID_REQ = CATEGORY_MSSQL_ALL_REQ + " and c.[Id] = <%= id %>";
 const CATEGORY_MYSQL_ID_REQ = CATEGORY_MYSQL_ALL_REQ + " and c.`Id` = <%= id %>";
+const MAX_COURSES_REQ_NUM = 10;
 
 const DbCategory = class DbCategory extends DbObject {
 
@@ -44,6 +58,38 @@ const DbCategory = class DbCategory extends DbObject {
     _getObjById(id, expression, options) {
         var exp = expression || CATEGORY_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    async getCourseCategories(courseIds, isAbsPath, dbOpts) {
+        let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
+        let result = { Categories: {}, Courses: {} };
+        for (let i = 0; i < arrayOfIds.length; i++) {
+            let cats = await this.reqCourseCategories(arrayOfIds[i], dbOpts);
+            if (cats && cats.detail && (cats.detail.length > 0)) {
+                cats.detail.forEach((elem) => {
+                    let category = {
+                        Id: elem.Id,
+                        URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
+                        Name: elem.Name
+                    };
+                    result.Categories[elem.Id] = category;
+                    let course = result.Courses[elem.CourseId];
+                    if (!course)
+                        result.Courses[elem.CourseId] = course = { Categories: [] };
+                    course.Categories.push(elem.Id);
+                })
+            }
+        }
+        return result;
+    }
+
+    async reqCourseCategories(course_ids, dbOpts) {
+        return $data.execSql({
+            dialect: {
+                mysql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MYSQL)({ courseIds: course_ids.join() }),
+                mssql: _.template(GET_CATEGORIES_BY_COURSE_IDS_MSSQL)({ courseIds: course_ids.join() })
+            }
+        }, dbOpts ? dbOpts : {});
     }
 
     getAll() {

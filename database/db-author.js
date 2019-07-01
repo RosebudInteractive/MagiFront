@@ -392,6 +392,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         IsBought: (elem.Counter || elem.GiftId) ? true : false,
                                         IsSubsFree: elem.IsSubsFree ? true : false,
                                         ProductId: elem.ProductId,
+                                        Categories: [],
                                         Price: 0,
                                         DPrice: 0,
                                         Total: 0,
@@ -448,6 +449,22 @@ const DbAuthor = class DbAuthor extends DbObject {
                             if (paidCourses.length > 0) {
                                 for (let i = 0; i < paidCourses.length; i++)
                                     await this._coursesService.getCoursePrice(paidCourses[i]);
+                            }
+                            if (author.Courses.length > 0) {
+                                let ctgService = this.getService("categories", true);
+                                if (ctgService) {
+                                    let courseIds = [];
+                                    for (let i = 0; i < author.Courses.length; i++)
+                                        courseIds.push(author.Courses[i].Id);
+                                    let cats = await ctgService.getCourseCategories(courseIds, isAbsPath);
+                                    author.Categories = cats.Categories;
+                                    for (let i = 0; i < author.Courses.length; i++) {
+                                        let course = author.Courses[i];
+                                        let cat_course = cats.Courses[course.Id];
+                                        if (cat_course)
+                                            course.Categories = cat_course.Categories;
+                                    }
+                                }
                             }
                             return $data.execSql({
                                 dialect: {

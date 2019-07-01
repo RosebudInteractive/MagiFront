@@ -2,6 +2,10 @@
 let { CategoriesService } = require('./../database/db-category');
 
 function setupCategories(app) {
+    if (!global.$Services)
+        global.$Services = {};
+    global.$Services.categories = CategoriesService;
+
     app.get('/api/adm/categories', (req, res, next) => {
         CategoriesService()
             .getAll()
