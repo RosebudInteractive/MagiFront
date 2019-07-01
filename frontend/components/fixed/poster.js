@@ -7,6 +7,7 @@ import * as userActions from "actions/user-actions";
 import * as storageActions from "actions/lesson-info-storage-actions";
 import {connect} from "react-redux";
 import {Redirect} from "react-router";
+import {notifyCourseLinkClicked, notifyLessonLinkClicked} from "ducks/google-analytics";
 
 class PlayerBlock extends React.Component {
 
@@ -21,6 +22,7 @@ class PlayerBlock extends React.Component {
         isPaidCourse: PropTypes.bool,
         isLessonFree: PropTypes.bool,
         needLockLessonAsPaid: PropTypes.bool,
+        analytics: PropTypes.object,
     }
 
     constructor(props) {
@@ -28,6 +30,22 @@ class PlayerBlock extends React.Component {
 
         this._redirect = false
         this._redirectWithoutPlay = false
+
+        this._onLinkClickHandler = () => {
+            if (!this.props.lessonUrl) {
+                this.props.notifyCourseLinkClicked(this.props.analytics)
+            } else {
+                this.props.notifyLessonLinkClicked(this.props.analytics)
+            }
+        }
+    }
+
+    componentDidMount() {
+        $('#img-fix-link').bind("click", this._onLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        $('#img-fix-link').unbind("click", this._onLinkClickHandler)
     }
 
     render() {
@@ -57,7 +75,7 @@ class PlayerBlock extends React.Component {
         }
 
         if (!lessonUrl) {
-            return <Link to={'/category/' + courseUrl}>
+            return <Link to={'/category/' + courseUrl} id={'img-fix-link'}>
                 <video src="#" style={_coverStyle}/>
             </Link>
         } else {
@@ -140,6 +158,8 @@ function mapDispatchToProps(dispatch) {
         playerStartActions: bindActionCreators(playerStartActions, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
         storageActions: bindActionCreators(storageActions, dispatch),
+        notifyCourseLinkClicked: bindActionCreators(notifyCourseLinkClicked, dispatch),
+        notifyLessonLinkClicked: bindActionCreators(notifyLessonLinkClicked, dispatch),
     }
 }
 

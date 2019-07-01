@@ -17,6 +17,29 @@ class Wrapper extends React.Component {
         course: PropTypes.object,
     }
 
+    constructor(props) {
+        super(props)
+
+        this._onLinkClickHandler = () => {
+            const {course} = this.props
+
+            this.props.notifyCourseLinkClicked({
+                ...course,
+                author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+                category: course.CategoriesObj[0].Name,
+                price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+            })
+        }
+    }
+
+    componentDidMount() {
+        $(`#course-link${this.props.course.Id}`).bind("click", this._onLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        $(`#course-link${this.props.course.Id}`).unbind("click", this._onLinkClickHandler)
+    }
+
     render() {
         let {course, enabledPaidCourse} = this.props;
 
@@ -36,6 +59,14 @@ class Wrapper extends React.Component {
             return category.Name
         }).join(', ');
 
+        const _analytics = {
+            Name: course.Name,
+            Id: course.Id,
+            author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+            category: course.CategoriesObj[0].Name,
+            price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+        }
+
         return [
             <div className="course-module _small">
                 <div className="course-module__info-block">
@@ -43,7 +74,7 @@ class Wrapper extends React.Component {
                         <h1 className="course-module__title">
 
                             <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
-                            <Link to={'/category/' + course.URL}>
+                            <Link to={'/category/' + course.URL} id={`course-link${this.props.course.Id}`}>
                                 <p className="course-module__label">Курс:</p> <span>{course.Name}</span>
                             </Link>
                         </h1>
@@ -61,8 +92,7 @@ class Wrapper extends React.Component {
                     <PriceBlock course={course}/>
                 </div>
             </div>,
-            <PlayerBlock poster={_coverPath} courseUrl={course.URL} visibleButton={false} />
-
+            <PlayerBlock poster={_coverPath} courseUrl={course.URL} visibleButton={false} analytics={_analytics}/>
         ]
     }
 

@@ -37,11 +37,11 @@ class Header extends React.Component {
     }
 
     componentDidMount() {
-        $('.js-course-link').bind("click", this._onLinkClickHandler)
+        $(`#course-link${this.props.course.Id}`).bind("click", this._onLinkClickHandler)
     }
 
     componentWillUnmount() {
-        $('.js-course-link').unbind("click", this._onLinkClickHandler)
+        $(`#course-link${this.props.course.Id}`).unbind("click", this._onLinkClickHandler)
     }
 
 
@@ -69,7 +69,7 @@ class Header extends React.Component {
         return (
             <h1 className="course-module__title">
                 <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
-                <Link to={'/category/' + this.props.url} className={"js-course-link"}>
+                <Link to={'/category/' + this.props.url} id={`course-link${this.props.course.Id}`}>
                     <p className="course-module__label">
                         { getCrownForCourse(this.props.course) }
                         Курс:

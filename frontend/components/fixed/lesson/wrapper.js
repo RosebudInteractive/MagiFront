@@ -13,19 +13,26 @@ class Wrapper extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
-        courseUrl: PropTypes.string,
-        isPaidCourse: PropTypes.bool,
+        course: PropTypes.object,
         needLockLessonAsPaid: PropTypes.bool,
     }
 
     render() {
-        let {lesson, courseUrl, isPaidCourse} = this.props,
+        let {lesson, course,} = this.props,
             _coverPath = '/data/' + getCoverPath(lesson);
-
 
         const _categories = lesson.category.map((category) => {
             return category.Name
         }).join(', ');
+
+        const _analytics = {
+            Name: course.Name,
+            Id: course.Id,
+            author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+            category: course.CategoriesObj[0].Name,
+            lessonName: lesson.Name,
+            price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+        }
 
         return [
             <div className="course-module _small">
@@ -34,7 +41,7 @@ class Wrapper extends React.Component {
                         <h1 className="course-module__title">
                             <span className={"favourites" + (this._isLessonInBookmarks(lesson.URL) ? ' active' : '')}
                                   onClick={::this._favoritesClick}>В закладки</span>
-                            <Link to={'/' + courseUrl + '/' + lesson.URL}>
+                            <Link to={'/' + course.URL + '/' + lesson.URL}>
                                 <p className="course-module__label">Лекция:</p> <span>{lesson.Name}</span>
                             </Link>
                         </h1>
@@ -52,8 +59,9 @@ class Wrapper extends React.Component {
                 </div>
             </div>,
             <PlayerBlock poster={_coverPath} visibleButton={true} lessonId={lesson.Id} audios={lesson.Audios}
-                         courseUrl={courseUrl} lessonUrl={lesson.URL} isPaidCourse={isPaidCourse}
-                         isLessonFree={lesson.IsFreeInPaidCourse} needLockLessonAsPaid={this._needLockLessonAsPaid()}/>
+                         courseUrl={course.URL} lessonUrl={lesson.URL} isPaidCourse={this.isPaidCourse}
+                         isLessonFree={lesson.IsFreeInPaidCourse} needLockLessonAsPaid={this._needLockLessonAsPaid()}
+                         analytics={_analytics}/>
 
         ]
     }
@@ -62,8 +70,14 @@ class Wrapper extends React.Component {
         return {__html: this.props.fixedObjDescr};
     }
 
+    get isPaidCourse() {
+        const {course} = this.props;
+
+        return course && course.IsPaid && !course.IsGift && !course.IsBought
+    }
+
     _needLockLessonAsPaid() {
-        return this.props.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
+        return this.isPaidCourse && !(this.props.lesson.IsFreeInPaidCourse || this.props.isAdmin)
     }
 
     _getAuthor() {
@@ -79,24 +93,24 @@ class Wrapper extends React.Component {
     }
 
     _favoritesClick() {
-        let {lesson, courseUrl} = this.props;
+        let {lesson, course} = this.props;
 
         if (!this.props.authorized) {
             this.props.userActions.showSignInForm();
         } else {
             if (this._isLessonInBookmarks(lesson.URL)) {
-                this.props.removeLessonFromBookmarks(courseUrl, lesson.URL)
+                this.props.removeLessonFromBookmarks(course.URL, lesson.URL)
             } else {
-                this.props.addLessonToBookmarks(courseUrl, lesson.URL)
+                this.props.addLessonToBookmarks(course.URL, lesson.URL)
             }
         }
     }
 
     _isLessonInBookmarks(lessonUrl) {
-        let {courseUrl} = this.props;
+        let {course} = this.props;
 
         return this.props.bookmarks && this.props.bookmarks.find((item) => {
-            return item === courseUrl + '/' + lessonUrl
+            return item === course.URL + '/' + lessonUrl
         })
     }
 }

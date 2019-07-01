@@ -6,6 +6,8 @@ import PriceBlock from "../common/price-block";
 import {connect} from 'react-redux';
 import {userPaidCoursesSelector} from "ducks/profile";
 import {getCrownForCourse} from "../../tools/svg-paths";
+import {notifyCourseLinkClicked} from "ducks/google-analytics";
+import {bindActionCreators} from "redux";
 
 class Item extends React.Component {
 
@@ -16,6 +18,35 @@ class Item extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this._onLinkClickHandler = () => {
+            const {item: course} = this.props
+
+            this.props.notifyCourseLinkClicked({
+                ...course,
+                author: course.authors[0].FirstName + course.authors[0].LastName,
+                category: course.categories[0].Name,
+                price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+            })
+        }
+    }
+
+    componentDidMount() {
+        const {item} = this.props,
+            _selector = `#img-course-link${item.Id}` + ", " +
+                `#btn-course-link${item.Id}` + ", " +
+                `#title-course-link${item.Id}`
+
+        $(_selector).bind("click", this._onLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        const {item} = this.props,
+            _selector = `#img-course-link${item.Id}` + ", " +
+                `#btn-course-link${item.Id}` + ", " +
+                `#title-course-link${item.Id}`
+
+        $(_selector).unbind("click", this._onLinkClickHandler)
     }
 
     _favoritesClick() {
@@ -50,7 +81,7 @@ class Item extends React.Component {
                         <span className={"fav" + (isFavorite ? " active" : "")} onClick={::this._favoritesClick}>
                             <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flag}}/>
                         </span>
-                        <Link to={'/category/' + item.URL}>
+                        <Link to={'/category/' + item.URL} id={`title-course-link${item.Id}`}>
                             <span className="fav-card__title-text">
                                 <p className="label course-module__label">
                                     { getCrownForCourse(item) }
@@ -70,7 +101,7 @@ class Item extends React.Component {
                     <div className="fav-card__col">
                         {
                             _priceButtonHidden ?
-                                <Link to={'/category/' + item.URL} className="btn btn--rounded fav-card__link">
+                                <Link to={'/category/' + item.URL} className="btn btn--rounded fav-card__link" id={`btn-course-link${item.Id}`}>
                                     Подробнее о курсе
                                 </Link>
                                 :
@@ -78,7 +109,7 @@ class Item extends React.Component {
                         }
                     </div>
                     <div className="fav-card__col">
-                        <Link to={'/category/' + item.URL} className={"fav-card__image-block " + item.Mask}>
+                        <Link to={'/category/' + item.URL} className={"fav-card__image-block " + item.Mask} id={`img-course-link${item.Id}`}>
                             <svg viewBox="0 0 563 514" width="563" height="514"
                                  dangerouslySetInnerHTML={{__html: _image}}/>
                         </Link>
@@ -93,4 +124,8 @@ function mapStateToProps(state) {
     return {userPaidCourses: userPaidCoursesSelector(state)}
 }
 
-export default connect(mapStateToProps,)(Item);
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({notifyCourseLinkClicked}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Item);

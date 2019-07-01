@@ -96,6 +96,10 @@ export const notifyConcreteCourseShowed = (course) => {
     return { type: CONCRETE_COURSE_PAGE_SHOWED, payload: course }
 }
 
+export const notifyLessonLinkClicked = (data) => {
+    return { type: LESSON_LINK_CLICKED, payload: data }
+}
+
 export const notifyLessonShowed = (data) => {
     return { type: LESSON_PAGE_SHOWED, payload: data }
 }
