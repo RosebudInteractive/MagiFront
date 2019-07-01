@@ -11,6 +11,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import * as userActions from "../../actions/user-actions"
 import {getCrownForCourse} from "../../tools/svg-paths";
+import {notifyCourseLinkClicked} from "ducks/google-analytics";
 
 class Header extends React.Component {
 
@@ -19,6 +20,30 @@ class Header extends React.Component {
         url: PropTypes.string.isRequired,
         course: PropTypes.object,
     };
+
+    constructor(props) {
+        super(props)
+
+        this._onLinkClickHandler = () => {
+            const {course} = this.props
+
+            this.props.notifyCourseLinkClicked({
+                ...course,
+                author: course.AuthorsObj[0].FirstName + course.AuthorsObj[0].LastName,
+                category: course.CategoriesObj[0].Name,
+                price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+            })
+        }
+    }
+
+    componentDidMount() {
+        $('.js-course-link').bind("click", this._onLinkClickHandler)
+    }
+
+    componentWillUnmount() {
+        $('.js-course-link').unbind("click", this._onLinkClickHandler)
+    }
+
 
     _favoritesClick() {
         if (!this.props.authorized) {
@@ -32,6 +57,8 @@ class Header extends React.Component {
         }
     }
 
+
+
     _isCourseInBookmarks() {
         return this.props.bookmarks && this.props.bookmarks.find((item) => {
             return item === this.props.url
@@ -42,7 +69,7 @@ class Header extends React.Component {
         return (
             <h1 className="course-module__title">
                 <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
-                <Link to={'/category/' + this.props.url}>
+                <Link to={'/category/' + this.props.url} className={"js-course-link"}>
                     <p className="course-module__label">
                         { getCrownForCourse(this.props.course) }
                         Курс:
@@ -67,6 +94,7 @@ function mapDispatchToProps(dispatch) {
         addCourseToBookmarks: bindActionCreators(addCourseToBookmarks, dispatch),
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
         userActions: bindActionCreators(userActions, dispatch),
+        notifyCourseLinkClicked: bindActionCreators(notifyCourseLinkClicked, dispatch),
     }
 }
 

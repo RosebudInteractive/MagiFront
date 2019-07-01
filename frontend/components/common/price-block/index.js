@@ -11,6 +11,7 @@ import {
 import {showSignInForm} from '../../../actions/user-actions'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {enabledPaidCoursesSelector} from "ducks/app";
+import {notifyPriceButtonClicked} from "ducks/google-analytics";
 import {connect} from 'react-redux';
 import {getCurrencySign} from "../../../tools/page-tools";
 
@@ -73,9 +74,40 @@ class PriceBlock extends React.Component {
 
     _onClick() {
         const {course} = this.props,
-            _returnUrl = '/category/' + course.URL;
+            _returnUrl = '/category/' + course.URL,
+            {author, category} = this._getAuthorAndCategory();
 
-        this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl})
+        this.props.getPaidCourseInfo({courseId: course.Id, productId: course.ProductId, returnUrl: _returnUrl, author: author, category: category, name: course.Name})
+        this.props.notifyPriceButtonClicked({...course, author: author, category: category})
+    }
+    
+    _getAuthorAndCategory() {
+        const {course} = this.props
+        
+        let _author = 'unknown',
+            _category = 'unknown';
+
+        if (course.hasOwnProperty("AuthorsObj") && course.hasOwnProperty("CategoriesObj")) {
+            _author = course.AuthorsObj && course.AuthorsObj[0] ? course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName : ''
+            _category = course.CategoriesObj && course.CategoriesObj[0] ? course.CategoriesObj[0].Name : '';
+        }
+
+        if (course.hasOwnProperty("Authors") && course.hasOwnProperty("Categories")) {
+            _author = course.Authors && course.Authors[0] ? course.Authors[0].FirstName + " " + course.Authors[0].LastName : ''
+            _category = course.Categories && course.Categories[0] ? course.Categories[0].Name : ''
+        }
+
+        if (course.hasOwnProperty("authors") && course.hasOwnProperty("categories")) {
+            _author = course.authors && course.authors[0] ? course.authors[0].FirstName + " " + course.authors[0].LastName : ''
+            _category = course.categories && course.categories[0] ? course.categories[0].Name : ''
+        }
+
+        if (course.hasOwnProperty("author")) {
+            _author = course.author
+            // _category = course.Categories && course.Categories[0] ? course.Categories[0].Name : ''
+        }
+
+        return {author: _author, category: _category}
     }
 }
 
@@ -94,6 +126,7 @@ function mapDispatchToProps(dispatch) {
         showPaymentWindow: bindActionCreators(showCoursePaymentWindow, dispatch),
         getPaidCourseInfo: bindActionCreators(getPaidCourseInfo, dispatch),
         showSignInForm: bindActionCreators(showSignInForm, dispatch),
+        notifyPriceButtonClicked: bindActionCreators(notifyPriceButtonClicked, dispatch),
     }
 }
 

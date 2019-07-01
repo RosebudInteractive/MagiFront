@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {pages, getDomain, getPageUrl,} from '../tools/page-tools';
 import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks, } from "ducks/profile";
 import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
+import {notifyConcreteCourseShowed} from "ducks/google-analytics";
 
 import {getCrownForCourse} from "../tools/svg-paths"
 import ScrollMemoryStorage from "../tools/scroll-memory-storage"
@@ -46,6 +47,7 @@ class Main extends React.Component {
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
+            this.props.notifyConcreteCourseShowed(this.props.course)
         }
     }
 
@@ -282,6 +284,7 @@ function mapDispatchToProps(dispatch) {
         removeCourseFromBookmarks: bindActionCreators(removeCourseFromBookmarks, dispatch),
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
+        notifyConcreteCourseShowed: bindActionCreators(notifyConcreteCourseShowed, dispatch),
     }
 }
 

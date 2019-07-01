@@ -7,6 +7,14 @@ import Lessons from "./lessons-list";
 
 class CoursesBlock extends React.Component {
 
+    componentDidMount() {
+        if (this.props.author) {
+            this.props.author.Courses.forEach((item) => {
+                item.author = this.props.author.FirstName + ' ' + this.props.author.LastName
+            })
+        }
+    }
+
     render() {
         let {author} = this.props
 
