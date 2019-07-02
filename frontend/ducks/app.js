@@ -36,6 +36,11 @@ const Billing = Record({
     self_refund: false,
     productReqParams: null,
 })
+
+const DebugRecord = Record({
+    lsnPositions: false,
+    gtm: false,
+})
 /**
  * Reducer
  * */
@@ -47,6 +52,7 @@ export const ReducerRecord = Record({
     fetching: false,
     currentPageRef: null,
     isWaiting: false,
+    debug: new DebugRecord()
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -68,6 +74,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('facebookAppID', payload.appId.fb)
                 .set('billing', new Billing(payload.billing))
                 .set('fetching', false)
+                .set('debug', new DebugRecord(payload.debug))
 
         case GET_OPTIONS_FAIL:
             return state
@@ -124,6 +131,7 @@ export const enabledPaidCoursesSelector = createSelector(stateSelector, (state) 
 
 const currentPageRefSelector = createSelector(stateSelector, state => state.currentPageRef)
 export const waitingSelector = createSelector(stateSelector, state => state.isWaiting)
+export const analyticsDebugModeSelector = createSelector(stateSelector, state => state.getIn(['debug', 'gtm']))
 
 
 /**
