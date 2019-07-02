@@ -4,6 +4,7 @@ import {Record, OrderedMap} from 'immutable'
 import 'whatwg-fetch';
 import {checkStatus, parseJSON} from "../tools/fetch-tools";
 import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
+import {analyticsDebugModeSelector} from './app'
 
 /**
  * Constants
@@ -164,7 +165,7 @@ const _fetchNonRegisterTransactions = () => {
 function* registerTransactionsSaga() {
     const _transactions = yield select(transactions)
 
-    let _result = _registerTransactions(_transactions)
+    let _result = yield call(_registerTransactions, _transactions)
 
     yield put({type: SET_TRANSACTION_REGISTERED_START})
     try {
@@ -177,13 +178,14 @@ function* registerTransactionsSaga() {
     }
 }
 
-const _registerTransactions = (data) => {
-    let _result = []
+function* _registerTransactions(data) {
+    let _result = [],
+        _data = null
 
-    if (window.dataLayer && data.size > 0) {
+    if (data.size > 0) {
         data.forEach((item) => {
             _result.push(item.id)
-            let _obj = {
+            let _data = {
                 'ecommerce': {
                     'currencyCode': 'RUB',
                     'purchase': {
@@ -201,12 +203,11 @@ const _registerTransactions = (data) => {
                     'gtm-ee-event-non-interaction': 'False',
                 }
             }
-            _obj.ecommerce.purchase.products = item.products.slice()
-
-            window.dataLayer.push(_obj)
-            console.log(_obj)
+            _data.ecommerce.purchase.products = item.products.slice()
         })
     }
+
+    yield call(_pushAnalyticsData, _data)
 
     return _result
 }
@@ -457,11 +458,15 @@ function* newUserRegisteredSaga() {
 }
 
 
+function* _pushAnalyticsData(data) {
+    const _isDebugMode = yield select(analyticsDebugModeSelector)
 
-const _pushAnalyticsData = (data) => {
     if (window.dataLayer && data) {
         window.dataLayer.push(data)
-        console.log(data)
+
+        if (_isDebugMode) {
+            console.log(data)
+        }
     }
 }
 
