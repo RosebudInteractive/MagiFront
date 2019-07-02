@@ -39,7 +39,7 @@ const Billing = Record({
 
 const DebugRecord = Record({
     lsnPositions: false,
-    gtm: false,
+    gtm: true,
 })
 /**
  * Reducer
