@@ -185,7 +185,7 @@ function* _registerTransactions(data) {
     if (data.size > 0) {
         data.forEach((item) => {
             _result.push(item.id)
-            let _data = {
+            _data = {
                 'ecommerce': {
                     'currencyCode': 'RUB',
                     'purchase': {
