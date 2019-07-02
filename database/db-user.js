@@ -913,6 +913,7 @@ const DbUser = class DbUser extends DbObject {
         })
             .then((result) => {
                 bookmarks.Authors = result.Authors;
+                bookmarks.Categories = result.Categories;
                 bookmarks.LessonCourses = result.Courses;
                 bookmarks.Lessons = result.Lessons;
                 bookmarks.Lessons.forEach((elem) => {
