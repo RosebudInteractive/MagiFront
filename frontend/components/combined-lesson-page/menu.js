@@ -11,6 +11,7 @@ import * as playerActions from "../../actions/player-actions";
 import LessonsListWrapper from './lessons-list-wrapper';
 import $ from "jquery";
 import {getLessonNumber, OverflowHandler} from "../../tools/page-tools";
+import {notifyCourseLinkClicked} from "ducks/google-analytics";
 
 
 class Menu extends React.Component {
@@ -61,7 +62,13 @@ class Menu extends React.Component {
 
         return (
             <div className={_menuClassName}>
-                <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl}/>
+                <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl} onLinkClick={this.props.notifyCourseLinkClicked} analyticsInfo={{
+                    Id: this.props.course.Id,
+                    Name: this.props.course.Name,
+                    category: this.props.course.Categories[0].Name,
+                    author: this.props.lesson.Author.FirstName + ' ' + this.props.lesson.Author.LastName,
+                    price: this.props.course.IsPaid ? (this.props.course.DPrice ? this.props.course.DPrice : this.props.course.Price) : 0
+                }}/>
                 <ListBlock total={_total}
                            courseUrl={_courseUrl}
                            {...this.props}/>
@@ -82,6 +89,8 @@ class LogoAndTitle extends React.Component {
     static propTypes = {
         courseTitle: PropTypes.string,
         courseUrl: PropTypes.string,
+        onLinkClick: PropTypes.func,
+        analyticsInfo: PropTypes.object,
     };
 
     render() {
@@ -93,7 +102,9 @@ class LogoAndTitle extends React.Component {
                 <Link to={'/'} className="logo-min">
                     <svg width="75" height="40" dangerouslySetInnerHTML={{__html: _logoMob}}/>
                 </Link>
-                <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back">
+                <Link to={'/category/' + this.props.courseUrl} className="lectures-menu__link-back" onClick={() => {
+                    this.props.onLinkClick(this.props.analyticsInfo)
+                }}>
                     <div className="icon">
                         <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _linkBack}}/>
                     </div>
@@ -338,6 +349,7 @@ function mapDispatchToProps(dispatch) {
     return {
         playerActions: bindActionCreators(playerActions, dispatch),
         appActions: bindActionCreators(appActions, dispatch),
+        notifyCourseLinkClicked: bindActionCreators(notifyCourseLinkClicked, dispatch),
     }
 }
 

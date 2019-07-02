@@ -11,23 +11,26 @@ import {all, takeEvery, put, call, select, fork,} from 'redux-saga/effects'
 export const moduleName = 'google-analytics'
 const prefix = `${appName}/${moduleName}`
 
-const COURSES_PAGE_SHOWED = 'COURSES_PAGE_SHOWED'
-const LESSON_PAGE_SHOWED = 'LECTURE_PAGE_SHOWED'
-const LESSON_LINK_CLICKED = 'LESSON_LINK_CLICKED'
-const CONCRETE_COURSE_PAGE_SHOWED = 'CONCRETE_COURSE_PAGE_SHOWED'
-const CONCRETE_COURSE_LINK_CLICKED = 'CONCRETE_COURSE_LINK_CLICKED'
-const PRICE_BUTTON_CLICKED = 'PRICE_BUTTON_CLICKED'
-const PAYMENT_BUTTON_CLICKED = 'PAYMENT_BUTTON_CLICKED'
+const COURSES_PAGE_SHOWED = `${prefix}/COURSES_PAGE_SHOWED`
+const LESSON_PAGE_SHOWED = `${prefix}/LECTURE_PAGE_SHOWED`
+const LESSON_LINK_CLICKED = `${prefix}/LESSON_LINK_CLICKED`
+const CONCRETE_COURSE_PAGE_SHOWED = `${prefix}/CONCRETE_COURSE_PAGE_SHOWED`
+const CONCRETE_COURSE_LINK_CLICKED = `${prefix}/CONCRETE_COURSE_LINK_CLICKED`
+const PRICE_BUTTON_CLICKED = `${prefix}/PRICE_BUTTON_CLICKED`
+const PAYMENT_BUTTON_CLICKED = `${prefix}/PAYMENT_BUTTON_CLICKED`
 
-export const GET_NON_REGISTER_TRANSACTION_REQUEST = 'GET_NON_REGISTER_TRANSACTION_REQUEST'
-export const GET_NON_REGISTER_TRANSACTION_START = 'GET_NON_REGISTER_TRANSACTION_START'
-export const GET_NON_REGISTER_TRANSACTION_SUCCESS = 'GET_NON_REGISTER_TRANSACTION_SUCCESS'
-export const GET_NON_REGISTER_TRANSACTION_FAIL = 'GET_NON_REGISTER_TRANSACTION_FAIL'
+const SEND_USER_ID = `${prefix}/SEND_USER_ID`
+const SEND_USER_SIGN_UP = `${prefix}/SEND_USER_SIGN_UP`
 
-export const SET_TRANSACTION_REGISTERED_REQUEST = 'SET_TRANSACTION_REGISTERED_REQUEST'
-export const SET_TRANSACTION_REGISTERED_START = 'SET_TRANSACTION_REGISTERED_START'
-export const SET_TRANSACTION_REGISTERED_SUCCESS = 'SET_TRANSACTION_REGISTERED_SUCCESS'
-export const SET_TRANSACTION_REGISTERED_FAIL = 'SET_TRANSACTION_REGISTERED_FAIL'
+const GET_NON_REGISTER_TRANSACTION_REQUEST = `${prefix}/GET_NON_REGISTER_TRANSACTION_REQUEST`
+const GET_NON_REGISTER_TRANSACTION_START = `${prefix}/GET_NON_REGISTER_TRANSACTION_START`
+const GET_NON_REGISTER_TRANSACTION_SUCCESS = `${prefix}/GET_NON_REGISTER_TRANSACTION_SUCCESS`
+const GET_NON_REGISTER_TRANSACTION_FAIL = `${prefix}/GET_NON_REGISTER_TRANSACTION_FAIL`
+
+const SET_TRANSACTION_REGISTERED_REQUEST = `${prefix}/SET_TRANSACTION_REGISTERED_REQUEST`
+const SET_TRANSACTION_REGISTERED_START = `${prefix}/SET_TRANSACTION_REGISTERED_START`
+const SET_TRANSACTION_REGISTERED_SUCCESS = `${prefix}/SET_TRANSACTION_REGISTERED_SUCCESS`
+const SET_TRANSACTION_REGISTERED_FAIL = `${prefix}/SET_TRANSACTION_REGISTERED_FAIL`
 
 /**
  * Reducer
@@ -112,6 +115,14 @@ export const notifyPaymentButtonClicked = (data) => {
     return { type: PAYMENT_BUTTON_CLICKED, payload: data }
 }
 
+export const notifyUserIdChanged = (userId) => {
+    return { type: SEND_USER_ID, payload: userId }
+}
+
+export const notifyNewUserRegistered = () => {
+    return { type: SEND_USER_SIGN_UP }
+}
+
 /**
  * Sagas
  */
@@ -126,6 +137,8 @@ export const saga = function* () {
         takeEvery(LESSON_LINK_CLICKED, addLessonClickedSaga),
         takeEvery(PRICE_BUTTON_CLICKED, addPriceButtonClickedSaga),
         takeEvery(PAYMENT_BUTTON_CLICKED, addPaymentButtonClickedSaga),
+        takeEvery(SEND_USER_ID, addUserIdSaga),
+        takeEvery(SEND_USER_SIGN_UP, newUserRegisteredSaga),
     ])
 }
 
@@ -284,10 +297,6 @@ function* addLessonPageShowedSaga(data) {
 
     const _course = data.payload
 
-    // let _author = _course.Authors && _course.Authors[0] ? _course.Authors[0].FirstName + " " + _course.Authors[0].LastName : '',
-    //     _category = _course.Categories && _course.Categories[0] ? _course.Categories[0].Name : '',
-    let _price = _course.IsPaid ? (_course.DPrice ? _course.DPrice : _course.Price) : 0
-
     let _data = {
         'ecommerce': {
             'currencyCode': 'RUB',
@@ -296,9 +305,9 @@ function* addLessonPageShowedSaga(data) {
                 'products': [{
                     'name': _course.Name, // 'Название курса',
                     'id': _course.Id, // 'ID1',
-                    'price': _price,
+                    'price': _course.price,
                     'brand': _course.author,
-                    'category': 'Категория курса',
+                    'category': _course.category, //'Категория курса',
                     'variant': _course.lessonName,
                 }]
             },
@@ -436,6 +445,18 @@ function* addLessonClickedSaga(data) {
     yield call(_pushAnalyticsData, _data)
 
 }
+
+function* addUserIdSaga(data) {
+    if (!data.payload) return
+
+    yield call(_pushAnalyticsData, { 'UID': data.payload })
+}
+
+function* newUserRegisteredSaga() {
+    yield call(_pushAnalyticsData, { 'event': 'reg' })
+}
+
+
 
 const _pushAnalyticsData = (data) => {
     if (window.dataLayer && data) {

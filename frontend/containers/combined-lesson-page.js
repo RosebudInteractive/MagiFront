@@ -237,7 +237,14 @@ class CombineLessonPage extends React.Component {
             ScrollMemoryStorage.scrollPage(_key)
 
 
-            this.props.notifyLessonShowed({...this.props.course, lessonName : this.props.lesson.Name, author: this.props.lesson.Author.FirstName + ' ' + this.props.lesson.Author.LastName})
+            this.props.notifyLessonShowed({
+                Id: this.props.course.Id,
+                Name: this.props.course.Name,
+                category: this.props.course.Categories[0].Name,
+                author: this.props.lesson.Author.FirstName + ' ' + this.props.lesson.Author.LastName,
+                lessonName: this.props.lesson.Name,
+                price: this.props.course.IsPaid ? (this.props.course.DPrice ? this.props.course.DPrice : this.props.course.Price) : 0
+            })
         }
     }
 

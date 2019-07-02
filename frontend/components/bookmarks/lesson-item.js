@@ -16,28 +16,6 @@ class Item extends React.Component {
 
     constructor(props) {
         super(props)
-
-        this._onCourseLinkClickHandler = () => {
-            this.props.notifyCourseLinkClicked(this.props.item.analyticsInfo)
-        }
-
-        this._onLessonLinkClickHandler = () => {
-            this.props.notifyLessonLinkClicked(this.props.item.analyticsInfo)
-        }
-    }
-
-    componentDidMount() {
-        const {item} = this.props
-
-        $(`#course-link${item.CourseId}`).bind("click", this._onCourseLinkClickHandler)
-        $(`#lesson-link${item.Id}`).bind("click", this._onLessonLinkClickHandler)
-    }
-
-    componentWillUnmount() {
-        const {item} = this.props
-
-        $(`#course-link${item.CourseId}`).unbind("click", this._onCourseLinkClickHandler)
-        $(`#lesson-link${item.Id}`).unbind("click", this._onLessonLinkClickHandler)
     }
 
     _favoritesClick() {
@@ -71,7 +49,9 @@ class Item extends React.Component {
                 </div>
                 <div className="bookmarks__lesson-item__info-block">
                     <h3 className="history-item__title">
-                        <Link to={'/category/' + item.courseUrl} id={`course-link${item.CourseId}`}>
+                        <Link to={'/category/' + item.courseUrl} onClick={() => {
+                            this.props.notifyCourseLinkClicked(this.props.item.analyticsInfo)
+                        }}>
                             <span className="history-item__title-text">
                                 <span className="label">{'Курс: '}</span>
                                 <span className="history-item__title-text__text">{item.courseName}</span>
@@ -79,7 +59,9 @@ class Item extends React.Component {
                         </Link>
                     </h3>
                     <h4 className="history-item__lecture">
-                        <Link to={'/' + item.courseUrl + '/' + item.URL} id={`lesson-link${item.Id}`}>
+                        <Link to={'/' + item.courseUrl + '/' + item.URL} onClick={() => {
+                            this.props.notifyLessonLinkClicked(this.props.item.analyticsInfo)
+                        }}>
                             <span className="history-item__lecture__num">{item.Number + '. '}</span>
                             <span className="history-item__lecture__text">{item.Name}</span>
                         </Link>

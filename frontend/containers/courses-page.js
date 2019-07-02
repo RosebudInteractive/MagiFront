@@ -73,13 +73,18 @@ class CoursesPage extends React.Component {
             let _filter = [];
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
             this.props.history.replace('/razdel/' + _filter.join('+'))
-            this.props.notifyCoursesShowed(this._courses)
+        }
+
+        if (!prevProps.selectedFilter.equals(selectedFilter)) {
+            this.props.notifyCoursesShowed(this._getVisibleCourses())
         }
 
         if (prevProps.courses.fetching && !this.props.courses.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
-            this.props.notifyCoursesShowed(this._courses)
+            if (!hasExternalFilter) {
+                this.props.notifyCoursesShowed(this._getVisibleCourses())
+            }
         }
     }
 
@@ -93,8 +98,6 @@ class CoursesPage extends React.Component {
         let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId, userPaidCourses} = this.props,
             _courses = this.props.courses.items,
             _result = [];
-
-        this._courses = []
 
         _courses.forEach((course, index) => {
             let _inFilter = false;
@@ -110,9 +113,6 @@ class CoursesPage extends React.Component {
             }
 
             if (_inFilter) {
-
-                this._courses.push(course)
-
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
                 } else {
@@ -170,6 +170,32 @@ class CoursesPage extends React.Component {
 
     _removeMetaTags() {
         $('meta[name="description"]').remove();
+    }
+
+    _getVisibleCourses() {
+        let {isEmptyFilter, selectedFilter} = this.props,
+            _courses = this.props.courses.items,
+            _result = [];
+
+        _courses.forEach((course) => {
+            let _inFilter = false;
+
+            if (isEmptyFilter) {
+                _inFilter = true
+            } else {
+                _inFilter = course.Categories.some((categoryId) => {
+                    return selectedFilter.find((item) => {
+                        return item.get('id') === categoryId
+                    });
+                });
+            }
+
+            if (_inFilter) {
+                _result.push(course)
+            }
+        })
+
+        return _result
     }
 }
 

@@ -50,6 +50,7 @@ import CoursePaymentWrapper from "./components/messages/billing/course-payment-w
 import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions, waitingSelector} from 'ducks/app'
+import {notifyNewUserRegistered} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 
@@ -150,7 +151,9 @@ class App extends Component {
         const _params = new URLSearchParams(this.props.location.search),
             _isBilling = _params.get('t') ? _params.get('t') === 'b' : false,
             _isPlayer= _params.get('t') ? _params.get('t') === 'p' : false,
-            _isAuth = _params.get('t') ? _params.get('t') === 'a' : false;
+            _isAuth = _params.get('t') ? _params.get('t') === 'a' : false,
+            _isNewUser = _params.get('_is_new_user') ? _params.get('_is_new_user') === 'true' : false
+
 
         this._scrollPosition = +_params.get('pos');
 
@@ -191,6 +194,10 @@ class App extends Component {
         if (this._scrollPosition) {
             ScrollMemoryStorage.setUrlPosition('INIT', this._scrollPosition)
             ScrollMemoryStorage.setKeyActive('INIT')
+        }
+
+        if (_isNewUser) {
+            this.props.notifyNewUserRegistered()
         }
     }
 
@@ -395,6 +402,7 @@ function mapDispatchToProps(dispatch) {
         getAppOptions: bindActionCreators(getAppOptions, dispatch),
         setBillingWaitingAuthorizeData: bindActionCreators(setBillingWaitingAuthorizeData, dispatch),
         setPlayerWaitingAuthorizeData: bindActionCreators(setPlayerWaitingAuthorizeData, dispatch),
+        notifyNewUserRegistered: bindActionCreators(notifyNewUserRegistered, dispatch),
     }
 }
 
