@@ -732,7 +732,7 @@ const handleBookmarksData = (data) => {
                     Id: _course.Id,
                     Name: _course.Name,
                     author: lesson.authorName,
-                    category : data.Categories[_course.Categories[0]].Name,
+                    category : (_course.Categories[0] && data.Categories[_course.Categories[0]]) ? data.Categories[_course.Categories[0]].Name : 'unknown',
                     price: _course.IsPaid ? (_course.DPrice ? _course.DPrice : _course.Price) : 0,
                     lessonName: lesson.Name
                 }
