@@ -418,7 +418,7 @@ class CombineLessonPage extends React.Component {
         return lesson
             ?
             <MetaTags>
-                <meta name="description" content={lesson.PageMeta.Post}/>
+                <meta name="description" content={lesson.PageMeta.Post ? lesson.PageMeta.Post : lesson.PageMeta.Description}/>
                 <link rel="canonical" href={_url}/>
                 <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
