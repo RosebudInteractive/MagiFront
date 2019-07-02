@@ -61,7 +61,7 @@ class PaymentForm extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if ((!nextProps.loadingSubsInfo) && (!this.props.loadingSubsInfo)) {
+        if ((!nextProps.loadingSubsInfo) && (this.props.loadingSubsInfo)) {
             if (nextProps.info && nextProps.info.get('Payment')) {
                 this.setState({
                     selectedMethod: 'stored-card',

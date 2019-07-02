@@ -284,8 +284,8 @@ export const getLessonBookmarks = createSelector(stateSelector, state => state.l
 export const errorSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadingBookmarksSelector = createSelector(stateSelector, state => state.loadingBookmarks)
-export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingSubsInfo)
-export const loadingSubsInfoSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
+export const loadingUserBookmarksSelector = createSelector(stateSelector, state => state.loadingUserBookmarks)
+export const loadingSubsInfoSelector = createSelector(stateSelector, state => state.loadingSubsInfo)
 
 export const transactionsSelector = createSelector(stateSelector, state => state.transactions)
 export const subscriptionInfoSelector = createSelector(stateSelector, state => state.subsInfo)
