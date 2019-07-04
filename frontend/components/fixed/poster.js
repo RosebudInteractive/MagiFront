@@ -9,6 +9,8 @@ import {connect} from "react-redux";
 import {Redirect} from "react-router";
 import {notifyCourseLinkClicked, notifyLessonLinkClicked} from "ducks/google-analytics";
 
+const RATIO = 2.2875
+
 class PlayerBlock extends React.Component {
 
     static propTypes = {
@@ -38,14 +40,27 @@ class PlayerBlock extends React.Component {
                 this.props.notifyLessonLinkClicked(this.props.analytics)
             }
         }
+
+        this._resizeHandler = () => {
+            // const _poster = $('#poster')
+            //
+            // if (_poster) {
+            //     _poster.height(_poster.width() / RATIO)
+            // }
+        }
     }
 
     componentDidMount() {
         $('#img-fix-link').bind("click", this._onLinkClickHandler)
+
+        window.addEventListener('resize', this._resizeHandler);
+
+        this._resizeHandler()
     }
 
     componentWillUnmount() {
         $('#img-fix-link').unbind("click", this._onLinkClickHandler)
+        window.removeEventListener('resize', this._resizeHandler);
     }
 
     render() {
@@ -60,7 +75,7 @@ class PlayerBlock extends React.Component {
         }
 
         return (
-            <div className="video-block">
+            <div className="video-block" id="poster">
                 {this._getPoster()}
                 {this._getButton()}
             </div>

@@ -12,6 +12,7 @@ export default class InfoBlock extends React.Component {
         title: PropTypes.string,
         url: PropTypes.string,
         isMobile: PropTypes.bool,
+        authorInLine: PropTypes.bool,
     };
 
     render() {
@@ -22,7 +23,8 @@ export default class InfoBlock extends React.Component {
                 <div className="course-module__header">
                     <Header title={title} url={url} course={course}/>
                     <Info authors={course ? course.AuthorsObj : []}
-                          categories={course ? course.CategoriesObj : []}/>
+                          categories={course ? course.CategoriesObj : []}
+                          isLineStyle={true}/>
                     <PriceBlock course={course}/>
                 </div>
                 <CourseModuleBody course={course} isMobile={isMobile}/>

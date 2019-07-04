@@ -1,0 +1,124 @@
+.page-header__wrapper
+  z-index: 1
+  background-color: white
+  display: -webkit-box
+  display: -webkit-flex
+  display: -moz-box
+  display: -ms-flexbox
+  display: flex
+  -webkit-box-sizing: border-box
+  -moz-box-sizing: border-box
+  box-sizing: border-box
+  padding: 28px 0 25px 35px
+  max-width: 100%
+  border-bottom: 1px solid rgba(47, 47, 47, 0.15)
+
+  .logo
+    display: block
+    margin-right: 33px
+
+  .navigation
+    ul
+      li
+        margin-right: 13px
+        -webkit-transition: opacity 0.4s ease
+        transition: opacity 0.4s ease
+        opacity: 0.6
+  
+  .language-indicator 
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-orient: vertical
+    -webkit-box-direction: normal
+    -webkit-flex-direction: column
+    -moz-box-orient: vertical
+    -moz-box-direction: normal
+    -ms-flex-direction: column
+    flex-direction: column
+    -webkit-box-pack: center
+    -webkit-justify-content: center
+    -moz-box-pack: center
+    -ms-flex-pack: center
+    justify-content: center
+    margin-top: 1px
+    margin-right: 6px
+    padding: 0
+    width: 36px
+    height: 36px
+    text-align: center
+    font-family: "Fira Sans", Arial, sans-serif
+    font-size: 14px
+    line-height: 22px
+    background-color: #c4c4c4
+    border: none
+    border-radius: 50%
+    -webkit-transition: color 0.4s ease, background-color 0.4s ease
+    transition: color 0.4s ease, background-color 0.4s ease
+
+  .search-block__trigger
+    margin-right: 35px
+    margin-left: 32px
+    padding: 0
+    padding-top: 4px
+    width: 36px
+    height: 36px
+    background-color: rgba(255, 255, 255, 0)
+    border: none
+    opacity: 0.6
+
+  .login-btn
+    background-color: transparent
+    border: none
+    outline: none
+    position: relative
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-align: center
+    -webkit-align-items: center
+    -moz-box-align: center
+    -ms-flex-align: center
+    align-items: center
+    padding-top: 6px
+    padding-left: 33px
+    padding-right: 32px
+    text-transform: uppercase
+    font-family: "Fira Sans", Arial, sans-serif
+    font-size: 14px
+    line-height: 26px
+    letter-spacing: 1.7px
+    color: #2f2f2f
+    opacity: 0.6
+
+
+.menu-mobile
+  @media (max-width: 899px)
+    position: fixed
+    opacity: 0
+    top: 64px
+    bottom: 0
+    left: 0
+    right: 0
+    -webkit-transform: translateX(2000px)
+    -ms-transform: translateX(2000px)
+    transform: translateX(2000px)
+    -webkit-box-orient: vertical
+    -webkit-box-direction: normal
+    -webkit-flex-direction: column
+    -moz-box-orient: vertical
+    -moz-box-direction: normal
+    -ms-flex-direction: column
+    flex-direction: column
+    padding: 0 18px 15px 18px
+    color: #fff
+    background-color: #2f2f2f
+    -webkit-transition: -webkit-transform 0.2s ease
+    transition: -webkit-transform 0.2s ease
+    transition: transform 0.2s ease
+    transition: transform 0.2s ease, -webkit-transform 0.2s ease
+    z-index: 100

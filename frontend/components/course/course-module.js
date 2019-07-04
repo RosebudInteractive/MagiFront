@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import InfoBlock from './info-block';
 import ImageBlock from './image-block'
+import './courses-page.sass'
 
 export default class CourseModule extends React.Component {
 

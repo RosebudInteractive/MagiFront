@@ -62,7 +62,7 @@ class SingleLecture extends React.Component {
                             <span className='title'>{lesson.Name + ' '}</span>
                         </h3>
                     </Link>
-                    <p>{lesson.ShortDescription}</p>
+                    <span className="text">{lesson.ShortDescription}</span>
                 </div>
             </section>
         )

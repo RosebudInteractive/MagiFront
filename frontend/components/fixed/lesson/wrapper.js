@@ -8,6 +8,8 @@ import {fixedObjDescrSelector} from '../../../ducks/params'
 import {addLessonToBookmarks, getUserBookmarks, removeLessonFromBookmarks, userBookmarksSelector} from "ducks/profile";
 import {bindActionCreators} from "redux";
 import * as userActions from "actions/user-actions";
+import '../fixed-block.sass'
+import '../../course/courses-page.sass'
 
 class Wrapper extends React.Component {
 
@@ -35,7 +37,7 @@ class Wrapper extends React.Component {
         }
 
         return [
-            <div className="course-module _small">
+            <div className="course-module _small _fixed">
                 <div className="course-module__info-block">
                     <div className="course-module__header">
                         <h1 className="course-module__title">

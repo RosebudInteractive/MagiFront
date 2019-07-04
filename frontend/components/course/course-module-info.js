@@ -8,6 +8,7 @@ export default class Info extends React.Component {
         authors: PropTypes.array.isRequired,
         categories: PropTypes.array.isRequired,
         showPhoto: PropTypes.bool,
+        isLineStyle: PropTypes.bool,
     };
 
     render() {
@@ -24,7 +25,16 @@ export default class Info extends React.Component {
             return category.Name
         }).join('\n');
 
-        return (
+        return this.props.isLineStyle
+            ?
+            <div className="course-module__info">
+                <div className="course-module__stats">
+                    <b className="category">{_categories}</b>
+                    {" / "}
+                    <span className="author-name">{_authors}</span>
+                </div>
+            </div>
+            :
             <div className='course-module__info'>
                 <div className='course-module__info-col'>
                     <p className='course-module__info-col-header'>{_multipleAuthors ? 'Авторы' : 'Автор'}</p>
@@ -35,6 +45,5 @@ export default class Info extends React.Component {
                     <p className='course-module__info-col-descr'>{_categories}</p>
                 </div>
             </div>
-        );
     }
 }

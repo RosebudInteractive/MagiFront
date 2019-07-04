@@ -11,6 +11,9 @@ import {bindActionCreators} from "redux";
 import * as userActions from "actions/user-actions";
 import PriceBlock from "../../common/price-block";
 import {enabledPaidCoursesSelector} from "ducks/app";
+import {getCrownForCourse} from "../../../tools/svg-paths";
+import '../fixed-block.sass'
+import '../../course/courses-page.sass'
 
 class Wrapper extends React.Component {
 
@@ -69,14 +72,18 @@ class Wrapper extends React.Component {
         }
 
         return [
-            <div className="course-module _small">
+            <div className="course-module _small _fixed">
                 <div className="course-module__info-block">
                     <div className="course-module__header">
                         <h1 className="course-module__title">
 
                             <span className={"favourites" + (this._isCourseInBookmarks() ? ' active' : '')} onClick={::this._favoritesClick}>В закладки</span>
                             <Link to={'/category/' + course.URL} id={`course-link${this.props.course.Id}`}>
-                                <p className="course-module__label">Курс:</p> <span>{course.Name}</span>
+                                <p className="course-module__label">
+                                    { getCrownForCourse(this.props.course) }
+                                    Курс:
+                                </p>
+                                <span>{course.Name}</span>
                             </Link>
                         </h1>
                         <div className="course-module__info">

@@ -10,6 +10,7 @@ import SubscriptionButton from './subscription-button';
 
 import {pages} from "../../tools/page-tools";
 import * as userActions from '../../actions/user-actions'
+import './desktop-header.sass'
 
 class DesktopHeaderRow extends React.Component {
 
@@ -68,9 +69,9 @@ class Navigator extends React.Component {
         return (
             <nav className="navigation">
                 <ul>
-                    <li className={_isCoursesPage ? "current" : ''}>
-                        <Link to={pages.courses.url}>Курсы</Link>
-                    </li>
+                    {/*<li className={_isCoursesPage ? "current" : ''}>*/}
+                    {/*    <Link to={pages.courses.url}>Курсы</Link>*/}
+                    {/*</li>*/}
                     {
                         this.props.authorized ?
                             <li className={"favorites" + (this.props.currentPage === pages.bookmarks ? ' active' : '')}

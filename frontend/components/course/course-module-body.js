@@ -37,7 +37,7 @@ class Counter extends React.Component {
         return (
             <div className='lectures-counter'>
                 <p>Лекции
-                    <span className='current'>{' ' + current}</span>
+                    <span className='current'>{current}</span>
                     <span className='total'>/{total}</span>
                 </p>
             </div>
