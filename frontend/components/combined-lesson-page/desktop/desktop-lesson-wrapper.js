@@ -38,16 +38,26 @@ export default class Wrapper extends React.Component {
     constructor(props) {
         super(props)
 
+        this.state = {
+            isLandscape: isLandscape()
+        }
+
 
         this._resizeHandler = () => {
             let _playerDiv = $('.lesson-player')
 
             if (isLandscape()) {
+                if (!this.state.isLandscape) {
+                    this.setState({isLandscape: true})
+                }
                 _playerDiv.removeClass('added')
                 this._height = _getHeight();
                 this._width = _getWidth();
                 $('.lesson-wrapper').css('height', this._height).css('width', this._width);
             } else {
+                if (this.state.isLandscape) {
+                    this.setState({isLandscape: false})
+                }
                 _playerDiv.addClass('added')
             }
 
@@ -59,9 +69,13 @@ export default class Wrapper extends React.Component {
         this._resizeHandler()
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
         if (this._height !== _getHeight()) {
             this._resizeHandler()
+        }
+
+        if (this.state.isLandscape !== prevState.isLandscape) {
+            setTimeout(() => {$(window).trigger('resize')}, 0);
         }
     }
 
