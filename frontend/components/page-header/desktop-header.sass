@@ -16,6 +16,8 @@
   .logo
     display: block
     margin-right: 33px
+    @media (max-width: 899px)
+      display: none
 
   .navigation
     ul
@@ -68,6 +70,15 @@
     background-color: rgba(255, 255, 255, 0)
     border: none
     opacity: 0.6
+    @media (max-width: 899px)
+      margin-left: -7px
+      margin-right: 1px
+      padding-top: 12px
+      cursor: pointer
+
+  .search-form
+    @media (max-width: 899px)
+      position: static
 
   .login-btn
     background-color: transparent
@@ -94,6 +105,12 @@
     letter-spacing: 1.7px
     color: #2f2f2f
     opacity: 0.6
+    @media (max-width: 899px)
+      padding: 11px 0 10px
+      text-transform: initial
+      font-size: 17px
+      line-height: 22px
+      color: rgba(255, 255, 255, 0.4)
 
 
 .menu-mobile

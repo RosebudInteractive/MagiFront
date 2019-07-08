@@ -111,7 +111,8 @@
         margin-bottom: 64px
         @media (max-width: 899px)
           margin-bottom: 0
-          width: 222%
+          padding-right: 33px
+          width: calc(100vw - 85px)
 
         .lectures-counter
           margin: 0
@@ -169,6 +170,8 @@
 
 
     .course-module__header
+      @media (max-width: 899px)
+        margin-bottom: 50%
       @media (max-width: 639px)
         padding-right: 0
 
@@ -219,6 +222,7 @@
 
     .course-module__price-block
       margin-bottom: auto
+      position: absolute
     .course-module__price-btn
       @media (max-width: 899px)
         font-size: 15px
@@ -229,3 +233,11 @@
     .lectures-wrapper
       @media (max-width: 899px)
         padding-bottom: 0
+        padding-right: 33px
+
+  .fading-cover
+    opacity: 0
+    transition: opacity 0.4s cubic-bezier(0.86, 0, 0.07, 1)
+
+    &.visible
+      opacity: 1

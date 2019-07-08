@@ -6,6 +6,21 @@ import {notifyCourseLinkClicked} from "ducks/google-analytics";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 
+const MASKS = {
+    '_mask01': {width: 574, height: 503,},
+    '_mask02': {width: 543, height: 511,},
+    '_mask03': {width: 549, height: 549,},
+    '_mask04': {width: 546, height: 492,},
+    '_mask05': {width: 564, height: 515,},
+    '_mask06': {width: 566, height: 507,},
+    '_mask07': {width: 570, height: 569,},
+    '_mask08': {width: 528, height: 551,},
+    '_mask09': {width: 560, height: 529,},
+    '_mask10': {width: 560, height: 479,},
+    '_mask11': {width: 525, height: 495,},
+    '_mask12': {width: 548, height: 507,},
+}
+
 class ImageBlock extends React.Component {
 
     static propTypes = {
@@ -14,6 +29,10 @@ class ImageBlock extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this.state = {
+            visible: false
+        }
 
         this._onLinkClickHandler = () => {
             const {course} = this.props
@@ -25,27 +44,37 @@ class ImageBlock extends React.Component {
                 price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
             })
         }
+
+        this._onImageLoadHandler = () => {
+            this.setState({visible: true})
+        }
     }
 
     componentDidMount() {
         $(`#img-course-link${this.props.course.Id}`).bind("click", this._onLinkClickHandler)
+        $(`#cover${this.props.course.Id}`).bind("load", this._onImageLoadHandler)
     }
 
     componentWillUnmount() {
         $(`#img-course-link${this.props.course.Id}`).unbind("click", this._onLinkClickHandler)
+        $(`#cover${this.props.course.Id}`).unbind("load", this._onImageLoadHandler)
     }
 
     render() {
         const {course} = this.props,
             _cover = getCoverPath(course, ImageSize.medium),
-            _mask = course.Mask;
+            _mask = MASKS[course.Mask];
 
-        const _image = '<image preserveAspectRatio="xMidYMid slice" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/data/' + _cover + '" x="0" width="574" height="503"/>';
+        const _image = `<image preserveAspectRatio="xMidYMid slice" ` +
+            `id="cover${this.props.course.Id}"` +
+            `xmlns:xlink="http://www.w3.org/1999/xlink" ` +
+            `xlink:href="/data/${ _cover}" x="0" ` +
+            `width="${_mask.width}" height="${_mask.height}"/>`;
 
         return (
             <Link to={'/category/' + course.URL} id={`img-course-link${this.props.course.Id}`}>
-                <div className={'course-module__image-block ' + _mask}>
-                    <svg viewBox="0 0 574 503" width="574" height="503" dangerouslySetInnerHTML={{__html: _image}}/>
+                <div className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
+                    <svg viewBox={`0 0 ${_mask.width} ${_mask.height}`} width={_mask.width} height={_mask.height} dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </Link>
         );
