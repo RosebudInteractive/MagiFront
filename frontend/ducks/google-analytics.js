@@ -196,12 +196,12 @@ function* _registerTransactions(data) {
                             'coupon': item.coupon // 'Coupon 1' //промокод, использовавшийся при оформлении заказа
                         },
                         'products': []
-                    },
-                    'event': 'gtm-ee-event',
-                    'gtm-ee-event-category': 'Enhanced Ecommerce',
-                    'gtm-ee-event-action': 'Purchase',
-                    'gtm-ee-event-non-interaction': 'False',
-                }
+                    }
+                },
+                'event': 'gtm-ee-event',
+                'gtm-ee-event-category': 'Enhanced Ecommerce',
+                'gtm-ee-event-action': 'Purchase',
+                'gtm-ee-event-non-interaction': 'False',
             }
             _data.ecommerce.purchase.products = item.products.slice()
         })
