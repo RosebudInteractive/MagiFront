@@ -137,8 +137,9 @@ export default class CWSPlayer extends CWSBase {
 
     _resizeChildren() {
         this._elements.array.forEach((elem) => {
-            if (elem.Id in this._audioState.playingNow)
+            if (elem.Id in this._audioState.playingNow) {
                 elem.resize();
+            }
         })
     }
 

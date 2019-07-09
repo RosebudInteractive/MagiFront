@@ -196,12 +196,12 @@ function* _registerTransactions(data) {
                             'coupon': item.coupon // 'Coupon 1' //промокод, использовавшийся при оформлении заказа
                         },
                         'products': []
-                    },
-                    'event': 'gtm-ee-event',
-                    'gtm-ee-event-category': 'Enhanced Ecommerce',
-                    'gtm-ee-event-action': 'Purchase',
-                    'gtm-ee-event-non-interaction': 'False',
-                }
+                    }
+                },
+                'event': 'gtm-ee-event',
+                'gtm-ee-event-category': 'Enhanced Ecommerce',
+                'gtm-ee-event-action': 'Purchase',
+                'gtm-ee-event-non-interaction': 'False',
             }
             _data.ecommerce.purchase.products = item.products.slice()
         })
@@ -342,13 +342,12 @@ function* addPriceButtonClickedSaga(data) {
                     'category': _course.category, // 'Категория курса',
                     'quantity': 1
                 }]
-
             },
-            'event': 'gtm-ee-event',
-            'gtm-ee-event-category': 'Enhanced Ecommerce',
-            'gtm-ee-event-action': 'Checkout Step 1',
-            'gtm-ee-event-non-interaction': 'False',
-        }
+        },
+        'event': 'gtm-ee-event',
+        'gtm-ee-event-category': 'Enhanced Ecommerce',
+        'gtm-ee-event-action': 'Checkout Step 1',
+        'gtm-ee-event-non-interaction': 'False',
     }
 
     yield call(_pushAnalyticsData, _data)
@@ -374,12 +373,11 @@ function* addPaymentButtonClickedSaga(data) {
                 }]
 
             },
-            'event': 'gtm-ee-event',
-            'gtm-ee-event-category': 'Enhanced Ecommerce',
-            'gtm-ee-event-action': 'Checkout Step 2',
-            'gtm-ee-event-non-interaction': 'False',
-
-        }
+        },
+        'event': 'gtm-ee-event',
+        'gtm-ee-event-category': 'Enhanced Ecommerce',
+        'gtm-ee-event-action': 'Checkout Step 2',
+        'gtm-ee-event-non-interaction': 'False',
     }
 
     yield call(_pushAnalyticsData, _data)
@@ -403,13 +401,12 @@ function* addConcreteCourseLinkClickedSaga(data) {
                     'category': _course.category, //'Категория курса',
                     'position': 1
                 }]
-
             },
-            'event': 'gtm-ee-event',
-            'gtm-ee-event-category': 'Enhanced Ecommerce',
-            'gtm-ee-event-action': 'Product Clicks',
-            'gtm-ee-event-non-interaction': 'False',
-        }
+        },
+        'event': 'gtm-ee-event',
+        'gtm-ee-event-category': 'Enhanced Ecommerce',
+        'gtm-ee-event-action': 'Product Clicks',
+        'gtm-ee-event-non-interaction': 'False',
     }
 
     yield call(_pushAnalyticsData, _data)
@@ -434,13 +431,12 @@ function* addLessonClickedSaga(data) {
                     'variant': _analyticsData.lessonName, // 'Название лекции',
                     'position': 1
                 }]
-
-            },
-            'event': 'gtm-ee-event',
-            'gtm-ee-event-category': 'Enhanced Ecommerce',
-            'gtm-ee-event-action': 'Product Clicks',
-            'gtm-ee-event-non-interaction': 'False',
-        }
+            }
+        },
+        'event': 'gtm-ee-event',
+        'gtm-ee-event-category': 'Enhanced Ecommerce',
+        'gtm-ee-event-action': 'Product Clicks',
+        'gtm-ee-event-non-interaction': 'False',
     }
 
     yield call(_pushAnalyticsData, _data)

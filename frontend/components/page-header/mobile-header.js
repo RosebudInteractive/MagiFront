@@ -29,9 +29,9 @@ class MobileHeader extends React.Component {
 
                 <nav className="navigation navigation-mobile">
                     <ul>
-                        <li className={this.props.currentPage.name === pages.courses.name ? "current" : ''}>
-                            <Link to={pages.courses.url}>Курсы</Link>
-                        </li>
+                        {/*<li className={this.props.currentPage.name === pages.courses.name ? "current" : ''}>*/}
+                        {/*    <Link to={pages.courses.url}>Курсы</Link>*/}
+                        {/*</li>*/}
                         {
                             this.props.authorized ?
                                 <li className={"favorites" + (this.props.currentPage === pages.bookmarks ? ' active' : '')}

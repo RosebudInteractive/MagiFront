@@ -234,6 +234,7 @@ export default class CWSPlayerElement extends CWSBase {
         this._calcMaxSize();
 
         let _item = $(`#${this.Id}`);
+
         if (_item && _item.length) {
             _item.css({
                 left: this._options.data.content.position.left + "%",

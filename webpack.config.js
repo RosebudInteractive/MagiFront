@@ -174,6 +174,7 @@ const _devConfig = {
             },
             {
                 test: /\.sass$/,
+                // test: /\.scss$/,
                 use: [
                     // fallback to style-loader in development
                     'style-loader',
@@ -183,12 +184,21 @@ const _devConfig = {
             },
             {
                 test: /\.css$/,
-                // loader: ["style-loader", "css-loader"]
-                use: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader"
-                })
+                // test: /\.scss$/,
+                use: [
+                    // fallback to style-loader in development
+                    'style-loader',
+                    "css-loader",
+                ]
             },
+            // {
+            //     test: /\.css$/,
+            //     // loader: ["style-loader", "css-loader"]
+            //     use: ExtractTextPlugin.extract({
+            //         fallback: "style-loader",
+            //         use: "css-loader"
+            //     })
+            // },
             {
                 test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
                 loader: "url-loader?limit=10000&mimetype=application/font-woff"
