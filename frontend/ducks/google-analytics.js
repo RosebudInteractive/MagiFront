@@ -33,6 +33,10 @@ const SET_TRANSACTION_REGISTERED_START = `${prefix}/SET_TRANSACTION_REGISTERED_S
 const SET_TRANSACTION_REGISTERED_SUCCESS = `${prefix}/SET_TRANSACTION_REGISTERED_SUCCESS`
 const SET_TRANSACTION_REGISTERED_FAIL = `${prefix}/SET_TRANSACTION_REGISTERED_FAIL`
 
+const SET_PLAYER_PROGRESS_PERCENT = `${prefix}/SET_PLAYER_PROGRESS_PERCENT`
+const PLAYER_PLAYED = `${prefix}/PLAYER_PLAYED`
+const PAGE_CHANGED = `${prefix}/PAGE_CHANGED`
+
 /**
  * Reducer
  * */
@@ -124,6 +128,18 @@ export const notifyNewUserRegistered = () => {
     return { type: SEND_USER_SIGN_UP }
 }
 
+export const notifyPageChanged = (data) => {
+    return { type: PAGE_CHANGED, payload: data }
+}
+
+export const notifyPlayerPlayed = (data) => {
+    return { type: PLAYER_PLAYED, payload: data }
+}
+
+export const setPlayerProgress = (data) => {
+    return { type: SET_PLAYER_PROGRESS_PERCENT, payload: data }
+}
+
 /**
  * Sagas
  */
@@ -140,6 +156,9 @@ export const saga = function* () {
         takeEvery(PAYMENT_BUTTON_CLICKED, addPaymentButtonClickedSaga),
         takeEvery(SEND_USER_ID, addUserIdSaga),
         takeEvery(SEND_USER_SIGN_UP, newUserRegisteredSaga),
+        takeEvery(SET_PLAYER_PROGRESS_PERCENT, setPlayerProgressSaga),
+        takeEvery(PLAYER_PLAYED, notifyPlayerPlayedSaga),
+        takeEvery(PAGE_CHANGED, notifyPageChangedSaga),
     ])
 }
 
@@ -453,11 +472,33 @@ function* newUserRegisteredSaga() {
     yield call(_pushAnalyticsData, { 'event': 'reg' })
 }
 
+function* setPlayerProgressSaga(data) {
+    if (!data.payload) return
+
+    yield call(_pushAnalyticsData, data.payload)
+}
+
+function* notifyPlayerPlayedSaga(data) {
+    if (!data.payload) return
+
+    yield call(_pushAnalyticsData, data.payload)
+}
+
+function* notifyPageChangedSaga(data) {
+    if (!data.payload) return
+
+    yield call(_pushAnalyticsData, data.payload)
+}
 
 function* _pushAnalyticsData(data) {
-    const _isDebugMode = yield select(analyticsDebugModeSelector)
+    const _isDebugMode = yield select(analyticsDebugModeSelector),
+        _state = yield select(state => state)
 
     if (window.dataLayer && data) {
+        if (_state.user.user && _state.user.user.Id) {
+            data.UID = _state.user.user.Id
+        }
+
         window.dataLayer.push(data)
 
         if (_isDebugMode) {

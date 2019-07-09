@@ -5,7 +5,12 @@ import {APP_CHANGE_PAGE} from "../constants/app";
 import {setProgressPercent} from "../actions/player-actions";
 import {MAIL_SUBSCRIBE_SUCCESS} from "../ducks/message";
 import {store} from "./configureStore";
-import {getNonRegisterTransaction, notifyUserIdChanged, notifyNewUserRegistered} from "ducks/google-analytics";
+import {
+    getNonRegisterTransaction,
+    notifyUserIdChanged,
+    notifyNewUserRegistered,
+    setPlayerProgress, notifyPageChanged, notifyPlayerPlayed
+} from "ducks/google-analytics";
 
 const GoogleAnalyticsMiddleware = store => next => action => {
 
@@ -29,7 +34,7 @@ const GoogleAnalyticsMiddleware = store => next => action => {
         case APP_CHANGE_PAGE: {
             let _pathPrefix = window.location.protocol + '//' + window.location.host;
 
-            window.dataLayer.push({
+            Analytics.getInstance().sendPageChanged({
                 'event': 'Pageview',
                 'url': _pathPrefix + action.payload
             });
@@ -66,15 +71,14 @@ const GoogleAnalyticsMiddleware = store => next => action => {
                 _lessonName = _state.lessonPlayInfo.playInfo.Name
             }
 
-            if (window.dataLayer) {
-                window.dataLayer.push({
-                    'event': 'play',
-                    'dimension1': _lessonName,
-                    'dimension2': _courseName,
-                    'dimension3': _authorName,
-                    'metric3': _totalDuration
-                });
-            }
+            Analytics.getInstance().sendPlayerPlayed({
+                'event': 'play',
+                'dimension1': _lessonName,
+                'dimension2': _courseName,
+                'dimension3': _authorName,
+                'metric3': _totalDuration
+            });
+
             return next(action)
         }
 
@@ -125,15 +129,13 @@ const GoogleAnalyticsMiddleware = store => next => action => {
                 _newValue = action.payload;
 
             if (_oldValue !== _newValue) {
-                if (window.dataLayer) {
-                    window.dataLayer.push({
-                        'event': 'play_' + _newValue,
-                        'dimension1': _lessonName,
-                        'dimension2': _courseName,
-                        'dimension3': _authorName,
-                        'metric3': _totalDuration
-                    });
-                }
+                Analytics.getInstance().sendPlayerProgress({
+                    'event': 'play_' + _newValue,
+                    'dimension1': _lessonName,
+                    'dimension2': _courseName,
+                    'dimension3': _authorName,
+                    'metric3': _totalDuration
+                })
             }
 
             return result;
@@ -166,6 +168,18 @@ class Analytics {
 
     sendNewUserRegistered() {
         store.dispatch(notifyNewUserRegistered());
+    }
+
+    sendPlayerProgress(data){
+        store.dispatch(setPlayerProgress(data))
+    }
+
+    sendPlayerPlayed(data){
+        store.dispatch(notifyPlayerPlayed(data))
+    }
+
+    sendPageChanged(data){
+        store.dispatch(notifyPageChanged(data))
     }
 }
 
