@@ -364,6 +364,7 @@ export default class NativeAppPlayer {
 
     _getLoaderOptions() {
         return {
+            isExternal: this._externalPlayer,
             onError: (err) => {
                 this._sendErrorMessageToApp(
                     'loader error: ' + JSON.stringify(err)

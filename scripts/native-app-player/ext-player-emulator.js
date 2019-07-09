@@ -59,7 +59,7 @@ export default class PlayerEmulator {
     }
 
     _timeUpdate(value) {
-        this._view.onChangePosition(value)
+        this._view.onChangePosition({playerId: this._playerId, position: value})
         $('.current-time_label').text(value)
 
         if (value >= (this._totalDuration / 1000)) {

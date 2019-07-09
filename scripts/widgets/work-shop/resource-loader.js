@@ -322,9 +322,11 @@ export default class CWSResourceLoader {
             this._loadFromQueue();
         }, 100);
 
-        this._state.loaderAudioInt = setInterval(() => {
-            this._loadFromAudioQueue();
-        }, 100);
+        if (!this._options.isExternal) {
+            this._state.loaderAudioInt = setInterval(() => {
+                this._loadFromAudioQueue();
+            }, 100);
+        }
     }
 
     _monitor() {
@@ -621,7 +623,9 @@ export default class CWSResourceLoader {
     destroy() {
         clearInterval(this._state.interval);
         clearInterval(this._state.loaderInt);
-        clearInterval(this._state.loaderAudioInt);
+        if (this._state.loaderAudioInt) {
+            clearInterval(this._state.loaderAudioInt);
+        }
 
         this._state = this._getInitialState();
     }
