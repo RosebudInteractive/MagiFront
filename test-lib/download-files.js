@@ -36,7 +36,7 @@ function getFile(url, fileName) {
                     let time = ((new Date()) - stTime) / 1000;
                     console.log(buildLogString(`--- Finished: "${url}", size: ${(length / 1024 / 1024).toFixed(3)}Mb, time: ${time.toFixed(3)}s.`));
                     resolve({
-                        isErr: false,
+                        isErr: statusCode !== 200 ? true : false,
                         result: {
                             url: url,
                             file: fileName,
@@ -150,7 +150,19 @@ async function getLessonSeq(id, isOld, baseUrl, baseDir) {
     });
 }
 
-function getLesson(id, isOld, baseUrl, baseDir) {
+async function concurExec(promise, p_arr, res_arr, degree) {
+    let dg = degree ? degree : 0;
+    if (promise)
+        p_arr.push(promise);
+    if (((dg > 0) && (p_arr.length >= dg)) || ((!promise) && (p_arr.length > 0))) {
+        let res = await Promise.all(p_arr);
+        p_arr.length = 0;
+        Array.prototype.push.apply(res_arr, res);
+    }
+    return res_arr;
+}
+
+function getLesson(id, isOld, baseUrl, baseDir, degree) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
@@ -179,27 +191,30 @@ function getLesson(id, isOld, baseUrl, baseDir) {
                                     reject(new Error("Path \"" + dir_path + "\" exists, but it's not a directory."));
                         });
                     })
-                        .then(dir => {
+                        .then(async (dir) => {
                             let promises = [];
+                            let res = [];
                             if (body) {
                                 if (body.assets) {
-                                    body.assets.forEach(elem => {
+                                    for (let i = 0; i < body.assets.length; i++){
+                                        let elem = body.assets[i];
                                         let parsed = path.parse(elem.file);
                                         let fileName = `${dir}/${parsed.base}`;
                                         let fileUrl = isOld ? elem.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.file;
-                                        promises.push(getFile(fileUrl, fileName));
-                                    })
+                                        await concurExec(getFile(fileUrl, fileName), promises, res, degree)
+                                    }
                                 }
                                 if (body.episodes) {
-                                    body.episodes.forEach(elem => {
+                                    for (let i = 0; i < body.episodes.length; i++) {
+                                        let elem = body.episodes[i];
                                         let parsed = path.parse(elem.audio.file);
                                         let fileName = `${dir}/${parsed.base}`;
                                         let fileUrl = isOld ? elem.audio.file.replace("new.magisteria.ru/data", "magisteria.ru/wp-content/uploads") : elem.audio.file;
-                                        promises.push(getFile(fileUrl, fileName));
-                                    })
+                                        await concurExec(getFile(fileUrl, fileName), promises, res, degree)
+                                    }
                                 }
                             }
-                            return Promise.all(promises);
+                            return await concurExec(null, promises, res, degree);
                         })
                         .then(result => {
                             let res = { isErr: true, result: result };

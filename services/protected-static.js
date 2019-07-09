@@ -7,6 +7,7 @@ const { HttpCode } = require("../const/http-codes");
 let uploadPath = config.get('uploadPath');
 let dataUrl = config.get('dataUrl');
 let oldDataUrl = config.get('oldDataUrl');
+let downLoadUrl = config.get('downLoadUrl');
 
 exports.setupProtectedStatic = (app, errorHandler) => {
     let dataProcessor = (req, res, next) => {
@@ -43,8 +44,10 @@ exports.setupProtectedStatic = (app, errorHandler) => {
     };
     app.use(dataUrl, dataProcessor);
     app.use(oldDataUrl, dataProcessor);
+    app.use(downLoadUrl, dataProcessor);
     if (errorHandler) {
         app.use(dataUrl, errorHandler);
         app.use(oldDataUrl, errorHandler);
+        app.use(downLoadUrl, errorHandler);
     }
 }

@@ -7,7 +7,7 @@ const { CreateInvoice } = require('./create-invoice');
 const { UploadFile } = require('./upload-file');
 
 async function start() {
-    if (true) {
+    if (false) {
         let st = new Date();
         await DownloadFiles.getLessonSeq(1, false)
             .then(result => {
@@ -26,7 +26,7 @@ async function start() {
 
     if (true) {
         let st = new Date();
-        await DownloadFiles.getLesson(1, false)
+        await DownloadFiles.getLesson(1, false, null, null, 11)
             .then(result => {
                 if (result && (result.isErr === false)) {
                     console.log(`Time taken: ${(((new Date()) - st) / 1000).toFixed(3)} sec.`)
