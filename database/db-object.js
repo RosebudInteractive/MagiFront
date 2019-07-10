@@ -25,16 +25,22 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absCategoryUrl = config.proxyServer.siteHost + config.categoryUrl + "/";
     }
 
-    _convertMeta(metaStr) {
-        let rc = null;
-        if (metaStr) {
+    _convertDataUrl(url, isAbsPath, dLink) {
+        let rc = (isAbsPath || dLink) ? (url ? ((dLink ? this._absDownLoadUrl : this._absDataUrl) + url) : null) : url;
+        return rc;
+    }
+
+    _convertMeta(metaStr, isAbsPath, dLink) {
+        let rc = metaStr;
+        if (metaStr && (isAbsPath || dLink)) {
             try {
                 rc = JSON.parse(metaStr);
             }
             catch (err) {
+                rc = null;
             }
             if (rc) {
-                let path = this._absDataUrl + rc.path;
+                let path = (dLink ? this._absDownLoadUrl : this._absDataUrl) + rc.path;
                 if (rc.content) {
                     if (rc.content.l)
                         rc.content.l = path + rc.content.l;

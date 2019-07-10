@@ -70,10 +70,12 @@ function makeDir(path) {
     });
 };
 
-async function getLessonSeq(id, isOld, baseUrl, baseDir) {
+async function getLessonSeq(id, isOld, baseUrl, baseDir, dLink) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
+            if (dLink)
+                url += "&dlink=true";
             let stTime = new Date();
             request({ url: url, json: true }, (error, res, body) => {
                 try {
@@ -162,10 +164,12 @@ async function concurExec(promise, p_arr, res_arr, degree) {
     return res_arr;
 }
 
-function getLesson(id, isOld, baseUrl, baseDir, degree) {
+function getLesson(id, isOld, baseUrl, baseDir, degree, dLink) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/lessons/play/${id.toString()}?abs_path=true`;
+            if (dLink)
+                url += "&dlink=true";
             let stTime = new Date();
             request({ url: url, json: true }, (error, res, body) => {
                 try {
@@ -243,10 +247,12 @@ function getLesson(id, isOld, baseUrl, baseDir, degree) {
     });
 }
 
-function getCourse(id, isOld, baseUrl, baseDir) {
+function getCourse(id, isOld, baseUrl, baseDir, degree, dLink) {
     return new Promise(resolve => {
         try {
             let url = `${baseUrl ? baseUrl : BASE_URL}/api/courses/${id.toString()}?abs_path=true`;
+            if (dLink)
+                url += "&dlink=true";
             let stTime = new Date();
             request({ url: url, json: true }, (error, res, body) => {
                 try {
@@ -262,10 +268,10 @@ function getCourse(id, isOld, baseUrl, baseDir) {
                             if (body) {
                                 if (body.Lessons) {
                                     body.Lessons.forEach(elem => {
-                                        promises.push(getLesson(elem.Id, isOld, baseUrl, baseDir));
+                                        promises.push(getLesson(elem.Id, isOld, baseUrl, baseDir, degree, dLink));
                                         if (elem.Lessons.length > 0)
                                             elem.Lessons.forEach(subElem => {
-                                                promises.push(getLesson(subElem.Id, isOld, baseUrl, baseDir));
+                                                promises.push(getLesson(subElem.Id, isOld, baseUrl, baseDir, degree, dLink));
                                             });
                                     })
                                 }

@@ -26,7 +26,7 @@ async function start() {
 
     if (true) {
         let st = new Date();
-        await DownloadFiles.getLesson(1, false, null, null, 11)
+        await DownloadFiles.getLesson(1, false, null, null, 10, true)
             .then(result => {
                 if (result && (result.isErr === false)) {
                     console.log(`Time taken: ${(((new Date()) - st) / 1000).toFixed(3)} sec.`)
