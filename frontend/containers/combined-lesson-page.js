@@ -602,7 +602,7 @@ function mapStateToProps(state, ownProps) {
         params: ownProps.location.search,
 
         lessonInfo: state.singleLesson,
-        fetching: state.singleLesson.fetching || state.lessonText.fetching,
+        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching,
         lesson: state.singleLesson.object,
         notFound: state.singleLesson.notFound || state.lessonText.notFound,
         authors: state.singleLesson.authors,

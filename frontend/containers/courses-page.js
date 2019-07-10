@@ -79,7 +79,7 @@ class CoursesPage extends React.Component {
             this.props.notifyCoursesShowed(this._getVisibleCourses())
         }
 
-        if (prevProps.courses.fetching && !this.props.courses.fetching) {
+        if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
             if (!hasExternalFilter) {
@@ -145,9 +145,8 @@ class CoursesPage extends React.Component {
             return <Redirect push to={'/'}/>;
         }
 
-        const {
-            fetching,
-        } = this.props.courses;
+        const { fetching,} = this.props
+
         return (
             fetching ?
                 <p>Загрузка...</p>
@@ -206,14 +205,14 @@ function mapStateToProps(state, ownProps) {
         filters: filtersSelector(state),
         isEmptyFilter: isEmptyFilterSelector(state),
         loadingFilters: loadingSelector(state),
+        fetching: state.user.loading || state.courses.fetching,
         selectedFilter: selectedFilterSelector(state),
         size: state.app.size,
-        // pageHeaderState: state.pageHeader,
         showFiltersForm: state.pageHeader.showFiltersForm,
         externalFilter: ownProps.match.params.filter,
         fixedCourseId: fixedCourseIdSelector(state),
         fixedLessonId: fixedLessonIdSelector(state),
-        userPaidCourses : userPaidCoursesSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
         ownProps,
     }
 }

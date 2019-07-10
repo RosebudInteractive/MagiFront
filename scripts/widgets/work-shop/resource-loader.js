@@ -322,7 +322,9 @@ export default class CWSResourceLoader {
             this._loadFromQueue();
         }, 100);
 
-        if (!this._options.isExternal) {
+        const _isExternal = this._options && this._options.isExternal
+        
+        if (!_isExternal) {
             this._state.loaderAudioInt = setInterval(() => {
                 this._loadFromAudioQueue();
             }, 100);

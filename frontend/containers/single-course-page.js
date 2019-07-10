@@ -264,7 +264,7 @@ class Inner extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.url,
-        fetching: state.singleCourse.fetching,
+        fetching: state.singleCourse.fetching || state.user.loading,
         notFound: state.singleCourse.notFound,
         course: state.singleCourse.object,
         bookmarks: userBookmarksSelector(state),
