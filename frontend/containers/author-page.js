@@ -140,7 +140,7 @@ class AuthorPage extends React.Component {
 function mapStateToProps(state, ownProps) {
     return {
         author: authorSelector(state),
-        loading: loadingSelector(state),
+        loading: loadingSelector(state) || state.courses.fetching,
         notFound: notFoundSelector(state),
         authorUrl: ownProps.match.params.url,
         facebookAppID: facebookAppIdSelector(state),
