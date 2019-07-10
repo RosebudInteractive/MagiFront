@@ -9,7 +9,7 @@ module.exports = {
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     dataUrl: '/data',
     oldDataUrl: '/wp-content/uploads',
-    downLoadUrl: '/download',
+    downLoadUrl: '/_dwld_',
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
