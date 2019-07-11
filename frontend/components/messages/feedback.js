@@ -14,6 +14,14 @@ class FeedbackMessageBox extends React.Component {
         }
     }
 
+    componentDidMount() {
+        if (this.props.user) {
+            this.setState({
+                sender: this.props.user.Email
+            })
+        }
+    }
+
     _close() {
         this.props.close()
     }
@@ -45,6 +53,7 @@ class FeedbackMessageBox extends React.Component {
 
     render() {
         let _disabledBtn = !this._isSendingEnable()
+        const {user} = this.props
 
         const _isIE = Platform.name === 'IE',
             _className = "modal-overlay modal-wrapper js-modal-wrapper" + (_isIE ? ' ms-based' : '')
@@ -55,7 +64,7 @@ class FeedbackMessageBox extends React.Component {
                         onClick={::this._close}>Закрыть
                 </button>
                 <div className="modal__header">
-                    <p className="modal__headline">Напишите нам, если у Вас есть вопросы или хотите помочь проекту</p>
+                    <p className="modal__headline">Напишите нам, если у Вас есть вопросы или пожелания</p>
                 </div>
                 <div className="modal__body">
                     <form className="form modal-form" onSubmit={::this._handleSubmit}>
@@ -63,7 +72,7 @@ class FeedbackMessageBox extends React.Component {
                                   placeholder="Ваше сообщение"/>
                         <div className="modal-form__row">
                             <input onChange={::this._changeSender} type="text" id="contacts" className="form__field"
-                                   placeholder="Как с вами связаться?"/>
+                                   placeholder="Как с вами связаться?" defaultValue={user ? user.Email : ''}/>
                             <button className={"btn btn--brown" + (_disabledBtn ? ' disabled' : '')} type='submit'>Отправить сообщение</button>
                         </div>
                     </form>
@@ -75,7 +84,8 @@ class FeedbackMessageBox extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        loading: loadingSelector(state)
+        loading: loadingSelector(state),
+        user: state.user.user
     }
 }
 

@@ -1,12 +1,13 @@
 import React from 'react';
+import {Link} from "react-router-dom"
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {errorMessageSelector, hideFeedbackResultMessage} from "ducks/message";
+import {errorMessageSelector, messageUrlSelector, hideFeedbackResultMessage} from "ducks/message";
 import Platform from "platform";
 
 class FeedbackResultMessage extends React.Component {
     render() {
-        let {error} = this.props,
+        let {error, msgUrl} = this.props,
             _header = error ? 'При отправке возникла ошибка' : 'Сообщение отправлено',
             _message = error ? error.message : 'Спасибо за Ваше сообщение. Оно успешно отправлено.'
 
@@ -23,6 +24,13 @@ class FeedbackResultMessage extends React.Component {
                 <div className="modal__body">
                     <div className="modal__message">
                         <p>{_message}</p>
+                        {
+                            msgUrl
+                                ?
+                            <Link to={msgUrl} className="feedback-message__link">{'>>> Ваше сообщение <<<'}</Link>
+                            :
+                            null
+                        }
                         <button className="btn btn--brown js-modal-close" data-target="#messagePopup" onClick={::this.props.close}>Закрыть</button>
                     </div>
                 </div>
@@ -34,6 +42,7 @@ class FeedbackResultMessage extends React.Component {
 function mapStateToProps(state) {
     return {
         error: errorMessageSelector(state),
+        msgUrl: messageUrlSelector(state),
     }
 }
 

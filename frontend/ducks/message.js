@@ -32,7 +32,8 @@ export const ReducerRecord = Record({
     showFeedbackResultMessage: false,
     fetching: false,
     successMessage: null,
-    error: null
+    error: null,
+    msgUrl: null
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -44,12 +45,14 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('error', null)
                 .set('fetching', true)
+                .set('msgUrl', null)
 
         case SEND_FEEDBACK_SUCCESS:
             return state
                 .set('fetching', false)
                 .set('showFeedbackWindow', false)
                 .set('showFeedbackResultMessage', true)
+                .set('msgUrl', (payload && payload.msgUrl) ? payload.msgUrl : null)
 
         case MAIL_SUBSCRIBE_SUCCESS:
             return state
@@ -99,6 +102,7 @@ export const showFeedbackWindowSelector = createSelector(stateSelector, state =>
 export const showFeedbackResultMessageSelector = createSelector(stateSelector, state => state.showFeedbackResultMessage)
 export const errorMessageSelector = createSelector(stateSelector, state => state.error)
 export const loadingSelector = createSelector(stateSelector, state => state.fetching)
+export const messageUrlSelector = createSelector(stateSelector, state => state.msgUrl)
 
 /**
  * Action Creators
@@ -120,10 +124,10 @@ export const sendFeedback = (values) => {
         })
             .then(checkStatus)
             .then(parseJSON)
-            .then(() => {
+            .then((data) => {
                 dispatch({
                     type: SEND_FEEDBACK_SUCCESS,
-                    payload: null
+                    payload: data
                 });
             })
             .catch((error) => {
