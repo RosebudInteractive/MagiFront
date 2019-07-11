@@ -713,7 +713,8 @@ const DbCourse = class DbCourse extends DbObject {
         let categories_list = {};
         let opts = options || {};
         let languageId = (typeof (opts.lang_id) === "number") && (!isNaN(opts.lang_id)) ? opts.lang_id : LANGUAGE_ID;
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let baseUrl;
         let productList = {};
@@ -750,8 +751,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     if (!curr_course) {
                                         curr_course = {
                                             Id: elem.Id,
-                                            Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                            CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                            Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                            CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                             Mask: elem.Mask,
                                             Color: elem.Color,
                                             Name: elem.Name,
@@ -790,8 +791,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
-                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
+                                        CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                         URL: isAbsPath ? baseCourseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
@@ -810,7 +811,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     lessons_list[elem.LessonId] = lesson;
                                 }
                                 if (elem.Audio)
-                                    lesson.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
+                                    lesson.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
                             })
 
                             if (Object.keys(productList).length > 0) {
@@ -1001,7 +1002,8 @@ const DbCourse = class DbCourse extends DbObject {
         let lc_list = {};
         let languageId;
         let opts = options || {};
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let baseUrl;
         let pendingCourses = {};
@@ -1056,8 +1058,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     course = {
                                         Id: elem.Id,
                                         LanguageId: elem.LanguageId,
-                                        Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                        CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                        Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                        CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                         OneLesson: elem.OneLesson ? true : false,
                                         Mask: elem.Mask,
                                         Color: elem.Color,
@@ -1106,8 +1108,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
-                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
+                                        CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                         URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
@@ -1143,7 +1145,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     lsn_list[elem.LessonId] = lsn;
                                 }
                                 if (elem.Audio)
-                                    lsn.Audios.push(isAbsPath ? this._absDataUrl + elem.Audio : elem.Audio);
+                                    lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
                             })
 
                             await this.getCoursePrice(course);
@@ -1179,8 +1181,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
-                                    Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
-                                    PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta,
+                                    Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
+                                    PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink),
                                     URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
                                 };
                                 course.Authors.push(author);
@@ -1291,8 +1293,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     book.CourseId = elem.CourseId;
                                     book.OtherAuthors = elem.OtherAuthors;
                                     book.OtherCAuthors = elem.OtherCAuthors;
-                                    book.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
-                                    book.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
+                                    book.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
+                                    book.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
                                     book.ExtLinks = elem.ExtLinks;
                                     book.Authors = [];
                                 }
@@ -1322,8 +1324,8 @@ const DbCourse = class DbCourse extends DbObject {
                                 course.PageMeta.Images = {};
                                 result.detail.forEach((elem) => {
                                     course.PageMeta.Images[elem.Type] = {
-                                        FileName: isAbsPath ? this._absDataUrl + elem.FileName : elem.FileName,
-                                        MetaData: isAbsPath ? this._convertMeta(elem.MetaData) : elem.MetaData
+                                        FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
+                                        MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
                                     };
                                 })
                             }

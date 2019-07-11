@@ -512,7 +512,8 @@ const DbUser = class DbUser extends DbObject {
         let lessonIds = [];
         let history = { Lessons: [], Courses: {}, Authors: {}, Categories: {} };
         let opts = options || {};
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let pendingCourses = {};
         let id = user.Id;
         let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
@@ -572,8 +573,8 @@ const DbUser = class DbUser extends DbObject {
                                             course = {
                                                 Id: elem.Id,
                                                 LanguageId: elem.LanguageId,
-                                                Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                                CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                                Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                                CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                                 Mask: elem.Mask,
                                                 Color: elem.Color,
                                                 Name: elem.Name,
@@ -602,8 +603,8 @@ const DbUser = class DbUser extends DbObject {
                                                 isSubLesson: false,
                                                 ReadyDate: elem.ReadyDate,
                                                 State: elem.State,
-                                                Cover: isAbsPath ? (elem.LCover ? this._absDataUrl + elem.LCover : null) : elem.LCover,
-                                                CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                                Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
+                                                CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                                 URL: isAbsPath ? this._baseUrl + '/' + elem.URL + '/' + elem.LURL : elem.LURL,
                                                 IsAuthRequired: elem.IsAuthRequired ? true : false,
                                                 IsSubsRequired: elem.IsSubsRequired ? true : false,
@@ -647,7 +648,7 @@ const DbUser = class DbUser extends DbObject {
                                                 history.Lessons.push(lsn);
                                             }
                                         }
-                                        lsn.Audios.push(isAbsPath ? (elem.Audio ? this._absDataUrl + elem.Audio : null) : elem.Audio);
+                                        lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
                                     })
                                     let courseIds = [];
                                     let ctgService = this.getService("categories", true);
@@ -685,7 +686,8 @@ const DbUser = class DbUser extends DbObject {
 
     async getPaidCourses(user_or_id, isDetailed, options) {
         let opts = options || {};
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let userId = user_or_id;
         let user;
         if (typeof (user_or_id) !== "number") {
@@ -745,7 +747,7 @@ const DbUser = class DbUser extends DbObject {
             result = [];
             let arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
             result = await this._getCoursesByIds(user ? user : user_or_id, { Authors: {}, Categories: {}, Courses: [] },
-                arrayOfIds, isAbsPath, courseBoookmarkOrder);
+                arrayOfIds, isAbsPath, dLink, courseBoookmarkOrder);
         }
         else
             if (opts.is_list)
@@ -755,7 +757,7 @@ const DbUser = class DbUser extends DbObject {
         return result;
     }
 
-    async _getCoursesByIds(user_or_id, data, arrayOfIds, isAbsPath, courseBoookmarkOrder) {
+    async _getCoursesByIds(user_or_id, data, arrayOfIds, isAbsPath, dLink, courseBoookmarkOrder) {
         let courseList = {};
         let pendingCourses = {};
         let user = user_or_id;
@@ -788,8 +790,8 @@ const DbUser = class DbUser extends DbObject {
                                     Id: elem.Id,
                                     Name: elem.Name,
                                     URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
-                                    Cover: isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                    CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                    Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                    CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                     Mask: elem.Mask,
                                     OneLesson: elem.OneLesson ? true : false,
                                     IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
@@ -835,8 +837,8 @@ const DbUser = class DbUser extends DbObject {
                                                 URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL,
                                                 FirstName: elem.FirstName,
                                                 LastName: elem.LastName,
-                                                Portrait: isAbsPath ? (elem.Portrait ? this._absDataUrl + elem.Portrait : null) : elem.Portrait,
-                                                PortraitMeta: isAbsPath ? this._convertMeta(elem.PortraitMeta) : elem.PortraitMeta
+                                                Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
+                                                PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink)
                                             };
                                             data.Authors[elem.Id] = author;
                                         }
@@ -880,7 +882,8 @@ const DbUser = class DbUser extends DbObject {
         let courseList = {};
         let bookmarks = { Authors: {}, Categories: {}, LessonCourses: {}, Courses: [], Lessons: [] };
         let opts = options || {};
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let arrayOfIds = [];
         let lessonBoookmarkOrder = {};
         let courseBoookmarkOrder = {};
@@ -937,7 +940,7 @@ const DbUser = class DbUser extends DbObject {
             })
             .then(async () => {
                 arrayOfIds = splitArray(courseIds, MAX_COURSES_REQ_NUM);
-                await this._getCoursesByIds(user, bookmarks, arrayOfIds, isAbsPath, courseBoookmarkOrder);
+                await this._getCoursesByIds(user, bookmarks, arrayOfIds, isAbsPath, dLink, courseBoookmarkOrder);
                 return bookmarks;
             });
     }

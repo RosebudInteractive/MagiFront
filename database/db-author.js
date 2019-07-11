@@ -301,7 +301,8 @@ const DbAuthor = class DbAuthor extends DbObject {
         let lc_list = {};
         let couse_list = {};
         let opts = options || {};
-        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true));
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let paidCourses = [];
         let userId = user ? user.Id : 0;
         let pendingCourses = {};
@@ -341,8 +342,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                         if (result && result.detail && (result.detail.length === 1)) {
                             author = result.detail[0];
                             author.URL = isAbsPath ? this._absAuthorUrl + author.URL : author.URL;
-                            author.Portrait = isAbsPath ? (author.Portrait ? this._absDataUrl + author.Portrait : null) : author.Portrait;
-                            author.PortraitMeta = isAbsPath ? this._convertMeta(author.PortraitMeta) : author.PortraitMeta;
+                            author.Portrait = this._convertDataUrl(author.Portrait, isAbsPath, dLink);
+                            author.PortraitMeta = this._convertMeta(author.PortraitMeta, isAbsPath, dLink);
                             author.Courses = [];
                             author.Lessons = [];
 
@@ -376,8 +377,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Id: elem.Id,
                                         LanguageId: elem.LanguageId,
                                         OneLesson: elem.OneLesson ? true : false,
-                                        Cover: isAbsPath ? (author.Portrait ? this._absDataUrl + elem.Cover : null) : elem.Cover,
-                                        CoverMeta: isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta,
+                                        Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
+                                        CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
                                         Mask: elem.Mask,
                                         Color: elem.Color,
                                         Name: elem.Name,
@@ -413,8 +414,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
-                                        Cover: isAbsPath ? (author.Portrait ? this._absDataUrl + elem.LCover : null) : elem.LCover,
-                                        CoverMeta: isAbsPath ? this._convertMeta(elem.LCoverMeta) : elem.LCoverMeta,
+                                        Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
+                                        CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                         URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
                                         IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
@@ -527,8 +528,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                     book.CourseId = elem.CourseId;
                                     book.OtherAuthors = elem.OtherAuthors;
                                     book.OtherCAuthors = elem.OtherCAuthors;
-                                    book.Cover = isAbsPath ? (elem.Cover ? this._absDataUrl + elem.Cover : null) : elem.Cover;
-                                    book.CoverMeta = isAbsPath ? this._convertMeta(elem.CoverMeta) : elem.CoverMeta;
+                                    book.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
+                                    book.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
                                     book.ExtLinks = elem.ExtLinks;
                                     book.Authors = [];
                                 }
