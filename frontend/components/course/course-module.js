@@ -22,7 +22,9 @@ export default class CourseModule extends React.Component {
                                course={course}
                                isMobile={isMobile}
                     />
-                    <ImageBlock course={course}/>
+                    <div className="course-module__image-block__wrapper">
+                        <ImageBlock course={course}/>
+                    </div>
                 </div>
                 :
                 ''
