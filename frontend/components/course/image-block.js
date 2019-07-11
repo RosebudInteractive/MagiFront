@@ -31,15 +31,17 @@ class ImageBlock extends React.Component {
         super(props)
 
         this.state = {
-            visible: false
+            visible: true
         }
 
         this._onImageLoadHandler = () => {
+            console.log(`fired ${this.props.course.Name}` )
             this.setState({visible: true})
         }
     }
 
     componentDidMount() {
+        console.log(`add ${this.props.course.Name}` )
         $(`#cover${this.props.course.Id}`).bind("load", this._onImageLoadHandler)
     }
 
@@ -53,7 +55,7 @@ class ImageBlock extends React.Component {
             _mask = MASKS[course.Mask];
 
         const _image = `<image preserveAspectRatio="xMidYMid slice" ` +
-            `id="cover${this.props.course.Id}"` +
+            // `id="cover${this.props.course.Id}"` +
             `xmlns:xlink="http://www.w3.org/1999/xlink" ` +
             `xlink:href="/data/${ _cover}" x="0" ` +
             `width="${_mask.width}" height="${_mask.height}"/>`;
@@ -61,7 +63,7 @@ class ImageBlock extends React.Component {
         return (
             <Link to={'/category/' + course.URL} onClick={::this._onLinkClickHandler}>
                 <div className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
-                    <svg viewBox={`0 0 ${_mask.width} ${_mask.height}`} width={_mask.width} height={_mask.height} dangerouslySetInnerHTML={{__html: _image}}/>
+                    <svg id={`cover${this.props.course.Id}`} viewBox={`0 0 ${_mask.width} ${_mask.height}`} width={_mask.width} height={_mask.height} dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </Link>
         );

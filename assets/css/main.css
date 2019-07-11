@@ -3598,6 +3598,10 @@ li.fancybox-thumbs-loading {
     border-bottom: 1px solid rgba(47, 47, 47, 0.15);
   }
 
+  .page-header__wrapper.filters-row__wrapper {
+    border: none;
+  }
+
   .page-header a {
     cursor: pointer;
   }
@@ -4912,7 +4916,8 @@ ul.user-tooltip {
     padding-left: 0;
     padding-bottom: 60px;
     max-width: 100%;
-    overflow: auto; }
+    overflow: hidden;
+    border: none; }
     @media (max-width: 1279px) {
       .filters-row__wrapper {
         padding-bottom: 30px; } }
