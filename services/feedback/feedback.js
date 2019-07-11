@@ -15,10 +15,12 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 exports.Feedback = class Feedback {
     constructor() { }
 
-    processFeedback(sender, message, userId) {
-        let self = this;
+    processFeedback(sender, message, options) {
         let dbOptions = { dbRoots: [] };
-        let opts = typeof (userId) === "number" ? { userId: userId } : {};
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        if ((!dbOpts.userId) && opts.user)
+            dbOpts.userId = opts.user.Id;
         let root_obj;
         let db = $memDataBase;
         let templateBody;
@@ -76,10 +78,14 @@ exports.Feedback = class Feedback {
                         MessageText: message,
                         Status: "ready"
                     };
-                    if (opts.userId)
-                        fields.User = opts.userId;
+                    let user = "";
+                    if (opts.user) {
+                        fields.UserId = opts.user.Id;
+                        user = _.template(`<b>Пользователь: </b><%= udata %><br>`)
+                            ({ udata: escape(`{id: ${opts.user.Id}, email: "${opts.user.Email}"}`) });
+                    }
                     if (templateBody)
-                        fields.Body = _.template(templateBody)({ sender: escape(sender), message: escape(message) });
+                        fields.Body = _.template(templateBody)({ sender: escape(sender), user: user, message: escape(message) });
                     if (config.has("mail.feedback.subject"))
                         fields.Subject = _.template(config.mail.feedback.subject)({ sender: sender, dt: (new Date()).toISOString() });
                     if (config.has("mail.feedback.recipients"))
@@ -87,11 +93,11 @@ exports.Feedback = class Feedback {
                     
                     return root_obj.newObject({
                         fields: fields
-                    }, {});
+                    }, dbOpts);
                 })
                 .then((result) => {
                     new_obj = db.getObj(result.newObject);
-                    return root_obj.save(opts);
+                    return root_obj.save(dbOpts);
                 })
                 .then(() => {
                     return new_obj.edit();
@@ -125,7 +131,7 @@ exports.Feedback = class Feedback {
                     if (resData) {
                         new_obj.status(resData.result === "OK" ? "sent" : "error");
                         new_obj.resBody(JSON.stringify(resData));
-                        return new_obj.save(opts);
+                        return new_obj.save(dbOpts);
                     }
                     else
                         resData = { result: "OK" };

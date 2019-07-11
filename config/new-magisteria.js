@@ -115,7 +115,7 @@ module.exports = {
             template: "./templates/mail/feedback.tmpl",
             subject: "Предложение от \"<%= sender %>\", ( <%= dt %> ).",
             sender: '"Magisteria" <test@magisteria.ru>',
-            recipients: 'sokolov@yandex.ru',
+            recipients: 'test@magisteria.ru',
             options: {
                 disableUrlAccess: false,
                 host: "smtp.yandex.ru",

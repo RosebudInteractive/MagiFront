@@ -10,7 +10,7 @@ exports.SetupRoute = (app) => {
         feedback = new Feedback();
     app.post('/api/feedback', (req, res, next) => {
         chechRecapture(false/*config.authentication.useCapture*/, req, res, () => {
-            feedback.processFeedback(req.body['sender'], req.body['message'], req.user ? req.user.Id : null)
+            feedback.processFeedback(req.body['sender'], req.body['message'], { user: req.user ? req.user : null })
                 .then(result => {
                     res.status(HttpCode.OK).json(result);
                 })
