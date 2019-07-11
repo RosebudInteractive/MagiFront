@@ -59,12 +59,12 @@ class SingleLessonTextBlock extends React.Component {
         return (
             <div className="lecture-full__text-block">
                 <FavoritesButton className={"lecture-full__fav"} courseUrl={course.URL} lessonUrl={lesson.URL}/>
-                <h3 className="lecture-full__title">
+                <h2 className="lecture-full__title">
                     <span className="label">Лекция:</span>
                     <Link to={_linkUrl} id={`lesson-link${lesson.Id}`}>
                         <span>{_title}</span>
                     </Link>
-                </h3>
+                </h2>
                 <p className="lecture-full__descr">
                     {' ' + lesson.ShortDescription + ' '}
                     {

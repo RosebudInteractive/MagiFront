@@ -34,29 +34,16 @@ class ImageBlock extends React.Component {
             visible: false
         }
 
-        this._onLinkClickHandler = () => {
-            const {course} = this.props
-
-            this.props.notifyCourseLinkClicked({
-                ...course,
-                author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
-                category: course.CategoriesObj[0].Name,
-                price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
-            })
-        }
-
         this._onImageLoadHandler = () => {
             this.setState({visible: true})
         }
     }
 
     componentDidMount() {
-        $(`#img-course-link${this.props.course.Id}`).bind("click", this._onLinkClickHandler)
         $(`#cover${this.props.course.Id}`).bind("load", this._onImageLoadHandler)
     }
 
     componentWillUnmount() {
-        $(`#img-course-link${this.props.course.Id}`).unbind("click", this._onLinkClickHandler)
         $(`#cover${this.props.course.Id}`).unbind("load", this._onImageLoadHandler)
     }
 
@@ -72,12 +59,23 @@ class ImageBlock extends React.Component {
             `width="${_mask.width}" height="${_mask.height}"/>`;
 
         return (
-            <Link to={'/category/' + course.URL} id={`img-course-link${this.props.course.Id}`}>
+            <Link to={'/category/' + course.URL} onClick={::this._onLinkClickHandler}>
                 <div className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
                     <svg viewBox={`0 0 ${_mask.width} ${_mask.height}`} width={_mask.width} height={_mask.height} dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </Link>
         );
+    }
+
+    _onLinkClickHandler() {
+        const {course} = this.props
+
+        this.props.notifyCourseLinkClicked({
+            ...course,
+            author: course.AuthorsObj[0].FirstName + " " + course.AuthorsObj[0].LastName,
+            category: course.CategoriesObj[0].Name,
+            price: course.IsPaid ? (course.DPrice && course.Discount ? course.DPrice : course.Price) : 0
+        })
     }
 }
 

@@ -4,6 +4,7 @@ import Info from './course-module-info';
 import CourseModuleBody from './course-module-body';
 import Header from './header'
 import PriceBlock from '../common/price-block'
+import ImageBlock from "./image-block";
 
 export default class InfoBlock extends React.Component {
 
@@ -20,12 +21,17 @@ export default class InfoBlock extends React.Component {
 
         return (
             <div className='course-module__info-block'>
-                <div className="course-module__header">
-                    <Header title={title} url={url} course={course}/>
-                    <Info authors={course ? course.AuthorsObj : []}
-                          categories={course ? course.CategoriesObj : []}
-                          isLineStyle={true}/>
-                    <PriceBlock course={course}/>
+                <div className="header__flex-wrapper">
+                    <div className="course-module__header">
+                        <Header title={title} url={url} course={course}/>
+                        <Info authors={course ? course.AuthorsObj : []}
+                              categories={course ? course.CategoriesObj : []}
+                              isLineStyle={true}/>
+                        <PriceBlock course={course}/>
+                    </div>
+                    <div className="course-module__flex-image-block">
+                        <ImageBlock course={course}/>
+                    </div>
                 </div>
                 <CourseModuleBody course={course} isMobile={isMobile}/>
             </div>

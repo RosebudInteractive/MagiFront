@@ -54,9 +54,9 @@ class TextBlock extends React.Component {
         return (
             <div className="lecture-full__text-block">
                 <FavoritesButton className={"lecture-full__fav"} courseUrl={_courseUrl} lessonUrl={_lessonUrl}/>
-                <h3 className="lecture-full__title">
+                <h2 className="lecture-full__title">
                     <Link to={_linkUrl} id={`lesson-link${lesson.Id}`}>{_title}</Link>
-                </h3>
+                </h2>
                 <p className="lecture-full__descr">
                     {' ' + _descr + ' '}
                     {needShowAuthors ? <p className="lecture-full__author">{_authorName}</p> : null}
