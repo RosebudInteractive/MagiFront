@@ -176,7 +176,7 @@ function* getNonRegisterTransactionSaga() {
 }
 
 const _fetchNonRegisterTransactions = () => {
-    return fetch('/api/users/not-sent-trans', {method: 'GET', credentials: 'include'})
+    return fetch('/api/users/not-sent-trans', {method: 'GET', credentials: 'include', cache: 'no-cache'})
         .then(checkStatus)
         .then(parseJSON)
 }
