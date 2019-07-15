@@ -24,7 +24,7 @@ import {
     Yandex,
 } from "./payment-items";
 import {loadingSubsInfoSelector, subscriptionInfoSelector, getSubscriptionInfo,} from "ducks/profile";
-import {notifyPaymentButtonClicked} from "ducks/google-analytics";
+import {notifyPaymentButtonClicked, notifyPriceButtonClicked} from "ducks/google-analytics";
 import WaitingFrame from "./waiting-frame";
 import EmailField from "./email-field";
 import PromoField from "./promo-field";
@@ -84,6 +84,18 @@ class PaymentForm extends React.Component {
         if (prevState.showSaveMethodButton !== _newShowSaveMethodButton) {
             this.setState({showSaveMethodButton: _newShowSaveMethodButton})
         }
+    }
+
+    componentDidMount() {
+        const {selectedSubscription,} = this.props;
+
+        this.props.notifyPriceButtonClicked({
+            id: selectedSubscription.CourseId,
+            author: selectedSubscription.Author,
+            category: selectedSubscription.Category,
+            name: selectedSubscription.CourseName,
+            price: selectedSubscription.Price,
+        })
     }
 
     _close() {
@@ -285,6 +297,7 @@ function mapDispatchToProps(dispatch) {
         switchToSubscription: bindActionCreators(switchToSubscription, dispatch),
         getSubscriptionInfo: bindActionCreators(getSubscriptionInfo, dispatch),
         notifyPaymentButtonClicked: bindActionCreators(notifyPaymentButtonClicked, dispatch),
+        notifyPriceButtonClicked: bindActionCreators(notifyPriceButtonClicked, dispatch),
     }
 }
 

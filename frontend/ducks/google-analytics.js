@@ -346,17 +346,15 @@ function* addPriceButtonClickedSaga(data) {
 
     const _course = data.payload
 
-    const _price = _course.IsPaid ? (_course.DPrice ? _course.DPrice : _course.Price) : 0
-
     const _data = {
         'ecommerce': {
             'currencyCode': 'RUB',
             'checkout': {
                 'actionField': {'step': 1},
                 'products': [{
-                    'name': _course.Name, // 'Название курса',
-                    'id': _course.Id, // 'ID1',
-                    'price': _price, // '23.5',
+                    'name': _course.name, // 'Название курса',
+                    'id': _course.id, // 'ID1',
+                    'price': _course.price, // '23.5',
                     'brand': _course.author, // 'Имя автора',
                     'category': _course.category, // 'Категория курса',
                     'quantity': 1
