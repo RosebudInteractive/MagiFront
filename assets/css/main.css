@@ -19167,7 +19167,7 @@ ul.lectures-tab {
   position: relative;
   padding-top: 43.65%;
   cursor: pointer; }
-  @media (max-width: 1023px) {
+  @media (max-width: 899px) {
     .video-block {
       padding-top: 56.25%; } }
   @media (max-width: 639px) {

@@ -55,7 +55,9 @@
       @media (max-width: 899px)
         margin-top: 8px
         margin-bottom: 14px
+        margin-left: 0
       @media (max-width: 639px)
+        margin-top: 4px
         margin-bottom: 18px
 
     .course-module__stats
@@ -98,7 +100,8 @@
       -moz-box-flex: 0
       -ms-flex: none
       flex: none
-      width: 41.165vw
+      //width: 41.165vw
+      width: 54.168%
       @media (max-width: 899px)
         width: 100%
         padding-top: 30px
@@ -127,11 +130,11 @@
           padding-left: 19px
 
       .course-module__body
-        padding-top: 148px
-        margin-bottom: 64px
+        padding-top: 66px
+        margin-bottom: 0
         @media (max-width: 899px)
           padding-top: 14px
-          margin-bottom: 0
+          //margin-bottom: 0
           padding-right: 33px
           width: calc(100vw - 70px)
         @media (max-width: 899px)
@@ -140,33 +143,42 @@
         .lectures-counter
           margin: 0
           font-family: "Fira Sans", Arial, sans-serif
-          font-size: 17px
-          line-height: 130%
+          font-size: 23px
+          line-height: 36px
+          //font-size: 17px
+          //line-height: 130%
           @media (max-width: 899px)
             margin-bottom: 12px
             font-size: 15px
             line-height: 18px
 
-          p
-            overflow: hidden
-
-            &:after
-              content: ''
-              display: inline-block
-              vertical-align: middle
-              box-sizing: border-box
-              width: 100%
-              border-top: 1px solid rgba(47, 47, 47, 0.2)
-              margin-right: -100%
-              @media (max-width: 899px)
-                display: none
+          //p
+          //  overflow: hidden
+          //
+          //  &:after
+          //    content: ''
+          //    display: inline-block
+          //    vertical-align: middle
+          //    box-sizing: border-box
+          //    width: 100%
+          //    border-top: 1px solid rgba(47, 47, 47, 0.2)
+          //    margin-right: -100%
+          //    @media (max-width: 899px)
+          //      display: none
 
           .current
-            padding: 0 0 0 4px
-            font-size: inherit
-            line-height: inherit
+            font-size: 49px
+            line-height: 51px
+            padding-right: 5px
+            @media (max-width: 899px)
+              padding: 0 0 0 4px
+              font-size: inherit
+              line-height: inherit
           .total
-            padding-right: 10px
+            font-size: 17px
+            @media (max-width: 899px)
+              font-size: 15px
+              padding-right: 10px
 
         .lecture
           display: -webkit-box
@@ -214,10 +226,11 @@
       padding-left: 5px
 
     .course-module__image-block
-      padding-left: calc(8.333vw + 82px)
+      //padding-left: calc(8.333vw + 82px)
+      padding-left: 5px
       display: inline-block
       vertical-align: top
-      padding-top: 42px
+      padding-top: 60px
       overflow: hidden
       @media (max-width: 899px)
         padding-left: 0
