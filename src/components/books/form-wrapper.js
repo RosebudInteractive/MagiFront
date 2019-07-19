@@ -75,12 +75,18 @@ class BookEditorForm extends React.Component {
         }
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.bookId !== prevProps.bookId) {
+            this._init()
+        }
+    }
+
     render() {
         const {hasChanges} = this.props;
 
         return <div className="editor course_editor">
-            <Prompt when={hasChanges}
-                    message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+            {/*<Prompt when={hasChanges}*/}
+            {/*        message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>*/}
             <div className='editor__head'>
                 <div className="tabs tabs-1" key='tab1'>
                     <div className="tab-links">
@@ -98,8 +104,8 @@ class BookEditorForm extends React.Component {
             <div className="editor__main-area">
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
-                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.state.editMode}/>
-                        <AuthorsTab visible={this.state.currentTab === TABS.AUTHORS} editMode={this.state.editMode}/>
+                        <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}/>
+                        <AuthorsTab visible={this.state.currentTab === TABS.AUTHORS} editMode={this.props.editMode}/>
                     </form>
                 </div>
             </div>

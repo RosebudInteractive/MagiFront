@@ -40,6 +40,7 @@ import paramsReducer, {moduleName as paramsModule} from '../ducks/params'
 import booksReducer, {moduleName as booksModule} from '../ducks/books'
 import promosReducer, {moduleName as promosModule} from '../ducks/promo-codes'
 import productsReducer, {moduleName as productsModule} from '../ducks/products'
+import messagesReducer, {moduleName as messagesModule} from '../ducks/messages'
 import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
@@ -78,6 +79,7 @@ export default combineReducers({
     [booksModule]: booksReducer,
     [promosModule]: promosReducer,
     [productsModule]: productsReducer,
+    [messagesModule]: messagesReducer,
     routing: routerReducer,
     form: formReducer,
 })

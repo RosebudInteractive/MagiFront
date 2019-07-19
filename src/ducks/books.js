@@ -4,10 +4,11 @@ import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
 import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
-import {reset,} from 'redux-form'
+import {reset, isDirty} from 'redux-form'
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, select, take, put, apply, call} from 'redux-saga/effects'
 import {convertLinksToString} from "../tools/link-tools";
+import {confirmCloseEditorSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -22,7 +23,9 @@ export const GET_BOOKS_FAIL = `${prefix}/GET_BOOKS_FAIL`
 
 export const CREATE_NEW_BOOK = `${prefix}/CREATE_NEW_BOOK`
 export const EDIT_CURRENT_BOOK = `${prefix}/EDIT_CURRENT_BOOK`
+export const EDIT_CURRENT_BOOK_REQUEST = `${prefix}/EDIT_CURRENT_BOOK_REQUEST`
 export const SHOW_EDITOR = `${prefix}/SHOW_EDITOR`
+export const CLOSE_EDITOR_REQUEST = `${prefix}/CLOSE_EDITOR_REQUEST`
 export const CLOSE_EDITOR = `${prefix}/CLOSE_EDITOR`
 
 export const INSERT_BOOK = `${prefix}/INSERT_BOOK`
@@ -188,11 +191,11 @@ export const createBook = () => {
 }
 
 export const editCurrentBook = (id) => {
-    return {type: EDIT_CURRENT_BOOK, payload: id}
+    return {type: EDIT_CURRENT_BOOK_REQUEST, payload: id}
 }
 
 export const closeEditor = () => {
-    return {type: CLOSE_EDITOR}
+    return {type: CLOSE_EDITOR_REQUEST}
 }
 
 export const insertBook = (data) => {
@@ -255,14 +258,54 @@ export function* createBookSaga() {
     yield put({type: SHOW_EDITOR})
 }
 
-export function* editBookSaga(action) {
-    yield put(replace('/adm/books/edit/' + action.payload))
+function* editBookRequestSaga(action) {
+    const _editorOpened = yield select(showEditorSelector)
 
+    if (_editorOpened) {
+        const _hasChanges = yield select(isDirty('BookEditor'))
+
+        console.log(_hasChanges)
+
+        if (_hasChanges) {
+            const _confirmed = yield call(confirmCloseEditorSaga);
+
+            if (_confirmed) {
+                yield call(editBookSaga, action.payload)
+            }
+        } else {
+            yield call(editBookSaga, action.payload)
+        }
+    } else {
+        yield call(editBookSaga, action.payload)
+    }
+}
+
+function* editBookSaga(id) {
+
+    yield put(replace('/adm/books/edit/' + id))
+
+    yield put({type: EDIT_CURRENT_BOOK, payload: id})
     yield put({type: SHOW_EDITOR})
 }
 
-export function* closeEditorSaga() {
+
+function* closeEditorWithCheckSaga() {
+    const _hasChanges = yield select(isDirty('BookEditor'))
+
+    if (_hasChanges) {
+        const _confirmed = yield call(confirmCloseEditorSaga);
+
+        if (_confirmed) {
+            yield call(closeEditorSaga)
+        }
+    } else {
+        yield call(closeEditorSaga)
+    }
+}
+
+function* closeEditorSaga() {
     yield put(replace('/adm/books'))
+    yield put({type: CLOSE_EDITOR})
 }
 
 export function* upsertBookSaga(action) {
@@ -298,7 +341,7 @@ export function* upsertBookSaga(action) {
         yield put({type: UPSERT_BOOK_SUCCESS})
         yield put(reset('BookEditor'))
         yield put({type: GET_BOOKS_REQUEST})
-        yield put({type: CLOSE_EDITOR})
+        yield put({type: CLOSE_EDITOR_REQUEST})
 
     } catch (error) {
         yield put({
@@ -383,8 +426,8 @@ export const saga = function* () {
     yield all([
         takeEvery(GET_BOOKS_REQUEST, getBooksSaga),
         takeEvery(CREATE_NEW_BOOK, createBookSaga),
-        takeEvery(EDIT_CURRENT_BOOK, editBookSaga),
-        takeEvery(CLOSE_EDITOR, closeEditorSaga),
+        takeEvery(EDIT_CURRENT_BOOK_REQUEST, editBookRequestSaga),
+        takeEvery(CLOSE_EDITOR_REQUEST, closeEditorWithCheckSaga),
         takeEvery(INSERT_BOOK, upsertBookSaga),
         takeEvery(UPDATE_BOOK, upsertBookSaga),
         takeEvery(DELETE_BOOK, deleteBookSaga),

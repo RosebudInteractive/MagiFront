@@ -1,11 +1,66 @@
 .modal-editor
   height: 90%
   width: 90%
-  position: relative
+  position: absolute
   left: 50%
   top: 50%
   transform: translate(-50%, -50%)
-  background: #fff
+  display: flex
+  flex-direction: row
+  background: none
+
+  .modal-editor__wrapper
+    position: relative
+    width: 100%
+    height: 100%
+
+  .scroll-button
+    display: none
+    padding-right: 25px
+    padding-left: 25px
+    cursor: pointer
+
+    &.disabled
+      cursor: default
+
+  .button-prev::before
+    position: relative
+    content: ""
+    display: inline-block
+    width: 1em
+    height: 1em
+    border-left: 0.2em solid
+    border-top: 0.2em solid
+    transform: rotate(-45deg)
+    margin-right: 0.5em
+    top: 50%
+    border-color: #FFFFFF
+
+  .button-prev.disabled::before
+    border-color: #5f5f5f
+
+  .button-next::before
+    position: relative
+    content: ""
+    display: inline-block
+    width: 1em
+    height: 1em
+    border-right: 0.2em solid
+    border-top: 0.2em solid
+    transform: rotate(45deg)
+    margin-right: 0.5em
+    top: 50%
+    border-color: #FFFFFF
+
+  .button-next.disabled::before
+    border-color: #5f5f5f
+
+  &.scrollable
+    .scroll-button
+      display: block
+
+  .editor
+    background: #FFFFFF
 
   &__close
     cursor: pointer

@@ -148,8 +148,32 @@ class BooksPage extends React.Component {
                         null
                 }
                 { !showBookEditor ? <ErrorDialog/> : null }
-                <BookEditor/>
+                <BookEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev} onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
             </div>
+    }
+
+    _onEditPrev() {
+        const _index = this.props.books.findIndex((item) => {
+            return item.id === this.props.bookId
+        })
+
+        if (_index > 0) {
+            window.$$("courses-grid").select(this.props.books[_index - 1].id)
+        }
+
+        this._onEditBtnClick()
+    }
+
+    _onEditNext() {
+        const _index = this.props.books.findIndex((item) => {
+            return item.id === this.props.bookId
+        })
+
+        if (_index < this.props.books.length - 1) {
+            window.$$("courses-grid").select(this.props.books[_index + 1].id)
+        }
+
+        this._onEditBtnClick()
     }
 
     _getSelectedBooksName() {

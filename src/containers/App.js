@@ -25,6 +25,7 @@ import {bindActionCreators} from "redux";
 import Toolbar from "../components/app/toolbar";
 import * as appActions from '../actions/app-actions'
 import './app.sass'
+import UserConfirmation from "../components/dialog/confirm";
 
 class App extends Component {
 
@@ -51,6 +52,7 @@ class App extends Component {
             !isUserAuthorized ? <SignInForm/> : null,
             isUserAuthorized ?
                 <div className="app adm" style={_isNeedHideAdm ? _hideStyle : null}>
+                    <UserConfirmation/>
                     <div className="left bar-bgcolor">
                         <div className="toolbar top-bar-size">
                             <Link to={'/'}>
