@@ -40,6 +40,10 @@ class SubscriptionBlock extends React.Component {
         if ((this._visibleCount === 0) && (this.props.transactions.size > 0)) {
             this._getMoreTransactions();
         }
+
+        if ((this.props.transactions.size === 0) && (this._visibleCount)) {
+            this._visibleCount = 0
+        }
     }
 
     _getList() {
