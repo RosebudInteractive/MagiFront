@@ -60,6 +60,8 @@ class Menu extends React.Component {
                 (extClass ? ' ' + extClass : '') +
                 (_singleLesson ? ' ' + '_single' : '')
 
+        const _courseIsPaid = course ? (course.IsPaid && !course.IsGift && !course.IsBought) : false
+
         return (
             <div className={_menuClassName}>
                 <LogoAndTitle courseTitle={_courseTitle} courseUrl={_courseUrl} onLinkClick={this.props.notifyCourseLinkClicked} analyticsInfo={{
@@ -76,7 +78,7 @@ class Menu extends React.Component {
                         onClick={::this._onFullScreenClick}>
                     <svg width="60" height="53" dangerouslySetInnerHTML={{__html: _fullscreen}}/>
                 </button>
-                <Navigation isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes}/>
+                <Navigation isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes} courseIsPaid={_courseIsPaid}/>
                 <div className='lectures-menu__gradient-block'/>
             </div>
         )
@@ -151,6 +153,13 @@ class ListBlock extends React.Component {
 
 class Navigation extends React.Component {
 
+    static propTypes = {
+        isNeedHideRefs: PropTypes.bool,
+        episodes: PropTypes.array,
+        courseIsPaid: PropTypes.bool
+    }
+
+
     constructor(props) {
         super(props);
 
@@ -194,6 +203,10 @@ class Navigation extends React.Component {
 
                            let _item = $("#" + _id)
                            if (!_item || !_item.length) {
+                               if (this.props.courseIsPaid) {
+                                    this._scrollToPriceButton()
+                               }
+
                                return
                            }
 
@@ -207,6 +220,22 @@ class Navigation extends React.Component {
             })
         })
     }
+
+    _scrollToPriceButton() {
+        const _priceBlock = ($('.course-module__price-block'))
+
+        if (_priceBlock && (_priceBlock.length)) {
+            let _elemOffset = _priceBlock.offset().top,
+                _elemHeight = _priceBlock.height()
+
+            const _offset = _elemOffset - (($(window).height() / 2) - (_elemHeight / 2))
+
+            $("body, html").animate({
+                scrollTop: _offset
+            }, 600);
+        }
+    }
+
 
     _closeMenu() {
         let _isMobile = window.innerWidth <= 899
