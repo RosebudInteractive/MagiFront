@@ -1,7 +1,7 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import { takeEvery, take, put, race, all } from 'redux-saga/effects';
-import {Record} from "../../_node_modules/immutable/dist/immutable";
+import {Record} from "immutable";
 
 export const moduleName = 'messages'
 const prefix = `${appName}/${moduleName}`
