@@ -2,6 +2,7 @@
 
 let HttpCode = {
     OK: 200,
+    MOVED_PERMANENTLY: 301,
     ERR_BAD_REQ: 400,
     ERR_UNAUTH: 401,
     ERR_PAYMENT_REQUIRED: 402,
@@ -18,6 +19,7 @@ let HttpCode = {
 let HttpMessage = {};
 
 HttpMessage[HttpCode.OK] = "OK";
+HttpMessage[HttpCode.MOVED_PERMANENTLY] = "Moved Permanently";
 HttpMessage[HttpCode.ERR_BAD_REQ] = "Bad Request";
 HttpMessage[HttpCode.ERR_UNAUTH] = "Unauthorized";
 HttpMessage[HttpCode.ERR_PAYMENT_REQUIRED] = "Payment Required";

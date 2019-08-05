@@ -113,6 +113,9 @@ function setupAPI(express, app) {
         }
     };
 
+    const trailingSlash = require('../middleware/trailing-slash');
+    app.use("/", trailingSlash());
+
     app.use("/", sessionMiddleware.express);
     app.use("/", sessionMiddleware.passportInit);
     app.use("/", sessionMiddleware.passportSession);
