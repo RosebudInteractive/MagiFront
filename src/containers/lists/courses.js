@@ -188,14 +188,14 @@ class Courses extends React.Component {
             editable: false,
             columns: [
                 {id: 'Name', header: ['Название', {content:"textFilter"}], width: 230},
-                {
-                    id: 'URL',
-                    header: 'Ярлык URL',
-                    width: 150,
-                    template: (obj) => {
-                        return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
-                    },
-                },
+                // {
+                //     id: 'URL',
+                //     header: 'Ярлык URL',
+                //     width: 150,
+                //     template: (obj) => {
+                //         return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
+                //     },
+                // },
                 {
                     id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
                     options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {

@@ -93,6 +93,10 @@ export class LessonEditor extends React.Component {
             _lesson.LessonType = 'L'
             _lesson.CurrParentName = this.props.parentLesson.name
             _lesson.CurrParentId = this.props.parentLesson.id
+
+            if (this.props.course.IsPaid) {
+                _lesson.IsFreeInPaidCourse = true
+            }
         }
 
         return _lesson
