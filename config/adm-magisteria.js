@@ -90,7 +90,7 @@ module.exports = {
             secretKey: pk.billing.yandexKassa.secretKey,
             callBack: "/api/yandex-kassa/callback",
             returnUrl: "/",
-            payment_mode: "full_prepayment",
+            payment_mode: "full_payment",
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
         }
     },
