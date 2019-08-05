@@ -6,7 +6,6 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as resourcesActions from '../../../actions/resources-actions';
 import ResourceForm from "../../resource-form";
-import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import MultiResourceForm from "../../multi-resource-form";
 import {enableButtonsSelector} from "adm-ducks/app";
 import {formValueSelector} from "redux-form";
@@ -28,6 +27,7 @@ class ResourcesGrid extends React.Component {
         this.state = {
             showResourceDialog: false,
             showMultipleUploadDialog: false,
+            scrollableResources: false,
         }
 
         this._selected = null
@@ -54,6 +54,9 @@ class ResourcesGrid extends React.Component {
                         cancel={::this._cancel}
                         save={::this._save}
                         data={this._resource}
+                        scrollable={this.state.scrollableResources}
+                        onPrevClick={ !this._isFirstEdit() ? ::this._editPrev : null }
+                        onNextClick={ !this._isLastEdit() ? ::this._editNext : null }
                     />
                     :
                     null
@@ -85,8 +88,10 @@ class ResourcesGrid extends React.Component {
         this._internalId--;
         this._resourceEditMode = false
 
-        // this.props.resourcesActions.create({ShowInGalery: false})
-        this.setState({showResourceDialog: true})
+        this.setState({
+            showResourceDialog: true,
+            scrollableResources: false
+        })
     }
 
     _remove(id) {
@@ -111,13 +116,43 @@ class ResourcesGrid extends React.Component {
     }
 
     _edit(id) {
-        let _resource = this.props.input.value.find((item) => {
+        const _currentIndex = this.props.input.value.findIndex((item) => {
             return item.id === +id
-        });
+        })
 
-        this._resource = Object.assign({}, _resource);
-        this._resourceEditMode = true
-        this.setState({showResourceDialog: true})
+        if (_currentIndex >= 0) {
+            let _resource = this.props.input.value[_currentIndex];
+
+            this._resource = Object.assign({}, _resource);
+            this._resourceEditMode = true
+            this.setState({
+                showResourceDialog: true,
+                scrollableResources: true,
+                currentIndex: _currentIndex,
+            })
+        }
+    }
+
+    _editPrev() {
+        const _newId = this.props.input.value[this.state.currentIndex - 1].id
+
+        this._select(_newId)
+        this._edit(_newId)
+    }
+
+    _editNext() {
+        const _newId = this.props.input.value[this.state.currentIndex + 1].id
+
+        this._select(_newId)
+        this._edit(_newId)
+    }
+
+    _isFirstEdit() {
+        return this.state.currentIndex === 0
+    }
+
+    _isLastEdit() {
+        return this.state.currentIndex === this.props.input.value.length - 1
     }
 
     _save(value) {

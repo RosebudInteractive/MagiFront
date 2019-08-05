@@ -13,7 +13,7 @@ import * as storageActions from "../../actions/lesson-info-storage-actions";
 import Item from "./lesson-item";
 import Message from "./favourites-message";
 
-const _pagingSize = 10;
+const PAGING_SIZE = 10;
 
 class LessonsBlock extends React.Component {
 
@@ -37,6 +37,10 @@ class LessonsBlock extends React.Component {
     componentDidUpdate() {
         if ((this._visibleCount === 0) && (this.props.bookmarks.size > 0)) {
             this._getMoreBookmarks();
+        }
+
+        if ((this.props.bookmarks.size === 0) && (this._visibleCount)) {
+            this._visibleCount = 0
         }
     }
 
@@ -70,7 +74,7 @@ class LessonsBlock extends React.Component {
 
     _getMoreBookmarks() {
         let {bookmarks} = this.props,
-            _newSize = this._visibleCount + _pagingSize,
+            _newSize = this._visibleCount + PAGING_SIZE,
             _oldSize = this._visibleCount;
 
         this._visibleCount = (_newSize) < bookmarks.size ? _newSize : bookmarks.size;

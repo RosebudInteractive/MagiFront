@@ -46,6 +46,11 @@ export default function singleLesson(state = initialState, action) {
                 mainEpisodes: [],
             };
 
+            if (action.payload.IsFreeInPaidCourse !== undefined) {
+                _newObject.IsFreeInPaidCourse = action.payload.IsFreeInPaidCourse
+            }
+
+
             return {
                 ...state,
                 initial: _newObject,

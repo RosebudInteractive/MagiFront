@@ -1,15 +1,21 @@
 import React from 'react'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
-import {showEditorSelector, closeEditor,} from "adm-ducks/books";
+import {showEditorSelector, closeEditor, editModeSelector,} from "adm-ducks/books";
 import '../common/modal-editor.sass'
 import BookEditorWrapper from "./form-wrapper"
 import {getCourses} from "../../actions/coursesListActions";
 import {getAuthors} from "../../actions/authorsListActions";
 import LoadingPage from "../common/loading-page";
 import ErrorDialog from "../../components/dialog/error-dialog";
+import PropTypes from "prop-types";
 
 class BookEditor extends React.Component {
+
+    static propTypes = {
+        onPrevClick: PropTypes.func,
+        onNextClick: PropTypes.func,
+    };
 
     componentWillMount() {
         this.props.actions.getCourses()
@@ -34,15 +40,31 @@ class BookEditor extends React.Component {
                     fetching ?
                         <LoadingPage/>
                         :
-                        <div className="modal-editor">
-                            <button type="button" className="modal-editor__close" onClick={::this.props.actions.closeEditor}>Закрыть</button>
-                            <BookEditorWrapper/>
-                            <ErrorDialog/>
+                        <div className={"modal-editor" + (this.props.editMode ? " scrollable" : "")}>
+                            <div className={"scroll-button button-prev" + (!this.props.onPrevClick ? " disabled" : "")} onClick={::this._onPrevClick}/>
+                            <div className="modal-editor__wrapper">
+                                <button type="button" className="modal-editor__close" onClick={::this.props.actions.closeEditor}>Закрыть</button>
+                                <BookEditorWrapper/>
+                                <ErrorDialog/>
+                            </div>
+                            <div className={"scroll-button button-next" + (!this.props.onNextClick ? " disabled" : "")} onClick={::this._onNextClick}/>
                         </div>
                 }
             </div>
             :
             null
+    }
+
+    _onPrevClick() {
+        if (this.props.onPrevClick) {
+            this.props.onPrevClick()
+        }
+    }
+
+    _onNextClick() {
+        if (this.props.onNextClick) {
+            this.props.onNextClick()
+        }
     }
 }
 
@@ -50,6 +72,7 @@ function mapStateToProps(state) {
     return {
         showEditor: showEditorSelector(state),
         fetching: state.courses.fetching || state.authorsList.fetching,
+        editMode: editModeSelector(state),
     }
 }
 

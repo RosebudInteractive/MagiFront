@@ -39,6 +39,7 @@ dfn {
 
 h1 {
   font-size: 2em;
+  line-height: 1.1em;
   margin: 0.67em 0; }
 
 mark {
@@ -5431,37 +5432,37 @@ ul.user-tooltip {
     padding-top: 60px;
     /*width: 41.632%;*/
     overflow: hidden; }
-    @media (max-width: 1200px) {
-      .course-module__image-block svg {
-        max-width: 450px;
-        max-height: 400px; } }
-    @media (max-width: 1279px) {
-      .course-module__image-block {
-        padding-top: 90px; } }
-    @media (max-width: 1100px) {
-      .course-module__image-block {
-        padding-left: 90px;
-        /*padding-top: 40px;*/ } }
-    @media (max-width: 1023px) {
-      .course-module__image-block {
-        padding-top: 50px;
-        padding-left: 10px; } }
-    @media (max-width: 1000px) {
-      .course-module__image-block svg {
-        max-width: 400px;
-        max-height: 350px; } }
+    /*@media (max-width: 1200px) {*/
+    /*  .course-module__image-block svg {*/
+    /*    max-width: 450px;*/
+    /*    max-height: 400px; } }*/
+    /*@media (max-width: 1279px) {*/
+    /*  .course-module__image-block {*/
+    /*    padding-top: 90px; } }*/
+    /*@media (max-width: 1100px) {*/
+    /*  .course-module__image-block {*/
+    /*    padding-left: 90px;*/
+    /*    !*padding-top: 40px;*! } }*/
+    /*@media (max-width: 1023px) {*/
+    /*  .course-module__image-block {*/
+    /*    padding-top: 50px;*/
+    /*    padding-left: 10px; } }*/
+    /*@media (max-width: 1000px) {*/
+    /*  .course-module__image-block svg {*/
+    /*    max-width: 400px;*/
+    /*    max-height: 350px; } }*/
     @media (max-width: 899px) {
       .course-module__image-block {
         padding-top: 20px; }
         .course-module__image-block svg {
           max-width: 350px;
           max-height: 300px; } }
-    @media (max-width: 767px) {
-      .course-module__image-block { } }
-    @media (max-width: 700px) {
-      .course-module__image-block svg {
-        max-width: 320px;
-        max-height: 280px; } }
+    /*@media (max-width: 767px) {*/
+    /*  .course-module__image-block { } }*/
+    /*@media (max-width: 700px) {*/
+    /*  .course-module__image-block svg {*/
+    /*    max-width: 320px;*/
+    /*    max-height: 280px; } }*/
     @media (max-width: 639px) {
       .course-module__image-block {
         -webkit-box-ordinal-group: 2;
@@ -19166,7 +19167,7 @@ ul.lectures-tab {
   position: relative;
   padding-top: 43.65%;
   cursor: pointer; }
-  @media (max-width: 1023px) {
+  @media (max-width: 899px) {
     .video-block {
       padding-top: 56.25%; } }
   @media (max-width: 639px) {
@@ -19181,7 +19182,7 @@ ul.lectures-tab {
     fill-opacity: 1; }
   .video-block video {
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     position: absolute;
     top: 0;
     left: 0;

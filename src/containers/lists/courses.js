@@ -187,23 +187,23 @@ class Courses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                {id: 'Name', header: 'Название', width: 230},
+                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 350},
+                // {
+                //     id: 'URL',
+                //     header: 'Ярлык URL',
+                //     width: 150,
+                //     template: (obj) => {
+                //         return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
+                //     },
+                // },
                 {
-                    id: 'URL',
-                    header: 'Ярлык URL',
-                    width: 150,
-                    template: (obj) => {
-                        return obj.URL ? "<a href='" + obj.URL + "'>" + obj.URL + "</a>" : ''
-                    },
-                },
-                {
-                    id: 'State', header: 'Состояние', width: 150, editor: 'select',
+                    id: 'State', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
                     options: [{id: 'D', value: 'Черновик'}, {id: 'P', value: 'Опубликованный'}, {
                         id: 'A',
                         value: 'Архив'
                     }]
                 },
-                {id: 'LanguageName', header: 'Язык курса', width: 200},
+                {id: 'LanguageName', header: ['Язык курса', {content:"selectFilter"}], width: 200},
                 {id: "Description", header: "Описание курса", fillspace: true},
             ],
             on: {

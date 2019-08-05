@@ -10,6 +10,15 @@ import * as appActions from "../actions/app-actions";
 
 class ResourceForm extends React.Component {
 
+    static propTypes = {
+        data: PropTypes.object.isRequired,
+        save: PropTypes.func.isRequired,
+        cancel: PropTypes.func.isRequired,
+        onPrevClick: PropTypes.func,
+        onNextClick: PropTypes.func,
+        scrollable: PropTypes.bool,
+    };
+
     constructor(props) {
         super(props);
         if (!this.props.isLanguagesLoaded)
@@ -30,33 +39,73 @@ class ResourceForm extends React.Component {
             cancel,
             fetching,
             errorDlgShown,
-            message
+            message,
+            scrollable
         } = this.props;
 
-        return (
-            <div>
-                {
-                    fetching ?
-                        <p>Загрузка...</p>
-                        :
-                        <div className="dlg">
-                            <div className="dlg-bg">
-                            </div>
-                            <div className="dlg-window">
-                                <Webix ui={::this.getUI(::this._save, cancel)} data={data}/>
-                            </div>
+        return <React.Fragment>
+            {
+                fetching ?
+                    <p>Загрузка...</p>
+                    :
+                    <div className="dlg">
+                        <div className="dlg-bg"/>
+                        <div className={"dlg-window" + (scrollable ? " scrollable" : "")}>
+                            <div className={"scroll-button button-prev" + (!this.props.onPrevClick ? " disabled" : "")} onClick={::this._onPrevClick}/>
+                            <Webix ui={::this.getUI(::this._save, cancel)} data={data}/>
+                            <div className={"scroll-button button-next" + (!this.props.onNextClick ? " disabled" : "")} onClick={::this._onNextClick}/>
                         </div>
+                    </div>
+            }
+            {
+                errorDlgShown ?
+                    <ErrorDialog
+                        message={message}
+                    />
+                    :
+                    null
+            }
+        </React.Fragment>
+    }
+
+    _onPrevClick() {
+        if (this.props.onPrevClick) {
+            if (this._doBeforeScroll()) {
+                this.props.onPrevClick()
+            }
+        }
+    }
+
+    _onNextClick() {
+        if (this.props.onNextClick) {
+            if (this._doBeforeScroll()) {
+                this.props.onNextClick()
+            }
+        }
+    }
+
+    _doBeforeScroll() {
+        const _form = window.$$("resource-form")
+
+        if (_form) {
+            if (_form.validate()) {
+                let _obj = _form.getValues();
+                let _id = window.$$('file-uploader').files.data.order[0];
+                let _file = window.$$('file-uploader').files.getItem(_id);
+                if (_file) {
+                    _obj.FileName = _file[0].file;
+                    _obj.MetaData = JSON.stringify(_file[0].info);
                 }
-                {
-                    errorDlgShown ?
-                        <ErrorDialog
-                            message={message}
-                        />
-                        :
-                        ""
-                }
-            </div>
-        )
+
+                this._save(_obj);
+
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return true
+        }
     }
 
     _refreshLanguages() {
@@ -87,6 +136,7 @@ class ResourceForm extends React.Component {
 
         return {
             view: "form",
+            id: "resource-form",
             width: 400,
             elements: [
 
@@ -133,7 +183,7 @@ class ResourceForm extends React.Component {
                         {
                             view: "text",
                             labelPosition: "top",
-                            id:'file-name',
+                            id: 'file-name',
                             name: "FileName",
                             label: "Имя файла",
                             placeholder: "Введите URL",
@@ -143,8 +193,7 @@ class ResourceForm extends React.Component {
                         },
                         {
                             rows: [
-                                {
-                                },
+                                {},
                                 {
                                     view: "uploader",
                                     id: "file-uploader",
@@ -227,7 +276,7 @@ class ResourceForm extends React.Component {
                                 {},
                                 {
                                     view: "button",
-                                    type:"iconButton",
+                                    type: "iconButton",
                                     icon: 'refresh',
                                     // value: "R",
                                     // background
@@ -283,9 +332,9 @@ class ResourceForm extends React.Component {
                     ]
                 }
             ],
-            on:{
+            on: {
                 onValues: function () {
-                    window.$$('file-uploader').files.attachEvent("onBeforeDelete", function(id){
+                    window.$$('file-uploader').files.attachEvent("onBeforeDelete", function (id) {
                         // todo : ОТПРАВКА СООБЩЕНИЯ СЕРВЕРУ ОБ УДАЛЕНИИ ФАЙЛА
                         let _item = window.$$('uploader_1').files.getItem(id);
                         window.webix.message('Удален ' + _item[0].file);
@@ -293,19 +342,13 @@ class ResourceForm extends React.Component {
                         return true;
                     });
                 },
-                onChange: function() {
+                onChange: function () {
                     this.clearValidation();
                 }
             }
         }
     }
 }
-
-ResourceForm.propTypes = {
-    data: PropTypes.object.isRequired,
-    save: PropTypes.func.isRequired,
-    cancel: PropTypes.func.isRequired
-};
 
 function mapStateToProps(state) {
     return {

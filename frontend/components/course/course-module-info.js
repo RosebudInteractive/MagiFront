@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom'
+import {isMobile} from "../../tools/page-tools";
 
 export default class Info extends React.Component {
 
@@ -25,7 +26,7 @@ export default class Info extends React.Component {
             return category.Name
         }).join('\n');
 
-        return this.props.isLineStyle
+        return this.props.isLineStyle && isMobile()
             ?
             <div className="course-module__info">
                 <div className="course-module__stats">

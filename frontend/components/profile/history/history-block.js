@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import * as storageActions from "../../../actions/lesson-info-storage-actions";
 import Item from "./history-item";
 
-const _pagingSize = 10;
+const PAGING_SIZE = 10;
 
 class HistoryBlock extends React.Component {
 
@@ -32,6 +32,10 @@ class HistoryBlock extends React.Component {
         if ((this._visibleCount === 0) && (this.props.history.length > 0)) {
             this._getMoreHistory();
         }
+
+        if ((this.props.history.length === 0) && (this._visibleCount)) {
+            this._visibleCount = 0
+        }
     }
 
     _getList() {
@@ -52,7 +56,7 @@ class HistoryBlock extends React.Component {
 
     _getMoreHistory() {
         let {history} = this.props,
-            _newSize = this._visibleCount + _pagingSize,
+            _newSize = this._visibleCount + PAGING_SIZE,
             _oldSize = this._visibleCount;
 
         this._visibleCount = (_newSize) < history.length ? _newSize : history.length;

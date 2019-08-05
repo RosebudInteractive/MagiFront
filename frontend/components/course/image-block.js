@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {notifyCourseLinkClicked} from "ducks/google-analytics";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Platform from 'platform';
 
 const MASKS = {
     '_mask01': {width: 574, height: 503,},
@@ -31,22 +32,41 @@ class ImageBlock extends React.Component {
         super(props)
 
         this.state = {
-            visible: true
+            visible: false
         }
 
-        this._onImageLoadHandler = () => {
-            console.log(`fired ${this.props.course.Name}` )
+        this._hasEvent = ((Platform.name === "Chrome") && (Platform.os.family !== "iOS") ||
+            (Platform.name === "Firefox") || (Platform.name === "Android Browser"))
+
+        this._onImageLoadEventHandler = () => {
             this.setState({visible: true})
+        }
+
+        this._onImageLoadAttrHandler = () => {
+            setTimeout(() => {
+                this.setState({visible: true})
+            }, 500)
         }
     }
 
     componentDidMount() {
-        console.log(`add ${this.props.course.Name}` )
-        $(`#cover${this.props.course.Id}`).bind("load", this._onImageLoadHandler)
+        const {course} = this.props
+
+        const _image = $(`#cover${course.Id}`)
+
+        if (_image) {
+            if (this._hasEvent) {
+                _image.bind('load', this._onImageLoadEventHandler)
+            } else {
+                _image.attr('onload', this._onImageLoadAttrHandler)
+            }
+        }
     }
 
     componentWillUnmount() {
-        $(`#cover${this.props.course.Id}`).unbind("load", this._onImageLoadHandler)
+        if (this._hasEvent) {
+            $(`#cover${this.props.course.Id}`).unbind("load", this._onImageLoadEventHandler)
+        }
     }
 
     render() {
@@ -55,15 +75,20 @@ class ImageBlock extends React.Component {
             _mask = MASKS[course.Mask];
 
         const _image = `<image preserveAspectRatio="xMidYMid slice" ` +
-            // `id="cover${this.props.course.Id}"` +
+            `id="cover${this.props.course.Id}" ` +
             `xmlns:xlink="http://www.w3.org/1999/xlink" ` +
-            `xlink:href="/data/${ _cover}" x="0" ` +
+            `xlink:href="/data/${_cover}" x="0" ` +
             `width="${_mask.width}" height="${_mask.height}"/>`;
 
         return (
             <Link to={'/category/' + course.URL} onClick={::this._onLinkClickHandler}>
-                <div className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
-                    <svg id={`cover${this.props.course.Id}`} viewBox={`0 0 ${_mask.width} ${_mask.height}`} width={_mask.width} height={_mask.height} dangerouslySetInnerHTML={{__html: _image}}/>
+                <div
+                    className={'course-module__image-block fading-cover ' + course.Mask + (this.state.visible ? ' visible' : '')}>
+                    <svg viewBox={`0 0 ${_mask.width} ${_mask.height}`}
+                        // id={`cover${this.props.course.Id}`}
+                         width={_mask.width}
+                         height={_mask.height}
+                         dangerouslySetInnerHTML={{__html: _image}}/>
                 </div>
             </Link>
         );
