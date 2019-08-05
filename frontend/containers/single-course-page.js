@@ -105,7 +105,7 @@ class Main extends React.Component {
         return course
             ?
             <MetaTags>
-                <meta name="description" content={course.PageMeta.Post ? course.PageMeta.Post : course.PageMeta.Description}/>
+                <meta name="description" content={course.PageMeta.Post ? course.PageMeta.Post : course.Description}/>
                 <link rel="canonical" href={_url}/>
                 <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
