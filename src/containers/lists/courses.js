@@ -187,7 +187,7 @@ class Courses extends React.Component {
             select: true,
             editable: false,
             columns: [
-                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 230},
+                {id: 'Name', header: ['Название', {content:"textFilter"}], width: 350},
                 // {
                 //     id: 'URL',
                 //     header: 'Ярлык URL',
