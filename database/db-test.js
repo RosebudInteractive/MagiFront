@@ -54,7 +54,7 @@ const GET_TEST_LIST_MYSQL =
     "  left join`CourseLng` cl on cl.`CourseId` = t.`CourseId`\n" +
     "  left join`LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
     "where <%= cond %>\n" +
-    "order by t.[Id]";
+    "order by t.`Id`";
 
 const DbTest = class DbTest extends DbObject {
 
