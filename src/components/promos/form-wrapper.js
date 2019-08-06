@@ -10,9 +10,8 @@ import {
 } from 'redux-form'
 import MainTab from './tabs/main-tab'
 import '../common/form.sass'
-import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
-import {promosSelector, selectedIdSelector, editModeSelector, closeEditor, insertPromo, updatePromo} from "adm-ducks/promo-codes"
+import {promosSelector, selectedIdSelector, editModeSelector, closeEditor, insertPromo, updatePromo, raiseNotExistPromoError} from "adm-ducks/promo-codes"
 import ProductTab from "./tabs/product-tab";
 import {showErrorDialog} from "../../actions/app-actions";
 import moment from "moment";
@@ -81,6 +80,14 @@ class PromoEditorForm extends React.Component {
                 products: _promo.Products,
                 rest: _promo.Rest,
             });
+        } else {
+            this.props.raiseNotExistPromoError()
+        }
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.promoId !== prevProps.promoId) {
+            this._init()
         }
     }
 
@@ -88,8 +95,6 @@ class PromoEditorForm extends React.Component {
         const {hasChanges} = this.props;
 
         return <div className="editor course_editor">
-            <Prompt when={hasChanges}
-                    message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
             <div className='editor__head'>
                 <div className="tabs tabs-1" key='tab1'>
                     <div className="tab-links">
@@ -205,7 +210,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({closeEditor, insertPromo, updatePromo, resetReduxForm: reset, showErrorDialog}, dispatch);
+    return bindActionCreators({closeEditor, insertPromo, updatePromo, resetReduxForm: reset, showErrorDialog, raiseNotExistPromoError}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(PromoEditorWrapper)
