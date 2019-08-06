@@ -15,11 +15,6 @@ const TEST_REQ_TREE = {
             childs: [
                 {
                     dataObject: {
-                        name: "TestLink"
-                    }
-                },
-                {
-                    dataObject: {
                         name: "Question",
                         childs: [
                             {
@@ -91,7 +86,7 @@ const DbTest = class DbTest extends DbObject {
                         throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test (Id = ${id}).`);
 
                     testObj = col.get(0);
-                    let testData = data.Test = { TestLinks: [], Questions: [] };
+                    let testData = data.Test = { Questions: [] };
                     testData.Id = testObj.id();
                     testData.TestTypeId = testObj.testTypeId();
                     testData.CourseId = testObj.courseId();
@@ -101,17 +96,6 @@ const DbTest = class DbTest extends DbObject {
                     testData.MaxQ = testObj.maxQ();
                     testData.FromLesson = testObj.fromLesson();
                     testData.Duration = testObj.duration();
-
-                    let root_price = testObj.getDataRoot("TestLink");
-                    col = root_price.getCol("DataElements");
-                    for (let i = 0; i < col.count(); i++) {
-                        let obj = col.get(i);
-                        testData.TestLinks.push({
-                            Id: obj.id(),
-                            CourseId: obj.courseId(),
-                            LessonId: obj.lessonId()
-                        });
-                    }
 
                     let root_q = testObj.getDataRoot("Question");
                     col = root_q.getCol("DataElements");
@@ -132,6 +116,8 @@ const DbTest = class DbTest extends DbObject {
                                 AnswBool: obj.answBool(),
                                 AnswInt: obj.answInt(),
                                 AnswText: obj.answText(),
+                                CorrectAnswResp: obj.correctAnswResp(),
+                                WrongAnswResp: obj.wrongAnswResp(),
                                 Answers: []
                             };
                             testData.Questions[obj.number() - 1] = q;
@@ -179,33 +165,8 @@ const DbTest = class DbTest extends DbObject {
                     await root_obj.edit();
 
                     let fields = _.clone(inpFields);
-                    delete fields.TestLinks;
                     delete fields.Questions;
                     this._setFieldValues(testObj, fields);
-
-                    if (Array.isArray(inpFields.TestLinks)) {
-                        let root_link = testObj.getDataRoot("TestLink");
-                        let col_link = root_link.getCol("DataElements");
-                        let link_list = {};
-                        for (let i = 0; i < col_link.count(); i++){
-                            let obj = col_link.get(i);
-                            link_list[obj.id()] = obj;
-                        }
-                        for (let i = 0; i < inpFields.TestLinks.length; i++) {
-                            let fld = _.clone(inpFields.TestLinks[i]);
-                            let list_obj = link_list[fld.Id];
-                            if (list_obj) {
-                                this._setFieldValues(list_obj, fld);
-                                delete link_list[fld.Id];
-                            }
-                            else {
-                                delete fld.Id;
-                                await root_link.newObject({ fields: fld }, dbOpts);
-                            }
-                        }
-                        for (let id in link_list)
-                            col_link._del(link_list[id]);
-                    }
 
                     if (Array.isArray(inpFields.Questions)) {
                         let root_q = testObj.getDataRoot("Question");
@@ -283,7 +244,6 @@ const DbTest = class DbTest extends DbObject {
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
                     let fields = _.defaults(_.clone(inpFields), { LanguageId: LANGUAGE_ID });
-                    delete fields.TestLinks;
                     delete fields.Questions;
                     delete fields.Id;
 
@@ -299,19 +259,6 @@ const DbTest = class DbTest extends DbObject {
 
                     newId = newHandler.keyValue;
                     testObj = this._db.getObj(newHandler.newObject);
-
-                    if (Array.isArray(inpFields.TestLinks)) {
-                        let root_link = testObj.getDataRoot("TestLink");
-                        for (let i = 0; i < inpFields.TestLinks.length; i++){
-                            let fld = _.clone(inpFields.TestLinks[i]);
-                            delete fld.Id;
-                            if ((typeof (fld.CourseId) !== "number") && (typeof (fld.LessonId) !== "number"))
-                                throw new Error(`Both fields "CourseId" and "LessonId" are missing or of incorrect type in link #${i}.`);
-                            if ((typeof (fld.CourseId) === "number") && (typeof (fld.LessonId) === "number"))
-                                throw new Error(`Both fields "CourseId" and "LessonId" have values in link #${i}.`);
-                            await root_link.newObject({ fields: fld }, dbOpts);
-                        }
-                    }
 
                     if (Array.isArray(inpFields.Questions)) {
                         let root_q = testObj.getDataRoot("Question");

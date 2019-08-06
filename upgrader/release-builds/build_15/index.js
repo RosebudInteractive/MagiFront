@@ -20,11 +20,6 @@ exports.upgradeDb = async (schema) => {
         .addField("FromLesson", { type: "boolean", allowNull: true })
         .addField("Duration", { type: "int", allowNull: true });
 
-    schema.addModel("TestLink", "4fd78f60-fd3d-4730-9111-00fff5d9c98c", "RootTestLink", "c6d888fd-d35c-43dc-b711-dfabe221f38a")
-        .addField("TestId", { type: "dataRef", model: "Test", refAction: "parentCascade", allowNull: false })
-        .addField("CourseId", { type: "dataRef", model: "Course", refAction: "parentRestrict", allowNull: true })
-        .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: true })
-
     schema.addModel("Question", "83c5bb31-14b5-4ce0-9975-eb9f4d81e012", "RootQuestion", "a002a804-b3ad-4add-9203-3a10cd78795d")
         .addField("TestId", { type: "dataRef", model: "Test", refAction: "parentCascade", allowNull: false })
         .addField("Number", { type: "int", allowNull: false })
@@ -39,7 +34,9 @@ exports.upgradeDb = async (schema) => {
         .addField("AllowedInCourse", { type: "boolean", allowNull: true })
         .addField("AnswBool", { type: "boolean", allowNull: true })
         .addField("AnswInt", { type: "int", allowNull: true })
-        .addField("AnswText", { type: "string", allowNull: true });
+        .addField("AnswText", { type: "string", allowNull: true })
+        .addField("CorrectAnswResp", { type: "string", allowNull: true })
+        .addField("WrongAnswResp", { type: "string", allowNull: true });
     
     schema.addModel("Answer", "97ae02f0-dc7e-418e-ade9-47417863e536", "RootAnswer", "0d2b9e70-1944-40f7-99f2-812be52cc29b")
         .addField("QuestionId", { type: "dataRef", model: "Question", refAction: "parentCascade", allowNull: false })

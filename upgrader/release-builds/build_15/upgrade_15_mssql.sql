@@ -1,9 +1,7 @@
 /*
 ** MSSQL: Upgrade to version ["ProtoOne" v.1.0.0.1 build 15]
 */
-CREATE UNIQUE INDEX [u_Idx_Test_Name] ON [Test]([Name]);
-GO
-CREATE UNIQUE INDEX [u_Idx_TestLink_TestId_CourseId_LessonId] ON [TestLink]([TestId], [CourseId], [LessonId]);
+CREATE INDEX [idx_Test_Name] ON [Test]([Name]);
 GO
 CREATE UNIQUE INDEX [u_Idx_Question_TestId_Number] ON [Question]([TestId], [Number]);
 GO
