@@ -6,6 +6,17 @@ function setupTests(app) {
         global.$Services = {};
     global.$Services.tests = TestService;
 
+    app.get('/api/adm/tests/list', (req, res, next) => {
+        TestService()
+            .getList(req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/tests/:id', (req, res, next) => {
         TestService()
             .get(parseInt(req.params.id), req.query)

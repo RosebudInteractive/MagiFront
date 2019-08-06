@@ -36,6 +36,25 @@ const GET_TEST_TYPES_MSSQL =
 const GET_TEST_TYPES_MYSQL =
     "select `Id`, `Code`, `Name`, `Description` from `TestType`";
 
+const GET_TEST_LIST_MSSQL =
+    "select t.[Id], t.[TestTypeId], tt.[Name] TypeName, t.[CourseId], cl.[Name] CourseName,\n" +
+    "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration]\n" +
+    "from[Test] t\n" +
+    "  join[TestType] tt on tt.[Id] = t.[TestTypeId]\n" +
+    "  left join[CourseLng] cl on cl.[CourseId] = t.[CourseId]\n" +
+    "  left join[LessonLng] ll on ll.[LessonId] = t.[LessonId]\n" +
+    "where <%= cond %>\n" +
+    "order by t.[Id]";
+
+const GET_TEST_LIST_MYSQL =
+    "select t.`Id`, t.`TestTypeId`, tt.`Name` TypeName, t.`CourseId`, cl.`Name` CourseName,\n" +
+    "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`\n" +
+    "from`Test` t\n" +
+    "  join`TestType` tt on tt.`Id` = t.`TestTypeId`\n" +
+    "  left join`CourseLng` cl on cl.`CourseId` = t.`CourseId`\n" +
+    "  left join`LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
+    "where <%= cond %>\n" +
+    "order by t.[Id]";
 
 const DbTest = class DbTest extends DbObject {
 
@@ -46,6 +65,42 @@ const DbTest = class DbTest extends DbObject {
     _getObjById(id, expression, options) {
         var exp = expression || TEST_REQ_TREE;
         return super._getObjById(id, exp, options);
+    }
+
+    async getList(options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let data = [];
+        let mysql_cond = "1=1";
+        let mssql_cond = "1=1";
+        let course_id;
+        if (opts.course_id) {
+            if (typeof (opts.course_id) === "string") {
+                let id = parseInt(opts.course_id);
+                if (!isNaN(id))
+                    course_id = id;
+            }
+            else
+                if (typeof (opts.course_id) === "number")
+                    course_id = opts.course_id;
+        }
+        if (course_id) {
+            mysql_cond = `t.${"`CourseId`"}=${course_id}`;
+            mssql_cond = `t.[CourseId]=${course_id}`;
+        }
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_TEST_LIST_MYSQL)({ cond: mysql_cond }),
+                mssql: _.template(GET_TEST_LIST_MSSQL)({ cond: mssql_cond })
+            }
+        }, dbOpts);
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach(elem => {
+                elem.FromLesson = elem.FromLesson ? true : false;
+                data.push(elem);
+            })
+        }
+        return data;
     }
 
     async get(id, options) {
