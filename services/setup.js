@@ -28,6 +28,7 @@ const { setupLanguages } = require('./languages');
 const { setupLessons } = require('./lessons');
 const { setupParameters } = require('./parameters');
 const { setupProducts } = require('./products');
+const { setupTests } = require('./tests');
 const { setupInvoices } = require('./invoices');
 const { setupBooks } = require('./books');
 const { setupPromoCodes } = require('./promo-codes');
@@ -112,6 +113,9 @@ function setupAPI(express, app) {
         }
     };
 
+    const trailingSlash = require('../middleware/trailing-slash');
+    app.use("/", trailingSlash());
+
     app.use("/", sessionMiddleware.express);
     app.use("/", sessionMiddleware.passportInit);
     app.use("/", sessionMiddleware.passportSession);
@@ -190,6 +194,7 @@ function setupAPI(express, app) {
     setupLessons(app);
     setupParameters(app);
     setupSessions(app);
+    setupTests(app);
     
     //
     // Common API options

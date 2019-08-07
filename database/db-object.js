@@ -64,6 +64,17 @@ exports.DbObject = class DbObject extends CacheableObject {
         return res;
     }
 
+    _setFieldValues(obj, fields, ignore) {
+        let ignore_list = ignore || { Id: true };
+        for (let fld in fields) {
+            if (!ignore_list[fld]) {
+                let method = this._genGetterName(fld);
+                if (typeof (obj[method]) === "function")
+                    obj[method](fields[fld]);
+            }
+        }
+    }
+
     _getObjById(id, expression, options) {
         return new MemDbPromise(this._db, (resolve) => {
             if (!expression)
