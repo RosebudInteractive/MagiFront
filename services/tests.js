@@ -17,6 +17,17 @@ function setupTests(app) {
             });
     });
 
+    app.get('/api/adm/tests/types', (req, res, next) => {
+        TestService()
+            .getTypes(req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/adm/tests/:id', (req, res, next) => {
         TestService()
             .get(parseInt(req.params.id), req.query)

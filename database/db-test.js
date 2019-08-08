@@ -38,7 +38,7 @@ const GET_TEST_TYPES_MYSQL =
 
 const GET_TEST_LIST_MSSQL =
     "select t.[Id], t.[TestTypeId], tt.[Name] TypeName, t.[CourseId], cl.[Name] CourseName,\n" +
-    "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration]\n" +
+    "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited]\n" +
     "from[Test] t\n" +
     "  join[TestType] tt on tt.[Id] = t.[TestTypeId]\n" +
     "  left join[CourseLng] cl on cl.[CourseId] = t.[CourseId]\n" +
@@ -48,7 +48,7 @@ const GET_TEST_LIST_MSSQL =
 
 const GET_TEST_LIST_MYSQL =
     "select t.`Id`, t.`TestTypeId`, tt.`Name` TypeName, t.`CourseId`, cl.`Name` CourseName,\n" +
-    "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`\n" +
+    "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`\n" +
     "from`Test` t\n" +
     "  join`TestType` tt on tt.`Id` = t.`TestTypeId`\n" +
     "  left join`CourseLng` cl on cl.`CourseId` = t.`CourseId`\n" +
@@ -97,7 +97,31 @@ const DbTest = class DbTest extends DbObject {
         if (result && result.detail && (result.detail.length > 0)) {
             result.detail.forEach(elem => {
                 elem.FromLesson = elem.FromLesson ? true : false;
+                elem.IsTimeLimited = elem.IsTimeLimited ? true : false;
                 data.push(elem);
+            })
+        }
+        return data;
+    }
+
+    async getTypes(options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let data = {};
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_TEST_TYPES_MYSQL)(),
+                mssql: _.template(GET_TEST_TYPES_MSSQL)()
+            }
+        }, dbOpts);
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach(elem => {
+                data[elem.Id] = {
+                    Id: elem.Id,
+                    Code: elem.Code,
+                    Name: elem.Name,
+                    Description: elem.Description
+                }
             })
         }
         return data;
@@ -109,7 +133,7 @@ const DbTest = class DbTest extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
         let testObj = null;
-        let data = { TestTypes: {} };
+        let testData = { Questions: [] };
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -119,29 +143,11 @@ const DbTest = class DbTest extends DbObject {
                     root_obj = root;
                     memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
-                    let result = await $data.execSql({
-                        dialect: {
-                            mysql: _.template(GET_TEST_TYPES_MYSQL)(),
-                            mssql: _.template(GET_TEST_TYPES_MSSQL)()
-                        }
-                    }, dbOpts);
-                    if (result && result.detail && (result.detail.length > 0)) {
-                        result.detail.forEach(elem => {
-                            data.TestTypes[elem.Id] = {
-                                Id: elem.Id,
-                                Code: elem.Code,
-                                Name: elem.Name,
-                                Description: elem.Description
-                            }
-                        })
-                    }
-
                     let col = root_obj.getCol("DataElements");
                     if (col.count() !== 1)
                         throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test (Id = ${id}).`);
 
                     testObj = col.get(0);
-                    let testData = data.Test = { Questions: [] };
                     testData.Id = testObj.id();
                     testData.TestTypeId = testObj.testTypeId();
                     testData.CourseId = testObj.courseId();
@@ -151,6 +157,7 @@ const DbTest = class DbTest extends DbObject {
                     testData.MaxQ = testObj.maxQ();
                     testData.FromLesson = testObj.fromLesson();
                     testData.Duration = testObj.duration();
+                    testData.IsTimeLimited = testObj.isTimeLimited();
 
                     let root_q = testObj.getDataRoot("Question");
                     col = root_q.getCol("DataElements");
@@ -191,7 +198,7 @@ const DbTest = class DbTest extends DbObject {
                             }
                         }
                     }
-                    return data;
+                    return testData;
                 })
         }, memDbOptions);
     }
