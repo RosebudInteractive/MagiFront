@@ -21,6 +21,11 @@ export const GET_TESTS_FAIL = `${prefix}/GET_TESTS_FAIL`
 export const CREATE_NEW_TEST_REQUEST = `${prefix}/CREATE_NEW_TEST_REQUEST`
 export const EDIT_TEST_REQUEST = `${prefix}/EDIT_TEST_REQUEST`
 
+export const DELETE_TEST_REQUEST = `${prefix}/DELETE_TEST_REQUEST`
+export const DELETE_TEST_START = `${prefix}/DELETE_TEST_START`
+export const DELETE_TEST_SUCCESS = `${prefix}/DELETE_TEST_SUCCESS`
+export const DELETE_TEST_FAIL = `${prefix}/DELETE_TEST_FAIL`
+
 /**
  * Reducer
  * */
@@ -71,6 +76,16 @@ export const loadingSelector = createSelector(stateSelector, state => state.load
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
 
 const entriesSelector = createSelector(stateSelector, state => state.entries)
+export const testsSelector = createSelector(entriesSelector, (entries) => {
+    let _array = entries.toArray();
+
+    return _array.map((item) => {
+        let _item = item.toObject()
+
+        _item.id = _item.Id
+        return _item
+    })
+})
 
 /**
  * Action Creators
@@ -87,6 +102,14 @@ export const editTest = (courseId, testId) => {
     return {type: EDIT_TEST_REQUEST, payload: {courseId: courseId, testId: testId}}
 }
 
+export const deleteTest = (testId) => {
+    return {type: DELETE_TEST_REQUEST, payload: testId}
+}
+
+
+/**
+ * Sagas
+ */
 function* getTestSaga(data) {
     yield put({type: GET_TESTS_START})
 
@@ -109,7 +132,7 @@ function* getTestSaga(data) {
 }
 
 const _fetchTests = (courseId) => {
-    const _url = courseId ? `/api/tests/${courseId}` : "/api/tests"
+    const _url = '/api/adm/tests/list' + (courseId ? `?course_id=${courseId}` : "")
 
     return fetch(_url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
@@ -117,11 +140,13 @@ const _fetchTests = (courseId) => {
 }
 
 function* createTestSaga(data) {
-    yield put(replace(`/adm/courses/edit/${data.courseId}/tests/edit/${data.testId}`))
+    yield put(replace(`/adm/courses/edit/${data.payload}/tests/new`))
+
 }
 
-function* editTestSaga(courseId) {
-    yield put(replace(`/adm/courses/edit/${courseId}/tests/new`))
+function* editTestSaga(data) {
+    const {courseId, testId} = data.payload
+    yield put(replace(`/adm/courses/edit/${courseId}/tests/edit/${testId}`))
 }
 
 export const saga = function* () {
