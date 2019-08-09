@@ -18,6 +18,7 @@ const dfltPrerenderSettings =
 {
     path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
     maxLinksLimit: 0,
+    renderPermanent: false,
     maxAgeSec: 365 * 24 * 60 * 60, // max link age
     minTimeToExpInSec: 60 * 60,// render if TTL < minTimeToExpInSec
     renderDelay: 10* 1000 // render request delay in ms
@@ -35,10 +36,15 @@ exports.PrerenderTask = class PrerenderTask extends Task {
         this._prerenderCache = PrerenderCache(opts.renderCache);
         this._links = {};
         this._lastReqTime = null;
+        this._initCounters();
+    }
+
+    _initCounters() {
         this._totLinks = 0;
         this._alreadyCached = 0;
         this._renderedLinks = 0;
         this._outdatedLinks = 0;
+        this._permanentLinks = 0;
     }
 
     _processLink(link, mdfDate) {
@@ -49,12 +55,15 @@ exports.PrerenderTask = class PrerenderTask extends Task {
             this._totLinks++;
             rc = this._prerenderCache.ttl(key)
                 .then(result => {
-                    if ((result >= 0) && (result < this._prerenderSettings.minTimeToExpInSec)) {
+                    if (((result >= 0) || this._prerenderSettings.renderPermanent) && (result < this._prerenderSettings.minTimeToExpInSec)) {
                         let now = new Date();
-                        let isOutDated = (!this._prerenderSettings.maxAgeSec) || (((now - mdfDate) / 1000.) >= this._prerenderSettings.maxAgeSec);
+                        let isOutDated = (this._prerenderSettings.maxAgeSec &&
+                            (((now - mdfDate) / 1000.) >= this._prerenderSettings.maxAgeSec)) ? true : false;
                         if ((!this._prerenderSettings.maxLinksLimit) ||
                             (this._renderedLinks < this._prerenderSettings.maxLinksLimit)) {
                             this._renderedLinks++;
+                            if (result === -1)
+                                this._permanentLinks++;
                             if (isOutDated)
                                 this._outdatedLinks++;
                             return this._delay(this._lastReqTime ? (this._prerenderSettings.renderDelay - (now - this._lastReqTime)) : 0)
@@ -112,10 +121,7 @@ exports.PrerenderTask = class PrerenderTask extends Task {
     }
 
     run(fireDate) {
-        this._totLinks = 0;
-        this._renderedLinks = 0;
-        this._alreadyCached = 0;
-        this._outdatedLinks = 0;
+        this._initCounters();
         return new Promise((resolve, reject) => {
             let rc;
             if (this._prerenderSettings.mapFiles && (this._prerenderSettings.mapFiles.length > 0)) {
@@ -138,7 +144,8 @@ exports.PrerenderTask = class PrerenderTask extends Task {
                 let outTxt = this._prerenderSettings.maxAgeSec ? (', outdated: ' + this._outdatedLinks + " > " +
                     Math.round(this._prerenderSettings.maxAgeSec / 24 / 60 / 60) + " day(s)") : '';
                 let limitTxt = this._prerenderSettings.maxLinksLimit ? (', limit: ' + this._prerenderSettings.maxLinksLimit) : '';
-                console.log(buildLogString(`Total links: ${this._totLinks}${outTxt}, already cached: ${this._alreadyCached}, rendered ${this._renderedLinks}${limitTxt}.`));
+                console.log(buildLogString(`Total links: ${this._totLinks}${outTxt}, ` +
+                    `already cached: ${this._alreadyCached}, rendered: ${this._renderedLinks}${limitTxt}, permanent: ${this._permanentLinks}.`));
             });
     }
 }

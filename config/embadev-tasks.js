@@ -22,7 +22,7 @@ let options = {
             name: "Listening history import",
             module: "./lsn-history",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 maxInsertNum: 2,
@@ -67,13 +67,14 @@ let options = {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
-            disabled: true,
+            disabled: false,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml"],
                 maxLinksLimit: 10,
-                maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                renderPermanent: true,
+                maxAgeSec: 0, // max link age
                 minTimeToExpInSec: 6 * 60 * 60, // render if TTL < minTimeToExpInSec
                 renderDelay: 5 * 1000 // render request delay in ms
             }

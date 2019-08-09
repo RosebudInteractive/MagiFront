@@ -63,7 +63,8 @@ module.exports = {
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"],
                 maxLinksLimit: 500,
-                maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                renderPermanent: true,
+                maxAgeSec: 0, // max link age
                 minTimeToExpInSec: 6 * 60 * 60, // render if TTL < minTimeToExpInSec
                 renderDelay: 10 * 1000 // render request delay in ms
             }

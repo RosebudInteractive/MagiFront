@@ -52,12 +52,13 @@ module.exports = {
             module: "./prerender",
             type: "scheduled-task",
             disabled: false,
-            schedule: "0 3 1,7,13,19 * * *", // run every 6 hours
+            schedule: "0 3 1,3,5,7,9,11,13,15,17,19,21,23 * * *", // run every 2 hours
             options: {
                 path: siteMapsPath,
                 mapFiles: ["category-sitemap.xml", "post-sitemap.xml", "author-sitemap.xml", "page-sitemap.xml", "razdel-sitemap.xml"],
                 maxLinksLimit: 500,
-                maxAgeSec: 365 * 24 * 60 * 60, // max link age
+                renderPermanent: true,
+                maxAgeSec: 0, // max link age
                 minTimeToExpInSec: 6 * 60 * 60, // render if TTL < minTimeToExpInSec
                 renderDelay: 10 * 1000 // render request delay in ms
             }
