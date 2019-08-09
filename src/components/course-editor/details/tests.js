@@ -45,7 +45,7 @@ class CourseTests extends GridControl{
         let _columns = [
             {id: 'Number', header: '#', width: 30},
             {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
-            {id: 'Method', header: ['Вид теста', {content:"selectFilter"}] , width: 150},
+            {id: 'TypeName', header: ['Вид теста', {content:"selectFilter"}] , width: 250},
         ];
 
         _columns.push(...super._getColumns());

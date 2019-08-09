@@ -105,7 +105,7 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/lessons/new'}
                                    component={LessonEditor}/>
-                            <Route path={_homePath + '/courses/edit/:courseId/tests/edit/:id'}
+                            <Route path={_homePath + '/courses/edit/:courseId/tests/edit/:testId'}
                                    component={TestsEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/tests/new'}
                                    component={TestsEditor}/>

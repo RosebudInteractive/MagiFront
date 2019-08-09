@@ -42,7 +42,7 @@ export default class ReferencesTab extends React.Component{
 
     render() {
         return <div className={"tab-wrapper tab-wrapper__test-questions" + (this.props.visible ? '' : ' hidden')}>
-            <Field component={QuestionsGrid} name="toc" editMode={this.props.editMode}/>
+            <Field component={QuestionsGrid} name="questions" editMode={this.props.editMode}/>
         </div>
     }
 }

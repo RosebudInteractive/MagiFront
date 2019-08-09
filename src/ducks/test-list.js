@@ -3,8 +3,8 @@ import {createSelector} from 'reselect'
 import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
-import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
-import {SHOW_ERROR_DIALOG} from "../constants/Common";
+import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
+import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
 
 /**
@@ -40,7 +40,7 @@ const ReducerRecord = Record({
 const TestRecord = Record({
     Id: null,
     Name: null,
-    Method: null,
+    TypeName: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -63,6 +63,10 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loaded', false)
                 .set('loading', false)
 
+        case DELETE_TEST_SUCCESS:
+            return state
+                .update('entries', entries => entries.delete(payload))
+
         default:
             return state
     }
@@ -79,10 +83,11 @@ const entriesSelector = createSelector(stateSelector, state => state.entries)
 export const testsSelector = createSelector(entriesSelector, (entries) => {
     let _array = entries.toArray();
 
-    return _array.map((item) => {
+    return _array.map((item, index) => {
         let _item = item.toObject()
 
         _item.id = _item.Id
+        _item.Number = index + 1
         return _item
     })
 })
@@ -149,11 +154,37 @@ function* editTestSaga(data) {
     yield put(replace(`/adm/courses/edit/${courseId}/tests/edit/${testId}`))
 }
 
+function* deleteTestSaga(data) {
+    yield put({type: DELETE_TEST_START})
+    yield put({type: HIDE_DELETE_DLG})
+
+    try {
+        yield call(_deletePromo, data.payload)
+        yield put({type: DELETE_TEST_SUCCESS, payload: data.payload})
+    } catch (error) {
+        yield put({type: DELETE_TEST_FAIL})
+
+        const _message = yield call(getErrorMessage, e)
+        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+    }
+}
+
+const _deletePromo = (id) => {
+    fetch(`/api/adm/tests/${id}`,
+        {
+            method: "DELETE",
+            credentials: 'include'
+        })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_TESTS_REQUEST, getTestSaga),
         takeEvery(CREATE_NEW_TEST_REQUEST, createTestSaga),
         takeEvery(EDIT_TEST_REQUEST, editTestSaga),
+        takeEvery(DELETE_TEST_REQUEST, deleteTestSaga),
     ])
 }
 

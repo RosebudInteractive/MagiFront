@@ -48,19 +48,11 @@ export class TestEditor extends React.Component {
             })
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        // let _needRefreshAfterSave = prevProps.savingLesson && !this.props.savingLesson && !this.props.lessonError,
-        //     _needSwitchToEditMode = !prevState.editMode && _needRefreshAfterSave
-        //
-        // if (_needSwitchToEditMode) {
-        //     let _newRout = `/adm/courses/edit/${this.props.courseId}/lessons/edit/${this.props.lesson.id}`;
-        //     this.props.history.push(_newRout);
-        //     this.setState({editMode: true})
-        // }
-        //
-        // if (_needRefreshAfterSave) {
-        //     this.props.getLesson(this.props.lesson.id, this.props.courseId)
-        // }
+    componentDidUpdate(prevProps) {
+        let _needReload = (prevProps.testId !== this.props.testId) && !isNaN(this.props.testId)
+        if (_needReload) {
+            this.props.getTest(this.props.testId)
+        }
     }
 
     render() {
@@ -103,16 +95,9 @@ function mapStateToProps(state, ownProps) {
         testId: Number(ownProps.match.params.testId),
         courseId: Number(ownProps.match.params.courseId),
         course: state.singleCourse.current,
-        // lesson: state.singleLesson.current,
-
-        // savingLesson: state.singleLesson.saving,
-        // lessonError: state.singleLesson.error,
 
         fetching: state.singleCourse.fetching ||
             loadingSelector(state),
-        //     state.singleLesson.fetching ||
-        //     state.singleCourse.fetching ||
-        //     parametersFetchingSelector(state),
 
         ownProps: ownProps,
     }

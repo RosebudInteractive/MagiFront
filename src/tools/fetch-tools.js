@@ -71,3 +71,15 @@ export const handleJsonError = (error) => {
 export const parseJSON = (response) => {
     return response.json()
 };
+
+export function* getErrorMessage(error) {
+
+    let _message
+    if (error.response) {
+        _message = yield handleJsonError(error)
+    } else {
+        _message = error.message ? error.message : "unknown error"
+    }
+
+    return _message
+}
