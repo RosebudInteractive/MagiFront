@@ -3,11 +3,29 @@ import PropTypes from "prop-types";
 import GridControl from "../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {EDIT_MODE_EDIT} from "../../../constants/Common";
 import {enableButtonsSelector} from "adm-ducks/app";
-import {createNewQuestion} from "adm-ducks/single-test";
+import {questionInEditModeSelector, questionsSelector, createNewQuestion} from "adm-ducks/single-test";
+import QuestionForm from "../question-editor/editor";
 
-class TocGrid extends React.Component {
+const NEW_QUESTION = {
+    AnswTime: 10,
+    Text: null,
+    Picture: null,
+    PictureMeta: null,
+    AnswType: 1,
+    Score: 1,
+    StTime: null,
+    EndTime: null,
+    AllowedInCourse: null,
+    AnswBool: null,
+    AnswInt: null,
+    AnswText: null,
+    CorrectAnswResp: null,
+    WrongAnswResp: null,
+    Answers: [],
+}
+
+class QuestionGrid extends React.Component {
 
     static propTypes = {
         editMode: PropTypes.bool,
@@ -17,6 +35,13 @@ class TocGrid extends React.Component {
         super(props)
 
         this._selected = null
+        this._question = null
+        this._internalId = -1
+        this._questionEditMode = false
+        this.state = {
+            showDialog: false,
+            scrollable: false,
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -37,8 +62,44 @@ class TocGrid extends React.Component {
                            selected={this._selected}
                            data={this.props.input.value}
                            disabled={!this.props.enableButtons}/>
+            {
+                this.state.showDialog ?
+                    <QuestionForm
+                        cancel={::this._cancel}
+                        save={::this._save}
+                        close={::this._close}
+                        data={this._question}
+                        scrollable={this.state.scrollableResources}
+                        onPrevClick={ !this._isFirstEdit() ? ::this._editPrev : null }
+                        onNextClick={ !this._isLastEdit() ? ::this._editNext : null }
+                    />
+                    :
+                    null
+            }
         </div>
 
+    }
+
+    _isFirstEdit() {
+        return this.state.currentIndex === 0
+    }
+
+    _isLastEdit() {
+        return this.state.currentIndex === this.props.input.value.length - 1
+    }
+
+    _editPrev() {
+        const _newId = this.props.input.value[this.state.currentIndex - 1].id
+
+        this._select(_newId)
+        this._edit(_newId)
+    }
+
+    _editNext() {
+        const _newId = this.props.input.value[this.state.currentIndex + 1].id
+
+        this._select(_newId)
+        this._edit(_newId)
     }
 
     _select(id) {
@@ -48,34 +109,49 @@ class TocGrid extends React.Component {
         }
     }
 
+    _cancel() {
+        this.setState({ showDialog: false })
+    }
+
+    _close() {
+        this.setState({ showDialog: false })
+    }
+
     _create() {
-        this.props.createNewQuestion()
+        this._question = Object.assign({}, NEW_QUESTION)
+        this._question.Id = this._internalId
+        this._question.id = this._question.Id
+        this._internalId--;
+        this._questionEditMode = false
+
+        this.setState({
+            showDialog: true,
+            scrollable: false
+        })
     }
 
     _edit(id) {
-        let _toc = this.props.input.value.find((item) => {
+        this._question = this.props.input.value.find((item) => {
             return item.id === parseInt(id)
         });
 
-        this.props.tocActions.edit(_toc);
         this.setState({showDialog: true})
     }
 
     _save(value) {
-        if (this.props.tocEditMode === EDIT_MODE_EDIT) {
+        if (this._questionEditMode) {
             this._update(value)
         } else {
             this._insert(value)
         }
 
         this.setState({showDialog: false})
-        this.props.tocActions.clear();
     }
 
     _insert(data) {
         let _array = [...this.props.input.value]
 
-        _array.push({...data, id: data.Id});
+        _array.push(data);
         this._setObjectsRank(_array)
 
         this.props.input.onChange(_array)
@@ -180,8 +256,8 @@ class TestQuestions extends GridControl {
 
 function mapStateToProps(state) {
     return {
-        toc: state.toc.object,
-        tocEditMode: state.toc.editMode,
+        toc: questionsSelector(state),
+        tocEditMode: questionInEditModeSelector(state),
 
         enableButtons: enableButtonsSelector(state),
     }
@@ -191,4 +267,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({createNewQuestion}, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TocGrid);
+export default connect(mapStateToProps, mapDispatchToProps)(QuestionGrid);

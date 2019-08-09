@@ -146,7 +146,6 @@ const _fetchTests = (courseId) => {
 
 function* createTestSaga(data) {
     yield put(replace(`/adm/courses/edit/${data.payload}/tests/new`))
-
 }
 
 function* editTestSaga(data) {

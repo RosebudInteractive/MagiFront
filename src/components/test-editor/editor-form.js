@@ -12,7 +12,7 @@ import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
 import {testSelector, questionsSelector, showQuestionEditorSelector, savingSelector, insertTest, updateTest, backToCourse,} from "adm-ducks/single-test";
 import PropTypes from "prop-types";
 import ErrorDialog from "../dialog/error-dialog";
-import QuestionEditor from "../question-editor/editor";
+import QuestionEditor from "./question-editor/editor";
 
 const EDITOR_NAME = "TestEditor"
 
@@ -89,10 +89,6 @@ class TestEditorForm extends React.Component {
                 <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
                                 onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
             </div>
-            { !showQuestionEditor ? <ErrorDialog/> : null }
-            <QuestionEditor/>
-            {/*<QuestionEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}*/}
-            {/*             onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>*/}
         </React.Fragment>
     }
 

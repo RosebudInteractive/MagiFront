@@ -11,6 +11,7 @@ import {EDIT_TEST_REQUEST} from "adm-ducks/test-list";
 import {confirmCloseEditorSaga} from "adm-ducks/messages";
 
 
+
 /**
  * Constants
  * */
@@ -59,6 +60,11 @@ export const EDIT_QUESTION_REQUEST = `${prefix}/EDIT_QUESTION_REQUEST`
 export const EDIT_QUESTION_START = `${prefix}/EDIT_QUESTION_START`
 export const EDIT_QUESTION_SUCCESS = `${prefix}/EDIT_QUESTION_SUCCESS`
 export const EDIT_QUESTION_FAIL = `${prefix}/EDIT_QUESTION_FAIL`
+
+export const INSERT_QUESTION_REQUEST = `${prefix}/INSERT_QUESTION_REQUEST`
+export const INSERT_QUESTION_START = `${prefix}/INSERT_QUESTION_START`
+export const INSERT_QUESTION_SUCCESS = `${prefix}/INSERT_QUESTION_SUCCESS`
+export const INSERT_QUESTION_FAIL = `${prefix}/INSERT_QUESTION_FAIL`
 
 
 /**
@@ -151,6 +157,10 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('showQuestionEditor', true)
 
+        case CLOSE_QUESTION_EDITOR:
+            return state
+                .set('showQuestionEditor', false)
+
         case INSERT_TEST_START:
         case UPDATE_TEST_START:
             return state
@@ -175,6 +185,9 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('selectedQuestionId', payload)
 
+        case INSERT_QUESTION_SUCCESS:
+            return state
+                .setIn(['questions', payload.id], new QuestionRecord(payload))
 
         default:
             return state
@@ -242,11 +255,11 @@ export const editQuestion = (courseId, testId) => {
 }
 
 export const closeQuestionEditor = () => {
-
+    return {type: CLOSE_QUESTION_EDITOR_REQUEST}
 }
 
-export const insertQuestion = () => {
-
+export const insertQuestion = (data) => {
+    return {type: INSERT_QUESTION_REQUEST, payload: data}
 }
 
 export const updateQuestion = () => {
@@ -405,9 +418,52 @@ const _putPromo = (data) => {
         .then(parseJSON)
 }
 
-function* createNewTestSaga() {
-    yield put({type: CREATE_NEW_TEST_START})
+function* createNewQuestionSaga() {
+    yield put({type: CREATE_NEW_QUESTION_START})
     yield put({type: SHOW_QUESTION_EDITOR})
+}
+
+let NEGATIVE_QUESTION_ID = 0
+
+function* insertQuestionSaga(action) {
+    yield put({type: INSERT_QUESTION_START})
+
+    try {
+        let _data = {...action.payload}
+
+        _data.id = NEGATIVE_QUESTION_ID--
+
+        yield put({type: INSERT_QUESTION_SUCCESS, payload: _data})
+
+        // yield put(reset('PromoEditor'))
+        // yield put({type: GET_PROMO_CODES_REQUEST})
+        yield put({type: CLOSE_QUESTION_EDITOR})
+    } catch (error) {
+        yield put({ type: INSERT_QUESTION_FAIL })
+
+        yield put({
+            type: SHOW_ERROR_DIALOG,
+            payload: error.message
+        })
+    }
+}
+
+function* closeQuestionEditorSaga() {
+    const _hasChanges = yield select(isDirty('QuestionEditor'))
+
+    if (_hasChanges) {
+        const _confirmed = yield call(confirmCloseQuestionEditorSaga);
+
+        if (_confirmed) {
+            yield call(confirmCloseQuestionEditorSaga)
+        }
+    } else {
+        yield call(confirmCloseQuestionEditorSaga)
+    }
+}
+
+function* confirmCloseQuestionEditorSaga() {
+    yield put({type: CLOSE_QUESTION_EDITOR})
 }
 
 export const saga = function* () {
@@ -417,7 +473,9 @@ export const saga = function* () {
         takeEvery(INSERT_TEST_REQUEST, insertTestSaga),
         takeEvery(UPDATE_TEST_REQUEST, updateTestSaga),
         takeEvery(BACK_TO_COURSE_REQUEST, backToCourseSaga),
-        takeEvery(CREATE_NEW_QUESTION_REQUEST, createNewTestSaga),
+        takeEvery(CREATE_NEW_QUESTION_REQUEST, createNewQuestionSaga),
+        takeEvery(INSERT_QUESTION_REQUEST, insertQuestionSaga),
+        takeEvery(CLOSE_QUESTION_EDITOR_REQUEST, closeQuestionEditorSaga),
         ]
     )}
 
