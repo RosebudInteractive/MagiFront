@@ -5,6 +5,7 @@ const { DbObject } = require('./db-object');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { DbUtils } = require('./db-utils');
+const { splitArray } = require('../utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
@@ -30,6 +31,36 @@ const TEST_REQ_TREE = {
     }
 };
 
+const TEST_INST_REQ_TREE = {
+    expr: {
+        model: {
+            name: "TestInstance",
+            childs: [
+                {
+                    dataObject: {
+                        name: "InstanceQuestion"
+                    }
+                }
+            ]
+        }
+    }
+};
+
+const GET_QUISTIONS_REQ_TREE = {
+    expr: {
+        model: {
+            name: "Question",
+            childs: [
+                {
+                    dataObject: {
+                        name: "Answer"
+                    }
+                }
+            ]
+        }
+    }
+};
+
 const GET_TEST_TYPES_MSSQL =
     "select [Id], [Code], [Name], [Description] from [TestType]";
 
@@ -38,23 +69,45 @@ const GET_TEST_TYPES_MYSQL =
 
 const GET_TEST_LIST_MSSQL =
     "select t.[Id], t.[TestTypeId], tt.[Name] TypeName, t.[CourseId], cl.[Name] CourseName,\n" +
-    "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited]\n" +
+    "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited],\n" +
+    "  coalesce(count(q.[Id]), 0) Nq\n" +
     "from[Test] t\n" +
     "  join[TestType] tt on tt.[Id] = t.[TestTypeId]\n" +
     "  left join[CourseLng] cl on cl.[CourseId] = t.[CourseId]\n" +
     "  left join[LessonLng] ll on ll.[LessonId] = t.[LessonId]\n" +
+    "  left join[Question] q on q.[TestId] = t.[Id]\n" +
     "where <%= cond %>\n" +
+    "group by t.[Id], t.[TestTypeId], tt.[Name], t.[CourseId], cl.[Name], t.[LessonId], ll.[Name], t.[Name],\n" +
+    "  t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited]\n" +
     "order by t.[Id]";
 
 const GET_TEST_LIST_MYSQL =
     "select t.`Id`, t.`TestTypeId`, tt.`Name` TypeName, t.`CourseId`, cl.`Name` CourseName,\n" +
-    "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`\n" +
+    "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`,\n" +
+    "  coalesce(count(q.`Id`), 0) Nq\n" +
     "from`Test` t\n" +
     "  join`TestType` tt on tt.`Id` = t.`TestTypeId`\n" +
     "  left join`CourseLng` cl on cl.`CourseId` = t.`CourseId`\n" +
     "  left join`LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
+    "  left join`Question` q on q.`TestId` = t.`Id`\n" +
     "where <%= cond %>\n" +
+    "group by t.`Id`, t.`TestTypeId`, tt.`Name`, t.`CourseId`, cl.`Name`, t.`LessonId`, ll.`Name`, t.`Name`,\n" +
+    "  t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`\n" +
     "order by t.`Id`";
+
+const GET_QUESTION_IDS_MSSQL =
+    "select q.[Id] from [Test] t\n" +
+    "  join [Question] q on q.[TestId] = t.[Id]\n" +
+    "where(t.[CourseId] = <%= course_id %>) and(not t.[LessonId] is NULL)";
+
+const GET_QUESTION_IDS_MYSQL =
+    "select q.`Id` from `Test` t\n" +
+    "  join `Question` q on q.`TestId` = t.`Id`\n" +
+    "where(t.`CourseId` = <%= course_id %>) and(not t.`LessonId` is NULL)";
+
+const DFLT_QUESTION_SCORE = 1;
+const DFLT_ANSW_TIME = 10;
+const MAX_QUESTIONS_REQ_LEN = 10;
 
 const DbTest = class DbTest extends DbObject {
 
@@ -166,6 +219,7 @@ const DbTest = class DbTest extends DbObject {
                         for (let i = 0; i < col.count(); i++) {
                             let obj = col.get(i);
                             let q = {
+                                Id: obj.id(),
                                 AnswTime: obj.answTime(),
                                 Text: obj.text(),
                                 Picture: obj.picture(),
@@ -190,6 +244,7 @@ const DbTest = class DbTest extends DbObject {
                                 for (let j = 0; j < col_a.count(); j++) {
                                     let obj_a = col_a.get(j);
                                     let a = {
+                                        Id: obj_a.id(),
                                         Text: obj_a.text(),
                                         IsCorrect: obj_a.isCorrect()
                                     };
@@ -199,6 +254,325 @@ const DbTest = class DbTest extends DbObject {
                         }
                     }
                     return testData;
+                })
+        }, memDbOptions);
+    }
+
+    async _getQuestionsByIds(ids, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let questions = {};
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjects(GET_QUISTIONS_REQ_TREE, { field: "Id", op: "in", value: ids }, dbOpts));
+            })
+                .then(async (root) => {
+                    root_obj = root;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    let col = root_obj.getCol("DataElements");
+                    for (let i = 0; i < col.count(); i++){
+                        let obj = col.get(i);
+                        let q = {
+                            Id: obj.id(),
+                            AnswTime: obj.answTime(),
+                            Text: obj.text(),
+                            Picture: obj.picture(),
+                            PictureMeta: obj.pictureMeta(),
+                            AnswType: obj.answType(),
+                            Score: obj.score(),
+                            StTime: obj.stTime(),
+                            EndTime: obj.endTime(),
+                            AllowedInCourse: obj.allowedInCourse(),
+                            AnswBool: obj.answBool(),
+                            AnswInt: obj.answInt(),
+                            AnswText: obj.answText(),
+                            CorrectAnswResp: obj.correctAnswResp(),
+                            WrongAnswResp: obj.wrongAnswResp(),
+                            Answers: []
+                        };
+                        questions[q.Id] = q;
+                        let root_a = obj.getDataRoot("Answer");
+                        let col_a = root_a.getCol("DataElements");
+                        if (col_a.count()) {
+                            q.Answers = new Array(col_a.count());
+                            for (let j = 0; j < col_a.count(); j++) {
+                                let obj_a = col_a.get(j);
+                                let a = {
+                                    Id: obj_a.id(),
+                                    Text: obj_a.text(),
+                                    IsCorrect: obj_a.isCorrect()
+                                };
+                                q.Answers[obj_a.number() - 1] = a;
+                            }
+                        }
+                    }
+                    return questions;
+                })
+        }, memDbOptions);
+    }
+
+    async getTestInstance(id, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let testObj = null;
+        let testData = { Questions: [] };
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
+            })
+                .then(async (root) => {
+                    root_obj = root;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let col = root_obj.getCol("DataElements");
+                    if (col.count() !== 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+
+                    testObj = col.get(0);
+                    testData.Id = testObj.id();
+                    testData.UserId = testObj.userId();
+                    testData.TestId = testObj.testId();
+                    testData.StTime = testObj.stTime();
+                    testData.ActDuration = testObj.actDuration();
+                    testData.Duration = testObj.duration();
+                    testData.Score = testObj.score();
+                    testData.MaxScore = testObj.maxScore();
+                    testData.IsFinished = testObj.isFinished();
+                    testData.IsVisible = testObj.isVisible();
+
+                    let root_iq = testObj.getDataRoot("InstanceQuestion");
+                    let col_i = root_iq.getCol("DataElements");
+                    let questions_list = {};
+                    if (col_i.count()) {
+                        testData.Questions = new Array(col_i.count());
+                        for (let n = 0; n < col_i.count(); n++) {
+                            let qobj = col_i.get(n);
+                            let qi = {
+                                Answer: qobj.answer(),
+                                AnswTime: qobj.answTime(),
+                                Score: qobj.score()
+                            }
+                            testData.Questions[qobj.number() - 1] = qi;
+                            questions_list[qobj.questionId()] = qi;
+                        }
+                        let qids = Object.keys(questions_list).map(item => {
+                            return parseInt(item);
+                        });
+                        let arr_q = splitArray(qids, MAX_QUESTIONS_REQ_LEN);
+                        for (let i = 0; i < arr_q.length; i++){
+                            let q = await this._getQuestionsByIds(arr_q[i], { dbOptions: dbOpts });
+                            for (let id in q) {
+                                let item = questions_list[id];
+                                if (item)
+                                    item.Question = q[id];
+                            }
+                        }
+                    }
+                    return testData;
+                })
+        }, memDbOptions);
+    }
+
+    async updateTestInstance(id, data, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+
+        let root_obj = null;
+        let testObj = null;
+        let inpFields = data || {};
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, TEST_INST_REQ_TREE, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let col = root_obj.getCol("DataElements");
+                    if (col.count() !== 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+
+                    testObj = col.get(0);
+                    await root_obj.edit();
+
+                    let fields = _.clone(inpFields);
+                    delete fields.Questions;
+                    this._setFieldValues(testObj, fields, { Id: true, UserId: true, Duration: true, MaxScore: true });
+
+                    if (Array.isArray(inpFields.Questions)) {
+                        let root_q = testObj.getDataRoot("InstanceQuestion");
+                        let col_q = root_q.getCol("DataElements");
+                        let q_list = {};
+                        for (let i = 0; i < col_q.count(); i++) {
+                            let obj = col_q.get(i);
+                            q_list[obj.number()] = obj;
+                        }
+                        for (let i = 0; i < inpFields.Questions.length; i++) {
+                            let fld = _.cloneDeep(inpFields.Questions[i]);
+                            fld.Number = i + 1;
+                            delete fld.Answers;
+                            let list_obj = q_list[i + 1];
+                            if (list_obj) {
+                                this._setFieldValues(list_obj, fld, { Id: true, QuestionId: true, Number: true });
+                                delete q_list[i + 1];
+                            }
+                        }
+                    }
+
+                    await root_obj.save(dbOpts);
+                    return { result: "OK", id: id };
+                })
+        }, memDbOptions);
+    }
+
+    async createTestInstance(user_id, test_id, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let params = opts.params || {};
+        
+        let root_obj = null;
+        let testObj = null;
+
+        let testData = await this.get(test_id, { dbOptions: dbOpts });
+        let testInstanse = {
+            Id: null,
+            UserId: user_id,
+            TestId: testData.Id,
+            StTime: null,
+            ActDuration: 0,
+            Duration: 0,
+            Score: 0,
+            MaxScore: 0,
+            IsFinished: false,
+            IsVisible: true,
+            Questions: []
+        };
+        for (let i = 0; i < testData.Questions.length; i++) {
+            testInstanse.Questions.push({
+                Answer: null,
+                AnswTime: null,
+                Score: null,
+                Question: testData.Questions[i]
+            });
+        }
+
+        if ((testData.Method === 2) && testData.FromLesson && testData.CourseId) {
+            let result = await $data.execSql({
+                dialect: {
+                    mysql: _.template(GET_QUESTION_IDS_MYSQL)({ course_id: testData.CourseId }),
+                    mssql: _.template(GET_QUESTION_IDS_MSSQL)({ course_id: testData.CourseId })
+                }
+            }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0)) {
+                let qids = [];
+                result.detail.forEach(elem => {
+                    qids.push(elem.Id);
+                })
+                let arr_q = splitArray(qids, MAX_QUESTIONS_REQ_LEN);
+                for (let i = 0; i < arr_q.length; i++) {
+                    let q = await this._getQuestionsByIds(arr_q[i], { dbOptions: dbOpts });
+                    for (let id in q) {
+                        testInstanse.Questions.push({
+                            Answer: null,
+                            AnswTime: null,
+                            Score: null,
+                            Question: q[id]
+                        });
+                    }
+                }
+            }
+        }
+
+        let maxQ = params.MaxQ ? params.MaxQ : testData.params.MaxQ;
+        if ((testData.Method === 2) && maxQ) {
+            let newq = [];
+            while ((newq.length < maxQ) && (testInstanse.Questions.length > 0)) {
+                let idx = Math.floor(Math.random() * testInstanse.Questions.length);
+                let elem = testInstanse.Questions.splice(idx, 1);
+                newq.push(elem[0]);
+            }
+            testInstanse.Questions = newq;
+        }
+
+        for (let i = 0; i < testInstanse.Questions.length; i++)
+            testInstanse.MaxScore += testInstanse.Questions[i].Score ? testInstanse.Questions[i].Score : 1;
+        
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(-1, TEST_INST_REQ_TREE, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let fields = _.clone(testInstanse);
+                    delete fields.Questions;
+                    delete fields.Id;
+
+                    await root_obj.edit();
+                    let newHandler = await root_obj.newObject({ fields: fields }, dbOpts);
+
+                    testInstanse.Id = newHandler.keyValue;
+                    testObj = this._db.getObj(newHandler.newObject);
+
+                    if (testInstanse.Questions.length > 0) {
+                        let root_q = testObj.getDataRoot("InstanceQuestion");
+                        for (let i = 0; i < testInstanse.Questions.length; i++) {
+                            let fld = _.cloneDeep(testInstanse.Questions[i]);
+                            fld.Number = i + 1;
+                            fld.QuestionId = fld.Question.Id;
+                            delete fld.Question;
+                            delete fld.Id;
+                            await root_q.newObject({ fields: fld }, dbOpts);
+                        }
+                    }
+
+                    await root_obj.save(dbOpts);
+                    return { result: "OK", test: testInstanse };
+                })
+        }, memDbOptions);
+    }
+
+    async delTestInstance(id, options) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let testObj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getObjById(id, {
+                    expr: {
+                        model: {
+                            name: "TestInstance"
+                        }
+                    }
+                }, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    let col = root_obj.getCol("DataElements");
+                    if (col.count() !== 1)
+                        throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test instance (Id = ${id}).`);
+
+                    testObj = col.get(0);
+                    await root_obj.edit();
+                    col._del(testObj);
+
+                    await root_obj.save(dbOpts);
+                    return { result: "OK", id: id };
                 })
         }, memDbOptions);
     }
@@ -330,6 +704,10 @@ const DbTest = class DbTest extends DbObject {
                             let answ = fld.Answers;
                             delete fld.Answers;
                             delete fld.Id;
+                            if (typeof (fld.Score) === "undefined")
+                                fld.Score = DFLT_QUESTION_SCORE;
+                            if (typeof (fld.AnswTime) === "undefined")
+                                fld.Score = DFLT_ANSW_TIME;
                             if (typeof (fld.PictureMeta) !== "undefined")
                                 fld.PictureMeta = typeof (fld.PictureMeta) === "string" ? fld.PictureMeta
                                     : JSON.stringify(fld.PictureMeta);
@@ -368,7 +746,13 @@ const DbTest = class DbTest extends DbObject {
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
-                resolve(this._getObjById(id, null, dbOpts));
+                resolve(this._getObjById(id, {
+                    expr: {
+                        model: {
+                            name: "Test"
+                        }
+                    }
+                }, dbOpts));
             })
                 .then(async (result) => {
                     root_obj = result;
