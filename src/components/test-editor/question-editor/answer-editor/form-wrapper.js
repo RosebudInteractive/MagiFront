@@ -17,7 +17,7 @@ import {CheckBox, TextBox} from "../../../common/input-controls";
 
 const EDITOR_NAME = "AnswerForm"
 
-class QuestionEditorForm extends React.Component {
+class AnswerEditorForm extends React.Component {
 
     static propTypes = {
         answer: PropTypes.object,
@@ -46,9 +46,9 @@ class QuestionEditorForm extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // if (this.props.promoId !== prevProps.promoId) {
-        //     this._init()
-        // }
+        if (this.props.answer !== prevProps.answer) {
+            this._init()
+        }
     }
 
     render() {
@@ -71,18 +71,15 @@ class QuestionEditorForm extends React.Component {
     }
 
     _save() {
-        let {editorValues, question} = this.props
+        let {editorValues, answer} = this.props
 
         if (this.props.onSave) {
-            this.props.onSave({...editorValues, Number: question.id, Id: question.Id})
+            this.props.onSave({...editorValues, Number: answer.Number, id: answer.id})
         }
     }
 
     _cancel() {
-        this.props.resetReduxForm('EDITOR_NAME')
-        if (this.props.onCancel) {
-            this.props.onCancel()
-        }
+        this.props.resetReduxForm(EDITOR_NAME)
     }
 
     _close() {
@@ -100,33 +97,17 @@ const validate = (values) => {
 
     const errors = {}
 
-    if (!values.text) {
-        errors.text = 'Значение не может быть пустым'
-    }
-
-    if (!values.answTime) {
-        errors.answTime = 'Значение не может быть пустым'
-    } else {
-        if (!$.isNumeric(values.answTime)) {
-            errors.answTime = 'Значение должно быть числовым'
-        }
-    }
-
-    if (!values.score) {
-        errors.score = 'Значение не может быть пустым'
-    } else {
-        if (!$.isNumeric(values.score)) {
-            errors.score = 'Значение должно быть числовым'
-        }
+    if (!values.Text) {
+        errors.Text = 'Значение не может быть пустым'
     }
 
     return errors
 }
 
-let QuestionEditorWrapper = reduxForm({
+let AnswerEditorWrapper = reduxForm({
     form: EDITOR_NAME,
     validate,
-})(QuestionEditorForm);
+})(AnswerEditorForm);
 
 function mapStateToProps(state) {
     return {
@@ -140,4 +121,4 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({resetReduxForm: reset,}, dispatch);
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(QuestionEditorWrapper)
+export default connect(mapStateToProps, mapDispatchToProps)(AnswerEditorWrapper)

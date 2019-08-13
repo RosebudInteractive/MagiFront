@@ -2,9 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import GridControl from "../../../gridControl";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {enableButtonsSelector} from "adm-ducks/app";
 import AnswerForm from "../answer-editor/editor";
+import {bindActionCreators} from "redux";
+import {touch} from "redux-form";
+
+const NEW_ANSWER = {
+    Text: null,
+    IsCorrect: false
+}
 
 class AnswerGrid extends React.Component {
 
@@ -16,9 +22,8 @@ class AnswerGrid extends React.Component {
         super(props)
 
         this._selected = null
-        this._question = null
-        this._internalId = -1
-        this._questionEditMode = false
+        this._answer = null
+        this._answerEditMode = false
         this.state = {
             showDialog: false,
             scrollable: false,
@@ -31,7 +36,16 @@ class AnswerGrid extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this._setObjectsRank(this.props.input.value)
+    }
+
     render() {
+        const {meta: {error, touched}} = this.props;
+
+        const _errorText = touched && error &&
+            <p className="form__error-message" style={{display: "block"}}>{error}</p>
+
         return <div className="question-answers">
             <AnswersGrid createAction={::this._create}
                          editAction={::this._edit}
@@ -47,14 +61,15 @@ class AnswerGrid extends React.Component {
                     <AnswerForm cancel={::this._cancel}
                                 save={::this._save}
                                 close={::this._close}
-                                data={this._question}
-                                scrollable={this.state.scrollableResources}
+                                data={this._answer}
+                                scrollable={this.state.scrollable}
                                 onPrevClick={!this._isFirstEdit() ? ::this._editPrev : null}
                                 onNextClick={!this._isLastEdit() ? ::this._editNext : null}
                     />
                     :
                     null
             }
+            {_errorText}
         </div>
 
     }
@@ -97,11 +112,8 @@ class AnswerGrid extends React.Component {
     }
 
     _create() {
-        this._question = Object.assign({}, NEW_QUESTION)
-        this._question.Id = this._internalId
-        this._question.id = this._question.Id
-        this._internalId--;
-        this._questionEditMode = false
+        this._answer = Object.assign({}, NEW_ANSWER)
+        this._answerEditMode = false
 
         this.setState({
             showDialog: true,
@@ -110,21 +122,32 @@ class AnswerGrid extends React.Component {
     }
 
     _edit(id) {
-        this._question = this.props.input.value.find((item) => {
-            return item.id === parseInt(id)
-        });
+        const _currentIndex = this.props.input.value.findIndex((item) => {
+            return item.id === +id
+        })
 
-        this.setState({showDialog: true})
+        if (_currentIndex >= 0) {
+            let _answer = this.props.input.value[_currentIndex];
+
+            this._answer = Object.assign({}, _answer);
+            this._answerEditMode = true
+            this.setState({
+                showDialog: true,
+                scrollable: true,
+                currentIndex: _currentIndex,
+            })
+        }
     }
 
     _save(value) {
-        if (this._questionEditMode) {
+        if (this._answerEditMode) {
             this._update(value)
         } else {
             this._insert(value)
         }
 
         this.setState({showDialog: false})
+        this.props.touch('QuestionEditor', 'Answers')
     }
 
     _insert(data) {
@@ -168,7 +191,7 @@ class AnswerGrid extends React.Component {
     _moveUp(id) {
         let _array = [...this.props.input.value],
             _index = _array.findIndex((item) => {
-                return item.Id === +id
+                return item.id === +id
             }),
             _current = _array[_index]
 
@@ -188,7 +211,7 @@ class AnswerGrid extends React.Component {
     _moveDown(id) {
         let _array = [...this.props.input.value],
             _index = _array.findIndex((item) => {
-                return item.Id === +id
+                return item.id === +id
             }),
             _current = _array[_index]
 
@@ -218,14 +241,14 @@ class AnswerGrid extends React.Component {
 class AnswersGrid extends GridControl {
 
     _getId() {
-        return 'test-questions';
+        return 'question-answers';
     }
 
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
             {id: 'Text', header: 'Текст ответа', fillspace: true},
-            {id: 'IsCorrect', header: 'Правильный', width: 110},
+            {id: 'IsCorrect', header: 'Правильный', width: 110, css: "center", template: "{common.checkbox()}"},
         ];
 
         _columns.push(...super._getColumns());
@@ -240,4 +263,8 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps,)(AnswerGrid);
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({touch}, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AnswerGrid);

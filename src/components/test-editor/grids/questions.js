@@ -64,11 +64,10 @@ class QuestionGrid extends React.Component {
             {
                 this.state.showDialog ?
                     <QuestionForm editMode={this.props.editMode}
-                                  cancel={::this._cancel}
                                   save={::this._save}
                                   close={::this._close}
                                   data={this._question}
-                                  scrollable={this.state.scrollableResources}
+                                  scrollable={this.state.scrollable}
                                   onPrevClick={!this._isFirstEdit() ? ::this._editPrev : null}
                                   onNextClick={!this._isLastEdit() ? ::this._editNext : null}
                     />
@@ -108,10 +107,6 @@ class QuestionGrid extends React.Component {
         }
     }
 
-    _cancel() {
-        this.setState({ showDialog: false })
-    }
-
     _close() {
         this.setState({ showDialog: false })
     }
@@ -130,11 +125,21 @@ class QuestionGrid extends React.Component {
     }
 
     _edit(id) {
-        this._question = this.props.input.value.find((item) => {
-            return item.id === parseInt(id)
-        });
+        const _currentIndex = this.props.input.value.findIndex((item) => {
+            return item.id === +id
+        })
 
-        this.setState({showDialog: true})
+        if (_currentIndex >= 0) {
+            let _question = this.props.input.value[_currentIndex];
+
+            this._question = Object.assign({}, _question);
+            this._questionEditMode = true
+            this.setState({
+                showDialog: true,
+                scrollable: true,
+                currentIndex: _currentIndex,
+            })
+        }
     }
 
     _save(value) {
@@ -144,6 +149,7 @@ class QuestionGrid extends React.Component {
             this._insert(value)
         }
 
+        this._setObjectsRank(this.props.input.value)
         this.setState({showDialog: false})
     }
 

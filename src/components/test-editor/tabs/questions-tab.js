@@ -3,7 +3,7 @@ import QuestionsGrid from '../grids/questions'
 import PropTypes from 'prop-types'
 import {Field} from "redux-form";
 
-export default class ReferencesTab extends React.Component{
+export default class QuestionsTab extends React.Component{
 
     static propTypes = {
         editMode : PropTypes.bool,

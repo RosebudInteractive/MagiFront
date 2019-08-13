@@ -30,15 +30,15 @@ class AnswersTab extends React.Component {
         super(props)
 
         this._resizeHandler = () => {
-            let _products = window.$$('question-answers'),
-                _width = $('.modal-editor').width() - 2
+            let _answers = window.$$('question-answers'),
+                _width = $('.modal-editor__wrapper').width() - 2
 
             let _actionBarHeight = $('.promo-products .action-bar').height()
 
             let _height = $('.editor__main-area').height() - _actionBarHeight - 14
 
-            if (_products) {
-                _products.$setSize(_width, _height);
+            if (_answers) {
+                _answers.$setSize(_width, _height);
             }
         }
     }
@@ -77,6 +77,9 @@ class AnswersTab extends React.Component {
                 return <Field component={RadioBox} name="AnswBool" label="Правильный ответ" options={RADIO_BOX_VALUES}/>
 
             case 3:
+                return <Field component={AnswerGrid} name="Answers" label="Варианты ответа" editMode={this.props.editMode}/>
+
+            case 4:
                 return <Field component={AnswerGrid} name="Answers" label="Варианты ответа" editMode={this.props.editMode}/>
 
             case 5:

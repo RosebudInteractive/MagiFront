@@ -25,7 +25,6 @@ export default class QuestionEditor extends React.Component {
                     <button type="button" className="modal-editor__close" onClick={::this._close}>Закрыть</button>
                     <EditorWrapper question={this.props.data}
                                    editMode={this.props.editMode}
-                                   onCancel={this.props.cancel}
                                    onSave={this.props.save}
                                    onClose={this.props.close}/>
                 </div>

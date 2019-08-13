@@ -21,12 +21,10 @@ export default class MainTab extends React.Component {
         return <div className={"tab-wrapper controls-wrapper main-tab" + (this.props.visible ? '' : ' hidden')}>
             <Field component={TextArea} name="Text" label="Текст вопроса" enableHtml={false}/>
             <Field component={TextBox} name="AnswTime" label="Время на вопрос" placeholder="Введите время, отводимое на ответ"/>
-
             <Field component={TextBox} name="Score" label="Количество баллов за правильный ответ"/>
             <Field component={TextBox} name="StTime" label="Начало времени эпизода, где можно послушать об этом"/>
             <Field component={TextBox} name="EndTime" label="Конец времени эпизода, где можно послушать об этом"/>
             <Field component={RadioBox} name="AllowedInCourse" label="Отображать в сводном тесте" options={RADIO_BOX_VALUES}/>
-            <Field component={TextBox} name="AnswText" label="Правильный ответ"/>
             <Field component={TextBox} name="CorrectAnswResp" label="Текст в случае правильного ответа"/>
             <Field component={TextBox} name="WrongAnswResp" label="Текст в случае ошибочного ответа"/>
         </div>

@@ -14,6 +14,7 @@ import BottomControls from "../../bottom-contols/buttons";
 import PropTypes from "prop-types";
 import MainTab from "./tabs/main-tab";
 import AnswersTab from "./tabs/answers-tab";
+import {TextBox} from "../../common/input-controls";
 
 const EDITOR_NAME = "QuestionEditor",
     TABS = {
@@ -26,7 +27,6 @@ class QuestionEditorForm extends React.Component {
     static propTypes = {
         question: PropTypes.object,
         onSave: PropTypes.func,
-        onCancel: PropTypes.func,
         onClose: PropTypes.func,
     };
 
@@ -64,12 +64,6 @@ class QuestionEditorForm extends React.Component {
                 Answers: question.Answers,
             });
         }
-    }
-
-    componentDidUpdate(prevProps) {
-        // if (this.props.promoId !== prevProps.promoId) {
-        //     this._init()
-        // }
     }
 
     render() {
@@ -117,15 +111,12 @@ class QuestionEditorForm extends React.Component {
         let {editorValues, question} = this.props
 
         if (this.props.onSave) {
-            this.props.onSave({...editorValues, id: question.id, Id: question.Id})
+            this.props.onSave({...editorValues, id: question.id, Id: question.Id, Number: question.Number})
         }
     }
 
     _cancel() {
-        this.props.resetReduxForm('EDITOR_NAME')
-        if (this.props.onCancel) {
-            this.props.onCancel()
-        }
+        this.props.resetReduxForm(EDITOR_NAME)
     }
 
     _close() {
@@ -143,27 +134,59 @@ const validate = (values) => {
 
     const errors = {}
 
-    if (!values.text) {
-        errors.text = 'Значение не может быть пустым'
+    if (!values.Text) {
+        errors.Text = 'Значение не может быть пустым'
     }
 
-    if (!values.answTime) {
-        errors.answTime = 'Значение не может быть пустым'
+    if (!values.AnswTime) {
+        errors.AnswTime = 'Значение не может быть пустым'
     } else {
-        if (!$.isNumeric(values.answTime)) {
-            errors.answTime = 'Значение должно быть числовым'
+        if (!$.isNumeric(values.AnswTime)) {
+            errors.AnswTime = 'Значение должно быть числовым'
         }
     }
 
-    if (!values.score) {
-        errors.score = 'Значение не может быть пустым'
+    if (!values.Score) {
+        errors.Score = 'Значение не может быть пустым'
     } else {
-        if (!$.isNumeric(values.score)) {
-            errors.score = 'Значение должно быть числовым'
+        if (!$.isNumeric(values.Score)) {
+            errors.Score = 'Значение должно быть числовым'
         }
+    }
+
+    if (values.AnswInt && !$.isNumeric(values.AnswTime)) {
+        errors.AnswInt = 'Значение должно быть числовым'
+    }
+
+    if ((values.AnswType === 3) || (values.AnswType === 4)) {
+        if (!_hasCorrectAnswer(values.Answers)) {
+            errors.Answers = 'Необходимо указать правильный ответ'
+        }
+    }
+
+    if ((values.AnswType === 3) && _hasMultipeCorrectAnswers(values.Answers)) {
+        errors.Answers = 'Необходимо указать только один правильный ответ'
     }
 
     return errors
+}
+
+function _hasCorrectAnswer(answers) {
+    return answers.some((item) => {
+        return item.IsCorrect
+    })
+}
+
+function _hasMultipeCorrectAnswers(answers) {
+    let _count = 0
+
+    answers.forEach((item) => {
+        if (item.IsCorrect) {
+            _count++
+        }
+    })
+
+    return _count > 1
 }
 
 let QuestionEditorWrapper = reduxForm({

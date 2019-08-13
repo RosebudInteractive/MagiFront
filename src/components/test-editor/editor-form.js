@@ -148,39 +148,38 @@ class TestEditorForm extends React.Component {
             MaxQ: +editorValues.maxQ,
             FromLesson: !!+editorValues.fromLesson,
             IsTimeLimited: !!+editorValues.isTimeLimited,
+            Questions: [],
         };
 
-        // this._fillToc(_obj.Toc);
-        // this._fillContent(_obj.Content);
+        this._fillQuestions(_obj.Questions);
+
         if (this.props.editMode) {
             this.props.updateTest(_obj);
         } else {
             this.props.insertTest(_obj);
         }
-
-
     }
 
-    _fillToc(array) {
-        this.props.editorValues.toc.map((item) => {
+    _fillQuestions(array) {
+        this.props.editorValues.questions.map((question) => {
             array.push({
-                Id: item.Id,
-                Number: item.Number,
-                StartTime: item.StartTime,
-                Topic: item.Topic,
-            })
-        });
-    }
-
-    _fillContent(array) {
-        this.props.editorValues.content.map((item) => {
-            array.push({
-                Id: item.Id,
-                Content: item.Content,
-                StartTime: item.StartTime,
-                Duration: item.Duration,
-                Topic: item.Topic,
-                ResourceId: item.ResourceId,
+                AnswTime: question.AnswTime,
+                Text: question.Text,
+                Picture: question.Picture,
+                PictureMeta: question.PictureMeta,
+                AnswType: question.AnswType,
+                Score: question.Score,
+                StTime: question.StTime,
+                EndTime: question.EndTime,
+                AllowedInCourse: question.AllowedInCourse,
+                AnswBool: question.AnswBool,
+                AnswInt: question.AnswInt,
+                AnswText: question.AnswText,
+                CorrectAnswResp: question.CorrectAnswResp,
+                WrongAnswResp: question.WrongAnswResp,
+                Answers: question.Answers.map((answer) => {
+                    return {Text: answer.Text, IsCorrect: answer.IsCorrect}
+                }),
             })
         });
     }
