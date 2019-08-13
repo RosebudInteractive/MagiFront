@@ -41,6 +41,8 @@ import booksReducer, {moduleName as booksModule} from '../ducks/books'
 import promosReducer, {moduleName as promosModule} from '../ducks/promo-codes'
 import productsReducer, {moduleName as productsModule} from '../ducks/products'
 import messagesReducer, {moduleName as messagesModule} from '../ducks/messages'
+import testListReducer, {moduleName as testListModule} from '../ducks/test-list'
+import singleTestReducer, {moduleName as singleTestModule} from '../ducks/single-test'
 import { reducer as formReducer } from 'redux-form'
 
 export default combineReducers({
@@ -80,6 +82,8 @@ export default combineReducers({
     [promosModule]: promosReducer,
     [productsModule]: productsReducer,
     [messagesModule]: messagesReducer,
+    [testListModule]: testListReducer,
+    [singleTestModule]: singleTestReducer,
     routing: routerReducer,
     form: formReducer,
 })

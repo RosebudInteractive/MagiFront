@@ -10,9 +10,8 @@ import {
 } from 'redux-form'
 import MainTab from './tabs/main-tab'
 import '../common/form.sass'
-import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
-import {booksSelector, bookIdSelector, editModeSelector, closeEditor, insertBook, updateBook} from "adm-ducks/books"
+import {booksSelector, bookIdSelector, editModeSelector, closeEditor, insertBook, updateBook, raiseNotExistBookError} from "adm-ducks/books"
 import AuthorsTab from "./tabs/authors-tab";
 import {checkBookExtLinks, getExtLinks} from "../../tools/link-tools";
 import {showErrorDialog} from "../../actions/app-actions";
@@ -72,6 +71,8 @@ class BookEditorForm extends React.Component {
             });
 
             this._order = _book.Order;
+        } else {
+            this.props.raiseNotExistBookError()
         }
     }
 
@@ -85,8 +86,6 @@ class BookEditorForm extends React.Component {
         const {hasChanges} = this.props;
 
         return <div className="editor course_editor">
-            {/*<Prompt when={hasChanges}*/}
-            {/*        message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>*/}
             <div className='editor__head'>
                 <div className="tabs tabs-1" key='tab1'>
                     <div className="tab-links">
@@ -196,7 +195,7 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog}, dispatch);
+    return bindActionCreators({closeEditor, insertBook, updateBook, resetReduxForm: reset, showErrorDialog, raiseNotExistBookError}, dispatch);
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(BookEditorWrapper)

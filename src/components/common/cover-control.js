@@ -14,6 +14,9 @@ class CoverControl extends React.Component {
         super(props)
 
         this._metaObj = null
+        this.state = {
+            imageLoaded: false
+        }
     }
 
     componentWillMount() {
@@ -22,10 +25,13 @@ class CoverControl extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if (!Object.is(this.props.input.value, nextProps.input.value)) {
+            this.setState({
+                imageLoaded: false
+            })
+
             this._metaObj = nextProps.input.value.meta ? JSON.parse(nextProps.input.value.meta) : null
         }
     }
-
 
     render() {
         const {input, id, label, hidden, disabled} = this.props;
@@ -40,7 +46,7 @@ class CoverControl extends React.Component {
                 <div className="cover-wrapper">
                     {
                         _cover ?
-                            <img className="cover" style={_imageStyle} src={_cover} alt={_cover}/>
+                            <img className={"cover" + (this.state.imageLoaded ? " _visible" : "")} style={_imageStyle} src={_cover} alt={_cover} onLoad={::this._imageLoadHandler}/>
                             :
                             <div className="cover" style={_imageStyle}/>
                     }
@@ -55,6 +61,12 @@ class CoverControl extends React.Component {
                 </div>
             </div>
         </div>
+    }
+
+    _imageLoadHandler() {
+        this.setState({
+            imageLoaded: true
+        })
     }
 
     _getSize() {

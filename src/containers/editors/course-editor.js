@@ -13,7 +13,7 @@ import SocialNetworkTab from "../../components/course-editor/tabs/social-network
 import SubscriptionTab from '../../components/course-editor/tabs/subscription-tab'
 import AuthorsTab from '../../components/course-editor/tabs/authors-and-categories'
 import LessonsTab from '../../components/course-editor/tabs/lessons'
-
+import TestsTab from '../../components/course-editor/tabs/tests-tabs'
 
 import * as singleCourseActions from "../../actions/course/courseActions";
 import {showErrorDialog} from '../../actions/app-actions';
@@ -23,6 +23,7 @@ import {getLanguages} from "../../actions/languages-actions";
 import {checkExtLinks, convertYouTubeWatchLinkToEmbed, getExtLinks} from "../../tools/link-tools";
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
 import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
+import {getTests, loadingSelector as testLoading} from "adm-ducks/test-list";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
@@ -34,7 +35,8 @@ const TABS = {
     SOCIAL_NETWORKS: 'SOCIAL_NETWORKS',
     SUBSCRIPTION: 'SUBSCRIPTION',
     AUTHORS: 'AUTHORS',
-    LESSONS: 'LESSONS'
+    LESSONS: 'LESSONS',
+    TESTS: 'TESTS',
 }
 
 const IMAGE_TYPE = {
@@ -58,6 +60,11 @@ class CourseEditor extends React.Component {
         this.props.getCategories();
         this.props.getLanguages();
         this.props.getParameters()
+
+        if (this.state.editMode) {
+            this.props.getTests(this.props.courseId)
+        }
+
 
         if (this.state.editMode) {
             this.props.courseActions.get(this.props.courseId)
@@ -93,61 +100,86 @@ class CourseEditor extends React.Component {
     }
 
     render() {
-        const {fetching, hasChanges, courseId, savingCourse} = this.props;
+        const {fetching, hasChanges, courseId, savingCourse, match} = this.props;
 
-        return (
-            fetching ?
-                <LoadingPage/>
-                :
-                <div className="editor course_editor">
-                    <SavingBlock visible={savingCourse}/>
-                    <Prompt when={hasChanges}
-                            message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
-                    <div className='editor__head'>
-                        <div className="tabs tabs-1" key='tab1'>
-                            <div className="tab-links">
-                                <div
-                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
-                                    onClick={() => { this._switchTo(TABS.MAIN) }}>Основные
-                                </div>
-                                <div
-                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL_NETWORKS ? ' tab-link-active' : '')}
-                                    onClick={() => {this._switchTo(TABS.SOCIAL_NETWORKS)}}>Социальные сети
-                                </div>
-                                <div
-                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SUBSCRIPTION ? ' tab-link-active' : '')}
-                                    onClick={() => { this._switchTo(TABS.SUBSCRIPTION) }}>Подписка
-                                </div>
-                                <div
-                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.AUTHORS ? ' tab-link-active' : '')}
-                                    onClick={() => { this._switchTo(TABS.AUTHORS) }}>Авторы и категории
-                                </div>
-                                <div
-                                    className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LESSONS ? ' tab-link-active' : '')}
-                                    onClick={() => { this._switchTo(TABS.LESSONS) }}>Лекции
+        return <React.Fragment>
+            {
+                fetching ?
+                    <LoadingPage/>
+                    :
+                    <div className="editor course_editor">
+                        <SavingBlock visible={savingCourse}/>
+                        <Prompt when={hasChanges}
+                                message={'Есть несохраненные данные.\n Перейти без сохранения?'}/>
+                        <div className='editor__head'>
+                            <div className="tabs tabs-1" key='tab1'>
+                                <div className="tab-links">
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.MAIN ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.MAIN)
+                                        }}>Основные
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL_NETWORKS ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.SOCIAL_NETWORKS)
+                                        }}>Социальные сети
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SUBSCRIPTION ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.SUBSCRIPTION)
+                                        }}>Подписка
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.AUTHORS ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.AUTHORS)
+                                        }}>Авторы и категории
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LESSONS ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.LESSONS)
+                                        }}>Лекции
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.TESTS ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.TESTS)
+                                        }}>Тесты
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="editor__main-area">
-                        <div className="main-area__container">
-                            <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN} editMode={this.state.editMode}/>
-                            <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS} editMode={this.props.editMode}/>
-                            <SubscriptionTab editMode={this.state.editMode} visible={this.state.currentTab === TABS.SUBSCRIPTION}/>
-                            <AuthorsTab editMode={this.state.editMode} visible={this.state.currentTab === TABS.AUTHORS}/>
-                            <LessonsTab editMode={this.state.editMode} courseId={courseId} visible={this.state.currentTab === TABS.LESSONS}/>
-                        </div>
+                        <div className="editor__main-area">
+                            <div className="main-area__container">
+                                <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN}
+                                                   editMode={this.state.editMode}/>
+                                <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS}
+                                                  editMode={this.props.editMode}/>
+                                <SubscriptionTab editMode={this.state.editMode}
+                                                 visible={this.state.currentTab === TABS.SUBSCRIPTION}/>
+                                <AuthorsTab editMode={this.state.editMode}
+                                            visible={this.state.currentTab === TABS.AUTHORS}/>
+                                <LessonsTab editMode={this.state.editMode} courseId={courseId}
+                                            visible={this.state.currentTab === TABS.LESSONS}/>
+                                <TestsTab editMode={this.state.editMode} courseId={courseId}
+                                          visible={this.state.currentTab === TABS.TESTS}/>
+                            </div>
 
-                        <ErrorDialog/>
-                        <CourseAuthorDialog/>
-                        <CourseCategoryDialog/>
+                            <ErrorDialog/>
+                            <CourseAuthorDialog/>
+                            <CourseCategoryDialog/>
+                        </div>
+                        <div className="editor__footer">
+                            <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
+                                            onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
+                        </div>
                     </div>
-                    <div className="editor__footer">
-                        <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
-                                        onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
-                    </div>
-                </div>
-        )
+            }
+        </React.Fragment>
     }
 
     _switchTo(tabName) {
@@ -322,7 +354,8 @@ function mapStateToProps(state, ownProps) {
             state.categoriesList.fetching ||
             state.languages.fetching ||
             state.singleCourse.fetching ||
-            parametersFetchingSelector(state),
+            parametersFetchingSelector(state) ||
+            testLoading(state),
 
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
@@ -344,6 +377,7 @@ function mapDispatchToProps(dispatch) {
         setFixedCourse: bindActionCreators(setFixedCourse, dispatch),
         resetReduxForm: bindActionCreators(reset, dispatch),
         setActiveTab: bindActionCreators(setActiveTab, dispatch),
+        getTests: bindActionCreators(getTests, dispatch),
     }
 }
 

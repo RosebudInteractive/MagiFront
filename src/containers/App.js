@@ -11,6 +11,7 @@ import Categories from './Categories';
 import CategoriesForm from './categoryEditor';
 import Courses from './lists/courses';
 import CourseEditor from './editors/course-editor';
+import TestsEditor from './editors/test-editor'
 import LessonEditor from './editors/lesson-editor';
 import SubLessonEditor from './editors/sublesson-editor';
 import EpisodeEditor from './editors/episode-editor';
@@ -104,6 +105,10 @@ class App extends Component {
                                    component={LessonEditor}/>
                             <Route path={_homePath + '/courses/edit/:courseId/lessons/new'}
                                    component={LessonEditor}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/tests/edit/:testId'}
+                                   component={TestsEditor}/>
+                            <Route path={_homePath + '/courses/edit/:courseId/tests/new'}
+                                   component={TestsEditor}/>
                             <Route path={_homePath + '/courses/edit/:id'} component={CourseEditor}/>
                             <Route path={_homePath + '/courses'} component={Courses}/>
                             <Route path={_homePath + '/books/new'} render={(props) => <BooksPage {...props} showEditor={true} editMode={false}/>}/>

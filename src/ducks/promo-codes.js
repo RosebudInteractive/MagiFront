@@ -4,9 +4,10 @@ import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
 import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
-import {reset,} from 'redux-form'
+import {isDirty, reset,} from 'redux-form'
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
-import {all, takeEvery, put, call} from 'redux-saga/effects'
+import {all, takeEvery, put, call, select} from 'redux-saga/effects'
+import {confirmCloseEditorSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -26,6 +27,7 @@ export const EDIT_CURRENT_PROMO_REQUEST = `${prefix}/EDIT_CURRENT_PROMO_REQUEST`
 export const EDIT_CURRENT_PROMO_START = `${prefix}/EDIT_CURRENT_PROMO_START`
 
 export const SHOW_EDITOR = `${prefix}/SHOW_EDITOR`
+export const CLOSE_EDITOR_REQUEST = `${prefix}/CLOSE_EDITOR_REQUEST`
 export const CLOSE_EDITOR = `${prefix}/CLOSE_EDITOR`
 
 export const INSERT_PROMO_REQUEST = `${prefix}/INSERT_PROMO_REQUEST`
@@ -42,6 +44,10 @@ export const DELETE_PROMO_REQUEST = `${prefix}/DELETE_PROMO_REQUEST`
 export const DELETE_PROMO_START = `${prefix}/DELETE_PROMO_START`
 export const DELETE_PROMO_SUCCESS = `${prefix}/DELETE_PROMO_SUCCESS`
 export const DELETE_PROMO_FAIL = `${prefix}/DELETE_PROMO_FAIL`
+
+export const RAISE_ERROR_REQUEST = `${prefix}/RAISE_ERROR_REQUEST`
+
+const NOT_EXIST_PROMO_ERROR = "Запрошенного промокода не существует"
 
 /**
  * Reducer
@@ -154,7 +160,7 @@ export const editCurrentPromo = (id) => {
 }
 
 export const closeEditor = () => {
-    return {type: CLOSE_EDITOR}
+    return {type: CLOSE_EDITOR_REQUEST}
 }
 
 export const insertPromo = (data) => {
@@ -167,6 +173,10 @@ export const updatePromo = (data) => {
 
 export const deletePromo = (data) => {
     return {type: DELETE_PROMO_REQUEST, payload: data}
+}
+
+export const raiseNotExistPromoError = () => {
+    return {type: RAISE_ERROR_REQUEST}
 }
 
 
@@ -207,15 +217,52 @@ function* createPromoCodeSaga(){
     yield put({type: SHOW_EDITOR})
 }
 
-function* editPromoSaga(data) {
-    yield put(replace('/adm/promos/edit/' + data.payload))
+function* editPromoRequestSaga(action) {
+    const _editorOpened = yield select(showEditorSelector)
 
-    yield put({type: EDIT_CURRENT_PROMO_START, payload: data.payload})
+    if (_editorOpened) {
+        const _hasChanges = yield select(isDirty('PromoEditor'))
+
+        console.log(_hasChanges)
+
+        if (_hasChanges) {
+            const _confirmed = yield call(confirmCloseEditorSaga);
+
+            if (_confirmed) {
+                yield call(editPromoSaga, action.payload)
+            }
+        } else {
+            yield call(editPromoSaga, action.payload)
+        }
+    } else {
+        yield call(editPromoSaga, action.payload)
+    }
+}
+
+function* editPromoSaga(id) {
+    yield put(replace('/adm/promos/edit/' + id))
+
+    yield put({type: EDIT_CURRENT_PROMO_START, payload: id})
     yield put({type: SHOW_EDITOR})
+}
+
+function* closeEditorWithCheckSaga() {
+    const _hasChanges = yield select(isDirty('PromoEditor'))
+
+    if (_hasChanges) {
+        const _confirmed = yield call(confirmCloseEditorSaga);
+
+        if (_confirmed) {
+            yield call(closeEditorSaga)
+        }
+    } else {
+        yield call(closeEditorSaga)
+    }
 }
 
 function* closeEditorSaga() {
     yield put(replace('/adm/promos'))
+    yield put({type: CLOSE_EDITOR})
 }
 
 function* insertPromoSaga(action) {
@@ -314,7 +361,7 @@ function* updatePromoSaga(action) {
 
         yield put(reset('PromoEditor'))
         yield put({type: GET_PROMO_CODES_REQUEST})
-        yield put({type: CLOSE_EDITOR})
+        yield put({type: CLOSE_EDITOR_REQUEST})
     } catch (error) {
         yield put({ type: UPDATE_PROMO_FAIL })
 
@@ -338,18 +385,21 @@ const _putPromo = (data) => {
         .then(parseJSON)
 }
 
-
+function* raiseNotExistBookErrorSaga() {
+    yield call(closeEditorSaga)
+    yield put({type: SHOW_ERROR_DIALOG, payload: NOT_EXIST_PROMO_ERROR})
+}
 
 export const saga = function* () {
     yield all([
         takeEvery(GET_PROMO_CODES_REQUEST, getPromoCodesSaga),
         takeEvery(CREATE_NEW_PROMO_REQUEST, createPromoCodeSaga),
-        takeEvery(EDIT_CURRENT_PROMO_REQUEST, editPromoSaga),
-        takeEvery(CLOSE_EDITOR, closeEditorSaga),
+        takeEvery(EDIT_CURRENT_PROMO_REQUEST, editPromoRequestSaga),
+        takeEvery(CLOSE_EDITOR_REQUEST, closeEditorWithCheckSaga),
         takeEvery(INSERT_PROMO_REQUEST, insertPromoSaga),
         takeEvery(UPDATE_PROMO_REQUEST, updatePromoSaga),
-        takeEvery(CLOSE_EDITOR, closeEditorSaga),
         takeEvery(DELETE_PROMO_REQUEST, deletePromoSaga),
+        takeEvery(RAISE_ERROR_REQUEST, raiseNotExistBookErrorSaga),
     ])
 }
 

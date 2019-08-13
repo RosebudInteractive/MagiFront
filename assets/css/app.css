@@ -577,7 +577,7 @@ html,
     position: absolute;
     left: 50%;
     transform: translate(-50%, -50%);
-    /*background: #fff;*/
+    background: #fff;
     top: 50%;
     width: auto;
 }

@@ -80,7 +80,14 @@ class PromosPage extends React.Component {
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
-            this._selected = (nextProps.promos.length > 0) ? nextProps.promos[0].id : null;
+            this._selected = (nextProps.promos.length > 0) ?
+                nextProps.promoId ?
+                    nextProps.promoId
+                    :
+                    nextProps.promos[0].id
+                :
+                null;
+
             this._isFirstSelected = !!this._selected
         }
     }
@@ -123,14 +130,39 @@ class PromosPage extends React.Component {
                         <YesNoDialog
                             yesAction={::this._deletePromo}
                             noAction={::this._cancelDelete}
-                            message={"Удалить промокод" + this._getSelectedBooksName() + "?"}
+                            message={"Удалить промокод" + this._getSelectedPromoName() + "?"}
                         />
                         :
                         null
                 }
                 { !showPromoEditor ? <ErrorDialog/> : null }
-                <PromoEditor/>
+                <PromoEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}
+                             onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
             </div>
+    }
+
+    _onEditPrev() {
+        const _index = this.props.promos.findIndex((item) => {
+            return item.id === this.props.promoId
+        })
+
+        if (_index > 0) {
+            window.$$("promos-grid").select(this.props.promos[_index - 1].id)
+        }
+
+        this._onEditBtnClick()
+    }
+
+    _onEditNext() {
+        const _index = this.props.promos.findIndex((item) => {
+            return item.id === this.props.promoId
+        })
+
+        if (_index < this.props.promos.length - 1) {
+            window.$$("promos-grid").select(this.props.promos[_index + 1].id)
+        }
+
+        this._onEditBtnClick()
     }
 
     _getData() {
@@ -143,7 +175,7 @@ class PromosPage extends React.Component {
         })
     }
 
-    _getSelectedBooksName() {
+    _getSelectedPromoName() {
         let _promo = null;
 
         if (this._selected) {

@@ -6,7 +6,7 @@ import 'whatwg-fetch';
 import {checkStatus, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {reset, isDirty} from 'redux-form'
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
-import {all, takeEvery, select, take, put, apply, call} from 'redux-saga/effects'
+import {all, takeEvery, select, put, call} from 'redux-saga/effects'
 import {convertLinksToString} from "../tools/link-tools";
 import {confirmCloseEditorSaga} from "adm-ducks/messages";
 
@@ -38,6 +38,11 @@ export const SAVE_CHANGES = `${prefix}/SAVE_CHANGES`
 export const MOVE_UP = `${prefix}/MOVE_UP`
 export const MOVE_DOWN = `${prefix}/MOVE_DOWN`
 export const CHANGE_ORDER = `${prefix}/CHANGE_ORDER`
+
+export const RAISE_ERROR_REQUEST = `${prefix}/RAISE_ERROR_REQUEST`
+// export const RAISE_ERROR = `${prefix}/RAISE_ERROR`
+
+const NOT_EXIST_BOOK_ERROR = "Запрошенной книги не существует"
 
 /**
  * Reducer
@@ -222,6 +227,10 @@ export const saveChanges = () => {
     return {type: SAVE_CHANGES}
 }
 
+export const raiseNotExistBookError = () => {
+    return {type: RAISE_ERROR_REQUEST}
+}
+
 
 /**
  * Sagas
@@ -263,8 +272,6 @@ function* editBookRequestSaga(action) {
 
     if (_editorOpened) {
         const _hasChanges = yield select(isDirty('BookEditor'))
-
-        console.log(_hasChanges)
 
         if (_hasChanges) {
             const _confirmed = yield call(confirmCloseEditorSaga);
@@ -422,6 +429,11 @@ export function* saveChangesSaga() {
     }
 }
 
+function* raiseNotExistBookErrorSaga() {
+    yield call(closeEditorSaga)
+    yield put({type: SHOW_ERROR_DIALOG, payload: NOT_EXIST_BOOK_ERROR})
+}
+
 export const saga = function* () {
     yield all([
         takeEvery(GET_BOOKS_REQUEST, getBooksSaga),
@@ -434,6 +446,7 @@ export const saga = function* () {
         takeEvery(MOVE_UP, moveUpSaga),
         takeEvery(MOVE_DOWN, moveDownSaga),
         takeEvery(SAVE_CHANGES, saveChangesSaga),
+        takeEvery(RAISE_ERROR_REQUEST, raiseNotExistBookErrorSaga),
     ])
 }
 

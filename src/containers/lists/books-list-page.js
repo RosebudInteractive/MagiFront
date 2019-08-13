@@ -48,7 +48,6 @@ class BooksPage extends React.Component {
             } else {
                 this.props.actions.createBook();
             }
-
         }
 
         this.props.actions.getBooks();
@@ -94,7 +93,15 @@ class BooksPage extends React.Component {
     componentWillReceiveProps(nextProps,) {
         if (!this.props.loaded && nextProps.loaded) {
 
-            this._selected = (nextProps.books.length > 0) ? nextProps.books[0].id : null;
+            this._selected = (nextProps.books.length > 0) ?
+                nextProps.bookId ?
+                    nextProps.bookId
+                    :
+                    nextProps.books[0].id
+                :
+                null;
+
+
             this._isFirstSelected = !!this._selected
         }
     }
@@ -138,7 +145,7 @@ class BooksPage extends React.Component {
                     </div>
                 </div>
                 {
-                    (deleteDlgShown && !showBookEditor)?
+                    (deleteDlgShown && !showBookEditor) ?
                         <YesNoDialog
                             yesAction={::this._deleteBook}
                             noAction={::this._cancelDelete}
@@ -147,8 +154,9 @@ class BooksPage extends React.Component {
                         :
                         null
                 }
-                { !showBookEditor ? <ErrorDialog/> : null }
-                <BookEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev} onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
+                {!showBookEditor ? <ErrorDialog/> : null}
+                <BookEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}
+                            onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
             </div>
     }
 
