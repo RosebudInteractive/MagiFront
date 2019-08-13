@@ -1,3 +1,4 @@
+const { HttpCode } = require("../const/http-codes");
 let { TestService } = require("../database/db-test");
 
 function setupTests(app) {
@@ -5,6 +6,66 @@ function setupTests(app) {
     if (!global.$Services)
         global.$Services = {};
     global.$Services.tests = TestService;
+
+    app.get('/api/tests/instance/:id', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            TestService()
+                .getTestInstance(parseInt(req.params.id), { dbOptions: { userId: req.user.Id } })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.post('/api/tests/instance', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else {
+            let test_id = req.body && req.body.TestId ? req.body.TestId : null;
+            if (!test_id)
+                res.status(HttpCode.ERR_BAD_REQ).json({ message: 'Invalid or missing "test_id" arg.' })
+            TestService()
+                .createTestInstance(req.user.Id, test_id, { params: req.body, dbOptions: { userId: req.user.Id } })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+        }
+    });
+
+    app.put('/api/tests/instance/:id', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            TestService()
+                .updateTestInstance(parseInt(req.params.id), req.body, { dbOptions: { userId: req.user.Id } })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
+
+    app.delete('/api/tests/instance/:id', (req, res, next) => {
+        if (!req.user)
+            res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })
+        else
+            TestService()
+                .delTestInstance(parseInt(req.params.id), { dbOptions: { userId: req.user.Id } })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+    });
 
     app.get('/api/adm/tests/list', (req, res, next) => {
         TestService()
