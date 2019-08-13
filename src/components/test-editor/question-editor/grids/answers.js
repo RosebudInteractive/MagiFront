@@ -1,30 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
-import GridControl from "../../gridControl";
+import GridControl from "../../../gridControl";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {enableButtonsSelector} from "adm-ducks/app";
-import QuestionForm from "../question-editor/editor";
+import AnswerForm from "../answer-editor/editor";
 
-const NEW_QUESTION = {
-    AnswTime: 10,
-    Text: null,
-    Picture: null,
-    PictureMeta: null,
-    AnswType: 1,
-    Score: 1,
-    StTime: null,
-    EndTime: null,
-    AllowedInCourse: null,
-    AnswBool: null,
-    AnswInt: null,
-    AnswText: null,
-    CorrectAnswResp: null,
-    WrongAnswResp: null,
-    Answers: [],
-}
-
-class QuestionGrid extends React.Component {
+class AnswerGrid extends React.Component {
 
     static propTypes = {
         editMode: PropTypes.bool,
@@ -50,27 +32,25 @@ class QuestionGrid extends React.Component {
     }
 
     render() {
-
-        return <div className="test-questions">
-            <TestQuestions createAction={::this._create}
-                           editAction={::this._edit}
-                           removeAction={::this._remove}
-                           moveUpAction={::this._moveUp}
-                           moveDownAction={::this._moveDown}
-                           editMode={this.props.editMode}
-                           selected={this._selected}
-                           data={this.props.input.value}
-                           disabled={!this.props.enableButtons}/>
+        return <div className="question-answers">
+            <AnswersGrid createAction={::this._create}
+                         editAction={::this._edit}
+                         removeAction={::this._remove}
+                         moveUpAction={::this._moveUp}
+                         moveDownAction={::this._moveDown}
+                         editMode={this.props.editMode}
+                         selected={this._selected}
+                         data={this.props.input.value}
+                         disabled={!this.props.enableButtons}/>
             {
                 this.state.showDialog ?
-                    <QuestionForm editMode={this.props.editMode}
-                                  cancel={::this._cancel}
-                                  save={::this._save}
-                                  close={::this._close}
-                                  data={this._question}
-                                  scrollable={this.state.scrollableResources}
-                                  onPrevClick={!this._isFirstEdit() ? ::this._editPrev : null}
-                                  onNextClick={!this._isLastEdit() ? ::this._editNext : null}
+                    <AnswerForm cancel={::this._cancel}
+                                save={::this._save}
+                                close={::this._close}
+                                data={this._question}
+                                scrollable={this.state.scrollableResources}
+                                onPrevClick={!this._isFirstEdit() ? ::this._editPrev : null}
+                                onNextClick={!this._isLastEdit() ? ::this._editNext : null}
                     />
                     :
                     null
@@ -235,7 +215,7 @@ class QuestionGrid extends React.Component {
 }
 
 
-class TestQuestions extends GridControl {
+class AnswersGrid extends GridControl {
 
     _getId() {
         return 'test-questions';
@@ -244,7 +224,8 @@ class TestQuestions extends GridControl {
     _getColumns() {
         let _columns = [
             {id: 'Number', header: '#', width: 30},
-            {id: 'Text', header: 'Текст вопроса', fillspace: true},
+            {id: 'Text', header: 'Текст ответа', fillspace: true},
+            {id: 'IsCorrect', header: 'Правильный', width: 110},
         ];
 
         _columns.push(...super._getColumns());
@@ -259,4 +240,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps,)(QuestionGrid);
+export default connect(mapStateToProps,)(AnswerGrid);
