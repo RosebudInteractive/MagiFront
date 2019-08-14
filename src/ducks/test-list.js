@@ -154,22 +154,25 @@ function* editTestSaga(data) {
 }
 
 function* deleteTestSaga(data) {
+
+    console.log(data)
+
     yield put({type: DELETE_TEST_START})
     yield put({type: HIDE_DELETE_DLG})
 
     try {
-        yield call(_deletePromo, data.payload)
+        yield call(_deleteTest, data.payload)
         yield put({type: DELETE_TEST_SUCCESS, payload: data.payload})
     } catch (error) {
         yield put({type: DELETE_TEST_FAIL})
 
-        const _message = yield call(getErrorMessage, e)
+        const _message = yield call(getErrorMessage, error)
         yield put({type: SHOW_ERROR_DIALOG, payload: _message})
     }
 }
 
-const _deletePromo = (id) => {
-    fetch(`/api/adm/tests/${id}`,
+const _deleteTest = (id) => {
+    return fetch(`/api/adm/tests/${id}`,
         {
             method: "DELETE",
             credentials: 'include'

@@ -329,7 +329,7 @@ function* deletePromoSaga(data) {
 }
 
 const _deletePromo = (id) => {
-    fetch("/api/adm/promo-codes/" + id,
+    return fetch("/api/adm/promo-codes/" + id,
         {
             method: "DELETE",
             credentials: 'include'
