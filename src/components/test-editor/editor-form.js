@@ -7,12 +7,9 @@ import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
 import MainTab from "./tabs/main-tab";
 import QuestionsTab from "./tabs/questions-tab";
-
 import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
-import {testSelector, questionsSelector, showQuestionEditorSelector, savingSelector, insertTest, updateTest, backToCourse,} from "adm-ducks/single-test";
+import {testSelector, questionsSelector, savingSelector, insertTest, updateTest, backToCourse,} from "adm-ducks/single-test";
 import PropTypes from "prop-types";
-import ErrorDialog from "../dialog/error-dialog";
-import QuestionEditor from "./question-editor/editor";
 
 const EDITOR_NAME = "TestEditor"
 
@@ -34,10 +31,6 @@ class TestEditorForm extends React.Component {
         this.state = {
             currentTab: TABS.MAIN,
         }
-    }
-
-    componentWillMount() {
-
     }
 
     componentWillMount() {
@@ -187,7 +180,7 @@ class TestEditorForm extends React.Component {
                 }
 
                 case 2: {
-                    _question.AnswBool = +question.AnswBool ? true : false
+                    _question.AnswBool = !!(+question.AnswBool)
                     break
                 }
 

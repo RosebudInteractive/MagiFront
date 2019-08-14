@@ -3,14 +3,11 @@ import {createSelector} from 'reselect'
 import {OrderedMap, Record,} from 'immutable'
 import {replace} from 'react-router-redux'
 import 'whatwg-fetch';
-import {checkStatus, handleJsonError, parseJSON, getErrorMessage} from "../tools/fetch-tools";
+import {checkStatus, parseJSON, getErrorMessage} from "../tools/fetch-tools";
 import {SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
-import {isDirty, reset} from "redux-form";
+import {reset} from "redux-form";
 import {EDIT_TEST_REQUEST} from "adm-ducks/test-list";
-import {confirmCloseEditorSaga} from "adm-ducks/messages";
-
-
 
 /**
  * Constants
@@ -26,7 +23,6 @@ export const GET_TEST_FAIL = `${prefix}/GET_TEST_FAIL`
 export const CREATE_NEW_TEST_REQUEST = `${prefix}/CREATE_NEW_TEST_REQUEST`
 export const CREATE_NEW_TEST_START = `${prefix}/CREATE_NEW_TEST_START`
 export const CREATE_NEW_TEST_SUCCESS = `${prefix}/CREATE_NEW_TEST_SUCCESS`
-export const CREATE_NEW_TEST_FAIL = `${prefix}/CREATE_NEW_TEST_FAIL`
 
 export const RELOAD_COURSE_INFO_REQUEST = `${prefix}/RELOAD_COURSE_INFO_REQUEST`
 export const BACK_TO_COURSE_REQUEST = `${prefix}/BACK_TO_COURSE_REQUEST`
@@ -44,28 +40,6 @@ export const UPDATE_TEST_REQUEST = `${prefix}/UPDATE_TEST_REQUEST`
 export const UPDATE_TEST_START = `${prefix}/UPDATE_TEST_START`
 export const UPDATE_TEST_SUCCESS = `${prefix}/UPDATE_TEST_SUCCESS`
 export const UPDATE_TEST_FAIL = `${prefix}/UPDATE_TEST_FAIL`
-
-export const SHOW_QUESTION_EDITOR = `${prefix}/SHOW_QUESTION_EDITOR`
-export const CLOSE_QUESTION_EDITOR_REQUEST = `${prefix}/CLOSE_QUESTION_EDITOR_REQUEST`
-export const CLOSE_QUESTION_EDITOR = `${prefix}/CLOSE_QUESTION_EDITOR`
-
-export const SELECT_QUESTION = `${prefix}/SELECT_QUESTION`
-
-export const CREATE_NEW_QUESTION_REQUEST = `${prefix}/CREATE_NEW_QUESTION_REQUEST`
-export const CREATE_NEW_QUESTION_START = `${prefix}/CREATE_NEW_QUESTION_START`
-export const CREATE_NEW_QUESTION_SUCCESS = `${prefix}/CREATE_NEW_QUESTION_SUCCESS`
-export const CREATE_NEW_QUESTION_FAIL = `${prefix}/CREATE_NEW_QUESTION_FAIL`
-
-export const EDIT_QUESTION_REQUEST = `${prefix}/EDIT_QUESTION_REQUEST`
-export const EDIT_QUESTION_START = `${prefix}/EDIT_QUESTION_START`
-export const EDIT_QUESTION_SUCCESS = `${prefix}/EDIT_QUESTION_SUCCESS`
-export const EDIT_QUESTION_FAIL = `${prefix}/EDIT_QUESTION_FAIL`
-
-export const INSERT_QUESTION_REQUEST = `${prefix}/INSERT_QUESTION_REQUEST`
-export const INSERT_QUESTION_START = `${prefix}/INSERT_QUESTION_START`
-export const INSERT_QUESTION_SUCCESS = `${prefix}/INSERT_QUESTION_SUCCESS`
-export const INSERT_QUESTION_FAIL = `${prefix}/INSERT_QUESTION_FAIL`
-
 
 /**
  * Reducer
@@ -90,10 +64,6 @@ const ReducerRecord = Record({
     test: new TestRecord(),
     questions: new OrderedMap([]),
     testTypes: new OrderedMap([]),
-    // currentQuestion: null,
-    showQuestionEditor: false,
-    questionInEditMode: false,
-    selectedQuestionId: null,
 })
 
 const TypeRecord = Record({
@@ -143,6 +113,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('test', new TestRecord(payload))
+                .update('questions', questions => questions.clear())
 
         case GET_TEST_FAIL:
         case GET_TEST_TYPES_FAIL:
@@ -153,14 +124,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case GET_TEST_TYPES_SUCCESS:
             return state
                 .set('testTypes', dataToEntries(payload, TypeRecord))
-
-        case SHOW_QUESTION_EDITOR:
-            return state
-                .set('showQuestionEditor', true)
-
-        case CLOSE_QUESTION_EDITOR:
-            return state
-                .set('showQuestionEditor', false)
 
         case INSERT_TEST_START:
         case UPDATE_TEST_START:
@@ -173,22 +136,6 @@ export default function reducer(state = new ReducerRecord(), action) {
         case UPDATE_TEST_FAIL:
             return state
                 .set('saving', false)
-
-        case CREATE_NEW_QUESTION_START:
-            return state
-                .set('questionInEditMode', false)
-
-        case EDIT_QUESTION_START:
-            return state
-                .set('questionInEditMode', true)
-
-        case SELECT_QUESTION:
-            return state
-                .set('selectedQuestionId', payload)
-
-        case INSERT_QUESTION_SUCCESS:
-            return state
-                .setIn(['questions', payload.id], new QuestionRecord(payload))
 
         default:
             return state
@@ -224,9 +171,6 @@ export const questionsSelector = createSelector(stateSelector, (state) => {
         return _item
     })
 })
-export const showQuestionEditorSelector = createSelector(stateSelector, state => state.showQuestionEditor)
-export const questionInEditModeSelector = createSelector(stateSelector, state => state.questionInEditMode)
-export const selectedQuestionIdSelector = createSelector(stateSelector, state => state.selectedQuestionId)
 
 /**
  * Action Creators
@@ -242,35 +186,6 @@ export const createTest = (initObject) => {
 export const getCourseLessons = (courseId) => {
     return {type: RELOAD_COURSE_INFO_REQUEST, payload: courseId}
 }
-
-export const selectQuestion = (id) => {
-
-}
-
-export const createNewQuestion = (courseId) => {
-    return {type: CREATE_NEW_QUESTION_REQUEST}
-}
-
-export const editQuestion = (courseId, testId) => {
-
-}
-
-export const closeQuestionEditor = () => {
-    return {type: CLOSE_QUESTION_EDITOR_REQUEST}
-}
-
-export const insertQuestion = (data) => {
-    return {type: INSERT_QUESTION_REQUEST, payload: data}
-}
-
-export const updateQuestion = () => {
-
-}
-
-export const raiseNotExistQuestionError = () => {
-
-}
-
 
 export const insertTest = (test) => {
     return {type: INSERT_TEST_REQUEST, payload: test}
@@ -370,17 +285,7 @@ function _fetchTest(id) {
 }
 
 function* backToCourseSaga(data) {
-    const _hasChanges = yield select(isDirty('TestEditor'))
-
-    if (_hasChanges) {
-        const _confirmed = yield call(confirmCloseEditorSaga);
-
-        if (_confirmed) {
-            yield call(closeEditorSaga, data.payload)
-        }
-    } else {
-        yield call(closeEditorSaga, data.payload)
-    }
+    yield call(closeEditorSaga, data.payload)
 }
 
 function* closeEditorSaga(courseId) {
@@ -393,7 +298,7 @@ function* updateTestSaga(data) {
     try {
         const _testId = data.payload.Id
 
-        yield call(_putPromo, data.payload)
+        yield call(_putTest, data.payload)
         yield put({type: UPDATE_TEST_SUCCESS})
 
         yield put(reset('TestEditor'))
@@ -406,7 +311,7 @@ function* updateTestSaga(data) {
     }
 }
 
-const _putPromo = (data) => {
+const _putTest = (data) => {
     return fetch(`/api/adm/tests/${data.Id}`, {
         method: 'PUT',
         headers: {
@@ -419,54 +324,6 @@ const _putPromo = (data) => {
         .then(parseJSON)
 }
 
-function* createNewQuestionSaga() {
-    yield put({type: CREATE_NEW_QUESTION_START})
-    yield put({type: SHOW_QUESTION_EDITOR})
-}
-
-let NEGATIVE_QUESTION_ID = 0
-
-function* insertQuestionSaga(action) {
-    yield put({type: INSERT_QUESTION_START})
-
-    try {
-        let _data = {...action.payload}
-
-        _data.id = NEGATIVE_QUESTION_ID--
-
-        yield put({type: INSERT_QUESTION_SUCCESS, payload: _data})
-
-        // yield put(reset('PromoEditor'))
-        // yield put({type: GET_PROMO_CODES_REQUEST})
-        yield put({type: CLOSE_QUESTION_EDITOR})
-    } catch (error) {
-        yield put({ type: INSERT_QUESTION_FAIL })
-
-        yield put({
-            type: SHOW_ERROR_DIALOG,
-            payload: error.message
-        })
-    }
-}
-
-function* closeQuestionEditorSaga() {
-    const _hasChanges = yield select(isDirty('QuestionEditor'))
-
-    if (_hasChanges) {
-        const _confirmed = yield call(confirmCloseQuestionEditorSaga);
-
-        if (_confirmed) {
-            yield call(confirmCloseQuestionEditorSaga)
-        }
-    } else {
-        yield call(confirmCloseQuestionEditorSaga)
-    }
-}
-
-function* confirmCloseQuestionEditorSaga() {
-    yield put({type: CLOSE_QUESTION_EDITOR})
-}
-
 export const saga = function* () {
     yield all([
         takeEvery(GET_TEST_REQUEST, getTestSaga),
@@ -474,9 +331,6 @@ export const saga = function* () {
         takeEvery(INSERT_TEST_REQUEST, insertTestSaga),
         takeEvery(UPDATE_TEST_REQUEST, updateTestSaga),
         takeEvery(BACK_TO_COURSE_REQUEST, backToCourseSaga),
-        takeEvery(CREATE_NEW_QUESTION_REQUEST, createNewQuestionSaga),
-        takeEvery(INSERT_QUESTION_REQUEST, insertQuestionSaga),
-        takeEvery(CLOSE_QUESTION_EDITOR_REQUEST, closeQuestionEditorSaga),
         ]
     )}
 

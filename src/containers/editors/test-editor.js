@@ -48,10 +48,14 @@ export class TestEditor extends React.Component {
             })
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         let _needReload = (prevProps.testId !== this.props.testId) && !isNaN(this.props.testId)
         if (_needReload) {
             this.props.getTest(this.props.testId)
+
+            if (!prevState.editMode) {
+                this.setState({editMode: true})
+            }
         }
     }
 
