@@ -136,6 +136,15 @@
                 "mysql": "./build_16/upgrade_16_mysql.sql"
             },
             "upgrader": "./build_16"
+        },
+        "17": {
+            "script_before": null,
+            "script_after": null,
+            "script_upgrade": {
+                "mssql": "./build_17/upgrade_17_mssql.sql",
+                "mysql": "./build_17/upgrade_17_mysql.sql"
+            },
+            "upgrader": "./build_17"
         }
     }
 }
