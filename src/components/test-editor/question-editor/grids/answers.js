@@ -22,6 +22,7 @@ class AnswerGrid extends React.Component {
         super(props)
 
         this._selected = null
+        this._internalId = -1
         this._answer = null
         this._answerEditMode = false
         this.state = {
@@ -114,6 +115,9 @@ class AnswerGrid extends React.Component {
     _create() {
         this._answer = Object.assign({}, NEW_ANSWER)
         this._answerEditMode = false
+        this._answer.Id = this._internalId
+        this._answer.id = this._answer.Id
+        this._internalId--;
 
         this.setState({
             showDialog: true,

@@ -9,7 +9,6 @@ import {
     isValid, Field,
 } from 'redux-form'
 import '../../../common/form.sass'
-import './answer-editor.sass'
 import BottomControls from "../../../bottom-contols/buttons";
 import PropTypes from "prop-types";
 import {CheckBox, TextBox} from "../../../common/input-controls";
@@ -65,7 +64,7 @@ class AnswerEditorForm extends React.Component {
             </div>
             <div className="editor__footer">
                 <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
-                                onAccept={::this._save} onCancel={::this._cancel} onBack={::this._close}/>
+                                onAccept={::this._save} onCancel={::this._cancel}/>
             </div>
         </div>
     }
@@ -74,7 +73,7 @@ class AnswerEditorForm extends React.Component {
         let {editorValues, answer} = this.props
 
         if (this.props.onSave) {
-            this.props.onSave({...editorValues, Number: answer.Number, id: answer.id})
+            this.props.onSave({...editorValues, Number: answer.Number, id: answer.id, Id: answer.Id})
         }
     }
 

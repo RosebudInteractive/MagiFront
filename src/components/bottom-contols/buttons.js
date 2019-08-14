@@ -16,9 +16,19 @@ class BottomControls extends React.Component {
 
     render() {
         return <div className="bottom-controls">
-            <button className={"adm__button bottom-controls__button" + (!this._getEnableCancel() ? ' disabled' : '')} onClick={::this.props.onCancel}>Отмена</button>
-            <button className={"adm__button bottom-controls__button" + (!this._getEnableAccept() ? ' disabled' : '')} onClick={::this._onAccept}>ОК</button>
-            <button className={"adm__button bottom-controls__button"} onClick={::this._goBack}>{"<<< Назад"}</button>
+            <button className={"adm__button bottom-controls__button" + (!this._getEnableCancel() ? ' disabled' : '')}
+                    onClick={::this.props.onCancel}>Отмена
+            </button>
+            <button className={"adm__button bottom-controls__button" + (!this._getEnableAccept() ? ' disabled' : '')}
+                    onClick={::this._onAccept}>ОК
+            </button>
+            {
+                this.props.onBack ?
+                    <button className={"adm__button bottom-controls__button"}
+                            onClick={::this._goBack}>{"<<< Назад"}</button>
+                    :
+                    null
+            }
         </div>
     }
 

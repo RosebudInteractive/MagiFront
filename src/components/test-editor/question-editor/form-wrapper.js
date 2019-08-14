@@ -14,7 +14,6 @@ import BottomControls from "../../bottom-contols/buttons";
 import PropTypes from "prop-types";
 import MainTab from "./tabs/main-tab";
 import AnswersTab from "./tabs/answers-tab";
-import {TextBox} from "../../common/input-controls";
 
 const EDITOR_NAME = "QuestionEditor",
     TABS = {
@@ -38,12 +37,18 @@ class QuestionEditorForm extends React.Component {
         }
     }
 
-    componentDidMount() {
+    componentWillMount() {
         this._init()
     }
 
     _init() {
         const {question} = this.props
+
+        if (question && question.Answers) {
+            question.Answers.forEach((item) => {
+                item.id = item.Id
+            })
+        }
 
         if (question) {
             this.props.initialize({
@@ -100,7 +105,7 @@ class QuestionEditorForm extends React.Component {
             </div>
             <div className="editor__footer">
                 <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
-                                onAccept={::this._save} onCancel={::this._cancel} onBack={::this._close}/>
+                                onAccept={::this._save} onCancel={::this._cancel}/>
             </div>
         </div>
     }
@@ -160,7 +165,7 @@ const validate = (values) => {
         }
     }
 
-    if (values.AnswInt && !$.isNumeric(values.AnswInt)) {
+    if ((+values.AnswType === 1) && values.AnswInt && !$.isNumeric(values.AnswInt)) {
         errors.AnswInt = 'Значение должно быть числовым'
     }
 
@@ -172,6 +177,10 @@ const validate = (values) => {
 
     if ((+values.AnswType === 3) && _hasMultipeCorrectAnswers(values.Answers)) {
         errors.Answers = 'Необходимо указать только один правильный ответ'
+    }
+
+    if ((+values.AnswType === 5) && !values.AnswText) {
+        errors.AnswText = 'Значение не может быть пустым'
     }
 
     return errors

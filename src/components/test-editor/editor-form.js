@@ -40,7 +40,7 @@ class TestEditorForm extends React.Component {
 
     }
 
-    componentDidMount() {
+    componentWillMount() {
         let _activeTab = this.props.activeTabs.get(EDITOR_NAME)
         if (_activeTab) {
             this.setState({
@@ -57,7 +57,7 @@ class TestEditorForm extends React.Component {
 
 
     render() {
-        const {hasChanges, saving, showQuestionEditor} = this.props;
+        const {hasChanges, saving,} = this.props;
 
         return <React.Fragment>
             <SavingBlock visible={saving}/>
@@ -162,25 +162,54 @@ class TestEditorForm extends React.Component {
 
     _fillQuestions(array) {
         this.props.editorValues.questions.map((question) => {
-            array.push({
+            let _question = {
                 AnswTime: question.AnswTime,
                 Text: question.Text,
                 Picture: question.Picture,
                 PictureMeta: question.PictureMeta,
-                AnswType: question.AnswType,
+                AnswType: +question.AnswType,
                 Score: question.Score,
                 StTime: question.StTime,
                 EndTime: question.EndTime,
                 AllowedInCourse: question.AllowedInCourse,
-                AnswBool: question.AnswBool,
-                AnswInt: question.AnswInt,
-                AnswText: question.AnswText,
                 CorrectAnswResp: question.CorrectAnswResp,
                 WrongAnswResp: question.WrongAnswResp,
-                Answers: question.Answers.map((answer) => {
-                    return {Text: answer.Text, IsCorrect: answer.IsCorrect}
-                }),
-            })
+                AnswBool: null,
+                AnswInt: null,
+                AnswText: null,
+                Answers: [],
+            }
+
+            switch (+question.AnswType) {
+                case 1 : {
+                    _question.AnswInt = question.AnswInt
+                    break
+                }
+
+                case 2: {
+                    _question.AnswBool = +question.AnswBool ? true : false
+                    break
+                }
+
+                case 3:
+                case 4: {
+                    _question.Answers = question.Answers.map((answer) => {
+                        return {Text: answer.Text, IsCorrect: answer.IsCorrect}
+                    })
+                    break
+                }
+
+                case 5: {
+                    _question.AnswText = question.AnswText
+                    break
+                }
+
+                default: {
+                    break
+                }
+            }
+
+            array.push(_question)
         });
     }
 }
@@ -218,7 +247,6 @@ function mapStateToProps(state) {
         test: testSelector(state),
         course: state.singleCourse.current,
         questions: questionsSelector(state),
-        showQuestionEditor: showQuestionEditorSelector(state),
 
         hasChanges: isDirty(EDITOR_NAME)(state),
 

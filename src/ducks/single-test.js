@@ -103,6 +103,7 @@ const TypeRecord = Record({
 
 
 const QuestionRecord = Record({
+    Id: null,
     AnswTime: null,
     Text: null,
     Picture: null,

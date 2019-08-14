@@ -1,11 +1,12 @@
 import React from 'react'
-import {Field, formValueSelector,} from 'redux-form'
+import {Field, formValueSelector, touch,} from 'redux-form'
 import PropTypes from "prop-types";
 import Select from "../../../common/select-control";
 import {connect} from "react-redux";
 import {TextBox} from "../../../common/input-controls";
 import RadioBox from "../../../common/radio-box-control";
 import AnswerGrid from "../grids/answers";
+import {bindActionCreators} from "redux";
 
 const ANSWER_TYPES = [
         {id: 1, value: 'Число'},
@@ -53,11 +54,17 @@ class AnswersTab extends React.Component {
         if (!prevProps.visible && this.props.visible) {
             this._resizeHandler();
         }
+
+        if (((+prevProps.answerType === 3) && (+this.props.answerType === 4)) ||
+            ((+prevProps.answerType === 4) && (+this.props.answerType === 3))) {
+            this.props.touch('QuestionEditor', 'Answers')
+        }
     }
 
     componentWillUnmount() {
         $(window).unbind('resize', this._resizeHandler)
     }
+
 
     render() {
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
@@ -99,4 +106,8 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(AnswersTab)
+function mapDispatchToProps(dispatch) {
+    return bindActionCreators({touch}, dispatch);
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AnswersTab)

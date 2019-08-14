@@ -169,15 +169,22 @@ export default class GridControl extends Component {
 
     render() {
         const {data} = this.props;
-        return <div className="grid-wrapper">
-            <div className="action-bar">
-                {this._configButtons()}
-            </div>
-            <div className="detail-grid-container">
-                <Webix ui={::this.getUI()} data={data}/>
-            </div>
+        return (
+            Array.isArray(data) ?
+                <div className="grid-wrapper">
+                    <div className="action-bar">
+                        {this._configButtons()}
+                    </div>
+                    <div className="detail-grid-container">
+                        <Webix ui={::this.getUI()} data={data}/>
+                    </div>
 
-        </div>
+                </div>
+                :
+                null
+        )
+
+
 
     }
 
