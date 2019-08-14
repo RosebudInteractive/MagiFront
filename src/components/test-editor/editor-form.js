@@ -137,7 +137,7 @@ class TestEditorForm extends React.Component {
             CourseId: editorValues.courseId ? +editorValues.courseId : null,
             LessonId: editorValues.lessonId ? +editorValues.lessonId : null,
             Name: editorValues.name,
-            Method: editorValues.method,
+            Method: +editorValues.method,
             MaxQ: +editorValues.maxQ,
             FromLesson: !!+editorValues.fromLesson,
             IsTimeLimited: !!+editorValues.isTimeLimited,
@@ -156,15 +156,15 @@ class TestEditorForm extends React.Component {
     _fillQuestions(array) {
         this.props.editorValues.questions.map((question) => {
             let _question = {
-                AnswTime: question.AnswTime,
+                AnswTime: +question.AnswTime,
                 Text: question.Text,
                 Picture: question.Picture,
                 PictureMeta: question.PictureMeta,
                 AnswType: +question.AnswType,
-                Score: question.Score,
-                StTime: question.StTime,
-                EndTime: question.EndTime,
-                AllowedInCourse: question.AllowedInCourse,
+                Score: +question.Score,
+                StTime: +question.StTime,
+                EndTime: +question.EndTime,
+                AllowedInCourse: !!+question.AllowedInCourse,
                 CorrectAnswResp: question.CorrectAnswResp,
                 WrongAnswResp: question.WrongAnswResp,
                 AnswBool: null,
@@ -175,7 +175,7 @@ class TestEditorForm extends React.Component {
 
             switch (+question.AnswType) {
                 case 1 : {
-                    _question.AnswInt = question.AnswInt
+                    _question.AnswInt = +question.AnswInt
                     break
                 }
 
@@ -187,7 +187,7 @@ class TestEditorForm extends React.Component {
                 case 3:
                 case 4: {
                     _question.Answers = question.Answers.map((answer) => {
-                        return {Text: answer.Text, IsCorrect: answer.IsCorrect}
+                        return {Text: answer.Text, IsCorrect: !!+answer.IsCorrect}
                     })
                     break
                 }
