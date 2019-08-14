@@ -66,6 +66,12 @@ class QuestionEditorForm extends React.Component {
         }
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.question !== prevProps.question) {
+            this._init()
+        }
+    }
+
     render() {
         const {hasChanges} = this.props;
 
@@ -154,17 +160,17 @@ const validate = (values) => {
         }
     }
 
-    if (values.AnswInt && !$.isNumeric(values.AnswTime)) {
+    if (values.AnswInt && !$.isNumeric(values.AnswInt)) {
         errors.AnswInt = 'Значение должно быть числовым'
     }
 
-    if ((values.AnswType === 3) || (values.AnswType === 4)) {
+    if ((+values.AnswType === 3) || (+values.AnswType === 4)) {
         if (!_hasCorrectAnswer(values.Answers)) {
             errors.Answers = 'Необходимо указать правильный ответ'
         }
     }
 
-    if ((values.AnswType === 3) && _hasMultipeCorrectAnswers(values.Answers)) {
+    if ((+values.AnswType === 3) && _hasMultipeCorrectAnswers(values.Answers)) {
         errors.Answers = 'Необходимо указать только один правильный ответ'
     }
 
