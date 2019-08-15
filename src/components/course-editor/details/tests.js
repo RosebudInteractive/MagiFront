@@ -75,9 +75,9 @@ class CourseTests extends GridControl{
     }
 
     _getLessons() {
-        this.props.lessons.map((lesson) => {
+        return this.props.lessons.map((lesson) => {
             return {
-                id: `${lesson.Id}`,
+                id: lesson.Id,
                 value: lesson.Name
             }
         })

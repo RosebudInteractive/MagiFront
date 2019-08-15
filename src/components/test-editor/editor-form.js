@@ -99,6 +99,7 @@ class TestEditorForm extends React.Component {
                 maxQ: test.MaxQ,
                 fromLesson: !!test.FromLesson,
                 isTimeLimited: !!test.IsTimeLimited,
+                status: test.Status,
                 questions: questions
             })
         }
@@ -141,6 +142,7 @@ class TestEditorForm extends React.Component {
             MaxQ: +editorValues.maxQ,
             FromLesson: !!+editorValues.fromLesson,
             IsTimeLimited: !!+editorValues.isTimeLimited,
+            Status: +editorValues.status,
             Questions: [],
         };
 

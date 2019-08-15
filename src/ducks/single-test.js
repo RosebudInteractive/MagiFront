@@ -54,6 +54,7 @@ const TestRecord = Record({
     MaxQ: 0,
     FromLesson: false,
     IsTimeLimited: false,
+    Status: null,
 })
 
 const ReducerRecord = Record({
