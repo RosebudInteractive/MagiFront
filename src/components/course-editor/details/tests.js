@@ -17,12 +17,13 @@ class CourseTestsWrapper extends React.Component {
         let {tests, selectedLesson, editMode, enableButtons} = this.props;
 
         return <CourseTests selected={selectedLesson}
-                              editMode={editMode}
-                              data={tests}
-                              createAction={::this._createTest}
-                              editAction={::this._editTest}
-                              removeAction={::this.props.deleteTest}
-                              disabled={!enableButtons}/>
+                            editMode={editMode}
+                            data={tests}
+                            lessons={this.props.courseLessons}
+                            createAction={::this._createTest}
+                            editAction={::this._editTest}
+                            removeAction={::this._remove}
+                            disabled={!enableButtons}/>
     }
 
     _createTest() {
@@ -33,9 +34,21 @@ class CourseTestsWrapper extends React.Component {
         this.props.editTest(this.props.courseId, id)
     }
 
+    _remove(id) {
+        const _test = this.props.tests.find(item => item.Id === id)
+
+        if (_test) {
+            this.props.deleteTest(_test)
+        }
+    }
+
 }
 
 class CourseTests extends GridControl{
+
+    static propTypes = {
+        lessons: PropTypes.array,
+    }
 
     _getId() {
         return 'course-tests';
@@ -45,6 +58,14 @@ class CourseTests extends GridControl{
         let _columns = [
             {id: 'Number', header: '#', width: 30},
             {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
+            {id: 'LessonId', header: 'Лекция', width: 300, editor: 'select',
+                options: this._getLessons()},
+            {
+                id: 'Status', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
+                options: [{id: '1', value: 'Черновик'},
+                    {id: '2', value: 'Опубликованный'},
+                    {id: '3', value: 'Архив'}]
+            },
             {id: 'TypeName', header: ['Вид теста', {content:"selectFilter"}] , width: 250},
         ];
 
@@ -52,17 +73,21 @@ class CourseTests extends GridControl{
 
         return _columns;
     }
+
+    _getLessons() {
+        this.props.lessons.map((lesson) => {
+            return {
+                id: `${lesson.Id}`,
+                value: lesson.Name
+            }
+        })
+    }
 }
 
 function mapStateToProps(state) {
     return {
         tests: testsSelector(state),
-
-        // courseLessons: state.courseLessons.current,
-        // selectedLesson: state.courseLessons.selected,
-
-        // courseCategories: state.courseCategories.current,
-        // selectedCategory: state.courseCategories.selected,
+        courseLessons: state.courseLessons.current,
 
         enableButtons: enableButtonsSelector(state),
     }

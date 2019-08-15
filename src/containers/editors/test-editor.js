@@ -20,6 +20,7 @@ const NEW_TEST = {
     MaxQ: 0,
     FromLesson: false,
     IsTimeLimited: false,
+    Status: 1,
 }
 
 export class TestEditor extends React.Component {

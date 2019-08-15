@@ -6,6 +6,7 @@ import 'whatwg-fetch';
 import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
+import {confirmDeleteObjectSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -41,6 +42,8 @@ const TestRecord = Record({
     Id: null,
     Name: null,
     TypeName: null,
+    LessonId: null,
+    Status: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -155,19 +158,20 @@ function* editTestSaga(data) {
 
 function* deleteTestSaga(data) {
 
-    console.log(data)
+    const _confirmed = yield confirmDeleteObjectSaga(`Удалить тест "${data.payload.Name}"?`)
 
-    yield put({type: DELETE_TEST_START})
-    yield put({type: HIDE_DELETE_DLG})
+    if (_confirmed) {
+        yield put({type: DELETE_TEST_START})
 
-    try {
-        yield call(_deleteTest, data.payload)
-        yield put({type: DELETE_TEST_SUCCESS, payload: data.payload})
-    } catch (error) {
-        yield put({type: DELETE_TEST_FAIL})
+        try {
+            yield call(_deleteTest, data.payload.Id)
+            yield put({type: DELETE_TEST_SUCCESS, payload: data.payload.Id})
+        } catch (error) {
+            yield put({type: DELETE_TEST_FAIL})
 
-        const _message = yield call(getErrorMessage, error)
-        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+            const _message = yield call(getErrorMessage, error)
+            yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+        }
     }
 }
 
