@@ -68,7 +68,7 @@ const GET_TEST_TYPES_MYSQL =
     "select `Id`, `Code`, `Name`, `Description` from `TestType`";
 
 const GET_TEST_LIST_MSSQL =
-    "select t.[Id], t.[TestTypeId], tt.[Name] TypeName, t.[CourseId], cl.[Name] CourseName,\n" +
+    "select t.[Id], t.[TestTypeId], tt.[Name] TypeName, t.[Status], t.[CourseId], cl.[Name] CourseName,\n" +
     "  t.[LessonId], ll.[Name] LessonName, t.[Name], t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited],\n" +
     "  coalesce(count(q.[Id]), 0) Nq\n" +
     "from[Test] t\n" +
@@ -77,12 +77,12 @@ const GET_TEST_LIST_MSSQL =
     "  left join[LessonLng] ll on ll.[LessonId] = t.[LessonId]\n" +
     "  left join[Question] q on q.[TestId] = t.[Id]\n" +
     "where <%= cond %>\n" +
-    "group by t.[Id], t.[TestTypeId], tt.[Name], t.[CourseId], cl.[Name], t.[LessonId], ll.[Name], t.[Name],\n" +
+    "group by t.[Id], t.[TestTypeId], tt.[Name], t.[Status], t.[CourseId], cl.[Name], t.[LessonId], ll.[Name], t.[Name],\n" +
     "  t.[Method], t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited]\n" +
     "order by t.[Id]";
 
 const GET_TEST_LIST_MYSQL =
-    "select t.`Id`, t.`TestTypeId`, tt.`Name` TypeName, t.`CourseId`, cl.`Name` CourseName,\n" +
+    "select t.`Id`, t.`TestTypeId`, tt.`Name` TypeName, t.`Status`, t.`CourseId`, cl.`Name` CourseName,\n" +
     "  t.`LessonId`, ll.`Name` LessonName, t.`Name`, t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`,\n" +
     "  coalesce(count(q.`Id`), 0) Nq\n" +
     "from`Test` t\n" +
@@ -91,19 +91,19 @@ const GET_TEST_LIST_MYSQL =
     "  left join`LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
     "  left join`Question` q on q.`TestId` = t.`Id`\n" +
     "where <%= cond %>\n" +
-    "group by t.`Id`, t.`TestTypeId`, tt.`Name`, t.`CourseId`, cl.`Name`, t.`LessonId`, ll.`Name`, t.`Name`,\n" +
+    "group by t.`Id`, t.`TestTypeId`, tt.`Name`, t.`Status`, t.`CourseId`, cl.`Name`, t.`LessonId`, ll.`Name`, t.`Name`,\n" +
     "  t.`Method`, t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`\n" +
     "order by t.`Id`";
 
 const GET_QUESTION_IDS_MSSQL =
     "select q.[Id] from [Test] t\n" +
     "  join [Question] q on q.[TestId] = t.[Id]\n" +
-    "where(t.[CourseId] = <%= course_id %>) and(not t.[LessonId] is NULL)";
+    "where (t.[Status] = 2) and (t.[CourseId] = <%= course_id %>) and (not t.[LessonId] is NULL)";
 
 const GET_QUESTION_IDS_MYSQL =
     "select q.`Id` from `Test` t\n" +
     "  join `Question` q on q.`TestId` = t.`Id`\n" +
-    "where(t.`CourseId` = <%= course_id %>) and(not t.`LessonId` is NULL)";
+    "where (t.`Status` = 2) and (t.`CourseId` = <%= course_id %>) and (not t.`LessonId` is NULL)";
 
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
@@ -203,6 +203,7 @@ const DbTest = class DbTest extends DbObject {
                     testObj = col.get(0);
                     testData.Id = testObj.id();
                     testData.TestTypeId = testObj.testTypeId();
+                    testData.Status = testObj.status();
                     testData.CourseId = testObj.courseId();
                     testData.LessonId = testObj.lessonId();
                     testData.Name = testObj.name();
@@ -481,12 +482,13 @@ const DbTest = class DbTest extends DbObject {
                 for (let i = 0; i < arr_q.length; i++) {
                     let q = await this._getQuestionsByIds(arr_q[i], { dbOptions: dbOpts });
                     for (let id in q) {
-                        testInstanse.Questions.push({
-                            Answer: null,
-                            AnswTime: null,
-                            Score: null,
-                            Question: q[id]
-                        });
+                        if (q[id].AllowedInCourse)
+                            testInstanse.Questions.push({
+                                Answer: null,
+                                AnswTime: null,
+                                Score: null,
+                                Question: q[id]
+                            });
                     }
                 }
             }
@@ -689,6 +691,8 @@ const DbTest = class DbTest extends DbObject {
                         throw new Error(`Missing or invalid field "Name"`);
                     if (typeof (fields.Method) !== "number")
                         throw new Error(`Missing or invalid field "Method"`);
+                    if (typeof (fields.Status) === "undefined")
+                        fields.Status = 1; // "Черновик"
 
                     await root_obj.edit();
                     let newHandler = await root_obj.newObject({ fields: fields }, dbOpts);
