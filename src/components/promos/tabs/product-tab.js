@@ -16,7 +16,7 @@ export default class ProductTab extends React.Component {
 
         this._resizeHandler = () => {
             let _products = window.$$('promo-products'),
-                _width = $('.modal-editor').width() - 2
+                _width = $('.modal-editor__wrapper').width() - 2
 
             let _actionBarHeight = $('.promo-products .action-bar').height()
 

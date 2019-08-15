@@ -95,13 +95,12 @@ class PromosPage extends React.Component {
     render() {
         const {
             loading,
+            loaded,
             deleteDlgShown,
             showPromoEditor,
         } = this.props;
 
-        return loading ?
-            <LoadingPage/>
-            :
+        return !loading && loaded ?
             <div className="courses">
                 <div className="courses-content">
                     <div className="action-bar">
@@ -139,6 +138,8 @@ class PromosPage extends React.Component {
                 <PromoEditor onPrevClick={this._isFirstSelected ? null : ::this._onEditPrev}
                              onNextClick={this._isLastSelected ? null : ::this._onEditNext}/>
             </div>
+            :
+            <LoadingPage/>
     }
 
     _onEditPrev() {

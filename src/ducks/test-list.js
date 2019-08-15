@@ -91,6 +91,8 @@ export const testsSelector = createSelector(entriesSelector, (entries) => {
 
         _item.id = _item.Id
         _item.Number = index + 1
+
+        _item.LessonId = item.LessonId ? item.LessonId : -1
         return _item
     })
 })

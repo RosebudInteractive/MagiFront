@@ -68,7 +68,9 @@ export default class GridControl extends Component {
     _select(selectedObj) {
         this._selectNoRefresh(selectedObj)
         this._saveScrollPos()
-        this.forceUpdate()
+        if (this.props.moveDownAction || this.props.moveUpAction) {
+            this.forceUpdate()
+        }
     }
 
     _selectNoRefresh(selectedObj) {

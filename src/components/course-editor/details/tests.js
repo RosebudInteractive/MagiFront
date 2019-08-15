@@ -58,7 +58,7 @@ class CourseTests extends GridControl{
         let _columns = [
             {id: 'Number', header: '#', width: 30},
             {id: 'Name', header: ['Название', {content:"textFilter"}], fillspace: true},
-            {id: 'LessonId', header: 'Лекция', width: 300, editor: 'select',
+            {id: 'LessonId', header: ['Лекция', {content:"selectFilter"}], width: 300, editor: 'select',
                 options: this._getLessons()},
             {
                 id: 'Status', header: ['Состояние', {content:"selectFilter"}], width: 150, editor: 'select',
@@ -75,12 +75,16 @@ class CourseTests extends GridControl{
     }
 
     _getLessons() {
-        return this.props.lessons.map((lesson) => {
+        let _list = this.props.lessons.map((lesson) => {
             return {
                 id: lesson.Id,
                 value: lesson.Name
             }
         })
+
+        _list.unshift({id: -1, value: ' - Без лекции -'})
+
+        return _list
     }
 }
 

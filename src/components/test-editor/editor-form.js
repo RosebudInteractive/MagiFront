@@ -93,7 +93,7 @@ class TestEditorForm extends React.Component {
             this.props.initialize({
                 testTypeId: test.TestTypeId,
                 courseId: test.CourseId,
-                lessonId: test.LessonId,
+                lessonId: test.LessonId ? test.LessonId : -1,
                 name: test.Name,
                 method: test.Method,
                 maxQ: test.MaxQ,
@@ -136,7 +136,7 @@ class TestEditorForm extends React.Component {
             Id: test.Id ? test.Id : -1,
             TestTypeId: +editorValues.testTypeId,
             CourseId: editorValues.courseId ? +editorValues.courseId : null,
-            LessonId: editorValues.lessonId ? +editorValues.lessonId : null,
+            LessonId: (editorValues.lessonId && (+editorValues.lessonId > 0)) ? +editorValues.lessonId : null,
             Name: editorValues.name,
             Method: +editorValues.method,
             MaxQ: +editorValues.maxQ,

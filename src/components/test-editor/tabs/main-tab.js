@@ -43,7 +43,7 @@ class MainTab extends React.Component {
 
         return <div className={"tab-wrapper controls-wrapper" + (this.props.visible ? '' : ' hidden')}>
             <Field component={Select} name="courseId" label="Курс" options={this._getCourses()} placeholder="Выберите курс" disabled={true}/>
-            <Field component={Select} name="lessonId" label="Урок" options={this._getLessons()} disabled={_disabled}/>
+            <Field component={Select} name="lessonId" label="Урок" placeholder="Выберите урок" options={this._getLessons()} disabled={_disabled}/>
             <Field component={TextBox} name="name" label="Название" placeholder="Введите название" disabled={_disabled}/>
             <Field component={Select} name="testTypeId" label="Вид теста" placeholder="Выберите вид теста" options={this._getTestTypes()} disabled={_disabled}/>
             <Field component={Select} name="method" label="Принцип тестирования" placeholder="Выберите способ тестирования" options={METHODS} disabled={_disabled}/>
@@ -59,9 +59,13 @@ class MainTab extends React.Component {
     }
 
     _getLessons() {
-        return this.props.courseLessons.map((lesson) => {
+        let _lessons = this.props.courseLessons.map((lesson) => {
             return {id: lesson.id, value: lesson.Name}
         })
+
+        _lessons.unshift({id: -1, value: ' - Без лекции - '})
+
+        return _lessons
     }
 
     _getTestTypes() {
