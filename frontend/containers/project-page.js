@@ -67,6 +67,8 @@ export default class ProjectPage extends React.Component {
     }
 
     _getMetaTags() {
+        this._removeRobotsMetaTags()
+
         return <MetaTags>
             <meta name="description"
                   content="Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом. Отличная помощь студентам, продвинутым старшеклассникам и всем людям с культурными запросами. Зачерпни знания у источника!"/>
@@ -75,5 +77,12 @@ export default class ProjectPage extends React.Component {
 
     _removeMetaTags() {
         $('meta[name="description"]').remove();
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _removeRobotsMetaTags() {
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 }
