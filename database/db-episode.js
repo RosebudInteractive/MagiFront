@@ -113,7 +113,8 @@ const EPISODE_INS_TREE = {
 };
 
 const EPISODE_MSSQL_ID_REQ =
-    "select e.[Id], el.[Name], els.[Number], el.[Audio], el.[AudioMeta], el.[State], e.[EpisodeType], els.[Supp], el.[Transcript], el.[Structure] from [Episode] e\n" +
+    "select e.[Id], e.[ContentType], el.[Name], els.[Number], el.[Audio], el.[AudioMeta], el.[State], e.[EpisodeType], els.[Supp],\n" +
+    "  el.[Transcript], el.[Structure], el.[VideoLink] from [Episode] e\n" +
     "  join [EpisodeLng] el on e.[Id] = el.[EpisodeId]\n" +
     "  join [EpisodeLesson] els on e.[Id] = els.[EpisodeId]\n" +
     "where e.[Id] = <%= id %> and els.[LessonId] = <%= lessonId %>";
@@ -134,7 +135,8 @@ const EPISODE_MSSQL_CONT_REQ =
     "order by t.[StartTime]";
 
 const EPISODE_MYSQL_ID_REQ =
-    "select e.`Id`, el.`Name`, els.`Number`, el.`Audio`, el.`AudioMeta`, el.`State`, e.`EpisodeType`, els.`Supp`, el.`Transcript`, el.`Structure` from `Episode` e\n" +
+    "select e.`Id`, e.`ContentType`, el.`Name`, els.`Number`, el.`Audio`, el.`AudioMeta`, el.`State`, e.`EpisodeType`,\n" +
+    "  els.`Supp`, el.`Transcript`, el.`Structure`, el.`VideoLink` from `Episode` e\n" +
     "  join `EpisodeLng` el on e.`Id` = el.`EpisodeId`\n" +
     "  join `EpisodeLesson` els on e.`Id` = els.`EpisodeId`\n" +
     "where e.`Id` = <%= id %> and els.`LessonId` = <%= lessonId %>";
@@ -187,6 +189,8 @@ const GET_LESSON_LANG_MYSQL =
     "select l.`LanguageId` from `Lesson` c\n" +
     "  join `LessonLng` l on l.`LessonId` = c.`Id`\n" +
     "where c.`Id` = <%= lessonId %>";
+
+const DFLT_CONTENT_TYPE = 1;
 
 const DbEpisode = class DbEpisode extends DbObject {
 
@@ -584,6 +588,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                     .then(() => {
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
                             epi_obj.episodeType(inpFields["EpisodeType"]);
+                        if (typeof (inpFields["ContentType"]) !== "undefined")
+                            epi_obj.contentType(inpFields["ContentType"]);
 
                         if (typeof (inpFields["State"]) !== "undefined")
                             epi_lng_obj.state(inpFields["State"]);
@@ -609,6 +615,8 @@ const DbEpisode = class DbEpisode extends DbObject {
 
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
+                        if (typeof (inpFields["VideoLink"]) !== "undefined")
+                            epi_lng_obj.videoLink(inpFields["VideoLink"]);
 
                         for (let key in toc_list)
                             if (toc_list[key].deleted)
@@ -757,9 +765,11 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return result.edit()
                     })
                     .then(() => {
-                        let fields = { LessonId: lesson_id };
+                        let fields = { LessonId: lesson_id, ContentType: DFLT_CONTENT_TYPE };
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
                             fields["EpisodeType"] = inpFields["EpisodeType"];
+                        if (typeof (inpFields["ContentType"]) !== "undefined")
+                            fields["ContentType"] = inpFields["ContentType"];
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
@@ -791,6 +801,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                         fields.Duration = duration;
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             fields["Structure"] = inpFields["Structure"];
+                        if (typeof (inpFields["VideoLink"]) !== "undefined")
+                            fields["VideoLink"] = inpFields["VideoLink"];
 
                         return root_lng.newObject({
                             fields: fields
