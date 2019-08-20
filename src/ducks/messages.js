@@ -83,8 +83,16 @@ export function* confirmCloseEditorSaga() {
     return !!yes;
 }
 
-// export const saga = function* () {
-//     yield all([
-//         takeEvery(CONFIRM_CLOSE_EDITOR, confirmSaga)
-//     ])
-// }
+export function* confirmDeleteObjectSaga(message) {
+
+    yield put(showConfirmation(message));
+
+    const {yes} = yield race({
+        yes: take(CONFIRM_RESULT),
+        no: take(CANCEL_RESULT)
+    })
+
+    yield put(hideConfirmation());
+
+    return !!yes;
+}

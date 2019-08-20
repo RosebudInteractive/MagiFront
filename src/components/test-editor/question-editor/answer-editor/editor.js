@@ -43,6 +43,8 @@ class AnswerEditor extends React.Component {
     }
 
     _onPrevClick() {
+        if (!this.props.editorValid) return
+
         this._doBeforeScroll()
 
         if (this.props.onPrevClick) {
@@ -51,6 +53,8 @@ class AnswerEditor extends React.Component {
     }
 
     _onNextClick() {
+        if (!this.props.editorValid) return
+
         this._doBeforeScroll()
 
         if (this.props.onNextClick) {

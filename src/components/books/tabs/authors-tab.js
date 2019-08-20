@@ -18,7 +18,7 @@ class AuthorsTab extends React.Component {
 
         this._resizeHandler = () => {
             let _authors = window.$$('book-authors'),
-                _width = $('.modal-editor').width() - 17
+                _width = $('.modal-editor__wrapper').width() - 2
 
             if (_authors) {
                 _authors.$setSize(_width, _authors.height);

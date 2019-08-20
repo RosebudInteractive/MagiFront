@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import GridControl from "../../gridControl";
 import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
 import {enableButtonsSelector} from "adm-ducks/app";
 import QuestionForm from "../question-editor/editor";
 
@@ -57,13 +56,13 @@ class QuestionGrid extends React.Component {
                            removeAction={::this._remove}
                            moveUpAction={::this._moveUp}
                            moveDownAction={::this._moveDown}
-                           editMode={this.props.editMode}
+                           editMode={true}
                            selected={this._selected}
                            data={this.props.input.value}
                            disabled={!this.props.enableButtons}/>
             {
                 this.state.showDialog ?
-                    <QuestionForm editMode={this.props.editMode}
+                    <QuestionForm editMode={true}
                                   save={::this._save}
                                   close={::this._close}
                                   data={this._question}

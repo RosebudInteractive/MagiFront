@@ -28,7 +28,9 @@ const GET_USER_PURCHASE_MSSQL =
     "  u.[Email], ii.[Name] Course, p.[Price] PriceIni, (p.[Price] - ii.[Price]) Discount, ii.[Price],\n" +
     "  coalesce(g.[Campaign] + ' (' + g.[Source] + '+' + g.[Medium] + ')', '') Campaign, coalesce(pc.[Code], '') as Promo,\n" +
     "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0, 2) as LsnTime, cd.[Duration] as CourseDuration,\n" +
-    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0 / cd.[Duration], 2) as LsnPart\n" +
+    "  round(coalesce(sum(h.[LsnTime]), 0) / 3600.0 / cd.[Duration], 2) as LsnPart,\n" +
+    "  max(h.[FinDate]) as ThisLastTime,\n" +
+    "  max(hu.[FinDate]) as LastTime\n" +
     "from[Cheque] c\n" +
     "  join[Invoice] i on i.[Id] = c.[InvoiceId]\n" +
     "  join[InvoiceItem] ii on ii.[InvoiceId] = i.[Id]\n" +
@@ -43,6 +45,8 @@ const GET_USER_PURCHASE_MSSQL =
     "      join [LessonLng] lg on lg.[LessonId] = lc.[LessonId]\n" +
     "    group by lc.[CourseId]) cd on cd.[CourseId] = cs.[Id]\n" +
     "  left join[LsnHistory] h on h.[UserId] = c.[UserId] and h.[LessonId] = lc.[LessonId]\n" +
+    "  left join ( select [UserId], max([FinDate]) FinDate from [LsnHistory]\n" +
+    "    group by [UserId]) hu on hu.[UserId] = c.[UserId]\n" +
     "where(c.[ChequeTypeId] = 1) and(c.[StateId] = 4) and(c.[ChequeDate] >= convert(datetime, '<%= first_date %>'))\n" +
     "  and(c.[ChequeDate] < convert(datetime, '<%= last_date %>'))\n" +
     "group by c.[ChequeDate], u.[RegDate], c.[UserId], u.[DisplayName], u.[Email], ii.[Name],\n" +
@@ -54,7 +58,9 @@ const GET_USER_PURCHASE_MYSQL =
     "  u.`Email`, ii.`Name` Course, p.`Price` PriceIni, (p.`Price` - ii.`Price`) Discount, ii.`Price`,\n" +
     "  coalesce(concat(g.`Campaign`, ' (', g.`Source`, '+', g.`Medium`, ')'), '') Campaign, coalesce(pc.`Code`, '') as Promo,\n" +
     "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0, 2) as LsnTime, cd.`Duration` as CourseDuration,\n" +
-    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart\n" +
+    "  round(coalesce(sum(h.`LsnTime`), 0) / 3600.0 / cd.`Duration`, 2) as LsnPart,\n" +
+    "  max(h.`FinDate`) as ThisLastTime,\n" +
+    "  max(hu.`FinDate`) as LastTime\n" +
     "from`Cheque` c\n" +
     "  join`Invoice` i on i.`Id` = c.`InvoiceId`\n" +
     "  join`InvoiceItem` ii on ii.`InvoiceId` = i.`Id`\n" +
@@ -69,6 +75,8 @@ const GET_USER_PURCHASE_MYSQL =
     "      join`LessonLng` lg on lg.`LessonId` = lc.`LessonId`\n" +
     "    group by lc.`CourseId`) cd on cd.`CourseId` = cs.`Id`\n" +
     "  left join`LsnHistory` h on h.`UserId` = c.`UserId` and h.`LessonId` = lc.`LessonId`\n" +
+    "  left join ( select `UserId`, max(`FinDate`) FinDate from `LsnHistory`\n" +
+    "    group by `UserId`) hu on hu.`UserId` = c.`UserId`\n" +
     "where(c.`ChequeTypeId` = 1) and(c.`StateId` = 4) and(c.`ChequeDate` >= '<%= first_date %>') and(c.`ChequeDate` < '<%= last_date %>')\n" +
     "group by c.`ChequeDate`, u.`RegDate`, c.`UserId`, u.`DisplayName`, u.`Email`, ii.`Name`,\n" +
     "  p.`Price`, ii.`Price`, g.`Campaign`, g.`Source`, g.`Medium`, pc.`Code`, cd.`Duration`\n" +
@@ -145,7 +153,7 @@ const DbStatistics = class DbStatistics extends DbObject {
             fin_date: true
         }
         let { firsDate, lastDate } = this._getInterval(opts);
-        let caption = `Статистика по рекламным компаниям с ` +
+        let caption = `Статистика по рекламным кампаниям с ` +
             `${this._dateToString(firsDate, true, false)} по ${this._dateToString(lastDate, true, false)}.`;
         opts.first_date = firsDate;
         opts.last_date = lastDate;
@@ -163,9 +171,23 @@ const DbStatistics = class DbStatistics extends DbObject {
             `${this._dateToString(firsDate, true, false)} по ${this._dateToString(lastDate, true, false)}.`;
         opts.first_date = firsDate;
         opts.last_date = lastDate;
-        return this._stat_report(caption, {
-            mysql: GET_USER_PURCHASE_MYSQL,
-            mssql: GET_USER_PURCHASE_MSSQL
+        return this._stat_report(caption, async () => {
+            let dbOpts = opts.dbOptions || {};
+            let res_data = [];
+            let dialect = {
+                mysql: _.template(GET_USER_PURCHASE_MYSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                }),
+                mssql: _.template(GET_USER_PURCHASE_MSSQL)({
+                    first_date: this._dateToString(firsDate, true, false),
+                    last_date: this._dateToString(lastDate, true, false)
+                })
+            };
+            let result = await $data.execSql({ dialect: dialect }, dbOpts);
+            if (result && result.detail && (result.detail.length > 0))
+                res_data = result.detail;
+            return res_data;
         }, opts);
     }
 
@@ -198,10 +220,12 @@ const DbStatistics = class DbStatistics extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let data = [];
         let header = [];
+        let res_data = [];
 
         let { firsDate, lastDate } = this._getInterval(opts);
         let dialect;
         switch (typeof (report_name)) {
+
             case "string":
                 dialect = {
                     mysql: _.template(GET_STAT_MYSQL)({
@@ -215,7 +239,15 @@ const DbStatistics = class DbStatistics extends DbObject {
                         last_date: this._dateToString(lastDate, true, false)
                     })
                 };
+                let result = await $data.execSql({ dialect: dialect }, dbOpts);
+                if (result && result.detail && (result.detail.length > 0))
+                    res_data = result.detail;
                 break;
+
+            case "function":
+                res_data = await report_name();
+                break;
+
             default:
                 if (report_name && report_name.mysql && report_name.mssql) {
                     dialect = {
@@ -228,14 +260,16 @@ const DbStatistics = class DbStatistics extends DbObject {
                             last_date: this._dateToString(lastDate, true, false)
                         })
                     };
+                    let result = await $data.execSql({ dialect: dialect }, dbOpts);
+                    if (result && result.detail && (result.detail.length > 0))
+                        res_data = result.detail;
                 }
                 else
                     throw new Error(`Invalid parameter "report_name": ${report_name}`);
         }
-        let result = await $data.execSql({ dialect: dialect }, dbOpts);
-        if (result && result.detail && (result.detail.length > 0)) {
+        if (res_data.length > 0) {
             let isFirst = true;
-            result.detail.forEach(elem => {
+            res_data.forEach(elem => {
                 if (isFirst) {
                     for (let fld in elem) {
                         if (((!opts.fields) || (opts.fields[fld])) &&

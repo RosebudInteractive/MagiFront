@@ -93,12 +93,13 @@ class TestEditorForm extends React.Component {
             this.props.initialize({
                 testTypeId: test.TestTypeId,
                 courseId: test.CourseId,
-                lessonId: test.LessonId,
+                lessonId: test.LessonId ? test.LessonId : -1,
                 name: test.Name,
                 method: test.Method,
                 maxQ: test.MaxQ,
                 fromLesson: !!test.FromLesson,
                 isTimeLimited: !!test.IsTimeLimited,
+                status: test.Status,
                 questions: questions
             })
         }
@@ -135,12 +136,13 @@ class TestEditorForm extends React.Component {
             Id: test.Id ? test.Id : -1,
             TestTypeId: +editorValues.testTypeId,
             CourseId: editorValues.courseId ? +editorValues.courseId : null,
-            LessonId: editorValues.lessonId ? +editorValues.lessonId : null,
+            LessonId: (editorValues.lessonId && (+editorValues.lessonId > 0)) ? +editorValues.lessonId : null,
             Name: editorValues.name,
-            Method: editorValues.method,
+            Method: +editorValues.method,
             MaxQ: +editorValues.maxQ,
             FromLesson: !!+editorValues.fromLesson,
             IsTimeLimited: !!+editorValues.isTimeLimited,
+            Status: +editorValues.status,
             Questions: [],
         };
 
@@ -156,15 +158,15 @@ class TestEditorForm extends React.Component {
     _fillQuestions(array) {
         this.props.editorValues.questions.map((question) => {
             let _question = {
-                AnswTime: question.AnswTime,
+                AnswTime: +question.AnswTime,
                 Text: question.Text,
                 Picture: question.Picture,
                 PictureMeta: question.PictureMeta,
                 AnswType: +question.AnswType,
-                Score: question.Score,
-                StTime: question.StTime,
-                EndTime: question.EndTime,
-                AllowedInCourse: question.AllowedInCourse,
+                Score: +question.Score,
+                StTime: +question.StTime,
+                EndTime: +question.EndTime,
+                AllowedInCourse: !!+question.AllowedInCourse,
                 CorrectAnswResp: question.CorrectAnswResp,
                 WrongAnswResp: question.WrongAnswResp,
                 AnswBool: null,
@@ -175,7 +177,7 @@ class TestEditorForm extends React.Component {
 
             switch (+question.AnswType) {
                 case 1 : {
-                    _question.AnswInt = question.AnswInt
+                    _question.AnswInt = +question.AnswInt
                     break
                 }
 
@@ -187,7 +189,7 @@ class TestEditorForm extends React.Component {
                 case 3:
                 case 4: {
                     _question.Answers = question.Answers.map((answer) => {
-                        return {Text: answer.Text, IsCorrect: answer.IsCorrect}
+                        return {Text: answer.Text, IsCorrect: !!+answer.IsCorrect}
                     })
                     break
                 }

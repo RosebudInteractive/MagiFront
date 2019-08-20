@@ -6,6 +6,7 @@ import 'whatwg-fetch';
 import {checkStatus, getErrorMessage, handleJsonError, parseJSON} from "../tools/fetch-tools";
 import {HIDE_DELETE_DLG, SHOW_ERROR_DIALOG} from "../constants/Common";
 import {all, takeEvery, put, call, select} from 'redux-saga/effects'
+import {confirmDeleteObjectSaga} from "adm-ducks/messages";
 
 /**
  * Constants
@@ -41,6 +42,8 @@ const TestRecord = Record({
     Id: null,
     Name: null,
     TypeName: null,
+    LessonId: null,
+    Status: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -88,6 +91,8 @@ export const testsSelector = createSelector(entriesSelector, (entries) => {
 
         _item.id = _item.Id
         _item.Number = index + 1
+
+        _item.LessonId = item.LessonId ? item.LessonId : -1
         return _item
     })
 })
@@ -154,22 +159,26 @@ function* editTestSaga(data) {
 }
 
 function* deleteTestSaga(data) {
-    yield put({type: DELETE_TEST_START})
-    yield put({type: HIDE_DELETE_DLG})
 
-    try {
-        yield call(_deletePromo, data.payload)
-        yield put({type: DELETE_TEST_SUCCESS, payload: data.payload})
-    } catch (error) {
-        yield put({type: DELETE_TEST_FAIL})
+    const _confirmed = yield confirmDeleteObjectSaga(`Удалить тест "${data.payload.Name}"?`)
 
-        const _message = yield call(getErrorMessage, e)
-        yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+    if (_confirmed) {
+        yield put({type: DELETE_TEST_START})
+
+        try {
+            yield call(_deleteTest, data.payload.Id)
+            yield put({type: DELETE_TEST_SUCCESS, payload: data.payload.Id})
+        } catch (error) {
+            yield put({type: DELETE_TEST_FAIL})
+
+            const _message = yield call(getErrorMessage, error)
+            yield put({type: SHOW_ERROR_DIALOG, payload: _message})
+        }
     }
 }
 
-const _deletePromo = (id) => {
-    fetch(`/api/adm/tests/${id}`,
+const _deleteTest = (id) => {
+    return fetch(`/api/adm/tests/${id}`,
         {
             method: "DELETE",
             credentials: 'include'
