@@ -177,46 +177,6 @@ class CombineLessonPage extends React.Component {
         $('[data-fancybox]').fancybox();
         this._handleScroll();
         this.props.setCurrentPage(this)
-
-        // this._createYoutube()
-
-    }
-
-    _createYoutube(){
-        let tag = document.createElement('script');
-
-        tag.src = "https://www.youtube.com/iframe_api";
-        let firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        //
-        // 3. This function creates an <iframe> (and YouTube player)
-        //    after the API code downloads.
-        // window.player;
-
-        window.onYouTubeIframeAPIReady = function () {
-            window.player = new YT.Player('player', {
-                height: '360',
-                width: '640',
-                videoId: 'cde5v-Oy5XQ',
-                playerVars: {
-                    autoplay: 1,
-                    cc_load_policy: 0,
-                    controls: 0,
-                    disablekb: 0,
-                    showinfo: 0,
-                    modestbranding: 1,
-                    rel: 0,
-                    autohide: 1,
-                    frameborder: 0,
-                    fs: 1,
-                },
-                // events: {
-                //     'onReady': onPlayerReady,
-                //     'onStateChange': onPlayerStateChange
-                // }
-            });
-        }
-
     }
 
     componentWillUnmount() {
@@ -249,20 +209,18 @@ class CombineLessonPage extends React.Component {
         if (this._needStartPlayer || _needStartPlay) {
             this._needStartPlayer = false;
 
-            // let _isPlayingLesson = playInfo ? (playInfo.id === _lesson.Id) : false;
-            //
-            // if (_isPlayingLesson) {
-            //     this.props.appActions.switchToFullPlayer()
-            // } else {
-            //     if ((_lesson.IsAuthRequired && !authorized) || this._needLockLessonAsPaid(_lesson)) {
-            //         let _newUrl = '/' + courseUrl + '/' + lessonUrl;
-            //         this.props.history.replace(_newUrl)
-            //     } else {
-            //         this.props.playerStartActions.startPlayLesson(_lesson)
-            //     }
-            // }
+            let _isPlayingLesson = playInfo ? (playInfo.id === _lesson.Id) : false;
 
-            this._createYoutube()
+            if (_isPlayingLesson) {
+                this.props.appActions.switchToFullPlayer()
+            } else {
+                if ((_lesson.IsAuthRequired && !authorized) || this._needLockLessonAsPaid(_lesson)) {
+                    let _newUrl = '/' + courseUrl + '/' + lessonUrl;
+                    this.props.history.replace(_newUrl)
+                } else {
+                    this.props.playerStartActions.startPlayLesson(_lesson)
+                }
+            }
         }
 
         if (_lesson) {
@@ -464,17 +422,16 @@ class CombineLessonPage extends React.Component {
             return _data ? _data.size.height : 0
         }
 
-        this._removeRobotsMetaTags()
-
         return lesson
             ?
             <MetaTags>
                 <meta name="description" content={lesson.PageMeta.Post ? lesson.PageMeta.Post : lesson.ShortDescription}/>
                 <link rel="canonical" href={_url}/>
+                <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="article"/>
-                <meta property="og:title" content={lesson.PageMeta.Name ? lesson.PageMeta.Name : lesson.Name}/>
-                <meta property="og:description" content={lesson.PageMeta.Description ? lesson.PageMeta.Description : lesson.ShortDescription}/>
+                <meta property="og:title" content={lesson.PageMeta.Name}/>
+                <meta property="og:description" content={lesson.PageMeta.Description}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="article:publisher" content="https://www.facebook.com/Magisteria.ru/"/>
@@ -497,8 +454,8 @@ class CombineLessonPage extends React.Component {
                         null
                 }
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:description" content={lesson.PageMeta.Description ? lesson.PageMeta.Description : lesson.ShortDescription}/>
-                <meta name="twitter:title" content={lesson.PageMeta.Name ? lesson.PageMeta.Name : lesson.Name}/>
+                <meta name="twitter:description" content={lesson.PageMeta.Description}/>
+                <meta name="twitter:title" content={lesson.PageMeta.Name}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 {
                     lesson.PageMeta && lesson.PageMeta.Images && lesson.PageMeta.Images.twitter
@@ -518,6 +475,7 @@ class CombineLessonPage extends React.Component {
     _removeMetaTags() {
         $('meta[name="description"]').remove();
         $('link[rel="canonical"]').remove();
+        $('link[rel="publisher"]').remove();
         $('meta[property="og:locale"]').remove();
         $('meta[property="og:type"]').remove();
         $('meta[property="og:title"]').remove();
@@ -542,13 +500,6 @@ class CombineLessonPage extends React.Component {
         $('meta[name="twitter:creator"]').remove();
         $('meta[name="apple-mobile-web-app-title"]').remove();
         $('meta[name="application-name"]').remove();
-        $('meta[name="robots"]').remove();
-        $('meta[name="prerender-status-code"]').remove();
-    }
-
-    _removeRobotsMetaTags() {
-        $('meta[name="robots"]').remove();
-        $('meta[name="prerender-status-code"]').remove();
     }
 
     render() {
@@ -591,7 +542,6 @@ class CombineLessonPage extends React.Component {
                             {this._getLessonsBundles()}
                             <Sources lesson={_lesson}/>
                             <LessonInfo lesson={_lesson} course={course}/>
-                            <div className="youtube"/>
                             <TranscriptPage episodes={lessonText.episodes}
                                             refs={lessonText.refs}
                                             gallery={lessonText.gallery}
