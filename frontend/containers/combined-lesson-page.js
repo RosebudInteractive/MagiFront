@@ -422,6 +422,8 @@ class CombineLessonPage extends React.Component {
             return _data ? _data.size.height : 0
         }
 
+        this._removeRobotsMetaTags()
+
         return lesson
             ?
             <MetaTags>
@@ -500,6 +502,13 @@ class CombineLessonPage extends React.Component {
         $('meta[name="twitter:creator"]').remove();
         $('meta[name="apple-mobile-web-app-title"]').remove();
         $('meta[name="application-name"]').remove();
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _removeRobotsMetaTags() {
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 
     render() {
