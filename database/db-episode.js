@@ -3,7 +3,7 @@ const config = require('config');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
-const { ACCOUNT_ID } = require('../const/sql-req-common');
+const { ACCOUNT_ID, EpisodeContentType } = require('../const/sql-req-common');
 let { LessonsService } = require('./db-lesson');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
@@ -190,7 +190,7 @@ const GET_LESSON_LANG_MYSQL =
     "  join `LessonLng` l on l.`LessonId` = c.`Id`\n" +
     "where c.`Id` = <%= lessonId %>";
 
-const DFLT_CONTENT_TYPE = 1;
+const DFLT_CONTENT_TYPE = EpisodeContentType.AUDIO;
 
 const DbEpisode = class DbEpisode extends DbObject {
 
@@ -585,7 +585,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                                 });
                         }
                     })
-                    .then(() => {
+                    .then(async () => {
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
                             epi_obj.episodeType(inpFields["EpisodeType"]);
                         if (typeof (inpFields["ContentType"]) !== "undefined")
@@ -600,8 +600,8 @@ const DbEpisode = class DbEpisode extends DbObject {
                         if (typeof (inpFields["Audio"]) !== "undefined")
                             epi_lng_obj.audio(inpFields["Audio"]);
 
+                        let oldDuration = typeof (epi_lng_obj.duration()) === "number" ? epi_lng_obj.duration() : 0;
                         if (typeof (inpFields["AudioMeta"]) !== "undefined") {
-                            let oldDuration = typeof (epi_lng_obj.duration()) === "number" ? epi_lng_obj.duration() : 0;
                             let newDuration = 0;
                             epi_lng_obj.audioMeta(inpFields["AudioMeta"]);
                             try {
@@ -615,8 +615,14 @@ const DbEpisode = class DbEpisode extends DbObject {
 
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             epi_lng_obj.structure(inpFields["Structure"]);
-                        if (typeof (inpFields["VideoLink"]) !== "undefined")
+                        if (typeof (inpFields["VideoLink"]) !== "undefined") {
                             epi_lng_obj.videoLink(inpFields["VideoLink"]);
+                            if (contentType === EpisodeContentType.VIDEO) {
+                                let { sec } = await this._getVideoInfo(epi_lng_obj.videoLink());
+                                durationDelta = sec - oldDuration;
+                                epi_lng_obj.duration(sec);
+                            }
+                        }
 
                         for (let key in toc_list)
                             if (toc_list[key].deleted)
@@ -733,6 +739,7 @@ const DbEpisode = class DbEpisode extends DbObject {
             let transactionId = null;
             let duration = 0;
             let languageId;
+            let contentType = DFLT_CONTENT_TYPE;
 
             resolve(
                 this._getObjById(lesson_id, LESSON_REQ_TREE)
@@ -765,16 +772,18 @@ const DbEpisode = class DbEpisode extends DbObject {
                         return result.edit()
                     })
                     .then(() => {
-                        let fields = { LessonId: lesson_id, ContentType: DFLT_CONTENT_TYPE };
+                        let fields = { LessonId: lesson_id, ContentType: contentType };
                         if (typeof (inpFields["EpisodeType"]) !== "undefined")
                             fields["EpisodeType"] = inpFields["EpisodeType"];
-                        if (typeof (inpFields["ContentType"]) !== "undefined")
+                        if (typeof (inpFields["ContentType"]) !== "undefined") {
                             fields["ContentType"] = inpFields["ContentType"];
+                            contentType = fields["ContentType"];
+                        }
                         return root_obj.newObject({
                             fields: fields
                         }, opts);
                     })
-                    .then((result) => {
+                    .then(async (result) => {
                         newId = result.keyValue;
                         new_obj = this._db.getObj(result.newObject);
                         let root_lng = new_obj.getDataRoot("EpisodeLng");
@@ -798,11 +807,16 @@ const DbEpisode = class DbEpisode extends DbObject {
                                     duration = meta.length;
                             } catch (err) { };
                         }
-                        fields.Duration = duration;
                         if (typeof (inpFields["Structure"]) !== "undefined")
                             fields["Structure"] = inpFields["Structure"];
-                        if (typeof (inpFields["VideoLink"]) !== "undefined")
+                        if (typeof (inpFields["VideoLink"]) !== "undefined") {
                             fields["VideoLink"] = inpFields["VideoLink"];
+                            if (contentType === EpisodeContentType.VIDEO) {
+                                let { sec } = await this._getVideoInfo(fields["VideoIntwLink"]);
+                                duration = sec;
+                            }
+                        }
+                        fields.Duration = duration;
 
                         return root_lng.newObject({
                             fields: fields

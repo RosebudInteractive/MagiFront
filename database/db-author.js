@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const config = require('config');
 const { DbObject } = require('./db-object');
-const { LANGUAGE_ID, ACCOUNT_ID } = require('../const/sql-req-common');
+const { LANGUAGE_ID, ACCOUNT_ID, EpisodeContentType } = require('../const/sql-req-common');
 const { Intervals } = require('../const/common');
 const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
@@ -52,7 +52,8 @@ const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], pc.[Counter], gc.[Id] GiftId,\n" +
-    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
+    "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.[Audio], el.[Number] Eln,\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId]\n" +
     "from[Lesson] l\n" +
@@ -118,7 +119,8 @@ const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, pc.`Counter`, gc.`Id` GiftId,\n" +
-    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
+    "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.`Audio`, el.`Number` Eln,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`\n" +
     "from`Lesson` l\n" +
@@ -414,6 +416,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
+                                        ContentType: elem.ContentType,
                                         Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
                                         CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                         URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
@@ -428,7 +431,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         NSub: 0,
                                         NRefBooks: 0,
                                         NBooks: 0,
-                                        Audios: []
+                                        Audios: [],
+                                        Videos: []
                                     };
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
@@ -445,7 +449,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                                     }
                                     lsn_list[elem.LessonId] = lsn;
                                 }
-                                lsn.Audios.push(elem.Audio);
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
+                                    lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    lsn.Videos.push(elem.VideoLink);
                             })
                             if (paidCourses.length > 0) {
                                 for (let i = 0; i < paidCourses.length; i++)

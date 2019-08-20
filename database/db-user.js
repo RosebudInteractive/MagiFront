@@ -12,12 +12,14 @@ const { CoursesService } = require('./db-course');
 const { splitArray } = require('../utils');
 const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
+const { EpisodeContentType } = require('../const/sql-req-common');
 
 const isBillingTest = config.has("billing.billing_test") ? config.billing.billing_test : false;
 
 const GET_HISTORY_MSSQL =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], c.[OneLesson], l.[Id] as[LessonId], c.[LanguageId], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
-    "  c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
+    "  c.[URL], lc.[Number], lc.[ReadyDate], ell.[Audio], el.[Number] Eln,\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
@@ -47,7 +49,8 @@ const GET_HISTORY_MSSQL =
 
 const GET_HISTORY_MYSQL =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, c.`OneLesson`, l.`Id` as`LessonId`, c.`LanguageId`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
-    "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
+    "  c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.`Audio`, el.`Number` Eln,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
@@ -603,6 +606,7 @@ const DbUser = class DbUser extends DbObject {
                                                 isSubLesson: false,
                                                 ReadyDate: elem.ReadyDate,
                                                 State: elem.State,
+                                                ContentType: elem.ContentType,
                                                 Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
                                                 CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                                 URL: isAbsPath ? this._baseUrl + '/' + elem.URL + '/' + elem.LURL : elem.LURL,
@@ -613,7 +617,8 @@ const DbUser = class DbUser extends DbObject {
                                                 Duration: elem.Duration,
                                                 DurationFmt: elem.DurationFmt,
                                                 AuthorId: elem.AuthorId,
-                                                Audios: []
+                                                Audios: [],
+                                                Videos: []
                                             };
                                             if (lsn.IsSubsRequired && elem.FreeExpDate && ((now - elem.FreeExpDate) > Intervals.MIN_FREE_LESSON))
                                                 lsn.FreeExpDate = elem.FreeExpDate;
@@ -648,7 +653,10 @@ const DbUser = class DbUser extends DbObject {
                                                 history.Lessons.push(lsn);
                                             }
                                         }
-                                        lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                        if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
+                                            lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                        if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                            lsn.Videos.push(elem.VideoLink);
                                     })
                                     let courseIds = [];
                                     let ctgService = this.getService("categories", true);
