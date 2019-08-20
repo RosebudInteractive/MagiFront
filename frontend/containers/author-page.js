@@ -63,12 +63,13 @@ class AuthorPage extends React.Component {
             _title = author ? (author.FirstName + ' ' + author.LastName + ' - Магистерия') : '',
             _portrait = getAuthorPortraitPath(author, ImageSize.small);
 
+        this._removeRobotsMetaTags()
+
         return author
             ?
             <MetaTags>
                 <meta name="description" content={author.Description}/>
                 <link rel="canonical" href={_url}/>
-                <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="object"/>
                 <meta property="og:title" content={_title}/>
@@ -93,7 +94,6 @@ class AuthorPage extends React.Component {
     _removeMetaTags() {
         $('meta[name="description"]').remove();
         $('link[rel="canonical"]').remove();
-        $('link[rel="publisher"]').remove();
         $('meta[property="og:locale"]').remove();
         $('meta[property="og:type"]').remove();
         $('meta[property="og:title"]').remove();
@@ -110,6 +110,13 @@ class AuthorPage extends React.Component {
         $('meta[name="twitter:image"]').remove();
         $('meta[name="apple-mobile-web-app-title"]').remove();
         $('meta[name="application-name"]').remove();
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _removeRobotsMetaTags() {
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 
     _getPage() {

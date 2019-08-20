@@ -102,16 +102,17 @@ class Main extends React.Component {
             return _data ? _data.size.height : 0
         }
 
+        this._removeRobotsMetaTags()
+
         return course
             ?
             <MetaTags>
                 <meta name="description" content={course.PageMeta.Post ? course.PageMeta.Post : course.Description}/>
                 <link rel="canonical" href={_url}/>
-                <link rel="publisher" href="https://plus.google.com/111286891054263651937"/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="article"/>
-                <meta property="og:title" content={course.PageMeta.Name}/>
-                <meta property="og:description" content={course.PageMeta.Description}/>
+                <meta property="og:title" content={course.PageMeta.Name ? course.PageMeta.Name : course.Name}/>
+                <meta property="og:description" content={course.PageMeta.Description ? course.PageMeta.Description : course.Description}/>
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
@@ -129,8 +130,8 @@ class Main extends React.Component {
                         null
                 }
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:title" content={course.PageMeta.Name}/>
-                <meta name="twitter:description" content={course.PageMeta.Description}/>
+                <meta name="twitter:title" content={course.PageMeta.Name ? course.PageMeta.Name : course.Name}/>
+                <meta name="twitter:description" content={course.PageMeta.Description ? course.PageMeta.Description : course.Description}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 {
                     course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.twitter
@@ -151,7 +152,6 @@ class Main extends React.Component {
     _removeMetaTags() {
         $('meta[name="description"]').remove();
         $('link[rel="canonical"]').remove();
-        $('link[rel="publisher"]').remove();
         $('meta[property="og:locale"]').remove();
         $('meta[property="og:type"]').remove();
         $('meta[property="og:title"]').remove();
@@ -168,6 +168,13 @@ class Main extends React.Component {
         $('meta[name="twitter:image"]').remove();
         $('meta[name="apple-mobile-web-app-title"]').remove();
         $('meta[name="application-name"]').remove();
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _removeRobotsMetaTags() {
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 
     render() {

@@ -162,6 +162,8 @@ class CoursesPage extends React.Component {
     }
 
     _getMetaTags() {
+        this._removeRobotsMetaTags()
+
         return <MetaTags>
             <meta name="description" content="Образовательный сайт с лекциями о живописи, музыке, философии, литературе, истории и многом другом."/>
         </MetaTags>
@@ -169,6 +171,13 @@ class CoursesPage extends React.Component {
 
     _removeMetaTags() {
         $('meta[name="description"]').remove();
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _removeRobotsMetaTags() {
+        $('meta[name="robots"]').remove();
+        $('meta[name="prerender-status-code"]').remove();
     }
 
     _getVisibleCourses() {
