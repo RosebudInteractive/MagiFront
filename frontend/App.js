@@ -18,6 +18,7 @@ import PageHeader from './components/page-header/page-header';
 import PageFooter from './components/page-footer/page-footer';
 import FeedbackMessageBox from './components/messages/feedback';
 import FeedbackResultMessage from './components/messages/feedback-result-message';
+import YoutubePage from './components/combined-lesson-page/youtube-test/youtube-player-page';
 
 import * as tools from './tools/page-tools';
 import * as appActions from './actions/app-actions';
@@ -324,6 +325,7 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
+                <Route path={_homePath + 'youtube-page'} component={YoutubePage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )
