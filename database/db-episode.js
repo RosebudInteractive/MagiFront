@@ -617,7 +617,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                             epi_lng_obj.structure(inpFields["Structure"]);
                         if (typeof (inpFields["VideoLink"]) !== "undefined") {
                             epi_lng_obj.videoLink(inpFields["VideoLink"]);
-                            if (contentType === EpisodeContentType.VIDEO) {
+                            if (epi_obj.contentType() === EpisodeContentType.VIDEO) {
                                 let { sec } = await this._getVideoInfo(epi_lng_obj.videoLink());
                                 durationDelta = sec - oldDuration;
                                 epi_lng_obj.duration(sec);
