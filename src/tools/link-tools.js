@@ -155,3 +155,9 @@ export const convertYouTubeWatchLinkToEmbed = (link) => {
 
     return link
 }
+
+export const isYoutubeLink = (link) => {
+    const _link = new ExtLinkObject(link)
+
+    return (_link.isValid() && (_link.host() === 'www.youtube.com'))
+}
