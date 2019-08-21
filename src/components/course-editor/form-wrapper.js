@@ -10,7 +10,7 @@ import PropTypes from 'prop-types'
 import {fixedCourseIdSelector, fixedObjDescrSelector, parametersFetchingSelector,} from "adm-ducks/params"
 import '../common/form.sass'
 import {enableButtonsSelector} from "adm-ducks/app";
-import {ExtLinkObject} from '../../tools/link-tools'
+import {isYoutubeLink} from '../../tools/link-tools'
 
 const STATE_OPTIONS = [
     {id: 'D', value: 'Черновик'},
@@ -144,21 +144,15 @@ const validate = (values, props) => {
         errors.fixDescription = 'Значение не может быть пустым'
     }
 
-    if (values.videoIntroLink && !_isYoutubeLink(values.videoIntroLink)) {
+    if (values.videoIntroLink && !isYoutubeLink(values.videoIntroLink)) {
         errors.videoIntroLink = 'Необходима ссылка на YouTube'
     }
 
-    if (values.videoIntwLink && !_isYoutubeLink(values.videoIntwLink)) {
+    if (values.videoIntwLink && !isYoutubeLink(values.videoIntwLink)) {
         errors.videoIntwLink = 'Необходима ссылка на YouTube'
     }
 
     return errors
-}
-
-function _isYoutubeLink(link) {
-    const _link = new ExtLinkObject(link)
-
-    return (_link.isValid() && (_link.host() === 'www.youtube.com'))
 }
 
 function _checkLessonsState(newState, courseLessons) {

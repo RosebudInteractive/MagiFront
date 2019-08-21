@@ -13,6 +13,7 @@ import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
 import {cancelChanges, save} from "../../actions/episode/episode-actions";
 import PropTypes from "prop-types";
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from "../../constants/Common";
+import {convertYouTubeWatchLinkToEmbed, isYoutubeLink} from '../../tools/link-tools'
 
 const TABS = {
     MAIN: 'MAIN',
@@ -24,6 +25,12 @@ const NEW_EPISODE = {
     EpisodeType: 'L',
     Supp: false,
     State: 'D',
+    ContentType : 1,
+}
+
+const CONTENT_TYPE = {
+    AUDIO: 1,
+    VIDEO: 2,
 }
 
 class EpisodeEditorForm extends React.Component {
@@ -126,7 +133,9 @@ class EpisodeEditorForm extends React.Component {
                 state: _episode.State,
                 transcript: _episode.Transcript,
                 toc: _episode.Toc ? _episode.Toc : [],
-                content: _episode.Content ? _episode.Content : []
+                content: _episode.Content ? _episode.Content : [],
+                contentType: _episode.ContentType ? _episode.ContentType : 1,
+                videoLink: _episode.VideoLink,
             })
         }
     }
@@ -186,14 +195,24 @@ class EpisodeEditorForm extends React.Component {
             Id: episode.Id,
             Name: editorValues.name,
             State: editorValues.state,
-            Audio: editorValues.audio.file,
-            AudioMeta: JSON.stringify(editorValues.audio.meta),
+
             EpisodeType: editorValues.episodeType,
             Transcript: editorValues.transcript,
             Supp: !!+editorValues.supp,
+            ContentType: +editorValues.contentType,
             Toc: [],
             Content: [],
         };
+
+        if (_obj.ContentType === CONTENT_TYPE.AUDIO) {
+            _obj.VideoLink = null
+            _obj.Audio = editorValues.audio.file
+            _obj.AudioMeta = JSON.stringify(editorValues.audio.meta)
+        } else if (_obj.ContentType === CONTENT_TYPE.VIDEO) {
+            _obj.VideoLink = convertYouTubeWatchLinkToEmbed(editorValues.videoLink)
+            _obj.Audio = null
+            _obj.AudioMeta = null
+        }
 
         this._fillToc(_obj.Toc);
         this._fillContent(_obj.Content);
@@ -248,6 +267,10 @@ const validate = (values) => {
 
     if (values.fixed && !values.fixDescription) {
         errors.fixDescription = 'Значение не может быть пустым'
+    }
+
+    if (values.videoLink && !isYoutubeLink(values.videoLink)) {
+        errors.videoLink = 'Необходима ссылка на YouTube'
     }
 
     return errors
