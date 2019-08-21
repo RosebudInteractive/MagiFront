@@ -19,10 +19,8 @@ function setupCourses(app) {
                 });
         });
 
-        // app.get('/api/courses-lng/:lessonId', (req, res, next) => {
         app.get('/api/courses', (req, res, next) => {
             CoursesService()
-                // .getAllPublic(parseInt(req.params.lessonId))
                 .getAllPublic(req.user, req.query)
                 .then(rows => {
                     res.send(rows);

@@ -21,7 +21,9 @@ const {
     AUTHORS_BY_ID_MSSQL_PUBLIC_REQ,
     AUTHORS_BY_ID_MYSQL_PUBLIC_REQ,
     CHECK_IF_CAN_DEL_LESSON_MSSQL,
-    CHECK_IF_CAN_DEL_LESSON_MYSQL } = require('../const/sql-req-common');
+    CHECK_IF_CAN_DEL_LESSON_MYSQL,
+    EpisodeContentType
+} = require('../const/sql-req-common');
 
 const COURSE_REQ_TREE = {
     expr: {
@@ -269,6 +271,7 @@ const LESSON_EPI_MSSQL_TOC_REQ =
 
 const LESSON_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
+    "  l.[VideoLink], e.[ContentType],\n" +
     "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
     "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -279,6 +282,7 @@ const LESSON_MSSQL_CONTENT_REQ =
 
 const LESSON_EPI_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
+    "  l.[VideoLink], e.[ContentType],\n" +
     "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
     "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -339,6 +343,7 @@ const LESSON_MSSQL_CHILDS_REQ =
     "select l.[Id], ll.[Name], ll.[ShortDescription], lc.[State], lc.[ReadyDate],\n" +
     "  l.[Cover], l.[CoverMeta], ll.[Duration], ll.[DurationFmt], l.[IsAuthRequired], l.[IsSubsRequired],\n" +
     "  l.[FreeExpDate], l.[URL], l.[AuthorId], lc.[Number],\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  ell.[Audio], l.[IsFreeInPaidCourse]\n" +
     "from[LessonCourse] lc\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
@@ -396,7 +401,8 @@ const PARENT_MSSQL_COND_URL =
     "where c.[URL] = '<%= course_url %>' and l.[URL] = '<%= lesson_url %>'";
 
 const LESSON_MSSQL_TRANSCRIPT_REQ =
-    "select pl.[Number], e.[Id], l.[Name], l.[Transcript], l.[Audio]\n" +
+    "select pl.[Number], e.[Id], l.[Name], l.[Transcript], l.[Audio],\n" +
+    "  l.[VideoLink], e.[ContentType]\n" +
     "from[EpisodeLesson] pl\n" +
     "  join[Episode] e on e.[Id] = pl.[EpisodeId]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -465,6 +471,7 @@ const LESSON_EPI_MYSQL_TOC_REQ =
 
 const LESSON_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
+    "  l.`VideoLink`, e.`ContentType`,\n" +
     "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
     "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -475,6 +482,7 @@ const LESSON_MYSQL_CONTENT_REQ =
 
 const LESSON_EPI_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
+    "  l.`VideoLink`, e.`ContentType`,\n" +
     "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
     "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -535,6 +543,7 @@ const LESSON_MYSQL_CHILDS_REQ =
     "select l.`Id`, ll.`Name`, ll.`ShortDescription`, lc.`State`, lc.`ReadyDate`,\n" +
     "  l.`Cover`, l.`CoverMeta`, ll.`Duration`, ll.`DurationFmt`, l.`IsAuthRequired`, l.`IsSubsRequired`,\n" +
     "  l.`FreeExpDate`, l.`URL`, l.`AuthorId`, lc.`Number`,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  ell.`Audio`, l.`IsFreeInPaidCourse`\n" +
     "from`LessonCourse` lc\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
@@ -592,7 +601,8 @@ const PARENT_MYSQL_COND_URL =
     "where c.`URL` = '<%= course_url %>' and l.`URL` = '<%= lesson_url %>'";
 
 const LESSON_MYSQL_TRANSCRIPT_REQ =
-    "select pl.`Number`, e.`Id`, l.`Name`, l.`Transcript`, l.`Audio`\n" +
+    "select pl.`Number`, e.`Id`, l.`Name`, l.`Transcript`, l.`Audio`,\n" +
+    "  l.`VideoLink`, e.`ContentType`\n" +
     "from`EpisodeLesson` pl\n" +
     "  join`Episode` e on e.`Id` = pl.`EpisodeId`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -659,6 +669,7 @@ const LESSONS_ALL_MSSQL_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], l.[Id] as[LessonId],\n" +
     "  lc.[Number], lc.[ReadyDate], l.[IsFreeInPaidCourse],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  ll.[Name] as[LName], ll.[Duration], ll.[DurationFmt], l.[AuthorId], ell.Audio, el.[Number] Eln from [Course] c\n" +
     "  join [CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join [LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -674,6 +685,7 @@ const LESSONS_ALL_MYSQL_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, l.`Id` as`LessonId`,\n" +
     "  lc.`Number`, lc.`ReadyDate`, l.`IsFreeInPaidCourse`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  ll.`Name` as`LName`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId`, ell.Audio, el.`Number` Eln from `Course` c\n" +
     "  join `CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join `LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -1013,6 +1025,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
+                                        ContentType: elem.ContentType,
                                         Cover: elem.LCover,
                                         CoverMeta: elem.LCoverMeta,
                                         URL: elem.LURL,
@@ -1024,7 +1037,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         DurationFmt: elem.DurationFmt,
                                         AuthorId: elem.AuthorId,
                                         Lessons: [],
-                                        Audios: []
+                                        Audios: [],
+                                        Videos: []
                                     };
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
@@ -1046,8 +1060,10 @@ const DbLesson = class DbLesson extends DbObject {
                                         }
                                     }
                                 };
-                                if (elem.Audio)
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
                                     lsn.Audios.push(elem.Audio);
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    lsn.Videos.push(elem.VideoLink);
                             })
                             let authors = "";
                             isFirst = true;
@@ -1226,7 +1242,7 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getLessonText(course_url, lesson_url, user) {
-        let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [] };
+        let data = { Galery: [], Episodes: [], Refs: [], Books: [], Audios: [], Videos: [] };
         let epi_list = {};
         let assets_list = {};
         let parentUrl = lesson_url;
@@ -1323,13 +1339,19 @@ const DbLesson = class DbLesson extends DbObject {
                             result.detail.forEach((elem) => {
                                 let curr_episode = {
                                     Id: elem.Id,
+                                    ContentType: elem.ContentType,
                                     Number: elem.Number,
                                     Name: elem.Name,
                                     Transcript: elem.Transcript,
                                     Toc: []
                                 };
                                 data.Episodes.push(curr_episode);
-                                data.Audios.push(elem.Audio);
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
+                                    data.Audios.push(elem.Audio);
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    data.Videos.push(elem.VideoLink);
+                                if (isFirst)
+                                    data.ContentType = elem.ContentType;
                                 epi_list[elem.Id] = curr_episode;
                                 if (!(showTranscript || IsFreeInPaidCourse)) {
                                     if (isFirst)
@@ -1388,7 +1410,7 @@ const DbLesson = class DbLesson extends DbObject {
     }
 
     getLessonV2(course_url, lesson_url, user, options) {
-        let data = { Galery: [], Episodes: [], Refs: [], RefBooks: [], Books: [], Audios: [], Childs: [], ShareCounters: {}, PageMeta: {} };
+        let data = { Galery: [], Episodes: [], Refs: [], RefBooks: [], Books: [], Audios: [], Videos: [], Childs: [], ShareCounters: {}, PageMeta: {} };
         let epi_list = {};
         let assets_list = {};
         let opts = options || {};
@@ -1547,6 +1569,7 @@ const DbLesson = class DbLesson extends DbObject {
                                     child.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
                                     child.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
                                     child.State = elem.State;
+                                    child.ContentType = elem.ContentType;
                                     child.ReadyDate = elem.ReadyDate;
                                     child.Duration = elem.Duration;
                                     child.DurationFmt = elem.DurationFmt;
@@ -1559,10 +1582,13 @@ const DbLesson = class DbLesson extends DbObject {
                                     if (child.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         child.FreeExpDate = elem.FreeExpDate;
                                     child.Audios = [];
+                                    child.Videos = [];
                                     data.Childs.push(child);
                                 }
-                                if (elem.Audio)
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
                                     child.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    child.Videos.push(elem.VideoLink);
                             })
                         }
                         return $data.execSql({
@@ -1630,10 +1656,11 @@ const DbLesson = class DbLesson extends DbObject {
                     })
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
+                            let isFirst = true;
                             result.detail.forEach((elem) => {
-                                let isFirst = true;
                                 let curr_episode = {
                                     Id: elem.Id,
+                                    ContentType: elem.ContentType,
                                     Number: elem.Number,
                                     Name: elem.Name,
                                     Transcript: elem.Transcript,
@@ -1644,11 +1671,16 @@ const DbLesson = class DbLesson extends DbObject {
                                         curr_episode.Transcript = truncateHtml(curr_episode.Transcript)
                                     else
                                         curr_episode.Transcript = "";
-                                    isFirst = false;
                                 }
+                                if (isFirst)
+                                    data.ContentType = elem.ContentType;
                                 data.Episodes.push(curr_episode);
-                                data.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.ContentType === EpisodeContentType.AUDIO)
+                                    data.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.ContentType === EpisodeContentType.VIDEO)
+                                    data.Videos.push(elem.VideoLink);
                                 epi_list[elem.Id] = curr_episode;
+                                isFirst = false;
                             });
                         }
                         return $data.execSql({
@@ -1801,19 +1833,21 @@ const DbLesson = class DbLesson extends DbObject {
                     .then((result) => {
                         if (result && result.detail && (result.detail.length > 0)) {
                             let curr_id = -1;
-                            let curr_episode = null;;
+                            let curr_episode = null;
                             
                             result.detail.forEach((elem) => {
                                 let assetId = elem.AssetId;
                                 if (curr_id !== elem.Episode) {
                                     curr_episode = {
                                         id: elem.Episode,
+                                        contentType: elem.ContentType,
                                         title: elem.Name,
                                         elements: [],
-                                        audio: {
+                                        audio: elem.Audio ? {
                                             file: this._convertDataUrl(elem.Audio, isAbsPath, dLink),
                                             info: JSON.parse(elem.AudioMeta)
-                                        },
+                                        } : null,
+                                        videoLink: elem.VideoLink,
                                         contents: []
                                     };
                                     data.episodes.push(curr_episode);

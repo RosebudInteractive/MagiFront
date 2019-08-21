@@ -1,7 +1,11 @@
+const { URL, URLSearchParams } = require('url');
 const config = require('config');
 const _ = require('lodash');
+const request = require('request');
+const { HttpError } = require('../errors/http-error');
+const { HttpCode } = require("../const/http-codes");
 const { CacheableObject } = require('../utils/cache-base');
-const { DbUtils: { intFmtWithLeadingZeros } } = require('./db-utils');
+const { DbUtils: { intFmtWithLeadingZeros, fmtDuration } } = require('./db-utils');
 const Predicate = require(UCCELLO_CONFIG.uccelloPath + 'predicate/predicate');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
@@ -147,6 +151,70 @@ exports.DbObject = class DbObject extends CacheableObject {
                 ":" + intFmtWithLeadingZeros(dt.getSeconds(), 2) +
                 (timeMsFlag ? ("." + intFmtWithLeadingZeros(dt.getMilliseconds(), 3)) : '');
         return result;
+    }
+
+    async _getVideoInfo(url) {
+        const TIME_REGEXP = /PT(([0-9]+)H)*(([0-9]+)M)*(([0-9]+)S)*/i;
+        const ID_REGEXP = /https:\/\/www.youtube.com\/embed\/(.+)/i;
+        const YOUTUBE_API_VIDEO_BASE_URL = "https://www.googleapis.com/youtube/v3/videos";
+
+        let res = { fmt: "", sec: 0 };
+        if (url) {
+            let match = url.toString().match(ID_REGEXP);
+            if (match && Array.isArray(match) && (match.length === 2)) {
+                let id = match[1];
+                return new Promise((resolve, reject) => {
+                    let reqUrl = new URL(YOUTUBE_API_VIDEO_BASE_URL);
+                    reqUrl.searchParams.append('id', id);
+                    reqUrl.searchParams.append('part', 'contentDetails');
+                    reqUrl.searchParams.append('fields', 'items(contentDetails(duration))');
+                    reqUrl.searchParams.append('key', config.authentication.googleAppId);
+                    request(reqUrl.href, (error, response, body) => {
+                        if (error) {
+                            console.error(buildLogString(`YouTube request error: "${error.message}"` +
+                                ` API: "${reqUrl.href}"`));
+                            reject(error);
+                        }
+                        else {
+                            if (response.statusCode === HttpCode.OK) {
+                                try {
+                                    let result = JSON.parse(body);
+                                    if (result && result.items && (result.items.length > 0)
+                                        && result.items[0].contentDetails && result.items[0].contentDetails.duration) {
+                                        let timeString = "" + result.items[0].contentDetails.duration;
+                                        match = timeString.match(TIME_REGEXP);
+                                        if (match && Array.isArray(match) && (match.length === 7)) {
+                                            if (match[2])
+                                                res.sec += (+match[2]) * 3600;
+                                            if (match[4])
+                                                res.sec += (+match[4]) * 60;
+                                            if (match[6])
+                                                res.sec += (+match[6]);
+                                            if (res.sec > 1)
+                                                res.sec--;
+                                            res.fmt = fmtDuration(res.sec);
+                                            resolve(res);
+                                        }
+                                        throw new Error(`Incorrect duration format: "${timeString}"`);
+                                    }
+                                    else
+                                        throw new Error(`Incorrect result of YouTube request: "${body}"`);
+                                }
+                                catch (err) {
+                                    reject(err);
+                                };
+                            }
+                            else
+                                reject(new Error(`YouTube request error: HttpCode: ${response.statusCode}, Body: ${body}`));
+                        }
+                    });
+
+                });
+            }
+            else
+                throw new Error(`Invalid video URL: "${url}"`);
+        }
+        return res;
     }
 
     getAll() {

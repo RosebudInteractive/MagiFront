@@ -18,7 +18,8 @@ const {
     AUTHORS_BY_ID_MSSQL_PUBLIC_REQ,
     AUTHORS_BY_ID_MYSQL_PUBLIC_REQ,
     CHECK_IF_CAN_DEL_LESSON_MSSQL,
-    CHECK_IF_CAN_DEL_LESSON_MYSQL
+    CHECK_IF_CAN_DEL_LESSON_MYSQL,
+    EpisodeContentType
 } = require('../const/sql-req-common');
 const { getTimeStr, buildLogString } = require('../utils');
 
@@ -205,7 +206,8 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
-    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.Audio, el.[Number] Eln,\n" +
+    "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.[Audio], el.[Number] Eln,\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id] and cl.[LanguageId] = <%= languageId %>\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
@@ -237,7 +239,8 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
-    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.Audio, el.`Number` Eln,\n" +
+    "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.`Audio`, el.`Number` Eln,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id` and cl.`LanguageId` = <%= languageId %>\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
@@ -271,6 +274,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
+    "  ell.[VideoLink], e.[ContentType],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -357,6 +361,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
+    "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -486,7 +491,6 @@ const CHECKIF_CAN_DEL_MYSQL =
     "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
 const { PrerenderCache } = require('../prerender/prerender-cache');
-const request = require('request');
 const { URL, URLSearchParams } = require('url');
 
 const URL_PREFIX = "category";
@@ -498,70 +502,6 @@ const DbCourse = class DbCourse extends DbObject {
         this._prerenderCache = PrerenderCache();
         this._partnerLink = new PartnerLink();
         this._productService = ProductService();
-    }
-
-    async _getVideoInfo(url) {
-        const TIME_REGEXP = /PT(([0-9]+)H)*(([0-9]+)M)*(([0-9]+)S)*/i;
-        const ID_REGEXP = /https:\/\/www.youtube.com\/embed\/(.+)/i;
-        const YOUTUBE_API_VIDEO_BASE_URL = "https://www.googleapis.com/youtube/v3/videos";
-
-        let res = { fmt: "", sec: 0 };
-        if (url) {
-            let match = url.toString().match(ID_REGEXP);
-            if (match && Array.isArray(match) && (match.length === 2)) {
-                let id = match[1];
-                return new Promise((resolve, reject) => {
-                    let reqUrl = new URL(YOUTUBE_API_VIDEO_BASE_URL);
-                    reqUrl.searchParams.append('id', id);
-                    reqUrl.searchParams.append('part', 'contentDetails');
-                    reqUrl.searchParams.append('fields', 'items(contentDetails(duration))');
-                    reqUrl.searchParams.append('key', config.authentication.googleAppId);
-                    request(reqUrl.href, (error, response, body) => {
-                        if (error) {
-                            console.error(buildLogString(`YouTube request error: "${error.message}"` +
-                                ` API: "${reqUrl.href}"`));
-                            reject(error);
-                        }
-                        else {
-                            if (response.statusCode === HttpCode.OK) {
-                                try {
-                                    let result = JSON.parse(body);
-                                    if (result && result.items && (result.items.length > 0)
-                                        && result.items[0].contentDetails && result.items[0].contentDetails.duration) {
-                                        let timeString = "" + result.items[0].contentDetails.duration;
-                                        match = timeString.match(TIME_REGEXP);
-                                        if (match && Array.isArray(match) && (match.length === 7)) {
-                                            if (match[2])
-                                                res.sec += (+match[2]) * 3600;
-                                            if (match[4])
-                                                res.sec += (+match[4]) * 60;
-                                            if (match[6])
-                                                res.sec += (+match[6]);
-                                            if (res.sec > 1)
-                                                res.sec--;
-                                            res.fmt = DbUtils.fmtDuration(res.sec);
-                                            resolve(res);
-                                        }
-                                        throw new Error(`Incorrect duration format: "${timeString}"`);
-                                    }
-                                    else
-                                        throw new Error(`Incorrect result of YouTube request: "${body}"`);
-                                }
-                                catch (err) {
-                                    reject(err);
-                                };
-                            }
-                            else
-                                reject(new Error(`YouTube request error: HttpCode: ${response.statusCode}, Body: ${body}`));
-                        }
-                    });
-                
-                });
-            }
-            else
-                throw new Error(`Invalid video URL: "${url}"`);
-        }
-        return res;
     }
 
     _isNumericString(str) {
@@ -790,6 +730,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Id: elem.LessonId,
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
+                                        ContentType: elem.ContentType,
                                         State: elem.State,
                                         Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
                                         CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
@@ -802,7 +743,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         Duration: elem.Duration,
                                         DurationFmt: elem.DurationFmt,
                                         AuthorId: elem.AuthorId,
-                                        Audios: []
+                                        Audios: [],
+                                        Videos: []
                                     };
                                     curr_course.IsSubsRequired = curr_course.IsSubsRequired || lesson.IsSubsRequired;
                                     if (lesson.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
@@ -810,8 +752,10 @@ const DbCourse = class DbCourse extends DbObject {
                                     curr_course.Lessons.push(lesson);
                                     lessons_list[elem.LessonId] = lesson;
                                 }
-                                if (elem.Audio)
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
                                     lesson.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    lesson.Videos.push(elem.VideoLink);
                             })
 
                             if (Object.keys(productList).length > 0) {
@@ -1108,6 +1052,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Number: elem.Number,
                                         ReadyDate: elem.ReadyDate,
                                         State: elem.State,
+                                        ContentType: elem.ContentType,
                                         Cover: this._convertDataUrl(elem.LCover, isAbsPath, dLink),
                                         CoverMeta: this._convertMeta(elem.LCoverMeta, isAbsPath, dLink),
                                         URL: isAbsPath ? courseUrl + elem.LURL : elem.LURL,
@@ -1123,7 +1068,8 @@ const DbCourse = class DbCourse extends DbObject {
                                         NRefBooks: 0,
                                         NBooks: 0,
                                         Lessons: [],
-                                        Audios: []
+                                        Audios: [],
+                                        Videos: []
                                     };
                                     course.IsSubsRequired = course.IsSubsRequired || lsn.IsSubsRequired;
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
@@ -1144,8 +1090,10 @@ const DbCourse = class DbCourse extends DbObject {
                                     }
                                     lsn_list[elem.LessonId] = lsn;
                                 }
-                                if (elem.Audio)
+                                if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
                                     lsn.Audios.push(this._convertDataUrl(elem.Audio, isAbsPath, dLink));
+                                if (elem.VideoLink && (elem.ContentType === EpisodeContentType.VIDEO))
+                                    lsn.Videos.push(elem.VideoLink);
                             })
 
                             await this.getCoursePrice(course);
