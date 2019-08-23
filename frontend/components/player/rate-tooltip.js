@@ -21,13 +21,15 @@ class RateTooltip extends Component {
 
     _getRates() {
         let that = this;
-        const _rates = [
-            {value: 0.75},
-            {value: 1.0, title: 'Обычная'},
-            {value: 1.25},
-            {value: 1.5},
-            {value: 1.75},
-        ];
+        // const _rates = [
+        //     {value: 0.75},
+        //     {value: 1.0, title: 'Обычная'},
+        //     {value: 1.25},
+        //     {value: 1.5},
+        //     {value: 1.75},
+        // ];
+
+        const {availableRates : _rates} = this.props
 
         return _rates.map((item, index) => {
             return <li className={(this.props.rate === item.value) ? 'active' : ''} key={index}
@@ -58,6 +60,7 @@ class RateTooltip extends Component {
 function mapStateToProps(state) {
     return {
         rate: state.player.rate,
+        availableRates: state.player.availableRates,
     }
 }
 

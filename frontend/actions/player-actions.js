@@ -20,7 +20,7 @@ import {
     SHOW_SPEED_TOOLTIP,
     HIDE_SPEED_TOOLTIP,
     PLAYER_CAN_NOT_START_PLAY_LESSON,
-    PLAYER_SET_PROGRESS_PERCENT,
+    PLAYER_SET_PROGRESS_PERCENT, PLAYER_SET_TOTAL_DURATION, PLAYER_SET_AVAILABLE_RATES,
 } from '../constants/player'
 
 export const startInit = () => {
@@ -78,6 +78,21 @@ export const setProgressPercent = (value) => {
         payload: value
     };
 };
+
+
+export const setTotalDuration = (value) => {
+    return {
+        type: PLAYER_SET_TOTAL_DURATION,
+        payload: value
+    };
+};
+
+export const setAvailableRates = (value) => {
+    return {
+        type: PLAYER_SET_AVAILABLE_RATES,
+        payload: value,
+    }
+}
 
 export const setTitle = (value) => {
     return {

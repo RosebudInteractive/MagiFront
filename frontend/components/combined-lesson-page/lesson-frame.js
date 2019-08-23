@@ -24,6 +24,7 @@ import {getLessonNumber} from "../../tools/page-tools";
 import {FINISH_DELTA_TIME} from "../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {unlockLesson,} from "ducks/player";
+import {CONTENT_TYPE} from "../../constants/common-consts";
 
 class LessonFrame extends React.Component {
     static propTypes = {
@@ -96,9 +97,14 @@ class LessonFrame extends React.Component {
 
         if (this.props.needLockLessonAsPaid) return
 
-        this.props.playerStartActions.preinitAudios(this.props.audios);
-        this.props.history.replace('/' + this.props.courseUrl + '/' + this.props.lesson.URL + '?play')
-        this.props.playerStartActions.startPlay(this.props.lesson.Id)
+        const {courseUrl, lesson, audios} = this.props
+
+        if (lesson.ContentType === CONTENT_TYPE.AUDIO) {
+            this.props.playerStartActions.preinitAudios(audios);
+        }
+
+        this.props.history.replace(`/${courseUrl}/${lesson.URL}?play`)
+        this.props.playerStartActions.startPlay(lesson.Id)
     }
 
     _crownButtonClick() {

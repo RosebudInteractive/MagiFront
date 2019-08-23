@@ -46,7 +46,7 @@ const loaderMiddleware = store => next => action => {
                 store.dispatch(playerActions.setVolume(_state.lessonInfoStorage.volume));
                 store.dispatch(playerActions.setMuteState(_state.lessonInfoStorage.muted));
 
-                Loader.notyfyPlayInfoLoaded({
+                Loader.notifyPlayInfoLoaded({
                     lessonId : _id,
                     courseUrl : _state.lessonPlayInfo.playInfo.courseUrl,
                     lessonUrl : _state.lessonPlayInfo.playInfo.lessonUrl,

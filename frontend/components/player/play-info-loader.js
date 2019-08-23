@@ -6,7 +6,7 @@ export default class PlayInfoLoader {
         store.dispatch(loaderActions.getLessonPlayInfo(lesson))
     }
 
-    static notyfyPlayInfoLoaded(data) {
+    static notifyPlayInfoLoaded(data) {
         store.dispatch(loaderActions.notifyLessonPlayInfoLoaded(data))
     }
 }
