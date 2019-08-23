@@ -2,6 +2,7 @@ import 'work-shop/youtube-player'
 import YoutubePlayer from "work-shop/youtube-player";
 import {store} from "../../store/configureStore";
 import * as playerActions from "actions/player-actions";
+import {getTimeFmt} from "../time-tools";
 
 const MARKER = '/embed/'
 
@@ -10,6 +11,9 @@ export default class YoutubePlayerWrapper {
     constructor({div, initState}) {
         this.divName = div.attr('id')
         this.options = Object.assign({}, initState)
+        if (this.options.volume) {
+            this.options.volume = this.options.volume * 100
+        }
 
         this._player = null
         this._currentTime = this.options.currentTime
@@ -18,24 +22,59 @@ export default class YoutubePlayerWrapper {
 
     setData(data) {
         // Todo : дополнить провериками
-        let _videoLink = data.episodes[0].videoLink,
+        let _videoLink = data.episodes[0].video.videoLink,
             _pos = _videoLink.indexOf(MARKER) + MARKER.length
 
         this.options.videoId = _videoLink.substring(_pos)
         this._data = Object.assign({}, data)
+        this.totalDuration = data.episodes[0].video.duration
+
+        this._calcEpisodesStarts(data)
 
         new YoutubePlayer({divName: this.divName, options: this.options, callbacks: this._getCallbacks()})
     }
 
+    _calcEpisodesStarts(data) {
+        this._episodeStarts = {};
+        let _cur = 0;
+
+        data.episodes.forEach((item, index, array) => {
+            this._episodeStarts[item.id] = {
+                start: _cur,
+                end: _cur + (+item.video.duration),
+                episode: item,
+                isLast: index === (array.length - 1)
+            }
+
+            _cur += +item.video.duration;
+        })
+    }
+
     getLectureContent() {
         return this._data.episodes.map((item) => {
+            let episodeStart = this._episodeStarts[item.id];
+
             return {
                 title: item.title,
-                duration: item.audio.info.length,
-                duration_formated: item.audio.info.length_formatted,
-                content: []
+                duration: item.video.duration,
+                duration_formated: getTimeFmt(item.video.duration),
+                content: item.contents.map((content) => {
+                    let _content = Object.assign({}, content)
+                    _content.begin += episodeStart.start
+                    return _content
+                })
             }
         });
+    }
+
+    clear() {
+        this._player = null
+    }
+
+    initContainer() {
+        if (!this._player) {
+            new YoutubePlayer({divName: this.divName, options: this.options, callbacks: this._getCallbacks()})
+        }
     }
 
     render() {
@@ -43,11 +82,23 @@ export default class YoutubePlayerWrapper {
     }
 
     play() {
-        this._player.play()
+        if (this._player) {
+            this._player.play()
+        }
     }
 
     pause() {
-        this._player.pause()
+        if (this._player) {
+            this._player.pause()
+        }
+    }
+
+    replay() {
+        this.options.currentTime = 0
+
+        if (this._player) {
+            this._player.setPosition(0).then(() => {this.play()})
+        }
     }
 
     stop() {
@@ -91,19 +142,14 @@ export default class YoutubePlayerWrapper {
                 that._player = player
                 let _data = {}
 
-                player.getDuration()
-                    .then((data) => {
-                        that.totalDuration = data
-                        store.dispatch(playerActions.setTotalDuration(data))
-                    })
-                    .then(() => {return player.getMute()})
+                player.getMute()
                     .then((data) => {
                         store.dispatch(playerActions.setMuteState(data))
                     })
-                    .then(() => {return player.getAvailablePlaybackRates()})
-                    .then((data) => {
-                        store.dispatch(playerActions.setAvailableRates(this._convertRates(data)))
-                    })
+                    // .then(() => {return player.getAvailablePlaybackRates()})
+                    // .then((data) => {
+                    //     store.dispatch(playerActions.setAvailableRates(this._convertRates(data)))
+                    // })
                     .then(() => {return player.getRate()})
                     .then((data) => {
                         store.dispatch(playerActions.setRate(data))

@@ -109,6 +109,12 @@ class NestedPlayer {
             fullViewPort = null;
             this._fullDiv = null;
         }
+
+        if (this._videoMode) {
+            fullViewPort = null;
+            this._fullDiv = null;
+            this.player.clear()
+        }
     }
 
     get player() {
@@ -133,11 +139,16 @@ class NestedPlayer {
                 this.player = null;
             }
 
-            this._fullPlayer.destroy();
-            // this._smallPlayer.destroy();
+            if (!this._videoMode) {
+                this._fullPlayer.destroy();
+                // this._smallPlayer.destroy();
+            }
+
 
             this._fullPlayer = null;
             this._smallPlayer = null;
+
+            this._videoMode = this._isVideoPlayer(data)
 
             this._setInitState(initState);
             this._setAssetsList(data);
@@ -182,11 +193,8 @@ class NestedPlayer {
             this._smallPlayer.setData(data);
         }
 
-        if (!this._videoMode) {
-            let content = this._fullPlayer ? this._fullPlayer.getLectureContent() : this._smallPlayer.getLectureContent();
-            this._renderContent(content);
-        }
-
+        let content = this._fullPlayer ? this._fullPlayer.getLectureContent() : this._smallPlayer.getLectureContent();
+        this._renderContent(content);
     }
 
     pause() {

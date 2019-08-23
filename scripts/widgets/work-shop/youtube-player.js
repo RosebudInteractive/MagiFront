@@ -103,6 +103,8 @@ export default class Player {
     }
 
     play() {
+        this._mainTimer = setInterval(::this._checkTimeChanged, TIMEOUT)
+
         return this._player.playVideo()
             .then(this._broadcastStarted())
 
@@ -197,6 +199,10 @@ export default class Player {
     }
 
     _broadcastPaused() {
+        if (this._mainTimer) {
+            clearInterval(this._mainTimer)
+        }
+
         if (this._callbacks.onPaused)
             this._callbacks.onPaused();
     }
