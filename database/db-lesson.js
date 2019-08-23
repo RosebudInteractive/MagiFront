@@ -271,7 +271,7 @@ const LESSON_EPI_MSSQL_TOC_REQ =
 
 const LESSON_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
-    "  l.[VideoLink], e.[ContentType],\n" +
+    "  l.[VideoLink], l.[Duration], e.[ContentType],\n" +
     "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
     "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -282,7 +282,7 @@ const LESSON_MSSQL_CONTENT_REQ =
 
 const LESSON_EPI_MSSQL_CONTENT_REQ =
     "select e.[Id] Episode, t.[Id], l.[Name], l.[Audio], l.[AudioMeta], r.[Id] as[AssetId],\n" +
-    "  l.[VideoLink], e.[ContentType],\n" +
+    "  l.[VideoLink], l.[Duration], e.[ContentType],\n" +
     "  t.[StartTime], t.[Content] from[EpisodeLesson] pl\n" +
     "  join[Episode] e on pl.[EpisodeId] = e.[Id]\n" +
     "  join[EpisodeLng] l on l.[EpisodeId] = e.[Id]\n" +
@@ -471,7 +471,7 @@ const LESSON_EPI_MYSQL_TOC_REQ =
 
 const LESSON_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
-    "  l.`VideoLink`, e.`ContentType`,\n" +
+    "  l.`VideoLink`, l.`Duration`, e.`ContentType`,\n" +
     "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
     "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -482,7 +482,7 @@ const LESSON_MYSQL_CONTENT_REQ =
 
 const LESSON_EPI_MYSQL_CONTENT_REQ =
     "select e.`Id` Episode, t.`Id`, l.`Name`, l.`Audio`, l.`AudioMeta`, r.`Id` as`AssetId`,\n" +
-    "  l.`VideoLink`, e.`ContentType`,\n" +
+    "  l.`VideoLink`, l.`Duration`, e.`ContentType`,\n" +
     "  t.`StartTime`, t.`Content` from`EpisodeLesson` pl\n" +
     "  join`Episode` e on pl.`EpisodeId` = e.`Id`\n" +
     "  join`EpisodeLng` l on l.`EpisodeId` = e.`Id`\n" +
@@ -1847,7 +1847,7 @@ const DbLesson = class DbLesson extends DbObject {
                                             file: this._convertDataUrl(elem.Audio, isAbsPath, dLink),
                                             info: JSON.parse(elem.AudioMeta)
                                         } : null,
-                                        videoLink: elem.VideoLink,
+                                        video: elem.VideoLink ? { videoLink: elem.VideoLink, duration: elem.Duration } : null,
                                         contents: []
                                     };
                                     data.episodes.push(curr_episode);
