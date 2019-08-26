@@ -19,6 +19,8 @@ import {
     PLAYER_CAN_NOT_START_PLAY_LESSON,
     PLAYER_SET_PROGRESS_PERCENT,
     PLAYER_CANCEL_START,
+    PLAYER_SET_TOTAL_DURATION,
+    PLAYER_SET_AVAILABLE_RATES,
 } from '../constants/player';
 
 import * as tools from '../tools/time-tools'
@@ -28,6 +30,7 @@ import {
     GET_LESSON_PLAY_INFO_REQUEST,
     CLEAR_LESSON_PLAY_INFO,
 } from '../constants/lesson'
+import {getTimeFmt} from "../tools/time-tools";
 
 const initialState = {
     currentTime: 0,
@@ -51,6 +54,13 @@ const initialState = {
     showContentTooltip: false,
     showSpeedTooltip: false,
     progressPercent: 0,
+    availableRates: [
+        {value: 0.75},
+        {value: 1.0, title: 'Обычная'},
+        {value: 1.25},
+        {value: 1.5},
+        {value: 1.75},
+    ],
 };
 
 export default function player(state = initialState, action) {
@@ -143,6 +153,21 @@ export default function player(state = initialState, action) {
                 totalDuration: _result.totalDuration,
                 totalDurationFmt: _result.totalDurationFmt,
                 contentArray: [..._result.content]
+            }
+        }
+
+        case PLAYER_SET_TOTAL_DURATION: {
+            return {
+                ...state,
+                totalDuration: action.payload,
+                totalDurationFmt: getTimeFmt(action.payload)
+            }
+        }
+
+        case PLAYER_SET_AVAILABLE_RATES: {
+            return {
+                ...state,
+                availableRates: [...action.payload]
             }
         }
 
