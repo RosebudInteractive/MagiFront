@@ -17,6 +17,7 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 
 import FadeTimer from '../fade-timer';
 import {showFeedbackWindowSelector} from "../../../ducks/message";
+import {CONTENT_TYPE} from "../../../constants/common-consts";
 
 $.fn.isInViewport = function() {
     let _this = $(this);
@@ -84,7 +85,7 @@ class Frame extends Component {
         _player.on('mouseup', (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-container'),
+                _isPlayer = e.target.closest('.ws-container') || e.target.closest('.player-frame__video-cap'),
                 _isPauseFrame = e.target.closest('.player-frame__screen'),
                 _isMenuButton = e.target.closest('.menu-button');
 
@@ -119,6 +120,12 @@ class Frame extends Component {
 
         _player.on('mousemove', () => {
             this._fadeTimer.restart()
+            console.log('mousemove')
+        });
+
+        $('.ws-container').on('mousemove', () => {
+            this._fadeTimer.restart()
+            console.log('ws-container mousemove')
         });
     }
 
@@ -248,10 +255,13 @@ class Frame extends Component {
 
         let { visible, starting, paused, contentArray, canNotPlay} = this.props;
 
+        const _isYoutubeVideo = this.props.lesson.ContentType === CONTENT_TYPE.VIDEO
+
         return (
             <div style={visible ? null : _invisibleStyle}>
                 <div className="player-frame__poster" style={_isFinished || canNotPlay ? _invisibleStyle : null}>
-                    <div className='ws-container' id={'player' + _id}>
+                    {_isYoutubeVideo ? <div className="player-frame__video-cap"/> : null}
+                    <div className={'ws-container' + (_isYoutubeVideo ? " youtube" : "")} id={'player' + _id}>
                     </div>
                 </div>
                 {

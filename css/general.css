@@ -23,6 +23,11 @@ html div {
   /*background-image: radial-gradient(rgba(28, 27, 23, 0) 0%, #1C1B17 100%); }*/
 }
 
+.ws-container.youtube {
+  padding: 53px 0 109px;
+  -webkit-box-sizing: border-box;
+}
+
 .ws-container-mini {
   position: absolute;
   width: 250px;
