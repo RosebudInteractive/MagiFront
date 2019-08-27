@@ -13,7 +13,7 @@ const { UserActivate } = require("./user-activate");
 const { UserPwdRecovery } = require("./user-pwd-recovery");
 const { UserLoginError } = require("./errors");
 const { recaptcha } = require('./recaptcha');
-const { AccessRigths } = require('./access-rights');
+const { AccessRights } = require('./access-rights');
 const { Activation } = require('../const/activation');
 const serialize = require('./serialize');
 
@@ -423,7 +423,7 @@ exports.AuthenticateLocal = (app, isAuthRequired, accessRights) => {
                 if (!req.user)
                     return res.status(HttpCode.ERR_UNAUTH).json({ message: "Authorization required" });
                 if (accessRights) {
-                    let userRights = AccessRigths.checkPermissions(req.user, accessRights)
+                    let userRights = AccessRights.checkPermissions(req.user, accessRights)
                     if(userRights!==accessRights)
                         return res.status(HttpCode.ERR_FORBIDDEN).json({ message: "Access denied." });
                 }
