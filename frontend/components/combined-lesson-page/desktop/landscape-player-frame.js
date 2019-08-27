@@ -120,12 +120,6 @@ class Frame extends Component {
 
         _player.on('mousemove', () => {
             this._fadeTimer.restart()
-            console.log('mousemove')
-        });
-
-        $('.ws-container').on('mousemove', () => {
-            this._fadeTimer.restart()
-            console.log('ws-container mousemove')
         });
     }
 

@@ -13,6 +13,8 @@ export default class Player {
             rate: (options && (options.rate !== undefined)) ? options.rate : 1.0,
         };
 
+        this.divName = divName
+
         this._callbacks = Object.assign({}, callbacks)
 
         this._player = YouTubePlayer(divName, {
@@ -37,6 +39,9 @@ export default class Player {
         this._player.on('stateChange', ::this._onPlayerStateChange)
         this._player.on('playbackRateChange', ::this._broadcastRateChanged)
         this._player.on('error', ::this._onError)
+
+        $(window).on('resize', ::this._onResize)
+        this._onResize()
     }
 
     _checkTimeChanged() {
@@ -183,9 +188,6 @@ export default class Player {
             that._broadcastVolumeChanged(newVol)
             requestAnimationFrame(_changeVolumeCallback);
         });
-
-
-        // this._player.setVolume(+value).then(() => {this._broadcastVolumeChanged(+value)})
     }
 
     _broadcastReady() {
@@ -262,40 +264,6 @@ export default class Player {
         }
     }
 
-    // setData(data) {
-    //     return new Promise((resolve) => {
-    //         let data2 = $.extend(true, {}, data);
-    //         this._callbacks.loader.setData(data2);
-    //
-    //         this._audioState.globalTime = 0;
-    //         this._audioState.currentTime = 0;
-    //
-    //         this._prepareElements();
-    //
-    //         if (data2.episodes.length > 0) {
-    //             this._audioState.currentEpisode = 0;
-    //             this._broadcastSetData(data2._nativeAppDataUuid);
-    //         }
-    //
-    //         resolve()
-    //     })
-    // }
-
-    // _initAudioTrack() {
-    //     try {
-    //         let data = this._callbacks.loader.getData();
-    //         let starts = this._callbacks.loader.getEpisodesStartTimes();
-    //
-    //         let startPos = starts[data.episodes[this._audioState.currentEpisode].id];
-    //         this._audioState.globalTime = startPos.start + this._audioState.currentTime;
-    //         this._audioState.baseTime = startPos.start;
-    //         this._callbacks.loader.setPosition(this._audioState.globalTime);
-    //     } catch (e) {
-    //         this._addDevErr(e.message)
-    //         console.log(e)
-    //     }
-    // }
-
     setPosition(position) {
         return this._player.seekTo(position)
             .then(() => {return this._player.getCurrentTime()})
@@ -304,35 +272,36 @@ export default class Player {
             })
     }
 
-    _proccessAnimationFrame() {
-        if (!this._audioState.stopped) {
-            this._playElements(this._audioState.globalTime);
-            this._audioState.requestAnimationFrameID = requestAnimationFrame(this._proccessAnimationFrame.bind(this));
-        }
-    }
-
-    onEnd() {
-        let data = this._callbacks.loader.getData();
-        if (this._audioState.currentEpisode + 1 < data.episodes.length) {
-            let newTime = 0;
-            for (let i = 0; i <= this._audioState.currentEpisode; i++)
-                newTime += data.episodes[i].audio.info.length;
-            this.setPosition(newTime);
-        } else {
-            if (!this._audioState.stopped) {
-                this._audioState.stopped = true;
-                // this._broadcastPaused();
-                // this._broadcastEnded();
-            }
-        }
-    }
-
-    onChangePosition(position){
-        this._audioState.globalTime = position;
-        this._audioState.currentTime = position - this._audioState.baseTime;
-        this._callbacks.loader.setPosition(position)
-    }
-
     _onError() {
+    }
+
+    _onResize() {
+        const RATIO = 16 / 9
+        let _container = $('.ws-container'),
+            _player = $(`#${this.divName}`),
+            _width = _container.innerWidth(),
+            _height = _container.height()
+
+        if (_width > _height * RATIO) {
+            let _actualWidth = _height * RATIO,
+                _delta = _container.innerWidth() - _actualWidth
+
+            _player.css({
+                left: _delta / 2,
+                width: _actualWidth,
+                top: 0,
+                height: _height,
+            })
+        } else {
+            let _actualHeight = _width / RATIO,
+                _delta = _container.height() - _actualHeight
+
+            _player.css({
+                left: 0,
+                width: _width,
+                top: _delta / 2,
+                height: _actualHeight,
+            })
+        }
     }
 }

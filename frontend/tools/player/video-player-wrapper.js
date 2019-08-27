@@ -9,7 +9,10 @@ const MARKER = '/embed/'
 export default class YoutubePlayerWrapper {
 
     constructor({div, initState}) {
-        this.divName = div.attr('id')
+        this.containerId = div.attr('id')
+
+        this.divName = `youtube-${div.attr('id')}`
+        div.append(`<div class="youtube-embedded-player" id="${this.divName}"></div>`)
         this.options = Object.assign({}, initState)
         if (this.options.volume) {
             this.options.volume = this.options.volume * 100
@@ -73,6 +76,11 @@ export default class YoutubePlayerWrapper {
 
     initContainer() {
         if (!this._player) {
+            let _container = $(`#${this.containerId}`)
+
+            if (_container.children().length == 0) {
+                _container.append(`<div class="youtube-embedded-player" id="${this.divName}"></div>`)
+            }
             new YoutubePlayer({divName: this.divName, options: this.options, callbacks: this._getCallbacks()})
         }
     }

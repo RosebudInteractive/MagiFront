@@ -28,6 +28,9 @@ html div {
   -webkit-box-sizing: border-box;
 }
 
+.youtube-embedded-player {
+  position: relative }
+
 .ws-container-mini {
   position: absolute;
   width: 250px;
