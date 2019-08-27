@@ -6,6 +6,7 @@ import FavoritesButton from "./favorites-button";
 import {notifyLessonLinkClicked} from "ducks/google-analytics";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import {CONTENT_TYPE} from "../../../../constants/common-consts";
 
 class Extras extends React.Component {
 
@@ -65,10 +66,14 @@ class Extras extends React.Component {
     }
 
     _getList() {
+        const _videoIcon = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#video-lesson"/>'
+
         return this.props.subLessons.map((lesson, index) => {
             let url = '/' + this.props.course.URL + '/' + lesson.URL;
 
             lesson.courseUrl = this.props.course.URL;
+
+            const _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO
 
             return <li key={index}>
                 <Link to={url} className="extras-list__item js-sublesson-link" data-id={lesson.Id}>
@@ -76,6 +81,13 @@ class Extras extends React.Component {
                     <span className="inner-counter">{lesson.Number}</span>
                     {lesson.Name + ' '}
                     <span className="duration">{lesson.DurationFmt}</span>
+                    {
+                        _isYoutubeVideo ?
+                            <span className="item__video-icon">
+                                <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _videoIcon}}/>
+                            </span>
+                            : null
+                    }
                 </Link>
                 <LessonPlayBlockSmall lesson={lesson} course={this.props.course} isPaidCourse={this.props.isPaidCourse}/>
                 <FavoritesButton className={"extras-list__fav"} courseUrl={lesson.courseUrl} lessonUrl={lesson.URL}/>

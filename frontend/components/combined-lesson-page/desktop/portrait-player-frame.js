@@ -16,6 +16,7 @@ import * as playerStartActions from '../../../actions/player-start-actions'
 
 import $ from 'jquery'
 import FadeTimer from '../fade-timer';
+import {CONTENT_TYPE} from "../../../constants/common-consts";
 
 class PlayerFrame extends Component {
 
@@ -49,7 +50,7 @@ class PlayerFrame extends Component {
         _player.on('mouseup', (e) => {
             let _isContent = e.target.closest('.js-contents'),
                 _isRate = e.target.closest('.js-speed'),
-                _isPlayer = e.target.closest('.ws-container') || e.target.closest('.lecture-frame__play-block-wrapper') ,
+                _isPlayer = e.target.closest('.ws-container') || e.target.closest('.lecture-frame__play-block-wrapper') || e.target.closest('.player-frame__video-cap'),
                 _isPauseFrame = e.target.closest('.player-frame__screen') || e.target.closest('.lecture-frame__play-block-wrapper');
 
             if (_isContent || _isRate) {
@@ -208,9 +209,12 @@ class PlayerFrame extends Component {
 
         let {visible, starting, paused, contentArray, canNotPlay, } = this.props;
 
+        const _isYoutubeVideo = this.props.lesson.ContentType === CONTENT_TYPE.VIDEO
+
         return (
             <div style={visible ? null : _invisibleStyle}>
                 <div className="player-frame__poster" style={_isFinished || canNotPlay ? _coverStyle : null}>
+                    {_isYoutubeVideo ? <div className="player-frame__video-cap"/> : null}
                     <div className='ws-container' id={'player' + _id} style={_isFinished || canNotPlay? {visibility: 'hidden'} : null}>
                     </div>
                 </div>
