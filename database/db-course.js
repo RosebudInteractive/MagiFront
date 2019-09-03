@@ -275,6 +275,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
+    "  cl.[ShortDescription] [CShortDescription], cl.[TargetAudience], cl.[Aims],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
     "  ell.[VideoLink], e.[ContentType],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
@@ -362,6 +363,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
+    "  cl.`ShortDescription` `CShortDescription`, cl.`TargetAudience`, cl.`Aims`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
     "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
@@ -1014,6 +1016,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         VideoIntwLink: elem.VideoIntwLink,
                                         VideoIntroLink: elem.VideoIntroLink,
+                                        ShortDescription: elem.CShortDescription,
+                                        TargetAudience: elem.TargetAudience,
+                                        Aims: elem.Aims,
                                         IntwD: elem.IntwD,
                                         IntwDFmt: elem.IntwDFmt,
                                         IntroD: elem.IntroD,
@@ -1131,6 +1136,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
+                                    Occupation: elem.Occupation,
+                                    Employment: elem.Employment,
                                     Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
                                     PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink),
                                     URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
