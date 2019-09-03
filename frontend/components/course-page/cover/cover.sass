@@ -1,0 +1,55 @@
+@import "../../../tools/variables"
+
+.course-page__cover
+  height: calc(56.26vw)
+  position: relative
+  background-repeat: no-repeat
+  -webkit-background-size: cover
+  background-size: cover
+  background-position: top center
+
+  .course-page__info-wrapper
+    position: absolute
+    bottom: 62px
+    margin-left: 8.333%
+    width: 58.331%
+
+  .info__title
+    font-family: $font-pt
+    font-weight: normal
+    font-size: 52px
+    line-height: 110%
+    color: $color-white
+    margin: 0
+    letter-spacing: -0.02em
+
+  .title__label
+    position: relative
+    font-style: italic
+    display: inline-block
+    vertical-align: top
+    margin: 0
+    letter-spacing: normal
+
+  .info__authors-and-category
+    font-family: $font-fira
+    display: inline-flex
+    color: $color-white
+
+    .author-item
+      font-size: 17px
+      line-height: 130%
+      color: $color-white
+      border-bottom: $border-hidden-link
+      -webkit-transition: border-color 0.3s ease
+      transition: border-color 0.3s ease
+      &:hover
+        border-bottom: $border-white-06
+
+    .category-item
+      letter-spacing: 0.12em
+      font-size: 14px
+      line-height: 17px
+
+    .course-page__info-separator
+      margin: 0 5px

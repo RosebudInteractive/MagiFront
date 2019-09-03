@@ -3615,6 +3615,7 @@ li.fancybox-thumbs-loading {
     .logo {
       display: none; } }
   .logo svg {
+    fill: #2F2F2F;
     display: block; }
 
 .logo-mobile {
@@ -4322,7 +4323,7 @@ li.fancybox-thumbs-loading {
           box-sizing: border-box;
           padding: 10px 11px;
           max-height: 36px; }
-        .navigation ul li.filter svg {
+        .navigation ul li.filter svg, .navigation ul li.favorites svg {
           fill: #2f2f2f;
           /*opacity: 0.6;*/
           -webkit-transition: opacity 0.4s ease;

@@ -156,6 +156,8 @@ class CoursesPage extends React.Component {
                     {this._getMetaTags()}
                     <div className={"courses courses-page" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')}
                          key={"courses-page"} id={"courses-page"}>
+
+                        <Link to={"/new-course-page"}>Новая страница курса</Link>
                         {this._getCoursesBundles()}
                     </div>
                 </React.Fragment>

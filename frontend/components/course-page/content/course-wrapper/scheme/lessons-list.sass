@@ -1,0 +1,47 @@
+@import "~tools/variables"
+
+.course-scheme__lessons-list
+  list-style: none
+  margin: 0
+  padding: 0
+
+.lessons-list__item
+  display: flex
+  height: 85px
+  align-items: center
+  border-bottom: $border-dark-02
+
+  .lessons-list__item-counter
+    width: 42px
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 17px
+    line-height: 130%
+    color: $color-orange
+
+.lessons-list__item-info
+  //margin: auto 0
+  //display: inline
+  flex-grow: 2
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+
+  a
+    color: $color-main-dark
+    -webkit-transition: opacity 0.3s ease
+    transition: opacity 0.3s ease
+
+    &:hover
+      opacity: 0.6
+
+  .item-info__duration
+    font-size: 14px
+    line-height: 124%
+    color: $color-dark-06
+
+  .item-info__ext-complete-status
+    margin-right: 21px

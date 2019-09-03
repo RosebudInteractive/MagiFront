@@ -1,0 +1,50 @@
+@import "~tools/variables"
+
+.course-statistic__progress
+  margin-top: 38px
+
+.course-statistic__progress-title
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+
+.statistic-block
+  padding: 24px 0
+  border-bottom: $border-dark-02
+  max-height: 72px
+
+.progress__lessons-block, .progress__tests-block
+  position: relative
+  display: flex
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  color: $color-main-dark
+
+  .progress-bar
+    border-bottom: 7px solid $color-orange
+    position: absolute
+    bottom: -4px
+    border-bottom-right-radius: 5px
+    border-top-right-radius: 5px
+    width: 0
+    height: 0
+
+.progress__completed, .statistic-separator, .progress__total
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 28px
+  line-height: 34px
+
+.statistic-separator, .progress__total
+  color: $color-dark-06
+
+.progress__text
+  align-self: flex-end
+  padding-left: 5px
+  padding-bottom: 2px
