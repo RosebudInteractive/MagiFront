@@ -106,6 +106,23 @@ class AuthorEditor extends ObjectEditor {
                 },
             },
             {
+                view: "text", name: "Occupation", label: "Профессия",
+                placeholder: "Укажите професию",
+                labelWidth: labelWidth,
+                validate: window.webix.rules.isNotEmpty,
+                invalidMessage: "Значение не может быть пустым",
+                on: {
+                    onChange: function () {
+                        that._externalValidate(this);
+                    },
+                },
+            },
+            {
+                view: "text", name: "Employment", label: "Место работы",
+                placeholder: "Укажите место работы",
+                labelWidth: labelWidth,
+            },
+            {
                 view: 'text',
                 name: 'URL',
                 label: 'URL',

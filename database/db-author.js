@@ -29,11 +29,11 @@ const AUTHOR_REQ_TREE = {
 };
 
 const AUTHOR_MSSQL_ALL_REQ =
-    "select a.[Id], l.[FirstName], l.[LastName], a.[URL], a.[Portrait], a.[PortraitMeta], l.[Description] from [Author] a\n" +
+    "select a.[Id], l.[FirstName], l.[LastName], a.[URL], a.[Portrait], a.[PortraitMeta], l.[Description], l.[Occupation], l.[Employment] from [Author] a\n" +
     "  join [AuthorLng] l on a.[Id] = l.[AuthorId] and a.[AccountId] = <%= accountId %>";
 
 const AUTHOR_MYSQL_ALL_REQ =
-    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`URL`, a.`Portrait`, a.`PortraitMeta`, l.`Description` from `Author` a\n" +
+    "select a.`Id`, l.`FirstName`, l.`LastName`, a.`URL`, a.`Portrait`, a.`PortraitMeta`, l.`Description`, l.`Occupation`, l.`Employment` from `Author` a\n" +
     "  join `AuthorLng` l on a.`Id` = l.`AuthorId` and a.`AccountId` = <%= accountId %>";
 
 const AUTHOR_MSSQL_ID_REQ = AUTHOR_MSSQL_ALL_REQ + "\nwhere a.[Id] = <%= id %>";
@@ -690,6 +690,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                             auth_lng_obj.lastName(inpFields["LastName"]);
                         if (typeof (inpFields["Description"]) !== "undefined")
                             auth_lng_obj.description(inpFields["Description"]);
+                        if (typeof (inpFields["Occupation"]) !== "undefined")
+                            auth_lng_obj.occupation(inpFields["Occupation"]);
+                        if (typeof (inpFields["Employment"]) !== "undefined")
+                            auth_lng_obj.employment(inpFields["Employment"]);
                         return auth_obj.save(opts)
                             .then((result) => {
                                 isModified = isModified || (result && result.detail && (result.detail.length > 0));
@@ -756,6 +760,10 @@ const DbAuthor = class DbAuthor extends DbObject {
                             fields["LastName"] = inpFields["LastName"];
                         if (typeof (inpFields["Description"]) !== "undefined")
                             fields["Description"] = inpFields["Description"];
+                        if (typeof (inpFields["Occupation"]) !== "undefined")
+                            fields["Occupation"] = inpFields["Occupation"];
+                        if (typeof (inpFields["Employment"]) !== "undefined")
+                            fields["Employment"] = inpFields["Employment"];
 
                         return root_lng.newObject({
                             fields: fields
