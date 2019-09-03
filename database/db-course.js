@@ -67,6 +67,7 @@ const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
+    "  cl.[ShortDescription], cl.[TargetAudience], cl.[Aims],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
@@ -80,6 +81,7 @@ const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
+    "  cl.`ShortDescription`, cl.`TargetAudience`, cl.`Aims`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
@@ -1841,6 +1843,13 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.introDFmt(fmt);
                         }
 
+                        if (typeof (inpFields["ShortDescription"]) !== "undefined")
+                            crs_lng_obj.shortDescription(inpFields["ShortDescription"]);
+                        if (typeof (inpFields["TargetAudience"]) !== "undefined")
+                            crs_lng_obj.targetAudience(inpFields["TargetAudience"]);
+                        if (typeof (inpFields["Aims"]) !== "undefined")
+                            crs_lng_obj.aims(inpFields["Aims"]);
+
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
                         
@@ -2147,6 +2156,13 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["IntroD"] = sec;
                             fields["IntroDFmt"] = fmt;
                         }
+
+                        if (typeof (inpFields["ShortDescription"]) !== "undefined")
+                            fields["ShortDescription"] = inpFields["ShortDescription"];
+                        if (typeof (inpFields["TargetAudience"]) !== "undefined")
+                            fields["TargetAudience"] = inpFields["TargetAudience"];
+                        if (typeof (inpFields["Aims"]) !== "undefined")
+                            fields["Aims"] = inpFields["Aims"];
 
                         return root_lng.newObject({
                             fields: fields
