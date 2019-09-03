@@ -4,6 +4,8 @@ import './statistic.sass'
 import PlayBlock from "../../../common/play-block";
 import {getCoverPath, ImageSize} from "tools/page-tools";
 import Progress from './progress'
+import $ from "jquery";
+import {isMobile} from "tools/page-tools";
 
 export default class Statistic extends React.Component {
 
@@ -13,6 +15,41 @@ export default class Statistic extends React.Component {
 
     constructor(props) {
         super(props)
+
+        this.state = {
+            fixed : false
+        }
+
+        this._handleScroll = () => {
+            if (isMobile()) { return }
+
+            let _windowScrollTop = $(window).scrollTop();
+
+            let _wrapper = $('.course-page__statistic'),
+                _offsetTop = _wrapper.offset().top - 100;
+
+            if ((_windowScrollTop < _offsetTop) && this.state.fixed){
+                this.setState({
+                    fixed: false
+                });
+            }
+
+            if ((_windowScrollTop > _offsetTop) && !this.state.fixed) {
+                this.setState({
+                    fixed: true
+                });
+            }
+        }
+
+        this._addEventListeners();
+    }
+
+    componentDidMount() {
+        this._handleScroll();
+    }
+
+    componentWillUnmount() {
+        this._removeEventListeners();
     }
 
     render() {
@@ -26,10 +63,20 @@ export default class Statistic extends React.Component {
         const _cover = getCoverPath(_lesson, ImageSize.small)
 
         return <div className="course-page__statistic">
-            <div className="play-block__wrapper">
-                <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+            <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "")}>
+                <div className="play-block__wrapper">
+                    <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+                </div>
+                <Progress course={course}/>
             </div>
-            <Progress course={course}/>
         </div>
+    }
+
+    _addEventListeners() {
+        window.addEventListener('scroll', ::this._handleScroll);
+    }
+
+    _removeEventListeners() {
+        window.removeEventListener('scroll', this._handleScroll);
     }
 }

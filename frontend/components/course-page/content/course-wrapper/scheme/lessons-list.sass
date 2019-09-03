@@ -43,5 +43,45 @@
     line-height: 124%
     color: $color-dark-06
 
+.item-info__ext
+  display: flex
+  align-items: center
+
   .item-info__ext-complete-status
     margin-right: 21px
+
+    &._green
+      fill: $color-green
+      fill-opacity: 0.6
+
+    &._yellow
+      fill: $color-yellow
+
+    &._gray
+      fill: $color-main-dark
+      fill-opacity: 0.2
+
+  .item-info__arrow-down
+    position: relative
+    width: 18px
+    height: 18px
+    margin-left: 18px
+
+    &:after
+      content: ""
+      position: absolute
+      top: 50%
+      -webkit-transform: translateY(-50%) rotate(45deg)
+      -ms-transform: translateY(-50%) rotate(45deg)
+      transform: translateY(-50%) rotate(45deg)
+      cursor: pointer
+      margin-top: -4px
+      width: 11px
+      height: 11px
+      border: 2px solid $color-dark-02
+      border-left: none
+      border-top: none
+      -webkit-transition: -webkit-transform 0.3s ease
+      transition: -webkit-transform 0.3s ease
+      transition: transform 0.3s ease
+      transition: transform 0.3s ease, -webkit-transform 0.3s ease

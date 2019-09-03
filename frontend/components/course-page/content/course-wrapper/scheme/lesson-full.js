@@ -27,19 +27,28 @@ export default class LessonFull extends React.Component{
                 <div className="item-info__duration">{lesson.DurationFmt}</div>
             </div>
             <div className="item-info__ext">
-                <div className="item-info__ext-complete-status _green">
+                <div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>
                     <svg width="18" height="18"
                          dangerouslySetInnerHTML={{__html: _completeStatus}}/>
                 </div>
                 <PlayBlock lesson={lesson}/>
-                    {/*<button className="extras-list__fav" type="button" onClick={() => {*/}
-                    {/*    this.props.onSwitchFavorites(lesson.URL)*/}
-                    {/*}}>*/}
-                    {/*    <svg width="14" height="23"*/}
-                    {/*         dangerouslySetInnerHTML={{__html: this.props.isLessonInBookmarks(lesson.URL) ? _redFlag : _flag}}/>*/}
-                    {/*</button>*/}
+                <div className={"item-info__arrow-down"}/>
             </div>
             </li>
+    }
+
+    _getColor(value) {
+        const _index = value % 3
+
+        switch (_index) {
+            case 0: return '_green'
+
+            case 1: return '_yellow'
+
+            case 2: return '_gray'
+
+            default: return '_gray'
+        }
     }
 
     _getSublessons() {

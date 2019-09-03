@@ -7,21 +7,7 @@ import './course-page.sass'
 import {course} from "./mock-data";
 import Content from "./content";
 import $ from "jquery";
-
-if (!$.fn.isInViewport) {
-    $.fn.isInViewport = function(margin) {
-        let _this = $(this);
-        if (!_this || !_this.length) { return }
-
-        let elementTop = _this.offset().top;
-        let elementBottom = elementTop + _this.outerHeight();
-
-        let viewportTop = $(window).scrollTop() + +margin;
-        let viewportBottom = viewportTop + $(window).height();
-
-        return elementBottom > viewportTop && elementTop < viewportBottom;
-    };
-}
+import {isInViewport} from "tools/page-tools";
 
 export default class Wrapper extends React.Component {
 
@@ -39,7 +25,7 @@ export default class Wrapper extends React.Component {
         this._resizeHandler = () => {
             const _margin =$('.page-header').height()
 
-            let _isCoverVisible = $('.course-page__cover').isInViewport(_margin)
+            let _isCoverVisible = isInViewport('.course-page__cover', _margin)
             if (_isCoverVisible && !this.state.transparentMenu) {
                 this.setState({transparentMenu: true})
             }
