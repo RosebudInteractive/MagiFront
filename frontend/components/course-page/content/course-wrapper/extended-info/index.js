@@ -34,9 +34,9 @@ function TargetAudience(props) {
     const _text = props.targetAudience;
 
     return _text ?
-        <div className="extended-info__target-audience">
-            <div className="target-audience__title">Кому подойдет этот курс</div>
-            <div className="target-audience__text">{_text}</div>
+        <div className="extended-info__target-audience block-wrapper">
+            <div className="target-audience__title block-title">Кому подойдет этот курс</div>
+            <div className="target-audience__text block-descr">{_text}</div>
         </div>
         :
         null
@@ -50,9 +50,9 @@ function Aims(props) {
     const _text = props.aims;
 
     return _text ?
-        <div className="extended-info__aims">
-            <div className="target-audience__title">Кому подойдет этот курс</div>
-            <div className="target-audience__text">{_text}</div>
+        <div className="extended-info__aims block-wrapper">
+            <div className="aims__title block-title">Чему вы научитесь</div>
+            <div className="aims__text block-descr">{_text}</div>
         </div>
         :
         null

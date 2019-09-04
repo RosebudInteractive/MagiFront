@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from "prop-types"
 
-const RATIO = 1.6
+const RATIO = 1.78
 
 export default class VideoBlock extends React.Component {
 
