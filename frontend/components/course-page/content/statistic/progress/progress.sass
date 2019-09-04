@@ -2,6 +2,8 @@
 
 .course-statistic__progress
   margin-top: 39px
+  @media (max-width: 899px)
+    margin-top: 0
 
 .course-statistic__progress-title
   padding: 24.5px 0
@@ -15,6 +17,13 @@
   border-bottom: $border-dark-02
   max-height: 72px
 
+.progress__completed-wrapper
+  display: flex
+  flex-direction: column
+  @media (max-width: 899px)
+    flex-direction: row
+
+
 .progress__lessons-block, .progress__tests-block
   padding: 18.5px 0
   position: relative
@@ -25,6 +34,9 @@
   font-size: 17px
   line-height: 130%
   color: $color-main-dark
+  margin: 0
+  @media (max-width: 899px)
+    flex-basis: 50%
 
   .progress-bar
     border-bottom: 7px solid $color-orange
@@ -34,6 +46,10 @@
     border-top-right-radius: 5px
     width: 0
     height: 0
+
+.progress__lessons-block
+  @media (max-width: 899px)
+    margin-right: 20px
 
 .progress__completed, .statistic-separator, .progress__total
   font-family: $font-fira
@@ -49,3 +65,12 @@
   align-self: flex-end
   padding-left: 5px
   padding-bottom: 2px
+
+  &._full
+    display: block
+    @media (max-width: 1199px)
+      display: none
+  &._short
+    display: none
+    @media (max-width: 1199px)
+      display: block

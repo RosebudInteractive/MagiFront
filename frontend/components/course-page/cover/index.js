@@ -1,11 +1,14 @@
 import React from 'react'
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types'
 import './cover.sass'
 import {Link} from "react-router-dom";
+import {userBookmarksSelector} from "ducks/profile";
 
 const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
 
-export default class Menu extends React.Component {
+class Cover extends React.Component {
 
     static propTypes = {
         course: PropTypes.object
@@ -16,15 +19,24 @@ export default class Menu extends React.Component {
     }
 
     render() {
+        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
+            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
+            _smallCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown-small"/>'
+
         const {course} = this.props,
-            _coverStyle = {backgroundImage : "url(" + '/data/' + course.Cover + ")"}
+            _coverStyle = {backgroundImage : "url(" + '/data/' + course.Cover + ")"},
+            _inFavorites = this._isLessonInBookmarks();
 
         return <div className="course-page__cover" style={_coverStyle}>
             <div className="course-page__info-wrapper">
-                <div className="course-page__favorite-button"/>
+                <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
+                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
+                </button>
                 <div className="course-page__info">
-
                     <h1 className="info__title">
+                        <span className="title__course-pay-status">
+                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>
+                        </span>
                         <p className="title__label">Курс:</p>
                         <span>{course.Name}</span>
                     </h1>
@@ -57,4 +69,32 @@ export default class Menu extends React.Component {
             </React.Fragment>);
         });
     }
+
+    _isLessonInBookmarks() {
+        let {courseUrl, lessonUrl} = this.props;
+
+        return this.props.bookmarks && this.props.bookmarks.find((item) => {
+            return item === courseUrl + '/' + lessonUrl
+        })
+    }
+
+    _favoritesClick() {
+
+    }
 }
+
+function mapStateToProps(state) {
+    return {
+        bookmarks: userBookmarksSelector(state),
+        lessonInfoStorage: state.lessonInfoStorage,
+        authorized: !!state.user.user,
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {}
+}
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cover);

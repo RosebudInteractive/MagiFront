@@ -1,7 +1,9 @@
-@import "../../../../tools/variables.sass"
+@import "~tools/variables.sass"
 
 .course-page__course-wrapper
   margin-right: 8.333%
+  @media (max-width: 899px)
+    margin: 20px 36px 0
 
 .course-wrapper__short-description
   font-family: $font-pt
@@ -11,6 +13,9 @@
   font-size: 20px
   line-height: 140%
   padding-bottom: 23px
+  @media (max-width: 899px)
+    padding: 12px 0 16px
+
   &:first-letter
     float: left
     width: auto

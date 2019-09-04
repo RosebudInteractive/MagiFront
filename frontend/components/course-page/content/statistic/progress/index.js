@@ -17,8 +17,10 @@ export default class Progress extends React.Component {
 
         return <div className="course-statistic__progress">
             <div className="course-statistic__progress-title statistic-block">Прогресс:</div>
-            <LessonCompleted course={course}/>
-            <TestsCompleted course={course}/>
+            <div className="progress__completed-wrapper">
+                <LessonCompleted course={course}/>
+                <TestsCompleted course={course}/>
+            </div>
         </div>
     }
 }
@@ -34,7 +36,8 @@ function LessonCompleted(props) {
             <span className="progress__completed">6</span>
             <span className="statistic-separator"> / </span>
             <span className="progress__total">16 </span>
-            <span className="progress__text"> лекции прослушано</span>
+            <span className="progress__text _full"> лекции прослушано</span>
+            <span className="progress__text _short"> лекций</span>
             <div className="progress-bar" style={_style}/>
         </div>
 }
@@ -50,7 +53,8 @@ function TestsCompleted(props) {
             <span className="progress__completed">5</span>
             <span className="statistic-separator"> / </span>
             <span className="progress__total">18 </span>
-            <span className="progress__text"> тестов завершено</span>
+            <span className="progress__text _full"> тестов завершено</span>
+            <span className="progress__text _short"> тестов</span>
             <div className="progress-bar" style={_style}/>
         </div>
 }

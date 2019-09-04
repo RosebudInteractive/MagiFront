@@ -3,6 +3,10 @@
   min-width: 25%
   margin-right: 8.333%
   padding-left: 48px
+  @media (max-width: 899px)
+    padding: 0
+    margin-left: 36px
+    margin-right: 36px
 
   .course-page__statistic-wrapper
     margin-top: 2px
@@ -11,10 +15,14 @@
       padding-top: 100px
       top: 0
       bottom: auto
+    @media (max-width: 899px)
+      margin: 0
 
   .play-block__wrapper
     width: 126px
     height: 126px
+    @media (max-width: 899px)
+      display: none
 
   .lecture-full__play-block
     padding: 0
