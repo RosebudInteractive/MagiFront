@@ -21,7 +21,15 @@ export default class Statistic extends React.Component {
         }
 
         this._handleScroll = () => {
-            if (isMobile()) { return }
+            if (isMobile()) {
+                if (this.state.fixed) {
+                    this.setState({
+                        fixed: false
+                    })
+                }
+
+                return
+            }
 
             let _windowScrollTop = $(window).scrollTop();
 
@@ -73,10 +81,10 @@ export default class Statistic extends React.Component {
     }
 
     _addEventListeners() {
-        window.addEventListener('scroll', ::this._handleScroll);
+        $(window).bind('resize scroll', ::this._handleScroll)
     }
 
     _removeEventListeners() {
-        window.removeEventListener('scroll', this._handleScroll);
+        $(window).unbind('resize scroll', ::this._handleScroll)
     }
 }

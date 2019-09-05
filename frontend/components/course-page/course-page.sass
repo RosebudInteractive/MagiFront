@@ -1,8 +1,18 @@
 @import "../../tools/variables"
 
 .course-page-ver2
+  body
+    line-height: normal
+
+  .page-header
+    display: none
+
   .language-block
     display: none
+
+  .course-page__content
+    .page-header
+      display: block !important
 
 .course-page-ver2._transparent-menu
   .navigation ul svg
@@ -51,3 +61,8 @@
 
   .user-block__header:after
     border-color: $color-white-06
+
+  .course-page__content
+    .page-header
+      display: none !important
+

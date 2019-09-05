@@ -7,28 +7,40 @@
 
 .lessons-list__item
   display: flex
-  height: 85px
+  //height: 85px
   align-items: center
   border-bottom: $border-dark-02
+  font-size: 17px
+  line-height: 130%
+  @media (max-width: 899px)
+    font-size: 15px
+
 
   .lessons-list__item-counter
+    display: block
     min-width: 42px
     font-family: $font-fira
     font-style: normal
     font-weight: normal
-    font-size: 17px
-    line-height: 130%
     color: $color-orange
+    @media (max-width: 899px)
+      display: none
+
+
+  .item-info__inner-counter
+    display: none
+    color: $color-orange
+    @media (max-width: 899px)
+      display: inline
 
 .lessons-list__item-info
-  //margin: auto 0
-  //display: inline
   flex-grow: 2
   font-family: $font-fira
   font-style: normal
   font-weight: normal
-  font-size: 17px
-  line-height: 130%
+  margin: 27px 0
+  @media (max-width: 899px)
+    margin: 17.5px 0
 
   a
     color: $color-main-dark
@@ -38,7 +50,7 @@
     &:hover
       opacity: 0.6
 
-  .item-info__duration
+  .item-info__duration, .item-info__duration a
     font-size: 14px
     line-height: 124%
     color: $color-dark-06

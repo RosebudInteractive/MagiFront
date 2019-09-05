@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Statistic from './statistic'
 import CourseWrapper from './course-wrapper'
 import './content.sass'
+import PageHeader from "../../page-header/page-header";
 
 export default class Content extends React.Component {
 
@@ -16,6 +17,7 @@ export default class Content extends React.Component {
 
     render() {
         return <div className="course-page__content">
+            <PageHeader visible={true}/>
             <Statistic course={this.props.course}/>
             <CourseWrapper course={this.props.course}/>
         </div>

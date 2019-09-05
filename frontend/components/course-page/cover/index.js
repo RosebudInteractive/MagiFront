@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import './cover.sass'
 import {Link} from "react-router-dom";
 import {userBookmarksSelector} from "ducks/profile";
+import PageHeader from "../../page-header/page-header";
 
 const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
 
@@ -28,6 +29,7 @@ class Cover extends React.Component {
             _inFavorites = this._isLessonInBookmarks();
 
         return <div className="course-page__cover" style={_coverStyle}>
+            <PageHeader visible={true}/>
             <div className="course-page__info-wrapper">
                 <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
                     <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>

@@ -10,6 +10,10 @@
     font-weight: normal
     font-size: 20px
     line-height: 140%
+    @media (max-width: 899px)
+      margin: 13px 18px 16px 0
+      font-size: 15px
+      line-height: 19px
 
 .author-block__title
   margin-bottom: 52px
@@ -18,9 +22,14 @@
   font-weight: normal
   font-size: 28px
   line-height: 34px
+  display: block
+  @media (max-width: 899px)
+    display: none
 
 .authors-block__item
   margin-bottom: 55px
+  @media (max-width: 899px)
+    margin-bottom: 45px
 
 .author-header
   display: flex
@@ -31,6 +40,8 @@
   height: 122px
   margin-right: 24px
   overflow: hidden
+  @media (max-width: 899px)
+    margin-right: 20px
 
   img
     display: block
@@ -57,6 +68,10 @@
   font-size: 28px
   line-height: 34px
   margin-bottom: 11px
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 24px
+    letter-spacing: -0.02em
 
 .author-header__occupation, .author-header__employment
   font-family: $font-fira
@@ -64,3 +79,9 @@
   font-weight: normal
   font-size: 14px
   line-height: 117.9%
+  @media (max-width: 899px)
+    font-size: 12px
+    line-height: 14px
+
+.author-header__employment
+  margin-bottom: -4px

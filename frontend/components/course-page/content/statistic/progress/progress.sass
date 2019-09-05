@@ -12,6 +12,12 @@
   font-weight: normal
   font-size: 17px
   line-height: 130%
+  @media (max-width: 1679px)
+    padding: 14.5px 0
+  @media (max-width: 899px)
+    font-size: 15px
+    line-height: 18px
+    padding: 10.5px 0
 
 .statistic-block
   border-bottom: $border-dark-02
@@ -22,6 +28,8 @@
   flex-direction: column
   @media (max-width: 899px)
     flex-direction: row
+  @media (max-width: 639px)
+    flex-direction: column
 
 
 .progress__lessons-block, .progress__tests-block
@@ -37,6 +45,9 @@
   margin: 0
   @media (max-width: 899px)
     flex-basis: 50%
+    font-size: 15px
+    line-height: 18px
+    padding: 7.5px 0
 
   .progress-bar
     border-bottom: 7px solid $color-orange
@@ -46,10 +57,15 @@
     border-top-right-radius: 5px
     width: 0
     height: 0
+    @media (max-width: 899px)
+      border-width: 5px
+      bottom: -3px
 
 .progress__lessons-block
   @media (max-width: 899px)
     margin-right: 20px
+  @media (max-width: 639px)
+    margin-right: 0
 
 .progress__completed, .statistic-separator, .progress__total
   font-family: $font-fira
@@ -57,6 +73,10 @@
   font-weight: normal
   font-size: 28px
   line-height: 34px
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 24px
+    letter-spacing: -0.02em
 
 .statistic-separator, .progress__total
   color: $color-dark-06

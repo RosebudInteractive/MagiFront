@@ -4,6 +4,8 @@
   margin-right: 8.333%
   @media (max-width: 899px)
     margin: 20px 36px 0
+  @media (max-width: 899px)
+    margin: 20px 20px 0
 
 .course-wrapper__short-description
   font-family: $font-pt
@@ -14,7 +16,10 @@
   line-height: 140%
   padding-bottom: 23px
   @media (max-width: 899px)
-    padding: 12px 0 16px
+    padding: 16px 0 16px
+    font-family: $font-fira
+    font-size: 15px
+    line-height: 130%
 
   &:first-letter
     float: left
@@ -26,6 +31,10 @@
     line-height: 56px
     color: $color-orange
     margin-right: 7px
+    @media (max-width: 899px)
+      font-size: 41px
+      line-height: 36px
+
 
 .course-wrapper__more-button
   font-family: $font-fira
@@ -36,6 +45,12 @@
   color: $color-orange
   margin-bottom: 24px
   cursor: pointer
+  @media (max-width: 899px)
+    font-size: 15px
+    line-height: 130%
+    margin-bottom: 11px
+
+
 
   span
     border-bottom: $border-hidden-link
@@ -65,20 +80,40 @@
   line-height: 110%
   color: $color-main-dark
   font-weight: 400
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 110%
 
 .course-page__books
   .course-wrapper__title
+    padding-top: 21px
     padding-bottom: 29px
+    @media (max-width: 899px)
+      padding-top: 12px
+      padding-bottom: 16px
+      margin-top: 20px
 
   .book-list__item
     padding-bottom: 31px
 
   .book-preview .book-preview__image
-    margin: 0 24px 0 0
+    margin: 0 17px 0 0
     padding: 0
     overflow: hidden
-    width: 120px
-    height: 184px
+    width: 96px
+    height: 147px
 
   .book-preview__title
     margin-top: 15px
+
+  .book-preview__name
+    @media (max-width: 899px)
+      font-size: 15px !important
+      line-height: 18px
+
+  .book-preview__author, .book-preview__title, .stores
+    @media (max-width: 899px)
+      font-family: $font-fira
+      font-size: 12px
+      line-height: 14px
+      margin: 0

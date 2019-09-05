@@ -7,6 +7,10 @@
     padding: 0
     margin-left: 36px
     margin-right: 36px
+  @media (max-width: 639px)
+    padding: 0
+    margin-left: 20px
+    margin-right: 20px
 
   .course-page__statistic-wrapper
     margin-top: 2px
@@ -21,8 +25,18 @@
   .play-block__wrapper
     width: 126px
     height: 126px
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
     @media (max-width: 899px)
       display: none
+
+  .play-block
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+      min-width: 79px
+
 
   .lecture-full__play-block
     padding: 0
@@ -32,6 +46,14 @@
     padding: 0
     height: 126px
     width: 126px
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+
+  .play-block__loader:after
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
 
   .lecture-full__play-block
     width: 100%

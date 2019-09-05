@@ -3,6 +3,7 @@ import PlayBlock from "../../../../course-extended/sublessons/small-play-block";
 import React from "react";
 import PropTypes from "prop-types";
 
+const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
 
 export default class LessonFull extends React.Component{
 
@@ -23,16 +24,22 @@ export default class LessonFull extends React.Component{
         return <li className="lessons-list__item">
             <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
             <div className="lessons-list__item-info">
+                <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
                 <Link to={url} className="item-info__name">{lesson.Name + ' '}</Link>
-                <div className="item-info__duration">{lesson.DurationFmt}</div>
+                <div className="item-info__duration">
+                    <span >{lesson.DurationFmt}</span>
+                    <span>
+                        <Link to={'#'}>{' • Михаил Свердлов'}</Link>
+                    </span>
+                </div>
             </div>
             <div className="item-info__ext">
-                <div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>
-                    <svg width="18" height="18"
-                         dangerouslySetInnerHTML={{__html: _completeStatus}}/>
-                </div>
+                {/*<div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>*/}
+                {/*    <svg width="18" height="18"*/}
+                {/*         dangerouslySetInnerHTML={{__html: _completeStatus}}/>*/}
+                {/*</div>*/}
                 <PlayBlock lesson={lesson}/>
-                <div className={"item-info__arrow-down"}/>
+                {/*<div className={"item-info__arrow-down"}/>*/}
             </div>
             </li>
     }
