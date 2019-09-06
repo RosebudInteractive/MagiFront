@@ -214,36 +214,8 @@ Promise.resolve()
 
         if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
             app.get("/*", function (req, res) {
-                try {
-                    if (req.path) {
-                        let urlArr = req.path.trim().split("/");
-                        if (urlArr.length > 1) {
-                            let flag = urlArr[1].match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/ig) ? true : false;
-                            if (flag) {
-                                console.log(buildLogString("=== DATA REQUEST ==="));
-                                console.log(buildLogString("  OriginalUrl: " + req.originalUrl));
-                                console.log(buildLogString("  Method: " + req.method));
-                                console.log(buildLogString("  upgrade: " + req.upgrade));
-                                console.log(buildLogString("  Ip: " + req.ip));
-                                console.log(buildLogString("  body: " + JSON.stringify(req.body ? req.body : "null")));
-                                console.log(buildLogString("=== START PARAMS ==="));
-                                if (req.query)
-                                    for (let q in req.query)
-                                        console.log(buildLogString(`    ${q}: "${req.query[q]}"`));
-                                console.log(buildLogString("===  END PARAMS  ==="));
-                                console.log(buildLogString("=== START HEADERS ==="));
-                                if (req.headers)
-                                    for (let h in req.headers)
-                                        console.log(buildLogString(`    ${h}: "${req.headers[h]}"`));
-                                console.log(buildLogString("===  END HEADERS  ==="));
-                            };
-                        }
-                    }
-                }
-                catch (err) {
-                    console.error(buildLogString(`502 monitoring, server.js: ${err && err.message ? err.message : err}`));
-                }
-                res.sendFile(__dirname + '/index.html');
+                console.log(req.user);
+                res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null" });
             });
 
         app.listen(port, address, function (error) {
