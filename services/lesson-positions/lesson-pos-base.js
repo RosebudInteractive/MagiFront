@@ -140,9 +140,9 @@ exports.LessonPositionsBase = class LessonPositionsBase {
                                 resData.ts = pos.ts;
                             if (pos.ts > ts) {
                                 if (pos.isFinished)
-                                    resData.lsn[lsnId] = { isFinished: true }
+                                    resData.lsn[lsnId] = { isFinished: true, ts: pos.ts }
                                 else
-                                    resData.lsn[lsnId] = { pos: pos.pos };
+                                    resData.lsn[lsnId] = { pos: pos.pos, ts: pos.ts };
                             }
                         }
                         

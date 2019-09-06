@@ -277,13 +277,14 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  cl.[ShortDescription] [CShortDescription], cl.[TargetAudience], cl.[Aims], c.[LandCover], c.[LandCoverMeta], c.[IsLandingPage], cl.[EstDuration],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  ell.[VideoLink], e.[ContentType],\n" +
+    "  ell.[VideoLink], e.[ContentType], f.[Id] [IsFinished],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join[CompletedLesson] f on (f.[UserId] = <%= user_id %>) and (f.[LessonId] = l.[Id])\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
@@ -365,13 +366,14 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  cl.`ShortDescription` `CShortDescription`, cl.`TargetAudience`, cl.`Aims`, c.`LandCover`, c.`LandCoverMeta`, c.`IsLandingPage`, cl.`EstDuration`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  ell.`VideoLink`, e.`ContentType`,\n" +
+    "  ell.`VideoLink`, e.`ContentType`, f.`Id` `IsFinished`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join `CompletedLesson` f on (f.`UserId` = <%= user_id %>) and (f.`LessonId` = l.`Id`)\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
@@ -1070,6 +1072,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
+                                        IsFinished: elem.IsFinished ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
