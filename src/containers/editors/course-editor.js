@@ -9,6 +9,7 @@ import ErrorDialog from '../../components/dialog/error-dialog'
 import CourseCategoryDialog from "../../components/course-editor/dialogs/category-dialog";
 import CourseFormWrapper from '../../components/course-editor/form-wrapper'
 import CourseAuthorDialog from '../../components/course-editor/dialogs/author-dialog'
+import LayoutVer2Tab, {LAYOUT_VER2_FORM} from "../../components/course-editor/tabs/layout-ver2-tab";
 import SocialNetworkTab from "../../components/course-editor/tabs/social-network-tab";
 import SubscriptionTab from '../../components/course-editor/tabs/subscription-tab'
 import AuthorsTab from '../../components/course-editor/tabs/authors-and-categories'
@@ -29,9 +30,9 @@ import {Prompt} from "react-router-dom";
 
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../../constants/Common'
 
-
 const TABS = {
     MAIN: 'MAIN',
+    LAYOUT_VER2: 'LAYOUT_VER2',
     SOCIAL_NETWORKS: 'SOCIAL_NETWORKS',
     SUBSCRIPTION: 'SUBSCRIPTION',
     AUTHORS: 'AUTHORS',
@@ -100,7 +101,7 @@ class CourseEditor extends React.Component {
     }
 
     render() {
-        const {fetching, hasChanges, courseId, savingCourse, match} = this.props;
+        const {fetching, hasChanges, courseId, savingCourse,} = this.props;
 
         return <React.Fragment>
             {
@@ -119,6 +120,12 @@ class CourseEditor extends React.Component {
                                         onClick={() => {
                                             this._switchTo(TABS.MAIN)
                                         }}>Основные
+                                    </div>
+                                    <div
+                                        className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LAYOUT_VER2 ? ' tab-link-active' : '')}
+                                        onClick={() => {
+                                            this._switchTo(TABS.LAYOUT_VER2)
+                                        }}>Новый формат
                                     </div>
                                     <div
                                         className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL_NETWORKS ? ' tab-link-active' : '')}
@@ -157,6 +164,8 @@ class CourseEditor extends React.Component {
                             <div className="main-area__container">
                                 <CourseFormWrapper visible={this.state.currentTab === TABS.MAIN}
                                                    editMode={this.state.editMode}/>
+                                <LayoutVer2Tab visible={this.state.currentTab === TABS.LAYOUT_VER2}
+                                                  editMode={this.props.editMode}/>
                                 <SocialNetworkTab visible={this.state.currentTab === TABS.SOCIAL_NETWORKS}
                                                   editMode={this.props.editMode}/>
                                 <SubscriptionTab editMode={this.state.editMode}
@@ -196,7 +205,7 @@ class CourseEditor extends React.Component {
 
 
     _save() {
-        let {editorValues, subscriptionValues, snValues, editorValid, courseId} = this.props;
+        let {editorValues, subscriptionValues, snValues, layoutVer2Values, editorValid, courseId} = this.props;
 
         if (!editorValid) {
             return
@@ -228,9 +237,6 @@ class CourseEditor extends React.Component {
             LanguageId: editorValues.languageId,
             URL: editorValues.URL,
             Description: editorValues.description,
-            ShortDescription: editorValues.shortDescription,
-            TargetAudience: editorValues.targetAudience,
-            Aims: editorValues.aims,
             Mask: editorValues.cover.mask,
             Authors: [],
             Categories: [],
@@ -248,6 +254,13 @@ class CourseEditor extends React.Component {
             SnName: snValues.snName,
             SnDescription: snValues.snDescription,
             SnPost: snValues.snPost,
+            IsLandingPage: layoutVer2Values.isLandingPage,
+            ShortDescription: layoutVer2Values.shortDescription,
+            TargetAudience: layoutVer2Values.targetAudience,
+            Aims: layoutVer2Values.aims,
+            EstDuration: this._valueToSeconds(layoutVer2Values.estDuration),
+            LandCover: layoutVer2Values.cover.file,
+            LandCoverMeta: layoutVer2Values.cover.meta,
         };
 
 
@@ -310,6 +323,7 @@ class CourseEditor extends React.Component {
         this.props.resetReduxForm('CourseEditor')
         this.props.resetReduxForm('CourseSubscriptionForm')
         this.props.resetReduxForm('CourseSocialNetworkForm')
+        this.props.resetReduxForm(LAYOUT_VER2_FORM)
     }
 
     _fillLessons(array) {
@@ -324,6 +338,10 @@ class CourseEditor extends React.Component {
 
     _enableApplyChanges() {
         return this.props.editorValid && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
+    }
+
+    _valueToSeconds(value) {
+        return null
     }
 }
 
@@ -362,8 +380,12 @@ function mapStateToProps(state, ownProps) {
 
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
+        layoutVer2Values: getFormValues(LAYOUT_VER2_FORM)(state),
         snValues: getFormValues('CourseSocialNetworkForm')(state),
-        editorValid: isValid('CourseEditor')(state) && isValid('CourseSubscriptionForm')(state) && isValid('CourseSocialNetworkForm')(state),
+        editorValid: isValid('CourseEditor')(state)
+            && isValid('CourseSubscriptionForm')(state)
+            && isValid('CourseSocialNetworkForm')(state)
+            && isValid(LAYOUT_VER2_FORM)(state),
         activeTabs: activeTabsSelector(state)
     }
 }
