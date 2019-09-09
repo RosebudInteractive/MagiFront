@@ -82,7 +82,7 @@ export const course = {
             "Number": 1,
             "ReadyDate": "2018-06-05T21:00:00.000Z",
             "State": "R",
-            "ContentType": 1,
+            "ContentType": 2,
             "Cover": "2018/06/Villa-di-Careggi.jpg",
             "CoverMeta": "{\"path\":\"2018/06/\",\"mime-type\":\"image/jpeg\",\"size\":{\"width\":1180,\"height\":1030},\"content\":{\"m\":\"Villa-di-Careggi-768x670.jpg\",\"s\":\"Villa-di-Careggi-360x314.jpg\"},\"icon\":\"Villa-di-Careggi-150x150.jpg\",\"name\":\"Villa di Careggi\"}",
             "URL": "medici",

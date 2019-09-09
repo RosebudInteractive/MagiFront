@@ -2,8 +2,9 @@ import {Link} from "react-router-dom";
 import PlayBlock from "../../../../course-extended/sublessons/small-play-block";
 import React from "react";
 import PropTypes from "prop-types";
+import {CONTENT_TYPE} from "../../../../../constants/common-consts";
 
-const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
+const _videoIcon = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#video-lesson"/>'
 
 export default class LessonFull extends React.Component{
 
@@ -21,27 +22,33 @@ export default class LessonFull extends React.Component{
             url = '/' + this.props.courseUrl + '/' + lesson.URL;
         lesson.courseUrl = this.props.courseUrl;
 
-        return <li className="lessons-list__item">
-            <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
-            <div className="lessons-list__item-info">
-                <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
-                <Link to={url} className="item-info__name">{lesson.Name + ' '}</Link>
-                <div className="item-info__duration">
-                    <span >{lesson.DurationFmt}</span>
-                    <span>
-                        <Link to={'#'}>{' • Михаил Свердлов'}</Link>
-                    </span>
-                </div>
-            </div>
-            <div className="item-info__ext">
-                {/*<div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>*/}
-                {/*    <svg width="18" height="18"*/}
-                {/*         dangerouslySetInnerHTML={{__html: _completeStatus}}/>*/}
-                {/*</div>*/}
-                <PlayBlock lesson={lesson}/>
-                {/*<div className={"item-info__arrow-down"}/>*/}
-            </div>
-            </li>
+        return <React.Fragment>
+                <li className="lessons-list__item">
+                    <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
+                    <div className="lessons-list__item-info">
+                        <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
+                        <Link to={url} className="item-info__name">{lesson.Name + ' '}</Link>
+                        <div className="item-info__duration">
+                            <span >{lesson.DurationFmt}</span>
+                            <span>
+                                <Link to={'#'}>{' • Михаил Свердлов'}</Link>
+                            </span>
+                        </div>
+                    </div>
+                    <div className="item-info__ext">
+                        {/*<div className={"item-info__ext-complete-status " + this._getColor(lesson.Id)}>*/}
+                        {/*    <svg width="18" height="18"*/}
+                        {/*         dangerouslySetInnerHTML={{__html: _completeStatus}}/>*/}
+                        {/*</div>*/}
+                        <PlayBlock lesson={lesson}/>
+                        {/*<div className={"item-info__arrow-down"}/>*/}
+                    </div>
+                </li>
+                <ol className="course-scheme__lessons-list _sublessons">
+                    {this._getSublessons()}
+                </ol>
+            </React.Fragment>
+
     }
 
     _getColor(value) {
@@ -59,27 +66,31 @@ export default class LessonFull extends React.Component{
     }
 
     _getSublessons() {
-        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
+        return this.props.lesson.Lessons.map((lesson, index) => {
 
-        return this.props.subLessons.map((lesson, index) => {
-            let url = '/' + this.props.courseUrl + '/' + lesson.URL;
+            const _url = '/' + this.props.courseUrl + '/' + lesson.URL,
+                _number = `${this.props.lesson.Number}.${lesson.Number} `,
+                 _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO
+
             lesson.courseUrl = this.props.courseUrl;
 
-            return <li key={index}>
-                <Link to={url} className="extras-list__item">
-                    <span className="counter">{this.props.parentNumber + '.'}</span>
-                    <span className="inner-counter">{lesson.Number}</span>
-                    {lesson.Name + ' '}
-                    <span className="duration">{lesson.DurationFmt}</span>
-                </Link>
+            return <li key={index} className="lessons-list__item">
+                <div className="lessons-list__item-counter">{_number}</div>
+                <div className="lessons-list__item-info">
+                    <div className="item-info__inner-counter">{_number}</div>
+                    <Link to={_url} className="item-info__name">{lesson.Name + ' '}</Link>
+                    <div className="item-info__duration">
+                        <span >{lesson.DurationFmt}</span>
+                        {
+                            _isYoutubeVideo ?
+                                <span className="item__video-icon">
+                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _videoIcon}}/>
+                                </span>
+                                : null
+                        }
+                    </div>
+                </div>
                 <PlayBlock lesson={lesson}/>
-                <button className="extras-list__fav" type="button" onClick={() => {
-                    this.props.onSwitchFavorites(lesson.URL)
-                }}>
-                    <svg width="14" height="23"
-                         dangerouslySetInnerHTML={{__html: this.props.isLessonInBookmarks(lesson.URL) ? _redFlag : _flag}}/>
-                </button>
             </li>
         })
     }
