@@ -2,10 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './../controls.sass'
 import InputMask from 'react-input-mask';
-import {touch} from "redux-form";
 
-const EMPTY_VALUE = "--",
-    MASK_CHAR = "-",
+const EMPTY_VALUE = "••",
+    MASK_CHAR = "•",
     MASK = "99 ч. 99 мин. 99 сек."
 
 export default class TimeInput extends React.Component {
@@ -32,7 +31,7 @@ export default class TimeInput extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         if ((this.props.input.value !== nextProps.input.value) && !isNaN(nextProps.input.value)) {
-            this.setState({textValue: _convertToTime(this.props.input.value)})
+            this.setState({textValue: _convertToTime(nextProps.input.value)})
         }
     }
 
@@ -74,7 +73,9 @@ export default class TimeInput extends React.Component {
             this.props.input.onChange(Number.NaN)
         }
 
-        this.props.meta.dispatch(touch(this.props.meta.form, this.props.input.name))
+        const {onBlur, input} = this.props
+        if (onBlur) onBlur()
+        if (input) input.onBlur()
     }
 }
 
