@@ -98,6 +98,7 @@
     "react-easy-swipe": "0.0.13",
     "react-google-invisible-recaptcha": "^0.2.11",
     "react-icons": "^2.2.7",
+    "react-input-mask": "^2.0.4",
     "react-intl": "^2.4.0",
     "react-lazyload": "^2.3.0",
     "react-meta-tags": "^0.7.1",
