@@ -16,6 +16,11 @@ module.exports = {
             schedule: "0 27 * * * *", // run every hour
             options: {
                 maxInsertNum: 10,
+                completion: {
+                    maxInsertNum: 20,
+                    limit: 10000,
+                    coeff: 0.95,
+                },
                 logStat: true
             }
         },

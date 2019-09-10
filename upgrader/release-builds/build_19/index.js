@@ -7,10 +7,16 @@ exports.upgradeDb = async (schema) => {
         .addField("UserId", { type: "dataRef", model: "User", refAction: "parentRestrict", allowNull: false })
         .addField("LessonId", { type: "dataRef", model: "Lesson", refAction: "parentRestrict", allowNull: false });
 
+    schema.getModel("Course")
+        .addField("LandCover", { type: "string", length: 255, allowNull: true })
+        .addField("LandCoverMeta", { type: "string", allowNull: true })
+        .addField("IsLandingPage", { type: "boolean", allowNull: true });
+
     schema.getModel("CourseLng")
         .addField("ShortDescription", { type: "string", allowNull: true })
         .addField("TargetAudience", { type: "string", allowNull: true })
-        .addField("Aims", { type: "string", allowNull: true });
+        .addField("Aims", { type: "string", allowNull: true })
+        .addField("EstDuration", { type: "int", allowNull: true });
 
     schema.getModel("AuthorLng")
         .addField("Occupation", { type: "string", length: 255, allowNull: true })

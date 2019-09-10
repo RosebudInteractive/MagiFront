@@ -67,7 +67,7 @@ const COURSE_MSSQL_ALL_REQ =
     "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
-    "  cl.[ShortDescription], cl.[TargetAudience], cl.[Aims],\n" +
+    "  cl.[ShortDescription], cl.[TargetAudience], cl.[Aims], c.[LandCover], c.[LandCoverMeta], c.[IsLandingPage], cl.[EstDuration],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[Language] as [LanguageName], c.[URL], cl.[Name], cl.[Description], cl.[ExtLinks] from [Course] c\n" +
     "  join [CourseLng] cl on c.[Id] = cl.[CourseId] and c.[AccountId] = <%= accountId %>\n" +
     "  left join [Language] l on c.[LanguageId] = l.[Id]";
@@ -81,7 +81,7 @@ const COURSE_MYSQL_ALL_REQ =
     "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
-    "  cl.`ShortDescription`, cl.`TargetAudience`, cl.`Aims`,\n" +
+    "  cl.`ShortDescription`, cl.`TargetAudience`, cl.`Aims`, c.`LandCover`, c.`LandCoverMeta`, c.`IsLandingPage`, cl.`EstDuration`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`Language` as `LanguageName`, c.`URL`, cl.`Name`, cl.`Description`, cl.`ExtLinks` from`Course` c\n" +
     "  join `CourseLng` cl on c.`Id` = cl.`CourseId` and c.`AccountId` = <%= accountId %>\n" +
     "  left join `Language` l on c.`LanguageId` = l.`Id`";
@@ -275,14 +275,16 @@ const COURSE_MSSQL_PUBLIC_REQ =
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
+    "  cl.[ShortDescription] [CShortDescription], cl.[TargetAudience], cl.[Aims], c.[LandCover], c.[LandCoverMeta], c.[IsLandingPage], cl.[EstDuration],\n" +
     "  cl.[Description], cl.[ExtLinks], c.[URL], lc.[Number], lc.[ReadyDate], ell.Audio, el.[Number] Eln,\n" +
-    "  ell.[VideoLink], e.[ContentType],\n" +
+    "  ell.[VideoLink], e.[ContentType], f.[Id] [IsFinished],\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
     "  join[LessonCourse] lc on lc.[CourseId] = c.[Id]\n" +
     "  join[Lesson] l on l.[Id] = lc.[LessonId]\n" +
     "  join[LessonLng] ll on ll.[LessonId] = l.[Id]\n" +
+    "  left join[CompletedLesson] f on (f.[UserId] = <%= user_id %>) and (f.[LessonId] = l.[Id])\n" +
     "  left join [UserPaidCourse] pc on (pc.[UserId] = <%= user_id %>) and (pc.[CourseId] = c.[Id])\n" +
     "  left join [UserGiftCourse] gc on (gc.[UserId] = <%= user_id %>) and (gc.[CourseId] = c.[Id])\n" +
     "  left join[EpisodeLesson] el on el.[LessonId] = l.[Id]\n" +
@@ -362,14 +364,16 @@ const COURSE_MYSQL_PUBLIC_REQ =
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
+    "  cl.`ShortDescription` `CShortDescription`, cl.`TargetAudience`, cl.`Aims`, c.`LandCover`, c.`LandCoverMeta`, c.`IsLandingPage`, cl.`EstDuration`,\n" +
     "  cl.`Description`, cl.`ExtLinks`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.Audio, el.`Number` Eln,\n" +
-    "  ell.`VideoLink`, e.`ContentType`,\n" +
+    "  ell.`VideoLink`, e.`ContentType`, f.`Id` `IsFinished`,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
     "  join`LessonCourse` lc on lc.`CourseId` = c.`Id`\n" +
     "  join`Lesson` l on l.`Id` = lc.`LessonId`\n" +
     "  join`LessonLng` ll on ll.`LessonId` = l.`Id`\n" +
+    "  left join `CompletedLesson` f on (f.`UserId` = <%= user_id %>) and (f.`LessonId` = l.`Id`)\n" +
     "  left join `UserPaidCourse` pc on (pc.`UserId` = <%= user_id %>) and (pc.`CourseId` = c.`Id`)\n" +
     "  left join `UserGiftCourse` gc on (gc.`UserId` = <%= user_id %>) and (gc.`CourseId` = c.`Id`)\n" +
     "  left join`EpisodeLesson` el on el.`LessonId` = l.`Id`\n" +
@@ -1006,6 +1010,9 @@ const DbCourse = class DbCourse extends DbObject {
                                         LanguageId: elem.LanguageId,
                                         Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
                                         CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),
+                                        LandCover: this._convertDataUrl(elem.LandCover, isAbsPath, dLink),
+                                        LandCoverMeta: this._convertMeta(elem.LandCoverMeta, isAbsPath, dLink),
+                                        IsLandingPage: elem.IsLandingPage ? true : false,
                                         OneLesson: elem.OneLesson ? true : false,
                                         Mask: elem.Mask,
                                         Color: elem.Color,
@@ -1014,6 +1021,10 @@ const DbCourse = class DbCourse extends DbObject {
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         VideoIntwLink: elem.VideoIntwLink,
                                         VideoIntroLink: elem.VideoIntroLink,
+                                        ShortDescription: elem.CShortDescription,
+                                        TargetAudience: elem.TargetAudience,
+                                        Aims: elem.Aims,
+                                        EstDuration: elem.EstDuration,
                                         IntwD: elem.IntwD,
                                         IntwDFmt: elem.IntwDFmt,
                                         IntroD: elem.IntroD,
@@ -1061,6 +1072,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         IsAuthRequired: elem.IsAuthRequired ? true : false,
                                         IsSubsRequired: elem.IsSubsRequired ? true : false,
                                         IsFreeInPaidCourse: elem.IsFreeInPaidCourse ? true : false,
+                                        IsFinished: elem.IsFinished ? true : false,
                                         Name: elem.LName,
                                         ShortDescription: elem.ShortDescription,
                                         Duration: elem.Duration,
@@ -1131,6 +1143,8 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
+                                    Occupation: elem.Occupation,
+                                    Employment: elem.Employment,
                                     Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
                                     PortraitMeta: this._convertMeta(elem.PortraitMeta, isAbsPath, dLink),
                                     URL: isAbsPath ? this._absAuthorUrl + elem.URL : elem.URL
@@ -1363,6 +1377,7 @@ const DbCourse = class DbCourse extends DbObject {
                             course.OneLesson = course.OneLesson ? true : false;
                             course.IsPaid = course.IsPaid ? true : false;
                             course.IsSubsFree = course.IsSubsFree ? true : false;
+                            course.IsLandingPage = course.IsLandingPage ? true : false;
                             await this.getCoursePrice(course, true, true);
                         }
                         else
@@ -1816,6 +1831,14 @@ const DbCourse = class DbCourse extends DbObject {
                         if (typeof (inpFields["IsSubsFree"]) === "boolean")
                             crs_obj.isSubsFree(inpFields["IsSubsFree"]);
 
+                        if (typeof (inpFields["LandCover"]) !== "undefined")
+                            crs_obj.landCover(inpFields["LandCover"]);
+                        if (typeof (inpFields["LandCoverMeta"]) !== "undefined")
+                            crs_obj.landCoverMeta(inpFields["LandCoverMeta"]);
+                        if (typeof (inpFields["IsLandingPage"]) === "boolean")
+                            crs_obj.isLandingPage(inpFields["IsLandingPage"]);
+                        
+                        
                         if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
                         if (typeof (inpFields["Name"]) !== "undefined")
@@ -1849,6 +1872,8 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_lng_obj.targetAudience(inpFields["TargetAudience"]);
                         if (typeof (inpFields["Aims"]) !== "undefined")
                             crs_lng_obj.aims(inpFields["Aims"]);
+                        if (typeof (inpFields["EstDuration"]) !== "undefined")
+                            crs_lng_obj.estDuration(inpFields["EstDuration"]);
 
                         for (let key in auth_list)
                             auth_collection._del(auth_list[key].obj);
@@ -2117,6 +2142,14 @@ const DbCourse = class DbCourse extends DbObject {
                         if (typeof (inpFields["IsSubsFree"]) === "boolean")
                             fields["IsSubsFree"] = inpFields["IsSubsFree"];
 
+                        if (typeof (inpFields["LandCover"]) !== "undefined")
+                            fields["LandCover"] = inpFields["LandCover"];
+                        if (typeof (inpFields["LandCoverMeta"]) !== "undefined")
+                            fields["LandCoverMeta"] = inpFields["LandCoverMeta"];
+                        fields["IsLandingPage"] = false;
+                        if (typeof (inpFields["IsLandingPage"]) === "boolean")
+                            fields["IsLandingPage"] = inpFields["IsLandingPage"];
+
                         if (!languageId)
                             throw new Erorr("Field \"LanguageId\" is required.");
                         return root_obj.newObject({
@@ -2163,6 +2196,8 @@ const DbCourse = class DbCourse extends DbObject {
                             fields["TargetAudience"] = inpFields["TargetAudience"];
                         if (typeof (inpFields["Aims"]) !== "undefined")
                             fields["Aims"] = inpFields["Aims"];
+                        if (typeof (inpFields["EstDuration"]) !== "undefined")
+                            fields["EstDuration"] = inpFields["EstDuration"];
 
                         return root_lng.newObject({
                             fields: fields

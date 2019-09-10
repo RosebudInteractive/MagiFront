@@ -90,9 +90,9 @@ class CourseEditorForm extends React.Component {
                 <Field component={Select} name="languageId" label="Язык" placeholder="Выберите язык"
                        options={this._getLanguagesArray()} disabled={_disabled}/>
                 <Field component={TextArea} enableHtml={true} name="description" label="Описание курса" disabled={_disabled}/>
-                <Field component={TextArea} enableHtml={true} name="shortDescription" label="Краткое описание курса" disabled={_disabled}/>
-                <Field component={TextArea} enableHtml={true} name="targetAudience" label="Кому подойдет этот курс" disabled={_disabled}/>
-                <Field component={TextArea} enableHtml={true} name="aims" label="Чему вы научитесь" disabled={_disabled}/>
+                {/*<Field component={TextArea} enableHtml={true} name="shortDescription" label="Краткое описание курса" disabled={_disabled}/>*/}
+                {/*<Field component={TextArea} enableHtml={true} name="targetAudience" label="Кому подойдет этот курс" disabled={_disabled}/>*/}
+                {/*<Field component={TextArea} enableHtml={true} name="aims" label="Чему вы научитесь" disabled={_disabled}/>*/}
                 <Field component={TextArea} enableHtml={false} name="extLinksValues" label="Ссылки на другие ресурсы"
                        disabled={_disabled}/>
                 <Field component={Cover} name="cover" label="Обложка курса" disabled={_disabled}/>

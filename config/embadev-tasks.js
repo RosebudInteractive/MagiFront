@@ -22,10 +22,15 @@ let options = {
             name: "Listening history import",
             module: "./lsn-history",
             type: "scheduled-task",
-            disabled: true,
+            disabled: false,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 maxInsertNum: 2,
+                completion: {
+                    maxInsertNum: 1,
+                    limit: 10000,
+                    coeff: 0.01,
+                },
                 logStat: true
             }
         },
@@ -67,7 +72,7 @@ let options = {
             name: "Prerender",
             module: "./prerender",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 path: path.normalize(path.join(process.cwd(), "..", "..", "sitemaps")),

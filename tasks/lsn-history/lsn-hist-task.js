@@ -17,6 +17,10 @@ const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 
 const dfltSettings = {
     maxInsertNum: 10,
+    completion: {
+        maxInsertNum: 10,
+        coeff: 0.95,
+    },
     logStat: false
 };
 
@@ -47,6 +51,16 @@ exports.LsnHistTask = class LsnHistTask extends Task {
             }
             resolve(rc);
         });  
+    }
+
+    async _processCompletion() {
+        let stTime = new Date();
+        let rc = await this._lsnHstService.setLessonCompleted(this._settings.completion);
+        if (this._settings.logStat) {
+            let msg = `Lesson completion: ${rc} lesson(s), ` +
+                `time taken: ${DbUtils.fmtDuration(((new Date()) - stTime) / 1000)}.`;
+            console.log(buildLogString(msg));
+        };
     }
 
     _importHstFromCache() {
@@ -126,7 +140,8 @@ exports.LsnHistTask = class LsnHistTask extends Task {
             });
     }
 
-    run(fireDate) {
-        return this._importHstFromCache();
+    async run(fireDate) {
+        await this._importHstFromCache();
+        await this._processCompletion();
     }
 };

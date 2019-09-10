@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#000000">
     <script>
-        dataLayer = []
+        dataLayer = [];
+        var id = <%= id %>;
+        if (!!id) {dataLayer.push({UID: id})}
     </script>
     <!--Google Tag Manager-->
     <script>(function (w, d, s, l, i) {
