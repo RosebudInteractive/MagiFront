@@ -258,7 +258,7 @@ class CourseEditor extends React.Component {
             ShortDescription: layoutVer2Values.shortDescription,
             TargetAudience: layoutVer2Values.targetAudience,
             Aims: layoutVer2Values.aims,
-            EstDuration: this._valueToSeconds(layoutVer2Values.estDuration),
+            EstDuration: layoutVer2Values.estDuration,
             LandCover: layoutVer2Values.cover.file,
             LandCoverMeta: layoutVer2Values.cover.meta,
         };
@@ -340,9 +340,6 @@ class CourseEditor extends React.Component {
         return this.props.editorValid && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
     }
 
-    _valueToSeconds(value) {
-        return null
-    }
 }
 
 const _roundNum = (value) => {
@@ -369,7 +366,8 @@ function mapStateToProps(state, ownProps) {
             state.courseLessons.hasChanges ||
             isDirty('CourseEditor')(state) ||
             isDirty('CourseSubscriptionForm')(state) ||
-            isDirty('CourseSocialNetworkForm')(state),
+            isDirty('CourseSocialNetworkForm')(state) ||
+            isDirty(LAYOUT_VER2_FORM)(state),
 
         fetching: state.authorsList.fetching ||
             state.categoriesList.fetching ||

@@ -1,6 +1,7 @@
 import React from 'react'
 import {Field, formValueSelector, reduxForm,} from 'redux-form'
-import {CheckBox, TextBox} from "../../common/input-controls";
+import {CheckBox,} from "../../common/input-controls";
+import TimeInput from "../../common/masked-controls/time-input";
 import TextArea from "../../common/text-area";
 import PropTypes from "prop-types";
 import {enableButtonsSelector} from "adm-ducks/app";
@@ -41,7 +42,7 @@ class LayoutVer2Form extends React.Component {
                 <Field component={TextArea} name="shortDescription" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
                 <Field component={TextArea} name="targetAudience" label="Кому подойдет этот курс" enableHtml={true} disabled={_disabled}/>
                 <Field component={TextArea} name="aims" label="Чему вы научитесь" enableHtml={true} disabled={_disabled}/>
-                <Field component={TextBox} name="estDuration" label="Ожидаемая длительность" disabled={_disabled}/>
+                <Field component={TimeInput} name="estDuration" label="Ожидаемая длительность" disabled={_disabled}/>
                 <Field component={Cover} name="cover" label="Обложка лекции" disabled={_disabled}/>
             </form>
         </div>
@@ -56,7 +57,7 @@ class LayoutVer2Form extends React.Component {
                 shortDescription: course.ShortDescription,
                 targetAudience: course.TargetAudience,
                 aims: course.Aims,
-                estDuration: course.EstDuration,
+                estDuration: course.EstDuration ? course.EstDuration : undefined,
                 cover: {
                     file: course.LandCover,
                     meta: course.LandCoverMeta,
@@ -83,6 +84,10 @@ const validate = (values,) => {
         if (!values.aims) {
             errors.aims = 'Значение не может быть пустым'
         }
+
+        if (isNaN(values.estDuration)) {
+            errors.estDuration = 'Неверное занечение'
+        }
     }
 
     return errors
@@ -91,6 +96,8 @@ const validate = (values,) => {
 let FormWrapper = reduxForm({
     form: LAYOUT_VER2_FORM,
     validate,
+    touchOnChange: true,
+    touchOnBlur: true
 })(LayoutVer2Form);
 
 const selector = formValueSelector(LAYOUT_VER2_FORM)
