@@ -214,7 +214,6 @@ Promise.resolve()
 
         if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
             app.get("/*", function (req, res) {
-                console.log(req.user);
                 res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null" });
             });
 
