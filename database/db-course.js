@@ -1143,6 +1143,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     Id: elem.Id,
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
+                                    Description: elem.Description,
                                     Occupation: elem.Occupation,
                                     Employment: elem.Employment,
                                     Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),
