@@ -36,7 +36,7 @@ function TargetAudience(props) {
     return _text ?
         <div className="extended-info__target-audience block-wrapper">
             <div className="target-audience__title block-title">Кому подойдет этот курс</div>
-            <div className="target-audience__text block-descr">{_text}</div>
+            <div className="target-audience__text block-descr" dangerouslySetInnerHTML={{__html: _text}}/>
         </div>
         :
         null
@@ -52,7 +52,7 @@ function Aims(props) {
     return _text ?
         <div className="extended-info__aims block-wrapper">
             <div className="aims__title block-title">Чему вы научитесь</div>
-            <div className="aims__text block-descr">{_text}</div>
+            <div className="aims__text block-descr" dangerouslySetInnerHTML={{__html: _text}}/>
         </div>
         :
         null

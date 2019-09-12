@@ -20,6 +20,18 @@
   @media (max-width: 899px)
     font-size: 15px
 
+  &._preview
+    color: $color-dark-06
+
+    .item-info__inner-counter, .lessons-list__item-counter
+      color: $color-dark-06
+
+
+  .item-info__ready-date
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 124%
+
 
   .lessons-list__item-counter
     display: block
@@ -63,6 +75,9 @@
     color: $color-dark-06
 
 
+.item-info__name
+  display: inline
+
 .item-info__ext
   display: flex
   align-items: center
@@ -105,3 +120,12 @@
       transition: -webkit-transform 0.3s ease
       transition: transform 0.3s ease
       transition: transform 0.3s ease, -webkit-transform 0.3s ease
+
+.lessons-list__item__play-block
+  display: block
+
+  .play-block-small__duration
+    display: none
+
+  .play-block-small
+    position: absolute

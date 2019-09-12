@@ -7,7 +7,6 @@ import {Switch, Route, withRouter} from 'react-router-dom'
 // import MetaTags from 'react-meta-tags';
 import CoursePage from './containers/courses-page';
 import SingleCoursePage from './containers/single-course-page';
-import NewCoursePage from './containers/course-page-ver2';
 import CombineLessonPage, {scroll} from './containers/combined-lesson-page';
 import AuthorPage from './containers/author-page'
 import ProfilePage from './containers/profile-page'
@@ -325,7 +324,6 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
-                <Route path={_homePath + 'new-course-page'} component={NewCoursePage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )

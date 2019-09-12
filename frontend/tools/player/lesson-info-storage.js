@@ -95,7 +95,7 @@ export default class LessonInfoStorage {
                     _map = _obj.lessons ? objectToMap(_obj.lessons) : new Map(),
                     _volume = _obj.volume;
 
-                _ts = _obj.ts ? _obj.ts : 0;
+                _ts = _obj.ts && this._checkAllLessonsHasTS(_map) ? _obj.ts : 0;
 
                 store.dispatch(storageActions.setInitialState(_map));
 
@@ -232,6 +232,18 @@ export default class LessonInfoStorage {
         }
 
         return {lsn}
+    }
+
+    _checkAllLessonsHasTS(map) {
+        let _result = true,
+            _iterator = map.values(),
+            _value
+
+        while ((_value = _iterator.next().value) && _result) {
+            _result = _value.hasOwnProperty('ts')
+        }
+
+        return _result
     }
 }
 

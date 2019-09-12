@@ -1,18 +1,17 @@
 import React from 'react'
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types'
 import './cover.sass'
 import {Link} from "react-router-dom";
-import {userBookmarksSelector} from "ducks/profile";
 import PageHeader from "../../page-header/page-header";
 
 const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
 
-class Cover extends React.Component {
+export default class Cover extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object
+        course: PropTypes.object,
+        isFavorite: PropTypes.bool,
+        onFavoritesClick: PropTypes.func,
     }
 
     constructor(props) {
@@ -24,21 +23,26 @@ class Cover extends React.Component {
             _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
             _smallCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown-small"/>'
 
-        const {course} = this.props,
-            _coverStyle = {backgroundImage : "url(" + '/data/' + course.Cover + ")"},
-            _inFavorites = this._isLessonInBookmarks();
+        const {course, isFavorite} = this.props,
+            _coverUrl = course.LandCover ? course.LandCover : course.Cover,
+            _coverStyle = {backgroundImage : "url(" + '/data/' + _coverUrl + ")"}
 
         return <div className="course-page__cover" style={_coverStyle}>
             <PageHeader visible={true}/>
             <div className="course-page__info-wrapper">
                 <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
-                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _inFavorites ? _redFlag : _flag}}/>
+                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ? _redFlag : _flag}}/>
                 </button>
                 <div className="course-page__info">
                     <h1 className="info__title">
-                        <span className="title__course-pay-status">
-                            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>
-                        </span>
+                        {
+                            course.IsPaid ?
+                                <span className="title__course-pay-status">
+                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>
+                                </span>
+                                :
+                                null
+                        }
                         <p className="title__label">Курс:</p>
                         <span>{course.Name}</span>
                     </h1>
@@ -72,31 +76,9 @@ class Cover extends React.Component {
         });
     }
 
-    _isLessonInBookmarks() {
-        let {courseUrl, lessonUrl} = this.props;
-
-        return this.props.bookmarks && this.props.bookmarks.find((item) => {
-            return item === courseUrl + '/' + lessonUrl
-        })
-    }
-
     _favoritesClick() {
-
+        if (this.props.onFavoritesClick) {
+            this.props.onFavoritesClick()
+        }
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        bookmarks: userBookmarksSelector(state),
-        lessonInfoStorage: state.lessonInfoStorage,
-        authorized: !!state.user.user,
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {}
-}
-
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(Cover);

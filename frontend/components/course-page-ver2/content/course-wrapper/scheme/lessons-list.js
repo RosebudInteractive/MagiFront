@@ -32,11 +32,7 @@ class CourseLessons extends React.Component {
             return lesson.State === 'R' ?
                 <LessonFull lesson={lesson} course={course} courseUrl={this.props.course.URL} isAdmin={isAdmin} needShowAuthors={_needShowAuthors}/>
                 :
-                <LessonPreview
-                    title={lesson.Name}
-                    readyDate={lesson.readyMonth + ' ' + lesson.readyYear}
-                    key={index}
-                />
+                <LessonPreview lesson={lesson} key={index}/>
         })
     }
 

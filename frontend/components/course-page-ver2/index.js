@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import Cover from './cover'
 import './course-page.sass'
 
-import {course} from "./mock-data";
+// import {course} from "./mock-data";
 import Content from "./content";
 import $ from "jquery";
 import {isInViewport} from "tools/page-tools";
@@ -12,11 +12,15 @@ import {isInViewport} from "tools/page-tools";
 export default class Wrapper extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object
+        course: PropTypes.object,
+        isFavorite: PropTypes.bool,
+        onFavoritesClick: PropTypes.func,
     }
 
     constructor(props) {
         super(props)
+
+        $('body').addClass('course-page-ver2').addClass('_transparent-menu')
 
         this.state = {
             transparentMenu: true
@@ -44,6 +48,7 @@ export default class Wrapper extends React.Component {
 
     componentWillUnmount() {
         $(window).unbind('resize scroll', this._resizeHandler);
+        $('body').removeClass('course-page-ver2').removeClass('_transparent-menu')
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -58,10 +63,10 @@ export default class Wrapper extends React.Component {
 
 
     render() {
-        // const {course} = this.props
+        const {course} = this.props
 
         return <div className={"course-page__wrapper"}>
-            <Cover course={course}/>
+            <Cover {...this.props}/>
             <Content course={course}/>
         </div>
     }

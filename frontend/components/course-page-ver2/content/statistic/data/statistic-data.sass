@@ -1,0 +1,92 @@
+@import "~tools/variables"
+
+
+
+
+.statistic__data-wrapper
+  position: absolute
+  width: 25%
+  display: flex
+  flex-direction: column
+  @media (max-width: 899px)
+    position: relative
+    width: 100%
+  //  flex-direction: row
+  //@media (max-width: 639px)
+  //  flex-direction: column
+
+.course-page__statistic-wrapper._fixed
+  .statistic__data-wrapper
+    width: calc(100% + 48px)
+
+.data__first-block
+  flex-direction: column
+
+.data__header-block
+  padding: 8.5px 0
+  @media (max-width: 899px)
+    flex-basis: 50%
+    font-size: 15px
+    line-height: 18px
+    padding: 7.5px 0
+
+.data__ready-date
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 14px
+  line-height: 17px
+  height: 60px
+  .data__text
+    padding: 0
+    margin: 0
+
+
+.data__info-block
+  padding: 8.5px 0
+  @media (max-width: 899px)
+    flex-basis: 50%
+    font-size: 15px
+    line-height: 18px
+    padding: 7.5px 0
+    &:nth-child(odd)
+      margin-right: 10px
+    &:nth-child(even)
+      margin-left: 10px
+    &:only-child
+      margin: 0
+      flex-basis: 100%
+  @media (max-width: 639px)
+    &:nth-child(odd)
+      margin-right: 0
+    &:nth-child(even)
+      margin-left: 0
+
+.statistic__data-block
+  border-bottom: $border-dark-02
+  position: relative
+  display: flex
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  color: $color-main-dark
+  margin: 0
+
+.data__text
+  align-self: flex-end
+  padding-left: 5px
+  margin-bottom: 2px
+  @media (max-width: 899px)
+    margin-bottom: -1px
+
+.data__counters-wrapper
+  display: flex
+  flex-direction: column
+  @media (max-width: 899px)
+    flex-direction: row
+    flex-basis: 50%
+
+  @media (max-width: 639px)
+    flex-direction: column

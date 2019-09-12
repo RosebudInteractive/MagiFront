@@ -2,7 +2,6 @@ import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
-import {Link,} from 'react-router-dom'
 
 import * as coursesActions from '../actions/courses-page-actions';
 import * as pageHeaderActions from '../actions/page-header-actions';
@@ -156,8 +155,6 @@ class CoursesPage extends React.Component {
                     {this._getMetaTags()}
                     <div className={"courses courses-page" + (this.props.showFiltersForm ? ' courses_opened_filter_row' : '')}
                          key={"courses-page"} id={"courses-page"}>
-
-                        <Link to={"/new-course-page"}>Новая страница курса</Link>
                         {this._getCoursesBundles()}
                     </div>
                 </React.Fragment>

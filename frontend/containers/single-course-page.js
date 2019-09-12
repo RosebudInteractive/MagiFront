@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import MetaTags from 'react-meta-tags';
 
-import InfoBlock from '../components/course-extended/info-block/'
+import InfoBlock from '../components/course-page-ver1/content/info-block/'
 import Content from '../components/course-extended/content-extended';
 import Tabs from '../components/course-extended/tabs';
 import NotFoundPage from '../components/not-found';
@@ -24,7 +24,10 @@ import {notifyConcreteCourseShowed} from "ducks/google-analytics";
 
 import {getCrownForCourse} from "../tools/svg-paths"
 import ScrollMemoryStorage from "../tools/scroll-memory-storage"
-import VideoBlock from "../components/course-extended/video-block";
+import VideoBlock from "../components/course-page-ver1/video-block";
+
+import WrapperVer1 from '../components/course-page-ver1/index'
+import WrapperVer2 from '../components/course-page-ver2/index'
 
 class Main extends React.Component {
     constructor(props) {
@@ -189,82 +192,21 @@ class Main extends React.Component {
                 <NotFoundPage/>
                 :
                 course ?
-                    [
-                        this._getMetaTags(),
-                        <div className="courses">
-                            <CourseModuleExt
-                                isFavorite={this._isCourseInBookmarks()}
-                                onFavoritesClick={::this._favoritesClick}
-                                shareUrl={window.location.href}
-                                course={course}
-                            />
-                            <VideoBlock course={course}/>
-                            <Tabs
-                                lessons={{total: course.lessonCount, ready: course.readyLessonCount}}
-                                books={{total: course.RefBooks.length}}
-                                course={course}
-                            />
-                        </div>
-                    ]
+                    <React.Fragment>
+                        {this._getMetaTags()}
+                        {
+                            course.IsLandingPage ?
+                                <WrapperVer2 course={course}
+                                             isFavorite={this._isCourseInBookmarks()}
+                                             onFavoritesClick={::this._favoritesClick}/>
+                                :
+                                <WrapperVer1 course={course}
+                                             isFavorite={this._isCourseInBookmarks()}
+                                             onFavoritesClick={::this._favoritesClick}
+                                             shareUrl={window.location.href}/>
+                        }
+                    </React.Fragment>
                     : null
-    }
-}
-
-class CourseModuleExt extends React.Component {
-
-    static propTypes = {
-        isFavorite: PropTypes.func,
-        onFavoritesClick: PropTypes.func,
-        shareUrl: PropTypes.string,
-        course: PropTypes.object,
-    }
-
-    render() {
-        const {course, shareUrl} = this.props
-
-        return (
-            <div className="course-module course-module--extended">
-                <TitleWrapper {...this.props}/>
-                <Inner shareUrl={shareUrl} counter={course.ShareCounters}/>
-            </div>
-        )
-    }
-}
-
-class TitleWrapper extends React.Component {
-    static propTypes = {
-        isFavorite: PropTypes.func,
-        onFavoritesClick: PropTypes.func,
-        course: PropTypes.object,
-    }
-
-    render() {
-        let {isFavorite, onFavoritesClick, course} = this.props;
-
-        return (
-            <div className="course-module__title-wrapper">
-                <h1 className="course-module__title no_underline">
-                    <span className={"favourites" + (isFavorite ? ' active' : '')}
-                          onClick={onFavoritesClick}>В закладки</span>
-                    <p className="course-module__label">
-                        { getCrownForCourse(course) }
-                        Курс:
-                    </p>
-                    <span>{course.Name}</span>
-                </h1>
-            </div>
-        )
-    }
-}
-
-class Inner extends React.Component {
-    render() {
-        return (
-            <div className="course-module__inner">
-                <InfoBlock/>
-                <Content shareUrl={this.props.shareUrl} counter={this.props.counter}/>
-            </div>
-        )
     }
 }
 

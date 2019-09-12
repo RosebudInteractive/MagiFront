@@ -12,7 +12,8 @@ import {
 } from '../constants/filters'
 
 import 'whatwg-fetch';
-import {parseReadyDate} from "../tools/time-tools";
+import {getTimeFmt, parseReadyDate} from "../tools/time-tools";
+import {LESSON_STATE} from "../constants/common-consts";
 
 export const getCourses = () => {
     return (dispatch) => {
@@ -199,8 +200,56 @@ const handleCourse = (data) => {
 
         data.lessonCount = _lessonCount;
         data.readyLessonCount = _readyLessonCount;
+
+        calcStatistics(data)
     }
     catch (err) {
         console.error('ERR: ' + err.message);
     }
 };
+
+const calcStatistics = (course) => {
+    course.statistics = {}
+
+    if (!course) return
+
+    let _published = 0,
+        _maxReadyDate = 0,
+        _sublessonsCount = 0,
+        _duration = 0,
+        _finishedLessons = 0
+
+    course.Lessons.forEach((item) => {
+        if (item.State === LESSON_STATE.READY) _published++
+
+        let _readyDate = item.ReadyDate ? new Date(item.ReadyDate) : 0
+        _maxReadyDate = (_readyDate > _maxReadyDate) ? _readyDate : _maxReadyDate
+
+        _duration += item.Duration
+
+        if (item.IsFinished) _finishedLessons++
+
+        if (item.Lessons.length > 0) {
+            _sublessonsCount += item.Lessons.length
+            item.Lessons.forEach((subitem) => { _duration += subitem.Duration })
+        }
+    })
+
+    let _allPublished = course.Lessons.length === _published
+
+    _duration = !_allPublished && course.EstDuration && (course.EstDuration > _duration) ?
+            course.EstDuration
+            :
+            _duration
+
+    course.statistics.lessons = {
+        total: course.Lessons.length,
+        sublessonsCount: _sublessonsCount,
+        published: _published,
+        allPublished : _allPublished,
+        readyDate: _allPublished ? null : parseReadyDate(_maxReadyDate),
+        duration: new Date(_duration * 1000).getUTCHours().toString(),
+        finishedLessons: _finishedLessons
+    }
+
+}

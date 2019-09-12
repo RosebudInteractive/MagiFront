@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom";
-import PlayBlock from "../../../../course-extended/sublessons/small-play-block";
+import PlayBlock from "../../../../common/small-play-block";
 import React from "react";
 import PropTypes from "prop-types";
 import {CONTENT_TYPE} from "../../../../../constants/common-consts";
@@ -14,12 +14,12 @@ export default class LessonFull extends React.Component{
     }
 
     render() {
-        const _completeStatus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>',
-            _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>'
+        const _completeStatus = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#complete-status"/>'
 
-        const {lesson} = this.props,
-            url = '/' + this.props.courseUrl + '/' + lesson.URL;
+        const {lesson, course} = this.props,
+            url = '/' + this.props.courseUrl + '/' + lesson.URL,
+            _multiAuthors = course.Authors.length > 1
+
         lesson.courseUrl = this.props.courseUrl;
 
         return <React.Fragment>
@@ -30,9 +30,15 @@ export default class LessonFull extends React.Component{
                         <Link to={url} className="item-info__name">{lesson.Name + ' '}</Link>
                         <div className="item-info__duration">
                             <span >{lesson.DurationFmt}</span>
-                            <span>
-                                <Link to={'#'}>{' • Михаил Свердлов'}</Link>
-                            </span>
+                            {
+                                _multiAuthors ?
+                                    <span>{' • '}
+                                        {this._getLinkToAuthor()}
+                                    </span>
+                                    :
+                                    null
+                            }
+
                         </div>
                     </div>
                     <div className="item-info__ext">
@@ -40,7 +46,7 @@ export default class LessonFull extends React.Component{
                         {/*    <svg width="18" height="18"*/}
                         {/*         dangerouslySetInnerHTML={{__html: _completeStatus}}/>*/}
                         {/*</div>*/}
-                        <PlayBlock lesson={lesson}/>
+                        <PlayBlock lesson={lesson} course={course} wrapperClass={"lessons-list__item__play-block"}/>
                         {/*<div className={"item-info__arrow-down"}/>*/}
                     </div>
                 </li>
@@ -48,7 +54,14 @@ export default class LessonFull extends React.Component{
                     {this._getSublessons()}
                 </ol>
             </React.Fragment>
+    }
 
+    _getLinkToAuthor() {
+
+        const {lesson, course} = this.props,
+            _author = course.Authors.find((item) => { return item.Id === lesson.AuthorId})
+
+        return _author && <Link to={'/autor/' + _author.URL}>{_author.FirstName + ' ' + _author.LastName}</Link>
     }
 
     _getColor(value) {
@@ -70,7 +83,7 @@ export default class LessonFull extends React.Component{
 
             const _url = '/' + this.props.courseUrl + '/' + lesson.URL,
                 _number = `${this.props.lesson.Number}.${lesson.Number} `,
-                 _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO
+                _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO
 
             lesson.courseUrl = this.props.courseUrl;
 
@@ -80,7 +93,7 @@ export default class LessonFull extends React.Component{
                     <div className="item-info__inner-counter">{_number}</div>
                     <Link to={_url} className="item-info__name">{lesson.Name + ' '}</Link>
                     <div className="item-info__duration">
-                        <span >{lesson.DurationFmt}</span>
+                        <span>{lesson.DurationFmt}</span>
                         {
                             _isYoutubeVideo ?
                                 <span className="item__video-icon">
@@ -90,7 +103,7 @@ export default class LessonFull extends React.Component{
                         }
                     </div>
                 </div>
-                <PlayBlock lesson={lesson}/>
+                <PlayBlock lesson={lesson} course={this.props.course} wrapperClass={"lessons-list__item__play-block"}/>
             </li>
         })
     }

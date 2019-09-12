@@ -6,6 +6,8 @@ import {getCoverPath, ImageSize} from "tools/page-tools";
 import Progress from './progress'
 import $ from "jquery";
 import {isMobile} from "tools/page-tools";
+import PriceBlock from "../../../common/price-block";
+import Data from "./data";
 
 export default class Statistic extends React.Component {
 
@@ -20,7 +22,9 @@ export default class Statistic extends React.Component {
             fixed : false
         }
 
-        this._handleScroll = () => {
+
+        // let that = this
+        this._handleScroll = function() {
             if (isMobile()) {
                 if (this.state.fixed) {
                     this.setState({
@@ -33,8 +37,11 @@ export default class Statistic extends React.Component {
 
             let _windowScrollTop = $(window).scrollTop();
 
-            let _wrapper = $('.course-page__statistic'),
-                _offsetTop = _wrapper.offset().top - 100;
+            let _wrapper = $('.course-page__statistic')
+
+            if (!_wrapper || !_wrapper.length) return;
+
+            let _offsetTop = _wrapper.offset().top - 100;
 
             if ((_windowScrollTop < _offsetTop) && this.state.fixed){
                 this.setState({
@@ -47,7 +54,9 @@ export default class Statistic extends React.Component {
                     fixed: true
                 });
             }
-        }
+        }.bind(this)
+
+        // this._handleScroll = _handleScroll.bind(this)
 
         this._addEventListeners();
     }
@@ -68,23 +77,34 @@ export default class Statistic extends React.Component {
             _lesson.CoverMeta = JSON.parse(_lesson.CoverMeta)
         }
 
-        const _cover = getCoverPath(_lesson, ImageSize.small)
+        const _cover = getCoverPath(_lesson, ImageSize.small),
+            _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
 
         return <div className="course-page__statistic">
             <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "")}>
-                <div className="play-block__wrapper">
-                    <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
-                </div>
-                <Progress course={course}/>
+                {
+                    _isBought ?
+                        <React.Fragment>
+                            <div className="play-block__wrapper">
+                                <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+                            </div>
+                            <Progress course={course}/>
+                        </React.Fragment>
+                        :
+                        <React.Fragment>
+                            <PriceBlock course={course}/>
+                            <Data course={course}/>
+                        </React.Fragment>
+                }
             </div>
         </div>
     }
 
     _addEventListeners() {
-        $(window).bind('resize scroll', ::this._handleScroll)
+        $(window).bind('resize scroll', this._handleScroll)
     }
 
     _removeEventListeners() {
-        $(window).unbind('resize scroll', ::this._handleScroll)
+        $(window).unbind('resize scroll', this._handleScroll)
     }
 }
