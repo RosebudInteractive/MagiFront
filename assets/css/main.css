@@ -5266,6 +5266,9 @@ ul.user-tooltip {
     -moz-box-align: center;
     -ms-flex-align: center;
     align-items: center; }
+    @media (max-width: 899px) {
+      .course-module .course-module__label {
+        margin-top: 0; } }
     /*@media (max-width: 1023px) {*/
     /*  .course-module .course-module__label {*/
     /*    padding-left: 26px; } }*/
