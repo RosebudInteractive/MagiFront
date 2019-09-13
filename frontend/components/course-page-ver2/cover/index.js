@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import './cover.sass'
 import {Link} from "react-router-dom";
 import PageHeader from "../../page-header/page-header";
+import {getCrownForCourse} from "tools/svg-paths";
 
 const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
 
@@ -35,14 +36,17 @@ export default class Cover extends React.Component {
                 </button>
                 <div className="course-page__info">
                     <h1 className="info__title">
-                        {
-                            course.IsPaid ?
-                                <span className="title__course-pay-status">
-                                    <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>
-                                </span>
-                                :
-                                null
-                        }
+                        <span className="title__course-pay-status">
+                            { getCrownForCourse(this.props.course) }
+                        </span>
+                        {/*{*/}
+                        {/*    course.IsPaid ?*/}
+                        {/*        <span className="title__course-pay-status">*/}
+                        {/*            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>*/}
+                        {/*        </span>*/}
+                        {/*        :*/}
+                        {/*        null*/}
+                        {/*}*/}
                         <p className="title__label">Курс:</p>
                         <span>{course.Name}</span>
                     </h1>

@@ -48,7 +48,7 @@ export const getCourses = () => {
 };
 
 export const getCourse = (url) => {
-    return (dispatch) => {
+    return (dispatch, getState) => {
         dispatch({
             type: GET_SINGLE_COURSE_REQUEST,
             payload: null
@@ -58,7 +58,7 @@ export const getCourse = (url) => {
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                handleCourse(data);
+                handleCourse(data, getState());
 
                 dispatch({
                     type: GET_SINGLE_COURSE_SUCCESS,
@@ -150,7 +150,7 @@ const handleCourses = (data) => {
     }
 };
 
-const handleCourse = (data) => {
+const handleCourse = (data, state) => {
     try {
         if (data.CoverMeta) {
             data.CoverMeta = JSON.parse(data.CoverMeta)
@@ -201,14 +201,14 @@ const handleCourse = (data) => {
         data.lessonCount = _lessonCount;
         data.readyLessonCount = _readyLessonCount;
 
-        calcStatistics(data)
+        calcStatistics(data, state)
     }
     catch (err) {
         console.error('ERR: ' + err.message);
     }
 };
 
-const calcStatistics = (course) => {
+const calcStatistics = (course, state) => {
     course.statistics = {}
 
     if (!course) return
@@ -242,6 +242,8 @@ const calcStatistics = (course) => {
             :
             _duration
 
+    let _lastListened = getLastListenedLesson(course.Lessons, state)
+
     course.statistics.lessons = {
         total: course.Lessons.length,
         sublessonsCount: _sublessonsCount,
@@ -249,7 +251,24 @@ const calcStatistics = (course) => {
         allPublished : _allPublished,
         readyDate: _allPublished ? null : parseReadyDate(_maxReadyDate),
         duration: new Date(_duration * 1000).getUTCHours().toString(),
-        finishedLessons: _finishedLessons
+        finishedLessons: _finishedLessons,
+        lastListened: _lastListened
     }
+}
 
+const getLastListenedLesson = (lessons, state) => {
+    let _lessonInStorage = state.lessonInfoStorage.lessons
+
+    let _lesson = lessons
+        .map((item, index) => {
+            return {info: _lessonInStorage.get(item.Id), id: item.Id, index: index}
+        })
+        .reduce((acc, curr) => {
+            return acc.info && curr.info ?
+                ((acc.info.ts < curr.info.ts) && !acc.info.isFinished && !curr.info.isFinished) || (acc.info.isFinished && !curr.info.isFinished) ? curr : acc
+                :
+                curr.info ? curr : acc
+    })
+
+    return lessons[_lesson.index]
 }

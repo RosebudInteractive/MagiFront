@@ -65,7 +65,9 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case PLAYER_SET_CURRENT_TIME: {
             let _state = store.getState();
 
-            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            const _isPlayingLessonExists = !!_state.player.playingLesson,
+                _authorized = !!_state.user.user
+
             if (_isPlayingLessonExists) {
                 let _id = _state.player.playingLesson.lessonId,
                     _lessonsMap = _state.lessonInfoStorage.lessons,
@@ -75,6 +77,7 @@ const LessonInfoStorageMiddleware = store => next => action => {
                 store.dispatch(storageActions.setCurrentTimeForLesson({
                     id: _id,
                     currentTime: _newPosition,
+                    needSetTS: !_authorized,
                 }))
 
                 if (Math.abs(_newPosition - _currentPosition) > 1) {
@@ -170,13 +173,16 @@ const LessonInfoStorageMiddleware = store => next => action => {
         case LESSON_INFO_STORAGE_RESTORE_LESSON: {
             let _state = store.getState();
 
-            let _isPlayingLessonExists = !!_state.player.playingLesson;
+            const _isPlayingLessonExists = !!_state.player.playingLesson,
+                _authorized = !!_state.user.user
+
             if (_isPlayingLessonExists) {
                 let _id = _state.player.playingLesson.lessonId
 
                 store.dispatch(storageActions.setCurrentTimeForLesson({
                     id: _id,
                     currentTime: 0,
+                    needSetTS: !_authorized,
                 }))
                 LessonInfoStorage.saveChanges()
 

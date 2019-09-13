@@ -34,7 +34,7 @@ export const getRandomInt = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export const getCrownForCourse = (course) => {
+export const getCrownForCourse = (course, className) => {
     const _crown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown"/>'
 
     if (!course) {
@@ -44,7 +44,7 @@ export const getCrownForCourse = (course) => {
     const _fill = (course.IsGift || course.IsBought) ? "#C8684C" : "#F79F1A"
 
     return course.IsPaid ?
-            <svg className="course-module__label-icon" width="18" height="18" fill={_fill}
+            <svg className={className ? className : "course-module__label-icon"} width="18" height="18" fill={_fill}
                  dangerouslySetInnerHTML={{__html: _crown}}/>
             :
             null

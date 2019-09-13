@@ -71,7 +71,7 @@ export default class Statistic extends React.Component {
 
     render() {
         const {course} = this.props,
-            _lesson = course.Lessons[0];
+            _lesson = course.statistics.lessons.lastListened;
 
         if (typeof _lesson.CoverMeta === "string") {
             _lesson.CoverMeta = JSON.parse(_lesson.CoverMeta)
