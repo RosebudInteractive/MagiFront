@@ -95,9 +95,15 @@ export default class LessonInfoStorage {
                     _map = _obj.lessons ? objectToMap(_obj.lessons) : new Map(),
                     _volume = _obj.volume;
 
-                _ts = _obj.ts && this._checkAllLessonsHasTS(_map) ? _obj.ts : 0;
+                _ts = _obj.ts ? _obj.ts : 0;
 
-                store.dispatch(storageActions.setInitialState(_map));
+                if (!this._checkAllLessonsHasTS(_map)) {
+                    _ts = 0
+                    store.dispatch(storageActions.setInitialState())
+                    localStorage.removeItem(_userId.toString())
+                } else {
+                    store.dispatch(storageActions.setInitialState(_map))
+                }
 
                 if (_volume !== undefined) {
                     store.dispatch(storageActions.setVolume(_volume))
@@ -256,6 +262,10 @@ const convertToStorageFormat = (object) => {
         let _obj = {};
         if (lsn[key].pos !== undefined) {
             _obj.currentTime = lsn[key].pos;
+        }
+
+        if (lsn[key].ts !== undefined) {
+            _obj.ts = lsn[key].ts;
         }
 
         if (lsn[key].isFinished !== undefined) {
