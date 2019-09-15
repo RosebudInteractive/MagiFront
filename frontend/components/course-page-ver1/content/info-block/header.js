@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Info from '../../course/course-module-info';
-import PriceBlock from "../../common/price-block";
+import Info from '../../../course/course-module-info';
+import PriceBlock from "../../../common/price-block";
 import GiftBlock from './gift-block'
 
 export default class Header extends React.Component {

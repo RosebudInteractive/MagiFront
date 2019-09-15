@@ -3545,7 +3545,7 @@ li.fancybox-thumbs-loading {
       padding-bottom: 0;
       border-bottom: none; } }
   .page-header._fixed {
-    height: 96px;
+    height: 98px;
     position: fixed;
     top: 0;
     left: 0;
@@ -3615,6 +3615,7 @@ li.fancybox-thumbs-loading {
     .logo {
       display: none; } }
   .logo svg {
+    fill: #2F2F2F;
     display: block; }
 
 .logo-mobile {
@@ -4322,7 +4323,7 @@ li.fancybox-thumbs-loading {
           box-sizing: border-box;
           padding: 10px 11px;
           max-height: 36px; }
-        .navigation ul li.filter svg {
+        .navigation ul li.filter svg, .navigation ul li.favorites svg {
           fill: #2f2f2f;
           /*opacity: 0.6;*/
           -webkit-transition: opacity 0.4s ease;
@@ -5255,6 +5256,7 @@ ul.user-tooltip {
         display: inline-block;
         vertical-align: top; } }
   .course-module .course-module__label {
+    margin-top: 8px;
     display: -webkit-inline-box;
     display: -webkit-inline-flex;
     display: -moz-inline-box;

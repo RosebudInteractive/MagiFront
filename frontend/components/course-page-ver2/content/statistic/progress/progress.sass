@@ -1,0 +1,99 @@
+@import "~tools/variables"
+
+.course-statistic__progress
+  margin-top: 39px
+  @media (max-width: 899px)
+    margin-top: 0
+
+.course-statistic__progress-title
+  padding: 24.5px 0
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  @media (max-width: 1679px)
+    padding: 14.5px 0
+  @media (max-width: 899px)
+    font-size: 15px
+    line-height: 18px
+    padding: 10.5px 0
+
+.statistic-block
+  border-bottom: $border-dark-02
+  max-height: 72px
+
+.progress__completed-wrapper
+  display: flex
+  flex-direction: column
+  @media (max-width: 899px)
+    flex-direction: row
+  @media (max-width: 639px)
+    flex-direction: column
+
+
+.progress__lessons-block, .progress__tests-block
+  padding: 18.5px 0
+  position: relative
+  display: flex
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  color: $color-main-dark
+  margin: 0
+  @media (max-width: 899px)
+    // Пока нет тестов можно убрать
+    //flex-basis: 50%
+    flex-basis: 100%
+    font-size: 15px
+    line-height: 18px
+    padding: 7.5px 0
+
+  .progress-bar
+    border-bottom: 7px solid $color-orange
+    position: absolute
+    bottom: -4px
+    border-bottom-right-radius: 5px
+    border-top-right-radius: 5px
+    width: 0
+    height: 0
+    @media (max-width: 899px)
+      border-width: 5px
+      bottom: -3px
+
+// Пока нет тестов можно убрать
+//.progress__lessons-block
+  @media (max-width: 899px)
+    margin-right: 20px
+  @media (max-width: 639px)
+    margin-right: 0
+
+.progress__completed, .statistic-separator, .progress__total
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 28px
+  line-height: 34px
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 24px
+    letter-spacing: -0.02em
+
+.statistic-separator, .progress__total
+  color: $color-dark-06
+
+.progress__text
+  align-self: flex-end
+  padding-left: 5px
+  padding-bottom: 2px
+
+  &._full
+    display: block
+    @media (max-width: 1199px)
+      display: none
+  &._short
+    display: none
+    @media (max-width: 1199px)
+      display: block

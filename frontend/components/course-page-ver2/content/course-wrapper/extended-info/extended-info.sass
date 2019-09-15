@@ -1,0 +1,99 @@
+@import "~tools/variables"
+
+.course-wrapper__extended-info
+  max-height: 0
+  overflow: hidden
+  -webkit-transition: max-height 0.5s ease
+  transition: max-height 0.5s ease
+
+  &._visible
+    max-height: 10000px
+
+  .course__video-block
+    padding-bottom: 21px
+    @media (max-width: 899px)
+      padding-bottom: 20px
+
+    .video-block__item
+      margin: 0 !important
+      width: 100%
+      display: block
+      @media (max-width: 899px) and (min-width: 640px)
+        display: flex
+        align-items: flex-end
+
+    .video-frame__wrapper
+      width: 100%
+      @media (max-width: 899px) and (min-width: 640px)
+        width: 75%
+
+  .video-frame__title
+    margin-top: 5px
+    font-size: 14px
+    line-height: 124%
+    padding: 0
+    width: auto
+    @media (max-width: 899px) and (min-width: 640px)
+      margin: 0
+      font-size: 12px
+      width: 25%
+
+    .title__wrapper
+      padding: 0
+      margin-bottom: 0
+      @media (max-width: 899px) and (min-width: 640px)
+        padding-left: 10px
+        margin-bottom: -2px
+
+  .block-wrapper
+    padding: 20px 0 21px
+    color: $color-main-dark
+    @media (max-width: 899px)
+      padding: 12px 0 16px
+
+  .extended-info__aims
+    margin-bottom: 24px
+
+  .block-title
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 28px
+    line-height: 34px
+    @media (max-width: 899px)
+      font-size: 20px
+      line-height: 110%
+
+  .block-descr
+    font-family: $font-pt
+    font-style: normal
+    font-weight: normal
+    font-size: 20px
+    line-height: 130%
+    @media (max-width: 899px)
+      font-size: 15px
+      line-height: 130%
+    *
+      font-family: $font-pt !important
+      color: $color-main-dark !important
+      font-style: normal
+      font-weight: normal
+      font-size: 20px !important
+      line-height: 130% !important
+      @media (max-width: 899px)
+        font-size: 15px !important
+    a
+      color: #c8684c !important
+      border-bottom: 1px solid rgba(200, 104, 76, 0)
+      -webkit-transition: border-color 0.3s ease
+      transition: border-color 0.3s ease
+      &:hover
+        border-bottom: 1px solid rgba(200, 104, 76, 0.3)
+
+  .target-audience__text
+    margin-top: 23px
+    @media (max-width: 899px)
+      margin-top: 19px
+
+  .aims__text
+    margin-top: 30px

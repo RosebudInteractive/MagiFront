@@ -97,7 +97,13 @@ export default class LessonInfoStorage {
 
                 _ts = _obj.ts ? _obj.ts : 0;
 
-                store.dispatch(storageActions.setInitialState(_map));
+                if (!this._checkAllLessonsHasTS(_map)) {
+                    _ts = 0
+                    store.dispatch(storageActions.setInitialState())
+                    localStorage.removeItem(_userId.toString())
+                } else {
+                    store.dispatch(storageActions.setInitialState(_map))
+                }
 
                 if (_volume !== undefined) {
                     store.dispatch(storageActions.setVolume(_volume))
@@ -233,6 +239,18 @@ export default class LessonInfoStorage {
 
         return {lsn}
     }
+
+    _checkAllLessonsHasTS(map) {
+        let _result = true,
+            _iterator = map.values(),
+            _value
+
+        while ((_value = _iterator.next().value) && _result) {
+            _result = _value.hasOwnProperty('ts')
+        }
+
+        return _result
+    }
 }
 
 
@@ -244,6 +262,10 @@ const convertToStorageFormat = (object) => {
         let _obj = {};
         if (lsn[key].pos !== undefined) {
             _obj.currentTime = lsn[key].pos;
+        }
+
+        if (lsn[key].ts !== undefined) {
+            _obj.ts = lsn[key].ts;
         }
 
         if (lsn[key].isFinished !== undefined) {

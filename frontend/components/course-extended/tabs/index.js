@@ -4,7 +4,7 @@ import LessonsTab from "./lessons-tab"
 import BooksTab from "./books-tab"
 import CourseLessons from "./course-lessons";
 import CourseBooks from "./course-books";
-import VideoBlock from "../video-block";
+import VideoBlock from "../../course-page-ver1/video-block";
 
 const TABS_NAME = {
     LESSONS: 'LESSONS',

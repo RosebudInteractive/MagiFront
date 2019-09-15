@@ -46,6 +46,19 @@ export function isMobile() {
     return window.innerWidth <= 899
 }
 
+export const isInViewport = (selector, margin) => {
+    let _this = $(selector);
+    if (!_this || !_this.length) { return }
+
+    let elementTop = _this.offset().top;
+    let elementBottom = elementTop + _this.outerHeight() - +margin;
+
+    let viewportTop = $(window).scrollTop();
+    let viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+}
+
 export const pages = {
     courses: {name: 'courses', url: '/'},
     singleCourse: {name: 'singleCourse', url: null},

@@ -50,7 +50,7 @@ import CoursePaymentWrapper from "./components/messages/billing/course-payment-w
 import CookiesMessage from "./components/messages/cookies-popup";
 
 import {getAppOptions, waitingSelector} from 'ducks/app'
-import {notifyNewUserRegistered} from 'ducks/google-analytics'
+import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 
@@ -62,8 +62,8 @@ const _globalScrollDelta = 80;
 class App extends Component {
 
     constructor(props) {
-
         super(props);
+
         this.state = {
             // direction: '',
             lastScrollPos: 0,
