@@ -1,3 +1,5 @@
+@import "~tools/variables"
+
 .course-page__statistic
   box-sizing: border-box
   min-width: 25%
@@ -15,7 +17,7 @@
   .course-page__statistic-wrapper
     margin-top: 2px
     &._fixed
-      min-width: calc(25% - 48px)
+      max-width: calc(25% - 48px)
       position: fixed
       padding-top: 100px
       top: 0
@@ -23,9 +25,13 @@
     @media (max-width: 899px)
       margin: 0
 
+  .statistic__play-block
+    display: flex
+
   .play-block__wrapper
     width: 126px
     height: 126px
+    margin-right: 24px
     @media (max-width: 1679px)
       width: 79px
       height: 79px
@@ -37,6 +43,41 @@
       width: 79px
       height: 79px
       min-width: 79px
+  .play-block__btn svg
+    width: auto
+    @media (max-width: 1679px)
+      width: 25px
+
+
+
+  .play-block__info-wrapper
+    display: flex
+    flex-direction: column
+    justify-content: center
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 17.4px
+    .info-wrapper__title
+      color: $color-orange
+      &._full
+        display: block
+        @media (max-width: 1199px)
+          display: none
+      &._short
+        display: none
+        @media (max-width: 1199px)
+          display: block
+
+    .info-wrapper__lesson
+      color: $color-main-dark
+      overflow: hidden
+      text-overflow: ellipsis
+      -webkit-line-clamp: 2
+      max-height: 34.8px
+      display: -webkit-box
+      -webkit-box-orient: vertical
+      @media (max-width: 1199px)
+        display: none
 
   .course-module__price-block
     @media (max-width: 899px)

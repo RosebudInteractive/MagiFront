@@ -25,11 +25,11 @@ export default class CourseWrapper extends React.Component {
 
         return <div className="course-page__course-wrapper">
             <div className="course-wrapper__short-description" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
+            <ExtendedInfo course={course} visible={this.state.showMore}/>
             <div className="course-wrapper__more-button">
                 <span onClick={::this._switchShowMore}>{this.state.showMore ? "Скрыть информацию" : "Вся информация о курсе"}</span>
                 {this.state.showMore ? " ↑ " : " ↓ "}
             </div>
-            <ExtendedInfo course={course} visible={this.state.showMore}/>
             <Scheme course={course}/>
             <Books books={this.props.course.Books}
                    titleClassName={"course-wrapper__title"}

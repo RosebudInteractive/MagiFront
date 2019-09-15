@@ -85,11 +85,19 @@ export default class Statistic extends React.Component {
                 {
                     _isBought ?
                         <React.Fragment>
-                            <div className="play-block__wrapper">
-                                <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+                            <div className="statistic__play-block">
+                                <div className="play-block__wrapper">
+                                    <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+                                </div>
+                                <div className="play-block__info-wrapper">
+                                    <div className="info-wrapper__title _full">Продолжить смотреть:</div>
+                                    <div className="info-wrapper__title _short">Продолжить смотреть</div>
+                                    <div className="info-wrapper__lesson">{_lesson.Number + '. ' + _lesson.Name}</div>
+                                </div>
                             </div>
                             <Progress course={course}/>
                         </React.Fragment>
+
                         :
                         <React.Fragment>
                             <PriceBlock course={course}/>
