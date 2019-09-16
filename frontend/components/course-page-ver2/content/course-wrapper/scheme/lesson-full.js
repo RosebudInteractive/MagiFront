@@ -18,7 +18,8 @@ export default class LessonFull extends React.Component{
 
         const {lesson, course} = this.props,
             url = '/' + this.props.courseUrl + '/' + lesson.URL,
-            _multiAuthors = course.Authors.length > 1
+            _multiAuthors = course.Authors.length > 1,
+            _title = lesson.Name.match(/[-.?!)(,:]$/g) ? lesson.Name : (lesson.Name + '.')
 
         lesson.courseUrl = this.props.courseUrl;
 
@@ -27,7 +28,8 @@ export default class LessonFull extends React.Component{
                     <div className="lessons-list__item-counter">{lesson.Number + '.'}</div>
                     <div className="lessons-list__item-info">
                         <div className="item-info__inner-counter">{lesson.Number + '. '}</div>
-                        <Link to={url} className="item-info__name">{lesson.Name + ' '}</Link>
+                        <Link to={url} className="item-info__name">{_title}</Link>
+                        <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
                         <div className="item-info__duration">
                             <span >{lesson.DurationFmt}</span>
                             {
@@ -83,7 +85,8 @@ export default class LessonFull extends React.Component{
 
             const _url = '/' + this.props.courseUrl + '/' + lesson.URL,
                 _number = `${this.props.lesson.Number}.${lesson.Number} `,
-                _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO
+                _isYoutubeVideo = lesson.ContentType === CONTENT_TYPE.VIDEO,
+                _title = lesson.Name.match(/[-.?!)(,:]$/g) ? lesson.Name : (lesson.Name + '.')
 
             lesson.courseUrl = this.props.courseUrl;
 
@@ -91,7 +94,8 @@ export default class LessonFull extends React.Component{
                 <div className="lessons-list__item-counter">{_number}</div>
                 <div className="lessons-list__item-info">
                     <div className="item-info__inner-counter">{_number}</div>
-                    <Link to={_url} className="item-info__name">{lesson.Name + ' '}</Link>
+                    <Link to={_url} className="item-info__name">{_title}</Link>
+                    <span className="item-info__description">{' ' + lesson.ShortDescription + ' '}</span>
                     <div className="item-info__duration">
                         <span>{lesson.DurationFmt}</span>
                         {
