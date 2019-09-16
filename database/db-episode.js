@@ -812,7 +812,7 @@ const DbEpisode = class DbEpisode extends DbObject {
                         if (typeof (inpFields["VideoLink"]) !== "undefined") {
                             fields["VideoLink"] = inpFields["VideoLink"];
                             if (contentType === EpisodeContentType.VIDEO) {
-                                let { sec } = await this._getVideoInfo(fields["VideoIntwLink"]);
+                                let { sec } = await this._getVideoInfo(fields["VideoLink"]);
                                 duration = sec;
                             }
                         }
