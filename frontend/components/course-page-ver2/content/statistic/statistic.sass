@@ -1,0 +1,128 @@
+@import "~tools/variables"
+
+.course-page__statistic
+  box-sizing: border-box
+  min-width: 25%
+  margin-right: 8.333%
+  padding-left: 48px
+  @media (max-width: 899px)
+    padding: 0
+    margin-left: 36px
+    margin-right: 36px
+  @media (max-width: 639px)
+    padding: 0
+    margin-left: 20px
+    margin-right: 20px
+
+  .course-page__statistic-wrapper
+    margin-top: 2px
+    &._fixed
+      max-width: calc(25% - 48px)
+      position: fixed
+      padding-top: 100px
+      top: 0
+      bottom: auto
+    @media (max-width: 899px)
+      margin: 0
+
+  .statistic__play-block
+    display: flex
+
+  .play-block__wrapper
+    width: 126px
+    height: 126px
+    margin-right: 24px
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+    @media (max-width: 899px)
+      display: none
+
+  .play-block
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+      min-width: 79px
+  .play-block__btn svg
+    width: auto
+    @media (max-width: 1679px)
+      width: 25px
+
+
+
+  .play-block__info-wrapper
+    display: flex
+    flex-direction: column
+    justify-content: center
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 17.4px
+    .info-wrapper__title
+      color: $color-orange
+      &._full
+        display: block
+        @media (max-width: 1199px)
+          display: none
+      &._short
+        display: none
+        @media (max-width: 1199px)
+          display: block
+
+    .info-wrapper__lesson
+      color: $color-main-dark
+      overflow: hidden
+      text-overflow: ellipsis
+      -webkit-line-clamp: 2
+      max-height: 34.8px
+      display: -webkit-box
+      -webkit-box-orient: vertical
+      @media (max-width: 1199px)
+        display: none
+
+  .course-module__price-block
+    @media (max-width: 899px)
+      display: none
+
+  .course-module__price-block-wrapper
+    display: none
+
+
+  .lecture-full__play-block
+    padding: 0
+
+  .play-block, .play-block__loader, .svg-loader
+    margin: 0
+    padding: 0
+    height: 126px
+    width: 126px
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+
+  .play-block__loader:after
+    @media (max-width: 1679px)
+      width: 79px
+      height: 79px
+
+  .lecture-full__play-block
+    width: 100%
+
+  .play-block__duration
+    display: none
+
+  .course-module__price-block
+    margin-bottom: 23px
+
+  .course-module__price-block-wrapper
+    flex-direction: column
+
+  .course-module__price-btn
+    order: 2
+    width: 100%
+
+  .course-module__price-block-section
+    align-self: flex-start
+    margin-left: 0
+
+  .svg-loader circle
+    stroke-width: 6px

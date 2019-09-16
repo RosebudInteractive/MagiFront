@@ -1,0 +1,138 @@
+@import "~tools/variables.sass"
+
+.course-page__course-wrapper
+  margin-right: 8.333%
+  @media (max-width: 899px)
+    margin: 20px 36px 0
+  @media (max-width: 639px)
+    margin: 20px 20px 0
+
+.course-wrapper__short-description
+  font-family: $font-pt
+  color: $color-main-dark
+  font-style: normal
+  font-weight: normal
+  font-size: 20px
+  line-height: 140%
+  padding-bottom: 23px
+  @media (max-width: 899px)
+    padding: 16px 0 16px
+    font-family: $font-fira
+    font-size: 15px
+    line-height: 130%
+  *
+    font-family: $font-pt !important
+    color: $color-main-dark !important
+    font-style: normal
+    font-weight: normal
+    font-size: 20px !important
+    line-height: 140% !important
+    @media (max-width: 899px)
+      font-family: $font-fira !important
+      font-size: 15px !important
+      line-height: 130% !important
+  a
+    color: #c8684c !important
+    border-bottom: 1px solid rgba(200, 104, 76, 0)
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+    &:hover
+      border-bottom: 1px solid rgba(200, 104, 76, 0.3)
+
+
+  &:first-letter
+    float: left
+    width: auto
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 61px
+    line-height: 56px
+    color: $color-orange
+    margin-right: 7px
+    @media (max-width: 899px)
+      font-size: 41px
+      line-height: 36px
+
+
+.course-wrapper__more-button
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  font-size: 17px
+  line-height: 130%
+  color: $color-orange
+  margin-bottom: 24px
+  cursor: pointer
+  @media (max-width: 899px)
+    font-size: 15px
+    line-height: 130%
+    margin-bottom: 11px
+
+
+
+  span
+    border-bottom: $border-hidden-link
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+
+    &:hover
+      border-bottom: $border-orange-03
+
+.course-wrapper__about
+  padding: 20px 0 24px
+  font-family: $font-pt
+  font-size: 20px
+  line-height: 130%
+
+.course-wrapper__about-title
+  font-family: $font-fira
+  font-size: 28px
+  line-height: 34px
+  margin-bottom: 28px
+
+.course-wrapper__title
+  margin: 30px 0 0
+  padding: 20px 0 23px
+  border: none
+  font-size: 30px
+  line-height: 110%
+  color: $color-main-dark
+  font-weight: 400
+  @media (max-width: 899px)
+    font-size: 20px
+    line-height: 110%
+
+.course-page__books
+  .course-wrapper__title
+    padding-top: 21px
+    padding-bottom: 29px
+    @media (max-width: 899px)
+      padding-top: 12px
+      padding-bottom: 16px
+      margin-top: 20px
+
+  .book-list__item
+    padding-bottom: 31px
+
+  .book-preview .book-preview__image
+    margin: 0 17px 0 0
+    padding: 0
+    overflow: hidden
+    width: 96px
+    height: 147px
+
+  .book-preview__title
+    margin-top: 15px
+
+  .book-preview__name
+    @media (max-width: 899px)
+      font-size: 15px !important
+      line-height: 18px
+
+  .book-preview__author, .book-preview__title, .stores
+    @media (max-width: 899px)
+      font-family: $font-fira
+      font-size: 12px
+      line-height: 14px
+      margin: 0

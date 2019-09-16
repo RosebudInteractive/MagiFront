@@ -1,10 +1,14 @@
 import React from 'react';
-import {connect} from 'react-redux';
+import PropTypes from "prop-types";
 import Header from './header';
 import Body from './body';
-import {ImageSize, getCoverPath} from '../../../tools/page-tools'
+import {ImageSize, getCoverPath} from 'tools/page-tools'
 
-class InfoBlock extends React.Component {
+export default class InfoBlock extends React.Component {
+
+    static propTypes = {
+        course: PropTypes.object,
+    }
 
     render() {
         if (!this.props.course) {
@@ -30,11 +34,3 @@ class InfoBlock extends React.Component {
         );
     }
 }
-
-function mapStateToProps(state) {
-    return {
-        course: state.singleCourse.object,
-    }
-}
-
-export default connect(mapStateToProps)(InfoBlock);

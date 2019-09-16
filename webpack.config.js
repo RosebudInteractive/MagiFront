@@ -112,6 +112,7 @@ const _prodConfig = {
             'adm-ducks': path.resolve(__dirname, 'src/ducks'),
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
             'actions': path.resolve(__dirname, 'frontend/actions'),
+            'tools': path.resolve(__dirname, 'frontend/tools'),
         }
     },
     resolveLoader: {
@@ -236,6 +237,7 @@ const _devConfig = {
             'adm-ducks': path.resolve(__dirname, 'src/ducks'),
             'ducks': path.resolve(__dirname, 'frontend/ducks'),
             'actions': path.resolve(__dirname, 'frontend/actions'),
+            'tools': path.resolve(__dirname, 'frontend/tools'),
         }
     },
     resolveLoader: {

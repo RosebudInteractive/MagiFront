@@ -1,0 +1,132 @@
+@import "~tools/variables"
+
+.course-scheme__lessons-list
+  list-style: none
+  margin: 0
+  padding: 0
+  &._sublessons
+    padding-left: 32px
+    @media (max-width: 899px)
+      padding-left: 24px
+
+
+.lessons-list__item
+  display: flex
+  //height: 85px
+  align-items: center
+  border-bottom: $border-dark-02
+  font-size: 17px
+  line-height: 130%
+  @media (max-width: 899px)
+    font-size: 15px
+
+  &._preview
+    color: $color-dark-06
+
+    .item-info__inner-counter, .lessons-list__item-counter
+      color: $color-dark-06
+
+
+  .item-info__ready-date
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 124%
+
+
+  .lessons-list__item-counter
+    display: block
+    min-width: 32px
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    color: $color-orange
+    @media (max-width: 899px)
+      display: none
+
+
+  .item-info__inner-counter
+    display: none
+    color: $color-orange
+    @media (max-width: 899px)
+      display: inline
+
+
+.lessons-list__item-info
+  flex-grow: 2
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  margin: 20px 0 23px
+  @media (max-width: 899px)
+    margin: 17.5px 0
+
+  a
+    color: $color-main-dark
+    -webkit-transition: opacity 0.3s ease
+    transition: opacity 0.3s ease
+
+    &:hover
+      opacity: 0.6
+
+  .item-info__duration, .item-info__duration a
+    position: relative
+    font-size: 14px
+    line-height: 124%
+    color: $color-dark-06
+
+
+.item-info__name
+  font-weight: bold
+  display: inline
+
+.item-info__ext
+  display: flex
+  align-items: center
+
+  .item-info__ext-complete-status
+    margin-right: 21px
+
+    &._green
+      fill: $color-green
+      fill-opacity: 0.6
+
+    &._yellow
+      fill: $color-yellow
+
+    &._gray
+      fill: $color-main-dark
+      fill-opacity: 0.2
+
+  .item-info__arrow-down
+    position: relative
+    width: 18px
+    height: 18px
+    margin-left: 16px
+
+    &:after
+      content: ""
+      position: absolute
+      top: 50%
+      -webkit-transform: translateY(-50%) rotate(45deg)
+      -ms-transform: translateY(-50%) rotate(45deg)
+      transform: translateY(-50%) rotate(45deg)
+      cursor: pointer
+      left: 4px
+      width: 11px
+      height: 11px
+      border: 2px solid $color-dark-02
+      border-left: none
+      border-top: none
+      -webkit-transition: -webkit-transform 0.3s ease
+      transition: -webkit-transform 0.3s ease
+      transition: transform 0.3s ease
+      transition: transform 0.3s ease, -webkit-transform 0.3s ease
+
+.lessons-list__item__play-block
+  display: block
+
+  .play-block-small__duration
+    display: none
+
+  .play-block-small
+    position: absolute
