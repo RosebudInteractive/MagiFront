@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import "./statistic-data.sass"
-import {getCountHoursTitle, getCountLessonTitle, getCountSubsTitle} from "tools/word-tools";
+import {getCountLessonTitle, getCountSubsTitle} from "tools/word-tools";
 
 export default class Data extends React.Component {
 
@@ -23,7 +23,7 @@ export default class Data extends React.Component {
                     <ReadyDate data={course.statistics.lessons}/>
                 </div>
                 <div className="data__counters-wrapper">
-                    <VideoCounter hours={course.statistics.lessons.duration}/>
+                    <VideoCounter duration={course.statistics.lessons.duration}/>
                     <SublessonsCounter count={course.statistics.lessons.sublessonsCount}/>
                 </div>
             </div>
@@ -70,11 +70,14 @@ function ReadyDate(props) {
  * @return {null}
  */
 function VideoCounter(props) {
-    const {hours} = props
+    const {duration} = props
 
-    return <div className="data__info-block statistic__data-block">
-        <span className="progress__completed">{hours}</span>
-        <span className="data__text">{` ${getCountHoursTitle(hours)} просмотра`}</span>
+    return <div className="data__info-block statistic__data-block video-data">
+        <span className="progress__completed">{duration.hours}</span>
+        <span className="data__text">{'ч'}</span>
+        <span className="data_separator"/>
+        <span className="progress__completed">{' ' + duration.minutes}</span>
+        <span className="data__text">{'м просмотра'}</span>
     </div>
 }
 

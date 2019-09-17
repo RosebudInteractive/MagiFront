@@ -17,7 +17,7 @@
   .course-page__statistic-wrapper
     margin-top: 2px
     &._fixed
-      max-width: calc(25% - 48px)
+      width: calc(25% - 48px)
       position: fixed
       padding-top: 100px
       top: 0
@@ -67,6 +67,8 @@
         display: none
         @media (max-width: 1199px)
           display: block
+        @media (max-width: 899px)
+          display: none
 
     .info-wrapper__lesson
       color: $color-main-dark
@@ -83,7 +85,7 @@
     @media (max-width: 899px)
       display: none
 
-  .course-module__price-block-wrapper
+  .course-module__price-block-info
     display: none
 
 
