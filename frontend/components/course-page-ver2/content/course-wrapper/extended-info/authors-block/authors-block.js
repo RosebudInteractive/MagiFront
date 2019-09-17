@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import {Link} from "react-router-dom";
 import './authors-block.sass'
 import {getAuthorPortraitPath, ImageSize} from "tools/page-tools";
 
@@ -45,9 +46,9 @@ class AuthorItem extends React.Component {
                     <img src={_portrait}/>
                 </div>
                 <div className="author-header__info">
-                    <div className="author-header__info-name">{_name}</div>
-                    <div className="author-header__occupation">{author.Occupation}</div>
-                    <div className="author-header__employment">{author.Employment}</div>
+                    <Link to={`/autor/${author.URL}`} className="author-header__info-name header-row">{_name}</Link>
+                    {author.Occupation ? <div className="author-header__occupation header-row">{author.Occupation}</div> : null}
+                    {author.Employment ? <div className="author-header__employment header-row">{author.Employment}</div> : null}
                 </div>
             </div>
             <div className="author-description">

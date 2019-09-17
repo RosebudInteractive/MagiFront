@@ -41,7 +41,7 @@ export default class Statistic extends React.Component {
 
             if (!_wrapper || !_wrapper.length) return;
 
-            let _offsetTop = _wrapper.offset().top - 100;
+            let _offsetTop = _wrapper.offset().top - 165;
 
             if ((_windowScrollTop < _offsetTop) && this.state.fixed){
                 this.setState({

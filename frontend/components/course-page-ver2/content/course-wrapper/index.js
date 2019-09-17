@@ -27,7 +27,7 @@ export default class CourseWrapper extends React.Component {
             <div className="course-wrapper__short-description" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
             <ExtendedInfo course={course} visible={this.state.showMore}/>
             <div className="course-wrapper__more-button">
-                <span onClick={::this._switchShowMore}>{this.state.showMore ? "Скрыть информацию" : "Вся информация о курсе"}</span>
+                <span onClick={::this._switchShowMore}>{this.state.showMore ? "Свернуть информацию о курсе" : "Вся информация о курсе"}</span>
                 {this.state.showMore ? " ↑ " : " ↓ "}
             </div>
             <Scheme course={course}/>
