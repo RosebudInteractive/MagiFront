@@ -65,11 +65,12 @@
 
   a
     color: $color-main-dark
-    -webkit-transition: opacity 0.3s ease
-    transition: opacity 0.3s ease
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+    border-bottom: $border-hidden-link
 
     &:hover
-      opacity: 0.6
+      border-bottom: $border-orange-03
 
   .item-info__duration, .item-info__duration a
     position: relative
