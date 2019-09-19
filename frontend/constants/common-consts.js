@@ -8,3 +8,8 @@ export const LESSON_STATE = {
     DRAFT: "D",
     ARCHIVE: "A"
 }
+
+export const COURSE_VIDEO_TYPE = {
+    INTERVIEW: "INTERVIEW",
+    PREVIEW: "PREVIEW",
+}

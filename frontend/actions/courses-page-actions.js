@@ -242,7 +242,9 @@ const calcStatistics = (course, state) => {
             :
             _duration
 
-    let _lastListened = getLastListenedLesson(course.Lessons, state)
+    _duration = new Date(_duration * 1000)
+
+    let {lesson: lastListened, hasListened} = getLastListenedLesson(course.Lessons, state)
 
     course.statistics.lessons = {
         total: course.Lessons.length,
@@ -250,9 +252,11 @@ const calcStatistics = (course, state) => {
         published: _published,
         allPublished : _allPublished,
         readyDate: _allPublished ? null : parseReadyDate(_maxReadyDate),
-        duration: new Date(_duration * 1000).getUTCHours().toString(),
+        duration: {hours: _duration.getUTCHours().toString(), minutes: _duration.getUTCMinutes().toString()},
         finishedLessons: _finishedLessons,
-        lastListened: _lastListened
+        lastListened: lastListened,
+        hasListened: hasListened,
+        freeLesson: course.Lessons.find((item) => {return item.IsFreeInPaidCourse})
     }
 }
 
@@ -270,5 +274,5 @@ const getLastListenedLesson = (lessons, state) => {
                 curr.info ? curr : acc
     })
 
-    return lessons[_lesson.index]
+    return {lesson: lessons[_lesson.index], hasListened: (_lesson.index !== 0) || (_lesson.info && _lesson.info.ts)}
 }

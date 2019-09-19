@@ -1,0 +1,43 @@
+@import "~tools/variables"
+
+.mobile-button_wrapper
+  position: fixed
+  bottom: 0
+  width: calc(100% - 12px)
+  margin-bottom: 26px
+  @media (max-width: 639px)
+    margin-bottom: 6px
+
+.mobile-button
+  max-width: 627px
+  margin: 0 auto
+  height: 57px
+
+  .course-module__price-btn
+    flex-grow: 2
+
+  .price-button__crown
+    flex-basis: 46px
+
+  .course-module__price .discount
+    position: absolute
+    top: -9px
+    margin: 0
+    border-radius: 11px
+
+  .course-module__old-price
+    font-size: 14px
+    line-height: 17px
+    color: $color-white
+    font-weight: normal
+
+.mobile-button_background
+  max-width: 627px
+  margin: 0 auto
+  height: 57px
+  position: absolute
+  background-color: $color-white
+
+  .btn:hover
+    .mobile-button_background
+      opacity: 1

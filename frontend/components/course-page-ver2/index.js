@@ -8,6 +8,7 @@ import './course-page.sass'
 import Content from "./content";
 import $ from "jquery";
 import {isInViewport} from "tools/page-tools";
+import MobileButton from "./mobile-button";
 
 export default class Wrapper extends React.Component {
 
@@ -63,11 +64,12 @@ export default class Wrapper extends React.Component {
 
 
     render() {
-        const {course} = this.props
+        const {course, shareUrl} = this.props
 
         return <div className={"course-page__wrapper"}>
             <Cover {...this.props}/>
-            <Content course={course}/>
+            <Content course={course} shareUrl={shareUrl}/>
+            <MobileButton course={course}/>
         </div>
     }
 }

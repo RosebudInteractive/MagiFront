@@ -5,6 +5,8 @@ import ExtendedInfo from "./extended-info";
 import Scheme from "./scheme";
 import CourseBooksList from "../../../books/course-books-list";
 import Books from "../../../books";
+import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
+import VideoBlock from "./video-block";
 
 export default class CourseWrapper extends React.Component {
 
@@ -26,8 +28,8 @@ export default class CourseWrapper extends React.Component {
         return <div className="course-page__course-wrapper">
             <div className="course-wrapper__short-description" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
             <ExtendedInfo course={course} visible={this.state.showMore}/>
-            <div className="course-wrapper__more-button">
-                <span onClick={::this._switchShowMore}>{this.state.showMore ? "Скрыть информацию" : "Вся информация о курсе"}</span>
+            <div className={"course-wrapper__more-button" + (this.state.showMore ? " _extended" : "")}>
+                <span onClick={::this._switchShowMore}>{this.state.showMore ? "Свернуть информацию о курсе" : "Вся информация о курсе"}</span>
                 {this.state.showMore ? " ↑ " : " ↓ "}
             </div>
             <Scheme course={course}/>
@@ -35,7 +37,8 @@ export default class CourseWrapper extends React.Component {
                    titleClassName={"course-wrapper__title"}
                    listClass={CourseBooksList}
                    extClass={"course-page__books"}
-                   title={"Курс в виде книги"}/>
+                   title={"Книга по курсу"}/>
+            <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.INTERVIEW}/>
             {/*<div className="course-wrapper__about">*/}
             {/*    <div className="course-wrapper__about-title">О магистерии</div>*/}
             {/*    Истина, полагает он, начинается с отказа от заблуждения. Поэтому в начале своего трактата "О душе" он*/}

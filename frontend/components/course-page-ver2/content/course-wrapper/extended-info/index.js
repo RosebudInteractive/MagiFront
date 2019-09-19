@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './extended-info.sass'
 import AuthorsBlock from "./authors-block/authors-block";
-import VideoBlock from "./video-block";
+import VideoBlock from "../video-block";
+import {COURSE_VIDEO_TYPE} from "../../../../../constants/common-consts";
 
 export default class ExtendedInfo extends React.Component {
 
@@ -20,7 +21,7 @@ export default class ExtendedInfo extends React.Component {
 
         return <div className={"course-wrapper__extended-info" + (visible ? " _visible" : "")}>
             <AuthorsBlock authors={course.Authors}/>
-            <VideoBlock course={course}/>
+            <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.PREVIEW}/>
             <TargetAudience targetAudience={course.TargetAudience}/>
             <Aims aims={course.Aims}/>
         </div>

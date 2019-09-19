@@ -22,9 +22,10 @@
 
   &._preview
     color: $color-dark-06
-
     .item-info__inner-counter, .lessons-list__item-counter
       color: $color-dark-06
+    .item-info__name
+      font-weight: normal
 
 
   .item-info__ready-date
@@ -34,12 +35,14 @@
 
 
   .lessons-list__item-counter
+    align-self: flex-start
     display: block
     min-width: 32px
     font-family: $font-fira
     font-style: normal
     font-weight: normal
     color: $color-orange
+    margin: 20px 0 23px
     @media (max-width: 899px)
       display: none
 
@@ -62,17 +65,19 @@
 
   a
     color: $color-main-dark
-    -webkit-transition: opacity 0.3s ease
-    transition: opacity 0.3s ease
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+    border-bottom: $border-hidden-link
 
     &:hover
-      opacity: 0.6
+      border-bottom: $border-orange-03
 
   .item-info__duration, .item-info__duration a
     position: relative
     font-size: 14px
     line-height: 124%
     color: $color-dark-06
+    margin-top: 2px
 
 
 .item-info__name
@@ -80,6 +85,7 @@
   display: inline
 
 .item-info__ext
+  margin-left: 16px
   display: flex
   align-items: center
 

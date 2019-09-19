@@ -170,7 +170,7 @@ class PromosPage extends React.Component {
         return this.props.promos.map((item) => {
             let _data = Object.assign({}, item)
 
-            _data.Rest = item.Counter ? item.Counter : '-'
+            _data.Rest = item.Counter ? item.Rest : '-'
 
             return _data
         })
