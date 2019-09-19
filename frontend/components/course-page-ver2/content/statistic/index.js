@@ -81,7 +81,7 @@ class Statistic extends React.Component {
         }
 
         const _cover = getCoverPath(_lastListenedLesson, ImageSize.small),
-            _freeLessonCover = getCoverPath(_freeLesson, ImageSize.small),
+            _freeLessonCover = _freeLesson ? getCoverPath(_freeLesson, ImageSize.small) : null,
             _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
 
         return <div className="course-page__statistic">

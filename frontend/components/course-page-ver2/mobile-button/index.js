@@ -20,7 +20,7 @@ export default class MobileButton extends React.Component {
 
         const _showPriceButton = course.IsPaid && !course.IsGift && !course.IsBought
 
-        return <div className="course-page__mobile-button">
+        return <div className="mobile-button_wrapper">
             {
                 _showPriceButton ?
                     <PriceButton course={course}/>

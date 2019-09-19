@@ -38,8 +38,7 @@ class PriceButton extends React.Component {
             _price = _hasDiscount ? course.DPrice : course.Price,
             _disabled = loading && (+loadingCourseId === course.Id)
 
-        return <div className="course-module__price-block">
-            <div className="btn btn--brown course-module__price-block-wrapper button-block">
+        return <div className="mobile-button _price-block btn btn--brown">
                 <div>
                     <svg className="course-module__label-icon" width="18" height="18" fill="#FFF" dangerouslySetInnerHTML={{__html: CROWN}}/>
                 </div>
@@ -52,7 +51,6 @@ class PriceButton extends React.Component {
                             null
                     }
                 </div>
-            </div>
         </div>
     }
 
