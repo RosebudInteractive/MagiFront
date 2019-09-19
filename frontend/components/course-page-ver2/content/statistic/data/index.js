@@ -16,8 +16,7 @@ export default class Data extends React.Component {
     render() {
         const {course} = this.props
 
-        return <div className="course-statistic__data">
-            <div className="statistic__data-wrapper">
+        return <div className="statistic__data-wrapper">
                 <div className="data__first-block statistic__data-block">
                     <TotalLessonCounter data={course.statistics.lessons}/>
                     <ReadyDate data={course.statistics.lessons}/>
@@ -27,7 +26,6 @@ export default class Data extends React.Component {
                     <SublessonsCounter count={course.statistics.lessons.sublessonsCount}/>
                 </div>
             </div>
-        </div>
     }
 }
 

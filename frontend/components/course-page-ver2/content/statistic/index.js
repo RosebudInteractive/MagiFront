@@ -8,8 +8,9 @@ import $ from "jquery";
 import {isMobile} from "tools/page-tools";
 import PriceBlock from "../../../common/price-block";
 import Data from "./data";
+import {connect} from "react-redux";
 
-export default class Statistic extends React.Component {
+class Statistic extends React.Component {
 
     static propTypes = {
         course: PropTypes.object
@@ -70,14 +71,17 @@ export default class Statistic extends React.Component {
     }
 
     render() {
-        const {course} = this.props,
-            _lesson = course.statistics.lessons.lastListened;
+        const {course, isAdmin} = this.props,
+            _hasListened = course.statistics.lessons.hasListened,
+            _lastListenedLesson = course.statistics.lessons.lastListened,
+            _freeLesson = course.statistics.lessons.freeLesson
 
-        if (typeof _lesson.CoverMeta === "string") {
-            _lesson.CoverMeta = JSON.parse(_lesson.CoverMeta)
+        if (typeof _lastListenedLesson.CoverMeta === "string") {
+            _lastListenedLesson.CoverMeta = JSON.parse(_lastListenedLesson.CoverMeta)
         }
 
-        const _cover = getCoverPath(_lesson, ImageSize.small),
+        const _cover = getCoverPath(_lastListenedLesson, ImageSize.small),
+            _freeLessonCover = getCoverPath(_freeLesson, ImageSize.small),
             _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
 
         return <div className="course-page__statistic">
@@ -87,21 +91,43 @@ export default class Statistic extends React.Component {
                         <React.Fragment>
                             <div className="statistic__play-block">
                                 <div className="play-block__wrapper">
-                                    <PlayBlock course={course} lesson={_lesson} cover={_cover} isAdmin={true}/>
+                                    <PlayBlock course={course} lesson={_lastListenedLesson} cover={_cover} isAdmin={isAdmin}/>
                                 </div>
-                                <div className="play-block__info-wrapper">
-                                    <div className="info-wrapper__title _full">Продолжить смотреть:</div>
-                                    <div className="info-wrapper__title _short">Продолжить смотреть</div>
-                                    <div className="info-wrapper__lesson">{_lesson.Number + '. ' + _lesson.Name}</div>
-                                </div>
+                                {
+                                    _hasListened ?
+                                        <div className="play-block__info-wrapper">
+                                            <div className="info-wrapper__title _full">Продолжить смотреть:</div>
+                                            <div className="info-wrapper__title _short">Продолжить смотреть</div>
+                                            <div className="info-wrapper__lesson">{_lastListenedLesson.Number + '. ' + _lastListenedLesson.Name}</div>
+                                        </div>
+                                        :
+                                        <div className="play-block__info-wrapper">
+                                            <div className="info-wrapper__title">Смотреть сейчас</div>
+                                        </div>
+                                }
                             </div>
                             <Progress course={course}/>
                         </React.Fragment>
-
                         :
                         <React.Fragment>
                             <PriceBlock course={course}/>
                             <Data course={course}/>
+                            {
+                                _freeLesson ?
+                                    <div className="statistic__play-block _free-lesson">
+                                        <div className="play-block__wrapper">
+                                            <PlayBlock course={course} lesson={_freeLesson} cover={_freeLessonCover} isAdmin={isAdmin}/>
+                                        </div>
+                                        <div className="play-block__info-wrapper">
+                                            <div className="info-wrapper__title _full">Смотреть бесплатную лекцию:</div>
+                                            <div className="info-wrapper__title _short">Смотреть бесплатную лекцию</div>
+                                            <div className="info-wrapper__lesson">{_freeLesson.Number + '. ' + _freeLesson.Name}</div>
+                                        </div>
+                                    </div>
+                                    :
+                                    null
+                            }
+
                         </React.Fragment>
                 }
             </div>
@@ -116,3 +142,11 @@ export default class Statistic extends React.Component {
         $(window).unbind('resize scroll', this._handleScroll)
     }
 }
+
+function mapStateToProps(state,) {
+    return {
+        isAdmin: !!state.user.user && state.user.user.isAdmin,
+    }
+}
+
+export default connect(mapStateToProps)(Statistic)
