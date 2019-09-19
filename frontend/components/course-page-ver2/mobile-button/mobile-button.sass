@@ -8,9 +8,6 @@
   @media (max-width: 639px)
     margin-bottom: 6px
 
-  .btn:hover
-    opacity: 1
-
 .mobile-button
   max-width: 627px
   margin: 0 auto
@@ -33,3 +30,14 @@
     line-height: 17px
     color: $color-white
     font-weight: normal
+
+.mobile-button_background
+  max-width: 627px
+  margin: 0 auto
+  height: 57px
+  position: absolute
+  background-color: $color-white
+
+  .btn:hover
+    .mobile-button_background
+      opacity: 1

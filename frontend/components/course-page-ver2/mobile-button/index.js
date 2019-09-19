@@ -27,6 +27,7 @@ export default class MobileButton extends React.Component {
                     :
                     <PlayButton course={course}/>
             }
+            <div className="mobile-button_background"/>
         </div>
     }
 }
