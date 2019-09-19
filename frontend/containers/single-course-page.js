@@ -198,7 +198,8 @@ class Main extends React.Component {
                             course.IsLandingPage ?
                                 <WrapperVer2 course={course}
                                              isFavorite={this._isCourseInBookmarks()}
-                                             onFavoritesClick={::this._favoritesClick}/>
+                                             onFavoritesClick={::this._favoritesClick}
+                                             shareUrl={window.location.href}/>
                                 :
                                 <WrapperVer1 course={course}
                                              isFavorite={this._isCourseInBookmarks()}

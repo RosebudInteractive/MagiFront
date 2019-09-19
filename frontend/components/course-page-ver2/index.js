@@ -64,11 +64,11 @@ export default class Wrapper extends React.Component {
 
 
     render() {
-        const {course} = this.props
+        const {course, shareUrl} = this.props
 
         return <div className={"course-page__wrapper"}>
             <Cover {...this.props}/>
-            <Content course={course}/>
+            <Content course={course} shareUrl={shareUrl}/>
             <MobileButton course={course}/>
         </div>
     }

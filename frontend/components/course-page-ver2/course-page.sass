@@ -13,12 +13,14 @@
   .course-page__content
     .page-header
       display: block !important
+      //@media (max-width: px)
+      //  margin-bottom: 6px
 
 .course-page-ver2._transparent-menu
   .navigation ul svg
     fill: $color-white-06
 
-  .page-header
+  .page-header:not(.opened)
     background-color: transparent
 
     &._white
@@ -27,52 +29,53 @@
     .filters-row
       display: none
 
-  .page-header__row
-    border: none
+    .page-header__row
+      border: none
 
-  .page-header__wrapper
-    background-color: transparent
-    border-color: $color-white-02
+    .page-header__wrapper
+      background-color: transparent
+      border-color: $color-white-02
 
-    .login-btn
+      .login-btn
+        color: $color-white
+
+        &:before
+          background-color: $color-white-02
+
+    .logo svg
+      fill: $color-white
+
+    .logo-mobile svg
+      fill: $color-white
+
+    .menu-trigger span
+      background-color: $color-white-06
+      &:before, &:after
+        background-color: $color-white-06
+    .page-header__menu-mobile:after
+      background-color: $color-white-02
+
+    .search-block
+      background-color: transparent
+
+      .search-block__trigger svg
+        fill: $color-white
+
+    .user-block
+      .login-btn svg
+        fill: $color-white
+
+    .user-block__name
       color: $color-white
 
-      &:before
-        background-color: $color-white-02
+    .user-block__header:before
+      background-color: $color-white-02
 
-  .logo svg
-    fill: $color-white
-
-  .logo-mobile svg
-    fill: $color-white
-
-  .menu-trigger span
-    background-color: $color-white-06
-    &:before, &:after
-      background-color: $color-white-06
-  .page-header__menu-mobile:after
-    background-color: $color-white-02
-
-  .search-block
-    background-color: transparent
-
-    .search-block__trigger svg
-      fill: $color-white
-
-  .user-block
-    .login-btn svg
-      fill: $color-white
-
-  .user-block__name
-    color: $color-white
-
-  .user-block__header:before
-    background-color: $color-white-02
-
-  .user-block__header:after
-    border-color: $color-white-06
+    .user-block__header:after
+      border-color: $color-white-06
 
   .course-page__content
     .page-header
       display: none !important
+
 

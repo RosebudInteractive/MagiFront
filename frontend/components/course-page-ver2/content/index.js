@@ -8,7 +8,8 @@ import PageHeader from "../../page-header/page-header";
 export default class Content extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object
+        course: PropTypes.object,
+        shareUrl: PropTypes.string
     }
 
     constructor(props) {
@@ -18,7 +19,7 @@ export default class Content extends React.Component {
     render() {
         return <div className="course-page__content">
             <PageHeader visible={true}/>
-            <Statistic course={this.props.course}/>
+            <Statistic course={this.props.course} shareUrl={this.props.shareUrl}/>
             <CourseWrapper course={this.props.course}/>
         </div>
     }

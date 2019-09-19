@@ -39,14 +39,17 @@ class PriceButton extends React.Component {
             _disabled = loading && (+loadingCourseId === course.Id)
 
         return <div className="mobile-button _price-block btn btn--brown">
-                <div>
+                <div className="price-button__crown">
                     <svg className="course-module__label-icon" width="18" height="18" fill="#FFF" dangerouslySetInnerHTML={{__html: CROWN}}/>
                 </div>
                 <div className={"course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{`Купить ${_price + _currency} `}</div>
                 <div className="course-module__price-block-section">
                     {
                         _hasDiscount ?
-                            <p className="course-module__price"><span className="discount">{`-${course.Discount.Perc}%`}</span></p>
+                            <React.Fragment>
+                                <div className="course-module__price"><span className="discount">{`-${course.Discount.Perc}%`}</span></div>
+                                <div className="course-module__old-price">{course.Price + _currency}</div>
+                            </React.Fragment>
                             :
                             null
                     }

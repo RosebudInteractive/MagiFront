@@ -9,11 +9,13 @@ import {isMobile} from "tools/page-tools";
 import PriceBlock from "../../../common/price-block";
 import Data from "./data";
 import {connect} from "react-redux";
+import {SocialBlock} from "./social-block";
 
 class Statistic extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object
+        course: PropTypes.object,
+        shareUrl: PropTypes.string
     }
 
     constructor(props) {
@@ -71,7 +73,7 @@ class Statistic extends React.Component {
     }
 
     render() {
-        const {course, isAdmin} = this.props,
+        const {course, isAdmin, shareUrl} = this.props,
             _hasListened = course.statistics.lessons.hasListened,
             _lastListenedLesson = course.statistics.lessons.lastListened,
             _freeLesson = course.statistics.lessons.freeLesson
@@ -107,11 +109,13 @@ class Statistic extends React.Component {
                                 }
                             </div>
                             <Progress course={course}/>
+                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
                         </React.Fragment>
                         :
                         <React.Fragment>
                             <PriceBlock course={course}/>
                             <Data course={course}/>
+                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
                             {
                                 _freeLesson ?
                                     <div className="statistic__play-block _free-lesson">
