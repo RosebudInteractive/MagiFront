@@ -52,6 +52,7 @@ export class SocialBlock extends React.Component {
                         <div className="social-btn__icon">
                             <svg width="27" height="22" dangerouslySetInnerHTML={{__html: _tw}}/>
                         </div>
+                        {/*<span className="social-btn__actions">0</span>*/}
                     </TwitterShareButton>
                 </div>
             </div>

@@ -26,7 +26,6 @@ class Statistic extends React.Component {
         }
 
 
-        // let that = this
         this._handleScroll = function() {
             if (isMobile()) {
                 if (this.state.fixed) {
@@ -40,11 +39,13 @@ class Statistic extends React.Component {
 
             let _windowScrollTop = $(window).scrollTop();
 
-            let _wrapper = $('.course-page__statistic')
+            let _statDiv = $('.course-page__statistic'),
+                _wrapper = $('.course-page__statistic-wrapper')
 
-            if (!_wrapper || !_wrapper.length) return;
+            if (!_statDiv || !_statDiv.length) return;
 
-            let _offsetTop = _wrapper.offset().top - 165;
+            let _offsetTop = _statDiv.offset().top - 165,
+                _divHeight = _wrapper.height()
 
             if ((_windowScrollTop < _offsetTop) && this.state.fixed){
                 this.setState({
