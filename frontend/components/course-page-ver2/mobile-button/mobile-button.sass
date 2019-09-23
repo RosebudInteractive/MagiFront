@@ -3,10 +3,12 @@
 .mobile-button_wrapper
   position: fixed
   bottom: 0
-  width: calc(100% - 12px)
+  width: 100%
   margin-bottom: 26px
   @media (max-width: 639px)
-    margin-bottom: 6px
+    width: calc(100% - 12px)
+    margin: 0 6px 6px
+
 
 .mobile-button
   max-width: 627px
@@ -34,10 +36,12 @@
 .mobile-button_background
   max-width: 627px
   margin: 0 auto
-  height: 57px
   position: absolute
   background-color: $color-white
-
-  .btn:hover
-    .mobile-button_background
-      opacity: 1
+  z-index: -1
+  width: 100%
+  height: 100%
+  top: 0
+  left: 50%
+  transform: translateX(-50%)
+  border-radius: 4px
