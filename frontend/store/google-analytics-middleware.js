@@ -3,14 +3,16 @@ import {PLAYER_PLAYED, PLAYER_SET_CURRENT_TIME, PLAYER_SET_PROGRESS_PERCENT} fro
 import {APP_CHANGE_PAGE} from "../constants/app";
 
 import {setProgressPercent} from "../actions/player-actions";
-import {MAIL_SUBSCRIBE_SUCCESS} from "../ducks/message";
+import {MAIL_SUBSCRIBE_SUCCESS} from "ducks/message";
 import {store} from "./configureStore";
 import {
     getNonRegisterTransaction,
     notifyUserIdChanged,
     notifyNewUserRegistered,
-    setPlayerProgress, notifyPageChanged, notifyPlayerPlayed
+    setPlayerProgress, notifyPageChanged, notifyPlayerPlayed, GET_NON_REGISTER_TRANSACTION_SUCCESS
 } from "ducks/google-analytics";
+import PaymentsChecker from "tools/payments-checker";
+import {SEND_PAYMENT_SUCCESS} from "ducks/billing";
 
 const GoogleAnalyticsMiddleware = store => next => action => {
 
@@ -140,6 +142,27 @@ const GoogleAnalyticsMiddleware = store => next => action => {
 
             return result;
         }
+
+        case GET_NON_REGISTER_TRANSACTION_SUCCESS: {
+            let _data = action.payload
+
+            if (_data && Array.isArray(_data) && _data.length > 0) {
+                PaymentsChecker.clear()
+            } else {
+                if (PaymentsChecker.hasPendingPayment()) {
+                    PaymentsChecker.startPing()
+                }
+            }
+
+            return next(action)
+        }
+
+        case SEND_PAYMENT_SUCCESS: {
+            PaymentsChecker.setPaymentDate()
+
+            return next(action)
+        }
+
 
         default:
             return next(action)
