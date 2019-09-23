@@ -332,6 +332,10 @@ const GET_NOT_SENT_TRANS_MSSQL =
     "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)\n" +
     "order by c.[Id], ii.[Id]";
 
+const GET_SHORT_NOT_SENT_TRANS_MSSQL =
+    "select c.[Id] from[Cheque] c\n" +
+    "where(c.[UserId] = <%= user_id %>) and(c.[StateId] = 4) and(c.[ChequeTypeId] = 1) and(c.[SendStatus] = 0)";
+
 const GET_NOT_SENT_TRANS_MYSQL =
     "select c.`Id` `TranId`, ii.`Id` `ItemId`, cc.`CourseId`, concat(al.`FirstName`, ' ', al.`LastName`) `Author`,\n" +
     "  ct.`Name` `Category`, cl.`Name`, ii.`Price`, ii.`Qty`, ii.`Qty` * ii.`Price` `Sum`,\n" +
@@ -349,6 +353,10 @@ const GET_NOT_SENT_TRANS_MYSQL =
     "  left join`PromoCode` g on g.`Id` = c.`PromoCodeId`\n" +
     "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)\n" +
     "order by c.`Id`, ii.`Id`";
+
+const GET_SHORT_NOT_SENT_TRANS_MYSQL =
+    "select c.`Id` from`Cheque` c\n" +
+    "where(c.`UserId` = <%= user_id %>) and(c.`StateId` = 4) and(c.`ChequeTypeId` = 1) and(c.`SendStatus` = 0)";
 
 const MAX_LESSONS_REQ_NUM = 15;
 const MAX_COURSES_REQ_NUM = 10;
@@ -373,48 +381,56 @@ const DbUser = class DbUser extends DbObject {
 
     async getNotSentTrans(userId) {
         let trans = [];
-        let key = this._getTranLockKey(userId);
-        let lockRes = await this.cacheSet(key, "1", {
-            ttlInSec: LOCK_TIMEOUT_SEC,
-            nx: true
-        });
-        if (lockRes === "OK") {
-            let result = await $data.execSql({
-                dialect: {
-                    mysql: _.template(GET_NOT_SENT_TRANS_MYSQL)({ user_id: userId }),
-                    mssql: _.template(GET_NOT_SENT_TRANS_MSSQL)({ user_id: userId })
-                }
-            }, {});
-            
-            if (result && result.detail && (result.detail.length > 0)) {
-                let currTranId = -1;
-                let cuttItemId = -1;
-                let currTran;
-                result.detail.forEach(elem => {
-                    if (elem.TranId !== currTranId) {
-                        currTran = { id: elem.TranId, currencyCode: "RUB", revenue: 0, tax: 0, coupon: elem.Coupon, products: [] };
-                        trans.push(currTran);
-                        currTranId = elem.TranId;
-                    }
-                    if (cuttItemId !== elem.ItemId) {
-                        let currItem = {
-                            id: elem.CourseId,
-                            name: elem.Name,
-                            price: elem.Price,
-                            brand: elem.Author,
-                            category: elem.Category,
-                            quantity: elem.Qty
-                        };
-                        currTran.products.push(currItem);
-                        currTran.revenue += elem.Sum;
-                        currTran.tax += elem.Tax;
-                        cuttItemId = elem.ItemId;
-                    }
-                })
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(GET_SHORT_NOT_SENT_TRANS_MYSQL)({ user_id: userId }),
+                mssql: _.template(GET_SHORT_NOT_SENT_TRANS_MSSQL)({ user_id: userId })
             }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            let key = this._getTranLockKey(userId);
+            let lockRes = await this.cacheSet(key, "1", {
+                ttlInSec: LOCK_TIMEOUT_SEC,
+                nx: true
+            });
+            if (lockRes === "OK") {
+                result = await $data.execSql({
+                    dialect: {
+                        mysql: _.template(GET_NOT_SENT_TRANS_MYSQL)({ user_id: userId }),
+                        mssql: _.template(GET_NOT_SENT_TRANS_MSSQL)({ user_id: userId })
+                    }
+                }, {});
+            
+                if (result && result.detail && (result.detail.length > 0)) {
+                    let currTranId = -1;
+                    let cuttItemId = -1;
+                    let currTran;
+                    result.detail.forEach(elem => {
+                        if (elem.TranId !== currTranId) {
+                            currTran = { id: elem.TranId, currencyCode: "RUB", revenue: 0, tax: 0, coupon: elem.Coupon, products: [] };
+                            trans.push(currTran);
+                            currTranId = elem.TranId;
+                        }
+                        if (cuttItemId !== elem.ItemId) {
+                            let currItem = {
+                                id: elem.CourseId,
+                                name: elem.Name,
+                                price: elem.Price,
+                                brand: elem.Author,
+                                category: elem.Category,
+                                quantity: elem.Qty
+                            };
+                            currTran.products.push(currItem);
+                            currTran.revenue += elem.Sum;
+                            currTran.tax += elem.Tax;
+                            cuttItemId = elem.ItemId;
+                        }
+                    })
+                }
 
-            if (trans.length === 0)
-                await this.cacheDel(key);
+                if (trans.length === 0)
+                    await this.cacheDel(key);
+            }
         }
         return trans;
     }
@@ -450,8 +466,10 @@ const DbUser = class DbUser extends DbObject {
                     }
                     for (let i = 0; i < trans.length; i++){
                         let obj = chequeList[trans[i]];
-                        if (obj)
+                        if (obj) {
                             obj.sendStatus(1);
+                            obj.sendStatusChangedAt(new Date());
+                        }
                     }
                     
                     await root_obj.save(dbOpts);
