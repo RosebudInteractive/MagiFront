@@ -16,14 +16,19 @@
 
   .course-page__statistic-wrapper
     margin-top: 2px
+    width: calc(25% - 48px)
+    position: absolute
     &._fixed
       width: calc(25% - 48px)
       position: fixed
-      padding-top: 165px
+      margin-top: 167px
       top: 0
       bottom: auto
     @media (max-width: 899px)
       margin: 0
+    &._bottom
+      bottom: 412px
+      top: auto
 
   .statistic__play-block
     display: flex
@@ -130,6 +135,17 @@
   .course-module__price-block-section
     align-self: flex-start
     margin-left: 0
+    flex-direction: row
+    align-items: flex-end
+    margin-bottom: 8px
+
+    .course-module__price
+      order: 1
+      margin-left: 8px
+      .discount
+        margin-bottom: 0
+    .course-module__old-price
+      order: 0
 
   .svg-loader circle
     stroke-width: 6px

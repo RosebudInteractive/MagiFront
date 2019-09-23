@@ -3635,7 +3635,8 @@ li.fancybox-thumbs-loading {
   padding-top: 60px; }
   @media (min-width: 900px) {
     .page-footer {
-      padding-top: 80px; } }
+      padding-top: 66px;
+      margin-top: 14px; } }
   .page-footer__inner {
     display: -webkit-box;
     display: -webkit-flex;

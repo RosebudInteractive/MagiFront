@@ -4,14 +4,14 @@
   color: $color-main-dark
 
   .author-description
-    margin: 19px 18px 23px 0
+    margin: 19px 0 23px
     font-family: $font-pt
     font-style: normal
     font-weight: normal
     font-size: 20px
     line-height: 140%
     @media (max-width: 899px)
-      margin: 13px 18px 16px 0
+      margin: 13px 0 0
       font-size: 15px
       line-height: 19px
 
@@ -24,12 +24,15 @@
   line-height: 34px
   display: block
   @media (max-width: 899px)
-    display: none
+    margin: 30px 0 18px
 
 .authors-block__item
-  margin-bottom: 60px
+  &:last-child
+    margin-bottom: 42px
   @media (max-width: 899px)
-    margin-bottom: 45px
+    margin-bottom: 20px
+    &:last-child
+      margin-bottom: 38px
 
 .author-header
   display: flex
