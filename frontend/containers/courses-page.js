@@ -72,7 +72,7 @@ class CoursesPage extends React.Component {
         if (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) {
             let _filter = [];
             selectedFilter.forEach(item => _filter.push(item.get('URL')));
-            this.props.history.replace('/razdel/' + _filter.join('+'))
+            this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
         }
 
         if (!prevProps.selectedFilter.equals(selectedFilter)) {

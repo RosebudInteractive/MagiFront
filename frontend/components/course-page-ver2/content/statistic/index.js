@@ -22,6 +22,7 @@ class Statistic extends React.Component {
         super(props)
 
         this.state = {
+            onBottom: false,
             fixed : false
         }
 
@@ -40,27 +41,44 @@ class Statistic extends React.Component {
             let _windowScrollTop = $(window).scrollTop();
 
             let _statDiv = $('.course-page__statistic'),
-                _wrapper = $('.course-page__statistic-wrapper')
+                _wrapper = $('.course-page__statistic-wrapper'),
+                _footer = $('.page-footer')
 
-            if (!_statDiv || !_statDiv.length) return;
+            if (!_wrapper || !_wrapper.length) return;
 
-            let _offsetTop = _statDiv.offset().top - 165,
-                _divHeight = _wrapper.height()
+            let _statDivTop = _statDiv.offset().top,
+                _innerDivTop = _wrapper.offset().top,
+                _innerDivHeight = _wrapper.innerHeight(),
+                _divTop = this.state.fixed ? _statDivTop : _innerDivTop,
+                _footerTop = _footer.offset().top
 
-            if ((_windowScrollTop < _offsetTop) && this.state.fixed){
-                this.setState({
-                    fixed: false
-                });
+            const _newState = {}
+
+            if (_windowScrollTop < (_divTop - 167)){
+                _newState.fixed = false
             }
 
-            if ((_windowScrollTop > _offsetTop) && !this.state.fixed) {
-                this.setState({
-                    fixed: true
-                });
+            if ((_windowScrollTop >= (_divTop - 167)) && !this.state.onBottom) {
+                _newState.fixed = true
+            }
+
+            if ((_footerTop - (_innerDivHeight + 165) <  _windowScrollTop) && !this.state.onBottom) {
+                _newState.onBottom = true
+                _newState.fixed = false
+            }
+
+            if ((_footerTop - (_innerDivHeight + 165) > _windowScrollTop) && this.state.onBottom) {
+                _newState.onBottom = false
+                _newState.fixed = true
+            }
+
+            _newState.onBottom = _newState.hasOwnProperty("onBottom") ? _newState.onBottom : this.state.onBottom
+            _newState.fixed = _newState.hasOwnProperty("fixed") ? _newState.fixed : this.state.fixed
+
+            if ((this.state.onBottom !== _newState.onBottom) || (this.state.fixed !== _newState.fixed)) {
+                this.setState(_newState)
             }
         }.bind(this)
-
-        // this._handleScroll = _handleScroll.bind(this)
 
         this._addEventListeners();
     }
@@ -88,7 +106,7 @@ class Statistic extends React.Component {
             _isBought = course && (!course.IsPaid || course.IsGift || course.IsBought)
 
         return <div className="course-page__statistic">
-            <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "")}>
+            <div className={"course-page__statistic-wrapper" + (this.state.fixed ? " _fixed" : "") + (this.state.onBottom ? " _bottom" : "")}>
                 {
                     _isBought ?
                         <React.Fragment>

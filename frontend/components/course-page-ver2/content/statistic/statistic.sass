@@ -16,14 +16,19 @@
 
   .course-page__statistic-wrapper
     margin-top: 2px
+    width: calc(25% - 48px)
+    position: absolute
     &._fixed
       width: calc(25% - 48px)
       position: fixed
-      padding-top: 165px
+      margin-top: 167px
       top: 0
       bottom: auto
     @media (max-width: 899px)
       margin: 0
+    &._bottom
+      bottom: 412px
+      top: auto
 
   .statistic__play-block
     display: flex
