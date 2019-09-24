@@ -199,6 +199,14 @@ class YandexKassa extends Payment {
         return this._req(method, func, {}, idempotenceKey);
     }
 
+    _getPaymentReceiptList(paymentId, chequeTypeId, op, idempotenceKey) {
+        let method = 'GET';
+        let func = `receipts?${chequeTypeId === Accounting.ChequeType.Payment ? "payment_id" : "refund_id"}=${paymentId}`;
+        if (op)
+            op.operation = method + " " + func;
+        return this._req(method, func, {}, idempotenceKey);
+    }
+
     _convertStatusToState(status) {
         let rc = Accounting.ChequeState.Error;
         switch (status) {
@@ -304,6 +312,31 @@ class YandexKassa extends Payment {
                     return rc;
                 }, err => {
                         return { isError: true, operation: op, req: paymentId, result: err, cheque: { chequeState: chequeState } };
+                });
+            resolve(rc);
+        });
+    }
+
+    _onGetPaymentReceipt(paymentId, chequeTypeId) {
+        let op = {};
+        return new Promise(resolve => {
+            let rc = this._getPaymentReceiptList(paymentId, chequeTypeId, op)
+                .then(result => {
+                    let cheque = {};
+                    let rc = { isError: false, operation: op, req: {}, result: result, cheque: cheque };
+                    if (result && result.items && (result.items.length > 0)) {
+                        for (let i = 0; i < result.items.length; i++) {
+                            let elem = result.items[i]
+                            if (elem.status === "succeeded") {
+                                let ms = Date.parse(elem.registered_at);
+                                cheque.ReceiptDate = new Date(ms);
+                                break;
+                            }
+                        }
+                    }
+                    return rc;
+                }, err => {
+                        return { isError: true, operation: op, req: {}, result: err, cheque: {} };
                 });
             resolve(rc);
         });

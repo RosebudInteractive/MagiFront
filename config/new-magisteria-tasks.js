@@ -7,6 +7,17 @@ const siteMapsPath = path.normalize(path.join(process.cwd(), "..", "..", "sitema
 module.exports = {
     tasks: [
         {
+            name: "Receipt collection",
+            module: "./receipt-collection",
+            type: "scheduled-task",
+            disabled: false,
+            schedule: "0 44 * * * *", // run every hour
+            options: {
+                maxRecNum: 100,
+                maxTrial: 2
+            }
+        },
+        {
             name: "Listening history import",
             module: "./lsn-history",
             type: "scheduled-task",

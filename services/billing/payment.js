@@ -125,6 +125,12 @@ exports.Payment = class Payment extends DbObject {
         })
     }
 
+    _onGetPaymentReceipt(paymentId, chequeTypeId) {
+        return new Promise(reject => {
+            reject(new Error(`Payment::_onGetPaymentReceipt isn't implemented. You shouldn't invoke this method of base class.`));
+        })
+    }
+
     _getOrCreateInvoice(data, options) {
         let opts = options || {};
         return new Promise(resolve => {
@@ -621,6 +627,57 @@ exports.Payment = class Payment extends DbObject {
                 }
                 return result;
             });
+    }
+
+    async getReceipt(id, options, chequeNum, chequeTypeId) {
+        let memDbOptions = { dbRoots: [] };
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let root_obj = null;
+        let chequeObj = null;
+
+        return Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                resolve(this._getCheque(id, dbOpts));
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    memDbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+                    let collection = root_obj.getCol("DataElements");
+                    if (collection.count() !== 1)
+                        throw new Error(`Cheque ("id" = "${id}") doesn't exist.`);
+                    chequeObj = collection.get(0);
+                    
+                    await chequeObj.edit();
+
+                    let tp = chequeTypeId ? chequeTypeId : chequeObj.chequeTypeId(); // chequeTypeId- debug parameter
+                    let num = chequeNum ? chequeNum : chequeObj.chequeNum(); // chequeNum- debug parameter
+                    let receipt_list = await this._onGetPaymentReceipt(num, tp);
+
+                    if (receipt_list.cheque.ReceiptDate)
+                        chequeObj.receiptDate(receipt_list.cheque.ReceiptDate);
+                    chequeObj.lastTrialTs(new Date());
+                    chequeObj.trialNum((chequeObj.trialNum() ? chequeObj.trialNum() : 0) + 1);
+                    if (!receipt_list.isError)
+                        chequeObj.receiptData(JSON.stringify(receipt_list.result));
+
+                    let root_item = chequeObj.getDataRoot("ChequeLog");
+                    let fields = {
+                        ResultCode: HttpCode.OK,
+                        Operation: receipt_list.operation.operation,
+                        Request: JSON.stringify(receipt_list.req),
+                        Response: JSON.stringify(receipt_list.result)
+                    };
+                    if (receipt_list.isError)
+                        fields.ResultCode = receipt_list.statusCode ? receipt_list.statusCode :
+                            (receipt_list.result && receipt_list.result.statusCode ? receipt_list.result.statusCode : HttpCode.ERR_INTERNAL);
+                    await root_item.newObject({
+                        fields: fields
+                    }, dbOpts);
+                    await chequeObj.save(dbOpts);
+                    return receipt_list.result;
+                })
+        }, memDbOptions);
     }
 
     insert(data, options) {
