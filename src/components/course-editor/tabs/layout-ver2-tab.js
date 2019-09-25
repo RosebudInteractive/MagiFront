@@ -6,7 +6,7 @@ import TextArea from "../../common/text-area";
 import PropTypes from "prop-types";
 import {enableButtonsSelector} from "adm-ducks/app";
 import {connect} from "react-redux";
-import Cover from "../../common/cover-control";
+import Cover from "../../common/cover-with-cross";
 
 export const LAYOUT_VER2_FORM = 'LayoutVer2Form'
 

@@ -26,7 +26,20 @@ export default class Cover extends React.Component {
 
         const {course, isFavorite} = this.props,
             _coverUrl = course.LandCover ? course.LandCover : course.Cover,
-            _coverStyle = {backgroundImage : "url(" + '/data/' + _coverUrl + ")"}
+            _backgroundPosition = course.LandCoverMeta && course.LandCoverMeta.backgroundPosition ?
+                {
+                    top: course.LandCoverMeta.backgroundPosition.percent.top * 100 + "%",
+                    left: course.LandCoverMeta.backgroundPosition.percent.left * 100 + "%",
+                }
+                :
+                {
+                    top: "top",
+                    left: "center"
+                },
+            _coverStyle = {
+                backgroundImage : "url(" + '/data/' + _coverUrl + ")",
+                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`
+            }
 
         return <div className="course-page__cover" style={_coverStyle}>
             <PageHeader visible={true}/>
