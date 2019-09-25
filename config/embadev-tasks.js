@@ -19,10 +19,21 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 let options = {
     tasks: [
         {
+            name: "Receipt collection",
+            module: "./receipt-collection",
+            type: "scheduled-task",
+            disabled: true,
+            schedule: "*/10 * * * * *", // run every 10 sec
+            options: {
+                maxRecNum: 100,
+                maxTrial: 2
+            }
+        },
+        {
             name: "Listening history import",
             module: "./lsn-history",
             type: "scheduled-task",
-            disabled: false,
+            disabled: true,
             schedule: "*/10 * * * * *", // run every 10 sec
             options: {
                 maxInsertNum: 2,
