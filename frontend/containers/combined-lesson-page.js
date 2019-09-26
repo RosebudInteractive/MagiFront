@@ -524,7 +524,8 @@ class CombineLessonPage extends React.Component {
 
         let _isNeedHideRefs = !lessonText || !lessonText.refs || !(lessonText.refs.length > 0),
             _lesson = lesson ? this._getLesson() : null,
-            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized)
+            _isNeedHideGallery = !_lesson || (_lesson.IsAuthRequired && !authorized),
+            _galleryHasItems = lessonText && lessonText.gallery && Array.isArray(lessonText.gallery) && (lessonText.gallery.length > 0)
 
         if ((this.state.redirectToPlayer) && (this.props.courseUrl) && (this.props.lessonUrl)) {
             return <Redirect push to={'/' + this.props.courseUrl + '/' + this.props.lessonUrl + '?play'}/>;
@@ -546,8 +547,15 @@ class CombineLessonPage extends React.Component {
                                   active={_lesson.Id}
                                   history={this.props.history}
                                   extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
-                            <GalleryButtons isLocked={!authorized}/>
-                            {lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null}
+                            {
+                                _galleryHasItems ?
+                                    <React.Fragment>
+                                        <GalleryButtons isLocked={!authorized}/>
+                                        {lessonText.loaded ? <GalleryWrapper gallery={lessonText.gallery}/> : null}
+                                    </React.Fragment>
+                                    :
+                                    null
+                            }
                             {this._getLessonsBundles()}
                             <Sources lesson={_lesson}/>
                             <LessonInfo lesson={_lesson} course={course}/>
