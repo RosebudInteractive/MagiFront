@@ -125,7 +125,7 @@ class CourseEditor extends React.Component {
                                         className={"tabs-1 tab-link" + (this.state.currentTab === TABS.LAYOUT_VER2 ? ' tab-link-active' : '')}
                                         onClick={() => {
                                             this._switchTo(TABS.LAYOUT_VER2)
-                                        }}>Новый формат
+                                        }}>Лендинг
                                     </div>
                                     <div
                                         className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL_NETWORKS ? ' tab-link-active' : '')}

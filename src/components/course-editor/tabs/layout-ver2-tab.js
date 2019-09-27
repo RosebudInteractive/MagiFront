@@ -43,7 +43,7 @@ class LayoutVer2Form extends React.Component {
                 <Field component={TextArea} name="targetAudience" label="Кому подойдет этот курс" enableHtml={true} disabled={_disabled}/>
                 <Field component={TextArea} name="aims" label="Чему вы научитесь" enableHtml={true} disabled={_disabled}/>
                 <Field component={TimeInput} name="estDuration" label="Ожидаемая длительность" disabled={_disabled}/>
-                <Field component={Cover} name="cover" label="Обложка лекции" disabled={_disabled}/>
+                <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
             </form>
         </div>
     }
