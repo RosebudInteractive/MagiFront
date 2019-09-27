@@ -212,6 +212,11 @@ Promise.resolve()
 
         PrerenderInit(app);
 
+        // if (config.has("server.adminEnabled") && (config.server.adminEnabled === true))
+        app.get("/mailing/*", function (req, res) {
+            res.sendFile(path.join(__dirname, 'mailing', 'index.html'));
+        });
+
         if (config.has("server.publicEnabled") && (config.server.publicEnabled === true))
             app.get("/*", function (req, res) {
                 res.render(__dirname + '/index.html', { id: req.user ? req.user.Id : "null" });
