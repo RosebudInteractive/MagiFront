@@ -156,6 +156,10 @@ const handleCourse = (data, state) => {
             data.CoverMeta = JSON.parse(data.CoverMeta)
         }
 
+        if (data.LandCoverMeta) {
+            data.LandCoverMeta = JSON.parse(data.LandCoverMeta)
+        }
+
         if (data.ExtLinks) {
             data.ExtLinks = JSON.parse(data.ExtLinks)
         }

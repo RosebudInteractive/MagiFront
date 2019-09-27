@@ -6,7 +6,7 @@ import TextArea from "../../common/text-area";
 import PropTypes from "prop-types";
 import {enableButtonsSelector} from "adm-ducks/app";
 import {connect} from "react-redux";
-import Cover from "../../common/cover-control";
+import Cover from "../../common/cover-with-cross";
 
 export const LAYOUT_VER2_FORM = 'LayoutVer2Form'
 
@@ -43,7 +43,7 @@ class LayoutVer2Form extends React.Component {
                 <Field component={TextArea} name="targetAudience" label="Кому подойдет этот курс" enableHtml={true} disabled={_disabled}/>
                 <Field component={TextArea} name="aims" label="Чему вы научитесь" enableHtml={true} disabled={_disabled}/>
                 <Field component={TimeInput} name="estDuration" label="Ожидаемая длительность" disabled={_disabled}/>
-                <Field component={Cover} name="cover" label="Обложка лекции" disabled={_disabled}/>
+                <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
             </form>
         </div>
     }

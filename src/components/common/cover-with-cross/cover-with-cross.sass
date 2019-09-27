@@ -1,0 +1,20 @@
+.cover-with-cross
+  cursor: crosshair
+
+
+.cross-point
+  position: absolute
+  &:after
+    content: ""
+    width: 11px
+    height: 1px
+    background-color: #fff
+    position: absolute
+    left: -5px
+  &:before
+    content: ""
+    width: 1px
+    height: 11px
+    top: -5px
+    position: absolute
+    background-color: #fff

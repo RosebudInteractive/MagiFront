@@ -237,6 +237,9 @@ class LessonEditorForm extends React.Component {
 
         this.props.setExtLinks(getExtLinks(editorValues.extLinksValues))
 
+        const _isChildExists = (editorValues.subLessons && editorValues.subLessons.length > 0)
+            || (this.props.lesson && this.props.lesson.Childs && this.props.lesson.Childs.length > 0)
+
         let _obj = {
             id: this.props.lesson.id,
             CourseId: this.props.course.id,
@@ -257,7 +260,7 @@ class LessonEditorForm extends React.Component {
             Episodes: [],
             References: [],
             Resources: [],
-            Childs: (editorValues.subLessons && editorValues.subLessons.length > 0) ? [] : null,
+            Childs: _isChildExists ? [] : null,
             SnName: editorValues.snName,
             SnDescription: editorValues.snDescription,
             SnPost: editorValues.snPost,
