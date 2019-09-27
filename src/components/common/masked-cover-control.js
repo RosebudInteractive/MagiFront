@@ -46,7 +46,7 @@ class MaskedCoverControl extends React.Component {
             <label htmlFor={id} className={"field-label" + (disabled ? " disabled" : "")}>{label}</label>
             <div className={"field-wrapper__editor-wrapper"}>
                 <div className="cover-wrapper">
-                    <div className={"cover " + _mask}>
+                    <div className={"cover _unfadable " + _mask}>
                         {
                             _svgData ?
                                 <svg viewBox={"0 0 " + _svgData.width + " " + _svgData.height} width={_svgData.width} height={_svgData.height}
