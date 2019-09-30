@@ -60,10 +60,10 @@ const dfltSettings = {
     twUrl: "https://twitter.com/MagisteriaRu",
     vkUrl: "https://vk.com/magisteriaru",
     mailLogo: "/assets/mail/logo.png",
-    fbLogo: "/assets/images/svg/fb.svg",
-    okLogo: "/assets/images/svg/ok.svg",
-    twLogo: "/assets/images/svg/tw.svg",
-    vkLogo: "/assets/images/svg/vk.svg",
+    fbLogo: "/images/fb.png",
+    okLogo: "/images/ok.png",
+    twLogo: "/images/tw.png",
+    vkLogo: "/images/vk.png",
 };
 
 const IMG_WIDTH = 360;
