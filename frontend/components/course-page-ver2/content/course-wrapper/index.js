@@ -22,6 +22,20 @@ export default class CourseWrapper extends React.Component {
         }
     }
 
+    componentWillMount() {
+        const {course} = this.props
+
+        if (course) {
+            if (course.IsPaid && !course.IsGift && !course.IsBought) {
+                this.setState({showMore: true})
+            }
+
+            if (!course.IsPaid && !course.statistics.lessons.hasListened) {
+                this.setState({showMore: true})
+            }
+        }
+    }
+
     render() {
         const {course} = this.props
 
