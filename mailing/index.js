@@ -3,14 +3,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {Provider} from 'react-redux';
-import App from './app';
+import Template from './email-template';
 import {store} from './store/configureStore';
-// import {Router} from 'react-router-dom';
+import {Route, Router} from 'react-router-dom';
+import history from "./history";
 
 ReactDOM.render(
     <Provider store={store}>
-        {/*<Router history={history}>*/}
-            <App/>
-        {/*</Router>*/}
+        <Router history={history}>
+            <Route exact path={'/mailing/:courseId'} component={Template}/>
+        </Router>
     </Provider>,
     document.getElementById('root'));

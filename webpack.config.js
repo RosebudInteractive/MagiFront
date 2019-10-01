@@ -173,6 +173,7 @@ const _devConfig = {
             },
             {
                 loader: 'json-loader',
+                exclude: /node_modules/,
                 test: /\.json$/,
             },
             {
