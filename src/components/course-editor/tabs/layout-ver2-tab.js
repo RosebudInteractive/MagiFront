@@ -39,9 +39,9 @@ class LayoutVer2Form extends React.Component {
         return <div className={"form-wrapper non-webix-form" + (this.props.visible ? '' : ' hidden')}>
             <form className="controls-wrapper layout-ver2-tab">
                 <Field component={CheckBox} name="isLandingPage" label="Использовать новый формат" disabled={!this.props.enableButtons}/>
-                <Field component={TextArea} name="shortDescription" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
-                <Field component={TextArea} name="targetAudience" label="Кому подойдет этот курс" enableHtml={true} disabled={_disabled}/>
-                <Field component={TextArea} name="aims" label="Чему вы научитесь" enableHtml={true} disabled={_disabled}/>
+                <Field component={TextArea} id="shortDescription-editor" name="shortDescription" label="Краткое описание" enableHtml={true} disabled={_disabled}/>
+                <Field component={TextArea} id="targetAudience-editor" name="targetAudience" label="Кому подойдет этот курс" enableHtml={true} disabled={_disabled}/>
+                <Field component={TextArea} id="aims-editor" name="aims" label="Чему вы научитесь" enableHtml={true} disabled={_disabled}/>
                 <Field component={TimeInput} name="estDuration" label="Ожидаемая длительность" disabled={_disabled}/>
                 <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
             </form>
