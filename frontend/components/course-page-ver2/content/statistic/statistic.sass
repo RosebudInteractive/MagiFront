@@ -21,7 +21,7 @@
     &._fixed
       width: calc(25% - 48px)
       position: fixed
-      margin-top: 167px
+      margin-top: 157px
       top: 0
       bottom: auto
     @media (max-width: 899px)
@@ -29,7 +29,7 @@
       position: relative
       width: 100%
     &._bottom
-      bottom: 412px
+      bottom: 422px
       top: auto
 
   .statistic__play-block
@@ -104,19 +104,21 @@
   .lecture-full__play-block
     padding: 0
 
-  .play-block, .play-block__loader, .svg-loader
+  .play-block
     margin: 0
     padding: 0
     height: 126px
     width: 126px
+    min-width: auto
     @media (max-width: 1679px)
       width: 79px
       height: 79px
 
-  .play-block__loader:after
-    @media (max-width: 1679px)
-      width: 79px
-      height: 79px
+  .play-block__loader, .play-block__loader:after, .svg-loader
+    margin: 0
+    padding: 0
+    width: 100%
+    height: 100%
 
   .lecture-full__play-block
     width: 100%

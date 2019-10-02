@@ -41,7 +41,7 @@ export default class CourseWrapper extends React.Component {
             _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought
 
         return <div className="course-page__course-wrapper">
-            <div className="course-wrapper__short-description" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
+            <div className="course-wrapper__short-description wrapper-item" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
             <ExtendedInfo course={course} visible={this.state.showMore}/>
             {
                 _showMoreHidden ?
@@ -57,7 +57,7 @@ export default class CourseWrapper extends React.Component {
             <Books books={this.props.course.Books}
                    titleClassName={"course-wrapper__title"}
                    listClass={CourseBooksList}
-                   extClass={"course-page__books"}
+                   extClass={"course-page__books wrapper-item"}
                    title={"Книга по курсу"}/>
             <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.INTERVIEW}/>
             {/*<div className="course-wrapper__about">*/}
@@ -71,8 +71,14 @@ export default class CourseWrapper extends React.Component {
     }
 
     _switchShowMore() {
+        const _isNewStateHidden = !this.state.showMore
+
         this.setState({
             showMore: !this.state.showMore
         })
+
+        if (_isNewStateHidden) {
+            window.dispatchEvent(new CustomEvent("ext-info-hidden", {}))
+        }
     }
 }

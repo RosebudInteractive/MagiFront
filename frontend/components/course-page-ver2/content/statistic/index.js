@@ -11,6 +11,8 @@ import Data from "./data";
 import {connect} from "react-redux";
 import {SocialBlock} from "./social-block";
 
+const FIXED_BLOCK_MARGIN_TOP = 99 + 56
+
 class Statistic extends React.Component {
 
     static propTypes = {
@@ -38,6 +40,8 @@ class Statistic extends React.Component {
                 return
             }
 
+            _setPlayBlockSize();
+
             let _windowScrollTop = $(window).scrollTop();
 
             let _statDiv = $('.course-page__statistic'),
@@ -54,11 +58,11 @@ class Statistic extends React.Component {
 
             const _newState = {}
 
-            if (_windowScrollTop < (_divTop - 167)){
+            if (_windowScrollTop < (_divTop - FIXED_BLOCK_MARGIN_TOP)){
                 _newState.fixed = false
             }
 
-            if ((_windowScrollTop >= (_divTop - 167)) && !this.state.onBottom) {
+            if ((_windowScrollTop >= (_divTop - FIXED_BLOCK_MARGIN_TOP)) && !this.state.onBottom) {
                 _newState.fixed = true
             }
 
@@ -158,12 +162,25 @@ class Statistic extends React.Component {
     }
 
     _addEventListeners() {
-        $(window).bind('resize scroll', this._handleScroll)
+        $(window).bind('resize scroll ext-info-hidden', this._handleScroll)
     }
 
     _removeEventListeners() {
-        $(window).unbind('resize scroll', this._handleScroll)
+        $(window).unbind('resize scroll ext-info-hidden', this._handleScroll)
     }
+}
+
+function _setPlayBlockSize(){
+    const _wrapper = $('.statistic__play-block'),
+        _playBlockWrapper = $('.play-block__wrapper'),
+        _playBlock = $('.play-block'),
+        _image = $('.play-block__image-wrapper')
+
+    let _size = _wrapper.width() / 3
+
+    _playBlockWrapper.width(_size).height(_size)
+    _playBlock.width(_size).height(_size)
+    _image.width(_size).height(_size)
 }
 
 function mapStateToProps(state,) {
