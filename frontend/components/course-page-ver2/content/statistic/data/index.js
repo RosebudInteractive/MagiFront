@@ -38,9 +38,15 @@ function TotalLessonCounter(props) {
 
     return <div className="data__header-block">
         <span className="progress__completed">{data.published}</span>
-        <span className="statistic-separator">/</span>
-        <span className="progress__total">{data.total}</span>
-        <span className="data__text">{` ${getCountLessonTitle(data.total)}`}</span>
+        { !data.allPublished ?
+            <React.Fragment>
+                <span className="statistic-separator">/</span>
+                <span className="progress__total">{data.total}</span>
+            </React.Fragment>
+            :
+            null
+        }
+        <span className="data__text">{`${getCountLessonTitle(data.total)}`}</span>
     </div>
 }
 

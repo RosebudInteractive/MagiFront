@@ -11,7 +11,7 @@ import Data from "./data";
 import {connect} from "react-redux";
 import {SocialBlock} from "./social-block";
 
-const FIXED_BLOCK_MARGIN_TOP = 99 + 56
+const FIXED_BLOCK_MARGIN_TOP = 58
 
 class Statistic extends React.Component {
 
@@ -138,7 +138,6 @@ class Statistic extends React.Component {
                         <React.Fragment>
                             <PriceBlock course={course}/>
                             <Data course={course}/>
-                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
                             {
                                 _freeLesson ?
                                     <div className="statistic__play-block _free-lesson">
@@ -154,6 +153,7 @@ class Statistic extends React.Component {
                                     :
                                     null
                             }
+                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
 
                         </React.Fragment>
                 }

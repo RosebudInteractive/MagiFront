@@ -18,7 +18,7 @@ export default class Content extends React.Component {
 
     render() {
         return <div className="course-page__content">
-            <PageHeader visible={true}/>
+            {/*<PageHeader visible={true}/>*/}
             <Statistic course={this.props.course} shareUrl={this.props.shareUrl}/>
             <CourseWrapper course={this.props.course}/>
         </div>
