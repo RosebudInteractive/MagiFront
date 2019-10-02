@@ -37,15 +37,22 @@ export default class CourseWrapper extends React.Component {
     }
 
     render() {
-        const {course} = this.props
+        const {course} = this.props,
+            _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought
 
         return <div className="course-page__course-wrapper">
             <div className="course-wrapper__short-description" dangerouslySetInnerHTML={{__html: course.ShortDescription}}/>
             <ExtendedInfo course={course} visible={this.state.showMore}/>
-            <div className={"course-wrapper__more-button" + (this.state.showMore ? " _extended" : "")}>
-                <span onClick={::this._switchShowMore}>{this.state.showMore ? "Свернуть информацию о курсе" : "Вся информация о курсе"}</span>
-                {this.state.showMore ? " ↑ " : " ↓ "}
-            </div>
+            {
+                _showMoreHidden ?
+                    null
+                    :
+                    <div className={"course-wrapper__more-button wrapper-item" + (this.state.showMore ? " _extended" : "")}>
+                        <span
+                            onClick={::this._switchShowMore}>{this.state.showMore ? "Свернуть информацию о курсе" : "Вся информация о курсе"}</span>
+                        {this.state.showMore ? " ↑ " : " ↓ "}
+                    </div>
+            }
             <Scheme course={course}/>
             <Books books={this.props.course.Books}
                    titleClassName={"course-wrapper__title"}
