@@ -41,7 +41,6 @@
     &:last-child
       margin-bottom: 26px
 
-
 .data__info-block
   padding: 8.5px 0
   @media (max-width: 899px)
@@ -80,6 +79,17 @@
   margin-bottom: 2px
   @media (max-width: 899px)
     margin-bottom: -1px
+    
+  &._full
+    display: block
+    @media (max-width: 1199px)
+      display: none
+  &._short
+    display: none
+    @media (max-width: 1199px)
+      display: block
+
+
 .data_separator
   width: 6px
 

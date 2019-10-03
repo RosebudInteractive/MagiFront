@@ -63,7 +63,7 @@ function ReadyDate(props) {
     return !data.allPublished ?
                 <div className="data__ready-date">
                     <div className="data__text">Курс в процессе публикации.</div>
-                    <div className="data__text">{`Ожидаемая дата окончания ${_readyDate}`}</div>
+                    <div className="data__text">{`Время завершения публикации всех лекций - ${_readyDate}`}</div>
                 </div>
                 :
                 null
@@ -81,7 +81,8 @@ function VideoCounter(props) {
         <span className="data__text">{'ч'}</span>
         <span className="data_separator"/>
         <span className="progress__completed">{' ' + duration.minutes}</span>
-        <span className="data__text">{'м просмотра'}</span>
+        <span className="data__text _full">{'м время просмотра'}</span>
+        <span className="data__text _short">{'м просмотра'}</span>
     </div>
 }
 
