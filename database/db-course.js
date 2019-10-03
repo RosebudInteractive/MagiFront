@@ -10,7 +10,9 @@ const { Product } = require('../const/product');
 const { ProductService } = require('./db-product');
 const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
+const { SubscriptionService } = require('../services/mail-subscription');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
+const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
 
 const {
     ACCOUNT_ID,
@@ -496,10 +498,14 @@ const CHECKIF_CAN_DEL_MYSQL =
     "  join`EpisodeLng` eln on e.`Id` = eln.`EpisodeId`\n" +
     "where(c.`Id` = <%= id %>) and((lc.`State` = 'R') or(eln.`State` = 'R'))";
 
+const DFLT_ADDRESS_BOOK = "Магистерия";
+const DFLT_SENDER_NAME = "Magisteria.ru";
+
 const { PrerenderCache } = require('../prerender/prerender-cache');
 const { URL, URLSearchParams } = require('url');
 
 const URL_PREFIX = "category";
+const MAILING_PREFIX = "mailing";
 
 const DbCourse = class DbCourse extends DbObject {
 
@@ -631,6 +637,127 @@ const DbCourse = class DbCourse extends DbObject {
                 }
                 return rc;
             });
+    }
+
+    async courseMailing(id, options) {
+
+        let opts = options || {};
+        let dbOpts = opts.dbOpts ? opts.dbOpts : {};
+        let book = opts.book ? opts.book :
+            (config.has('mail.mailing.newCourse.addressBook') ? config.get('mail.mailing.newCourse.addressBook') : DFLT_ADDRESS_BOOK);
+        let sender = opts.sender ? opts.sender :
+            (config.has('mail.mailing.newCourse.sender') ? config.get('mail.mailing.newCourse.sender') : null);
+        if (!sender)
+            throw new Error(`Sender parameter is missing.`);
+        let sender_name = opts.sender_name ? opts.sender_name :
+            (config.has('mail.mailing.newCourse.senderName') ? config.get('mail.mailing.newCourse.senderName') : DFLT_SENDER_NAME);
+
+        let course_info = await $data.execSql({
+            cmd: `select l.Name, c.URL from Course c join CourseLng l on c.Id = l.CourseId where c.Id = ${id}`
+        }, dbOpts);
+        if (course_info && course_info.detail && (course_info.detail.length !== 1))
+            throw new Error(`Course Id=${id} doesn't exist.`)
+        let path = opts.url ? `/${URL_PREFIX}/${course_info.detail[0].URL}` : `/${MAILING_PREFIX}/${id}`;
+        let letter_subj = `Новый курс: ${course_info.detail[0].Name}.`;
+
+        let book_id;
+        let books = await SubscriptionService().listAddressBooks();
+        if (books && Array.isArray(books) && books.length) {
+            books.forEach(elem => {
+                if (elem.name === book)
+                    book_id = elem.id;
+            })
+            if (!book_id)
+                throw new Error(`Address book "${book}" is missing!`);
+        }
+        else
+            throw new Error(`List of address books is empty!`);
+
+        let host = opts.host ? opts.host : (config.has('mail.mailing.newCourse.host')
+            && config.mail.mailing.newCourse.host ? config.mail.mailing.newCourse.host : config.proxyServer.siteHost);
+        let { statusCode, body: html } = await this._prerenderCache.prerender(path, false, null, { host: host, response: true });
+        if (statusCode !== HttpCode.OK)
+            throw new HttpError(statusCode, `HTTP error "${statusCode}" accessing "${host + path}".`);
+
+        let dbOptions = { dbRoots: [] };
+        let root_obj;
+
+        let new_obj;
+        let root_course;
+
+        let fin_result = await Utils.editDataWrapper(() => {
+            return new MemDbPromise(this._db, resolve => {
+                let res = this._getObjById(id, {
+                    expr: {
+                        model: {
+                            name: "Mailing",
+                            childs: [
+                                {
+                                    dataObject: {
+                                        name: "CourseMailing"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }, dbOpts);
+                resolve(res);
+            })
+                .then(async (result) => {
+                    root_obj = result;
+                    dbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
+
+                    await root_obj.edit();
+
+                    let fields = {
+                        Name: letter_subj,
+                        SenderName: sender_name,
+                        SenderEmail: sender,
+                        Subject: letter_subj,
+                        BookId: book_id,
+                        Body: html,
+                        IsSent: false
+                    };
+
+                    let res_new = await root_obj.newObject({
+                        fields: fields
+                    }, dbOpts);
+
+                    new_obj = this._db.getObj(res_new.newObject);
+                    root_course = new_obj.getDataRoot("CourseMailing");
+                    await root_obj.save(dbOpts);
+                    await new_obj.edit();
+                    let data = await SubscriptionService().createCampaign(sender_name, sender,
+                        letter_subj, html, book_id, letter_subj);
+
+                    let rc = data;
+                    if (data && (!data.is_error) && (!data.error_code)) {
+                        new_obj.isSent(true);
+                        new_obj.campaignId(data.id);
+                        new_obj.status(data.status);
+                    }
+                    else {
+                        rc = {
+                            is_error: true,
+                            message: `Send error: ${data.message ? data.message : "Unknown error."}` +
+                                (data.error_code ? ` (error_code: ${data.error_code})` : "")
+                        };
+                    }
+                    new_obj.resBody(JSON.stringify(rc));
+
+                    if (!rc.is_error)
+                        await root_course.newObject({
+                            fields: { CourseId: id }
+                        }, dbOpts);
+
+                    await new_obj.save(dbOpts);
+                    return rc;
+                });
+        }, dbOptions);
+
+        if (fin_result.is_error)
+            throw new Error(fin_result.message);
+        return fin_result;
     }
 
     getAll() {
@@ -1144,6 +1271,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     FirstName: elem.FirstName,
                                     LastName: elem.LastName,
                                     Description: elem.Description,
+                                    ShortDescription: elem.ShortDescription,
                                     Occupation: elem.Occupation,
                                     Employment: elem.Employment,
                                     Portrait: this._convertDataUrl(elem.Portrait, isAbsPath, dLink),

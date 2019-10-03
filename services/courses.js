@@ -1,5 +1,6 @@
 //let { CoursesService } = require('./../database/courses');
-let { CoursesService } = require('./../database/db-course');
+const _ = require('lodash');
+const { CoursesService } = require('./../database/db-course');
 
 function setupCourses(app) {
 
@@ -48,6 +49,24 @@ function setupCourses(app) {
                     throw new Error(`Invalid parameter: ${req.params.id}`);
                 let rc = CoursesService()
                     .prerender(id);
+                resolve(rc);
+            })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+        });
+
+        app.get('/api/adm/courses/mailing/:id', (req, res, next) => {
+            new Promise(resolve => {
+                let id = parseInt(req.params.id);
+                if ((typeof (id) === "number") && isNaN(id))
+                    throw new Error(`Invalid parameter [:id]: ${req.params.id}`);
+                let opts = _.defaultsDeep(req.query, { dbOpts: { userId: req.user.Id } });
+                let rc = CoursesService()
+                    .courseMailing(id, opts);
                 resolve(rc);
             })
                 .then(rows => {

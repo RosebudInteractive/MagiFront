@@ -133,6 +133,14 @@ module.exports = {
             scriptPath: "//cdn.sendpulse.com/js/push/700d4d64866e5acf0b24dfead24eac1d_1.js",
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
+        mailing: {
+            newCourse: {
+                addressBook: "Магистерия",
+                sender: "test@magisteria.ru",
+                senderName: "Magisteria.ru",
+                host: "https://new.magisteria.ru"
+            }
+        },
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
