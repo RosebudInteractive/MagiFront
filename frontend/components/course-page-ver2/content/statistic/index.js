@@ -66,12 +66,12 @@ class Statistic extends React.Component {
                 _newState.fixed = true
             }
 
-            if ((_footerTop - (_innerDivHeight + 165) <  _windowScrollTop) && !this.state.onBottom) {
+            if ((_footerTop - (_innerDivHeight + 5) <  _windowScrollTop) && !this.state.onBottom) {
                 _newState.onBottom = true
                 _newState.fixed = false
             }
 
-            if ((_footerTop - (_innerDivHeight + 165) > _windowScrollTop) && this.state.onBottom) {
+            if ((_footerTop - (_innerDivHeight + 5) > _windowScrollTop) && this.state.onBottom) {
                 _newState.onBottom = false
                 _newState.fixed = true
             }

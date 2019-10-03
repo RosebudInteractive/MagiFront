@@ -38,7 +38,8 @@ class AuthorItem extends React.Component {
     render() {
         const {author} = this.props,
             _name = author.FirstName + " " + author.LastName,
-            _portrait = getAuthorPortraitPath(author, ImageSize.icon);
+            _portrait = getAuthorPortraitPath(author, ImageSize.icon),
+            _description = author.ShortDescription ? author.ShortDescription : author.Description
 
         return <div className="authors-block__item">
             <div className="author-header">
@@ -52,7 +53,7 @@ class AuthorItem extends React.Component {
                 </div>
             </div>
             <div className="author-description">
-                {author.Description}
+                {_description}
             </div>
         </div>
     }

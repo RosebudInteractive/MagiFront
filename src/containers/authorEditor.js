@@ -254,10 +254,18 @@ class AuthorEditor extends ObjectEditor {
             },
             {
                 view: "textarea",
+                name: "ShortDescription",
+                label: "Краткое описание",
+                placeholder: "Краткое описание",
+                height: 100,
+                labelWidth: labelWidth,
+            },
+            {
+                view: "textarea",
                 name: "Description",
                 label: "Описание",
                 placeholder: "Описание",
-                height: 150,
+                height: 200,
                 labelWidth: labelWidth,
             }
         ];
