@@ -694,6 +694,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                             auth_lng_obj.occupation(inpFields["Occupation"]);
                         if (typeof (inpFields["Employment"]) !== "undefined")
                             auth_lng_obj.employment(inpFields["Employment"]);
+                        if (typeof (inpFields["ShortDescription"]) !== "undefined")
+                            auth_lng_obj.shortDescription(inpFields["ShortDescription"]);
                         return auth_obj.save(opts)
                             .then((result) => {
                                 isModified = isModified || (result && result.detail && (result.detail.length > 0));
@@ -764,6 +766,8 @@ const DbAuthor = class DbAuthor extends DbObject {
                             fields["Occupation"] = inpFields["Occupation"];
                         if (typeof (inpFields["Employment"]) !== "undefined")
                             fields["Employment"] = inpFields["Employment"];
+                        if (typeof (inpFields["ShortDescription"]) !== "undefined")
+                            fields["ShortDescription"] = inpFields["ShortDescription"];
 
                         return root_lng.newObject({
                             fields: fields

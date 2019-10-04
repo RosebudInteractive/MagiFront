@@ -17,7 +17,7 @@ export default class Scheme extends React.Component {
     render() {
         const {course} = this.props
 
-        return <div className="course-wrapper__scheme">
+        return <div className="course-wrapper__scheme wrapper-item">
             <div className="course-scheme__title">Программа курса </div>
             <LessonsList course={course}/>
         </div>

@@ -128,6 +128,14 @@ let options = {
             apiSecret: "2593d02228f842c412e51d24de824dde",
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
+        mailing: {
+            newCourse: {
+                addressBook: "Магистерия",
+                sender: "test@magisteria.ru",
+                senderName: "Magisteria.ru",
+                host: null
+            }            
+        },
         userReg: {
             type: "test",//"smtp",
             template: "./templates/mail/registration.tmpl",

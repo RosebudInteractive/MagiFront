@@ -47,7 +47,7 @@ export default class VideoBlock extends React.Component {
 
 
         return _visible ?
-            <div className={"course__video-block" + (videoType === COURSE_VIDEO_TYPE.INTERVIEW ? ' _interview' : '')}>
+            <div className={"course__video-block wrapper-item" + (videoType === COURSE_VIDEO_TYPE.INTERVIEW ? ' _interview' : '')}>
                 <div className="video-block__item">
                     <div className="video-frame__wrapper" id={this._getId()}>
                         <iframe width="100%" height="100%" src={_source}

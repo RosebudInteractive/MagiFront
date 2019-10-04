@@ -38,9 +38,15 @@ function TotalLessonCounter(props) {
 
     return <div className="data__header-block">
         <span className="progress__completed">{data.published}</span>
-        <span className="statistic-separator">/</span>
-        <span className="progress__total">{data.total}</span>
-        <span className="data__text">{` ${getCountLessonTitle(data.total)}`}</span>
+        { !data.allPublished ?
+            <React.Fragment>
+                <span className="statistic-separator">/</span>
+                <span className="progress__total">{data.total}</span>
+            </React.Fragment>
+            :
+            null
+        }
+        <span className="data__text">{`${getCountLessonTitle(data.total)}`}</span>
     </div>
 }
 
@@ -57,7 +63,7 @@ function ReadyDate(props) {
     return !data.allPublished ?
                 <div className="data__ready-date">
                     <div className="data__text">Курс в процессе публикации.</div>
-                    <div className="data__text">{`Ожидаемая дата окончания ${_readyDate}`}</div>
+                    <div className="data__text">{`Время завершения публикации всех лекций - ${_readyDate}`}</div>
                 </div>
                 :
                 null
@@ -75,7 +81,8 @@ function VideoCounter(props) {
         <span className="data__text">{'ч'}</span>
         <span className="data_separator"/>
         <span className="progress__completed">{' ' + duration.minutes}</span>
-        <span className="data__text">{'м просмотра'}</span>
+        <span className="data__text view-time _full">{'м - время просмотра'}</span>
+        <span className="data__text view-time _short">{'м просмотра'}</span>
     </div>
 }
 

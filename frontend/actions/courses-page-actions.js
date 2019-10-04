@@ -259,7 +259,7 @@ const calcStatistics = (course, state) => {
         duration: {hours: _duration.getUTCHours().toString(), minutes: _duration.getUTCMinutes().toString()},
         finishedLessons: _finishedLessons,
         lastListened: lastListened,
-        hasListened: hasListened,
+        hasListened: !!hasListened,
         freeLesson: course.Lessons.find((item) => {return item.IsFreeInPaidCourse})
     }
 }

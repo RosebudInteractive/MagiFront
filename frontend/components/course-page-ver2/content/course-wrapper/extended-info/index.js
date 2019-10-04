@@ -19,7 +19,7 @@ export default class ExtendedInfo extends React.Component {
     render() {
         const {visible, course} = this.props
 
-        return <div className={"course-wrapper__extended-info" + (visible ? " _visible" : "")}>
+        return <div className={"course-wrapper__extended-info wrapper-item" + (visible ? " _visible" : "")}>
             <AuthorsBlock authors={course.Authors}/>
             <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.PREVIEW}/>
             <TargetAudience targetAudience={course.TargetAudience}/>

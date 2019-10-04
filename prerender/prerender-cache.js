@@ -129,11 +129,16 @@ let PrerenderCache = class PrerenderCache extends CacheableObject {
             .then(() => res);
     }
 
-    prerender(path, isPersist, headers) {
+    prerender(path, isPersist, headers, options) {
+        let opts = options || {};
+        let rc;
         return new Promise((resolve, reject) => {
-            let url = this._renderHost + path;
+            let url = (opts.host ? opts.host : this._renderHost) + path;
             let hs = headers ? headers : { "User-Agent": SEO.FORCE_RENDER_USER_AGENT };
             request({ url: url, headers: hs, strictSSL: false }, (error, response, body) => {
+                if (opts.response) {
+                    rc = { statusCode: response.statusCode, body: body };
+                }
                 if (error)
                     reject(error)
                 else
@@ -147,7 +152,8 @@ let PrerenderCache = class PrerenderCache extends CacheableObject {
                         return connection.persistAsync(id);
                     });
                 }
-            });
+            })
+            .then(() => { return rc; });
     }
 
     ttl(key, inMsec) {

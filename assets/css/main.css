@@ -5790,6 +5790,7 @@ ul.user-tooltip {
       transition: border-color 0.3s ease; }
     .course-module--extended .course-module__title span {
       margin-left: 0;
+      vertical-align: top;
     }
     .course-module__title:hover span {
       border-bottom: 1px solid rgba(200, 104, 76, 0.3); }
