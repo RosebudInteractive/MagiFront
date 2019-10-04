@@ -81,8 +81,8 @@ function VideoCounter(props) {
         <span className="data__text">{'ч'}</span>
         <span className="data_separator"/>
         <span className="progress__completed">{' ' + duration.minutes}</span>
-        <span className="data__text _full">{'м - время просмотра'}</span>
-        <span className="data__text _short">{'м просмотра'}</span>
+        <span className="data__text view-time _full">{'м - время просмотра'}</span>
+        <span className="data__text view-time _short">{'м просмотра'}</span>
     </div>
 }
 
