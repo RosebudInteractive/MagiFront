@@ -114,13 +114,13 @@ export default class Footer extends React.Component {
             <tr>
                <td style={STYLE.SOCIAL.CELL}>
                    <a target="_blank" href={twUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={'/images/mail-tw.png'} alt={'twitter'}/>
+                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-tw.png'} alt={'twitter'}/>
                    </a>
                    <a target="_blank" href={fbUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={'/images/mail-fb.png'} alt={'facebook'}/>
+                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-fb.png'} alt={'facebook'}/>
                    </a>
                    <a target="_blank" href={vkUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={'/images/mail-vk.png'} alt={'vk'}/>
+                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-vk.png'} alt={'vk'}/>
                    </a>
                </td>
             </tr>
