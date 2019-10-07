@@ -49,7 +49,7 @@ export default class Header extends React.Component {
 
     render() {
         const {course} = this.props,
-            _coverUrl = '/data/' + (course.LandCover ? course.LandCover : course.Cover)
+            _coverUrl = course.LandCover ? course.LandCover : course.Cover
 
         return <React.Fragment>
                 <tr>
@@ -57,8 +57,8 @@ export default class Header extends React.Component {
                 </tr>
                 <tr>
                     <td style={STYLE.COURSE.WRAPPER}>
-                        <div style={STYLE.COURSE.TITLE}>Курс: </div>
-                        <div style={STYLE.COURSE.NAME}>{course.Name}</div>
+                        <span style={STYLE.COURSE.TITLE}>Курс: </span>
+                        <span style={STYLE.COURSE.NAME}>{course.Name}</span>
                     </td>
                 </tr>
                 <tr>

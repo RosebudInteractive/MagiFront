@@ -47,14 +47,16 @@ export const getCourses = () => {
     }
 };
 
-export const getCourse = (url) => {
+export const getCourse = (url, options) => {
     return (dispatch, getState) => {
         dispatch({
             type: GET_SINGLE_COURSE_REQUEST,
             payload: null
         });
 
-        fetch("/api/courses/" + url, {method: 'GET', credentials: 'include'})
+        const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
+
+        fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
@@ -152,29 +154,29 @@ const handleCourses = (data) => {
 
 const handleCourse = (data, state) => {
     try {
-        if (data.CoverMeta) {
+        if (data.CoverMeta && (typeof data.CoverMeta === "string")) {
             data.CoverMeta = JSON.parse(data.CoverMeta)
         }
 
-        if (data.LandCoverMeta) {
+        if (data.LandCoverMeta && (typeof data.LandCoverMeta === "string")) {
             data.LandCoverMeta = JSON.parse(data.LandCoverMeta)
         }
 
-        if (data.ExtLinks) {
+        if (data.ExtLinks && (typeof data.ExtLinks === "string")) {
             data.ExtLinks = JSON.parse(data.ExtLinks)
         }
 
         data.Mask = data.Mask ? data.Mask : '_mask01';
 
         data.Authors.forEach((author) => {
-            if (author.PortraitMeta) {
+            if (author.PortraitMeta && (typeof author.PortraitMeta === "string")) {
                 author.PortraitMeta = JSON.parse(author.PortraitMeta)
             }
         });
 
         if (data.Books) {
             data.Books.forEach((book) => {
-                if (book.ExtLinks) {
+                if (book.ExtLinks && (typeof book.ExtLinks === "string")) {
                     book.ExtLinks = JSON.parse(book.ExtLinks)
                 }
             })
@@ -191,7 +193,7 @@ const handleCourse = (data, state) => {
                 _lessonCount++
             }
 
-            if (lesson.CoverMeta) {
+            if (lesson.CoverMeta && (typeof lesson.CoverMeta === "string")) {
                 lesson.CoverMeta = JSON.parse(lesson.CoverMeta)
             }
 
@@ -265,6 +267,10 @@ const calcStatistics = (course, state) => {
 }
 
 const getLastListenedLesson = (lessons, state) => {
+    if (!state.lessonInfoStorage) {
+        return {lesson: null, hasListened: false}
+    }
+
     let _lessonInStorage = state.lessonInfoStorage.lessons
 
     let _lesson = lessons

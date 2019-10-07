@@ -8,6 +8,9 @@ import Logo from "./components/logo";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Description from "./components/description";
+import PriceButton from "./components/price-button";
+import Statistic from "./components/statistic";
+import Scheme from "./components/scheme";
 
 
 class EmailTemplate extends React.Component {
@@ -15,7 +18,7 @@ class EmailTemplate extends React.Component {
     constructor(props) {
         super(props)
 
-        this.props.getCourse(this.props.courseUrl);
+        this.props.getCourse(this.props.courseUrl, {absPath: true});
     }
 
     render() {
@@ -30,9 +33,10 @@ class EmailTemplate extends React.Component {
                         <tbody>
                             <Logo/>
                             <Header course={course}/>
+                            <PriceButton course={course}/>
                             <Description course={course}/>
-
-
+                            <Statistic course={course}/>
+                            <Scheme course={course}/>
                             <Footer course={course}/>
                         </tbody>
                     </table>
