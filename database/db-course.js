@@ -679,84 +679,87 @@ const DbCourse = class DbCourse extends DbObject {
         if (statusCode !== HttpCode.OK)
             throw new HttpError(statusCode, `HTTP error "${statusCode}" accessing "${host + path}".`);
 
-        let dbOptions = { dbRoots: [] };
-        let root_obj;
+        let fin_result = opts.preview ? html : null;
+        if (!opts.preview) {
+            let dbOptions = { dbRoots: [] };
+            let root_obj;
 
-        let new_obj;
-        let root_course;
+            let new_obj;
+            let root_course;
 
-        let fin_result = await Utils.editDataWrapper(() => {
-            return new MemDbPromise(this._db, resolve => {
-                let res = this._getObjById(id, {
-                    expr: {
-                        model: {
-                            name: "Mailing",
-                            childs: [
-                                {
-                                    dataObject: {
-                                        name: "CourseMailing"
+            fin_result = await Utils.editDataWrapper(() => {
+                return new MemDbPromise(this._db, resolve => {
+                    let res = this._getObjById(id, {
+                        expr: {
+                            model: {
+                                name: "Mailing",
+                                childs: [
+                                    {
+                                        dataObject: {
+                                            name: "CourseMailing"
+                                        }
                                     }
-                                }
-                            ]
+                                ]
+                            }
                         }
-                    }
-                }, dbOpts);
-                resolve(res);
-            })
-                .then(async (result) => {
-                    root_obj = result;
-                    dbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
-
-                    await root_obj.edit();
-
-                    let fields = {
-                        Name: letter_subj,
-                        SenderName: sender_name,
-                        SenderEmail: sender,
-                        Subject: letter_subj,
-                        BookId: book_id,
-                        Body: html,
-                        IsSent: false
-                    };
-
-                    let res_new = await root_obj.newObject({
-                        fields: fields
                     }, dbOpts);
+                    resolve(res);
+                })
+                    .then(async (result) => {
+                        root_obj = result;
+                        dbOptions.dbRoots.push(root_obj); // Remember DbRoot to delete it finally in editDataWrapper
 
-                    new_obj = this._db.getObj(res_new.newObject);
-                    root_course = new_obj.getDataRoot("CourseMailing");
-                    await root_obj.save(dbOpts);
-                    await new_obj.edit();
-                    let data = await SubscriptionService().createCampaign(sender_name, sender,
-                        letter_subj, html, book_id, letter_subj);
+                        await root_obj.edit();
 
-                    let rc = data;
-                    if (data && (!data.is_error) && (!data.error_code)) {
-                        new_obj.isSent(true);
-                        new_obj.campaignId(data.id);
-                        new_obj.status(data.status);
-                    }
-                    else {
-                        rc = {
-                            is_error: true,
-                            message: `Send error: ${data.message ? data.message : "Unknown error."}` +
-                                (data.error_code ? ` (error_code: ${data.error_code})` : "")
+                        let fields = {
+                            Name: letter_subj,
+                            SenderName: sender_name,
+                            SenderEmail: sender,
+                            Subject: letter_subj,
+                            BookId: book_id,
+                            Body: html,
+                            IsSent: false
                         };
-                    }
-                    new_obj.resBody(JSON.stringify(rc));
 
-                    if (!rc.is_error)
-                        await root_course.newObject({
-                            fields: { CourseId: id }
+                        let res_new = await root_obj.newObject({
+                            fields: fields
                         }, dbOpts);
 
-                    await new_obj.save(dbOpts);
-                    return rc;
-                });
-        }, dbOptions);
+                        new_obj = this._db.getObj(res_new.newObject);
+                        root_course = new_obj.getDataRoot("CourseMailing");
+                        await root_obj.save(dbOpts);
+                        await new_obj.edit();
+                        let data = await SubscriptionService().createCampaign(sender_name, sender,
+                            letter_subj, html, book_id, letter_subj);
 
-        if (fin_result.is_error)
-            throw new Error(fin_result.message);
+                        let rc = data;
+                        if (data && (!data.is_error) && (!data.error_code)) {
+                            new_obj.isSent(true);
+                            new_obj.campaignId(data.id);
+                            new_obj.status(data.status);
+                        }
+                        else {
+                            rc = {
+                                is_error: true,
+                                message: `Send error: ${data.message ? data.message : "Unknown error."}` +
+                                    (data.error_code ? ` (error_code: ${data.error_code})` : "")
+                            };
+                        }
+                        new_obj.resBody(JSON.stringify(rc));
+
+                        if (!rc.is_error)
+                            await root_course.newObject({
+                                fields: { CourseId: id }
+                            }, dbOpts);
+
+                        await new_obj.save(dbOpts);
+                        return rc;
+                    });
+            }, dbOptions);
+
+            if (fin_result.is_error)
+                throw new Error(fin_result.message);
+        }
         return fin_result;
     }
 
