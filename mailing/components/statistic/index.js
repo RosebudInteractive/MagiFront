@@ -110,7 +110,7 @@ export default class Statistic extends React.Component {
                         <td style={STYLE.CELL.RIGHT}>
                             <div style={STYLE.CELL.WRAPPER}>
                                 <span style={STYLE.TEXT.COUNTER}>{`${_duration.hours}ч ${_duration.minutes}м `}</span>
-                                <span style={STYLE.TEXT.DESCRIPTION}>видео</span>
+                                <span style={STYLE.TEXT.DESCRIPTION}> - время просмотра</span>
                             </div>
                         </td>
                     </tr>

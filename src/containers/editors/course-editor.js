@@ -25,7 +25,7 @@ import {checkExtLinks, convertYouTubeWatchLinkToEmbed, getExtLinks} from "../../
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
 import {setActiveTab, activeTabsSelector, enableButtonsSelector} from "adm-ducks/app";
 import {getTests, loadingSelector as testLoading} from "adm-ducks/test-list";
-import {sendEmail} from "adm-ducks/course";
+import {sendEmail, fetchingSelector as emailSending} from "adm-ducks/course";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
@@ -386,7 +386,8 @@ function mapStateToProps(state, ownProps) {
             state.languages.fetching ||
             state.singleCourse.fetching ||
             parametersFetchingSelector(state) ||
-            testLoading(state),
+            testLoading(state) ||
+            emailSending(state),
 
         editorValues: getFormValues('CourseEditor')(state),
         subscriptionValues: getFormValues('CourseSubscriptionForm')(state),
