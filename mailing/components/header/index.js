@@ -41,7 +41,7 @@ const STYLE = {
         display: "block",
     },
     IMAGE_CELL: {
-        width: "550px",
+        width: "552px",
     }
 }
 
@@ -67,7 +67,7 @@ export default class Header extends React.Component {
                 </tr>
                 <tr>
                     <td style={STYLE.IMAGE_CELL}>
-                        <img src={_coverUrl} width="550" alt={course.Name} style={STYLE.IMG}/>
+                        <img src={_coverUrl} width="552" alt={course.Name} style={STYLE.IMG}/>
                     </td>
                 </tr>
             </React.Fragment>

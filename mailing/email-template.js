@@ -39,27 +39,17 @@ class EmailTemplate extends React.Component {
         return fetching || !course ?
             null
             :
-            <center style={STYLES.CENTER_WRAPPER}>
-                <div style={STYLES.WEBKIT}>
-                    <table align="center" style={STYLES.MAIN_TABLE}>
-                        <tbody>
-                        <tr>
-                            <td style={STYLE.COLUMN.BORDER}>--</td>
-                            <td style={STYLE.COLUMN.MAIN}>
-                                <Logo/>
-                                <Header course={course}/>
-                                <PriceButton course={course}/>
-                                <Description course={course}/>
-                                <Statistic course={course}/>
-                                <Scheme course={course}/>
-                                <Footer course={course}/>
-                            </td>
-                            <td style={STYLE.COLUMN.BORDER}>--</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </center>
+            <table align="center" style={STYLES.MAIN_TABLE}>
+                <tbody>
+                    <Logo/>
+                    <Header course={course}/>
+                    <PriceButton course={course}/>
+                    <Description course={course}/>
+                    <Statistic course={course}/>
+                    <Scheme course={course}/>
+                    <Footer course={course}/>
+                </tbody>
+            </table>
     }
 }
 
