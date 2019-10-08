@@ -14,6 +14,7 @@ const STYLE = {
             fontWeight: "normal",
             fontSize: "24px",
             lineHeight: "120%",
+            color: "#2B2B2B",
             borderBottom: "1px solid #d9d9d9"
         },
         COMMON: {
