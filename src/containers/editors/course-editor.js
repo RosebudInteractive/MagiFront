@@ -23,12 +23,14 @@ import {getCategories} from "../../actions/categoriesListActions";
 import {getLanguages} from "../../actions/languages-actions";
 import {checkExtLinks, convertYouTubeWatchLinkToEmbed, getExtLinks} from "../../tools/link-tools";
 import {getParameters, parametersFetchingSelector, setFixedCourse,} from "adm-ducks/params";
-import {setActiveTab, activeTabsSelector} from "adm-ducks/app";
+import {setActiveTab, activeTabsSelector, enableButtonsSelector} from "adm-ducks/app";
 import {getTests, loadingSelector as testLoading} from "adm-ducks/test-list";
+import {sendEmail} from "adm-ducks/course";
 import {getFormValues, isValid, isDirty, reset,} from 'redux-form'
 import {Prompt} from "react-router-dom";
 
 import {EDIT_MODE_EDIT, EDIT_MODE_INSERT} from '../../constants/Common'
+import './course-editor.sass'
 
 const TABS = {
     MAIN: 'MAIN',
@@ -183,6 +185,8 @@ class CourseEditor extends React.Component {
                             <CourseCategoryDialog/>
                         </div>
                         <div className="editor__footer">
+                            <button className={"adm__button bottom-controls__button email-button" + (!this._getEmailButtonEnabled() ? ' disabled' : '')}
+                                onClick={::this._sendEmail}>Рассылка</button>
                             <BottomControls hasChanges={hasChanges} enableApplyChanges={this._enableApplyChanges()}
                                             onAccept={::this._save} onCancel={::this._cancel} onBack={::this._goBack}/>
                         </div>
@@ -340,6 +344,14 @@ class CourseEditor extends React.Component {
         return this.props.editorValid && (this.props.courseAuthors.length > 0) && (this.props.courseCategories.length > 0)
     }
 
+    _getEmailButtonEnabled() {
+        let {hasChanges, editorValid, enableButtons} = this.props;
+        return this.state.editMode && !hasChanges && editorValid && enableButtons
+    }
+
+    _sendEmail() {
+        this.props.sendEmail(this.props.courseId)
+    }
 }
 
 const _roundNum = (value) => {
@@ -384,7 +396,8 @@ function mapStateToProps(state, ownProps) {
             && isValid('CourseSubscriptionForm')(state)
             && isValid('CourseSocialNetworkForm')(state)
             && isValid(LAYOUT_VER2_FORM)(state),
-        activeTabs: activeTabsSelector(state)
+        activeTabs: activeTabsSelector(state),
+        enableButtons: enableButtonsSelector(state)
     }
 }
 
@@ -401,6 +414,7 @@ function mapDispatchToProps(dispatch) {
         resetReduxForm: bindActionCreators(reset, dispatch),
         setActiveTab: bindActionCreators(setActiveTab, dispatch),
         getTests: bindActionCreators(getTests, dispatch),
+        sendEmail: bindActionCreators(sendEmail, dispatch),
     }
 }
 
