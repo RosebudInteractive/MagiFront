@@ -7,7 +7,7 @@ export const STYLES = {
 
     WEBKIT: {
         maxWidth: "600px",
-        backgroundColor: "#FFFFFF",
+        background: "#FFFFFF",
     },
 
     MAIN_TABLE: {

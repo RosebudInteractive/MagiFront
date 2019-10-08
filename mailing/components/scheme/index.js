@@ -59,7 +59,7 @@ const STYLE = {
             fontWeight: "normal",
             fontSize: "15px",
             lineHeight: "140%",
-            color: "#d9d9d9",
+            color: "rgba(47, 47, 47, 0.6)",
             display: "inline",
         },
         COMMON_LESSON: {
@@ -70,6 +70,9 @@ const STYLE = {
             lineHeight: "140%",
             color: "#2F2F2F",
             display: "inline",
+        },
+        LINK: {
+            textDecoration: "none"
         }
     }
 }
@@ -101,12 +104,14 @@ export default class Scheme extends React.Component {
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
                             <span style={STYLE.TEXT.COUNTER}>{item.Number + '. '}</span>
-                            <span style={STYLE.TEXT.FREE_LESSON}>{_title}</span>
-                            <span style={STYLE.TEXT.FREE_MARK}> Бесплатно</span>
+                            <a target="_blank" href={item.URL} style={STYLE.TEXT.LINK}>
+                                <span style={STYLE.TEXT.FREE_LESSON}>{_title}</span>
+                                <span style={STYLE.TEXT.FREE_MARK}> Бесплатно</span>
+                            </a>
                         </div>
                     </td>
                 </tr>
-            } else if (item.STATE === "D") {
+            } else if (item.State === "D") {
                 return <tr>
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
@@ -120,7 +125,9 @@ export default class Scheme extends React.Component {
                     <td style={STYLE.CELL.COMMON}>
                         <div style={STYLE.CELL.WRAPPER}>
                             <span style={STYLE.TEXT.COUNTER}>{item.Number + '. '}</span>
-                            <span style={STYLE.TEXT.COMMON_LESSON}>{_title}</span>
+                            <a target="_blank" href={item.URL} style={STYLE.TEXT.LINK}>
+                                <span style={STYLE.TEXT.COMMON_LESSON}>{_title}</span>
+                            </a>
                         </div>
                     </td>
                 </tr>
