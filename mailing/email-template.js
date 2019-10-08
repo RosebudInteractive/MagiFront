@@ -42,7 +42,7 @@ class EmailTemplate extends React.Component {
                 <div style={STYLES.WEBKIT}>
                     <table align="center" style={STYLES.MAIN_TABLE}>
                         <tbody>
-                        <td style={STYLE.COLUMN.BORDER}/>
+                        <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
                         <td style={STYLE.COLUMN.MAIN}>
                             <Logo/>
                             <Header course={course}/>
@@ -52,7 +52,7 @@ class EmailTemplate extends React.Component {
                             <Scheme course={course}/>
                             <Footer course={course}/>
                         </td>
-                        <td style={STYLE.COLUMN.BORDER}/>
+                        <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
                         </tbody>
                     </table>
                 </div>
