@@ -11,6 +11,7 @@ const STYLE = {
         letterSpacing: "0.1em",
         textTransform: "uppercase",
         padding: "20px 0 15px",
+        color: "#2B2B2B",
     },
     COURSE: {
         WRAPPER: {
