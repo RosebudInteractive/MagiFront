@@ -136,6 +136,14 @@ module.exports = {
             scriptPath: pk.mail.sendPulse.scriptPath,
             tmpPath: path.join(os.tmpdir(), path.sep),
         },
+        mailing: {
+            newCourse: {
+                addressBook: "Магистерия",
+                sender: "sys@magisteria.ru",
+                senderName: "Magisteria.ru",
+                host: "https://magisteria.ru"
+            }
+        },
         userReg: {
             type: "smtp",
             template: "./templates/mail/registration.tmpl",
