@@ -42,17 +42,19 @@ class EmailTemplate extends React.Component {
                 <div style={STYLES.WEBKIT}>
                     <table align="center" style={STYLES.MAIN_TABLE}>
                         <tbody>
-                        <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
-                        <td style={STYLE.COLUMN.MAIN}>
-                            <Logo/>
-                            <Header course={course}/>
-                            <PriceButton course={course}/>
-                            <Description course={course}/>
-                            <Statistic course={course}/>
-                            <Scheme course={course}/>
-                            <Footer course={course}/>
-                        </td>
-                        <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
+                        <tr>
+                            <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
+                            <td style={STYLE.COLUMN.MAIN}>
+                                <Logo/>
+                                <Header course={course}/>
+                                <PriceButton course={course}/>
+                                <Description course={course}/>
+                                <Statistic course={course}/>
+                                <Scheme course={course}/>
+                                <Footer course={course}/>
+                            </td>
+                            <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
