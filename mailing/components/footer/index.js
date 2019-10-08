@@ -42,8 +42,8 @@ const STYLE = {
             padding: 0,
             textAlign: "center",
         },
-        ICON: {
-            paddingRight: "24px",
+        PADDING_CELL: {
+            width: "24px",
         }
     },
     LINK_BLOCK: {
@@ -112,17 +112,31 @@ export default class Footer extends React.Component {
                 </td>
             </tr>
             <tr>
-               <td style={STYLE.SOCIAL.CELL}>
-                   <a target="_blank" href={twUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-tw.png'} alt={'twitter'}/>
-                   </a>
-                   <a target="_blank" href={fbUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-fb.png'} alt={'facebook'}/>
-                   </a>
-                   <a target="_blank" href={vkUrl}>
-                       <img style={STYLE.SOCIAL.ICON} src={window.location.origin + '/images/mail-vk.png'} alt={'vk'}/>
-                   </a>
-               </td>
+                <td style={STYLE.SOCIAL.CELL}>
+                    <table align="center">
+                        <tbody>
+                        <tr>
+                            <td>
+                                <a target="_blank" href={twUrl}>
+                                    <img src={window.location.origin + '/images/mail-tw.png'} alt={'twitter'}/>
+                                </a>
+                            </td>
+                            <td style={STYLE.SOCIAL.PADDING_CELL}/>
+                            <td>
+                                <a target="_blank" href={fbUrl}>
+                                    <img src={window.location.origin + '/images/mail-fb.png'} alt={'facebook'}/>
+                                </a>
+                            </td>
+                            <td style={STYLE.SOCIAL.PADDING_CELL}/>
+                            <td>
+                                <a target="_blank" href={vkUrl}>
+                                    <img src={window.location.origin + '/images/mail-vk.png'} alt={'vk'}/>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
             </tr>
             <tr>
                 <td style={STYLE.LINK_BLOCK.CELL}>

@@ -21,11 +21,6 @@ export const STYLES = {
         maxWidth: "600px",
         border: "none",
         // borderColor: "#e7ddd3",
-        borderColor: "#FFFFFF",
-        borderWidth: "24px",
-        borderStyle: "solid",
-        borderTop: "none",
-        borderBottom: "none",
     },
 
     LOGO: {

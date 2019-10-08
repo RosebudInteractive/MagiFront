@@ -12,6 +12,17 @@ import PriceButton from "./components/price-button";
 import Statistic from "./components/statistic";
 import Scheme from "./components/scheme";
 
+const STYLE = {
+    COLUMN: {
+        BORDER: {
+            width: "24px",
+            padding: 0,
+        },
+        MAIN: {
+            padding: 0
+        }
+    }
+}
 
 class EmailTemplate extends React.Component {
 
@@ -31,6 +42,8 @@ class EmailTemplate extends React.Component {
                 <div style={STYLES.WEBKIT}>
                     <table align="center" style={STYLES.MAIN_TABLE}>
                         <tbody>
+                        <td style={STYLE.COLUMN.BORDER}/>
+                        <td style={STYLE.COLUMN.MAIN}>
                             <Logo/>
                             <Header course={course}/>
                             <PriceButton course={course}/>
@@ -38,6 +51,8 @@ class EmailTemplate extends React.Component {
                             <Statistic course={course}/>
                             <Scheme course={course}/>
                             <Footer course={course}/>
+                        </td>
+                        <td style={STYLE.COLUMN.BORDER}/>
                         </tbody>
                     </table>
                 </div>

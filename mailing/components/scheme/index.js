@@ -60,7 +60,7 @@ const STYLE = {
             fontWeight: "normal",
             fontSize: "15px",
             lineHeight: "140%",
-            color: "rgba(47, 47, 47, 0.6)",
+            color: "#2f2f2f99",
             display: "inline",
         },
         COMMON_LESSON: {
