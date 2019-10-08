@@ -3,12 +3,10 @@ export const STYLES = {
         width: "100%",
         tableLayout: "fixed",
         paddingBottom: "7px",
-        background: "#FFFFFF",
     },
 
     WEBKIT: {
         maxWidth: "600px",
-        background: "#FFFFFF",
     },
 
     MAIN_TABLE: {
@@ -20,7 +18,6 @@ export const STYLES = {
         width: "100%",
         maxWidth: "600px",
         border: "none",
-        // borderColor: "#e7ddd3",
     },
 
     LOGO: {
