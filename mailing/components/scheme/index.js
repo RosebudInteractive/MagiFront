@@ -84,7 +84,7 @@ export default class Scheme extends React.Component {
         return <React.Fragment>
             <tr>
                 <td style={STYLE.CELL.TITLE}>
-                    Програма курса
+                    Программа курса
                 </td>
 
             </tr>
