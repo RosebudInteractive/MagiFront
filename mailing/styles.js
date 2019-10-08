@@ -14,12 +14,13 @@ export const STYLES = {
     MAIN_TABLE: {
         borderSpacing:0,
         fontFamily: "arial,helvetica,sans-serif",
-
+        background: "#FFFFFF",
         borderCollapse: "collapse",
         margin: "0 auto",
         width: "100%",
         maxWidth: "600px",
         border: "none",
+        // borderColor: "#e7ddd3",
         borderColor: "#FFFFFF",
         borderWidth: "24px",
         borderStyle: "solid",
