@@ -3,6 +3,7 @@ export const STYLES = {
         width: "100%",
         tableLayout: "fixed",
         paddingBottom: "7px",
+        background: "#FFFFFF",
     },
 
     WEBKIT: {
@@ -15,13 +16,15 @@ export const STYLES = {
         fontFamily: "arial,helvetica,sans-serif",
 
         borderCollapse: "collapse",
-        margin: "0 auto",
+        // margin: "0 auto",
         width: "100%",
-        maxWidth: "552px",
+        maxWidth: "600px",
         border: "none",
-        borderColor: "#e7ddd3",
-        // borderWidth: "10px",
-        // borderStyle: "solid"
+        borderColor: "#FFFFFF",
+        borderWidth: "24px",
+        borderStyle: "solid",
+        borderTop: "none",
+        borderBottom: "none",
     },
 
     LOGO: {
