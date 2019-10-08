@@ -16,7 +16,7 @@ export const STYLES = {
         fontFamily: "arial,helvetica,sans-serif",
 
         borderCollapse: "collapse",
-        // margin: "0 auto",
+        margin: "0 auto",
         width: "100%",
         maxWidth: "600px",
         border: "none",
