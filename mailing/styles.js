@@ -2,6 +2,7 @@ export const STYLES = {
     CENTER_WRAPPER : {
         width: "100%",
         tableLayout: "fixed",
+        paddingBottom: "7px",
     },
 
     WEBKIT: {

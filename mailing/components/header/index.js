@@ -38,6 +38,9 @@ const STYLE = {
     IMG : {
         border: 0,
         width: "100%",
+    },
+    IMAGE_CELL: {
+        width: "550px",
     }
 }
 
@@ -62,7 +65,7 @@ export default class Header extends React.Component {
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td style={STYLE.IMAGE_CELL}>
                         <img src={_coverUrl} alt={course.Name} style={STYLE.IMG}/>
                     </td>
                 </tr>

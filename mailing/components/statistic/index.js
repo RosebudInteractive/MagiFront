@@ -26,7 +26,6 @@ const STYLE = {
             height: "37px",
         },
         WRAPPER: {
-            height: "100%",
             padding: "8px 0",
             borderBottom: "1px solid #d9d9d9"
         },
