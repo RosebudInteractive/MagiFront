@@ -17,6 +17,7 @@ const STYLE = {
         BORDER: {
             width: "24px",
             padding: 0,
+            color: "#FFFFFF"
         },
         MAIN: {
             padding: 0
@@ -43,7 +44,7 @@ class EmailTemplate extends React.Component {
                     <table align="center" style={STYLES.MAIN_TABLE}>
                         <tbody>
                         <tr>
-                            <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
+                            <td style={STYLE.COLUMN.BORDER}>--</td>
                             <td style={STYLE.COLUMN.MAIN}>
                                 <Logo/>
                                 <Header course={course}/>
@@ -53,7 +54,7 @@ class EmailTemplate extends React.Component {
                                 <Scheme course={course}/>
                                 <Footer course={course}/>
                             </td>
-                            <td style={STYLE.COLUMN.BORDER}>&nbsp;</td>
+                            <td style={STYLE.COLUMN.BORDER}>--</td>
                         </tr>
                         </tbody>
                     </table>
