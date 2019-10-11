@@ -57,9 +57,6 @@ const GUID_REG_EXP = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{1
 const PAYMENT_CACHE_PREFIX = "pay:";
 const DFLT_CHEQUE_PENDING_PERIOD = 15 * 60; // cheque pending period in sec - 15 min
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// Currently we are ignoring payments which aren't completed. Potentially it can result in duplicate payments !!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 const IGNORE_PENDING_PAYMENTS = true;
 
 exports.Payment = class Payment extends DbObject {
@@ -576,6 +573,7 @@ exports.Payment = class Payment extends DbObject {
         }
 
         let iniState = chequeObj.stateId();
+        let capturingInvoiceId = null;
         return updateState(req_result)
             .then(result => {
                 if (chequeObj.stateId() === Accounting.ChequeState.WaitForCapture) {
@@ -587,12 +585,27 @@ exports.Payment = class Payment extends DbObject {
                         rc = $data.tranCommit(transactionId);
                     }
                     rc = rc.
-                        then(() => {
-                            // Capture payment
-                            return this._onCapturePayment(chequeObj.chequeNum());
+                        then(async () => {
+                            await getInvoiceData(dbOpts);
+                            let needToCancel = false;
+                            if (invoiceData) {
+                                capturingInvoiceId = `capturingInv:${invoiceData.Id}`;
+                                // Trying to lock paid invoice
+                                let lockRes = await this.cacheSet(capturingInvoiceId, chequeObj.chequeNum(), { nx: true });
+                                needToCancel = (lockRes === "OK") ? false : true;
+                                if (!needToCancel) {
+                                    let check = await this._preCheckInvoice(invoiceData, { isSilent: true, checkForBought: true });
+                                    needToCancel = check.isBought;
+                                }
+                                else
+                                    capturingInvoiceId = null;
+                            }
+                            return needToCancel ?
+                                this._onCancelPayment(chequeObj.chequeNum()) : // Cancel payment
+                                this._onCapturePayment(chequeObj.chequeNum()); // Capture payment
                         })
                         .then(result => {
-                            // Set status "Paid" to cheque and invoice
+                            // Set status "Paid" to cheque and invoice OR cancel cheque
                             return this._updateChequeState(result, root_obj, cheque, dbOpts, memDbOptions);
                         })
                         .then(result => {
@@ -625,7 +638,14 @@ exports.Payment = class Payment extends DbObject {
                         }
                     }
                 }
+                if (capturingInvoiceId)
+                    await this.cacheDel(capturingInvoiceId);
                 return result;
+            })
+            .catch(async (err) => {
+                if (capturingInvoiceId)
+                    await this.cacheDel(capturingInvoiceId);
+                throw err;
             });
     }
 
@@ -874,34 +894,52 @@ exports.Payment = class Payment extends DbObject {
         return result;           
     }
 
-    async _preCheckInvoice(invoice_data) {
-        if (invoice_data.Items && (invoice_data.Items.length > 0)) {
-            let inv_courses = [];
-            for (let i = 0; i < invoice_data.Items.length; i++) {
-                let item = invoice_data.Items[i];
-                if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
-                    && item.ExtFields.prod && item.ExtFields.prod.courseId) {
-                    inv_courses.push({
-                        id: item.ExtFields.prod.courseId,
-                        name: item.Name
-                    });
+    async _preCheckInvoice(invoice_data, options) {
+        let opts = options || {};
+        let isSilent = typeof (opts.isSilent) === "boolean" ? opts.isSilent : false;
+        let checkForPending = typeof (opts.checkForPending) === "boolean" ? opts.checkForPending : true;
+        let checkForBought = typeof (opts.checkForBought) === "boolean" ? opts.checkForBought : true;
+        let result = {};
+        if (checkForPending || checkForBought) {
+            if (invoice_data.Items && (invoice_data.Items.length > 0)) {
+                let inv_courses = [];
+                for (let i = 0; i < invoice_data.Items.length; i++) {
+                    let item = invoice_data.Items[i];
+                    if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
+                        && item.ExtFields.prod && item.ExtFields.prod.courseId) {
+                        inv_courses.push({
+                            id: item.ExtFields.prod.courseId,
+                            name: item.Name
+                        });
+                    }
+                }
+                if (inv_courses.length > 0) {
+                    let pending = checkForPending ? await this.getPendingObjects(invoice_data.UserId) : {};
+                    let bought = {};
+                    let userService = this.getService("users", true);
+                    if (userService && checkForBought)
+                        bought = await userService.getPaidCourses(invoice_data.UserId, false, { paid: true, gift: true, is_list: true });
+                    for (let i = 0; i < inv_courses.length; i++) {
+                        let crs = inv_courses[i];
+                        if (bought[crs.id])
+                            if (isSilent) {
+                                result.isBought = true;
+                                break;
+                            }
+                            else
+                                throw new Error(`${crs.name} уже доступен для использования.`);
+                        if (pending[crs.id])
+                            if (isSilent) {
+                                result.isPending = true;
+                                break;
+                            }
+                            else
+                                throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
+                    }
                 }
             }
-            if (inv_courses.length > 0) {
-                let pending = await this.getPendingObjects(invoice_data.UserId);
-                let bought = {};
-                let userService = this.getService("users", true);
-                if (userService)
-                    bought = await userService.getPaidCourses(invoice_data.UserId, false, { paid: true, gift: true, is_list: true });
-                for (let i = 0; i < inv_courses.length; i++){
-                    let crs = inv_courses[i];
-                    if (bought[crs.id])
-                        throw new Error(`${crs.name} уже доступен для использования.`);
-                    if (pending[crs.id])
-                        throw new Error(`${crs.name} ожидает завершения операции оплаты.`);
-                }
-           }
         }
+        return result;
     }
 
     async _setPendingObjects(chequeObj, invoice_data, flag) {

@@ -89,6 +89,7 @@ module.exports = {
             shopId: pk.billing.yandexKassa.shopId,
             secretKey: pk.billing.yandexKassa.secretKey,
             callBack: "/api/yandex-kassa/callback",
+            trace_callback: true,
             returnUrl: "/",
             payment_mode: "full_payment",
             chequePendingPeriod: 60 * 60 // cheque pending period in sec - 60 min
