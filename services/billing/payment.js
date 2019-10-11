@@ -573,7 +573,42 @@ exports.Payment = class Payment extends DbObject {
         }
 
         let iniState = chequeObj.stateId();
-        let capturingInvoiceId = null;
+        let capturingObjKeys = [];
+
+        async function _releaseLocks(locks) {
+            while (locks.length > 0)
+                await self.cacheDel(locks.pop());
+        }
+
+        async function _setInvoiceLocks(invoice_data, locks) {
+            let result = true;
+            if (invoice_data.Items && (invoice_data.Items.length > 0)) {
+                let inv_courses = [];
+                for (let i = 0; i < invoice_data.Items.length; i++) {
+                    let item = invoice_data.Items[i];
+                    if (item.ExtFields && (item.ExtFields.prodType === Product.ProductTypes.CourseOnLine)
+                        && item.ExtFields.prod && item.ExtFields.prod.courseId) {
+                        inv_courses.push(item.ExtFields.prod.courseId);
+                    }
+                }
+                inv_courses.sort((a, b) => {
+                    return a > b ? 1 : (a < b ? -1 : 0);
+                });
+                for (let i = 0; i < inv_courses.length; i++){
+                    let key = `capturing:user:${invoice_data.UserId}:crs:${inv_courses[i]}`;
+                    let lockRes = await self.cacheSet(key, "1", { nx: true });
+                    if (lockRes === "OK")
+                        locks.push(key)
+                    else {
+                        await _releaseLocks(locks);
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
         return updateState(req_result)
             .then(result => {
                 if (chequeObj.stateId() === Accounting.ChequeState.WaitForCapture) {
@@ -589,16 +624,12 @@ exports.Payment = class Payment extends DbObject {
                             await getInvoiceData(dbOpts);
                             let needToCancel = false;
                             if (invoiceData) {
-                                capturingInvoiceId = `capturingInv:${invoiceData.Id}`;
-                                // Trying to lock paid invoice
-                                let lockRes = await this.cacheSet(capturingInvoiceId, chequeObj.chequeNum(), { nx: true });
-                                needToCancel = (lockRes === "OK") ? false : true;
+                                // Trying to lock invoice objects
+                                needToCancel = !(await _setInvoiceLocks(invoiceData, capturingObjKeys));
                                 if (!needToCancel) {
                                     let check = await this._preCheckInvoice(invoiceData, { isSilent: true, checkForBought: true });
                                     needToCancel = check.isBought;
                                 }
-                                else
-                                    capturingInvoiceId = null;
                             }
                             return needToCancel ?
                                 this._onCancelPayment(chequeObj.chequeNum()) : // Cancel payment
@@ -638,13 +669,11 @@ exports.Payment = class Payment extends DbObject {
                         }
                     }
                 }
-                if (capturingInvoiceId)
-                    await this.cacheDel(capturingInvoiceId);
+                await _releaseLocks(capturingObjKeys);
                 return result;
             })
             .catch(async (err) => {
-                if (capturingInvoiceId)
-                    await this.cacheDel(capturingInvoiceId);
+                await _releaseLocks(capturingObjKeys);
                 throw err;
             });
     }
