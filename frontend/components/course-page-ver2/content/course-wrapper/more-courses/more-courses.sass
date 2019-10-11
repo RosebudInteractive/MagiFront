@@ -1,0 +1,90 @@
+@import "~tools/variables"
+
+.more-courses__title
+  padding: 20px 0 22px
+  @media (max-width: 899px)
+    font-size: 20px
+    padding: 12px 0 16px
+
+.more-courses__list
+  display: flex
+  flex-wrap: wrap
+
+  .more-item
+    flex-basis: 50%
+    padding: 0
+    @media (max-width: 899px)
+      &:nth-child(2n+1)
+        .more-item__wrapper
+          padding-right: 10px
+          padding-left: 0
+      &:nth-child(2n)
+        .more-item__wrapper
+          padding-left: 10px
+          padding-right: 0
+
+  .more-item__wrapper
+    padding-left: 20px
+    padding-right: 0
+    padding-bottom: 104px
+    position: relative
+    @media (max-width: 899px)
+      padding-bottom: 78px
+
+  .more-item__cover
+    position: relative
+    background-repeat: no-repeat
+    -webkit-background-size: cover
+    background-size: cover
+    margin-bottom: 6px
+
+
+.more-item__course-pay-status
+  bottom: 13px
+  left: 10px
+  position: absolute
+
+.more-item__course-info
+  position: absolute
+  font-size: 14px
+  line-height: 124%
+  font-family: $font-fira
+  font-style: normal
+  font-weight: normal
+  @media (max-width: 899px)
+    font-size: 12px
+    line-height: 124%
+  .more-item__title
+    padding-bottom: 0
+    color: #2F2F2F
+    .title__label
+      color: #C8684C
+    .title__name
+      color: #2F2F2F
+      border-bottom: $border-hidden-link
+      -webkit-transition: border-color 0.3s ease
+      transition: border-color 0.3s ease
+      &:hover
+        border-bottom: $border-orange-03
+    @media (max-width: 899px)
+      padding-bottom: 3px
+
+  .more-item__author
+    color: rgba(47, 47, 47, 0.6)
+  .author-info
+    color: rgba(47, 47, 47, 0.6)
+    border-bottom: $border-hidden-link
+    -webkit-transition: border-color 0.3s ease
+    transition: border-color 0.3s ease
+    white-space: pre-line
+    display: inline-block
+    &:hover
+      border-bottom: $border-gray-06
+
+
+  .course-page__info-separator
+    margin: 0 4px
+
+
+
+

@@ -14,6 +14,7 @@ export default class Wrapper extends React.Component {
 
     static propTypes = {
         course: PropTypes.object,
+        moreCourses: PropTypes.array,
         isFavorite: PropTypes.bool,
         onFavoritesClick: PropTypes.func,
     }
@@ -64,11 +65,11 @@ export default class Wrapper extends React.Component {
 
 
     render() {
-        const {course, shareUrl} = this.props
+        const {course, shareUrl, moreCourses} = this.props
 
         return <div className={"course-page__wrapper"}>
             <Cover {...this.props}/>
-            <Content course={course} shareUrl={shareUrl}/>
+            <Content course={course} shareUrl={shareUrl} moreCourses={moreCourses}/>
             <MobileButton course={course}/>
         </div>
     }
