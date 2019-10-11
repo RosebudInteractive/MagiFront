@@ -15,8 +15,16 @@ import 'whatwg-fetch';
 import {getTimeFmt, parseReadyDate} from "../tools/time-tools";
 import {LESSON_STATE} from "../constants/common-consts";
 
+const COURSES_RELOAD_TIME_INTERVAL = 3 * 60 * 1000
+
 export const getCourses = () => {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const _state = getState().courses
+
+        if (!!_state.lastSuccessTime && ((Date.now() - _state.lastSuccessTime) < COURSES_RELOAD_TIME_INTERVAL)) {
+            return
+        }
+
         dispatch({
             type: GET_COURSES_REQUEST,
             payload: null
@@ -26,11 +34,11 @@ export const getCourses = () => {
         .then(checkStatus)
             .then(parseJSON)
             .then(data => {
-                handleCourses(data);
+                handleCourses(data, getState());
 
                 dispatch({
                     type: GET_COURSES_SUCCESS,
-                    payload: data
+                    payload: {...data, time: Date.now()}
                 });
 
                 dispatch({
@@ -111,7 +119,7 @@ const _getCategory = (array, id) => {
     })
 };
 
-const handleCourses = (data) => {
+const handleCourses = (data, state) => {
     try {
         data.Courses.forEach((item) => {
             item.CategoriesObj = [];
@@ -145,6 +153,8 @@ const handleCourses = (data) => {
             if (item.CoverMeta) {
                 item.CoverMeta = JSON.parse(item.CoverMeta)
             }
+
+            calcStatistics(item, state)
         });
     }
     catch (err) {
@@ -235,7 +245,7 @@ const calcStatistics = (course, state) => {
 
         if (item.IsFinished) _finishedLessons++
 
-        if (item.Lessons.length > 0) {
+        if (item.Lessons && item.Lessons.length > 0) {
             _sublessonsCount += item.Lessons.length
             item.Lessons.forEach((subitem) => { _duration += subitem.Duration })
         }
