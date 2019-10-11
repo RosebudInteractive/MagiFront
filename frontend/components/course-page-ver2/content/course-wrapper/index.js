@@ -7,11 +7,13 @@ import CourseBooksList from "../../../books/course-books-list";
 import Books from "../../../books";
 import {COURSE_VIDEO_TYPE} from "../../../../constants/common-consts";
 import VideoBlock from "./video-block";
+import MoreCourses from "./more-courses";
 
 export default class CourseWrapper extends React.Component {
 
     static propTypes = {
-        course: PropTypes.object
+        course: PropTypes.object,
+        moreCourses: PropTypes.array
     }
 
     constructor(props) {
@@ -23,7 +25,7 @@ export default class CourseWrapper extends React.Component {
     }
 
     componentWillMount() {
-        const {course} = this.props
+        const {course, moreCourses} = this.props
 
         if (course) {
             if (course.IsPaid && !course.IsGift && !course.IsBought) {
@@ -37,7 +39,7 @@ export default class CourseWrapper extends React.Component {
     }
 
     render() {
-        const {course} = this.props,
+        const {course, moreCourses} = this.props,
             _showMoreHidden = course && course.IsPaid && !course.IsGift && !course.IsBought
 
         return <div className="course-page__course-wrapper">
@@ -60,6 +62,7 @@ export default class CourseWrapper extends React.Component {
                    extClass={"course-page__books wrapper-item"}
                    title={"Книга по курсу"}/>
             <VideoBlock course={course} videoType={COURSE_VIDEO_TYPE.INTERVIEW}/>
+            <MoreCourses courses={moreCourses}/>
             {/*<div className="course-wrapper__about">*/}
             {/*    <div className="course-wrapper__about-title">О магистерии</div>*/}
             {/*    Истина, полагает он, начинается с отказа от заблуждения. Поэтому в начале своего трактата "О душе" он*/}

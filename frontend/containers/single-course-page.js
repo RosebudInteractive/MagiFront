@@ -3,9 +3,6 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import MetaTags from 'react-meta-tags';
 
-import InfoBlock from '../components/course-page-ver1/content/info-block/'
-import Content from '../components/course-extended/content-extended';
-import Tabs from '../components/course-extended/tabs';
 import NotFoundPage from '../components/not-found';
 import LoadingFrame from '../components/loading-frame';
 
@@ -22,9 +19,7 @@ import { addCourseToBookmarks, userBookmarksSelector, removeCourseFromBookmarks,
 import {enabledPaidCoursesSelector, facebookAppIdSelector, setCurrentPage, clearCurrentPage} from "ducks/app";
 import {notifyConcreteCourseShowed} from "ducks/google-analytics";
 
-import {getCrownForCourse} from "../tools/svg-paths"
 import ScrollMemoryStorage from "../tools/scroll-memory-storage"
-import VideoBlock from "../components/course-page-ver1/video-block";
 
 import WrapperVer1 from '../components/course-page-ver1/index'
 import WrapperVer2 from '../components/course-page-ver2/index'
@@ -38,8 +33,18 @@ class Main extends React.Component {
         window.scrollTo(0, 0)
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
+        this.props.coursesActions.getCourses();
         this.props.coursesActions.getCourse(this.props.courseUrl);
         this.props.pageHeaderActions.setCurrentPage(pages.singleCourse);
+    }
+
+    componentWillUpdate(nextProps) {
+        if (this.props.courseUrl && nextProps.courseUrl && (this.props.courseUrl !== nextProps.courseUrl)) {
+            this.props.storageActions.refreshState();
+            this.props.coursesActions.getCourses();
+            this.props.coursesActions.getCourse(nextProps.courseUrl);
+            window.scrollTo(0, 0)
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -61,6 +66,7 @@ class Main extends React.Component {
     reload() {
         this.props.userActions.whoAmI()
         this.props.storageActions.refreshState();
+        this.props.coursesActions.getCourses();
         this.props.coursesActions.getCourse(this.props.courseUrl);
     }
 
@@ -199,7 +205,8 @@ class Main extends React.Component {
                                 <WrapperVer2 course={course}
                                              isFavorite={this._isCourseInBookmarks()}
                                              onFavoritesClick={::this._favoritesClick}
-                                             shareUrl={window.location.href}/>
+                                             shareUrl={window.location.href}
+                                             moreCourses={this._getMoreCourses()}/>
                                 :
                                 <WrapperVer1 course={course}
                                              isFavorite={this._isCourseInBookmarks()}
@@ -209,14 +216,66 @@ class Main extends React.Component {
                     </React.Fragment>
                     : null
     }
+
+    _getMoreCourses() {
+        let {course, courses} = this.props
+
+        let _courses = courses.reduce((acc, value) => {
+            let _hasAuthor = course.Authors.some(item => value.Authors.find(authorId => authorId === item.Id)),
+                _hasCategory = course.Categories.some(item => value.Categories.find(categoryId => categoryId === item.Id))
+
+            if ((_hasAuthor || _hasCategory) && (value.Id !== course.Id)) {
+                acc.push(value)
+            }
+
+            return acc
+        }, [])
+
+        _courses.sort((item1, item2) => {
+            // сортируем по признаку платности
+            let _result = item2.IsPaid - item1.IsPaid
+
+            // далее по признаку купленности
+            if (!_result) {
+                const _bought1 = item1.IsBought || item1.IsGift,
+                    _bought2 = item2.IsBought || item2.IsGift
+
+                _result = _bought2 - _bought1
+            }
+
+
+            // далее вверх поднимаем курсы автора
+            if (!_result) {
+                const _hasAuthor1 = course.Authors.some(item => item1.Authors.find(authorId => authorId === item.Id)),
+                    _hasAuthor2 = course.Authors.some(item => item2.Authors.find(authorId => authorId === item.Id))
+
+                _result = _hasAuthor2 - _hasAuthor1
+            }
+
+            // Среди бесплатных приоритезируем те, которые еще не слушались данным пользователем
+            if (!item2.IsPaid && !item1.IsPaid) {
+                const _hasListened1 = item1.statistics && item1.statistics.lessons.hasListened,
+                    _hasListened2 = item2.statistics && item2.statistics.lessons.hasListened
+
+                _result = _hasListened1 - _hasListened2
+            }
+
+
+            return _result
+        })
+
+        return _courses.slice(0, 6)
+    }
+
 }
 
 function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.url,
-        fetching: state.singleCourse.fetching || state.user.loading,
+        fetching: state.singleCourse.fetching || state.user.loading || state.courses.fetching,
         notFound: state.singleCourse.notFound,
         course: state.singleCourse.object,
+        courses: state.courses.items,
         bookmarks: userBookmarksSelector(state),
         authorized: !!state.user.user,
         facebookAppID: facebookAppIdSelector(state),
