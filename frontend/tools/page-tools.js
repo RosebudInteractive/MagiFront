@@ -237,5 +237,13 @@ export const getCurrencySign = () => {
         }
     }
 
+    // Баг отображнения знака рубля после обновления до 13 версии
+    if (Platform.os.family === "iOS") {
+        let _version = Platform.os.version.split('.')
+        if (+_version[0] > 12) {
+            return "Р"
+        }
+    }
+
     return "₽"
 }

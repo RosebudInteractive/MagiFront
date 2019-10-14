@@ -346,7 +346,7 @@ class CourseEditor extends React.Component {
 
     _getEmailButtonEnabled() {
         let {hasChanges, editorValid, enableButtons} = this.props;
-        return this.state.editMode && !hasChanges && editorValid && enableButtons
+        return this.state.editMode && !hasChanges && editorValid && enableButtons && (this.props.course && this.props.course.State === "P")
     }
 
     _sendEmail() {
