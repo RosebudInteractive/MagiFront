@@ -5,6 +5,7 @@ import {
 } from '../constants/courses'
 
 import {SIGN_IN_START, LOGOUT_START, SIGN_UP_START} from "../constants/user";
+import {REFUND_PAYMENT_REQUEST} from "ducks/billing";
 
 const initialState = {
     items: [],
@@ -26,6 +27,7 @@ export default function courses(state = initialState, action) {
         case SIGN_IN_START:
         case LOGOUT_START:
         case SIGN_UP_START:
+        case REFUND_PAYMENT_REQUEST:
             return {...state, lastSuccessTime: null};
 
         case GET_COURSES_FAIL:
