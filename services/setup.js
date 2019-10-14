@@ -19,6 +19,7 @@ const { AuthLocalInit, AuthenticateLocal, SetupWhoAmI, SetupLogOut } = require('
 const { AuthVKInit } = require('../security/vk-auth');
 const { AuthFBInit } = require('../security/fb-auth');
 const { AuthGoogleInit } = require('../security/google-auth');
+const { AuthAppleInit } = require('../security/apple-auth');
 const { setupEpisodes } = require('./episodes');
 const { setupAuthors } = require('./authors');
 const { setupUsers } = require('./users');
@@ -155,6 +156,7 @@ function setupAPI(express, app) {
     AuthVKInit(app, sessionMiddleware);
     AuthFBInit(app, sessionMiddleware);
     AuthGoogleInit(app, sessionMiddleware);
+    AuthAppleInit(app, sessionMiddleware);
     if (useJWT)
         AuthJWTInit(app);
 
