@@ -13,7 +13,8 @@ let HttpCode = {
     ERR_UNPROC_ENTITY: 422,
     ERR_TOO_MANY_REQ: 429,
     ERR_INTERNAL: 500,
-    ERR_NIMPL: 501
+    ERR_NIMPL: 501,
+    ERR_SERVICE_UNAVAILABLE: 503
 };
 
 let HttpMessage = {};
@@ -27,9 +28,11 @@ HttpMessage[HttpCode.ERR_FORBIDDEN] = "Forbidden";
 HttpMessage[HttpCode.ERR_NOT_FOUND] = "Not Found";
 HttpMessage[HttpCode.ERR_CONFLICT] = "Conflict";
 HttpMessage[HttpCode.ERR_TOO_LARGE] = "Payload Too Large";
+HttpMessage[HttpCode.ERR_UNPROC_ENTITY] = "Unprocessable Entity";
 HttpMessage[HttpCode.ERR_TOO_MANY_REQ] = "Too Many Requests";
 HttpMessage[HttpCode.ERR_INTERNAL] = "Internal Server Error";
 HttpMessage[HttpCode.ERR_NIMPL] = "Not Implemented";
+HttpMessage[HttpCode.ERR_SERVICE_UNAVAILABLE] = "Service Unavailable";
 
 exports.HttpCode = HttpCode;
 exports.HttpMessage = HttpMessage;

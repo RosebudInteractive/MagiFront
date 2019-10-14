@@ -25,6 +25,7 @@ class YandexKassa extends Payment {
             (opts.apiVer ? opts.apiVer : (config.billing.yandexKassa.apiVer ? config.billing.yandexKassa.apiVer : API_VERSION));
         this._timeout = opts.timeout ? opts.timeout : DEFAULT_TIMEOUT;
         this._payment_mode = config.has("billing.yandexKassa.payment_mode") ? config.billing.yandexKassa.payment_mode : null;
+        this._trace_callback = config.has("billing.yandexKassa.trace_callback") ? config.billing.yandexKassa.trace_callback : false;
 
         if (config.has("billing.yandexKassa.chequePendingPeriod"))
             this._chequePendingPeriod = config.billing.yandexKassa.chequePendingPeriod;
@@ -32,12 +33,14 @@ class YandexKassa extends Payment {
         if (opts.app) {
             if (config.has("billing.yandexKassa.callBack"))
                 opts.app.post(config.billing.yandexKassa.callBack, (req, res, next) => {
-                    console.log(`### YandexKassa Callback: method: "${req.method}", data: ${JSON.stringify(req.body, null, 2)}`);
+                    if (this._trace_callback)
+                        console.log(buildLogString(`### YandexKassa Callback: method: "${req.method}", data: ${JSON.stringify(req.body, null, 2)}`));
                     if (req.body && req.body.object && req.body.object.metadata && req.body.object.metadata.ChequeId)
                         this.checkAndChangeState(req.body.object.id, // parseInt(req.body.object.metadata.ChequeId),
                             { CheckueStateId: Accounting.ChequeState.Pending })
                             .then(data => {
-                                console.log(`### YandexKassa Callback: method result: ${JSON.stringify(data, null, 2)}`);
+                                if (this._trace_callback)
+                                    console.log(buildLogString(`### YandexKassa Callback: method result: ${JSON.stringify(data, null, 2)}`));
                                 res.send(data);
                             })
                             .catch(err => {
