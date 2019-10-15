@@ -132,7 +132,7 @@ class Statistic extends React.Component {
                                 }
                             </div>
                             <Progress course={course}/>
-                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
+                            <SocialBlock shareUrl={shareUrl} counter={course.ShareCounters}/>
                         </React.Fragment>
                         :
                         <React.Fragment>
@@ -153,7 +153,7 @@ class Statistic extends React.Component {
                                     :
                                     null
                             }
-                            <SocialBlock shareUrl={shareUrl} counter={course.counter}/>
+                            <SocialBlock shareUrl={shareUrl} counter={course.ShareCounters}/>
 
                         </React.Fragment>
                 }

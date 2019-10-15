@@ -13,19 +13,16 @@
   .more-item
     flex-basis: 50%
     padding: 0
-    @media (max-width: 899px)
-      &:nth-child(2n+1)
-        .more-item__wrapper
-          padding-right: 10px
-          padding-left: 0
-      &:nth-child(2n)
-        .more-item__wrapper
-          padding-left: 10px
-          padding-right: 0
+    &:nth-child(2n+1)
+      .more-item__wrapper
+        padding-right: 10px
+        padding-left: 0
+    &:nth-child(2n)
+      .more-item__wrapper
+        padding-left: 10px
+        padding-right: 0
 
   .more-item__wrapper
-    padding-left: 20px
-    padding-right: 0
     padding-bottom: 104px
     position: relative
     @media (max-width: 899px)

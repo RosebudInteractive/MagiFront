@@ -42,7 +42,7 @@ class PriceBlock extends React.Component {
             _hasDiscountDescr = _hasDiscount && course.Discount.Description,
             _disabled = loading && (loadingCourseId === course.Id)
 
-        return <div className="course-module__price-block">
+        return <div className={"course-module__price-block" + (!_hasDiscountDescr ? " _no-description" : "")}>
             <div className="course-module__price-block-wrapper button-block">
                 <div className={"btn btn--brown course-module__price-btn" + (_disabled ? " disabled" : "")} onClick={::this._onClick}>{title}</div>
                 <div className="course-module__price-block-section">

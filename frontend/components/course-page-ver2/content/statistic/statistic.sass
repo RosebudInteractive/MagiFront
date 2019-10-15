@@ -96,12 +96,13 @@
       @media (max-width: 1199px)
         display: none
 
-  .course-module__price-block
-    @media (max-width: 899px)
-      display: none
-
   .course-module__price-block-info
-    display: none
+    padding: 13px 0 17px
+    font-family: $font-fira
+    width: 100%
+    font-size: 12px
+    line-height: 14px
+    color: #2F2F2F
 
 
   .lecture-full__play-block
@@ -130,7 +131,11 @@
     display: none
 
   .course-module__price-block
-    margin-bottom: 23px
+    margin-bottom: 0
+    &._no-description
+      margin-bottom: 23px
+    @media (max-width: 899px)
+      display: none
 
   .course-module__price-block-wrapper
     flex-direction: column
