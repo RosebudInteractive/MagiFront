@@ -1,9 +1,9 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import Platform from 'platform';
 
 import * as playerStartActions from '../../actions/player-start-actions'
+import {isMobileAppleDevice} from "tools/page-tools";
 
 class SoundButton extends React.Component {
 
@@ -11,7 +11,7 @@ class SoundButton extends React.Component {
         const _sound = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sound"/>',
             _mute = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mute"/>';
 
-        let _isIOS = Platform.os.family === "iOS"
+        let _isIOS = isMobileAppleDevice()
 
         return (
             <button type="button" className="sound-button"

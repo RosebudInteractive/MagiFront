@@ -1,10 +1,10 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
-import Platform from 'platform';
 
 import * as playerStartActions from '../../actions/player-start-actions'
 import $ from "jquery";
+import {isMobileAppleDevice} from "tools/page-tools";
 
 class SoundBar extends React.Component {
 
@@ -39,7 +39,7 @@ class SoundBar extends React.Component {
 
     render() {
         let _id = this.props.lesson ? this.props.lesson.Id : '',
-            _isIOS = Platform.os.family === "iOS",
+            _isIOS = isMobileAppleDevice(),
             _needHideSoundControl = (this.props.muted || _isIOS)
 
         return (

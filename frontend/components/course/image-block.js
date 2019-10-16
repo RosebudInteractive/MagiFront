@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import {getCoverPath, ImageSize} from "../../tools/page-tools";
+import {getCoverPath, ImageSize, isMobileAppleDevice} from "../../tools/page-tools";
 import {Link} from "react-router-dom";
 import {notifyCourseLinkClicked} from "ducks/google-analytics";
 import {connect} from "react-redux";
@@ -35,7 +35,7 @@ class ImageBlock extends React.Component {
             visible: false
         }
 
-        this._hasEvent = ((Platform.name === "Chrome") && (Platform.os.family !== "iOS") ||
+        this._hasEvent = ((Platform.name === "Chrome") && isMobileAppleDevice() ||
             (Platform.name === "Firefox") || (Platform.name === "Android Browser"))
 
         this._onImageLoadEventHandler = () => {

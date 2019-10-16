@@ -229,6 +229,20 @@ export const getScrollPage = () => {
 
 window.$overflowHandler = OverflowHandler;
 
+// Такая проверка добавлена для того чтобы обработать настройку "Запрос настольного веб-сайта"
+// Так как при ее включении сафари определяется как десктопный с ос mac OS X 10.15
+export const isIOSWithEnabledDesktopBrowser = () => {
+    const _ua = window.navigator.userAgent.toLowerCase();
+
+    return _ua.indexOf('macintosh') > -1 && 'ontouchend' in document
+}
+
+export const isMobileAppleDevice = () => {
+    const _isTrueIOS = Platform.os.family === "iOS"
+
+    return _isTrueIOS || isIOSWithEnabledDesktopBrowser()
+}
+
 export const getCurrencySign = () => {
     if (Platform.os.family === "Android") {
         let _version = Platform.os.version.split('.')
@@ -243,6 +257,10 @@ export const getCurrencySign = () => {
         if (+_version[0] > 12) {
             return "Р"
         }
+    }
+
+    if (isIOSWithEnabledDesktopBrowser()) {
+        return "Р"
     }
 
     return "₽"
