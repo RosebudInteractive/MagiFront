@@ -53,6 +53,7 @@ import {getAppOptions, waitingSelector} from 'ducks/app'
 import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
+import {isMobileAppleDevice} from "./tools/page-tools";
 
 Polyfill.registry();
 
@@ -76,7 +77,7 @@ class App extends Component {
 
         this._handleScroll = this._handleScroll.bind(this);
 
-        let _isMobile = (Platform.os.family === "Android") || (Platform.os.family === "iOS") || (Platform.os.family === "Windows Phone");
+        let _isMobile = (Platform.os.family === "Android") || isMobileAppleDevice() || (Platform.os.family === "Windows Phone");
         if (_isMobile) {
             this.props.appActions.setAppTypeMobile()
         }
