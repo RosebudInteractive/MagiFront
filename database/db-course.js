@@ -66,7 +66,7 @@ const COURSE_REQ_TREE = {
 };
 
 const COURSE_MSSQL_ALL_REQ =
-    "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId],\n" +
+    "select c.[Id], c.[OneLesson], c.[Color], c.[Cover], c.[CoverMeta], c.[Mask], c.[State], c.[LanguageId], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  cl.[ShortDescription], cl.[TargetAudience], cl.[Aims], c.[LandCover], c.[LandCoverMeta], c.[IsLandingPage], cl.[EstDuration],\n" +
@@ -80,7 +80,7 @@ const COURSE_MSSQL_IMG_REQ =
     "where l.[CourseId] = <%= id %>";
 
 const COURSE_MYSQL_ALL_REQ =
-    "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`,\n" +
+    "select c.`Id`, c.`OneLesson`, c.`Color`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`State`, c.`LanguageId`, c.`CourseType`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  cl.`ShortDescription`, cl.`TargetAudience`, cl.`Aims`, c.`LandCover`, c.`LandCoverMeta`, c.`IsLandingPage`, cl.`EstDuration`,\n" +
@@ -208,7 +208,7 @@ const COURSE_LESSONS_MYSQL =
 
 const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.[Audio], el.[Number] Eln,\n" +
     "  ell.[VideoLink], e.[ContentType],\n" +
@@ -241,7 +241,7 @@ const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`, c.`CourseType`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.`Audio`, el.`Number` Eln,\n" +
     "  ell.`VideoLink`, e.`ContentType`,\n" +
@@ -274,7 +274,7 @@ const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
 
 const COURSE_MSSQL_PUBLIC_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, cl.[SnPost], cl.[SnName], cl.[SnDescription],\n" +
     "  cl.[VideoIntwLink], cl.[VideoIntroLink], cl.[IntwD], cl.[IntwDFmt], cl.[IntroD], cl.[IntroDFmt],\n" +
     "  cl.[ShortDescription] [CShortDescription], cl.[TargetAudience], cl.[Aims], c.[LandCover], c.[LandCoverMeta], c.[IsLandingPage], cl.[EstDuration],\n" +
@@ -363,7 +363,7 @@ const COURSE_BOOKS_MSSQL_REQ =
     
 const COURSE_MYSQL_PUBLIC_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`, c.`CourseType`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, cl.`SnPost`, cl.`SnName`, cl.`SnDescription`,\n" +
     "  cl.`VideoIntwLink`, cl.`VideoIntroLink`, cl.`IntwD`, cl.`IntwDFmt`, cl.`IntroD`, cl.`IntroDFmt`,\n" +
     "  cl.`ShortDescription` `CShortDescription`, cl.`TargetAudience`, cl.`Aims`, c.`LandCover`, c.`LandCoverMeta`, c.`IsLandingPage`, cl.`EstDuration`,\n" +
@@ -832,6 +832,7 @@ const DbCourse = class DbCourse extends DbObject {
                                             Mask: elem.Mask,
                                             Color: elem.Color,
                                             Name: elem.Name,
+                                            CourseType: elem.CourseType,
                                             URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                             IsSubsRequired: false,
                                             OneLesson: elem.OneLesson ? true : false,
@@ -1148,6 +1149,7 @@ const DbCourse = class DbCourse extends DbObject {
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
+                                        CourseType: elem.CourseType,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         VideoIntwLink: elem.VideoIntwLink,
                                         VideoIntroLink: elem.VideoIntroLink,
@@ -1969,7 +1971,8 @@ const DbCourse = class DbCourse extends DbObject {
                             crs_obj.landCoverMeta(inpFields["LandCoverMeta"]);
                         if (typeof (inpFields["IsLandingPage"]) === "boolean")
                             crs_obj.isLandingPage(inpFields["IsLandingPage"]);
-                        
+                        if (typeof (inpFields["CourseType"]) !== "undefined")
+                            crs_obj.courseType(inpFields["CourseType"]);
                         
                         if (typeof (inpFields["State"]) !== "undefined")
                             crs_lng_obj.state(inpFields["State"] === "P" ? "R" : inpFields["State"]);
@@ -2281,6 +2284,9 @@ const DbCourse = class DbCourse extends DbObject {
                         fields["IsLandingPage"] = false;
                         if (typeof (inpFields["IsLandingPage"]) === "boolean")
                             fields["IsLandingPage"] = inpFields["IsLandingPage"];
+                        fields["CourseType"] = 1; // Theoretical course
+                        if (typeof (inpFields["CourseType"]) !== "undefined")
+                            fields["CourseType"] = inpFields["CourseType"];
 
                         if (!languageId)
                             throw new Erorr("Field \"LanguageId\" is required.");

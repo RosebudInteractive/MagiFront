@@ -50,7 +50,7 @@ const AUTHOR_MSSQL_PUB_WHERE_ID = "where a.[Id] = <%= authorId %>";
 
 const AUTHOR_MSSQL_CL_PUB_REQ =
     "select lc.[Id] as[LcId], lc.[ParentId], c.[Id], l.[Id] as[LessonId], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name],\n" +
-    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse],\n" +
+    "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], pc.[Counter], gc.[Id] GiftId,\n" +
     "  cl.[Description], c.[URL], lc.[Number], lc.[ReadyDate], ell.[Audio], el.[Number] Eln,\n" +
     "  ell.[VideoLink], e.[ContentType],\n" +
@@ -117,7 +117,7 @@ const AUTHOR_MYSQL_PUB_WHERE_ID = "where a.`Id` = <%= authorId %>";
 
 const AUTHOR_MYSQL_CL_PUB_REQ =
     "select lc.`Id` as`LcId`, lc.`ParentId`, c.`Id`, l.`Id` as`LessonId`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`,\n" +
-    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`,\n" +
+    "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, c.`CourseType`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, pc.`Counter`, gc.`Id` GiftId,\n" +
     "  cl.`Description`, c.`URL`, lc.`Number`, lc.`ReadyDate`, ell.`Audio`, el.`Number` Eln,\n" +
     "  ell.`VideoLink`, e.`ContentType`,\n" +
@@ -385,6 +385,7 @@ const DbAuthor = class DbAuthor extends DbObject {
                                         Color: elem.Color,
                                         Name: elem.Name,
                                         Description: elem.Description,
+                                        CourseType: elem.CourseType,
                                         URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                         IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)
                                             || ((elem.PaidTp === 1) && ((!elem.PaidDate) || ((now - elem.PaidDate) > 0)))) ? true : false,

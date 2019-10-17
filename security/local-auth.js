@@ -373,13 +373,14 @@ const StdLoginProcessor = (strategy, hasCapture, redirectUrl, genTokenFunc, redi
     }
 };
 
-const AuthByToken = (getUserProfile, processUserProfile, redirectUrl, genTokenFunc) => {
+const AuthByToken = (getUserProfile, processUserProfile, redirectUrl, genTokenFunc, options) => {
+    let opts = options || {};
     if (typeof (getUserProfile) !== "function")
         throw new Error(`Arg "getUserProfile" must be a function.`);
     if (typeof (processUserProfile) !== "function")
         throw new Error(`Arg "processUserProfile" must be a function.`);
     return (req, res, next) => {
-        let accessToken = req.query.accessToken;
+        let accessToken = typeof (opts.getToken) === "function" ? opts.getToken(req) : req.query.accessToken;
         let refreshToken = null;
         let authProcessor = getAuthProcessor(req, res, next, redirectUrl, genTokenFunc);
         getUserProfile(accessToken, (err, profile) => {
