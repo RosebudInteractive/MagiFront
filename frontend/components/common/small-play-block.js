@@ -25,6 +25,7 @@ class LessonPlayBlockSmall extends React.Component {
         lesson: PropTypes.object,
         course: PropTypes.object,
         showRestTime: PropTypes.bool,
+        externalPlayFunction: PropTypes.func
     };
 
     constructor(props) {
@@ -34,7 +35,7 @@ class LessonPlayBlockSmall extends React.Component {
         this._redirectWithoutPlay = false
 
         this._goToLesson = _goToLesson.bind(this)
-        this._play = _play.bind(this)
+        this._play = this.props.externalPlayFunction ? this.props.externalPlayFunction : _play.bind(this)
         this._startPlay = _startPlay.bind(this)
         this._getTooltip = _getTooltip.bind(this)
         this._calcLessonProps = _calcLessonProps.bind(this)

@@ -7592,6 +7592,7 @@ ul.user-tooltip {
     background-image: linear-gradient(to bottom, #1C1B17 0%, rgba(28, 27, 23, 0) 100%);
     color: #fff; }
     .lectures-menu._dark.opened {
+      z-index: 3;
       background-color: #2f2f2f; }
   .lectures-menu.hide {
     opacity: 0;
@@ -7763,6 +7764,10 @@ body[data-page="fullpage-player"] .lectures-menu {
     -moz-box-align: center;
     -ms-flex-align: center;
     align-items: center; }
+  .play-block-mobile__play-block .play-block-small__duration {
+    order: 1; }
+  .play-block-mobile__play-block .play-block-small {
+    position: absolute; }
   .play-block-mobile__duration {
     margin-left: 2px;
     min-width: 42px;
@@ -8043,8 +8048,9 @@ body[data-page="fullpage-player"] .lectures-menu {
       color: #2f2f2f; }
     .lectures-list__item.active .lectures-list__item-author {
       color: rgba(47, 47, 47, 0.6); }
-    .lectures-list__item.active .play-block__duration {
-      color: rgba(47, 47, 47, 0.6); }
+    .lectures-list__item.active .play-block__duration,
+    .lectures-list__item.active .play-block-small__duration {
+      color: rgba(47, 47, 47, 0.6) !important; }
     .lectures-list__item.active:before {
       color: #2f2f2f;
       z-index: 1; }
@@ -8185,7 +8191,8 @@ body[data-page="fullpage-player"] .lectures-menu {
         color: rgba(47, 47, 47, 0.6); }
       .lectures-sublist__item.active .lectures-sublist__item-author {
         color: rgba(47, 47, 47, 0.6); }
-      .lectures-sublist__item.active .lectures-sublist__item-duration {
+      .lectures-sublist__item.active .lectures-sublist__item-duration,
+      .lectures-sublist__item.active .play-block-small__duration {
         color: rgba(47, 47, 47, 0.6); }
       .lectures-sublist__item.active .lectures-sublist__item {
         border-top: 1px solid rgba(47, 47, 74, 0.2); }
@@ -8193,7 +8200,7 @@ body[data-page="fullpage-player"] .lectures-menu {
     display: inline-block;
     vertical-align: top;
     margin: 0;
-    font-weight: 400;
+    font-weight: 400;lectures-list__item
     font-family: "Fira Sans", Arial, sans-serif;
     font-size: 17px;
     line-height: 23px;
@@ -8239,7 +8246,8 @@ body[data-page="fullpage-player"] .lectures-menu {
     -moz-box-align: center;
     -ms-flex-align: center;
     align-items: center; }
-  .lectures-sublist__item-author, .lectures-sublist__item-duration {
+  .lectures-sublist__item-author, .lectures-sublist__item-duration,
+  .play-block-mobile__play-block .play-block-small__duration {
     margin: 0;
     padding-bottom: 8px;
     font-family: "Fira Sans", Arial, sans-serif;
@@ -8247,12 +8255,15 @@ body[data-page="fullpage-player"] .lectures-menu {
     line-height: 20px;
     color: rgba(47, 47, 47, 0.6); }
     @media (max-width: 599px) {
-      .lectures-sublist__item-author, .lectures-sublist__item-duration {
+      .lectures-sublist__item-author, .lectures-sublist__item-duration,
+      .play-block-mobile__play-block .play-block-small__duration {
         font-size: 13px;
         line-height: 16px; } }
-    ._dark .lectures-sublist__item-author, ._dark .lectures-sublist__item-duration {
+    ._dark .lectures-sublist__item-author, ._dark .lectures-sublist__item-duration,
+    ._dark .play-block-mobile__play-block .play-block-small__duration {
       color: rgba(255, 255, 255, 0.6); }
-  .lectures-sublist__item-duration {
+  .lectures-sublist__item-duration,
+  .play-block-mobile__play-block .play-block-small__duration {
     margin-left: 10px;
     padding-bottom: 5px;
     min-width: 33px;
@@ -18006,6 +18017,7 @@ ul.lectures-tab {
     @media (max-width: 767px) {
       .lesson-player .player-block {
         position: absolute;
+        z-index: 2;
         left: 0;
         right: 0;
         padding-left: 18px;
@@ -19199,7 +19211,7 @@ ul.lectures-tab {
       margin-top: 20px; } }
   .video-block:hover .play-block__btn svg {
     fill-opacity: 1; }
-  .video-block video {
+  .video-block video, .video-block .video-block_cover{
     background-size: cover;
     background-position: center top;
     position: absolute;
@@ -19211,7 +19223,7 @@ ul.lectures-tab {
     width: 100%;
     height: 100%; }
     @media (max-width: 1023px) {
-      .video-block video {
+      .video-block video, .video-block .video-block_cover {
         position: absolute;
         top: 50%;
         left: 50%;

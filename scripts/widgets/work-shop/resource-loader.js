@@ -7,7 +7,21 @@ const FAIL_AUDIO_TIME = 120;
 
 let _audioMap = new Map();
 
-const _isIOS = Platform.os.family === "iOS",
+// Такая проверка добавлена для того чтобы обработать настройку "Запрос настольного веб-сайта"
+// Так как при ее включении сафари определяется как десктопный с ос mac OS X 10.15
+const isIOSWithEnabledDesktopBrowser = () => {
+    const _ua = window.navigator.userAgent.toLowerCase();
+
+    return _ua.indexOf('macintosh') > -1 && 'ontouchend' in document
+}
+
+const isMobileAppleDevice = () => {
+    const _isTrueIOS = Platform.os.family === "iOS"
+
+    return _isTrueIOS || isIOSWithEnabledDesktopBrowser()
+}
+
+const _isIOS = isMobileAppleDevice(),
     _isAndroid = Platform.os.family === "Android",
     _isSafariOnMac = (Platform.os.family === "OS X") && (Platform.name === "Safari"),
     _usePreinit = (_isIOS || _isAndroid || _isSafariOnMac);

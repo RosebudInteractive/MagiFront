@@ -3,9 +3,9 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import $ from 'jquery'
 import {Link} from 'react-router-dom';
-import Platform from 'platform';
 
 import * as playerStartActions from '../../actions/player-start-actions'
+import {isMobileAppleDevice} from "tools/page-tools";
 
 class Controls extends React.Component {
 
@@ -42,7 +42,7 @@ class Controls extends React.Component {
             _mute = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#mute"/>';
 
         let _id = this.props.lesson ? this.props.lesson.Id : '',
-            _isIOS = Platform.os.family === "iOS",
+            _isIOS = isMobileAppleDevice(),
             _needHideSoundControl = (this.props.muted || _isIOS)
 
         return (

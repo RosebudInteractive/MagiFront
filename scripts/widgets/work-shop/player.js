@@ -12,6 +12,20 @@ const ratioX = 16, ratioY = 9;
 
 let _counter = 0;
 
+// Такая проверка добавлена для того чтобы обработать настройку "Запрос настольного веб-сайта"
+// Так как при ее включении сафари определяется как десктопный с ос mac OS X 10.15
+const isIOSWithEnabledDesktopBrowser = () => {
+    const _ua = window.navigator.userAgent.toLowerCase();
+
+    return _ua.indexOf('macintosh') > -1 && 'ontouchend' in document
+}
+
+const isMobileAppleDevice = () => {
+    const _isTrueIOS = Platform.os.family === "iOS"
+
+    return _isTrueIOS || isIOSWithEnabledDesktopBrowser()
+}
+
 export default class CWSPlayer extends CWSBase {
     constructor(container, options, audioOptions) {
         super(container, tpl);
@@ -249,7 +263,7 @@ export default class CWSPlayer extends CWSBase {
 
 
                 this._addDevInfo('IOS - version');
-                if (Platform.os.family === "iOS") {
+                if (isMobileAppleDevice()) {
                     // Данная установка необходима только для iOS, так как при переходе между аудио-эпизодами в
                     // лекции курсор не устанавливается в выбраное место нового (незагруженного) эпизода, а
                     // устанавливается в нулевую позицию и там остается.

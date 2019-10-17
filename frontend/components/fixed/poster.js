@@ -91,10 +91,10 @@ class PlayerBlock extends React.Component {
 
         if (!lessonUrl) {
             return <Link to={'/category/' + courseUrl} id={'img-fix-link'}>
-                <video src="#" style={_coverStyle}/>
+                <div className="video-block_cover" style={_coverStyle}/>
             </Link>
         } else {
-            return <video src="#" style={_coverStyle} onClick={(isAuthRequired && !authorized) ? ::this._unlock : ::this._play}/>
+            return <div className="video-block_cover" style={_coverStyle} onClick={(isAuthRequired && !authorized) ? ::this._unlock : ::this._play}/>
         }
     }
 

@@ -11,6 +11,7 @@ import {FINISH_DELTA_TIME} from "../../constants/player";
 import {getPaidCourseInfo,} from "ducks/billing";
 import {_unlock, SVG} from "../common/play-block-functions";
 import {unlockLesson} from "ducks/player";
+import LessonPlayBlockSmall from "../common/small-play-block";
 
 class PlayBlock extends React.Component {
     static propTypes = {
@@ -190,31 +191,32 @@ class PlayBlock extends React.Component {
             </div>,
 
             <div className="play-block-mobile">
-                <div className="play-block-mobile__play-block">
-                    {
-                        (_isThisLessonPlaying)
-                            ?
-                            (paused)
-                                ?
-                                <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPlay}>
-                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                    <span>Воспроизвести</span>
-                                </button>
-                                :
-                                <button type="button" className="play-btn-small"
-                                        onClick={::this.props.playerStartActions.startPause}>
-                                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>
-                                    <span>Воспроизвести</span>
-                                </button>
-                            :
-                            <button type="button" className="play-btn-small" onClick={::this._play}>
-                                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>
-                                <span>Воспроизвести</span>
-                            </button>
-                    }
-                    <span className="play-block-mobile__duration">{_duration}</span>
-                </div>
+                <LessonPlayBlockSmall course={this.props.course} lesson={lesson} wrapperClass={"play-block-mobile__play-block"} externalPlayFunction={::this._play}/>
+                {/*<div className="play-block-mobile__play-block">*/}
+                {/*    {*/}
+                {/*        (_isThisLessonPlaying)*/}
+                {/*            ?*/}
+                {/*            (paused)*/}
+                {/*                ?*/}
+                {/*                <button type="button" className="play-btn-small"*/}
+                {/*                        onClick={::this.props.playerStartActions.startPlay}>*/}
+                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
+                {/*                    <span>Воспроизвести</span>*/}
+                {/*                </button>*/}
+                {/*                :*/}
+                {/*                <button type="button" className="play-btn-small"*/}
+                {/*                        onClick={::this.props.playerStartActions.startPause}>*/}
+                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>*/}
+                {/*                    <span>Воспроизвести</span>*/}
+                {/*                </button>*/}
+                {/*            :*/}
+                {/*            <button type="button" className="play-btn-small" onClick={::this._play}>*/}
+                {/*                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
+                {/*                <span>Воспроизвести</span>*/}
+                {/*            </button>*/}
+                {/*    }*/}
+                {/*    <span className="play-block-mobile__duration">{_duration}</span>*/}
+                {/*</div>*/}
             </div>
         ]
     }
