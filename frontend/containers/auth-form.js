@@ -8,7 +8,7 @@ import {AUTHORIZATION_STATE} from '../constants/user'
 import Wrapper from '../components/auth/auth-wrapper'
 
 import * as userActions from '../actions/user-actions'
-import {OverflowHandler} from "../tools/page-tools";
+import {isIOS13, isIOSWithEnabledDesktopBrowser, OverflowHandler} from "../tools/page-tools";
 import {clearWaitingAuthorize} from "ducks/app";
 
 class AuthPopup extends React.Component {
@@ -68,8 +68,16 @@ class AuthPopup extends React.Component {
     render() {
         let {visible} = this.props;
 
+        // В iOS 13 появился баг связанный с отсутствием курсора в полях ввода если для transform используется
+        // transform: translateY(200vh)
+        const _needFixBugIOS13 = isIOS13() || isIOSWithEnabledDesktopBrowser(),
+            _popupClass = "popup js-popup _registration" +
+                (visible ? " opened" : "") +
+                (this.state.noTransition && !_needFixBugIOS13 ? ' no-transition' : '') +
+                (_needFixBugIOS13 ? " _ios13-version" : "")
+
         return (
-            <div className={"popup js-popup _registration" + (visible ? " opened" : "") + (this.state.noTransition ? ' no-transition' : '')}>
+            <div className={_popupClass}>
                 <button className="popup-close js-popup-close" onClick={::this._close}>Закрыть</button>
                 <div className="sign-in-block">
                     {

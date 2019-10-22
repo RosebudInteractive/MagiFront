@@ -243,6 +243,15 @@ export const isMobileAppleDevice = () => {
     return _isTrueIOS || isIOSWithEnabledDesktopBrowser()
 }
 
+export const isIOS13 = () => {
+    if (Platform.os.family === "iOS") {
+        let _version = Platform.os.version.split('.')
+        return +_version[0] > 12
+    } else {
+        return false
+    }
+}
+
 export const getCurrencySign = () => {
     if (Platform.os.family === "Android") {
         let _version = Platform.os.version.split('.')
@@ -252,12 +261,15 @@ export const getCurrencySign = () => {
     }
 
     // Баг отображнения знака рубля после обновления до 13 версии
-    if (Platform.os.family === "iOS") {
-        let _version = Platform.os.version.split('.')
-        if (+_version[0] > 12) {
-            return "Р"
-        }
+    if (isIOS13()) {
+        return "Р"
     }
+    // if (Platform.os.family === "iOS") {
+    //     let _version = Platform.os.version.split('.')
+    //     if (+_version[0] > 12) {
+    //         return "Р"
+    //     }
+    // }
 
     if (isIOSWithEnabledDesktopBrowser()) {
         return "Р"
