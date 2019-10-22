@@ -153,7 +153,7 @@ const GET_COURSE_IDS_BKM_MSSQL =
 
 const GET_COURSES_BY_IDS_MSSQL =
     "select c.[Id], pc.[Counter], c.[IsPaid], c.[IsSubsFree], c.[ProductId], c.[OneLesson], c.[Cover],\n" +
-    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
+    "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId, c.[CourseType],\n" +
     "  c.[CoverMeta], c.[Mask], c.[URL], cl.[Name]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -265,7 +265,7 @@ const GET_COURSE_IDS_BKM_MYSQL =
 
 const GET_COURSES_BY_IDS_MYSQL =
     "select c.`Id`, pc.`Counter`, c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, c.`OneLesson`, c.`Cover`,\n" +
-    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
+    "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId, c.`CourseType`,\n" +
     "  c.`CoverMeta`, c.`Mask`, c.`URL`, cl.`Name`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -815,6 +815,7 @@ const DbUser = class DbUser extends DbObject {
                                 let course = {
                                     Id: elem.Id,
                                     Name: elem.Name,
+                                    CourseType: elem.CourseType,
                                     URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
                                     Cover: this._convertDataUrl(elem.Cover, isAbsPath, dLink),
                                     CoverMeta: this._convertMeta(elem.CoverMeta, isAbsPath, dLink),

@@ -156,7 +156,8 @@ module.exports = {
             siteKey: "6Le8aHUUAAAAAE3d9H-9fqzTFE7flJkL0n3o08Mj",
             secretKey: "6Le8aHUUAAAAAHA_EPD2G0qwlG_tw31lWMIiU3il"
         },
-        googleAppId: "AIzaSyAcqC46EVwt7voascHI5j9CrGVbeiiwgVQ"
+        googleAppId: "AIzaSyAcqC46EVwt7voascHI5j9CrGVbeiiwgVQ",
+        appleMobileAppAud: "ru.magisteria.Magisteria.dev"
     },
     mail: {
         feedback: {

@@ -2454,7 +2454,7 @@ const DbLesson = class DbLesson extends DbObject {
                         }
                         let currState = ls_course_obj.state();
                         if (typeof (inpFields["ReadyDate"]) !== "undefined") {
-                            let olgReadyDate = ls_course_obj.readyDate() - 0;
+                            let oldReadyDate = ls_course_obj.readyDate() - 0;
                             let newReadyDate = ls_course_obj.readyDate(inpFields["ReadyDate"]) - 0;
                             if (currState === "R") {
                                 if (currState !== prevState) {
@@ -2462,7 +2462,7 @@ const DbLesson = class DbLesson extends DbObject {
                                         throw new Error(`Publish date should be equal to CURRENT date for "READY" lesson.`);
                                 }
                                 else
-                                    if (olgReadyDate !== newReadyDate)
+                                    if (oldReadyDate !== newReadyDate)
                                         throw new Error(`Can't change "READY" lesson publish date.`);
                             }
                         }
