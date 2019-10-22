@@ -19,10 +19,19 @@ class AuthApple {
 
         const processUserProfile = ((req, accessToken, refreshToken, params, profile, done) => {
 
-            profile.displayName = profile.givenName || profile.familyName ?
-                ((profile.name.givenName ? profile.name.givenName + " " : "") +
-                    (profile.name.familyName ? profile.name.familyName : "")) : profile.identifier;
-            profile.username = profile.givenName ? profile.givenName : profile.identifier;
+            let name_arr = [];
+            if (profile.nickname)
+                name_arr.push(profile.nickname)
+            else {
+                if (profile.givenName)
+                    name_arr.push(profile.givenName);
+                if (profile.middleName)
+                    name_arr.push(profile.middleName);
+                if (profile.familyName)
+                    name_arr.push(profile.familyName);
+            }
+            profile.displayName = name_arr.length > 0 ? name_arr.join(" ") : profile.identifier;
+            profile.username = profile.nickname ? profile.nickname : (profile.givenName ? profile.givenName : profile.identifier);
             profile.firstName = profile.givenName;
             profile.lastName = profile.familyName;
 
@@ -51,8 +60,10 @@ class AuthApple {
 
         let _aud = config.authentication.appleMobileAppAud;
 
-        function getUserProfile(token, profileProcessor) {
+        function getUserProfile(tokenObj, profileProcessor) {
             let profile = {};
+            let isObject = typeof (tokenObj) === "string" ? false : true;
+            let token = isObject ? tokenObj.identityToken : tokenObj;
             try {
                 jwt.verify(token, getApplePublicKey, null, function (err, decoded) {
                     let _err = err;
@@ -61,14 +72,20 @@ class AuthApple {
                             _err = new Error(`Unexpected issuer (iss claim): ${decoded.iss}.`)
                         else
                             if (decoded.aud !== _aud)
-                                _err = new Error(`Unexpected audience (aud claim): ${decoded.aud}.`)
-                            else
-                                if (!decoded.email)
-                                    _err = new Error(`Необходимо наличие подтвержденного Email.`)
+                                _err = new Error(`Unexpected audience (aud claim): ${decoded.aud}.`);
 
                         profile.provider = APPLE_PROFILE_PROVIDER_CODE;
                         profile.identifier = decoded.sub;
-                        profile.emails = [{ type: "email", value: decoded.email }];
+                        if (decoded.email)
+                            profile.emails = [{ type: "email", value: decoded.email }];
+                        if (isObject && tokenObj.fullName) {
+                            profile.familyName = tokenObj.fullName.familyName;
+                            profile.givenName = tokenObj.fullName.givenName;
+                            profile.middleName = tokenObj.fullName.middleName;
+                            profile.namePrefix = tokenObj.fullName.namePrefix;
+                            profile.nameSuffix = tokenObj.fullName.nameSuffix;
+                            profile.nickname = tokenObj.fullName.nickname;
+                        }
                     }
                     profileProcessor(_err, profile);
                 });
@@ -82,10 +99,12 @@ class AuthApple {
             return req.query.accessToken ? req.query.accessToken : null;
         }
 
+        function getTokenBodyFunc(req) {
+            return req.body ? req.body : null;
+        }
+
         app.get('/api/app-applelogin', AuthByToken(getUserProfile, processUserProfile, null, GenTokenFunc, { getToken: getTokenFunc }));
-        // app.get('/api/app-applelogin', (req, res, next) => {
-        //     next(new HttpError(HttpCode.ERR_NIMPL, HttpMessage[HttpCode.ERR_NIMPL]));
-        // });
+        app.post('/api/app-applelogin', AuthByToken(getUserProfile, processUserProfile, null, GenTokenFunc, { getToken: getTokenBodyFunc }));
     }
 };
 
