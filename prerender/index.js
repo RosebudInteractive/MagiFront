@@ -15,6 +15,7 @@ let additionalBots = [
     "yandex",
     "odklbot",
     "telegrambot",
+    "sitereport",
     SEO.FORCE_RENDER_USER_AGENT,
     SEO.BOT_USER_AGENT
 ];
