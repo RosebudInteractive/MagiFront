@@ -35,8 +35,8 @@ export default function reducer(state = new ReducerRecord(), action) {
             let _map = _getFilters(payload)
 
             return state
-                .set('loading', false)
                 .update('filters', filters => filters.merge(_map))
+                .set('loading', false)
         }
 
 
@@ -91,6 +91,16 @@ const _getFilters = (data) => {
 
             return _obj[item.URL]= _value
         })
+
+        _obj['0'] = {
+            id: 0,
+            name: "Все темы",
+            count: data.Categories.reduce((acc, item) => {
+                return acc + item.Counter
+            }, 0),
+            URL: "/",
+            selected: false,
+        }
     }
 
     return Immutable.fromJS(_obj)

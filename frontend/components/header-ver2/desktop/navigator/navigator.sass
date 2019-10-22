@@ -1,0 +1,55 @@
+@import "~tools/variables"
+
+.header-ver2
+  .navigation
+    padding-top: 7px
+    ul a
+      padding: 0
+
+  .header-menu
+    align-items: center
+    height: 100%
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-flex-wrap: wrap
+    -ms-flex-wrap: wrap
+    flex-wrap: wrap
+    margin: 0
+    padding: 0
+    list-style: none
+    text-transform: uppercase
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 17px
+    letter-spacing: 0.12em
+
+  .header-menu__item
+    margin: 0 !important
+    padding: 0 12px
+    opacity: 1 !important
+    a
+      display: flex
+      align-items: center
+
+    svg
+      padding: 7px 12px 6px 0
+      opacity: 0.6
+    &.active
+      .item__title
+        font-weight: bold
+        &::after
+          content: ""
+          border-bottom: $border-active-menu-item
+          position: absolute
+          width: 100%
+          left: 0
+          top: -28px
+
+
+  .item__title
+    position: relative
+    font-weight: normal
+

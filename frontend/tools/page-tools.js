@@ -68,7 +68,8 @@ export const pages = {
     bookmarks: {name: 'bookmarks', url: '/favorites'},
     purchases: {name: 'purchases', url: '/purchases'},
     author: {name: 'author', url: null},
-    profile: {name: 'profile', url: '/profile/'},
+    profile: {name: 'profile', url: '/profile'},
+    history: {name: 'history', url: '/history'},
     notFound: {name: 'not-found', url: null}
 }
 

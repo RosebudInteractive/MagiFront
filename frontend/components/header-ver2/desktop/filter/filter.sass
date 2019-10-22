@@ -1,0 +1,98 @@
+@import "~tools/variables"
+
+.header-ver2
+
+  .filters-row
+    overflow: hidden
+    z-index: 0
+    top: 0
+    border-bottom: none
+    -webkit-transition: transform 0.3s ease
+    transition: transform 0.3s ease
+
+  .filters-row__wrapper
+    padding: 0 0 0 19px !important
+
+  .filters-row__inner
+    max-width: calc(100% - 229px)
+    overflow: hidden
+
+  .filter-item
+    padding: 9px 0 14px
+    margin-right: 0
+    &.active
+      .filter-btn
+        color: #2f2f2f
+        background: none
+
+      .filter-btn__title::after
+        content: ""
+        border-bottom: $border-active-menu-item
+        position: absolute
+        width: 100%
+        left: 0
+        top: -9px
+
+  .filter-btn
+    background: none
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 14px
+    line-height: 17px
+    padding: 0 15px
+    
+  .filter-btn__title
+    position: relative
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-align: start
+    -webkit-align-items: flex-start
+    -moz-box-align: start
+    -ms-flex-align: start
+    align-items: flex-start
+    padding: 7.5px 0
+    margin-bottom: 0
+
+  .ext-block_wrapper
+    position: absolute
+    right: 0
+    height: 100%
+    display: flex
+    box-shadow: none
+    &._shadow
+      box-shadow: 0 0 30px 0 rgba(47, 47, 47, 0.5)
+
+  .ext-block__item
+    padding: 16.5px 15px 21.5px 11px
+    font-family: $font-fira
+    font-style: normal
+    font-weight: normal
+    font-size: 14px
+    line-height: 17px
+    position: relative
+    &::before
+      content: ""
+      border-left: $border-dark-02
+      position: absolute
+      height: 100%
+      left: 0
+      top: 0
+
+  .ext-block__button
+    color: $color-orange
+    cursor: pointer
+
+  .selector__courses
+    color: $color-main-dark
+    cursor: pointer
+
+  .selector__separator
+    color: $color-dark-02
+
+  .selector__lessons
+    color: $color-orange
+    cursor: pointer

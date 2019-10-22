@@ -14,7 +14,8 @@ import BookmarksPage from './containers/bookmark-page'
 import PurchasesPage from './containers/purchases-page'
 import ProjectPage from './containers/project-page'
 
-import PageHeader from './components/page-header/page-header';
+// import PageHeader from './components/page-header/page-header';
+import PageHeader from './components/header-ver2';
 import PageFooter from './components/page-footer/page-footer';
 import FeedbackMessageBox from './components/messages/feedback';
 import FeedbackResultMessage from './components/messages/feedback-result-message';

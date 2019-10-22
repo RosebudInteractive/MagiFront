@@ -33,7 +33,23 @@ class ProfilePage extends React.Component {
     componentWillMount() {
         window.scrollTo(0, 0)
         this.props.getUserProfile();
-        this.props.pageHeaderActions.setCurrentPage(pages.profile);
+        switch (this.props.page) {
+            case '/history': {
+                this.props.pageHeaderActions.setCurrentPage(pages.history);
+                return
+            }
+
+            case '/profile': {
+                this.props.pageHeaderActions.setCurrentPage(pages.profile);
+                return
+            }
+
+            default: {
+                this.props.pageHeaderActions.setCurrentPage(pages.profile);
+            }
+
+        }
+
     }
 
     componentWillReceiveProps(nextProps) {
@@ -81,10 +97,12 @@ class ProfilePage extends React.Component {
 
     _openHistory() {
         this.props.history.replace('/history')
+        this.props.pageHeaderActions.setCurrentPage(pages.history);
     }
 
     _openProfile() {
         this.props.history.replace('/profile')
+        this.props.pageHeaderActions.setCurrentPage(pages.profile);
     }
 
     render() {

@@ -1,0 +1,65 @@
+@import "~tools/variables"
+
+.header-ver2
+
+  &.page-header._fixed
+    height: 72px
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    background-color: #fff
+    z-index: 50
+    -webkit-transition: -webkit-transform 0.5s ease
+    transition: -webkit-transform 0.5s ease
+
+  .page-header__row
+    border-bottom: none
+    height: auto
+
+  .page-header__wrapper
+    position: relative
+    z-index: 1
+    background-color: white
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-sizing: border-box
+    -moz-box-sizing: border-box
+    box-sizing: border-box
+    padding: 15px 0 20px 35px
+    max-width: 100%
+    border-bottom: 1px solid rgba(47, 47, 47, 0.15)
+
+    .logo
+      margin-right: 25px
+
+  .user-block__header
+    margin-top: 0
+    position: relative
+    padding-left: 25px
+    cursor: pointer
+    &::before
+      content: ""
+      position: absolute
+      left: 0
+      top: 0
+      margin-top: 0
+      width: 1px
+      height: 37px
+      background-color: rgba(47, 47, 47, 0.15)
+
+  .user-block__name
+    -webkit-box-sizing: border-box
+    -moz-box-sizing: border-box
+    box-sizing: border-box
+    margin: 0
+    padding: 2px 65px 0 0
+    width: 126px
+    text-align: left
+    font-family: $font-fira
+    font-size: 14px
+    color: $color-dark-06
+    line-height: 18px
