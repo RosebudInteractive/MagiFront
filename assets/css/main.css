@@ -15947,6 +15947,7 @@ ul.lectures-tab {
         position: static; } }
 
 .popup._registration{
+  caret-color: #c8684c;
   -webkit-overflow-scrolling: touch;
   overflow-scrolling: touch;
   top: -200vh;
@@ -15957,13 +15958,22 @@ ul.lectures-tab {
   -webkit-transition: transform 0.7s ease;
   transition: transform 0.7s ease;
 }
+.popup._registration._ios13-version{
+  top: 0;
+  opacity: 0;
+  z-index: -1000;
+  -webkit-transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease; }
 .popup._registration.opened {
   position: fixed;
   transform: translateY(200vh); }
+.popup._registration.opened._ios13-version {
+  opacity: 1;
+  transform: none;
+  z-index: 1000; }
 .popup._registration.no-transition {
   -webkit-transition: none;
   transition: none; }
-
 ._registration {
   position: fixed;
   padding-bottom: 50px;
@@ -17974,6 +17984,7 @@ ul.lectures-tab {
           position: static;
           opacity: 1; } }
   .lesson-player .player-block {
+    z-index: 1;
     position: absolute;
     width: 100%;
     display: -webkit-box;
