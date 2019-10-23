@@ -342,9 +342,10 @@ const getAuthProcessor = (req, res, next, redirectUrl, genTokenFunc, redirectByS
                         if (redirect_url)
                             res.redirect(buildRedirectUrl(redirect_url, err.toString()))
                         else {
-                            let statusCode = err instanceof HttpError ? err.statusCode : HttpCode.ERR_UNAUTH;
-                            let errMsg = err instanceof HttpError ? err.message : err.toString();
-                            res.status(statusCode).json({ message: errMsg });
+                            if (err instanceof HttpError)
+                                res.status(err.statusCode).json(err.errObject)
+                            else
+                                res.status(HttpCode.ERR_UNAUTH).json({ message: err.toString() });
                         }
                         return;
                     }

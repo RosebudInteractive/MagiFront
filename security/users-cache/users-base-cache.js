@@ -889,7 +889,10 @@ exports.UsersBaseCache = class UsersBaseCache extends DbObject{
                     if (profile.emails && (profile.emails.length > 0) && profile.emails[0].value)
                         return getUserByEmailOrCreate(profile.emails[0].value, profile)
                     else
-                        throw new HttpError(HttpCode.ERR_BAD_REQ, "Для регистрации необходим Email.");
+                        throw new HttpError(HttpCode.ERR_BAD_REQ, {
+                            error: "missingEmail",
+                            message: "Для регистрации необходим Email."
+                        });
             });
     }
 
