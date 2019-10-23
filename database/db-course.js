@@ -232,7 +232,7 @@ const AUTHOR_COURSE_MSSQL_ALL_PUBLIC_REQ =
     "<%= whereClause %>" +
     "order by ac.[CourseId]";
 const CATEGORY_COURSE_MSSQL_ALL_PUBLIC_REQ =
-    "select cc.[CourseId], c.[Id], l.[Name], c.[URL] from[CourseCategory] cc\n" +
+    "select cc.[CourseId], c.[Id], l.[Name], c.[URL], cs.[CourseType] from[CourseCategory] cc\n" +
     "  join[Category] c on c.[Id] = cc.[CategoryId]\n" +
     "  join[CategoryLng] l on l.[CategoryId] = c.[Id]\n" +
     "  join[Course] cs on cs.[Id] = cc.[CourseId] and cs.[LanguageId] = <%= languageId %>\n" +
@@ -265,7 +265,7 @@ const AUTHOR_COURSE_MYSQL_ALL_PUBLIC_REQ =
     "<%= whereClause %>" +
     "order by ac.`CourseId`";
 const CATEGORY_COURSE_MYSQL_ALL_PUBLIC_REQ =
-    "select cc.`CourseId`, c.`Id`, l.`Name`, c.`URL` from`CourseCategory` cc\n" +
+    "select cc.`CourseId`, c.`Id`, l.`Name`, c.`URL`, cs.`CourseType` from`CourseCategory` cc\n" +
     "  join`Category` c on c.`Id` = cc.`CategoryId`\n" +
     "  join`CategoryLng` l on l.`CategoryId` = c.`Id`\n" +
     "  join`Course` cs on cs.`Id` = cc.`CourseId` and cs.`LanguageId` = <%= languageId %>\n" +
@@ -964,12 +964,16 @@ const DbCourse = class DbCourse extends DbObject {
                                         Id: elem.Id,
                                         Name: elem.Name,
                                         URL: isAbsPath ? this._absCategoryUrl + elem.URL : elem.URL,
-                                        Counter: 0
+                                        Counter: 0,
+                                        CntByType: {}
                                     };
                                     categories.push(category);
                                     categories_list[elem.Id] = category;
                                 }
                                 category.Counter++;
+                                if (typeof (category.CntByType[elem.CourseType]) === "undefined")
+                                    category.CntByType[elem.CourseType] = 0;
+                                category.CntByType[elem.CourseType]++;
                             })
                         }
                         return {
