@@ -9,44 +9,46 @@ import {bindActionCreators} from "redux";
 
 class PhoneUserNavigator extends React.Component {
 
-
     render() {
-        const HISTORY = '<use xlink:href="#filter"/>'
+        const HISTORY = '<use xlink:href="#history"/>'
 
         const {authorized, currentPage, filterMainType} = this.props,
             _isCoursePage = currentPage === pages.courses
 
-        return authorized &&
-                <div className='mobile-menu__section phone-navigator-block'>
-                    {
-                        _isCoursePage &&
-                            <div className="menu-item__wrapper">
-                                <div className={"menu-item" + (filterMainType === FILTER_COURSE_TYPE.THEORY ? ' active' : '')}
-                                     onClick={() => {
-                                         this.props.setFilterCourseType(FILTER_COURSE_TYPE.THEORY)
-                                     }}>
-                                    <span className="underlined-item">Теория</span>
-                                </div>
-                            </div>
-                    }
-                    {
-                        _isCoursePage &&
-                            <div className="menu-item__wrapper">
-                                <div className={"menu-item" + (filterMainType === FILTER_COURSE_TYPE.PRACTICE ? ' active' : '')}
-                                     onClick={() => {
-                                         this.props.setFilterCourseType(FILTER_COURSE_TYPE.PRACTICE)
-                                     }}>
-                                    <span className="underlined-item">Практика</span>
-                                </div>
-                            </div>
-                    }
+        return <div className='mobile-menu__section phone-navigator-block'>
+            {
+                _isCoursePage &&
+                    <div className="menu-item__wrapper">
+                        <div className={"menu-item" + (filterMainType === FILTER_COURSE_TYPE.THEORY ? ' active' : '')}
+                             onClick={() => {
+                                 this.props.setFilterCourseType(FILTER_COURSE_TYPE.THEORY)
+                             }}>
+                            <span className="underlined-item">Теория</span>
+                        </div>
+                    </div>
+            }
+            {
+                _isCoursePage &&
+                    <div className="menu-item__wrapper">
+                        <div className={"menu-item" + (filterMainType === FILTER_COURSE_TYPE.PRACTICE ? ' active' : '')}
+                             onClick={() => {
+                                 this.props.setFilterCourseType(FILTER_COURSE_TYPE.PRACTICE)
+                             }}>
+                            <span className="underlined-item">Практика</span>
+                        </div>
+                    </div>
+            }
+            {
+                authorized &&
                     <Link to={'/history'} className="menu-item__wrapper">
                         <svg width="16" height="16" dangerouslySetInnerHTML={{__html: HISTORY}}/>
-                        <div className={"menu-item history-item" + (currentPage === pages.history ? ' active' : '')}>
+                        <div
+                            className={"menu-item history-item" + (currentPage === pages.history ? ' active' : '')}>
                             <span className="underlined-item">История</span>
                         </div>
                     </Link>
-                </div>
+            }
+        </div>
     }
 }
 

@@ -11,8 +11,8 @@ class UserNavigator extends React.Component {
     };
 
     render() {
-        const _filter = '<use xlink:href="#filter"/>',
-            _flagFull = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>'
+        const HISTORY = '<use xlink:href="#history"/>',
+            FLAG_FULL = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-full"/>'
 
         const {authorized, currentPage, isPhoneViewPort} = this.props
 
@@ -20,20 +20,20 @@ class UserNavigator extends React.Component {
                 isPhoneViewPort ?
                     <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
                         <Link to={'/favorites'}>
-                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                            <svg width="14" height="23" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
                         </Link>
                     </li>
                     :
                     <React.Fragment>
                         <li className={"header-menu__item" + (currentPage === pages.bookmarks ? ' active' : '')}>
                             <Link to={'/favorites'}>
-                                <svg width="10" height="16" dangerouslySetInnerHTML={{__html: _flagFull}}/>
+                                <svg width="10" height="16" dangerouslySetInnerHTML={{__html: FLAG_FULL}}/>
                                 {!isPhoneViewPort && <span className="item__title">Закладки</span>}
                             </Link>
                         </li>
                         <li className={"header-menu__item" + (currentPage === pages.history ? ' active' : '')}>
                             <Link to={'/history'}>
-                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: _filter}}/>
+                                <svg width="16" height="16" dangerouslySetInnerHTML={{__html: HISTORY}}/>
                                 <span className="item__title">История</span>
                             </Link>
                         </li>
