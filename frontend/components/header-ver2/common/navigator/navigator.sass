@@ -1,7 +1,8 @@
-@import "~tools/variables"
+@import "~tools/variables.sass"
 
 .header-ver2
   .navigation
+    display: block !important
     padding-top: 7px
     ul a
       padding: 0
@@ -25,11 +26,16 @@
     font-size: 14px
     line-height: 17px
     letter-spacing: 0.12em
+    color: $color-main-dark
+    @media (max-width: 899px)
+      font-size: 12px
+      line-height: 110%
 
   .header-menu__item
     margin: 0 !important
     padding: 0 12px
     opacity: 1 !important
+    cursor: pointer
     a
       display: flex
       align-items: center
@@ -47,9 +53,24 @@
           width: 100%
           left: 0
           top: -28px
+          @media (max-width: 899px)
+            top: -31px
 
 
   .item__title
     position: relative
     font-weight: normal
+
+  &.opened
+    .header-menu
+      color: $color-white
+
+    .header-menu__item
+      svg
+        fill: $color-white
+
+      &.active
+        .item__title::after
+          border-color: $color-white
+
 

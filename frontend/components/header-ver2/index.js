@@ -3,20 +3,21 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from "redux";
 
 import DesktopHeader from './desktop';
-import MobileHeaderRow from '../page-header/mobile-header';
-import MobileFilter from '../page-header/desktop-filters';
+import MobileHeader from './mobile';
 
 import * as pageHeaderActions from "../../actions/page-header-actions";
 import * as appActions from "../../actions/app-actions";
-import {isMobile, OverflowHandler, pages, widthLessThan900} from "../../tools/page-tools";
+import {isMobile, isPhoneViewPort, OverflowHandler, pages, widthLessThan900} from "../../tools/page-tools";
 import $ from "jquery";
+import './header-ver2.sass'
 
 class Header extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            isMobile: isMobile()
+            isMobile: isMobile(),
+            isPhoneViewPort: isPhoneViewPort()
         }
 
         this._width = window.innerWidth;
@@ -24,6 +25,10 @@ class Header extends React.Component {
         this._handleResize = function() {
             if (this.state.isMobile !== isMobile()) {
                 this.setState({isMobile: isMobile()})
+            }
+
+            if (this.state.isPhoneViewPort !== isPhoneViewPort()) {
+                this.setState({isPhoneViewPort: isPhoneViewPort()})
             }
         }.bind(this)
 
@@ -78,7 +83,7 @@ class Header extends React.Component {
     }
 
     render() {
-        let {authorized, pageHeaderState, visible} = this.props,
+        let {pageHeaderState, visible} = this.props,
             _menuOpened = pageHeaderState.showMenu,
             _headerClass = 'header-ver2 page-header' + (_menuOpened ? ' opened' : ' _fixed' + (!visible ? ' _animate' : ''))
 
@@ -88,13 +93,11 @@ class Header extends React.Component {
                     <div className='page-header__row'>
                         {
                             this.state.isMobile ?
-                                <MobileHeaderRow onClickMenuTrigger={::this._onClickMenuTrigger}
-                                                 currentPage={pageHeaderState.currentPage}/>
+                                <MobileHeader onClickMenuTrigger={::this._onClickMenuTrigger} isPhoneViewPort={this.state.isPhoneViewPort}/>
                                 :
-                                <DesktopHeader/>
+                                <DesktopHeader />
                         }
                     </div>
-                    {/*<MobileFilter/>*/}
                 </header>
                 : null
         )

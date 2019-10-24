@@ -32,6 +32,7 @@ export default function singleCourse(state = initialState, action) {
                 State: 'D',
                 Mask: '_mask01',
                 PaidTp: 1,
+                CourseType: 1,
             };
 
             return {

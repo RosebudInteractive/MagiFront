@@ -46,6 +46,11 @@ export function isMobile() {
     return window.innerWidth <= 899
 }
 
+export function isPhoneViewPort() {
+    // return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
+    return window.innerWidth <= 649
+}
+
 export const isInViewport = (selector, margin) => {
     let _this = $(selector);
     if (!_this || !_this.length) { return }

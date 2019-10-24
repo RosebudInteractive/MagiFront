@@ -242,6 +242,7 @@ class CourseEditor extends React.Component {
             URL: editorValues.URL,
             Description: editorValues.description,
             Mask: editorValues.cover.mask,
+            CourseType: +editorValues.courseType ? +editorValues.courseType : 1,
             Authors: [],
             Categories: [],
             Lessons: [],

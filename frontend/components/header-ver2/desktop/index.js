@@ -1,19 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
 import SignInBlock from './sign-in-block';
-import Navigator from './navigator';
+import Navigator from '../common/navigator';
 import FiltersRow from './filter';
 
 import './desktop-header.sass'
 
 export default class DesktopHeader extends React.Component {
-
-    static propTypes = {
-        currentPage: PropTypes.object.isRequired,
-    }
 
     constructor(props) {
         super(props)

@@ -1,0 +1,20 @@
+@import "~tools/variables.sass"
+
+.phone-navigator-block
+  .menu-item__wrapper
+    display: flex
+
+    svg
+      fill: $color-white-06
+      padding: 10px 7px 14px 0
+
+  .menu-item.active:before
+    content: ""
+    position: absolute
+    bottom: 0
+    left: -19px
+    height: 100%
+    border-left: $border-active-menu-item-white
+
+  .history-item.active:before
+    left: -42px

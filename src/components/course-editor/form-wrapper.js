@@ -13,10 +13,14 @@ import {enableButtonsSelector} from "adm-ducks/app";
 import {isYoutubeLink} from '../../tools/link-tools'
 
 const STATE_OPTIONS = [
-    {id: 'D', value: 'Черновик'},
-    {id: 'P', value: 'Опубликованный'},
-    {id: 'A', value: 'Архив'}
-]
+        {id: 'D', value: 'Черновик'},
+        {id: 'P', value: 'Опубликованный'},
+        {id: 'A', value: 'Архив'}
+    ],
+    COURSE_TYPES = [
+        {id: 1, value: 'Теория'},
+        {id: 2, value: 'Практика'}
+    ]
 
 class CourseEditorForm extends React.Component {
 
@@ -55,7 +59,7 @@ class CourseEditorForm extends React.Component {
                 fixDescription: _fixDescription,
                 videoIntroLink: course.VideoIntroLink,
                 videoIntwLink: course.VideoIntwLink,
-
+                courseType: course.CourseType
             });
         }
     }
@@ -89,6 +93,8 @@ class CourseEditorForm extends React.Component {
                        options={STATE_OPTIONS} disabled={_disabled}/>
                 <Field component={Select} name="languageId" label="Язык" placeholder="Выберите язык"
                        options={this._getLanguagesArray()} disabled={_disabled}/>
+                <Field component={Select} name="courseType" label="Тип курса" placeholder="Выберите тип курса"
+                       options={COURSE_TYPES} disabled={_disabled}/>
                 <Field component={TextArea} enableHtml={true} name="description" label="Описание курса" disabled={_disabled}/>
                 {/*<Field component={TextArea} enableHtml={true} name="shortDescription" label="Краткое описание курса" disabled={_disabled}/>*/}
                 {/*<Field component={TextArea} enableHtml={true} name="targetAudience" label="Кому подойдет этот курс" disabled={_disabled}/>*/}

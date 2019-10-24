@@ -2,6 +2,7 @@ import {appName} from '../config'
 import {createSelector} from 'reselect'
 import Immutable, {Record, Map,} from 'immutable'
 import {GET_COURSES_REQUEST, GET_COURSES_SUCCESS} from "../constants/courses";
+import {FILTER_COURSE_TYPE} from "../constants/filters";
 
 /**
  * Constants
@@ -12,13 +13,26 @@ const prefix = `${appName}/${moduleName}`
 export const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
 export const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
 export const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
+export const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
+export const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
 
 
 /**
  * Reducer
  * */
+const FilterRecord = Record({
+    id: null,
+    name: null,
+    count: { theory: 0, practice: 0 },
+    URL: null,
+    selected: false,
+})
+
 export const ReducerRecord = Record({
+    courseType: new Set([FILTER_COURSE_TYPE.THEORY]),
+    mainType: FILTER_COURSE_TYPE.THEORY,
     filters: new Map(),
+    root: new FilterRecord(),
     loading: false,
 })
 
@@ -36,6 +50,7 @@ export default function reducer(state = new ReducerRecord(), action) {
 
             return state
                 .update('filters', filters => filters.merge(_map))
+                .set('root', _getRoot(payload))
                 .set('loading', false)
         }
 
@@ -70,6 +85,25 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         }
 
+        case SET_FILTER_COURSE_TYPE:
+            return state
+                .set('courseType', new Set([payload]))
+                .set('mainType', payload)
+
+        case TOGGLE_FILTER_COURSE_TYPE:
+            return state
+                .update('courseType', (courseType) => {
+                    let _set = new Set(courseType)
+
+                    if (_set.has(payload)) {
+                        _set.delete(payload)
+                    } else {
+                        _set.add(payload)
+                    }
+
+                    return _set
+                })
+
         default:
             return state
     }
@@ -84,26 +118,34 @@ const _getFilters = (data) => {
             let _value = {
                 id: item.Id,
                 name: item.Name,
-                count: item.Counter,
+                count: { theory: _parseCounter(item.CntByType["1"]), practice: _parseCounter(item.CntByType["2"]) },
                 URL: item.URL,
                 selected: false,
             }
 
             return _obj[item.URL]= _value
         })
-
-        _obj['0'] = {
-            id: 0,
-            name: "Все темы",
-            count: data.Categories.reduce((acc, item) => {
-                return acc + item.Counter
-            }, 0),
-            URL: "/",
-            selected: false,
-        }
     }
 
     return Immutable.fromJS(_obj)
+}
+
+const _getRoot = (data) => {
+    let _root =  {
+        id: 0,
+        name: "Все темы",
+        count: data.Categories.reduce((acc, item) => {
+            return {theory : acc.theory + _parseCounter(item.CntByType["1"]), practice: acc.practice + _parseCounter(item.CntByType["2"])}
+        }, {theory: 0, practice: 0}),
+        URL: "/",
+        selected: true,
+    }
+
+    return new FilterRecord(_root)
+}
+
+const _parseCounter = (value) => {
+    return isNaN(+value) ? 0 : +value
 }
 
 /**
@@ -111,7 +153,10 @@ const _getFilters = (data) => {
  * */
 
 export const stateSelector = state => state[moduleName]
+export const rootSelector = createSelector(stateSelector, state => state.root)
 export const filtersSelector = createSelector(stateSelector, state => state.filters)
+export const filterCourseTypeSelector = createSelector(stateSelector, state => state.courseType)
+export const filterMainTypeSelector = createSelector(stateSelector, state => state.mainType)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const isEmptyFilterSelector = createSelector(filtersSelector, filter => filter.every(item => !item.get('selected')))
 export const selectedFilterSelector = createSelector(filtersSelector, filter => filter.filter(item => item.get('selected')))
@@ -138,4 +183,12 @@ export const applyExternalFilter = (value) => {
         type: APPLY_EXTERNAL_FILTER,
         payload: _array
     }
+}
+
+export const setFilterCourseType = (value) => {
+    return { type: SET_FILTER_COURSE_TYPE, payload: value }
+}
+
+export const toggleCourseTypeToFilter = (value) => {
+    return { type: TOGGLE_FILTER_COURSE_TYPE, payload: value }
 }

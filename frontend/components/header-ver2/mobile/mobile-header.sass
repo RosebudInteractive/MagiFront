@@ -1,0 +1,43 @@
+@import "~tools/variables"
+
+.page-header__menu-mobile
+  display: none
+  @media (max-width: 899px)
+    position: relative
+    display: -webkit-box
+    display: -webkit-flex
+    display: -moz-box
+    display: -ms-flexbox
+    display: flex
+    -webkit-box-sizing: border-box
+    -moz-box-sizing: border-box
+    box-sizing: border-box
+    padding: 15px 20px 11px
+    //height: 64px
+    -webkit-transition: background-color 0.3s ease
+    transition: background-color 0.3s ease
+    &::after
+      content: ""
+      position: absolute
+      bottom: 0
+      left: 20px
+      right: 20px
+      height: 1px
+      background-color: $border-dark-02
+
+  .logo-mobile
+    margin: 0 !important
+
+  .button-wrapper
+    position: absolute
+    right: 20px
+    top: 0
+    height: 100%
+    button
+      position: relative
+      margin: 30px 0 17px
+      width: 18px
+      height: 17px
+      top: 0
+      right: 0
+      padding: 0

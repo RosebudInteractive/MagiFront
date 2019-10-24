@@ -1,5 +1,5 @@
 import React from "react";
-import {showSignInForm} from '../../../actions/user-actions'
+import {showSignInForm} from '../../../../actions/user-actions'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 
@@ -9,8 +9,8 @@ class SignInBlock extends React.Component {
         const LOGIN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#login"/>'
 
         return !this.props.authorized &&
-            <div className="user-block">
-                <button className="login-btn js-login" onClick={::this.props.showSignInForm}>
+            <div className="mobile-menu__section">
+                <button className="login-btn" onClick={::this.props.showSignInForm}>
                     <svg width="15" height="16" dangerouslySetInnerHTML={{__html: LOGIN}}/>
                     <span>Вход</span>
                 </button>

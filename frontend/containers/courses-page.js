@@ -18,7 +18,8 @@ import {
     isEmptyFilterSelector,
     loadingSelector,
     selectedFilterSelector,
-    applyExternalFilter, clear
+    filterCourseTypeSelector,
+    applyExternalFilter, clear,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -67,11 +68,15 @@ class CoursesPage extends React.Component {
 
         if (!prevProps.isEmptyFilter && isEmptyFilter) {
             this._needRedirectToCourses = true
+            this.forceUpdate()
         }
 
         if (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) {
             let _filter = [];
-            selectedFilter.forEach(item => _filter.push(item.get('URL')));
+            selectedFilter.forEach((item) => {
+                _filter.push(item.get('URL'))
+            })
+
             this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
         }
 
@@ -95,7 +100,7 @@ class CoursesPage extends React.Component {
     }
 
     _getCoursesBundles() {
-        let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId, userPaidCourses} = this.props,
+        let {isEmptyFilter, selectedFilter, fixedCourseId, fixedLessonId, userPaidCourses, filterCourseType} = this.props,
             _courses = this.props.courses.items,
             _result = [];
 
@@ -103,11 +108,11 @@ class CoursesPage extends React.Component {
             let _inFilter = false;
 
             if (isEmptyFilter) {
-                _inFilter = true
+                _inFilter = filterCourseType.has(course.CourseType)
             } else {
                 _inFilter = course.Categories.some((categoryId) => {
                     return selectedFilter.find((item) => {
-                        return item.get('id') === categoryId
+                        return (item.get('id') === categoryId) && filterCourseType.has(course.CourseType)
                     });
                 });
             }
@@ -222,6 +227,7 @@ function mapStateToProps(state, ownProps) {
         fixedCourseId: fixedCourseIdSelector(state),
         fixedLessonId: fixedLessonIdSelector(state),
         userPaidCourses: userPaidCoursesSelector(state),
+        filterCourseType: filterCourseTypeSelector(state),
         ownProps,
     }
 }

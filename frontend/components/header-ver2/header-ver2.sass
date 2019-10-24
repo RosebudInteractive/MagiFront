@@ -1,0 +1,28 @@
+@import "~tools/variables"
+
+.header-ver2
+
+  .underlined-item
+    border-bottom: $border-hidden-link
+    -webkit-transition: all 0.3s ease
+    transition: all 0.3s ease
+    cursor: pointer
+    &:hover
+      border-bottom: $border-orange
+      color: $color-orange
+
+  .navigation ul li
+    display: block
+
+  &.page-header._fixed
+    height: 72px
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    background-color: $color-white
+    z-index: 50
+    -webkit-transition: -webkit-transform 0.5s ease
+    transition: -webkit-transform 0.5s ease
+    @media (max-width: 899px)
+      height: 64px
