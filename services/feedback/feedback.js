@@ -84,8 +84,13 @@ exports.Feedback = class Feedback {
                         user = _.template(`<b>Пользователь: </b><%= udata %><br>`)
                             ({ udata: escape(`{id: ${opts.user.Id}, email: "${opts.user.Email}"}`) });
                     }
+                    let path = "";
+                    if (opts.path) {
+                        path = _.template(`<b>Страница: </b><%= path %><br>`)
+                            ({ path: escape(`${opts.path}`) });
+                    }
                     if (templateBody)
-                        fields.Body = _.template(templateBody)({ sender: escape(sender), user: user, message: escape(message) });
+                        fields.Body = _.template(templateBody)({ sender: escape(sender), user: user, path: path, message: escape(message) });
                     if (config.has("mail.feedback.subject"))
                         fields.Subject = _.template(config.mail.feedback.subject)({ sender: sender, dt: (new Date()).toISOString() });
                     if (config.has("mail.feedback.recipients"))
