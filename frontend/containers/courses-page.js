@@ -19,6 +19,7 @@ import {
     loadingSelector,
     selectedFilterSelector,
     filterCourseTypeSelector,
+    filterMainTypeSelector,
     applyExternalFilter, clear,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
@@ -27,6 +28,7 @@ import {setCurrentPage, clearCurrentPage,} from "ducks/app";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 import MetaTags from 'react-meta-tags';
 import $ from "jquery";
+import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -54,7 +56,7 @@ class CoursesPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter} = this.props;
+        let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter, filterMainType, filterCourseType} = this.props;
 
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
@@ -71,13 +73,39 @@ class CoursesPage extends React.Component {
             this.forceUpdate()
         }
 
-        if (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) {
-            let _filter = [];
+        const _filterChanged = (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) ||
+            (prevProps.filterMainType !== filterMainType) ||
+            (!prevProps.filterCourseType.equals(filterCourseType))
+
+        if (_filterChanged) {
+            let _filter = []
+
+            const _type = filterMainType === FILTER_COURSE_TYPE.THEORY ?
+                    isEmptyFilter ? '' : FILTER_MAIN_TYPE.THEORY
+                    :
+                    FILTER_MAIN_TYPE.PRACTICE
+
+            if (_type) {
+                _filter.push(_type)
+                if ((_type === FILTER_MAIN_TYPE.THEORY) && filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE)) {
+                    _filter.push(FILTER_ADDED_TYPE.PRACTICE)
+                }
+
+                if ((_type === FILTER_MAIN_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
+                    _filter.push(FILTER_ADDED_TYPE.THEORY)
+                }
+            }
+
             selectedFilter.forEach((item) => {
                 _filter.push(item.get('URL'))
             })
 
-            this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
+            if (_filter.length > 0) {
+                this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
+            } else {
+                this._needRedirectToCourses = true
+                this.forceUpdate()
+            }
         }
 
         if (!prevProps.selectedFilter.equals(selectedFilter)) {
@@ -219,6 +247,7 @@ function mapStateToProps(state, ownProps) {
         filters: filtersSelector(state),
         isEmptyFilter: isEmptyFilterSelector(state),
         loadingFilters: loadingSelector(state),
+        filterMainType: filterMainTypeSelector(state),
         fetching: state.user.loading || state.courses.fetching,
         selectedFilter: selectedFilterSelector(state),
         size: state.app.size,
