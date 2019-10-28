@@ -72,7 +72,7 @@ class FiltersRow extends React.Component {
                         _right = _last.offset().left + _last.innerWidth(),
                         _row = $('.filters-row__inner')
 
-                    const _needShowShadowAfter = _right > _row.offset().left + _row.innerWidth()
+                    const _needShowShadowAfter = Math.round(_right) > Math.round(_row.offset().left + _row.innerWidth())
 
                     if (this.state.showShadowAfter !== _needShowShadowAfter) {
                         this.setState({showShadowAfter: _needShowShadowAfter})
@@ -81,7 +81,7 @@ class FiltersRow extends React.Component {
                     let _first = $('.filter-item').first(),
                         _left = _first.offset().left
 
-                    const _needShowShadowBefore = _left < _row.offset().left
+                    const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
 
                     if (this.state.showShadowBefore !== _needShowShadowBefore) {
                         this.setState({showShadowBefore: _needShowShadowBefore})
