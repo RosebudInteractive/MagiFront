@@ -39,13 +39,13 @@ class FiltersRow extends React.Component {
                 _left = _first.offset().left
 
             if (_row && (_row.length > 0) && _filter) {
-                const _needShowShadowAfter = _right > _row.offset().left + _row.innerWidth()
+                const _needShowShadowAfter = Math.round(_right) > Math.round(_row.offset().left + _row.innerWidth())
 
                 if (this.state.showShadowAfter !== _needShowShadowAfter) {
                     this.setState({showShadowAfter: _needShowShadowAfter})
                 }
 
-                const _needShowShadowBefore = _left < _row.offset().left
+                const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
 
                 if (this.state.showShadowBefore !== _needShowShadowBefore) {
                     this.setState({showShadowBefore: _needShowShadowBefore})
