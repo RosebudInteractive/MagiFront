@@ -63,7 +63,7 @@ class AuthApple {
         function getUserProfile(tokenObj, profileProcessor) {
             let profile = {};
             let isObject = typeof (tokenObj) === "string" ? false : true;
-            let token = isObject ? tokenObj.identityToken : tokenObj;
+            let token = isObject ? tokenObj.accessToken : tokenObj;
             try {
                 jwt.verify(token, getApplePublicKey, null, function (err, decoded) {
                     let _err = err;
