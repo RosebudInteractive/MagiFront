@@ -24,18 +24,31 @@ class FiltersRow extends React.Component {
         super(props);
 
         this.state = {
-            showShadow : false
+            showShadowAfter : false,
+            showShadowBefore : false,
         }
+
+        this._onScrollBinded = false
 
         this._handleResize = function() {
             let _filter = $('.filters-list'),
-                _row = $('.filters-row__inner')
+                _row = $('.filters-row__inner'),
+                _last = $('.filter-item').last(),
+                _right = _last.offset().left + _last.innerWidth(),
+                _first = $('.filter-item').first(),
+                _left = _first.offset().left
 
-            if (_row && _filter) {
-                const _needShowShadow = _filter.width() > _row.width()
+            if (_row && (_row.length > 0) && _filter) {
+                const _needShowShadowAfter = Math.round(_right) > Math.round(_row.offset().left + _row.innerWidth())
 
-                if (this.state.showShadow !== _needShowShadow) {
-                    this.setState({showShadow: _needShowShadow})
+                if (this.state.showShadowAfter !== _needShowShadowAfter) {
+                    this.setState({showShadowAfter: _needShowShadowAfter})
+                }
+
+                const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
+
+                if (this.state.showShadowBefore !== _needShowShadowBefore) {
+                    this.setState({showShadowBefore: _needShowShadowBefore})
                 }
             }
 
@@ -46,11 +59,38 @@ class FiltersRow extends React.Component {
 
     componentDidMount() {
         this._handleResize();
+
     }
 
     componentDidUpdate(prevProps) {
         if (!this.props.loading && prevProps.loading) {
             this._handleResize();
+
+            if (!this._onScrollBinded) {
+                $('.filters-list').scroll(() => {
+                    let _last = $('.filter-item').last(),
+                        _right = _last.offset().left + _last.innerWidth(),
+                        _row = $('.filters-row__inner')
+
+                    const _needShowShadowAfter = Math.round(_right - 5) > Math.round(_row.offset().left + _row.innerWidth())
+
+                    if (this.state.showShadowAfter !== _needShowShadowAfter) {
+                        this.setState({showShadowAfter: _needShowShadowAfter})
+                    }
+
+                    let _first = $('.filter-item').first(),
+                        _left = _first.offset().left
+
+                    const _needShowShadowBefore = Math.round(_left) < Math.round(_row.offset().left)
+
+                    if (this.state.showShadowBefore !== _needShowShadowBefore) {
+                        this.setState({showShadowBefore: _needShowShadowBefore})
+                    }
+                })
+
+                this._onScrollBinded = true
+            }
+
         }
     }
 
@@ -66,11 +106,12 @@ class FiltersRow extends React.Component {
             <div className={'page-header__row filters-row'}>
                 <div className="page-header__wrapper filters-row__wrapper">
                     <div className="filters-row__inner">
+                        <div className={"filter-list__shadow-element" + (this.state.showShadowBefore ? " _shadow" : "")}/>
                         <ul className="filters-list">
                             {this._getFilters()}
                         </ul>
                     </div>
-                    <div className={"ext-block_wrapper" + (this.state.showShadow ? " _shadow" : "")}>
+                    <div className={"ext-block_wrapper" + (this.state.showShadowAfter ? " _shadow" : "")}>
                         {
                             filterMainType === FILTER_COURSE_TYPE.THEORY &&
                             <div className="ext-block__button ext-block__item">

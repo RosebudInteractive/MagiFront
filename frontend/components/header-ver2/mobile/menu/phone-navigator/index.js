@@ -15,7 +15,7 @@ class PhoneUserNavigator extends React.Component {
         const {authorized, currentPage, filterMainType} = this.props,
             _isCoursePage = currentPage === pages.courses
 
-        return <div className='mobile-menu__section phone-navigator-block'>
+        return (_isCoursePage || authorized) && <div className='mobile-menu__section phone-navigator-block'>
             {
                 _isCoursePage &&
                     <div className="menu-item__wrapper">

@@ -1,8 +1,8 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import Immutable, {Record, Map,} from 'immutable'
+import Immutable, {Record, Map, Set} from 'immutable'
 import {GET_COURSES_REQUEST, GET_COURSES_SUCCESS} from "../constants/courses";
-import {FILTER_COURSE_TYPE} from "../constants/filters";
+import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
 
 /**
  * Constants
@@ -65,7 +65,13 @@ export default function reducer(state = new ReducerRecord(), action) {
 
         case SWITCH_FILTERS:
             return state
-                .setIn(['filters', payload, 'selected'], !state.getIn(['filters', payload, 'selected']))
+                .update('filters', filters => {
+                    return filters.map((item) => {
+                        let _value = item.get('URL') === payload ? !item.get('selected') : false
+
+                        return item.set('selected', _value)
+                    });
+                })
 
         case APPLY_EXTERNAL_FILTER: {
             if (payload) {
@@ -77,8 +83,16 @@ export default function reducer(state = new ReducerRecord(), action) {
                     }
                 })
 
+                let _type = payload.includes(FILTER_MAIN_TYPE.PRACTICE) ? FILTER_COURSE_TYPE.PRACTICE : FILTER_COURSE_TYPE.THEORY,
+                    _courseType = new Set([_type])
+
+                if (payload.includes(FILTER_ADDED_TYPE.THEORY)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.THEORY)}
+                if (payload.includes(FILTER_ADDED_TYPE.PRACTICE)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.PRACTICE)}
+
                 return state
                     .set('filters', _map)
+                    .set('mainType', _type)
+                    .set('courseType', _courseType)
             } else {
                 return state
             }
@@ -93,15 +107,11 @@ export default function reducer(state = new ReducerRecord(), action) {
         case TOGGLE_FILTER_COURSE_TYPE:
             return state
                 .update('courseType', (courseType) => {
-                    let _set = new Set(courseType)
-
-                    if (_set.has(payload)) {
-                        _set.delete(payload)
+                    if (courseType.has(payload)) {
+                        return courseType.delete(payload)
                     } else {
-                        _set.add(payload)
+                        return courseType.add(payload)
                     }
-
-                    return _set
                 })
 
         default:

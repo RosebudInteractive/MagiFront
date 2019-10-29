@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './cover.sass'
 import {Link} from "react-router-dom";
-import PageHeader from "../../page-header/page-header";
+import PageHeader from "../../header-ver2";
 import {getCrownForCourse} from "tools/svg-paths";
 
 const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>

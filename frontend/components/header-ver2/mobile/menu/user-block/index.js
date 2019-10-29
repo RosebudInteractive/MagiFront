@@ -39,9 +39,11 @@ class UserBlock extends React.Component {
                             </Link>
                     }
                     <div className="logout-btn" onClick={::this._onLogout}>
-                        <svg width="15" height="16" dangerouslySetInnerHTML={{__html: LOGOUT}}/>
-                        <div className="menu-item">
-                            <span className="underlined-item">Выйти</span>
+                        <div className="logout-btn__wrapper">
+                            <svg width="15" height="16" dangerouslySetInnerHTML={{__html: LOGOUT}}/>
+                            <div className="menu-item">
+                                <span className="underlined-item">Выйти</span>
+                            </div>
                         </div>
                     </div>
                 </React.Fragment>
