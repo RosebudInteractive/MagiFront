@@ -9,18 +9,35 @@ import {getDomain, getPageUrl, pages} from "tools/page-tools";
 
 import {refreshState as refreshStorage} from "actions/lesson-info-storage-actions";
 import {whoAmI} from "actions/user-actions";
-import {setCurrentPage} from "actions/page-header-actions";
+import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import $ from "jquery";
-import {facebookAppIdSelector, clearCurrentPage} from "ducks/app";
+import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
+import ScrollMemoryStorage from "tools/scroll-memory-storage";
+import Wrapper from "../components/test-page";
 
 class TestPage extends React.Component {
     componentWillMount() {
         window.scrollTo(0, 0)
         this.props.whoAmI()
         this.props.refreshStorage();
-        this.props.coursesActions.getCourses();
-        this.props.coursesActions.getCourse(this.props.courseUrl);
-        this.props.setCurrentPage(pages.test);
+        // this.props.coursesActions.getCourses();
+        // this.props.coursesActions.getCourse(this.props.courseUrl);
+        this.props.headerSetPage(pages.test);
+    }
+
+    componentDidMount() {
+        this.props.setCurrentPage(this);
+    }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.test) {
+            document.title = 'Тест: ' + this.props.test.Name + ' - Магистерия'
+        }
+
+        if (prevProps.fetching && !this.props.fetching) {
+            const _key = this.props.location.key;
+            ScrollMemoryStorage.scrollPage(_key)
+        }
     }
 
     render() {
@@ -34,7 +51,7 @@ class TestPage extends React.Component {
                 :
                 test && <React.Fragment>
                     {this._getMetaTags()}
-                    <div className="test-page"/>
+                    <Wrapper test={test}/>
                 </React.Fragment>
     }
 
@@ -142,7 +159,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({whoAmI, refreshStorage, setCurrentPage, clearCurrentPage}, dispatch)
+    return bindActionCreators({whoAmI, refreshStorage, headerSetPage, setCurrentPage, clearCurrentPage}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TestPage)

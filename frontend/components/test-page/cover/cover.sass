@@ -1,0 +1,104 @@
+@import "../../../tools/variables"
+
+.course-page__cover
+  .page-header
+    display: block !important
+    position: absolute
+    @media (max-width: 899px)
+      position: relative
+
+  //height: calc(56.26vw)
+  height: 633px
+  position: relative
+  background-repeat: no-repeat
+  -webkit-background-size: cover
+  background-size: cover
+  background-position: top center
+  @media(max-width: 1679px)
+    height: 512px
+  @media(max-width: 899px)
+    height: 420px
+
+
+  .lecture-frame__fav
+    position: relative
+    top: 0
+    left: 0
+
+  .course-page__info-wrapper
+    position: absolute
+    bottom: 62px
+    margin-left: 8.333%
+    width: 58.331%
+    @media(max-width: 899px)
+      bottom: 29px
+      margin: 0 20px
+      width: auto
+
+  .info__title
+    font-family: $font-pt
+    font-weight: normal
+    font-size: 52px
+    line-height: 110%
+    color: $color-white
+    margin: 0 0 18px 0
+    letter-spacing: -0.02em
+    @media(max-width: 899px)
+      font-size: 29px
+      letter-spacing: -0.01em
+      margin-bottom: 10px
+
+  .title__course-pay-status
+    margin-right: 13px
+    margin-left: 7px
+
+    svg
+      top: 50%
+      transform: translateY(-50%)
+
+
+  .title__label
+    vertical-align: initial
+    position: relative
+    font-style: italic
+    display: inline-block
+    margin: 0 13px 0 0
+    letter-spacing: normal
+    @media(max-width: 899px)
+      top: 3px
+
+  .info__authors-and-category
+    font-family: $font-fira
+    color: $color-white
+
+    .info__authors, .info__categories
+      display: inline
+
+    .author-item
+      font-size: 17px
+      line-height: 130%
+      color: $color-white
+      border-bottom: $border-hidden-link
+      -webkit-transition: border-color 0.3s ease
+      transition: border-color 0.3s ease
+      white-space: pre-line
+      display: inline-block
+      @media(max-width: 899px)
+        font-size: 12px
+        line-height: 124%
+      &:hover
+        border-bottom: $border-white-06
+
+    .category-item
+      letter-spacing: 0.12em
+      font-size: 14px
+      line-height: 17px
+      @media(max-width: 899px)
+        font-size: 12px
+        line-height: 110%
+
+    .course-page__info-separator
+      font-size: 17px
+      margin: 0 5px
+      @media(max-width: 899px)
+        font-size: 12px
