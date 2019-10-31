@@ -13,6 +13,7 @@ import ProfilePage from './containers/profile-page'
 import BookmarksPage from './containers/bookmark-page'
 import PurchasesPage from './containers/purchases-page'
 import ProjectPage from './containers/project-page'
+import TestPage from './containers/test-page'
 
 // import PageHeader from './components/page-header/page-header';
 import PageHeader from './components/header-ver2';
@@ -326,6 +327,7 @@ class App extends Component {
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
+                <Route path={_homePath + 'test/:testId'} component={TestPage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )
