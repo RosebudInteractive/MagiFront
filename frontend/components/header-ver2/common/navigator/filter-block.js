@@ -15,11 +15,11 @@ class FilterBlock extends React.Component {
             <React.Fragment>
                 <li className={"header-menu__item" + (filterMainType === FILTER_COURSE_TYPE.THEORY ? ' active' : '')}
                     onClick={() => {this.props.setFilterCourseType(FILTER_COURSE_TYPE.THEORY)}}>
-                    <span className="item__title">Теория</span>
+                    <span className="item__title">Знания</span>
                 </li>
                 <li className={"header-menu__item" + (filterMainType === FILTER_COURSE_TYPE.PRACTICE ? ' active' : '')}
                     onClick={() => {this.props.setFilterCourseType(FILTER_COURSE_TYPE.PRACTICE)}}>
-                    <span className="item__title">Практика</span>
+                    <span className="item__title">Навыки</span>
                 </li>
             </React.Fragment>
     }

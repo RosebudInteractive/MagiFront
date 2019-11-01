@@ -23,7 +23,7 @@ class PhoneUserNavigator extends React.Component {
                              onClick={() => {
                                  this.props.setFilterCourseType(FILTER_COURSE_TYPE.THEORY)
                              }}>
-                            <span className="underlined-item">Теория</span>
+                            <span className="underlined-item">Знания</span>
                         </div>
                     </div>
             }
@@ -34,7 +34,7 @@ class PhoneUserNavigator extends React.Component {
                              onClick={() => {
                                  this.props.setFilterCourseType(FILTER_COURSE_TYPE.PRACTICE)
                              }}>
-                            <span className="underlined-item">Практика</span>
+                            <span className="underlined-item">Навыки</span>
                         </div>
                     </div>
             }

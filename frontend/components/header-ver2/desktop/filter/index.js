@@ -117,7 +117,7 @@ class FiltersRow extends React.Component {
                             <div className="ext-block__button ext-block__item">
                                 <div className={"selector__item underlined-item" + (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? " active" : "")}
                                      onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.PRACTICE)}}>
-                                    {filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? "- Практика" : "+ Практика"}
+                                    {filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? "- Навыки" : "+ Навыки"}
                                 </div>
                             </div>
                         }
@@ -126,7 +126,7 @@ class FiltersRow extends React.Component {
                             <div className="ext-block__button ext-block__item">
                                 <div className={"selector__item underlined-item"  + (filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? " active" : "")}
                                      onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.THEORY)}}>
-                                    {filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? "- Теория" : "+ Теория"}
+                                    {filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? "- Знания" : "+ Знания"}
                                 </div>
                             </div>
                         }
