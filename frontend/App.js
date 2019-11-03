@@ -216,7 +216,11 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _nextLocation;
 
         if (_isNewLocation) {
-            if (!this.state.showHeader) {
+            const _isFilterSwitched = (_thisLocation.startsWith('/razdel/') && _nextLocation.startsWith('/razdel/')) ||
+                (_thisLocation.startsWith('/razdel/') && (_nextLocation === _homePath)) ||
+                ((_thisLocation === _homePath) && _nextLocation.startsWith('/razdel/'))
+
+            if (!this.state.showHeader && !_isFilterSwitched) {
                 this.setState({showHeader: true,});
             }
 

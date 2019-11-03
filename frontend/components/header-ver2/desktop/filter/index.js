@@ -32,8 +32,13 @@ class FiltersRow extends React.Component {
 
         this._handleResize = function() {
             let _filter = $('.filters-list'),
-                _row = $('.filters-row__inner'),
-                _last = $('.filter-item').last(),
+                _row = $('.filters-row__inner')
+
+            if (!_filter || (_filter.length === 0)) {
+                return
+            }
+
+            let _last = $('.filter-item').last(),
                 _right = _last.offset().left + _last.innerWidth(),
                 _first = $('.filter-item').first(),
                 _left = _first.offset().left
