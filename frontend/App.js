@@ -45,7 +45,6 @@ import NotFound from './components/not-found'
 
 import SizeInfo from './components/size-info'
 
-import Platform from 'platform';
 import BillingWrapper from "./components/messages/billing/billing-wrapper";
 import CoursePaymentWrapper from "./components/messages/billing/course-payment-wrapper";
 import CookiesMessage from "./components/messages/cookies-popup";
@@ -54,7 +53,7 @@ import {getAppOptions, waitingSelector} from 'ducks/app'
 import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
-import {isMobileAppleDevice} from "./tools/page-tools";
+import {isMobilePlatform} from "./tools/page-tools";
 
 Polyfill.registry();
 
@@ -67,53 +66,21 @@ class App extends Component {
         super(props);
 
         this.state = {
-            // direction: '',
             lastScrollPos: 0,
             showHeader: true,
-            // width: 0,
-            // height: 0,
         };
 
         this._lastScrollPos = 0;
 
         this._handleScroll = this._handleScroll.bind(this);
 
-        let _isMobile = (Platform.os.family === "Android") || isMobileAppleDevice() || (Platform.os.family === "Windows Phone");
-        if (_isMobile) {
+        if (isMobilePlatform()) {
             this.props.appActions.setAppTypeMobile()
         }
 
         this.props.getAppOptions()
-    }
 
-    get width() {
-        return this.state.width
-    }
-
-    set width(value) {
-        this.state.width = value
-    }
-
-    get height() {
-        return this.state.height
-    }
-
-    set height(value) {
-        this.setState({height: value})
-    }
-
-    get size() {
-        return this.props.size
-    }
-
-    updateDimensions() {
-        this.width = window.innerWidth;
-        let _size = tools.getSize(this.width);
-        if (_size !== this.size) {
-            this.props.appActions.switchSizeTo(_size);
-        }
-
-        this.height = window.innerHeight;
+        this._mediaQuery = window.matchMedia("(orientation: portrait)");
     }
 
     componentWillMount() {
@@ -122,7 +89,6 @@ class App extends Component {
 
         if (!(_recoveryRout || _errorRout)) {
             this.props.userActions.whoAmI()
-            // this.props.getUserBookmarks()
         }
 
         this.props.appActions.getCookiesConfimation()
@@ -131,16 +97,7 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.updateDimensions();
-        window.addEventListener("resize", this.updateDimensions.bind(this));
         window.addEventListener('scroll', this._handleScroll);
-
-        let tooltips = $('.js-language, .js-user-block');
-        $(document).mouseup(function (e) {
-            if (tooltips.has(e.target).length === 0) {
-                tooltips.removeClass('opened');
-            }
-        });
 
         this.props.playerActions.startInit()
 
@@ -347,7 +304,8 @@ class App extends Component {
             isVisible = _dev.is(':visible');
 
         if (isVisible === true) {
-            _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
+            if (_dev.children().last().text() !== text)
+                _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
         }
     }
 
