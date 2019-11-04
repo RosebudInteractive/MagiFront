@@ -1,46 +1,6 @@
 import $ from "jquery";
 import Platform from 'platform'
 
-export const Size = {
-    xxl: {width: 1900, name: 'xxl-size'},
-    xl: {width: 1400, name: 'xl-size'},
-    l: {width: 1280, name: 'l-size'},
-    m: {width: 1024, name: 'm-size'},
-    s: {width: 900, name: 's-size'},
-    xs: {width: 768, name: 'xs-size'},
-    xxs: {width: 640, name: 'xxs-size'},
-    mobile: {width: 500, name: 'mobile'}
-};
-
-export const getSize = (width) => {
-// export const getSize = () => {
-    let _size = Object.keys(Size).find((item) => {
-        return width >= Size[item].width
-    });
-
-    // let _size = Size.xl;
-
-    if (!_size) {
-        _size = Size.mobile;
-    } else {
-        _size = Size[_size]
-    }
-
-    return _size;
-};
-
-export function widerThan(size) {
-    return this ? (this.width >= size.width) : false;
-}
-
-export function narrowerThan(size) {
-    return this ? (this.width < size.width) : false;
-}
-
-export function widthBetween(min, max) {
-    return this ? (this.narrowerThan(max) && this.widerThan(min)) : false
-}
-
 const addDevWarn = (text) => {
     let _dev = $('#dev'),
         isVisible = _dev.is(':visible');
@@ -245,6 +205,10 @@ window.$overflowHandler = OverflowHandler;
 
 export const isMobilePlatform = () => {
     return (Platform.os.family === "Android") || isMobileAppleDevice() || (Platform.os.family === "Windows Phone")
+}
+
+export const isSafariOnMac = () => {
+    return (Platform.os.family === "OS X") && (Platform.name === "Safari")
 }
 
 // Такая проверка добавлена для того чтобы обработать настройку "Запрос настольного веб-сайта"
