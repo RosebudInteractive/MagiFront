@@ -52,11 +52,11 @@ const addDevWarn = (text) => {
 }
 
 export function isMobile() {
-    return $(window).innerWidth() <= 899
+    return window.matchMedia("(max-width: 899px)").matches
 }
 
 export function isPhoneViewPort() {
-    return $(window).innerWidth() <= 649
+    return window.matchMedia("(max-width: 649px)").matches
 }
 
 export const isInViewport = (selector, margin) => {
