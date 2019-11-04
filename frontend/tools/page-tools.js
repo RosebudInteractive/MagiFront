@@ -41,14 +41,22 @@ export function widthBetween(min, max) {
     return this ? (this.narrowerThan(max) && this.widerThan(min)) : false
 }
 
+const addDevWarn = (text) => {
+    let _dev = $('#dev'),
+        isVisible = _dev.is(':visible');
+
+    if (isVisible === true) {
+        if (!_dev.children().last() || (_dev.children().last().text() !== text))
+            _dev.append($('<div style="position:  relative; color:darkgreen">' + text + '</div>'))
+    }
+}
+
 export function isMobile() {
-    // return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
-    return window.innerWidth <= 899
+    return $(window).innerWidth() <= 899
 }
 
 export function isPhoneViewPort() {
-    // return (this && this.props.size) ? (this.props.size.width < Size.s.width) : false
-    return window.innerWidth <= 649
+    return $(window).innerWidth() <= 649
 }
 
 export const isInViewport = (selector, margin) => {
@@ -235,6 +243,10 @@ export const getScrollPage = () => {
 
 window.$overflowHandler = OverflowHandler;
 
+export const isMobilePlatform = () => {
+    return (Platform.os.family === "Android") || isMobileAppleDevice() || (Platform.os.family === "Windows Phone")
+}
+
 // Такая проверка добавлена для того чтобы обработать настройку "Запрос настольного веб-сайта"
 // Так как при ее включении сафари определяется как десктопный с ос mac OS X 10.15
 export const isIOSWithEnabledDesktopBrowser = () => {
@@ -270,12 +282,6 @@ export const getCurrencySign = () => {
     if (isIOS13()) {
         return "Р"
     }
-    // if (Platform.os.family === "iOS") {
-    //     let _version = Platform.os.version.split('.')
-    //     if (+_version[0] > 12) {
-    //         return "Р"
-    //     }
-    // }
 
     if (isIOSWithEnabledDesktopBrowser()) {
         return "Р"
