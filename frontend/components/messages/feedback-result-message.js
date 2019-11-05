@@ -8,7 +8,13 @@ import Platform from "platform";
 class FeedbackResultMessage extends React.Component {
     render() {
         let {error, msgUrl} = this.props,
-            _header = error ? 'При отправке возникла ошибка' : 'Сообщение отправлено',
+            _header = error ?
+                error.messageTitle ?
+                    error.messageTitle
+                    :
+                    'При отправке возникла ошибка'
+                :
+                'Сообщение отправлено',
             _message = error ? error.message : 'Спасибо за Ваше сообщение. Оно успешно отправлено.'
 
         const _isIE = Platform.name === 'IE',

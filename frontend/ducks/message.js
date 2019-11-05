@@ -107,6 +107,11 @@ export const messageUrlSelector = createSelector(stateSelector, state => state.m
 /**
  * Action Creators
  * */
+export const showModalErrorMessage = (error) => {
+    return {type: SHOW_MODAL_MESSAGE_ERROR, payload: {error : error}}
+}
+
+
 export const sendFeedback = (values) => {
     return (dispatch) => {
         dispatch({
