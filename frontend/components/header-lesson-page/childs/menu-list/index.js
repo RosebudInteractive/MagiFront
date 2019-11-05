@@ -95,6 +95,7 @@ function mapStateToProps(state) {
         fetching: state.lessons.fetching,
         lessons: state.lessons,
         userPaidCourses : userPaidCoursesSelector(state),
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }
 

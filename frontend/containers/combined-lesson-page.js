@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import MetaTags from 'react-meta-tags';
 
-import Menu from '../components/combined-lesson-page/menu'
+// import Menu from '../components/combined-lesson-page/menu'
+import Menu from '../components/header-lesson-page'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 import MobileLessonWrapper from '../components/combined-lesson-page/mobile/mobile-lesson-wrapper';
 import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';

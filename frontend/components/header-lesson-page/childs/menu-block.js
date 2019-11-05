@@ -6,6 +6,8 @@ import PropTypes from "prop-types";
 import {getLessonNumber} from "tools/page-tools";
 import {hideLessonMenu, showLessonMenu} from 'actions/app-actions';
 
+import LessonsList from './menu-list'
+
 class MenuBlock extends React.Component {
 
     static propTypes = {
@@ -35,7 +37,7 @@ class MenuBlock extends React.Component {
                         onClick={::this._switchMenu}><span className='caption'>Лекция </span>
                     <span className="num"><span
                         className="current">{_number}</span>{'/' + _total}</span></button>
-                <LessonsListWrapper {...this.props}/>
+                <LessonsList {...this.props}/>
             </div>
         )
     }
@@ -45,6 +47,7 @@ const mapStateToProps = (state) => {
     return {
         course: state.singleLesson.course,
         lessonList: state.lessons,
+        isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }
 
