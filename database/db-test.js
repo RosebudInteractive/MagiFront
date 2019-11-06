@@ -25,6 +25,11 @@ const TEST_REQ_TREE = {
                             }
                         ]
                     }
+                },
+                {
+                    dataObject: {
+                        name: "TestMetaImage"
+                    }
                 }
             ]
         }
@@ -186,7 +191,7 @@ const DbTest = class DbTest extends DbObject {
         let dbOpts = opts.dbOptions || {};
         let root_obj = null;
         let testObj = null;
-        let testData = { Questions: [] };
+        let testData = { Questions: [], Images: [] };
 
         return Utils.editDataWrapper(() => {
             return new MemDbPromise(this._db, resolve => {
@@ -212,6 +217,26 @@ const DbTest = class DbTest extends DbObject {
                     testData.FromLesson = testObj.fromLesson();
                     testData.Duration = testObj.duration();
                     testData.IsTimeLimited = testObj.isTimeLimited();
+                    testData.Cover = testObj.cover();
+                    testData.CoverMeta = testObj.coverMeta();
+                    testData.URL = testObj.uRL();
+                    testData.SnPost = testObj.snPost();
+                    testData.SnName = testObj.snName();
+                    testData.SnDescription = testObj.snDescription();
+
+                    let root_img = testObj.getDataRoot("TestMetaImage");
+                    col = root_img.getCol("DataElements");
+                    if (col.count()) {
+                        for (let i = 0; i < col.count(); i++) {
+                            let obj = col.get(i);
+                            testData.Images.push({
+                                Id: obj.id(),
+                                Type: obj.type(),
+                                FileName: obj.fileName(),
+                                MetaData: obj.metaData(),
+                            });
+                        }
+                    };
 
                     let root_q = testObj.getDataRoot("Question");
                     col = root_q.getCol("DataElements");
@@ -253,7 +278,7 @@ const DbTest = class DbTest extends DbObject {
                                 }
                             }
                         }
-                    }
+                    };
                     return testData;
                 })
         }, memDbOptions);
@@ -605,6 +630,34 @@ const DbTest = class DbTest extends DbObject {
                     let fields = _.clone(inpFields);
                     delete fields.Questions;
                     this._setFieldValues(testObj, fields);
+                    if (testObj.uRL() && this._isNumericString(testObj.uRL()))
+                        throw new Error(`Test URL can't be numeric: ${inpFields["URL"]}`);
+
+                    if (Array.isArray(inpFields.Images)) {
+                        let root_img = testObj.getDataRoot("TestMetaImage");
+                        let img_collection = root_img.getCol("DataElements");
+                        let img_list = {};
+
+                        for (let i = 0; i < img_collection.count(); i++) {
+                            let obj = img_collection.get(i);
+                            img_list[obj.id()] = obj;
+                        }
+
+                        for (let i = 0; i < inpFields.Images.length; i++) {
+                            let fld = _.cloneDeep(inpFields.Images[i]);
+                            let img_obj = img_list[fld.Id];
+                            if (img_obj) {
+                                this._setFieldValues(img_obj, fld);
+                                delete img_list[fld.Id];
+                            }
+                            else {
+                                delete fld.Id;
+                                await root_img.newObject({ fields: fld }, dbOpts);
+                            }
+                        }
+                        for (let id in img_list)
+                            img_collection._del(img_list[id]);
+                    }
 
                     if (Array.isArray(inpFields.Questions)) {
                         let root_q = testObj.getDataRoot("Question");
@@ -693,12 +746,29 @@ const DbTest = class DbTest extends DbObject {
                         throw new Error(`Missing or invalid field "Method"`);
                     if (typeof (fields.Status) === "undefined")
                         fields.Status = 1; // "Черновик"
+                    if (typeof (fields.URL) === "string") {
+                        if (this._isNumericString(fields.URL))
+                            throw new Error(`Test URL can't be numeric: ${fields.URL}`);
+                    }
 
                     await root_obj.edit();
                     let newHandler = await root_obj.newObject({ fields: fields }, dbOpts);
 
                     newId = newHandler.keyValue;
                     testObj = this._db.getObj(newHandler.newObject);
+
+                    if (Array.isArray(inpFields.Images) && (inpFields.Images.length > 0)) {
+                        let root_img = testObj.getDataRoot("CourseMetaImage");
+                        for (let i = 0; i < inpFields.Images.length; i++) {
+                            let fld = _.cloneDeep(inpFields.Images[i]);
+                            if (typeof (fld.MetaData) !== "undefined")
+                                fld.MetaData = typeof (fld.MetaData === "string") ?
+                                    fld.MetaData : JSON.stringify(fld.MetaData);
+                            await root_img.newObject({
+                                fields: fld
+                            }, dbOpts);
+                        }
+                    }
 
                     if (Array.isArray(inpFields.Questions)) {
                         let root_q = testObj.getDataRoot("Question");
