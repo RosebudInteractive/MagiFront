@@ -302,7 +302,7 @@ module.exports = {
             appSecret: pk.app.facebook.appSecret,
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/facebook/oauth',
-            profileURL: 'https://graph.facebook.com/v2.12/me',
+            profileURL: 'https://graph.facebook.com/v5.0/me',
             // profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
             profileFields: ['id', 'about', 'email', 'name', 'photos'],
             passportOptions: {

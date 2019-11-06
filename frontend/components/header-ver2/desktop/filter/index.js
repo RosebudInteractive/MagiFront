@@ -32,8 +32,13 @@ class FiltersRow extends React.Component {
 
         this._handleResize = function() {
             let _filter = $('.filters-list'),
-                _row = $('.filters-row__inner'),
-                _last = $('.filter-item').last(),
+                _row = $('.filters-row__inner')
+
+            if (!_filter || (_filter.length === 0)) {
+                return
+            }
+
+            let _last = $('.filter-item').last(),
                 _right = _last.offset().left + _last.innerWidth(),
                 _first = $('.filter-item').first(),
                 _left = _first.offset().left
@@ -117,7 +122,7 @@ class FiltersRow extends React.Component {
                             <div className="ext-block__button ext-block__item">
                                 <div className={"selector__item underlined-item" + (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? " active" : "")}
                                      onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.PRACTICE)}}>
-                                    {filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? "- Практика" : "+ Практика"}
+                                    {filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) ? "- Навыки" : "+ Навыки"}
                                 </div>
                             </div>
                         }
@@ -126,7 +131,7 @@ class FiltersRow extends React.Component {
                             <div className="ext-block__button ext-block__item">
                                 <div className={"selector__item underlined-item"  + (filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? " active" : "")}
                                      onClick={() => {this.props.toggleCourseTypeToFilter(FILTER_COURSE_TYPE.THEORY)}}>
-                                    {filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? "- Теория" : "+ Теория"}
+                                    {filterCourseType.has(FILTER_COURSE_TYPE.THEORY) ? "- Знания" : "+ Знания"}
                                 </div>
                             </div>
                         }

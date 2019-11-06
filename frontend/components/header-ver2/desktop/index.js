@@ -1,4 +1,6 @@
 import React from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from "redux";
 import {Link} from 'react-router-dom';
 
 import UserBlock from './user-block';
@@ -6,12 +8,18 @@ import SignInBlock from './sign-in-block';
 import Navigator from '../common/navigator';
 import FiltersRow from './filter';
 
+import {hideUserBlock} from "actions/app-actions";
+
 import './desktop-header.sass'
 
-export default class DesktopHeader extends React.Component {
+class DesktopHeader extends React.Component {
 
     constructor(props) {
         super(props)
+    }
+
+    componentWillUnmount() {
+        this.props.hideUserBlock();
     }
 
     render() {
@@ -30,3 +38,9 @@ export default class DesktopHeader extends React.Component {
             </React.Fragment>
     }
 }
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({hideUserBlock}, dispatch)
+}
+
+export default connect(null, mapDispatchToProps)(DesktopHeader)

@@ -182,7 +182,7 @@ module.exports = {
             appSecret: '386e5c11ab88a43c5c96b7df69c9e06d',
             redirectURL: { success: '/', error: '/auth/error' },
             callBack: '/api/facebook/oauth',
-            profileURL: 'https://graph.facebook.com/v2.12/me',
+            profileURL: 'https://graph.facebook.com/v5.0/me',
             // profileFields: ['id', 'about', 'email', 'gender', 'name', 'photos', 'address', 'birthday', 'hometown', 'link'],
             profileFields: ['id', 'about', 'email', 'name', 'photos'],
             passportOptions: {

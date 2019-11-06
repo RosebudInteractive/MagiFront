@@ -1,11 +1,14 @@
 @import "~tools/variables"
 
 .mobile-button_wrapper
+  display: none
   position: fixed
   z-index: 1000
   bottom: 0
   width: 100%
   margin-bottom: 26px
+  @media (max-width: 899px)
+    display: block
   @media (max-width: 639px)
     width: calc(100% - 12px)
     margin: 0 6px 6px

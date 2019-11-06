@@ -1,13 +1,10 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {bindActionCreators} from "redux";
 
 import DesktopHeader from './desktop';
 import MobileHeader from './mobile';
 
-import * as pageHeaderActions from "../../actions/page-header-actions";
-import * as appActions from "../../actions/app-actions";
-import {isMobile, isPhoneViewPort, OverflowHandler, pages, widthLessThan900} from "../../tools/page-tools";
+import {isMobile, isPhoneViewPort,} from "tools/page-tools";
 import $ from "jquery";
 import './header-ver2.sass'
 
@@ -19,8 +16,6 @@ class Header extends React.Component {
             isMobile: isMobile(),
             isPhoneViewPort: isPhoneViewPort()
         }
-
-        this._width = window.innerWidth;
 
         this._handleResize = function() {
             if (this.state.isMobile !== isMobile()) {
@@ -43,45 +38,6 @@ class Header extends React.Component {
         this._removeEventListeners();
     }
 
-    componentDidUpdate() {
-        let _isCoursesPage = this.props.pageHeaderState.currentPage.name === pages.courses.name;
-        if (!_isCoursesPage && this.props.pageHeaderState.showFiltersForm) {
-            this.props.pageHeaderActions.hideFiltersForm()
-        }
-
-        if (widthLessThan900() && !this.props.showUserBlock) {
-            this.props.appActions.showUserBlock()
-        }
-
-        if ((this._width < 900) && !widthLessThan900()) {
-            this.props.appActions.hideUserBlock()
-            this._hideUserMenu()
-        }
-
-        this._width = window.innerWidth;
-    }
-
-    _onClickMenuTrigger() {
-        if (this.props.pageHeaderState.showMenu) {
-            this._hideUserMenu()
-        } else {
-            this._showUserMenu()
-        }
-    }
-
-    _showUserMenu() {
-        this.props.pageHeaderActions.showMenu()
-        OverflowHandler.rememberScrollPos();
-        OverflowHandler.turnOn();
-    }
-
-    _hideUserMenu() {
-        this.props.pageHeaderActions.hideMenu()
-        if (!this.props.showSignInForm) {
-            OverflowHandler.turnOff();
-        }
-    }
-
     render() {
         let {pageHeaderState, visible} = this.props,
             _menuOpened = pageHeaderState.showMenu,
@@ -93,9 +49,9 @@ class Header extends React.Component {
                     <div className='page-header__row'>
                         {
                             this.state.isMobile ?
-                                <MobileHeader onClickMenuTrigger={::this._onClickMenuTrigger} isPhoneViewPort={this.state.isPhoneViewPort}/>
+                                <MobileHeader isPhoneViewPort={this.state.isPhoneViewPort}/>
                                 :
-                                <DesktopHeader />
+                                <DesktopHeader/>
                         }
                     </div>
                 </header>
@@ -113,21 +69,10 @@ class Header extends React.Component {
 
 }
 
-function mapStateToProps(state, ownProps) {
+function mapStateToProps(state,) {
     return {
         pageHeaderState: state.pageHeader,
-        authorized: !!state.user.user,
-        showUserBlock: state.app.showUserBlock,
-        showSignInForm: state.app.showSignInForm,
-        ownProps,
     }
 }
 
-function mapDispatchToProps(dispatch) {
-    return {
-        pageHeaderActions: bindActionCreators(pageHeaderActions, dispatch),
-        appActions: bindActionCreators(appActions, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default connect(mapStateToProps,)(Header);

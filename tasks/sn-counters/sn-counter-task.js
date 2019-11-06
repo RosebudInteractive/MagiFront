@@ -162,7 +162,7 @@ exports.SnCounterTask = class SnCounterTask extends Task {
                         }
                     }
                     if (!options.lock) {
-                        let reqUrl = new URL("https://graph.facebook.com/v3.0");
+                        let reqUrl = new URL("https://graph.facebook.com/v5.0");
                         reqUrl.searchParams.append('id', _url);
                         reqUrl.searchParams.append('fields', 'engagement');
                         reqUrl.searchParams.append('access_token', config.snets.facebook.appId + '|' + config.snets.facebook.appSecret);
