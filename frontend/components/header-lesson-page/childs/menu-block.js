@@ -11,7 +11,8 @@ import LessonsList from './menu-list'
 class MenuBlock extends React.Component {
 
     static propTypes = {
-        lesson: PropTypes.object
+        lesson: PropTypes.object,
+        test: PropTypes.object,
     };
 
     componentWillUnmount() {
@@ -27,16 +28,21 @@ class MenuBlock extends React.Component {
     }
 
     render() {
-        let {lesson, lessonList} = this.props,
+        let {lesson, test, lessonList} = this.props,
+            _object = lesson ? lesson : test,
             _total = lessonList.object.length,
-            _number = getLessonNumber(lesson)
+            _number = getLessonNumber(_object),
+            _title = lesson ? "Лекция " : "Тест "
 
         return (
             <div className="lectures-menu__section lectures-list-block">
                 <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
-                        onClick={::this._switchMenu}><span className='caption'>Лекция </span>
-                    <span className="num"><span
-                        className="current">{_number}</span>{'/' + _total}</span></button>
+                        onClick={::this._switchMenu}><span className='caption'>{_title}</span>
+                    <span className="num">
+                        <span className="current">{_number}</span>
+                        {'/' + _total}
+                    </span>
+                </button>
                 <LessonsList {...this.props}/>
             </div>
         )
@@ -45,7 +51,7 @@ class MenuBlock extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        course: state.singleLesson.course,
+        course: state.singleCourse.object,
         lessonList: state.lessons,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }

@@ -12,6 +12,7 @@ class HeaderWrapper extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        test: PropTypes.object,
     };
 
     constructor(props) {
@@ -41,7 +42,7 @@ class HeaderWrapper extends React.Component {
     render() {
         const FULLSCREEN = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#fullscreen-n"/>';
 
-        let {course, lesson, isLessonMenuOpened, isMobileApp, extClass,} = this.props,
+        let {course, lesson, test, isLessonMenuOpened, isMobileApp, extClass,} = this.props,
             _singleLesson = course ? !!course.OneLesson : false,
             _type = this._getMenuType(),
             _menuClassName = "lectures-menu _plain-menu js-lectures-menu js-plain-menu " + _type +
@@ -54,13 +55,18 @@ class HeaderWrapper extends React.Component {
 
         return (
             <div className={_menuClassName}>
-                <LogoAndTitle lesson={lesson}/>
-                <MenuBlock lesson={lesson}/>
-                <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
-                        onClick={::this._onFullScreenClick}>
-                    <svg width="60" height="53" dangerouslySetInnerHTML={{__html: FULLSCREEN}}/>
-                </button>
-                <Navigator isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes} courseIsPaid={_courseIsPaid}/>
+                <LogoAndTitle lesson={lesson} test={test}/>
+                <MenuBlock lesson={lesson} test={test}/>
+                {
+                    lesson &&
+                        <React.Fragment>
+                            <button className="lectures-menu__fullscreen fullscreen-btn js-adjust" type="button"
+                                    onClick={::this._onFullScreenClick}>
+                                <svg width="60" height="53" dangerouslySetInnerHTML={{__html: FULLSCREEN}}/>
+                            </button>
+                            <Navigator isNeedHideRefs={this.props.isNeedHideRefs} episodes={this.props.episodes} courseIsPaid={_courseIsPaid}/>
+                        </React.Fragment>
+                }
                 <div className='lectures-menu__gradient-block'/>
             </div>
         )

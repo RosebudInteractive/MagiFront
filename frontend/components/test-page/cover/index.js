@@ -1,18 +1,16 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import './cover.sass'
-import {Link} from "react-router-dom";
-import PageHeader from "../../header-ver2";
-import {getCrownForCourse} from "tools/svg-paths";
+import StartButton from "./start-button";
+import {getCountMinutesTitle, getQuestionsTitle} from "tools/word-tools";
 
-const COURSE_PAGE_INFO_SEPARATOR = <span className="course-page__info-separator">•</span>
+const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 
 export default class Cover extends React.Component {
 
     static propTypes = {
+        test: PropTypes.object,
         course: PropTypes.object,
-        isFavorite: PropTypes.bool,
-        onFavoritesClick: PropTypes.func,
     }
 
     constructor(props) {
@@ -20,16 +18,16 @@ export default class Cover extends React.Component {
     }
 
     render() {
-        const _flag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-white"/>',
-            _redFlag = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#flag-red"/>',
-            _smallCrown = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#crown-small"/>'
+        const {test, course,} = this.props,
+            _coverUrl = test.Cover
 
-        const {course, isFavorite} = this.props,
-            _coverUrl = course.LandCover ? course.LandCover : course.Cover,
-            _backgroundPosition = course.LandCoverMeta && course.LandCoverMeta.backgroundPosition ?
+        if (typeof test.CoverMeta === "string") {
+            test.CoverMeta = JSON.parse(test.CoverMeta)
+        }
+        const _backgroundPosition = test.CoverMeta && test.CoverMeta.backgroundPosition ?
                 {
-                    top: course.LandCoverMeta.backgroundPosition.percent.top * 100 + "%",
-                    left: course.LandCoverMeta.backgroundPosition.percent.left * 100 + "%",
+                    top: test.CoverMeta.backgroundPosition.percent.top * 100 + "%",
+                    left: test.CoverMeta.backgroundPosition.percent.left * 100 + "%",
                 }
                 :
                 {
@@ -37,65 +35,28 @@ export default class Cover extends React.Component {
                     left: "center"
                 },
             _coverStyle = {
-                backgroundImage : "url(" + '/data/' + _coverUrl + ")",
-                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`
+                backgroundImage : "linear-gradient(rgba(47, 47, 47, 0.4) 0%, rgba(47, 47, 47, 0.4) 100%), url(" + '/data/' + _coverUrl + ")",
+                backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
             }
 
-        return <div className="course-page__cover" style={_coverStyle}>
-            <PageHeader visible={true}/>
-            <div className="course-page__info-wrapper">
-                <button type="button" className="lecture-frame__fav" onClick={::this._favoritesClick}>
-                    <svg width="14" height="23" dangerouslySetInnerHTML={{__html: isFavorite ? _redFlag : _flag}}/>
-                </button>
-                <div className="course-page__info">
+        return <div className="test-page__cover" style={_coverStyle}>
+            <div className="test-page__info-wrapper">
+                <StartButton test={test} course={course}/>
+
+                <div className="test-page__info">
                     <h1 className="info__title">
-                        <span className="title__course-pay-status">
-                            { getCrownForCourse(this.props.course) }
-                        </span>
-                        {/*{*/}
-                        {/*    course.IsPaid ?*/}
-                        {/*        <span className="title__course-pay-status">*/}
-                        {/*            <svg width="18" height="18" dangerouslySetInnerHTML={{__html: _smallCrown}}/>*/}
-                        {/*        </span>*/}
-                        {/*        :*/}
-                        {/*        null*/}
-                        {/*}*/}
-                        <p className="title__label">Курс:</p>
-                        <span>{course.Name.trim()}</span>
+                        <p className="title__label">Тест:</p>
+                        <span>{test.Name.trim()}</span>
                     </h1>
-                    <div className="info__authors-and-category">
-                        <div className="info__authors">{this._getAuthorBlock()}</div>
-                        <div className="info__categories">{this._getCategoriesBlock()}</div>
+                    <div className="info__detail">
+                        <div className="info__detail-item">{test.questionsCount + ' ' + getQuestionsTitle(test.questionsCount)}</div>
+                        {INFO_SEPARATOR}
+                        <div className="info__detail-item">{'≈' + test.estimatedTime + ' ' + getCountMinutesTitle(test.estimatedTime)}</div>
                     </div>
                 </div>
+
+
             </div>
         </div>
-    }
-
-    _getAuthorBlock(){
-        return this.props.course.Authors.map((author, index) => {
-            let _authorName = author.FirstName + ' ' + author.LastName;
-
-            return (<React.Fragment>
-                <Link to={'/autor/' + author.URL} className="author-item" key={index}>{_authorName}</Link>
-                {COURSE_PAGE_INFO_SEPARATOR}
-            </React.Fragment>);
-        });
-    }
-
-    _getCategoriesBlock() {
-        return this.props.course.Categories.map((item, index, array) => {
-            let _isLast = (index === array.length - 1);
-            return (<React.Fragment>
-                <span className="category-item" key={index}>{item.Name.toUpperCase()}</span>
-                {_isLast ? null : COURSE_PAGE_INFO_SEPARATOR}
-            </React.Fragment>);
-        });
-    }
-
-    _favoritesClick() {
-        if (this.props.onFavoritesClick) {
-            this.props.onFavoritesClick()
-        }
     }
 }

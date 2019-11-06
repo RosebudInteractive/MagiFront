@@ -55,6 +55,7 @@ import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 import {isMobilePlatform} from "./tools/page-tools";
+import {TEST_PAGE_TYPE} from "./constants/common-consts";
 
 Polyfill.registry();
 
@@ -225,7 +226,6 @@ class App extends Component {
 
     componentWillUnmount() {
         window.removeEventListener('scroll', this._handleScroll);
-        window.removeEventListener("resize", this.updateDimensions.bind(this));
     }
 
     _handleScroll(event) {
@@ -291,11 +291,13 @@ class App extends Component {
                 <Route path={_homePath + 'category/:url'} component={SingleCoursePage}/>
                 <Route path={_homePath + 'autor/:url/:garbage'} component={NotFound}/>
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
+                <Route path={_homePath + 'test/:courseUrl/:testId'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.TEST}/>)}/>
+                <Route path={_homePath + 'test-instance/:courseUrl/:testId'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.INSTANCE}/>)}/>
+                <Route path={_homePath + 'test-result/:courseUrl/:testId'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.RESULT}/>)}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/:garbage'} component={NotFound}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>
                 <Route path={_homePath + 'purchases'} component={PurchasesPage}/>
-                <Route path={_homePath + 'test/:testId'} component={TestPage}/>
                 <Route path="*" component={NotFound}/>
             </Switch>
         )

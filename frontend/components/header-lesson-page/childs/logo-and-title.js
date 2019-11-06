@@ -9,6 +9,7 @@ class LogoAndTitle extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        test: PropTypes.object,
     };
 
     render() {
@@ -20,7 +21,7 @@ class LogoAndTitle extends React.Component {
                 Id: course.Id,
                 Name: course.Name,
                 category: course.Categories[0].Name,
-                author: lesson.Author.FirstName + ' ' + lesson.Author.LastName,
+                author: lesson ? lesson.Author.FirstName + ' ' + lesson.Author.LastName : null,
                 price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
             }
 
@@ -43,7 +44,7 @@ class LogoAndTitle extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        course: state.singleLesson.course,
+        course: state.singleCourse.object,
     }
 }
 

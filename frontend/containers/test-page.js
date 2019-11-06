@@ -1,6 +1,7 @@
 import React from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
+import PropTypes from 'prop-types'
 import MetaTags from 'react-meta-tags';
 
 import NotFoundPage from '../components/not-found';
@@ -10,18 +11,31 @@ import {getDomain, getPageUrl, pages} from "tools/page-tools";
 import {refreshState as refreshStorage} from "actions/lesson-info-storage-actions";
 import {whoAmI} from "actions/user-actions";
 import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
+import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
-import Wrapper from "../components/test-page";
+
+import '../components/test-page/test-page.sass'
+import CoverWrapper from "../components/test-page/cover";
+import InstanceWrapper from "../components/test-page/instance";
+import {TEST_PAGE_TYPE} from "../constants/common-consts";
+import {test} from "../components/test-page/mock-data";
+import Header from "../components/header-lesson-page";
+
 
 class TestPage extends React.Component {
+
+    static propTypes = {
+        type: PropTypes.string,
+    }
+
     componentWillMount() {
         window.scrollTo(0, 0)
         this.props.whoAmI()
         this.props.refreshStorage();
-        // this.props.coursesActions.getCourses();
-        // this.props.coursesActions.getCourse(this.props.courseUrl);
+        this.props.getCourses();
+        this.props.getCourse(this.props.courseUrl);
         this.props.headerSetPage(pages.test);
     }
 
@@ -41,7 +55,7 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {test, fetching, notFound,} = this.props;
+        let {fetching, notFound,} = this.props;
 
         return fetching ?
             <LoadingFrame/>
@@ -49,14 +63,47 @@ class TestPage extends React.Component {
             notFound ?
                 <NotFoundPage/>
                 :
-                test && <React.Fragment>
+                <div className="test-page">
                     {this._getMetaTags()}
-                    <Wrapper test={test}/>
-                </React.Fragment>
+                    <Header test={test}/>
+                    {this._getWrapper()}
+                </div>
+
+    }
+
+    _getWrapper() {
+        // let {course, test, type} = this.props;
+        let {course, type} = this.props;
+
+        switch (type) {
+            case TEST_PAGE_TYPE.TEST :
+                return <CoverWrapper test={test} course={course}/>
+
+            case TEST_PAGE_TYPE.INSTANCE:
+                return <InstanceWrapper test={test} course={course}/>
+
+            case TEST_PAGE_TYPE.RESULT:
+                return <CoverWrapper test={test} course={course}/>
+
+            default:
+                return <CoverWrapper test={test} course={course}/>
+        }
+    }
+
+    reload() {
+        // let {courseUrl, lessonUrl} = this.props;
+        //
+        // this.props.userActions.whoAmI();
+        // this.props.storageActions.refreshState();
+        //
+        // this.props.lessonActions.getLesson(courseUrl, lessonUrl);
+        // this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
+        // this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
     }
 
     _getMetaTags() {
-        let {test, facebookAppID} = this.props,
+        // let {test, facebookAppID} = this.props,
+        let {facebookAppID} = this.props,
             _url = getPageUrl(),
             _domain = getDomain(),
             _imagePath = _domain + '/data/';
@@ -75,7 +122,7 @@ class TestPage extends React.Component {
 
         this._removeRobotsMetaTags()
 
-        return course
+        return test
             &&
             <MetaTags>
                 <meta name="description" content={"Test"}/>
@@ -153,13 +200,24 @@ class TestPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
     return {
+        courseUrl: ownProps.match.params.courseUrl,
         testId: ownProps.match.params.testId,
         facebookAppID: facebookAppIdSelector(state),
+        fetching: state.singleCourse.fetching || state.user.loading || state.courses.fetching,
+        course: state.singleCourse.object,
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({whoAmI, refreshStorage, headerSetPage, setCurrentPage, clearCurrentPage}, dispatch)
+    return bindActionCreators({
+        getCourse,
+        getCourses,
+        whoAmI,
+        refreshStorage,
+        headerSetPage,
+        setCurrentPage,
+        clearCurrentPage
+    }, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TestPage)

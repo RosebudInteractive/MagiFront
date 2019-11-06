@@ -1,0 +1,32 @@
+@import "~tools/variables"
+
+.test-page
+  .question-wrapper
+    background-color: $color-main-dark
+    position: relative
+    display: flex
+    flex-direction: column
+    padding: 30px 32.14% 60px
+    width: auto
+    height: auto
+    @media(max-width: 1679px)
+      padding: 30px 16.666% 60px
+    @media(max-width: 899px)
+      padding: 0 36px 43px
+    @media(max-width: 639px)
+      padding: 0 20px 43px
+
+  .question-title
+    padding: 36px 0 28px
+    font-family: $font-fira
+    font-style: normal
+    font-weight: bold
+    font-size: 17px
+    line-height: 24px
+    color: $color-white
+    margin: 0
+
+    .current
+      color: $color-orange
+    .total
+      color: $color-white-06
