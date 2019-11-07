@@ -29,6 +29,15 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absCategoryUrl = config.proxyServer.siteHost + config.categoryUrl + "/";
     }
 
+    _isNumericString(str) {
+        let result = false;
+        if (typeof (str) === "string") {
+            let res = str.match(/[0-9]*/);
+            result = (res && (str.length > 0) && (res[0].length === str.length))
+        }
+        return result;
+    }
+
     _convertDataUrl(url, isAbsPath, dLink) {
         let rc = (isAbsPath || dLink) ? (url ? ((dLink ? this._absDownLoadUrl : this._absDataUrl) + url) : null) : url;
         return rc;

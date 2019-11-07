@@ -516,15 +516,6 @@ const DbCourse = class DbCourse extends DbObject {
         this._productService = ProductService();
     }
 
-    _isNumericString(str) {
-        let result = false;
-        if (typeof (str) === "string") {
-            let res = str.match(/[0-9]*/);
-            result = (res && (str.length > 0) && (res[0].length === str.length))
-        }
-        return result;
-    }
-
     _getObjById(id, expression, options) {
         var exp = expression || COURSE_REQ_TREE;
         return super._getObjById(id, exp, options);
