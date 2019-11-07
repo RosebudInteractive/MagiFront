@@ -7,6 +7,7 @@ import {TextBox} from "../../common/input-controls";
 import Select from "../../common/select-control";
 import RadioBox from "../../common/radio-box-control";
 import {getCourseLessons, typesSelector} from 'adm-ducks/single-test'
+import Cover from "../../common/cover-with-cross";
 
 const METHODS = [
         {id: 1, value: 'Последовательный'},
@@ -51,6 +52,7 @@ class MainTab extends React.Component {
             <Field component={TextBox} name="maxQ" label="Количество вопросов" placeholder="Выберите максимальное количество вопросов" disabled={_disabled}/>
             <Field component={RadioBox} name="fromLesson" label="Брать вопросы из эпизодов" options={RADIO_BOX_VALUES} disabled={_disabled}/>
             <Field component={RadioBox} name="isTimeLimited" label="Ограничивать по времени" options={RADIO_BOX_VALUES} disabled={_disabled}/>
+            <Field component={Cover} name="cover" label="Обложка" disabled={_disabled}/>
         </div>
     }
 

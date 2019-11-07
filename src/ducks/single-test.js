@@ -55,6 +55,9 @@ const TestRecord = Record({
     FromLesson: false,
     IsTimeLimited: false,
     Status: null,
+    Cover: null,
+    CoverMeta: null,
+    URL: null,
 })
 
 const ReducerRecord = Record({

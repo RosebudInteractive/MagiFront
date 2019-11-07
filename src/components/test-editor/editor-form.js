@@ -100,7 +100,11 @@ class TestEditorForm extends React.Component {
                 fromLesson: !!test.FromLesson,
                 isTimeLimited: !!test.IsTimeLimited,
                 status: test.Status,
-                questions: questions
+                questions: questions,
+                cover: {
+                    file: test.Cover,
+                    meta: test.CoverMeta,
+                },
             })
         }
     }
@@ -144,6 +148,8 @@ class TestEditorForm extends React.Component {
             IsTimeLimited: !!+editorValues.isTimeLimited,
             Status: +editorValues.status,
             Questions: [],
+            Cover: editorValues.cover.file,
+            CoverMeta: editorValues.cover.meta,
         };
 
         this._fillQuestions(_obj.Questions);

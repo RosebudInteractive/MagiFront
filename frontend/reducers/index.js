@@ -24,6 +24,7 @@ import versionReducer, {moduleName as versionModule} from 'ducks/version'
 import appReducer, {moduleName as appModule} from 'ducks/app'
 import playerReducer, {moduleName as playerModule} from 'ducks/player'
 import GoogleAnalyticsReducer, {moduleName as GoogleAnalyticsModule} from 'ducks/google-analytics'
+import TestReducer, {moduleName as TestModule} from 'ducks/test'
 
 export default combineReducers({
 
@@ -50,6 +51,7 @@ export default combineReducers({
     [appModule]: appReducer,
     [playerModule]: playerReducer,
     [GoogleAnalyticsModule]: GoogleAnalyticsReducer,
+    [TestModule]: TestReducer,
     routing: routerReducer,
     form: formReducer,
 })

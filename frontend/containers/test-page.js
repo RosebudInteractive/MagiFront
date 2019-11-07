@@ -14,13 +14,14 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
+import {testSelector, loadingSelector as testLoading, getTest} from "ducks/test";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
 import CoverWrapper from "../components/test-page/cover";
 import InstanceWrapper from "../components/test-page/instance";
 import {TEST_PAGE_TYPE} from "../constants/common-consts";
-import {test} from "../components/test-page/mock-data";
+// import {test} from "../components/test-page/mock-data";
 import Header from "../components/header-lesson-page";
 
 
@@ -37,6 +38,7 @@ class TestPage extends React.Component {
         this.props.getCourses();
         this.props.getCourse(this.props.courseUrl);
         this.props.headerSetPage(pages.test);
+        this.props.getTest(this.props.testId)
     }
 
     componentDidMount() {
@@ -55,7 +57,7 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound,} = this.props;
+        let {fetching, notFound, test} = this.props;
 
         return fetching ?
             <LoadingFrame/>
@@ -72,8 +74,8 @@ class TestPage extends React.Component {
     }
 
     _getWrapper() {
-        // let {course, test, type} = this.props;
-        let {course, type} = this.props;
+        let {course, test, type} = this.props;
+        // let {course, type} = this.props;
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
@@ -102,8 +104,7 @@ class TestPage extends React.Component {
     }
 
     _getMetaTags() {
-        // let {test, facebookAppID} = this.props,
-        let {facebookAppID} = this.props,
+        let {test, facebookAppID} = this.props,
             _url = getPageUrl(),
             _domain = getDomain(),
             _imagePath = _domain + '/data/';
@@ -203,13 +204,15 @@ function mapStateToProps(state, ownProps) {
         courseUrl: ownProps.match.params.courseUrl,
         testId: ownProps.match.params.testId,
         facebookAppID: facebookAppIdSelector(state),
-        fetching: state.singleCourse.fetching || state.user.loading || state.courses.fetching,
+        fetching: state.singleCourse.fetching || state.user.loading || state.courses.fetching || testLoading(state),
         course: state.singleCourse.object,
+        test: testSelector(state)
     }
 }
 
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
+        getTest,
         getCourse,
         getCourses,
         whoAmI,
