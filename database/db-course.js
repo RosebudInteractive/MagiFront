@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const config = require('config');
+const striptags = require('striptags');
 const { DbObject } = require('./db-object');
 const { DbUtils } = require('./db-utils');
 const { Intervals } = require('../const/common');
@@ -13,6 +14,11 @@ const { AccessRights } = require('../security/access-rights');
 const { SubscriptionService } = require('../services/mail-subscription');
 const Utils = require(UCCELLO_CONFIG.uccelloPath + 'system/utils');
 const MemDbPromise = require(UCCELLO_CONFIG.uccelloPath + 'memdatabase/memdbpromise');
+
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+const writeFileAsync = promisify(fs.writeFile);
 
 const {
     ACCOUNT_ID,
@@ -210,6 +216,7 @@ const COURSE_MSSQL_ALL_PUBLIC_REQ =
     "select c.[Id], l.[Id] as[LessonId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color], cl.[Name], c.[URL], lc.[Number], lc.[ReadyDate],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], l.[IsFreeInPaidCourse], pc.[Counter], c.[CourseType],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], gc.[Id] GiftId,\n" +
+    "  case when c.[IsLandingPage] = 1 then cl.[ShortDescription] else cl.[Description] end CrsDescription,\n" +
     "  lc.[State], l.[Cover] as[LCover], l.[CoverMeta] as[LCoverMeta], l.[IsAuthRequired], l.[IsSubsRequired], l.[FreeExpDate], l.[URL] as[LURL], ell.[Audio], el.[Number] Eln,\n" +
     "  ell.[VideoLink], e.[ContentType],\n" +
     "  ll.[Name] as[LName], ll.[ShortDescription], ll.[Duration], ll.[DurationFmt], l.[AuthorId] from[Course] c\n" +
@@ -243,6 +250,7 @@ const COURSE_MYSQL_ALL_PUBLIC_REQ =
     "select c.`Id`, l.`Id` as`LessonId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`, cl.`Name`, c.`URL`, lc.`Number`, lc.`ReadyDate`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, l.`IsFreeInPaidCourse`, pc.`Counter`, c.`CourseType`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, gc.`Id` GiftId,\n" +
+    "  case when c.`IsLandingPage` = 1 then cl.`ShortDescription` else cl.`Description` end CrsDescription,\n" +
     "  lc.`State`, l.`Cover` as`LCover`, l.`CoverMeta` as`LCoverMeta`, l.`IsAuthRequired`, l.`IsSubsRequired`, l.`FreeExpDate`, l.`URL` as`LURL`, ell.`Audio`, el.`Number` Eln,\n" +
     "  ell.`VideoLink`, e.`ContentType`,\n" +
     "  ll.`Name` as`LName`, ll.`ShortDescription`, ll.`Duration`, ll.`DurationFmt`, l.`AuthorId` from`Course` c\n" +
@@ -770,6 +778,52 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
+    async createFbPriceList() {
+        const CURRENCY_CODE = "RUB";
+        if (!(config.has("pricelist.fb.path") && config.has("pricelist.fb.file")))
+            throw new Error(`DbCourse::createFbPriceList: Undefined pricelist file path!`);
+        let fileName = path.join(config.get("pricelist.fb.path"), config.get("pricelist.fb.file"));
+
+        let baseUrl = config.has("pricelist.fb.baseUrl") ? config.get("pricelist.fb.baseUrl") : this._baseUrl;
+        let absDataUrl = this._getAbsDataUrl(baseUrl);
+        let absCourseUrl = this._getAbsCourseUrl(baseUrl);
+
+        let data = await this.getAllPublic(null, { price_list: true });
+        let authors = {};
+        for (let i = 0; i < data.Authors.length; i++) {
+            let elem = data.Authors[i];
+            authors[elem.Id] = elem;
+        };
+        let courses = [];
+        for (let i = 0; i < data.Courses.length; i++){
+            let elem = data.Courses[i];
+            if (elem._rawProduct) {
+                courses.push({
+                    id: elem._rawProduct.Code,
+                    title: elem._rawProduct.Name,
+                    description: striptags(elem.CrsDescription),
+                    availability: "in stock",
+                    condition: "new",
+                    price: `${elem.Price} ${CURRENCY_CODE}`,
+                    link: absCourseUrl + elem.URL,
+                    image_link: absDataUrl + elem.Cover,
+                    brand: `${authors[elem.Authors[0]].FirstName} ${authors[elem.Authors[0]].LastName}`,
+                    sale_price: elem.Discount ? `${elem.DPrice} ${CURRENCY_CODE}` : null,
+                    sale_price_effective_date: elem.Discount ?
+                        `${elem.Discount.FirstDate.toISOString()}/${elem.Discount.LastDate.toISOString()}` : null
+                });
+            }
+        }
+        let columns = ["id", "title", "description", "availability", "condition", "price",
+            "link", "image_link", "brand", "sale_price", "sale_price_effective_date"];
+        let content = columns.join("\t");
+        for (let i = 0; i < courses.length; i++)
+            for (let j = 0; j < columns.length; j++)
+                content += `${j === 0 ? "\n" : "\t"}${courses[i][columns[j]] ? courses[i][columns[j]] : ""}`;
+        await writeFileAsync(fileName, content);
+        return { result: "OK", file: fileName };
+    }
+
     getAllPublic(user, options) {
         let courses = [];
         let authors = [];
@@ -781,6 +835,7 @@ const DbCourse = class DbCourse extends DbObject {
         let opts = options || {};
         let languageId = (typeof (opts.lang_id) === "number") && (!isNaN(opts.lang_id)) ? opts.lang_id : LANGUAGE_ID;
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let isPriceList = opts.price_list && ((opts.price_list === "true") || (opts.price_list === true)) ? true : false;
         let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let baseUrl;
@@ -843,6 +898,8 @@ const DbCourse = class DbCourse extends DbObject {
                                             Categories: [],
                                             Lessons: []
                                         };
+                                        if (isPriceList)
+                                            curr_course.CrsDescription = elem.CrsDescription;
                                         if (curr_course.IsPaid && curr_course.ProductId) {
                                             productList[curr_course.ProductId] = curr_course;
                                         }
@@ -896,7 +953,7 @@ const DbCourse = class DbCourse extends DbObject {
                                     let prod = prods[i];
                                     let course = productList[prod.Id];
                                     if (course)
-                                        this._setPriceByProd(course, prod);
+                                        this._setPriceByProd(course, prod, isPriceList);
                                 }
                             }
 
@@ -1449,11 +1506,13 @@ const DbCourse = class DbCourse extends DbObject {
         })
     }
 
-    _setPriceByProd(course, prod) {
+    _setPriceByProd(course, prod, hasRaw) {
         course.Price = prod.Price;
         course.DPrice = prod.DPrice;
         if (prod.Discount)
             course.Discount = prod.Discount;
+        if (hasRaw)
+            course._rawProduct = prod;
     }
 
     async getCoursePrice(course, withCheckProd, alwaysShowDiscount) {

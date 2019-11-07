@@ -220,6 +220,12 @@ module.exports = {
             }
         }
     },
+    pricelist: {
+        fb: {
+            path: path.normalize(path.join(process.cwd(), "..", "pricelist", "fb")),
+            file: "products.tsv",
+        }  
+    },
     connections: {
         redis: {
             host: "localhost",
