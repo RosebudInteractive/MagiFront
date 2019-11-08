@@ -10,7 +10,6 @@ export default class Cover extends React.Component {
 
     static propTypes = {
         test: PropTypes.object,
-        course: PropTypes.object,
     }
 
     constructor(props) {
@@ -18,7 +17,7 @@ export default class Cover extends React.Component {
     }
 
     render() {
-        const {test, course,} = this.props,
+        const {test,} = this.props,
             _coverUrl = test.Cover
 
         if (typeof test.CoverMeta === "string") {
@@ -41,7 +40,7 @@ export default class Cover extends React.Component {
 
         return <div className="test-page__cover" style={_coverStyle}>
             <div className="test-page__info-wrapper">
-                <StartButton test={test} course={course}/>
+                <StartButton test={test}/>
 
                 <div className="test-page__info">
                     <h1 className="info__title">

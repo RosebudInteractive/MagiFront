@@ -72,8 +72,12 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('loaded', true)
-                .set('test', parseData(payload))
+                .set('test', new TestRecord(payload))
                 .set('questions', dataToEntries(payload.Questions, QuestionRecord))
+
+        case GET_TEST_FAIL:
+            return state
+            .set('loading', false)
 
         default:
             return state
@@ -86,23 +90,6 @@ const dataToEntries = (values, DataRecord) => {
         new OrderedMap({})
     )
 }
-
-const parseData = (data) => {
-    if (typeof data.CoverMeta === "string") {
-        data.CoverMeta = JSON.parse(data.CoverMeta)
-    }
-
-    data.questionsCount = data.Questions.length
-
-    let _estimatedTime = data.Questions.reduce((acc, value) => {
-        return acc + value.AnswTime
-    }, 0)
-
-    data.estimatedTime = Math.round(_estimatedTime / 60)
-
-    return new TestRecord(data)
-}
-
 
 /**
  * Selectors
@@ -144,14 +131,33 @@ function* getTestSaga(data) {
 
     try {
         const _test = yield call(_fetchTest, data.payload)
+
+        console.error(_test)
+
         yield put({type: GET_TEST_SUCCESS, payload: _test})
     } catch (e) {
+        console.log(e)
         yield put({ type: GET_TEST_FAIL, payload: {e} })
     }
 }
 
 function _fetchTest(url) {
-    return fetch(`/api/adm/tests/${url}`, {method: 'GET', credentials: 'include'})
+    return fetch(`/api/tests/${url}`, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
+        .then((data) => {
+            if (typeof data.CoverMeta === "string") {
+                data.CoverMeta = JSON.parse(data.CoverMeta)
+            }
+
+            data.questionsCount = data.Questions.length
+
+            let _estimatedTime = data.Questions.reduce((acc, value) => {
+                return acc + value.AnswTime
+            }, 0)
+
+            data.estimatedTime = Math.round(_estimatedTime / 60)
+
+            return data
+        })
 }

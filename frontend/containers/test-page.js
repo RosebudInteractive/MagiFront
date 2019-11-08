@@ -36,9 +36,9 @@ class TestPage extends React.Component {
         this.props.whoAmI()
         this.props.refreshStorage();
         this.props.getCourses();
-        this.props.getCourse(this.props.courseUrl);
+        // this.props.getCourse(this.props.courseUrl);
         this.props.headerSetPage(pages.test);
-        this.props.getTest(this.props.testId)
+        this.props.getTest(this.props.testUrl)
     }
 
     componentDidMount() {
@@ -54,6 +54,11 @@ class TestPage extends React.Component {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
         }
+    }
+
+    componentWillUnmount() {
+        TestPage._removeMetaTags();
+        this.props.clearCurrentPage();
     }
 
     render() {
@@ -79,16 +84,16 @@ class TestPage extends React.Component {
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
-                return <CoverWrapper test={test} course={course}/>
+                return <CoverWrapper test={test}/>
 
             case TEST_PAGE_TYPE.INSTANCE:
-                return <InstanceWrapper test={test} course={course}/>
+                return <InstanceWrapper test={test}/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <CoverWrapper test={test} course={course}/>
+                return <CoverWrapper test={test}/>
 
             default:
-                return <CoverWrapper test={test} course={course}/>
+                return <CoverWrapper test={test}/>
         }
     }
 
@@ -121,7 +126,7 @@ class TestPage extends React.Component {
             return _data ? _data.size.height : 0
         }
 
-        this._removeRobotsMetaTags()
+        TestPage._removeRobotsMetaTags()
 
         return test
             &&
@@ -135,42 +140,38 @@ class TestPage extends React.Component {
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
-                {/*{*/}
-                {/*    course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.og*/}
-                {/*        ?*/}
-                {/*        [*/}
-                {/*            <meta property="og:image" content={_imagePath + course.PageMeta.Images.og.FileName}/>,*/}
-                {/*            <meta property="og:image:secure_url"*/}
-                {/*                  content={_imagePath + course.PageMeta.Images.og.FileName}/>,*/}
-                {/*            <meta property="og:image:width" content={_getWidth(course.PageMeta.Images.og.MetaData)}/>,*/}
-                {/*            <meta property="og:image:height" content={_getHeight(course.PageMeta.Images.og.MetaData)}/>*/}
-                {/*        ]*/}
-                {/*        :*/}
-                {/*        null*/}
-                {/*}*/}
+                {
+                    test.PageMeta && test.PageMeta.Images && test.PageMeta.Images.og
+                        &&
+                        [
+                            <meta property="og:image" content={_imagePath + test.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:secure_url"
+                                  content={_imagePath + test.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image:width" content={_getWidth(test.PageMeta.Images.og.MetaData)}/>,
+                            <meta property="og:image:height" content={_getHeight(test.PageMeta.Images.og.MetaData)}/>
+                        ]
+                }
                 <meta name="twitter:card" content="summary_large_image"/>
-                {/*<meta name="twitter:title" content={course.PageMeta.Name ? course.PageMeta.Name : course.Name}/>*/}
-                {/*<meta name="twitter:description" content={course.PageMeta.Description ? course.PageMeta.Description : course.Description}/>*/}
+                <meta name="twitter:title" content={test.PageMeta.Name ? test.PageMeta.Name : test.Name}/>
+                <meta name="twitter:description" content={test.PageMeta.Description ? test.PageMeta.Description : test.Description}/>
                 <meta name="twitter:site" content="@MagisteriaRu"/>
-                {/*{*/}
-                {/*    course.PageMeta && course.PageMeta.Images && course.PageMeta.Images.twitter*/}
-                {/*        ?*/}
-                {/*        <meta name="twitter:image" content={_imagePath + course.PageMeta.Images.twitter.FileName}/>*/}
-                {/*        :*/}
-                {/*        null*/}
-                {/*}*/}
+                {
+                    test.PageMeta && test.PageMeta.Images && test.PageMeta.Images.twitter
+                        &&
+                        <meta name="twitter:image" content={_imagePath + test.PageMeta.Images.twitter.FileName}/>
+                }
                 <meta name="twitter:creator" content="@MagisteriaRu"/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
                 <meta name="application-name" content="Magisteria"/>
             </MetaTags>
     }
 
-    _removeRobotsMetaTags() {
+    static _removeRobotsMetaTags() {
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
     }
 
-    _removeMetaTags() {
+    static _removeMetaTags() {
         $('meta[name="description"]').remove();
         $('link[rel="canonical"]').remove();
         $('meta[property="og:locale"]').remove();
@@ -192,19 +193,18 @@ class TestPage extends React.Component {
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
     }
-
-    componentWillUnmount() {
-        this._removeMetaTags();
-        this.props.clearCurrentPage();
-    }
 }
 
 function mapStateToProps(state, ownProps) {
     return {
         courseUrl: ownProps.match.params.courseUrl,
-        testId: ownProps.match.params.testId,
+        testUrl: ownProps.match.params.testUrl,
         facebookAppID: facebookAppIdSelector(state),
-        fetching: state.singleCourse.fetching || state.user.loading || state.courses.fetching || testLoading(state),
+        fetching: testLoading(state) ||
+            // state.singleCourse.fetching ||
+            state.user.loading ||
+            state.courses.fetching,
+
         course: state.singleCourse.object,
         test: testSelector(state)
     }
