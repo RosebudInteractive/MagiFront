@@ -13,6 +13,7 @@ module.exports = {
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
+    testUrl: '/test',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',
