@@ -632,7 +632,7 @@ const DbTest = class DbTest extends DbObject {
             }
         }
 
-        let maxQ = params.MaxQ ? params.MaxQ : testData.params.MaxQ;
+        let maxQ = params.MaxQ ? params.MaxQ : testData.MaxQ;
         if ((testData.Method === 2) && maxQ) {
             let newq = [];
             while ((newq.length < maxQ) && (testInstanse.Questions.length > 0)) {
