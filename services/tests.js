@@ -7,6 +7,17 @@ function setupTests(app) {
         global.$Services = {};
     global.$Services.tests = TestService;
 
+    app.get('/api/tests/:url', (req, res, next) => {
+        TestService()
+            .getPublic(req.params.url, req.user, req.query)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
     app.get('/api/tests/instance/:id', (req, res, next) => {
         if (!req.user)
             res.status(HttpCode.ERR_UNAUTH).json({ message: 'Authorization required!' })

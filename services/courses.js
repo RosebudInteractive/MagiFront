@@ -42,6 +42,19 @@ function setupCourses(app) {
                 });
         });
 
+        app.post('/api/adm/courses/pricelist/fb', (req, res, next) => {
+            new Promise(resolve => {
+                let rc = CoursesService().createFbPriceList();
+                resolve(rc);
+            })
+                .then(rows => {
+                    res.send(rows);
+                })
+                .catch(err => {
+                    next(err);
+                });
+        });
+
         app.get('/api/adm/courses/prerender/:id', (req, res, next) => {
             new Promise((resolve, reject) => {
                 let id = (req.query && req.query.url) ? req.query.url : parseInt(req.params.id);
