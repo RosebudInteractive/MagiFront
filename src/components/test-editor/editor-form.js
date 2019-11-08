@@ -7,6 +7,7 @@ import {Prompt} from "react-router-dom";
 import BottomControls from "../bottom-contols/buttons";
 import MainTab from "./tabs/main-tab";
 import QuestionsTab from "./tabs/questions-tab";
+import SocialTab from "./tabs/social-network-tab";
 import {activeTabsSelector, setActiveTab} from "adm-ducks/app";
 import {testSelector, questionsSelector, savingSelector, insertTest, updateTest, backToCourse,} from "adm-ducks/single-test";
 import PropTypes from "prop-types";
@@ -15,7 +16,13 @@ const EDITOR_NAME = "TestEditor"
 
 const TABS = {
     MAIN: 'MAIN',
+    SOCIAL: 'SOCIAL',
     QUESTIONS: 'QUESTIONS',
+}
+
+const IMAGE_TYPE = {
+    OG: 'og',
+    TWITTER: 'twitter',
 }
 
 class TestEditorForm extends React.Component {
@@ -64,6 +71,10 @@ class TestEditorForm extends React.Component {
                             onClick={() => { this._switchTo(TABS.MAIN) }}>Основные
                         </div>
                         <div
+                            className={"tabs-1 tab-link" + (this.state.currentTab === TABS.SOCIAL ? ' tab-link-active' : '')}
+                            onClick={() => { this._switchTo(TABS.SOCIAL) }}>Социальные сети
+                        </div>
+                        <div
                             className={"tabs-1 tab-link" + (this.state.currentTab === TABS.QUESTIONS ? ' tab-link-active' : '')}
                             onClick={() => { this._switchTo(TABS.QUESTIONS) }}>Вопросы
                         </div>
@@ -74,6 +85,7 @@ class TestEditorForm extends React.Component {
                 <div className="main-area__container">
                     <form className={"form-wrapper non-webix-form"} action={"javascript:void(0)"}>
                         <MainTab visible={this.state.currentTab === TABS.MAIN} editMode={this.props.editMode}/>
+                        <SocialTab visible={this.state.currentTab === TABS.SOCIAL} editMode={this.props.editMode}/>
                         <QuestionsTab visible={this.state.currentTab === TABS.QUESTIONS} editMode={this.props.editMode}/>
                     </form>
                 </div>
@@ -88,6 +100,9 @@ class TestEditorForm extends React.Component {
     _init() {
         let {test, questions} = this.props,
             _test = test ? test : {}
+
+        const _ogImage = this._getImage(IMAGE_TYPE.OG),
+            _twitterImage = this._getImage(IMAGE_TYPE.TWITTER)
 
         if (_test) {
             this.props.initialize({
@@ -105,8 +120,25 @@ class TestEditorForm extends React.Component {
                     file: test.Cover,
                     meta: test.CoverMeta,
                 },
+                URL: _test.URL,
+                snName: _test.SnName,
+                snDescription: _test.SnDescription,
+                snPost: _test.SnPost,
+                images: _test.Images ? _test.Images : [],
+                ogImage: {
+                    file: _ogImage ? _ogImage.FileName : '',
+                    meta: _ogImage ? JSON.parse(_ogImage.MetaData) : '',
+                },
+                twitterImage : {
+                    file: _twitterImage ? _twitterImage.FileName : '',
+                    meta: _twitterImage ? JSON.parse(_twitterImage.MetaData) : '',
+                },
             })
         }
+    }
+
+    _getImage(type) {
+        return (this.props.test && this.props.test.Images) ? this.props.test.Images.find(image => image.Type === type) : null
     }
 
     _switchTo(tabName) {
@@ -150,9 +182,38 @@ class TestEditorForm extends React.Component {
             Questions: [],
             Cover: editorValues.cover.file,
             CoverMeta: editorValues.cover.meta,
+            URL: editorValues.URL,
+            SnName: editorValues.snName,
+            SnDescription: editorValues.snDescription,
+            SnPost: editorValues.snPost,
         };
 
         this._fillQuestions(_obj.Questions);
+
+        const _ogImage = this._getImage(IMAGE_TYPE.OG),
+            _twitterImage = this._getImage(IMAGE_TYPE.TWITTER)
+
+        if (editorValues.ogImage.file || editorValues.twitterImage.file || _ogImage || _twitterImage) {
+            _obj.Images = [];
+
+            if (editorValues.ogImage.file) {
+                _obj.Images.push({
+                    Id: _ogImage ? _ogImage.Id : -1,
+                    Type: IMAGE_TYPE.OG,
+                    FileName: editorValues.ogImage.file,
+                    MetaData: JSON.stringify(editorValues.ogImage.meta)
+                })
+            }
+
+            if (editorValues.twitterImage.file) {
+                _obj.Images.push({
+                    Id: _twitterImage ? _twitterImage.Id : -2,
+                    Type: IMAGE_TYPE.TWITTER,
+                    FileName: editorValues.twitterImage.file,
+                    MetaData: JSON.stringify(editorValues.twitterImage.meta)
+                })
+            }
+        }
 
         if (this.props.editMode) {
             this.props.updateTest(_obj);
