@@ -29,6 +29,8 @@ const TestRecord = Record({
     Cover: null,
     CoverMeta: null,
     URL: null,
+    questionsCount: 0,
+    estimatedTime: 0,
 })
 
 const ReducerRecord = Record({
@@ -70,7 +72,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('loading', false)
                 .set('loaded', true)
-                .set('test', new TestRecord(payload))
+                .set('test', parseData(payload))
                 .set('questions', dataToEntries(payload.Questions, QuestionRecord))
 
         default:
@@ -83,6 +85,22 @@ const dataToEntries = (values, DataRecord) => {
         (acc, value) => acc.set(value.Id, new DataRecord(value)),
         new OrderedMap({})
     )
+}
+
+const parseData = (data) => {
+    if (typeof data.CoverMeta === "string") {
+        data.CoverMeta = JSON.parse(data.CoverMeta)
+    }
+
+    data.questionsCount = data.Questions.length
+
+    let _estimatedTime = data.Questions.reduce((acc, value) => {
+        return acc + value.AnswTime
+    }, 0)
+
+    data.estimatedTime = Math.round(_estimatedTime / 60)
+
+    return new TestRecord(data)
 }
 
 
