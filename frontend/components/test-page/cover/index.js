@@ -1,16 +1,18 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+// import PropTypes from 'prop-types'
 import './cover.sass'
 import StartButton from "./start-button";
 import {getCountMinutesTitle, getQuestionsTitle} from "tools/word-tools";
+import {testSelector} from "ducks/test";
+import {connect} from "react-redux";
 
 const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 
-export default class Cover extends React.Component {
+class Cover extends React.Component {
 
-    static propTypes = {
-        test: PropTypes.object,
-    }
+    // static propTypes = {
+    //     test: PropTypes.object,
+    // }
 
     constructor(props) {
         super(props)
@@ -40,7 +42,7 @@ export default class Cover extends React.Component {
 
         return <div className="test-page__cover" style={_coverStyle}>
             <div className="test-page__info-wrapper">
-                <StartButton test={test}/>
+                <StartButton/>
 
                 <div className="test-page__info">
                     <h1 className="info__title">
@@ -59,3 +61,9 @@ export default class Cover extends React.Component {
         </div>
     }
 }
+
+const mapStateToProps = (state) => {
+    return {test: testSelector(state)}
+}
+
+export default connect(mapStateToProps,)(Cover)

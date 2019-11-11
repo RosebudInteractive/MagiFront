@@ -13,15 +13,20 @@ export default class AnswerButton extends React.Component {
     static propTypes = {
         buttonType: PropTypes.string,
         disabled: PropTypes.bool,
+        onButtonClick: PropTypes.func,
     }
 
     render() {
-        const {disabled} = this.props
+        const {disabled,} = this.props
 
         return <div className="answer-button__wrapper">
-                <button className="button btn--brown" disabled={disabled}>
+                <button className="button btn--brown" disabled={disabled} onClick={::this._onClick}>
                     Ответить
                 </button>
         </div>
+    }
+
+    _onClick() {
+        if (this.props.onButtonClick) this.props.onButtonClick()
     }
 }

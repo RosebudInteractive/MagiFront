@@ -1,16 +1,16 @@
 import React from 'react'
-import PropTypes from 'prop-types'
+import {connect} from "react-redux";
+import PropTypes from 'prop-types';
 
+import {testSelector} from "ducks/test";
 import Cover from './cover'
-import Header from '../header-lesson-page'
 
 
-
-export default class Wrapper extends React.Component {
-    static propTypes = {
-        test: PropTypes.object,
-        course: PropTypes.object
-    }
+class Wrapper extends React.Component {
+    // static propTypes = {
+    //     test: PropTypes.object,
+    //     course: PropTypes.object
+    // }
 
     constructor(props) {
         super(props);
@@ -32,3 +32,9 @@ export default class Wrapper extends React.Component {
 
     }
 }
+
+const mapStateToProps = (state) => {
+    return {test: testSelector(state)}
+}
+
+export default connect(mapStateToProps,)(Wrapper)

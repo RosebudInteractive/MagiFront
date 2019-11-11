@@ -1,25 +1,38 @@
 import React from "react"
-import {Link} from "react-router-dom";
+import {bindActionCreators} from 'redux';
+import {connect} from "react-redux";
 import PropTypes from 'prop-types'
 
 import "./start-button.sass"
+import {testSelector} from "ducks/test";
+import {createNewTestInstance} from "ducks/test-instance";
 
 
-export default class StartButton extends React.Component {
+class StartButton extends React.Component {
 
     static propTypes = {
         test: PropTypes.object,
     }
 
     render() {
-        const {test,} = this.props
-
         return <div className="start-button__wrapper">
-            <Link to={`/test-instance/${test.URL}`}>
-                <div className="button btn--brown">
-                    Начать тест
-                </div>
-            </Link>
+            <div className="button btn--brown" onClick={::this._createInstance}>
+                Начать тест
+            </div>
         </div>
     }
+
+    _createInstance() {
+        this.props.createNewTestInstance(this.props.test.URL)
+    }
 }
+
+const mapStateToProps = (state) => {
+    return {test: testSelector(state)}
+}
+
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({createNewTestInstance}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(StartButton)

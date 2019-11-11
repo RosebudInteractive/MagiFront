@@ -30,13 +30,13 @@ export default class MenuItem extends React.Component {
 
         return (
             <li className={"lectures-list__item" + (_isActive ? ' active' : '')} id={'lesson-' + lesson.Id}>
-                <Link to={'/' + this.props.courseUrl + '/' + lesson.URL} className="lectures-list__item-header" onClick={() => {
+                <Link to={'/' + this.props.course.URL + '/' + lesson.URL} className="lectures-list__item-header" onClick={() => {
                     this.props.onLinkClick({
                         Id: course.Id,
                         Name: course.Name,
-                        author: lesson.Author.FirstName + lesson.Author.LastName,
+                        author: lesson ? lesson.Author.FirstName + lesson.Author.LastName : null,
                         category: course.Categories[0].Name,
-                        lessonName: lesson.Name,
+                        lessonName: lesson ? lesson.Name : null,
                         price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
                     })
                 }}>

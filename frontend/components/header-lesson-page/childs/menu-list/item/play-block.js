@@ -31,16 +31,16 @@ class PlayBlock extends React.Component {
     _play(e) {
         if (e) e.preventDefault()
 
-        let {lesson, courseUrl, lessonUrl} = this.props,
+        let {lesson, course, lessonUrl} = this.props,
             _audios = Object.values(lesson.Audios);
 
         this.props.playerStartActions.preinitAudios(_audios);
 
-        if ((lesson.courseUrl === courseUrl) && (lesson.URL === lessonUrl)) {
-            history.replace('/' + courseUrl + '/' + lesson.URL + '?play')
+        if ((lesson.courseUrl === course.URL) && (lesson.URL === lessonUrl)) {
+            history.replace('/' + course.URL + '/' + lesson.URL + '?play')
             this.forceUpdate()
         } else {
-            let _url = '/' + courseUrl + '/' + lesson.URL;
+            let _url = '/' + course.URL + '/' + lesson.URL;
 
             history.push({
                 pathname: _url,
@@ -64,7 +64,7 @@ class PlayBlock extends React.Component {
         const {course} = this.props;
 
         if (this.needLockLessonAsPaid) {
-            let _needLocation = '/' + this.props.courseUrl + '/' + this.props.lesson.URL
+            let _needLocation = '/' + this.props.course.URL + '/' + this.props.lesson.URL
 
             let _courseInfo = {
                 courseId: course.Id,
@@ -192,31 +192,6 @@ class PlayBlock extends React.Component {
 
             <div className="play-block-mobile">
                 <LessonPlayBlockSmall course={this.props.course} lesson={lesson} wrapperClass={"play-block-mobile__play-block"} externalPlayFunction={::this._play}/>
-                {/*<div className="play-block-mobile__play-block">*/}
-                {/*    {*/}
-                {/*        (_isThisLessonPlaying)*/}
-                {/*            ?*/}
-                {/*            (paused)*/}
-                {/*                ?*/}
-                {/*                <button type="button" className="play-btn-small"*/}
-                {/*                        onClick={::this.props.playerStartActions.startPlay}>*/}
-                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                {/*                    <span>Воспроизвести</span>*/}
-                {/*                </button>*/}
-                {/*                :*/}
-                {/*                <button type="button" className="play-btn-small"*/}
-                {/*                        onClick={::this.props.playerStartActions.startPause}>*/}
-                {/*                    <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _pause}}/>*/}
-                {/*                    <span>Воспроизвести</span>*/}
-                {/*                </button>*/}
-                {/*            :*/}
-                {/*            <button type="button" className="play-btn-small" onClick={::this._play}>*/}
-                {/*                <svg width="12" height="11" dangerouslySetInnerHTML={{__html: _playSmall}}/>*/}
-                {/*                <span>Воспроизвести</span>*/}
-                {/*            </button>*/}
-                {/*    }*/}
-                {/*    <span className="play-block-mobile__duration">{_duration}</span>*/}
-                {/*</div>*/}
             </div>
         ]
     }

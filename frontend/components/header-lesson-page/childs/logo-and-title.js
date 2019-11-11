@@ -8,6 +8,7 @@ import {connect} from "react-redux";
 class LogoAndTitle extends React.Component {
 
     static propTypes = {
+        course: PropTypes.object,
         lesson: PropTypes.object,
         test: PropTypes.object,
     };
@@ -42,14 +43,8 @@ class LogoAndTitle extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
-    return {
-        course: state.singleCourse.object,
-    }
-}
-
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({notifyCourseLinkClicked}, dispatch)
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LogoAndTitle)
+export default connect(null, mapDispatchToProps)(LogoAndTitle)

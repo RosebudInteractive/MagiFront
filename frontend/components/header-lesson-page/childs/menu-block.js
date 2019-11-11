@@ -11,6 +11,7 @@ import LessonsList from './menu-list'
 class MenuBlock extends React.Component {
 
     static propTypes = {
+        course: PropTypes.object,
         lesson: PropTypes.object,
         test: PropTypes.object,
     };
@@ -51,7 +52,7 @@ class MenuBlock extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        course: state.singleCourse.object,
+        // course: state.singleCourse.object,
         lessonList: state.lessons,
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }

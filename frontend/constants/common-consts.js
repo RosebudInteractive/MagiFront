@@ -1,3 +1,5 @@
+export const DATA_EXPIRATION_TIME = 3 * 60 * 1000
+
 export const CONTENT_TYPE = {
     AUDIO: 1,
     VIDEO: 2,

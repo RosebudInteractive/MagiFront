@@ -14,7 +14,8 @@ import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
 import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
-import {testSelector, loadingSelector as testLoading, getTest} from "ducks/test";
+import {testSelector, loadingSelector as testLoading, getTest,} from "ducks/test";
+import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
@@ -38,11 +39,48 @@ class TestPage extends React.Component {
         this.props.getCourses();
         // this.props.getCourse(this.props.courseUrl);
         this.props.headerSetPage(pages.test);
-        this.props.getTest(this.props.testUrl)
+        // this.props.getTest(this.props.testUrl)
+
+        switch (this.props.type) {
+            case TEST_PAGE_TYPE.TEST: {
+                this.props.getTest(this.props.testUrl)
+                return
+            }
+
+            case TEST_PAGE_TYPE.INSTANCE: {
+                this.props.getTestInstance(this.props.testUrl)
+                return
+            }
+
+            default:
+                return;
+
+        }
     }
 
     componentDidMount() {
         this.props.setCurrentPage(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.type !== this.props.type) {
+            switch (nextProps.type) {
+                case TEST_PAGE_TYPE.TEST: {
+                    this.props.getTest(nextProps.testUrl)
+                    return
+                }
+
+                case TEST_PAGE_TYPE.INSTANCE: {
+                    this.props.getTestInstance(nextProps.testUrl)
+                    return
+                }
+
+                default:
+                    return;
+
+            }
+
+        }
     }
 
     componentDidUpdate(prevProps) {
@@ -62,7 +100,7 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound, test} = this.props;
+        let {fetching, notFound, test, course} = this.props;
 
         return fetching ?
             <LoadingFrame/>
@@ -72,7 +110,7 @@ class TestPage extends React.Component {
                 :
                 <div className="test-page">
                     {this._getMetaTags()}
-                    <Header test={test}/>
+                    <Header test={test} course={course}/>
                     {this._getWrapper()}
                 </div>
 
@@ -84,16 +122,16 @@ class TestPage extends React.Component {
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
-                return <CoverWrapper test={test}/>
+                return <CoverWrapper/>
 
             case TEST_PAGE_TYPE.INSTANCE:
-                return <InstanceWrapper test={test}/>
+                return <InstanceWrapper/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <CoverWrapper test={test}/>
+                return <CoverWrapper/>
 
             default:
-                return <CoverWrapper test={test}/>
+                return <CoverWrapper/>
         }
     }
 
@@ -135,30 +173,30 @@ class TestPage extends React.Component {
                 <link rel="canonical" href={_url}/>
                 <meta property="og:locale" content="ru_RU"/>
                 <meta property="og:type" content="article"/>
-                <meta property="og:title" content={test.Name}/>
-                <meta property="og:description" content={test.Description}/>
+                <meta property="og:title" content={test.SnName ? test.SnName : test.Name}/>
+                { test.SnDescription && <meta property="og:description" content={test.SnDescription}/> }
                 <meta property="og:url" content={_url}/>
                 <meta property="og:site_name" content="Магистерия"/>
                 <meta property="fb:app_id" content={facebookAppID}/>
                 {
-                    test.PageMeta && test.PageMeta.Images && test.PageMeta.Images.og
+                    test.Images && test.Images.og
                         &&
                         [
-                            <meta property="og:image" content={_imagePath + test.PageMeta.Images.og.FileName}/>,
+                            <meta property="og:image" content={_imagePath + test.Images.og.FileName}/>,
                             <meta property="og:image:secure_url"
-                                  content={_imagePath + test.PageMeta.Images.og.FileName}/>,
-                            <meta property="og:image:width" content={_getWidth(test.PageMeta.Images.og.MetaData)}/>,
-                            <meta property="og:image:height" content={_getHeight(test.PageMeta.Images.og.MetaData)}/>
+                                  content={_imagePath + test.Images.og.FileName}/>,
+                            <meta property="og:image:width" content={_getWidth(test.Images.og.MetaData)}/>,
+                            <meta property="og:image:height" content={_getHeight(test.Images.og.MetaData)}/>
                         ]
                 }
                 <meta name="twitter:card" content="summary_large_image"/>
-                <meta name="twitter:title" content={test.PageMeta.Name ? test.PageMeta.Name : test.Name}/>
-                <meta name="twitter:description" content={test.PageMeta.Description ? test.PageMeta.Description : test.Description}/>
+                <meta name="twitter:title" content={test.SnName ? test.SnName : test.Name}/>
+                { test.SnDescription && <meta name="twitter:description" content={test.SnDescription}/> }
                 <meta name="twitter:site" content="@MagisteriaRu"/>
                 {
-                    test.PageMeta && test.PageMeta.Images && test.PageMeta.Images.twitter
+                    test.Images && test.Images.twitter
                         &&
-                        <meta name="twitter:image" content={_imagePath + test.PageMeta.Images.twitter.FileName}/>
+                        <meta name="twitter:image" content={_imagePath + test.Images.twitter.FileName}/>
                 }
                 <meta name="twitter:creator" content="@MagisteriaRu"/>
                 <meta name="apple-mobile-web-app-title" content="Magisteria"/>
@@ -201,7 +239,8 @@ function mapStateToProps(state, ownProps) {
         testUrl: ownProps.match.params.testUrl,
         facebookAppID: facebookAppIdSelector(state),
         fetching: testLoading(state) ||
-            // state.singleCourse.fetching ||
+            testInstanceLoading(state) ||
+            state.singleCourse.fetching ||
             state.user.loading ||
             state.courses.fetching,
 
@@ -213,6 +252,7 @@ function mapStateToProps(state, ownProps) {
 function mapDispatchToProps(dispatch) {
     return bindActionCreators({
         getTest,
+        getTestInstance,
         getCourse,
         getCourses,
         whoAmI,

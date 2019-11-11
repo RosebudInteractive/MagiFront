@@ -5,6 +5,9 @@ import {saga as appSaga} from 'ducks/app'
 import {saga as playerSaga} from 'ducks/player'
 import {saga as googleAnalyticsSaga} from 'ducks/google-analytics'
 import {saga as testSaga} from 'ducks/test'
+import {saga as testInstanceSaga} from 'ducks/test-instance'
+// пока костыль
+import {saga as coursesSaga} from 'actions/courses-page-actions'
 
 export default function* rootSaga() {
     yield all([
@@ -14,5 +17,7 @@ export default function* rootSaga() {
         playerSaga(),
         googleAnalyticsSaga(),
         testSaga(),
+        testInstanceSaga(),
+        coursesSaga(),
     ])
 }

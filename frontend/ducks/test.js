@@ -1,34 +1,42 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {OrderedMap, Record,} from 'immutable'
-import {all, call, put, takeEvery} from "@redux-saga/core/effects";
+import {Record,} from 'immutable'
+import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
+import {GET_CONCRETE_COURSE_REQUEST} from "actions/courses-page-actions";
+import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
 
 /**
  * Constants
  * */
-export const moduleName = 'single-test'
+export const moduleName = 'test-header'
 const prefix = `${appName}/${moduleName}`
 
-const GET_TEST_REQUEST = `${prefix}/GET_TEST_REQUEST`
+export const GET_TEST_REQUEST = `${prefix}/GET_TEST_REQUEST`
 const GET_TEST_START = `${prefix}/GET_TEST_START`
 const GET_TEST_SUCCESS = `${prefix}/GET_TEST_SUCCESS`
-const GET_TEST_FAIL = `${prefix}/GET_TEST_FAIL`
+export const GET_TEST_COMPLETED = `${prefix}/GET_TEST_COMPLETED`
+export const GET_TEST_FAIL = `${prefix}/GET_TEST_FAIL`
+
 
 const TestRecord = Record({
     Id: null,
     TestTypeId: null,
     CourseId: null,
+    CourseName: null,
+    CourseURL: null,
     LessonId: null,
+    LsnName: null,
+    LsnURL: null,
     Name: null,
-    Method: null,
-    MaxQ: 0,
-    FromLesson: false,
-    IsTimeLimited: false,
     Status: null,
     Cover: null,
     CoverMeta: null,
     URL: null,
+    Images: [],
+    SnName: null,
+    SnDescription: null,
+    SnPost: null,
     questionsCount: 0,
     estimatedTime: 0,
 })
@@ -37,26 +45,7 @@ const ReducerRecord = Record({
     loading: false,
     loaded: false,
     test: new TestRecord(),
-    questions: new OrderedMap([]),
-})
-
-const QuestionRecord = Record({
-    Id: null,
-    AnswTime: null,
-    Text: null,
-    Picture: null,
-    PictureMeta: null,
-    AnswType: null,
-    Score: null,
-    StTime: null,
-    EndTime: null,
-    AllowedInCourse: null,
-    AnswBool: null,
-    AnswInt: null,
-    AnswText: null,
-    CorrectAnswResp: null,
-    WrongAnswResp: null,
-    Answers: [],
+    lastSuccessTime: null,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -73,7 +62,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
                 .set('loaded', true)
                 .set('test', new TestRecord(payload))
-                .set('questions', dataToEntries(payload.Questions, QuestionRecord))
+                .set('lastSuccessTime', payload.lastSuccessTime)
 
         case GET_TEST_FAIL:
             return state
@@ -84,31 +73,14 @@ export default function reducer(state = new ReducerRecord(), action) {
     }
 }
 
-const dataToEntries = (values, DataRecord) => {
-    return values.reduce(
-        (acc, value) => acc.set(value.Id, new DataRecord(value)),
-        new OrderedMap({})
-    )
-}
-
 /**
  * Selectors
  * */
 const stateSelector = state => state[moduleName]
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
 export const loadedSelector = createSelector(stateSelector, state => state.loaded)
+const successTimeSelector = createSelector(stateSelector, state => state.lastSuccessTime)
 export const testSelector = createSelector(stateSelector, state => state.test)
-export const questionsSelector = createSelector(stateSelector, (state) => {
-    let _array = state.questions.toArray();
-
-    return _array.map((item, index) => {
-        let _item = item.toObject()
-
-        _item.Number = index + 1
-        return _item
-    })
-})
-
 
 /**
  * Action Creators
@@ -127,22 +99,29 @@ export const saga = function* () {
 }
 
 function* getTestSaga(data) {
+    let _time = yield select(successTimeSelector)
+
+    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
+        yield put({type: GET_TEST_COMPLETED})
+        return
+    }
+
     yield put({type: GET_TEST_START})
 
     try {
-        const _test = yield call(_fetchTest, data.payload)
+        const _test = yield call(_fetchTest, `/api/tests/${data.payload}`)
 
-        console.error(_test)
+        yield put({type: GET_CONCRETE_COURSE_REQUEST, payload: _test.CourseURL})
 
         yield put({type: GET_TEST_SUCCESS, payload: _test})
+        yield put({type: GET_TEST_COMPLETED})
     } catch (e) {
-        console.log(e)
         yield put({ type: GET_TEST_FAIL, payload: {e} })
     }
 }
 
 function _fetchTest(url) {
-    return fetch(`/api/tests/${url}`, {method: 'GET', credentials: 'include'})
+    return fetch(url, {method: 'GET', credentials: 'include'})
         .then(checkStatus)
         .then(parseJSON)
         .then((data) => {
@@ -153,10 +132,11 @@ function _fetchTest(url) {
             data.questionsCount = data.Questions.length
 
             let _estimatedTime = data.Questions.reduce((acc, value) => {
-                return acc + value.AnswTime
+                return acc + value
             }, 0)
 
             data.estimatedTime = Math.round(_estimatedTime / 60)
+            data.lastSuccessTime = Date.now()
 
             return data
         })

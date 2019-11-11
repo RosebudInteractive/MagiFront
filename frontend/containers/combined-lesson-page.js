@@ -543,6 +543,7 @@ class CombineLessonPage extends React.Component {
                         <React.Fragment>
                             {this._getMetaTags()}
                             <Menu lesson={_lesson}
+                                  course={course}
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={_lesson.Id}
@@ -620,7 +621,7 @@ function mapStateToProps(state, ownProps) {
         params: ownProps.location.search,
 
         lessonInfo: state.singleLesson,
-        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching,
+        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching || state.singleCourse.fetching,
         lesson: state.singleLesson.object,
         notFound: state.singleLesson.notFound || state.lessonText.notFound,
         authors: state.singleLesson.authors,
