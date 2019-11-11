@@ -46,7 +46,7 @@ export default function pageHeader(state = initialState, action) {
                 currentPage: action.payload.page,
                 courseUrl: action.payload.courseUrl,
                 lessonUrl: action.payload.lessonUrl,
-                visibility: !((action.payload.page === pages.lesson) || (action.payload.page === pages.player))
+                visibility: !((action.payload.page === pages.lesson) || (action.payload.page === pages.player) || (action.payload.page === pages.test))
             };
         }
 

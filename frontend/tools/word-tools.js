@@ -6,6 +6,14 @@ export const getCountHoursTitle = (count) => {
     return getCounterTitle(count, {single: 'час', twice: 'часа', many: 'часов'})
 }
 
+export const getCountMinutesTitle = (count) => {
+    return getCounterTitle(count, {single: 'минута', twice: 'минуты', many: 'минут'})
+}
+
+export const getQuestionsTitle = (count) => {
+    return getCounterTitle(count, {single: 'вопрос', twice: 'вопроса', many: 'вопросов'})
+}
+
 export const getCountSubsTitle = (count) => {
     return getCounterTitle(count, {single: 'доп.эпизод', twice: 'доп.эпизода', many: 'доп.эпизодов'})
 }

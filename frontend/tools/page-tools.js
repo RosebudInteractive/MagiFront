@@ -43,7 +43,8 @@ export const pages = {
     author: {name: 'author', url: null},
     profile: {name: 'profile', url: '/profile'},
     history: {name: 'history', url: '/history'},
-    notFound: {name: 'not-found', url: null}
+    test: {name: 'test', url: null},
+    notFound: {name: 'not-found', url: null},
 }
 
 export const ImageSize = {

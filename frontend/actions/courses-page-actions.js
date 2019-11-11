@@ -13,15 +13,26 @@ import {
 
 import 'whatwg-fetch';
 import {getTimeFmt, parseReadyDate} from "../tools/time-tools";
-import {LESSON_STATE} from "../constants/common-consts";
+import {DATA_EXPIRATION_TIME, LESSON_STATE} from "../constants/common-consts";
 
-const COURSES_RELOAD_TIME_INTERVAL = 3 * 60 * 1000
+
+import {appName} from '../config'
+import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
+import {checkStatus, parseJSON} from "tools/fetch-tools";
+
+/**
+ * Constants
+ * */
+export const moduleName = 'courses'
+const prefix = `${appName}/${moduleName}`
+
+export const GET_CONCRETE_COURSE_REQUEST = `${prefix}/GET_CONCRETE_COURSE_REQUEST`
 
 export const getCourses = () => {
     return (dispatch, getState) => {
         const _state = getState().courses
 
-        if (!!_state.lastSuccessTime && ((Date.now() - _state.lastSuccessTime) < COURSES_RELOAD_TIME_INTERVAL)) {
+        if (!!_state.lastSuccessTime && ((Date.now() - _state.lastSuccessTime) < DATA_EXPIRATION_TIME)) {
             return
         }
 
@@ -92,20 +103,20 @@ export const getCourse = (url, options) => {
     }
 };
 
-const checkStatus = (response) => {
-    if (response.status >= 200 && response.status < 300) {
-        return response
-    } else {
-        let error = new Error(response.statusText);
-        error.status = response.status;
-        error.response = response;
-        throw error
-    }
-};
-
-const parseJSON = (response) => {
-    return response.json()
-};
+// const checkStatus = (response) => {
+//     if (response.status >= 200 && response.status < 300) {
+//         return response
+//     } else {
+//         let error = new Error(response.statusText);
+//         error.status = response.status;
+//         error.response = response;
+//         throw error
+//     }
+// };
+//
+// const parseJSON = (response) => {
+//     return response.json()
+// };
 
 const _getAuthor = (array, id) => {
     return array.find((item) => {
@@ -295,4 +306,53 @@ const getLastListenedLesson = (lessons, state) => {
     })
 
     return {lesson: lessons[_lesson.index], hasListened: (_lesson.index !== 0) || (_lesson.info && _lesson.info.ts)}
+}
+
+
+/**
+ * Sagas
+ */
+export const saga = function* () {
+    yield all([
+        takeEvery(GET_CONCRETE_COURSE_REQUEST, getCourseSaga),
+    ])
+}
+
+function* getCourseSaga(data) {
+
+
+    console.log(data)
+
+    yield put({type: GET_SINGLE_COURSE_REQUEST})
+
+    try {
+        const _course = yield call(_fetchCourse, data.payload),
+            _state = yield select(state => state)
+
+        handleCourse(_course, _state);
+
+        yield put({type: GET_SINGLE_COURSE_SUCCESS, payload: _course})
+    } catch (err) {
+
+        console.error(err)
+
+        if (err.status === 404) {
+            yield put({type: SET_COURSE_NOT_FOUND})
+        } else {
+            yield put({type: GET_SINGLE_COURSE_FAIL, payload: err})
+        }
+    }
+}
+
+function _fetchCourse(url, options) {
+    const _fetchUrl = "/api/courses/" + url + (options && options.absPath ? "?abs_path=true" : "")
+
+    return fetch(_fetchUrl, {method: 'GET', credentials: 'include'})
+        .then(checkStatus)
+        .then(parseJSON)
+        .then((data) => {
+            console.log(data)
+
+            return data
+        })
 }

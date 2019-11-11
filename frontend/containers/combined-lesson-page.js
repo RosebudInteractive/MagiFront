@@ -4,7 +4,8 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import MetaTags from 'react-meta-tags';
 
-import Menu from '../components/combined-lesson-page/menu'
+// import Menu from '../components/combined-lesson-page/menu'
+import Menu from '../components/header-lesson-page'
 import GalleryWrapper from "../components/transcript-page/gallery-slider-wrapper";
 import MobileLessonWrapper from '../components/combined-lesson-page/mobile/mobile-lesson-wrapper';
 import DesktopLessonWrapper from '../components/combined-lesson-page/desktop/desktop-lesson-wrapper';
@@ -542,6 +543,7 @@ class CombineLessonPage extends React.Component {
                         <React.Fragment>
                             {this._getMetaTags()}
                             <Menu lesson={_lesson}
+                                  course={course}
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={_lesson.Id}
@@ -619,7 +621,7 @@ function mapStateToProps(state, ownProps) {
         params: ownProps.location.search,
 
         lessonInfo: state.singleLesson,
-        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching,
+        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching || state.singleCourse.fetching,
         lesson: state.singleLesson.object,
         notFound: state.singleLesson.notFound || state.lessonText.notFound,
         authors: state.singleLesson.authors,
