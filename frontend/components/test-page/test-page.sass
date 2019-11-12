@@ -1,0 +1,17 @@
+@import "~tools/variables"
+
+.test-page
+  .lectures-menu._plain-menu
+    position: relative
+
+  .lectures-menu__section
+    flex-grow: 0 !important
+    flex-basis: 50%
+    @media(max-width: 899px)
+      flex-basis: auto
+
+  .lectures-list-trigger:after
+    border-color: $color-white-02
+    display: block
+    @media(max-width: 899px)
+      display: none

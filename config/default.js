@@ -13,6 +13,7 @@ module.exports = {
     courseUrl: '/category',
     authorUrl: '/autor',
     categoryUrl: '/razdel',
+    testUrl: '/test',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',
@@ -219,6 +220,12 @@ module.exports = {
                 scope: ['status', 'email', 'friends']
             }
         }
+    },
+    pricelist: {
+        fb: {
+            path: path.normalize(path.join(process.cwd(), "..", "pricelist", "fb")),
+            file: "products.tsv",
+        }  
     },
     connections: {
         redis: {

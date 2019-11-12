@@ -110,6 +110,48 @@ const GET_QUESTION_IDS_MYSQL =
     "  join `Question` q on q.`TestId` = t.`Id`\n" +
     "where (t.`Status` = 2) and (t.`CourseId` = <%= course_id %>) and (not t.`LessonId` is NULL)";
 
+const TEST_MSSQL_PUBLIC_REQ =
+    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method],\n" +
+    "  t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited], t.[Status], t.[Cover], t.[CoverMeta], t.[URL],\n" +
+    "  t.[SnPost], t.[SnDescription], t.[SnName], q.[AnswTime], c.[URL] CourseURL, cl.[Name] CourseName,\n" +
+    "  l.[URL] LsnURL, ll.[Name] LsnName\n" +
+    "from [Test] t\n" +
+    "  join [Question] q on q.[TestId] = t.[Id]\n" +
+    "  left join [Course] c on c.[Id] = t.[CourseId]\n" +
+    "  left join [CourseLng] cl on cl.[CourseId] = t.[CourseId]\n" +
+    "  left join [Lesson] l on l.[Id] = t.[LessonId]\n" +
+    "  left join [LessonLng] ll on ll.[LessonId] = t.[LessonId]\n" +
+    "<%= where %>\n" +
+    "order by t.[Id]";
+
+const TEST_MSSQL_PUBLIC_WHERE_URL =
+    "where t.[URL] = '<%= courseUrl %>'";
+const TEST_MSSQL_PUBLIC_WHERE_ID =
+    "where t.[Id] = <%= id %>";
+const TEST_MSSQL_IMG_REQ =
+    "select [Id], [Type], [FileName], [MetaData] from [TestMetaImage] where [TestId] = <%= id %>";
+
+const TEST_MYSQL_PUBLIC_REQ =
+    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`,\n" +
+    "  t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`, t.`Status`, t.`Cover`, t.`CoverMeta`, t.`URL`,\n" +
+    "  t.`SnPost`, t.`SnDescription`, t.`SnName`, q.`AnswTime`, c.`URL` CourseURL, cl.`Name` CourseName,\n" +
+    "  l.`URL` LsnURL, ll.`Name` LsnName\n" +
+    "from `Test` t\n" +
+    "  join `Question` q on q.`TestId` = t.`Id`\n" +
+    "  left join `Course` c on c.`Id` = t.`CourseId`\n" +
+    "  left join `CourseLng` cl on cl.`CourseId` = t.`CourseId`\n" +
+    "  left join `Lesson` l on l.`Id` = t.`LessonId`\n" +
+    "  left join `LessonLng` ll on ll.`LessonId` = t.`LessonId`\n" +
+    "<%= where %>\n" +
+    "order by t.`Id`";
+
+const TEST_MYSQL_PUBLIC_WHERE_URL =
+    "where t.`URL` = '<%= courseUrl %>'";
+const TEST_MYSQL_PUBLIC_WHERE_ID =
+    "where t.`Id` = <%= id %>";
+const TEST_MYSQL_IMG_REQ =
+    "select `Id`, `Type`, `FileName`, `MetaData` from `TestMetaImage` where `TestId` = <%= id %>";
+
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
@@ -183,6 +225,77 @@ const DbTest = class DbTest extends DbObject {
             })
         }
         return data;
+    }
+
+    async getPublic(url, user, options) {
+        let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+        let dLink = opts.dlink && ((opts.dlink === "true") || (opts.dlink === true)) ? true : false;
+
+        let id = url;
+        let isInt = (typeof (id) === "number");
+        if (isInt && isNaN(id))
+            throw new Error(`Invalid argument "url": ${url}.`);
+        if (!isInt)
+            if (typeof (id) === "string") {
+                let res = id.match(/[0-9]*/);
+                if (res && (id.length > 0) && (res[0].length === id.length)) {
+                    id = parseInt(id);
+                    isInt = true;
+                }
+            }
+            else
+                throw new Error(`Invalid argument "url": ${url}.`);
+
+        let whereMSSQL = isInt ? _.template(TEST_MSSQL_PUBLIC_WHERE_ID)({ id: id })
+            : _.template(TEST_MSSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
+        let whereMYSQL = isInt ? _.template(TEST_MYSQL_PUBLIC_WHERE_ID)({ id: id })
+            : _.template(TEST_MYSQL_PUBLIC_WHERE_URL)({ courseUrl: id })
+
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(TEST_MYSQL_PUBLIC_REQ)({ where: whereMYSQL }),
+                mssql: _.template(TEST_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
+            }
+        }, {});
+        let testData = { Questions: [], Images: {} };
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach(elem => {
+                if (!testData.Id) {
+                    for (let fld in elem) {
+                        if (fld !== "AnswTime")
+                            testData[fld] = elem[fld];
+                    }
+                    testData.IsTimeLimited = elem.IsTimeLimited ? true : false;
+                    testData.FromLesson = elem.FromLesson ? true : false;
+                    testData.URL = isAbsPath ? this._absTestUrl + elem.URL : elem.URL;
+                    testData.CourseURL = elem.CourseURL && isAbsPath ? this._absCourseUrl + elem.CourseURL : elem.CourseURL;
+                    testData.LsnURL = elem.LsnURL && isAbsPath ? this._baseUrl + elem.CourseURL + '/' + elem.LsnURL : elem.LsnURL;
+                    testData.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
+                    testData.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
+                }
+                testData.Questions.push(elem.AnswTime);
+            });
+        }
+        else
+            throw new HttpError(HttpCode.ERR_NOT_FOUND, `Can't find test "${url}".`);
+
+        result = await $data.execSql({
+            dialect: {
+                mysql: _.template(TEST_MYSQL_IMG_REQ)({ id: testData.Id }),
+                mssql: _.template(TEST_MSSQL_IMG_REQ)({ id: testData.Id })
+            }
+        }, {});
+        if (result && result.detail && (result.detail.length > 0)) {
+            result.detail.forEach((elem) => {
+                testData.Images[elem.Type] = {
+                    FileName: this._convertDataUrl(elem.FileName, isAbsPath, dLink),
+                    MetaData: this._convertMeta(elem.MetaData, isAbsPath, dLink)
+                };
+            })
+        }
+
+        return testData;
     }
 
     async get(id, options) {
@@ -519,7 +632,7 @@ const DbTest = class DbTest extends DbObject {
             }
         }
 
-        let maxQ = params.MaxQ ? params.MaxQ : testData.params.MaxQ;
+        let maxQ = params.MaxQ ? params.MaxQ : testData.MaxQ;
         if ((testData.Method === 2) && maxQ) {
             let newq = [];
             while ((newq.length < maxQ) && (testInstanse.Questions.length > 0)) {

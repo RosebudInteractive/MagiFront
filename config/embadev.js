@@ -169,6 +169,13 @@ let options = {
             }
         }
     },
+    pricelist: {
+        fb: {
+            path: path.normalize(path.join(process.cwd(), "..", "pricelist", "fb")),
+            file: "products.tsv",
+            baseUrl: "https://magisteria.ru"
+        }
+    },
     connections: {
         redis: {
             host: "dragonegg",

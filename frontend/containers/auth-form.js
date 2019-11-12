@@ -70,7 +70,7 @@ class AuthPopup extends React.Component {
 
         // В iOS 13 появился баг связанный с отсутствием курсора в полях ввода если для transform используется
         // transform: translateY(200vh)
-        const _needFixBugIOS13 = isIOS13() || isIOSWithEnabledDesktopBrowser(),
+        const _needFixBugIOS13 = false, //isIOS13() || isIOSWithEnabledDesktopBrowser(),
             _popupClass = "popup js-popup _registration" +
                 (visible ? " opened" : "") +
                 (this.state.noTransition && !_needFixBugIOS13 ? ' no-transition' : '') +
