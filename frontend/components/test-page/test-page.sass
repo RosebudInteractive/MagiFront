@@ -15,3 +15,16 @@
     display: block
     @media(max-width: 899px)
       display: none
+
+.test-page._desktop
+  .lectures-menu._plain-menu
+    position: absolute
+    background-color: transparent
+    border-bottom: $border-white-04
+
+  &.added
+    .content-wrapper
+      height: calc(56.25vw + 130px)
+    .lectures-menu._plain-menu
+      position: inherit
+      background-color: #2f2f2f

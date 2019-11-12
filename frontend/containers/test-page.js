@@ -6,7 +6,7 @@ import MetaTags from 'react-meta-tags';
 
 import NotFoundPage from '../components/not-found';
 import LoadingFrame from '../components/loading-frame';
-import {getDomain, getPageUrl, pages} from "tools/page-tools";
+import {getDomain, getPageUrl, isMobilePlatform, pages} from "tools/page-tools";
 
 import {refreshState as refreshStorage} from "actions/lesson-info-storage-actions";
 import {whoAmI} from "actions/user-actions";
@@ -19,17 +19,57 @@ import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/tes
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
-import CoverWrapper from "../components/test-page/cover";
-import InstanceWrapper from "../components/test-page/instance";
+import Cover from "../components/test-page/cover";
+import Instance from "../components/test-page/instance";
 import {TEST_PAGE_TYPE} from "../constants/common-consts";
-// import {test} from "../components/test-page/mock-data";
 import Header from "../components/header-lesson-page";
+import {isLandscape} from "../components/combined-lesson-page/desktop/tools";
 
+function _getHeight() {
+    return $(window).innerHeight();
+}
+
+function _getWidth() {
+    return $(window).innerWidth();
+}
 
 class TestPage extends React.Component {
 
     static propTypes = {
         type: PropTypes.string,
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            isMobile: isMobilePlatform(),
+            isLandscape: false
+        }
+
+        this._resizeHandler = function () {
+            let _div = $('.test-page')
+
+            if (isLandscape()) {
+                if (!this.state.isLandscape) {
+                    this.setState({isLandscape: true})
+                }
+                _div.removeClass('added')
+                this._height = _getHeight();
+                this._width = _getWidth();
+                $('.content-wrapper').css('height', this._height).css('width', this._width);
+            } else {
+                if (this.state.isLandscape) {
+                    this.setState({isLandscape: false})
+                }
+
+                $('.content-wrapper').css('height', "").css('width', "");
+
+                _div.addClass('added')
+            }
+        }.bind(this)
+
+        this._addEventListeners();
     }
 
     componentWillMount() {
@@ -60,6 +100,7 @@ class TestPage extends React.Component {
 
     componentDidMount() {
         this.props.setCurrentPage(this);
+        this._resizeHandler();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -97,6 +138,7 @@ class TestPage extends React.Component {
     componentWillUnmount() {
         TestPage._removeMetaTags();
         this.props.clearCurrentPage();
+        this._removeEventListeners();
     }
 
     render() {
@@ -108,30 +150,31 @@ class TestPage extends React.Component {
             notFound ?
                 <NotFoundPage/>
                 :
-                <div className="test-page">
+                <div className={"test-page" + (this.state.isMobile ? " _mobile" : " _desktop")}>
                     {this._getMetaTags()}
                     <Header test={test} course={course}/>
-                    {this._getWrapper()}
+                    <div className="content-wrapper">
+                        {this._getContent()}
+                    </div>
                 </div>
 
     }
 
-    _getWrapper() {
-        let {course, test, type} = this.props;
-        // let {course, type} = this.props;
+    _getContent() {
+        let {type} = this.props;
 
         switch (type) {
             case TEST_PAGE_TYPE.TEST :
-                return <CoverWrapper/>
+                return <Cover/>
 
             case TEST_PAGE_TYPE.INSTANCE:
-                return <InstanceWrapper/>
+                return <Instance/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <CoverWrapper/>
+                return <Cover/>
 
             default:
-                return <CoverWrapper/>
+                return <Cover/>
         }
     }
 
@@ -230,6 +273,14 @@ class TestPage extends React.Component {
         $('meta[name="application-name"]').remove();
         $('meta[name="robots"]').remove();
         $('meta[name="prerender-status-code"]').remove();
+    }
+
+    _addEventListeners() {
+        $(window).bind('resize', this._resizeHandler)
+    }
+
+    _removeEventListeners() {
+        $(window).unbind('resize', this._resizeHandler)
     }
 }
 
