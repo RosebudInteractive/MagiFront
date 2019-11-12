@@ -780,6 +780,9 @@ const DbCourse = class DbCourse extends DbObject {
 
     async createFbPriceList() {
         const CURRENCY_CODE = "RUB";
+        const URL_PARAMS = "?utm_source=facebook&utm_medium=social&utm_campaign=catalog";
+        const CATEGORY = "543542"; // Media > Books > E-books
+
         if (!(config.has("pricelist.fb.path") && config.has("pricelist.fb.file")))
             throw new Error(`DbCourse::createFbPriceList: Undefined pricelist file path!`);
         let fileName = path.join(config.get("pricelist.fb.path"), config.get("pricelist.fb.file"));
@@ -799,14 +802,15 @@ const DbCourse = class DbCourse extends DbObject {
             let elem = data.Courses[i];
             if (elem._rawProduct) {
                 courses.push({
-                    id: elem._rawProduct.Code,
+                    id: `${elem.Id}`,
                     title: elem._rawProduct.Name,
-                    description: striptags(elem.CrsDescription),
+                    description: striptags(elem.CrsDescription).replace(/\r?\n|\r/g, " "),
                     availability: "in stock",
                     condition: "new",
                     price: `${elem.Price} ${CURRENCY_CODE}`,
-                    link: absCourseUrl + elem.URL,
+                    link: absCourseUrl + elem.URL + URL_PARAMS,
                     image_link: absDataUrl + elem.Cover,
+                    google_product_category: CATEGORY,
                     brand: `${authors[elem.Authors[0]].FirstName} ${authors[elem.Authors[0]].LastName}`,
                     sale_price: elem.Discount ? `${elem.DPrice} ${CURRENCY_CODE}` : null,
                     sale_price_effective_date: elem.Discount ?
@@ -815,7 +819,7 @@ const DbCourse = class DbCourse extends DbObject {
             }
         }
         let columns = ["id", "title", "description", "availability", "condition", "price",
-            "link", "image_link", "brand", "sale_price", "sale_price_effective_date"];
+            "link", "image_link", "google_product_category", "brand", "sale_price", "sale_price_effective_date"];
         let content = columns.join("\t");
         for (let i = 0; i < courses.length; i++)
             for (let j = 0; j < columns.length; j++)
