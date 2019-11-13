@@ -305,6 +305,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
 const COURSE_MSSQL_PRICE_REQ =
     "select c.[Id], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], gc.[Id] GiftId,\n" +
+    "  c.[URL], cl.[Name],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], p.[Name] as [ProductName]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -394,6 +395,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
 const COURSE_MYSQL_PRICE_REQ =
     "select c.`Id`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, gc.`Id` GiftId,\n" +
+    "  c.`URL`, cl.`Name`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, p.`Name` as `ProductName`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -1041,6 +1043,7 @@ const DbCourse = class DbCourse extends DbObject {
     async getPriceInfo(url, user, options) {
         let course = null;
         let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let pendingCourses = {};
         let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
@@ -1084,6 +1087,9 @@ const DbCourse = class DbCourse extends DbObject {
                     isFirst = false;
                     course = {
                         Id: elem.Id,
+                        Name: elem.Name,
+                        URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                        OneLesson: elem.OneLesson ? true : false,
                         IsSubsRequired: false,
                         IsBought: (elem.Counter || elem.GiftId) ? true : false,
                         IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)

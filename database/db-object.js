@@ -27,7 +27,9 @@ exports.DbObject = class DbObject extends CacheableObject {
         this._absCourseUrl = config.proxyServer.siteHost + config.courseUrl + "/";
         this._absAuthorUrl = config.proxyServer.siteHost + config.authorUrl + "/";
         this._absCategoryUrl = config.proxyServer.siteHost + config.categoryUrl + "/";
-        this._absTestUrl = config.proxyServer.siteHost + config.testUrl + "/";        
+        this._absTestUrl = config.proxyServer.siteHost + config.testUrl + "/";
+        this._absTestInstUrl = config.proxyServer.siteHost + config.testInstUrl + "/";
+        
     }
 
     _removeTrailingSlash(path) {
@@ -35,34 +37,37 @@ exports.DbObject = class DbObject extends CacheableObject {
             ((path.length > 0) && (path[path.length - 1] === "/") ? path.substr(0, path.length - 1) : path) : `${path}`;
     }
 
-    _getAbsTestUrl(baseUrl) {
+    _getAbsUrl(url, baseUrl) {
         let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.testUrl + "/";
+        return base + url + "/";
+    }
+
+    _getAbsTestInstUrl(baseUrl) {
+        return this._getAbsUrl(config.testInstUrl, baseUrl);
+    }
+
+    _getAbsTestUrl(baseUrl) {
+        return this._getAbsUrl(config.testUrl, baseUrl);
     }
 
     _getAbsDataUrl(baseUrl) {
-        let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.dataUrl + "/";
+        return this._getAbsUrl(config.dataUrl, baseUrl);
     }
 
     _getAbsDownLoadUrl(baseUrl) {
-        let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.downLoadUrl + "/";
+        return this._getAbsUrl(config.downLoadUrl, baseUrl);
     }
 
     _getAbsCourseUrl(baseUrl) {
-        let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.courseUrl + "/";
+        return this._getAbsUrl(config.courseUrl, baseUrl);
     }
 
     _getAbsAuthorUrl(baseUrl) {
-        let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.authorUrl + "/";
+        return this._getAbsUrl(config.authorUrl, baseUrl);
     }
 
     _getAbsCategoryUrl(baseUrl) {
-        let base = this._removeTrailingSlash(baseUrl ? baseUrl : this._baseUrl);
-        return base + config.categoryUrl + "/";
+        return this._getAbsUrl(config.categoryUrl, baseUrl);
     }
 
     _isNumericString(str) {

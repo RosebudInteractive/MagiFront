@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { HttpCode } = require("../const/http-codes");
 let { TestService } = require("../database/db-test");
 
@@ -7,15 +8,18 @@ function setupTests(app) {
         global.$Services = {};
     global.$Services.tests = TestService;
 
-    app.get('/api/tests/:url', (req, res, next) => {
-        TestService()
-            .getPublic(req.params.url, req.user, req.query)
-            .then(rows => {
-                res.send(rows);
-            })
-            .catch(err => {
-                next(err);
-            });
+    app.get('/api/tests/course/:course_id', async (req, res, next) => {
+        try {
+            let user_id = req.user ? req.user.Id : null;
+            let options = _.defaultsDeep(req.query, { dbOpts: { userId: user_id } });
+            options.dbOptions = { userId: user_id };
+            let rows = await TestService()
+                .getTestsByCourse(parseInt(req.params.course_id), user_id, options);
+            res.send(rows);
+        }
+        catch (err) {
+            next(err);
+        };
     });
 
     app.get('/api/tests/instance/:id', (req, res, next) => {
@@ -136,6 +140,17 @@ function setupTests(app) {
     app.delete('/api/adm/tests/:id', (req, res, next) => {
         TestService()
             .del(parseInt(req.params.id), { dbOptions: { userId: req.user.Id } })
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/tests/:url', (req, res, next) => {
+        TestService()
+            .getPublic(req.params.url, req.user, req.query)
             .then(rows => {
                 res.send(rows);
             })

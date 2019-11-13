@@ -8,6 +8,7 @@ const { HttpError } = require('../errors/http-error');
 const { HttpCode } = require("../const/http-codes");
 const { PartnerLink } = require('../utils/partner-link');
 const { CoursesService } = require('./db-course');
+const { TestService } = require('./db-test');
 const { getTimeStr, buildLogString } = require('../utils');
 const { AccessFlags } = require('../const/common');
 const { AccessRights } = require('../security/access-rights');
@@ -997,10 +998,12 @@ const DbLesson = class DbLesson extends DbObject {
         })
     }
 
-    getLessonsAll(course_url, lesson_url) {
+    getLessonsAll(course_url, lesson_url, user) {
         let lc_list = {};
         let lessons = [];
         let currLesson = [];
+        let course = {};
+        let user_id = user ? user.Id : null;
 
         return new Promise((resolve, reject) => {
             resolve(
@@ -1010,7 +1013,10 @@ const DbLesson = class DbLesson extends DbObject {
                         mssql: _.template(LESSONS_ALL_MSSQL_REQ)({ courseUrl: course_url })
                     }
                 }, {})
-                    .then((result) => {
+                    .then(async (result) => {
+                        course = await CoursesService().getPriceInfo(course_url, user);
+                        let tests = await TestService().getTestsByCourse(course.Id, user_id);
+                        course.Tests = tests.Course;
                         if (result && result.detail && (result.detail.length > 0)) {
                             let isFirst = true;
                             let authors_list = {};
@@ -1038,7 +1044,8 @@ const DbLesson = class DbLesson extends DbObject {
                                         AuthorId: elem.AuthorId,
                                         Lessons: [],
                                         Audios: [],
-                                        Videos: []
+                                        Videos: [],
+                                        Tests: []
                                     };
                                     if (lsn.IsSubsRequired && elem.FreeExpDate && ((elem.FreeExpDate - now) > Intervals.MIN_FREE_LESSON))
                                         lsn.FreeExpDate = elem.FreeExpDate;
@@ -1059,6 +1066,8 @@ const DbLesson = class DbLesson extends DbObject {
                                                 parent.lesson.Lessons.push(lsn);
                                         }
                                     }
+                                    if (tests.Lessons[lsn.Id])
+                                        lsn.Tests = tests.Lessons[lsn.Id];
                                 };
                                 if (elem.Audio && (elem.ContentType === EpisodeContentType.AUDIO))
                                     lsn.Audios.push(elem.Audio);
@@ -1102,7 +1111,7 @@ const DbLesson = class DbLesson extends DbObject {
                                 authors.push(author);
                             })
                         }
-                        return { CurrLesson: currLesson, Authors: authors, Lessons: lessons };
+                        return { CurrLesson: currLesson, Course: course, Authors: authors, Lessons: lessons };
                     })
             );
         })

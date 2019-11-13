@@ -14,6 +14,7 @@ module.exports = {
     authorUrl: '/autor',
     categoryUrl: '/razdel',
     testUrl: '/test',
+    testInstUrl: '/test-instance',
     proxyServer: {
         protocol: 'http',
         address: '0.0.0.0',
