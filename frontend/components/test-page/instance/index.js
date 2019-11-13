@@ -8,7 +8,7 @@ import AnswerBlock from "./answer-block";
 
 import "./instance.sass"
 
-class Wrapper extends React.Component {
+class Instance extends React.Component {
     static propTypes = {
         test: PropTypes.object,
     }
@@ -77,4 +77,4 @@ const mapDispatchToProps = (dispatch) => {
     return bindActionCreators({setAnswer}, dispatch)
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Wrapper)
+export default connect(mapStateToProps, mapDispatchToProps)(Instance)

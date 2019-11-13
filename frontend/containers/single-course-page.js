@@ -224,7 +224,7 @@ class Main extends React.Component {
             let _hasAuthor = course.Authors.some(item => value.Authors.find(authorId => authorId === item.Id)),
                 _hasCategory = course.Categories.some(item => value.Categories.find(categoryId => categoryId === item.Id))
 
-            if ((_hasAuthor || _hasCategory) && (value.Id !== course.Id)) {
+            if ((_hasAuthor || _hasCategory) && (value.Id !== course.Id) && !value.OneLesson) {
                 acc.push(value)
             }
 
