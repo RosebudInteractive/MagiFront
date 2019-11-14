@@ -305,6 +305,7 @@ const COURSE_MSSQL_PUBLIC_REQ =
 const COURSE_MSSQL_PRICE_REQ =
     "select c.[Id], c.[LanguageId], c.[OneLesson], c.[Cover], c.[CoverMeta], c.[Mask], c.[Color],\n" +
     "  c.[IsPaid], c.[IsSubsFree], c.[ProductId], pc.[Counter], gc.[Id] GiftId,\n" +
+    "  c.[URL], cl.[Name],\n" +
     "  c.[PaidTp], c.[PaidDate], c.[PaidRegDate], p.[Name] as [ProductName]\n" +
     "from [Course] c\n" +
     "  join[CourseLng] cl on cl.[CourseId] = c.[Id]\n" +
@@ -394,6 +395,7 @@ const COURSE_MYSQL_PUBLIC_REQ =
 const COURSE_MYSQL_PRICE_REQ =
     "select c.`Id`, c.`LanguageId`, c.`OneLesson`, c.`Cover`, c.`CoverMeta`, c.`Mask`, c.`Color`,\n" +
     "  c.`IsPaid`, c.`IsSubsFree`, c.`ProductId`, pc.`Counter`, gc.`Id` GiftId,\n" +
+    "  c.`URL`, cl.`Name`,\n" +
     "  c.`PaidTp`, c.`PaidDate`, c.`PaidRegDate`, p.`Name` as `ProductName`\n" +
     "from `Course` c\n" +
     "  join`CourseLng` cl on cl.`CourseId` = c.`Id`\n" +
@@ -780,6 +782,9 @@ const DbCourse = class DbCourse extends DbObject {
 
     async createFbPriceList() {
         const CURRENCY_CODE = "RUB";
+        const URL_PARAMS = "?utm_source=facebook&utm_medium=social&utm_campaign=catalog";
+        const CATEGORY = "543542"; // Media > Books > E-books
+
         if (!(config.has("pricelist.fb.path") && config.has("pricelist.fb.file")))
             throw new Error(`DbCourse::createFbPriceList: Undefined pricelist file path!`);
         let fileName = path.join(config.get("pricelist.fb.path"), config.get("pricelist.fb.file"));
@@ -799,14 +804,15 @@ const DbCourse = class DbCourse extends DbObject {
             let elem = data.Courses[i];
             if (elem._rawProduct) {
                 courses.push({
-                    id: elem._rawProduct.Code,
+                    id: `${elem.Id}`,
                     title: elem._rawProduct.Name,
-                    description: striptags(elem.CrsDescription),
+                    description: striptags(elem.CrsDescription).replace(/\r?\n|\r/g, " "),
                     availability: "in stock",
                     condition: "new",
                     price: `${elem.Price} ${CURRENCY_CODE}`,
-                    link: absCourseUrl + elem.URL,
+                    link: absCourseUrl + elem.URL + URL_PARAMS,
                     image_link: absDataUrl + elem.Cover,
+                    google_product_category: CATEGORY,
                     brand: `${authors[elem.Authors[0]].FirstName} ${authors[elem.Authors[0]].LastName}`,
                     sale_price: elem.Discount ? `${elem.DPrice} ${CURRENCY_CODE}` : null,
                     sale_price_effective_date: elem.Discount ?
@@ -815,7 +821,7 @@ const DbCourse = class DbCourse extends DbObject {
             }
         }
         let columns = ["id", "title", "description", "availability", "condition", "price",
-            "link", "image_link", "brand", "sale_price", "sale_price_effective_date"];
+            "link", "image_link", "google_product_category", "brand", "sale_price", "sale_price_effective_date"];
         let content = columns.join("\t");
         for (let i = 0; i < courses.length; i++)
             for (let j = 0; j < columns.length; j++)
@@ -1037,6 +1043,7 @@ const DbCourse = class DbCourse extends DbObject {
     async getPriceInfo(url, user, options) {
         let course = null;
         let opts = options || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
         let userId = user ? user.Id : 0;
         let pendingCourses = {};
         let show_paid = user && (AccessRights.checkPermissions(user, AccessFlags.Administrator) !== 0) ? true : false;
@@ -1080,6 +1087,9 @@ const DbCourse = class DbCourse extends DbObject {
                     isFirst = false;
                     course = {
                         Id: elem.Id,
+                        Name: elem.Name,
+                        URL: isAbsPath ? this._absCourseUrl + elem.URL : elem.URL,
+                        OneLesson: elem.OneLesson ? true : false,
                         IsSubsRequired: false,
                         IsBought: (elem.Counter || elem.GiftId) ? true : false,
                         IsPaid: show_paid && elem.IsPaid && ((elem.PaidTp === 2)

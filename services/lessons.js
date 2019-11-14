@@ -92,7 +92,18 @@ function setupLessons(app) {
 
     app.get('/api/lessons-all/:course_url/:lesson_url', (req, res, next) => {
         LessonsService()
-            .getLessonsAll(req.params.course_url, req.params.lesson_url)
+            .getLessonsAll(req.params.course_url, req.params.lesson_url, req.user)
+            .then(rows => {
+                res.send(rows);
+            })
+            .catch(err => {
+                next(err);
+            });
+    });
+
+    app.get('/api/lessons-all/:course_url', (req, res, next) => {
+        LessonsService()
+            .getLessonsAll(req.params.course_url, null, req.user)
             .then(rows => {
                 res.send(rows);
             })

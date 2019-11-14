@@ -152,6 +152,38 @@ const TEST_MYSQL_PUBLIC_WHERE_ID =
 const TEST_MYSQL_IMG_REQ =
     "select `Id`, `Type`, `FileName`, `MetaData` from `TestMetaImage` where `TestId` = <%= id %>";
 
+const TEST_BY_COURSE_MSSQL =
+    "select t.[Id], t.[LanguageId], t.[TestTypeId], t.[CourseId], t.[LessonId], t.[Name], t.[Method],\n" +
+    "  t.[MaxQ], t.[FromLesson], t.[Duration], t.[IsTimeLimited], t.[Status], t.[Cover], t.[CoverMeta],\n" +
+    "  t.[URL], q.[AnswTime]\n" +
+    "from [Test] t\n" +
+    "  join [Question] q on q.[TestId] = t.[Id]\n" +
+    "where t.[CourseId] = <%= course_id %>\n" +
+    "order by t.[Id]";
+
+const INST_BY_COURSE_MSSQL =
+    "select i.[Id], i.[TestId], i.[IsFinished]\n" +
+    "from [TestInstance] i\n" +
+    "  join [Test] t on t.[Id] = i.[TestId]\n" +
+    "where t.[CourseId] = <%= course_id %> and i.[UserId] = <%= user_id %>\n" +
+    "order by i.[TestId], i.[Id] desc";
+
+const TEST_BY_COURSE_MYSQL =
+    "select t.`Id`, t.`LanguageId`, t.`TestTypeId`, t.`CourseId`, t.`LessonId`, t.`Name`, t.`Method`,\n" +
+    "  t.`MaxQ`, t.`FromLesson`, t.`Duration`, t.`IsTimeLimited`, t.`Status`, t.`Cover`, t.`CoverMeta`,\n" +
+    "  t.`URL`, q.`AnswTime`\n" +
+    "from `Test` t\n" +
+    "  join `Question` q on q.`TestId` = t.`Id`\n" +
+    "where t.`CourseId` = <%= course_id %>\n" +
+    "order by t.`Id`";
+
+const INST_BY_COURSE_MYSQL =
+    "select i.`Id`, i.`TestId`, i.`IsFinished`\n" +
+    "from `TestInstance` i\n" +
+    "  join `Test` t on t.`Id` = i.`TestId`\n" +
+    "where t.`CourseId` = <%= course_id %> and i.`UserId` = <%= user_id %>\n" +
+    "order by i.`TestId`, i.`Id` desc";
+
 const DFLT_QUESTION_SCORE = 1;
 const DFLT_ANSW_TIME = 10;
 const MAX_QUESTIONS_REQ_LEN = 10;
@@ -227,6 +259,70 @@ const DbTest = class DbTest extends DbObject {
         return data;
     }
 
+    async getTestsByCourse(course_id, user_id, options) {
+        let opts = options || {};
+        let dbOpts = opts.dbOptions || {};
+        let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
+
+        let tests = { Course: [], Lessons: {} };
+        let result = await $data.execSql({
+            dialect: {
+                mysql: _.template(TEST_BY_COURSE_MYSQL)({ course_id: course_id }),
+                mssql: _.template(TEST_BY_COURSE_MSSQL)({ course_id: course_id })
+            }
+        }, dbOpts);
+        if (result && result.detail && (result.detail.length > 0)) {
+            let currId = 0;
+            let currTest = null;
+            let testList = {};
+            result.detail.forEach(elem => {
+                if (currId !== elem.Id) {
+                    currId = elem.Id;
+                    testList[currId] = currTest = {
+                        Id: elem.Id,
+                        Name: elem.Name,
+                        TestTypeId: elem.TestTypeId,
+                        URL: isAbsPath ? this._absTestUrl + elem.URL : elem.URL,
+                        AnswTime: 0
+                    };
+                    if (elem.LessonId) {
+                        let lsnTests = tests.Lessons[elem.LessonId];
+                        if (!lsnTests)
+                            lsnTests = tests.Lessons[elem.LessonId] = []
+                        lsnTests.push(currTest);
+                    }
+                    else
+                        tests.Course.push(currTest);
+                }
+                currTest.AnswTime += elem.AnswTime ? elem.AnswTime : DFLT_ANSW_TIME;
+            })
+            if (user_id) {
+                result = await $data.execSql({
+                    dialect: {
+                        mysql: _.template(INST_BY_COURSE_MYSQL)({ course_id: course_id, user_id: user_id }),
+                        mssql: _.template(INST_BY_COURSE_MSSQL)({ course_id: course_id, user_id: user_id })
+                    }
+                }, dbOpts);
+                currId = 0;
+                if (result && result.detail && (result.detail.length > 0))
+                    result.detail.forEach(elem => {
+                        if (elem.TestId !== currId) {
+                            currId = elem.TestId;
+                            currTest = testList[currId];
+                            if (currTest)
+                                currTest.Instance = {
+                                    Id: elem.Id,
+                                    URL: isAbsPath ? `${this._absTestInstUrl}${elem.Id}` : `${elem.Id}`,
+                                    IsFinished: elem.IsFinished
+                                };
+                        }
+                    });
+            }
+        }
+
+        return tests;
+    }
+
     async getPublic(url, user, options) {
         let opts = options || {};
         let isAbsPath = opts.abs_path && ((opts.abs_path === "true") || (opts.abs_path === true)) ? true : false;
@@ -273,8 +369,9 @@ const DbTest = class DbTest extends DbObject {
                     testData.LsnURL = elem.LsnURL && isAbsPath ? this._baseUrl + elem.CourseURL + '/' + elem.LsnURL : elem.LsnURL;
                     testData.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
                     testData.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
+                    testData.AnswTime = 0;
                 }
-                testData.Questions.push(elem.AnswTime);
+                testData.AnswTime += elem.AnswTime ? elem.AnswTime : DFLT_ANSW_TIME;
             });
         }
         else
