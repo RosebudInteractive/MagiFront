@@ -16,11 +16,13 @@ import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import {testSelector, loadingSelector as testLoading, getTest,} from "ducks/test";
 import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
+import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
 import Cover from "../components/test-page/cover";
 import Instance from "../components/test-page/instance";
+import ResultCover from "../components/test-page/result/cover";
 import {TEST_PAGE_TYPE} from "../constants/common-consts";
 import Header from "../components/header-lesson-page";
 import {Desktop, Mobile} from "tools/cover";
@@ -100,6 +102,11 @@ class TestPage extends React.Component {
                 return
             }
 
+            case TEST_PAGE_TYPE.RESULT: {
+                this.props.getTestResult(this.props.testUrl)
+                return
+            }
+
             default:
                 return;
 
@@ -120,6 +127,11 @@ class TestPage extends React.Component {
 
                 case TEST_PAGE_TYPE.INSTANCE: {
                     this.props.getTestInstance(nextProps.testUrl)
+                    return
+                }
+
+                case TEST_PAGE_TYPE.RESULT: {
+                    this.props.getTestResult(nextProps.testUrl)
                     return
                 }
 
@@ -184,7 +196,7 @@ class TestPage extends React.Component {
                 return <Instance/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <Cover/>
+                return <ResultCover/>
 
             default:
                 return <Cover/>
@@ -316,6 +328,7 @@ function mapStateToProps(state, ownProps) {
         facebookAppID: facebookAppIdSelector(state),
         fetching: testLoading(state) ||
             testInstanceLoading(state) ||
+            testResultLoading(state) ||
             state.singleCourse.fetching ||
             state.user.loading ||
             state.courses.fetching,
@@ -329,6 +342,7 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({
         getTest,
         getTestInstance,
+        getTestResult,
         getCourse,
         getCourses,
         whoAmI,

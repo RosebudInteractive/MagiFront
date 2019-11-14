@@ -5,8 +5,8 @@ import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/ef
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/test";
 import {push} from 'react-router-redux'
-import {ANSWER_TYPES, DATA_EXPIRATION_TIME} from "../constants/common-consts";
-import React from "react";
+import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
+import {isAnswerCorrect} from "tools/tests-tools";
 
 /**
  * Constants
@@ -261,7 +261,7 @@ function* setAnswerSaga(data) {
         _questions = _state.questions,
         _question = _questions.get(_answer.questionId)
 
-    if (_isAnswerCorrect(_question.Question, _answer)) {
+    if (isAnswerCorrect(_question.Question, _answer.value)) {
         _questions = _questions.setIn([_answer.questionId, 'Score'], _question.Question.Score)
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     }
@@ -271,38 +271,38 @@ function* setAnswerSaga(data) {
     yield put({type: SET_ANSWER_SUCCESS, payload: {instance: _instance, questions: _questions}})
 }
 
-const _isAnswerCorrect = (question, answer) => {
-    switch (question.AnswType) {
-
-        case ANSWER_TYPES.BOOL:
-            return answer.value === question.AnswBool
-
-        case ANSWER_TYPES.SELECT: {
-            const _answerItem = question.Answers.find((item) => {
-                return item.Id === answer.value[0]
-            })
-
-            return !!_answerItem && _answerItem.IsCorrect
-        }
-
-        case ANSWER_TYPES.MULTI_SELECT: {
-            const _correctAnswers = question.Answers
-                .filter((item) => {
-                    return item.IsCorrect
-                })
-                .map(item => item.Id)
-
-            const _firstStepCheck = answer.value.every(item => _correctAnswers.includes(item))
-
-            const _secondStepCheck = _correctAnswers.every(item => answer.value.includes(item))
-
-            return _firstStepCheck && _secondStepCheck
-        }
-
-        default:
-            return false
-    }
-}
+// const _isAnswerCorrect = (question, answer) => {
+//     switch (question.AnswType) {
+//
+//         case ANSWER_TYPES.BOOL:
+//             return answer.value === question.AnswBool
+//
+//         case ANSWER_TYPES.SELECT: {
+//             const _answerItem = question.Answers.find((item) => {
+//                 return item.Id === answer.value[0]
+//             })
+//
+//             return !!_answerItem && _answerItem.IsCorrect
+//         }
+//
+//         case ANSWER_TYPES.MULTI_SELECT: {
+//             const _correctAnswers = question.Answers
+//                 .filter((item) => {
+//                     return item.IsCorrect
+//                 })
+//                 .map(item => item.Id)
+//
+//             const _firstStepCheck = answer.value.every(item => _correctAnswers.includes(item))
+//
+//             const _secondStepCheck = _correctAnswers.every(item => answer.value.includes(item))
+//
+//             return _firstStepCheck && _secondStepCheck
+//         }
+//
+//         default:
+//             return false
+//     }
+// }
 
 function* saveInstanceSaga() {
     let _instance = yield select(testInstanceSelector),

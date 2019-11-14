@@ -1,0 +1,77 @@
+@import "~tools/variables"
+
+.test-page__cover
+  height: 100%
+  position: relative
+  background-repeat: no-repeat
+  -webkit-background-size: cover
+  background-size: cover
+  background-position: top center
+
+  .test-result__info-wrapper
+    position: relative
+    display: flex
+    flex-direction: column-reverse
+    margin-left: 8.333%
+    width: 75%
+    height: 100%
+    @media(max-width: 899px)
+      margin: 0 20px
+      width: calc(50% - 20px)
+
+  .test-result__info
+    color: $color-white
+
+
+  .info__title
+    font-family: $font-pt
+    font-weight: normal
+    font-size: 52px
+    line-height: 57px
+    color: $color-white
+    margin: 0 0 18px 0
+    letter-spacing: -0.02em
+    @media(max-width: 899px)
+      font-size: 29px
+      letter-spacing: -0.01em
+      margin-bottom: 10px
+
+  .info__message
+    font-family: $font-fira
+    font-size: 30px
+    line-height: 36px
+
+  .title__course-pay-status
+    margin-right: 13px
+    margin-left: 7px
+
+    svg
+      top: 50%
+      transform: translateY(-50%)
+
+
+  .title__label
+    vertical-align: initial
+    position: relative
+    font-style: italic
+    display: inline-block
+    margin: 0 13px 0 0
+    letter-spacing: normal
+    @media(max-width: 899px)
+      top: 3px
+
+  .info__detail
+    font-family: $font-fira
+    color: $color-white
+    font-size: 17px
+    line-height: 24px
+
+    .info__detail-item
+      display: inline
+
+
+  .test-page__info-separator
+    font-size: 17px
+    margin: 0 5px
+    @media(max-width: 899px)
+      font-size: 12px
