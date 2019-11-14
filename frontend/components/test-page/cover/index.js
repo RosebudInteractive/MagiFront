@@ -40,10 +40,9 @@ class Cover extends React.Component {
                 backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
             }
 
-        return <div className="test-page__cover" style={_coverStyle}>
+        return <div className="test-page__cover js-test-content" style={_coverStyle}>
             <div className="test-page__info-wrapper">
                 <StartButton/>
-
                 <div className="test-page__info">
                     <h1 className="info__title">
                         <p className="title__label">Тест:</p>
