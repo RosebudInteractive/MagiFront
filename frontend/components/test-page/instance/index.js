@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import PropTypes from 'prop-types'
-import {testInstanceSelector, questionsSelector, setAnswer} from "ducks/test-instance";
+import {testInstanceSelector, questionsSelector, setAnswerAndSave, setAnswerAndFinish} from "ducks/test-instance";
 import AnswerButton from "./answer-button";
 import AnswerBlock from "./answer-block";
 
@@ -23,12 +23,22 @@ class Instance extends React.Component {
         }
     }
 
+    componentDidMount() {
+        let _index = this.props.questions.findIndex(item => !item.Answer)
+
+        _index = _index === -1 ? this.props.questions.length - 1 : _index
+
+        if (_index !== this.state.currentIndex) {
+            this.setState({currentIndex: _index})
+        }
+    }
+
     render() {
         const {test, questions} = this.props,
             _total = questions.length,
             _text = questions[this.state.currentIndex].Question.Text
 
-        return <div className="question-wrapper">
+        return <div className="question-wrapper js-test-content">
             <h3 className="question-title">
                 <span className="current">{this.state.currentIndex + 1}</span>
                 <span className="total">{"/" + _total + ": "}</span>
@@ -48,10 +58,10 @@ class Instance extends React.Component {
 
     _onForward() {
         const {currentIndex, answer} = this.state,
-            {questions, setAnswer} = this.props
+            {questions, setAnswerAndSave, setAnswerAndFinish} = this.props
 
         if (currentIndex < questions.length - 1) {
-            setAnswer({...answer, questionId: questions[currentIndex].Question.Id})
+            setAnswerAndSave({...answer, questionId: questions[currentIndex].Question.Id})
 
             this.setState({
                 currentIndex : currentIndex + 1,
@@ -60,6 +70,7 @@ class Instance extends React.Component {
             })
         } else {
             // завершение теста
+            setAnswerAndFinish({...answer, questionId: questions[currentIndex].Question.Id})
         }
     }
 
@@ -74,7 +85,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    return bindActionCreators({setAnswer}, dispatch)
+    return bindActionCreators({setAnswerAndSave, setAnswerAndFinish}, dispatch)
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Instance)

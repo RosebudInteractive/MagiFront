@@ -16,22 +16,16 @@ import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
 import {testSelector, loadingSelector as testLoading, getTest,} from "ducks/test";
 import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
+import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
 
 import '../components/test-page/test-page.sass'
 import Cover from "../components/test-page/cover";
 import Instance from "../components/test-page/instance";
+import ResultCover from "../components/test-page/result/cover";
 import {TEST_PAGE_TYPE} from "../constants/common-consts";
 import Header from "../components/header-lesson-page";
-import {isLandscape} from "../components/combined-lesson-page/desktop/tools";
-
-function _getHeight() {
-    return $(window).innerHeight();
-}
-
-function _getWidth() {
-    return $(window).innerWidth();
-}
+import {Desktop, Mobile} from "tools/cover";
 
 class TestPage extends React.Component {
 
@@ -44,28 +38,44 @@ class TestPage extends React.Component {
 
         this.state = {
             isMobile: isMobilePlatform(),
-            isLandscape: false
+            isLandscape: true
         }
 
         this._resizeHandler = function () {
-            let _div = $('.test-page')
+            let _div = $('.test-page'),
+                _content = $('.js-test-content'),
+                _wrapper = $('.test-page__content')
 
-            if (isLandscape()) {
+            if (!_content || !_content.length || !_wrapper || !_wrapper.length) return
+
+            if (this._isLandscape()) {
                 if (!this.state.isLandscape) {
                     this.setState({isLandscape: true})
                 }
                 _div.removeClass('added')
-                this._height = _getHeight();
-                this._width = _getWidth();
-                $('.content-wrapper').css('height', this._height).css('width', this._width);
+                this._height = this._getHeight();
+                this._width = this._getWidth();
+                _wrapper.css('min-height', this._height).css('width', this._width);
             } else {
                 if (this.state.isLandscape) {
                     this.setState({isLandscape: false})
                 }
 
-                $('.content-wrapper').css('height', "").css('width', "");
+                _wrapper.css('min-height', "").css('width', "");
 
                 _div.addClass('added')
+            }
+
+            if (_content && (_content.length > 0)) {
+                let _contentHeight = _content.outerHeight()
+
+                _wrapper.css("height", "")
+
+                let _wrapperHeight = _wrapper.height()
+
+                if (_contentHeight >= _wrapperHeight) {
+                    _wrapper.css("height", _contentHeight)
+                }
             }
         }.bind(this)
 
@@ -92,6 +102,11 @@ class TestPage extends React.Component {
                 return
             }
 
+            case TEST_PAGE_TYPE.RESULT: {
+                this.props.getTestResult(this.props.testUrl)
+                return
+            }
+
             default:
                 return;
 
@@ -100,7 +115,6 @@ class TestPage extends React.Component {
 
     componentDidMount() {
         this.props.setCurrentPage(this);
-        this._resizeHandler();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -113,6 +127,11 @@ class TestPage extends React.Component {
 
                 case TEST_PAGE_TYPE.INSTANCE: {
                     this.props.getTestInstance(nextProps.testUrl)
+                    return
+                }
+
+                case TEST_PAGE_TYPE.RESULT: {
+                    this.props.getTestResult(nextProps.testUrl)
                     return
                 }
 
@@ -132,6 +151,7 @@ class TestPage extends React.Component {
         if (prevProps.fetching && !this.props.fetching) {
             const _key = this.props.location.key;
             ScrollMemoryStorage.scrollPage(_key)
+            this._resizeHandler();
         }
     }
 
@@ -142,7 +162,10 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound, test, course} = this.props;
+        let {fetching, notFound, test, course, type} = this.props,
+            _className = "test-page" +
+                (this.state.isMobile ? " _mobile" : " _desktop") +
+                (type === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
         return fetching ?
             <LoadingFrame/>
@@ -150,11 +173,13 @@ class TestPage extends React.Component {
             notFound ?
                 <NotFoundPage/>
                 :
-                <div className={"test-page" + (this.state.isMobile ? " _mobile" : " _desktop")}>
+                <div className={_className}>
                     {this._getMetaTags()}
                     <Header test={test} course={course}/>
-                    <div className="content-wrapper">
-                        {this._getContent()}
+                    <div className="test-page__content">
+                        <div className="content-wrapper">
+                            {this._getContent()}
+                        </div>
                     </div>
                 </div>
 
@@ -171,7 +196,7 @@ class TestPage extends React.Component {
                 return <Instance/>
 
             case TEST_PAGE_TYPE.RESULT:
-                return <Cover/>
+                return <ResultCover/>
 
             default:
                 return <Cover/>
@@ -282,6 +307,18 @@ class TestPage extends React.Component {
     _removeEventListeners() {
         $(window).unbind('resize', this._resizeHandler)
     }
+
+    _isLandscape() {
+        return this.state.isMobile ? Mobile.isLandscape() : Desktop.isLandscape()
+    }
+
+    _getHeight() {
+        return this.state.isMobile ? Mobile.getLandscapeHeight() : Desktop.getLandscapeHeight()
+    }
+
+    _getWidth() {
+        return this.state.isMobile ? Mobile.getLandscapeWidth() : Desktop.getLandscapeWidth()
+    }
 }
 
 function mapStateToProps(state, ownProps) {
@@ -291,6 +328,7 @@ function mapStateToProps(state, ownProps) {
         facebookAppID: facebookAppIdSelector(state),
         fetching: testLoading(state) ||
             testInstanceLoading(state) ||
+            testResultLoading(state) ||
             state.singleCourse.fetching ||
             state.user.loading ||
             state.courses.fetching,
@@ -304,6 +342,7 @@ function mapDispatchToProps(dispatch) {
     return bindActionCreators({
         getTest,
         getTestInstance,
+        getTestResult,
         getCourse,
         getCourses,
         whoAmI,

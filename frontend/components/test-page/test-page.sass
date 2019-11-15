@@ -16,14 +16,29 @@
     @media(max-width: 899px)
       display: none
 
-.test-page._desktop
-  .lectures-menu._plain-menu
+  .test-page__content
+    position: relative
+
+  .content-wrapper
     position: absolute
-    background-color: transparent
-    border-bottom: $border-white-04
+    width: 100%
+    height: 100%
+    padding: 0
+    background-color: $color-main-dark
+
+  &._desktop
+    .lectures-menu._plain-menu
+      position: absolute
+      background-color: transparent
+      border-bottom: $border-white-04
+
+    &._instance-page:not(.added)
+      .content-wrapper
+        padding-top: 53px
+        height: calc(100% - 53px)
 
   &.added
-    .content-wrapper
+    .test-page__content
       height: calc(56.25vw + 130px)
     .lectures-menu._plain-menu
       position: inherit

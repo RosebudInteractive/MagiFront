@@ -293,7 +293,7 @@ class App extends Component {
                 <Route path={_homePath + 'autor/:url'} component={AuthorPage}/>
                 <Route path={_homePath + 'test/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.TEST}/>)}/>
                 <Route path={_homePath + 'test-instance/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.INSTANCE}/>)}/>
-                <Route path={_homePath + 'test-result/:courseUrl/:testId'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.RESULT}/>)}/>
+                <Route path={_homePath + 'test-result/:testUrl'} render={(props) => (<TestPage {...props} type={TEST_PAGE_TYPE.RESULT}/>)}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl/:garbage'} component={NotFound}/>
                 <Route path={_homePath + ':courseUrl/:lessonUrl'} component={CombineLessonPage}/>
                 <Route path={_homePath + 'about'} component={ProjectPage}/>

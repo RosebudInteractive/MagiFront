@@ -5,8 +5,8 @@ import {all, call, put, takeEvery, select, race, take} from "@redux-saga/core/ef
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {GET_TEST_COMPLETED, GET_TEST_FAIL, getTest, testSelector} from "ducks/test";
 import {push} from 'react-router-redux'
-import {ANSWER_TYPES, DATA_EXPIRATION_TIME} from "../constants/common-consts";
-import React from "react";
+import {DATA_EXPIRATION_TIME} from "../constants/common-consts";
+import {isAnswerCorrect} from "tools/tests-tools";
 
 /**
  * Constants
@@ -29,6 +29,15 @@ const GET_TEST_INSTANCE_FAIL = `${prefix}/GET_TEST_INSTANCE_FAIL`
 const SET_ANSWER_REQUEST = `${prefix}/SET_ANSWER_REQUEST`
 const SET_ANSWER_SUCCESS = `${prefix}/SET_ANSWER_SUCCESS`
 
+const SAVE_INSTANCE_REQUEST = `${prefix}/SAVE_INSTANCE_REQUEST`
+const SAVE_INSTANCE_START = `${prefix}/SAVE_INSTANCE_START`
+const SAVE_INSTANCE_SUCCESS = `${prefix}/SAVE_INSTANCE_SUCCESS`
+const SAVE_INSTANCE_FAIL = `${prefix}/SAVE_INSTANCE_FAIL`
+
+const SET_ANSWER_AND_SAVE_REQUEST = `${prefix}/SET_ANSWER_AND_SAVE_REQUEST`
+const FINISH_INSTANCE_REQUEST = `${prefix}/FINISH_INSTANCE_REQUEST`
+const FINISH_INSTANCE_SUCCESS = `${prefix}/FINISH_INSTANCE_SUCCESS`
+
 const InstanceRecord = Record({
     ActDuration: 0,
     Duration: 0,
@@ -44,6 +53,7 @@ const InstanceRecord = Record({
 
 const ReducerRecord = Record({
     loading: false,
+    saving: false,
     loaded: false,
     testInstance: new InstanceRecord(),
     questions: new Map([]),
@@ -61,8 +71,8 @@ export default function reducer(state = new ReducerRecord(), action) {
     const {type, payload} = action
 
     switch (type) {
-        case CREATE_TEST_INSTANCE_REQUEST:
-        case GET_TEST_INSTANCE_REQUEST:
+        case CREATE_TEST_INSTANCE_START:
+        case GET_TEST_INSTANCE_START:
             return state
                 .set('loaded', false)
                 .set('loading', true)
@@ -91,6 +101,10 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loaded', true)
                 .set('testInstance', payload.instance)
                 .set('questions', payload.questions)
+
+        case FINISH_INSTANCE_SUCCESS:
+            return state
+                .set('testInstance', payload)
 
         default:
             return state
@@ -139,6 +153,18 @@ export const setAnswer = (answer) => {
     return { type: SET_ANSWER_REQUEST, payload: answer }
 }
 
+export const save = (answer) => {
+    return { type: SAVE_INSTANCE_REQUEST, payload: answer }
+}
+
+export const setAnswerAndSave = (answer) => {
+    return { type: SET_ANSWER_AND_SAVE_REQUEST, payload: answer }
+}
+
+export const setAnswerAndFinish = (answer) => {
+    return { type: FINISH_INSTANCE_REQUEST, payload: answer }
+}
+
 /**
  * Sagas
  */
@@ -147,6 +173,9 @@ export const saga = function* () {
         takeEvery(CREATE_TEST_INSTANCE_REQUEST, createNewTestInstanceSaga),
         takeEvery(GET_TEST_INSTANCE_REQUEST, getTestInstanceSaga),
         takeEvery(SET_ANSWER_REQUEST, setAnswerSaga),
+        takeEvery(SAVE_INSTANCE_REQUEST, saveInstanceSaga),
+        takeEvery(SET_ANSWER_AND_SAVE_REQUEST, setAnswerAndSaveSaga),
+        takeEvery(FINISH_INSTANCE_REQUEST, finishInstanceSaga),
     ])
 }
 
@@ -194,9 +223,10 @@ function _fetchCreateInstanceTest(testId) {
 
 function* getTestInstanceSaga(data) {
 
-    let _time = yield select(successTimeSelector)
+    let _time = yield select(successTimeSelector),
+        _instance = yield select(testInstanceSelector)
 
-    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
+    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME) && !!_instance && _instance.Id === data.payload) {
         yield put({ type: GET_TEST_INSTANCE_COMPLETED })
         return
     }
@@ -231,33 +261,119 @@ function* setAnswerSaga(data) {
         _questions = _state.questions,
         _question = _questions.get(_answer.questionId)
 
-    if (_isAnswerCorrect(_question.Question, _answer)) {
+    if (isAnswerCorrect(_question.Question, _answer.value)) {
         _questions = _questions.setIn([_answer.questionId, 'Score'], _question.Question.Score)
-
         _instance = _instance.set("Score", +_instance.Score + _question.Question.Score)
     }
 
+    _questions = _questions.setIn([_answer.questionId, 'Answer'], JSON.stringify(_answer.value))
 
     yield put({type: SET_ANSWER_SUCCESS, payload: {instance: _instance, questions: _questions}})
 }
 
-const _isAnswerCorrect = (question, answer) => {
-    switch (question.AnswType) {
+// const _isAnswerCorrect = (question, answer) => {
+//     switch (question.AnswType) {
+//
+//         case ANSWER_TYPES.BOOL:
+//             return answer.value === question.AnswBool
+//
+//         case ANSWER_TYPES.SELECT: {
+//             const _answerItem = question.Answers.find((item) => {
+//                 return item.Id === answer.value[0]
+//             })
+//
+//             return !!_answerItem && _answerItem.IsCorrect
+//         }
+//
+//         case ANSWER_TYPES.MULTI_SELECT: {
+//             const _correctAnswers = question.Answers
+//                 .filter((item) => {
+//                     return item.IsCorrect
+//                 })
+//                 .map(item => item.Id)
+//
+//             const _firstStepCheck = answer.value.every(item => _correctAnswers.includes(item))
+//
+//             const _secondStepCheck = _correctAnswers.every(item => answer.value.includes(item))
+//
+//             return _firstStepCheck && _secondStepCheck
+//         }
+//
+//         default:
+//             return false
+//     }
+// }
 
-        case ANSWER_TYPES.BOOL:
-            return answer.AnswBool === question.AnswBool
+function* saveInstanceSaga() {
+    let _instance = yield select(testInstanceSelector),
+        _questions = yield select(questionsSelector)
 
-        case ANSWER_TYPES.SELECT: {
-            const _answerItem = question.Answers.find((item) => {
-                return item.Id === answer.Answers[0]
-            })
+    try{
+        let _obj = _instance.toJS()
+        _obj.Questions = _questions
 
-            return !!_answerItem && _answerItem.IsCorrect
-        }
+        yield put({ type: SAVE_INSTANCE_START })
 
+        const _result = yield call(_fetchSaveInstanceTest, _obj)
 
-        case ANSWER_TYPES.MULTI_SELECT:
-            return false
+        console.log(_result)
 
+        yield put({ type: SAVE_INSTANCE_SUCCESS })
+
+    } catch (e) {
+        yield put({ type: SAVE_INSTANCE_FAIL, payload: {e} })
     }
+}
+
+const _fetchSaveInstanceTest = (data) => {
+    return fetch(`/api/tests/instance/${data.Id}`,
+        {
+            method: 'PUT',
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify(data),
+            credentials: 'include'
+        })
+        .then(checkStatus)
+        .then(parseJSON)
+}
+
+function* setAnswerAndSaveSaga(data) {
+
+    console.log('setAnswerAndSaveSaga')
+
+    yield put(setAnswer(data.payload))
+
+    console.log(SET_ANSWER_SUCCESS)
+
+    yield take(SET_ANSWER_SUCCESS)
+
+    console.log(SET_ANSWER_SUCCESS)
+
+    yield put(save())
+}
+
+function* finishInstanceSaga(data) {
+
+    yield put(setAnswer(data.payload))
+
+    yield take(SET_ANSWER_SUCCESS)
+
+    let _instance = yield select(testInstanceSelector)
+
+    _instance = _instance.set("IsFinished", true)
+
+    yield put({ type: FINISH_INSTANCE_SUCCESS, payload: _instance })
+
+    yield put(save())
+
+    const {success} = yield race({
+        success: take(SAVE_INSTANCE_SUCCESS),
+        error: take(SAVE_INSTANCE_FAIL)
+    })
+
+    if (!success) { return }
+
+    yield put(push(`/test-result/${_instance.Id}`))
 }

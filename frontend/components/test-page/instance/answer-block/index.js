@@ -82,8 +82,7 @@ export default class AnswerBlock extends React.Component {
 
     _onChangeBoolValue(e) {
         if (this.props.onChangeValue) {this.props.onChangeValue({
-            AnswBool: e.target.dataset.value === "true",
-            Answers: []
+            value: e.target.dataset.value === "true",
         })}
     }
 
@@ -100,8 +99,7 @@ export default class AnswerBlock extends React.Component {
         }
 
         if (this.props.onChangeValue) {this.props.onChangeValue({
-            AnswBool: null,
-            Answers: _answer
+            value: _answer
         })}
     }
 }
