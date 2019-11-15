@@ -37,6 +37,7 @@ const TestRecord = Record({
     SnName: null,
     SnDescription: null,
     SnPost: null,
+    Qty: null,
     questionsCount: 0,
     estimatedTime: 0,
 })
@@ -129,7 +130,7 @@ function _fetchTest(url) {
                 data.CoverMeta = JSON.parse(data.CoverMeta)
             }
 
-            data.questionsCount = data.Questions.length
+            data.questionsCount = data.Qty
 
             data.estimatedTime = Math.round(data.AnswTime / 60)
             data.lastSuccessTime = Date.now()
