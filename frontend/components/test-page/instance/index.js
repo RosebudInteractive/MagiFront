@@ -44,7 +44,7 @@ class Instance extends React.Component {
                 <span className="total">{"/" + _total + ": "}</span>
                 {_text}
             </h3>
-            <AnswerBlock question={questions[this.state.currentIndex].Question} onChangeValue={::this._onChangeValue}/>
+            <AnswerBlock question={questions[this.state.currentIndex].Question} onChangeValue={::this._onChangeValue} answer={this.state.answer && this.state.answer.value}/>
             <AnswerButton test={test} disabled={!this.state.hasAnswer} onButtonClick={::this._onForward}/>
         </div>
     }

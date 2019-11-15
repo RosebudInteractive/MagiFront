@@ -1,9 +1,13 @@
 import React from 'react'
+import {bindActionCreators} from 'redux';
 import './cover.sass'
-// import StartButton from "./start-button";
 import {testSelector} from "ducks/test";
 import {testResultSelector} from "ducks/test-result";
 import {connect} from "react-redux";
+import {SocialBlock} from "../../social-block";
+import {createNewTestInstance} from "ducks/test-instance";
+
+const RELOAD = '<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#reload"/>'
 
 class Cover extends React.Component {
 
@@ -34,18 +38,44 @@ class Cover extends React.Component {
                 backgroundPosition: `${_backgroundPosition.top} ${_backgroundPosition.left}`,
             }
 
-        return <div className="test-page__cover js-test-content" style={_coverStyle}>
-            <div className="test-result__info-wrapper">
-                <div className="test-page__info">
-                    <h1 className="info__title">
-                        {`Верно ${result.CorrectCount} из ${result.TotalCount}`}
-                    </h1>
-                    <div className="info__message">
-                        {`Вы не сдали тест «${test.Name}».`}
+        return <div className="test-result__cover js-test-content" style={_coverStyle}>
+            <div className="margin-block flex-column-block">
+                <div className="test-result__info">
+                        <h1 className="title">
+                            {`Верно ${result.CorrectCount} из ${result.TotalCount}`}
+                        </h1>
+                        <div className="message">
+                            {`Вы не сдали тест «${test.Name}».`}
+                        </div>
+                </div>
+                <div className="next-lesson__buttons-block">
+                    <div className="reinit-button" onClick={::this._createInstance}>
+                        <span>
+                            <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
+                        </span>
+                        Пройти заново
+                    </div>
+                    <div className="button btn--brown next-lesson-button">
+                        Следующая лекция
+                    </div>
+                </div>
+
+                <div className="social-block__title">Поделится результатом с друзьями</div>
+                <div className="social-block__wrapper">
+                    <SocialBlock shareUrl={window.location.href}/>
+                    <div className="reinit-button" onClick={::this._createInstance}>
+                        <span>
+                            <svg width="15" height="15" dangerouslySetInnerHTML={{__html: RELOAD}}/>
+                        </span>
+                        Пройти заново
                     </div>
                 </div>
             </div>
         </div>
+    }
+
+    _createInstance() {
+        this.props.createNewTestInstance(this.props.test.URL)
     }
 }
 
@@ -56,4 +86,8 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps,)(Cover)
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({createNewTestInstance}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cover)

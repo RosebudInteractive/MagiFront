@@ -131,11 +131,7 @@ function _fetchTest(url) {
 
             data.questionsCount = data.Questions.length
 
-            let _estimatedTime = data.Questions.reduce((acc, value) => {
-                return acc + value
-            }, 0)
-
-            data.estimatedTime = Math.round(_estimatedTime / 60)
+            data.estimatedTime = Math.round(data.AnswTime / 60)
             data.lastSuccessTime = Date.now()
 
             return data

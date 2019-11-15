@@ -1,6 +1,7 @@
 @import "~tools/variables"
 
-.test-page__cover
+
+.test-result__cover
   height: 100%
   position: relative
   background-repeat: no-repeat
@@ -8,38 +9,54 @@
   background-size: cover
   background-position: top center
 
-  .test-result__info-wrapper
-    position: relative
-    display: flex
-    flex-direction: column-reverse
-    margin-left: 8.333%
-    width: 75%
+  .margin-block
     height: 100%
+    margin: 0 8.333%
     @media(max-width: 899px)
+      margin: 0 36px
+    @media(max-width: 639px)
       margin: 0 20px
-      width: calc(50% - 20px)
+
+  .flex-column-block
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+
 
   .test-result__info
+    position: relative
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+    width: 90%
+    margin-bottom: 21px
     color: $color-white
-
-
-  .info__title
-    font-family: $font-pt
-    font-weight: normal
-    font-size: 52px
-    line-height: 57px
-    color: $color-white
-    margin: 0 0 18px 0
-    letter-spacing: -0.02em
     @media(max-width: 899px)
-      font-size: 29px
-      letter-spacing: -0.01em
-      margin-bottom: 10px
+      width: 75%
+    @media(max-width: 639px)
+      width: 100%
 
-  .info__message
-    font-family: $font-fira
-    font-size: 30px
-    line-height: 36px
+    .title
+      font-family: $font-pt
+      font-weight: normal
+      font-size: 52px
+      line-height: 57px
+      color: $color-white
+      margin: 0 0 36px 0
+      letter-spacing: -0.02em
+      @media(max-width: 899px)
+        font-size: 29px
+        line-height: 33px
+        letter-spacing: -0.01em
+        margin-bottom: 24px
+
+    .message
+      font-family: $font-fira
+      font-size: 30px
+      line-height: 36px
+      @media(max-width: 899px)
+        font-size: 20px
+        line-height: 24px
 
   .title__course-pay-status
     margin-right: 13px
@@ -75,3 +92,91 @@
     margin: 0 5px
     @media(max-width: 899px)
       font-size: 12px
+
+  .social-block__wrapper
+    height: 48px
+    min-height: 48px
+    margin-bottom: 21px
+    display: flex
+    flex-direction: row
+    @media(max-width: 899px)
+      margin-bottom: 13px
+    @media(max-width: 639px)
+      margin-bottom: 21px
+
+    .reinit-button
+      display: block
+      margin-left: 25px
+      @media(max-width: 639px)
+        display: none
+
+  .social-block
+    flex-basis: auto
+    @media(max-width: 899px)
+      flex-basis: 50%
+    @media(max-width: 639px)
+      flex-basis: 100%
+
+  .social-button-wrapper
+    width: 108px
+    @media(max-width: 899px)
+      flex-basis: 29%
+      width: auto
+      max-width: none
+
+    &:last-of-type
+      width: 51px
+      @media(max-width: 899px)
+        flex-basis: 13%
+
+  .social-block__title
+    color: $color-white
+    font-family: $font-fira
+    font-size: 17px
+    line-height: 24px
+    margin-bottom: 12px
+    @media(max-width: 899px)
+      font-size: 15px
+      line-height: 21px
+      margin-bottom: 10px
+
+  .reinit-button
+    color: $color-white
+    font-family: $font-fira
+    font-size: 14px
+    line-height: 18px
+    letter-spacing: 0.01em
+    align-self: center
+    cursor: pointer
+    span
+      vertical-align: sub
+      margin-right: 4px
+    @media(max-width: 899px)
+      font-size: 12px
+      line-height: 15px
+
+  .next-lesson__buttons-block
+    margin: 0 0 21px
+    display: flex
+    width: auto
+    @media (max-width: 639px)
+      width: 100%
+
+    .next-lesson-button
+      padding-left: 0
+      padding-right: 0
+      height: 26px
+      width: 216px
+      cursor: pointer
+      flex-grow: 0
+      @media(max-width: 899px)
+        width: 50%
+      @media(max-width: 639px)
+        flex-grow: 1
+
+    .reinit-button
+      display: none
+      width: 64px
+      margin-right: 20px
+      @media (max-width: 639px)
+        display: block

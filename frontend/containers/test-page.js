@@ -26,6 +26,7 @@ import ResultCover from "../components/test-page/result/cover";
 import {TEST_PAGE_TYPE} from "../constants/common-consts";
 import Header from "../components/header-lesson-page";
 import {Desktop, Mobile} from "tools/cover";
+import Answers from "../components/test-page/result/answers";
 
 class TestPage extends React.Component {
 
@@ -66,17 +67,17 @@ class TestPage extends React.Component {
                 _div.addClass('added')
             }
 
-            if (_content && (_content.length > 0)) {
-                let _contentHeight = _content.outerHeight()
-
-                _wrapper.css("height", "")
-
-                let _wrapperHeight = _wrapper.height()
-
-                if (_contentHeight >= _wrapperHeight) {
-                    _wrapper.css("height", _contentHeight)
-                }
-            }
+            // if (_content && (_content.length > 0)) {
+            //     let _contentHeight = _content.outerHeight()
+            //
+            //     _wrapper.css("height", "")
+            //
+            //     let _wrapperHeight = _wrapper.height()
+            //
+            //     if (_contentHeight >= _wrapperHeight) {
+            //         _wrapper.css("height", _contentHeight)
+            //     }
+            // }
         }.bind(this)
 
         this._addEventListeners();
@@ -181,6 +182,7 @@ class TestPage extends React.Component {
                             {this._getContent()}
                         </div>
                     </div>
+                    {type === TEST_PAGE_TYPE.RESULT && <Answers/>}
                 </div>
 
     }

@@ -1,18 +1,17 @@
 import React from 'react'
-// import PropTypes from 'prop-types'
-import './cover.sass'
-import StartButton from "./start-button";
+import {bindActionCreators} from 'redux';
+import {connect} from "react-redux";
+
 import {getCountMinutesTitle, getQuestionsTitle} from "tools/word-tools";
 import {testSelector} from "ducks/test";
-import {connect} from "react-redux";
+import {createNewTestInstance} from "ducks/test-instance";
+
+import './cover.sass'
+import {SocialBlock} from "../social-block";
 
 const INFO_SEPARATOR = <span className="test-page__info-separator">•</span>
 
 class Cover extends React.Component {
-
-    // static propTypes = {
-    //     test: PropTypes.object,
-    // }
 
     constructor(props) {
         super(props)
@@ -41,23 +40,30 @@ class Cover extends React.Component {
             }
 
         return <div className="test-page__cover js-test-content" style={_coverStyle}>
-            <div className="test-page__info-wrapper">
-                <StartButton/>
+            <div className="margin-block flex-column-block">
                 <div className="test-page__info">
-                    <h1 className="info__title">
+                    <h1 className="title">
                         <p className="title__label">Тест:</p>
                         <span>{test.Name.trim()}</span>
                     </h1>
-                    <div className="info__detail">
+                    <div className="detail">
                         <div className="info__detail-item">{test.questionsCount + ' ' + getQuestionsTitle(test.questionsCount)}</div>
                         {INFO_SEPARATOR}
                         <div className="info__detail-item">{'≈' + test.estimatedTime + ' ' + getCountMinutesTitle(test.estimatedTime)}</div>
                     </div>
                 </div>
-
-
+                <div className="start-button__block">
+                    <div className="button btn--brown start-button" onClick={::this._createInstance}>
+                        Начать тест
+                    </div>
+                    <SocialBlock />
+                </div>
             </div>
         </div>
+    }
+
+    _createInstance() {
+        this.props.createNewTestInstance(this.props.test.URL)
     }
 }
 
@@ -65,4 +71,8 @@ const mapStateToProps = (state) => {
     return {test: testSelector(state)}
 }
 
-export default connect(mapStateToProps,)(Cover)
+const mapDispatchToProps = (dispatch) => {
+    return bindActionCreators({createNewTestInstance}, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cover)

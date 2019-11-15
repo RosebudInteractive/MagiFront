@@ -1,35 +1,46 @@
 @import "~tools/variables"
 
 .test-page__cover
-  //height: calc(56.26vw)
   height: 100%
   position: relative
   background-repeat: no-repeat
   -webkit-background-size: cover
   background-size: cover
   background-position: top center
-  //@media(max-width: 1679px)
-  //  height: 500px
-  //@media(max-width: 899px)
-  //  height: 515px
 
-  .test-page__info-wrapper
+  .margin-block
+    height: 100%
+    margin: 0 8.333%
+    @media(max-width: 899px)
+      margin: 0 36px
+    @media(max-width: 639px)
+      margin: 0 20px
+
+  .flex-column-block
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+
+  .test-page__info
     position: relative
     display: flex
-    flex-direction: column-reverse
-    margin-left: 8.333%
-    width: 58.331%
-    height: 100%
+    flex-direction: column
+    justify-content: flex-end
+    width: 70%
+    color: $color-white
+    max-width: unset
     @media(max-width: 899px)
-      margin: 0 20px
-      width: calc(50% - 20px)
+      width: 50%
+    @media(max-width: 639px)
+      width: 100%
+      max-width: 279px
 
-  .info__title
+  .title
     font-family: $font-pt
     font-weight: normal
     font-size: 52px
     line-height: 110%
-    color: $color-white
+
     margin: 0 0 18px 0
     letter-spacing: -0.02em
     @media(max-width: 899px)
@@ -56,7 +67,7 @@
     @media(max-width: 899px)
       top: 3px
 
-  .info__detail
+  .detail
     font-family: $font-fira
     color: $color-white
     font-size: 17px
@@ -71,3 +82,51 @@
     margin: 0 5px
     @media(max-width: 899px)
       font-size: 12px
+
+  .start-button__block
+    margin: 23px 0 36px
+    display: flex
+    flex-direction: row
+    width: auto
+    max-width: unset
+    @media(max-width: 639px)
+      width: 100%
+      flex-direction: column
+      max-width: 279px
+
+    .start-button
+      padding-left: 0
+      padding-right: 0
+      width: 267px
+      height: 26px
+      cursor: pointer
+      flex-basis: auto
+      @media(max-width: 899px)
+        flex-basis: 50%
+      @media(max-width: 639px)
+        flex-basis: auto
+        width: 100%
+
+    .social-block
+      height: 48px
+      margin-left: 20px
+      margin-top: 0
+      flex-basis: auto
+      @media(max-width: 899px)
+        flex-basis: 50%
+      @media(max-width: 639px)
+        flex-basis: auto
+        margin-left: 0
+        margin-top: 18px
+
+    .social-button-wrapper
+      width: 81px
+      @media(max-width: 899px)
+        flex-basis: 29%
+        width: auto
+        max-width: none
+
+      &:last-of-type
+        width: 38px
+        @media(max-width: 899px)
+          flex-basis: 13%
