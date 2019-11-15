@@ -283,7 +283,8 @@ const DbTest = class DbTest extends DbObject {
                         Name: elem.Name,
                         TestTypeId: elem.TestTypeId,
                         URL: isAbsPath ? this._absTestUrl + elem.URL : elem.URL,
-                        AnswTime: 0
+                        AnswTime: 0,
+                        Qty: 0
                     };
                     if (elem.LessonId) {
                         let lsnTests = tests.Lessons[elem.LessonId];
@@ -295,6 +296,7 @@ const DbTest = class DbTest extends DbObject {
                         tests.Course.push(currTest);
                 }
                 currTest.AnswTime += elem.AnswTime ? elem.AnswTime : DFLT_ANSW_TIME;
+                currTest.Qty++;
             })
             if (user_id) {
                 result = await $data.execSql({
@@ -354,7 +356,7 @@ const DbTest = class DbTest extends DbObject {
                 mssql: _.template(TEST_MSSQL_PUBLIC_REQ)({ where: whereMSSQL })
             }
         }, {});
-        let testData = { Questions: [], Images: {} };
+        let testData = { Images: {} };
         if (result && result.detail && (result.detail.length > 0)) {
             result.detail.forEach(elem => {
                 if (!testData.Id) {
@@ -370,8 +372,10 @@ const DbTest = class DbTest extends DbObject {
                     testData.Cover = this._convertDataUrl(elem.Cover, isAbsPath, dLink);
                     testData.CoverMeta = this._convertMeta(elem.CoverMeta, isAbsPath, dLink);
                     testData.AnswTime = 0;
+                    testData.Qty = 0;
                 }
                 testData.AnswTime += elem.AnswTime ? elem.AnswTime : DFLT_ANSW_TIME;
+                testData.Qty++;
             });
         }
         else
