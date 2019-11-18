@@ -9,6 +9,7 @@ import {saga as testInstanceSaga} from 'ducks/test-instance'
 import {saga as testResultSaga} from 'ducks/test-result'
 // пока костыль
 import {saga as coursesSaga} from 'actions/courses-page-actions'
+import {saga as lessonMenuSaga} from 'ducks/lesson-menu'
 
 export default function* rootSaga() {
     yield all([
@@ -21,5 +22,6 @@ export default function* rootSaga() {
         testInstanceSaga(),
         testResultSaga(),
         coursesSaga(),
+        lessonMenuSaga(),
     ])
 }

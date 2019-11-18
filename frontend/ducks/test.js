@@ -100,12 +100,13 @@ export const saga = function* () {
 }
 
 function* getTestSaga(data) {
-    let _time = yield select(successTimeSelector)
+    // let _time = yield select(successTimeSelector),
+    //     _test = yield select(testSelector)
 
-    if (!!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
-        yield put({type: GET_TEST_COMPLETED})
-        return
-    }
+    // if (!!_test && !!_time && ((Date.now() - _time) < DATA_EXPIRATION_TIME)) {
+    //     yield put({type: GET_TEST_COMPLETED})
+    //     return
+    // }
 
     yield put({type: GET_TEST_START})
 

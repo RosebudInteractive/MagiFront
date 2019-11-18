@@ -31,6 +31,7 @@ import Sources from "../components/combined-lesson-page/sources";
 import {userPaidCoursesSelector} from "ducks/profile";
 import {facebookAppIdSelector, setCurrentPage, clearCurrentPage,} from "ducks/app";
 import {notifyLessonShowed,} from "ducks/google-analytics";
+import {getLessonsAll, loadingSelector as menuDataLoading} from "ducks/lesson-menu";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 
 let _scrollTop = 0;
@@ -165,7 +166,7 @@ class CombineLessonPage extends React.Component {
         this.props.storageActions.refreshState();
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
+        this.props.getLessonsAll(courseUrl, lessonUrl);
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
 
         this.props.pageHeaderActions.setCurrentPage(pages.lesson, courseUrl, lessonUrl);
@@ -256,7 +257,7 @@ class CombineLessonPage extends React.Component {
         this.props.storageActions.refreshState();
 
         this.props.lessonActions.getLesson(courseUrl, lessonUrl);
-        this.props.lessonActions.getLessonsAll(courseUrl, lessonUrl);
+        this.props.getLessonsAll(courseUrl, lessonUrl);
         this.props.lessonActions.getLessonText(courseUrl, lessonUrl);
     }
 
@@ -543,11 +544,9 @@ class CombineLessonPage extends React.Component {
                         <React.Fragment>
                             {this._getMetaTags()}
                             <Menu lesson={_lesson}
-                                  course={course}
                                   isNeedHideRefs={_isNeedHideRefs}
                                   episodes={lessonText.episodes}
                                   active={_lesson.Id}
-                                  history={this.props.history}
                                   extClass={!isMobileApp && isDesktopInLandscape() ? 'pushed' : ''}/>
                             {
                                 _galleryHasItems ?
@@ -621,13 +620,15 @@ function mapStateToProps(state, ownProps) {
         params: ownProps.location.search,
 
         lessonInfo: state.singleLesson,
-        fetching: state.singleLesson.fetching || state.lessonText.fetching || state.courses.fetching || state.singleCourse.fetching,
+        fetching: state.singleLesson.fetching ||
+            state.lessonText.fetching ||
+            menuDataLoading(state),
+
         lesson: state.singleLesson.object,
         notFound: state.singleLesson.notFound || state.lessonText.notFound,
         authors: state.singleLesson.authors,
         lessonText: state.lessonText,
         course: state.singleLesson.course,
-        lessons: state.lessons,
         authorized: !!state.user.user,
         isAdmin: !!state.user.user && state.user.user.isAdmin,
 
@@ -652,6 +653,7 @@ function mapDispatchToProps(dispatch) {
         setCurrentPage: bindActionCreators(setCurrentPage, dispatch),
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         notifyLessonShowed: bindActionCreators(notifyLessonShowed, dispatch),
+        getLessonsAll: bindActionCreators(getLessonsAll, dispatch),
     }
 }
 

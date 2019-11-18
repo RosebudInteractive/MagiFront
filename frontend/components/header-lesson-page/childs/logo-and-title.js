@@ -21,7 +21,7 @@ class LogoAndTitle extends React.Component {
             _analyticsInfo = {
                 Id: course.Id,
                 Name: course.Name,
-                category: course.Categories[0].Name,
+                // category: course.Categories[0].Name,
                 author: lesson ? lesson.Author.FirstName + ' ' + lesson.Author.LastName : null,
                 price: course.IsPaid ? (course.DPrice ? course.DPrice : course.Price) : 0
             }

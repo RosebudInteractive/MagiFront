@@ -9,6 +9,7 @@ import {OverflowHandler} from 'tools/page-tools'
 import $ from 'jquery'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {notifyLessonLinkClicked} from "ducks/google-analytics";
+import {lessonsSelector, authorsSelector} from "ducks/lesson-menu";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -19,7 +20,7 @@ class LessonsListWrapper extends React.Component {
         super(props);
     }
 
-    componentWillReceiveProps(nextProps){
+    componentWillReceiveProps(nextProps) {
         if ((!this.props.isLessonMenuOpened) && (nextProps.isLessonMenuOpened)) {
             OverflowHandler.rememberScrollPos()
         }
@@ -54,22 +55,17 @@ class LessonsListWrapper extends React.Component {
     }
 
     render() {
-        return (
-            (this.props.fetching) ?
-                null
-                : (
-                    <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
-                        <ol className="lectures-list">
-                            {this._getLessonsList()}
-                        </ol>
-                    </div>
-                )
-        )
+        return <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
+            <ol className="lectures-list">
+                <div></div>
+                {this._getLessonsList()}
+            </ol>
+        </div>
     }
 
     _getLessonsList() {
-        const {object: lessons, authors} = this.props.lessons;
-        const {course, userPaidCourses} = this.props;
+        const {lessons, authors, course, userPaidCourses} = this.props;
+
         let _needShowAuthor = (authors && (authors.length > 1)),
             _isPaidCourse = (course.IsPaid && !course.IsGift && !course.IsBought && !userPaidCourses.includes(course.Id))
 
@@ -84,7 +80,8 @@ class LessonsListWrapper extends React.Component {
                 });
             })
 
-            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index} isPaidCourse={_isPaidCourse}
+            return <ListItem {...this.props} lesson={lesson} course={course} showAuthor={_needShowAuthor} key={index}
+                             isPaidCourse={_isPaidCourse}
                              onLinkClick={this.props.notifyLessonLinkClicked}/>
         });
     }
@@ -92,9 +89,9 @@ class LessonsListWrapper extends React.Component {
 
 function mapStateToProps(state) {
     return {
-        fetching: state.lessons.fetching,
-        lessons: state.lessons,
-        userPaidCourses : userPaidCoursesSelector(state),
+        lessons: lessonsSelector(state),
+        authors: authorsSelector(state),
+        userPaidCourses: userPaidCoursesSelector(state),
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
 }

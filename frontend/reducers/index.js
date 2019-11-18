@@ -27,6 +27,7 @@ import GoogleAnalyticsReducer, {moduleName as GoogleAnalyticsModule} from 'ducks
 import TestReducer, {moduleName as TestModule} from 'ducks/test'
 import TestInstanceReducer, {moduleName as TestInstanceModule} from 'ducks/test-instance'
 import TestResultReducer, {moduleName as TestResultModule} from 'ducks/test-result'
+import LessonMenuReducer, {moduleName as LessonMenuModule} from 'ducks/lesson-menu'
 
 export default combineReducers({
 
@@ -56,6 +57,7 @@ export default combineReducers({
     [TestModule]: TestReducer,
     [TestInstanceModule]: TestInstanceReducer,
     [TestResultModule]: TestResultReducer,
+    [LessonMenuModule]: LessonMenuReducer,
     routing: routerReducer,
     form: formReducer,
 })

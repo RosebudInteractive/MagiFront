@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Menu from '../menu';
+import Menu from '../../header-lesson-page/';
 import LandscapePlayerFrame from './landscape-player-frame'
 import PortraitPlayerFrame from './portrait-player-frame'
 import LessonFrame from '../lesson-frame';

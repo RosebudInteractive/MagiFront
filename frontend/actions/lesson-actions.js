@@ -2,9 +2,6 @@ import {
     GET_LESSON_REQUEST,
     GET_LESSON_SUCCESS,
     GET_LESSON_FAIL,
-    GET_LESSONS_ALL_REQUEST,
-    GET_LESSONS_ALL_SUCCESS,
-    GET_LESSONS_ALL_FAIL,
     GET_LESSON_TEXT_REQUEST,
     GET_LESSON_TEXT_SUCCESS,
     GET_LESSON_TEXT_FAIL,
@@ -16,7 +13,10 @@ import {
 } from '../constants/lesson'
 
 import 'whatwg-fetch';
-import {parseReadyDate} from "../tools/time-tools";
+import {parseReadyDate} from "tools/time-tools";
+
+
+
 
 export const clearLesson = () => {
     return {
@@ -57,33 +57,6 @@ export const getLesson = (courseUrl, lessonUrl) => {
             });
     }
 };
-
-export const getLessonsAll = (courseUrl, lessonUrl) => {
-    return (dispatch) => {
-        dispatch({
-            type: GET_LESSONS_ALL_REQUEST,
-            payload: null
-        });
-
-        fetch("/api/lessons-all/" + courseUrl + '/' + lessonUrl, {method: 'GET', credentials: 'include'})
-            .then(checkStatus)
-            .then(parseJSON)
-            .then(data => {
-                handleLessons(data);
-
-                dispatch({
-                    type: GET_LESSONS_ALL_SUCCESS,
-                    payload: data
-                });
-            })
-            .catch((err) => {
-                dispatch({
-                    type: GET_LESSONS_ALL_FAIL,
-                    payload: err
-                });
-            });
-    }
-}
 
 export const getLessonText = (courseUrl, lessonUrl) => {
     return (dispatch) => {
