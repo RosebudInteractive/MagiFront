@@ -10,6 +10,8 @@ import $ from 'jquery'
 import {userPaidCoursesSelector} from "ducks/profile";
 import {notifyLessonLinkClicked} from "ducks/google-analytics";
 import {lessonsSelector, authorsSelector} from "ducks/lesson-menu";
+import {TEST_TYPE} from "../../../../constants/common-consts";
+import TestItem from "./test-item";
 
 class LessonsListWrapper extends React.Component {
     static propTypes = {
@@ -57,8 +59,9 @@ class LessonsListWrapper extends React.Component {
     render() {
         return <div className={"lectures-list-wrapper" + (this.props.isDark ? ' _dark' : '')}>
             <ol className="lectures-list">
-                <div></div>
+                <TestItem test={this._getStartedTest()}/>
                 {this._getLessonsList()}
+                <TestItem test={this._getFinishedTest()}/>
             </ol>
         </div>
     }
@@ -84,6 +87,16 @@ class LessonsListWrapper extends React.Component {
                              isPaidCourse={_isPaidCourse}
                              onLinkClick={this.props.notifyLessonLinkClicked}/>
         });
+    }
+
+    _getStartedTest() {
+        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
+            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.STARTED)
+    }
+
+    _getFinishedTest() {
+        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
+            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.FINISHED)
     }
 }
 

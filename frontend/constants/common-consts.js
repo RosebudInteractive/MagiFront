@@ -29,3 +29,10 @@ export const ANSWER_TYPES = {
     MULTI_SELECT: 4,
     TEXT: 5,
 }
+
+export const TEST_TYPE = {
+    COMMON: 1,
+    STARTED: 2,
+    FINISHED: 3,
+    EXT: 4,
+}

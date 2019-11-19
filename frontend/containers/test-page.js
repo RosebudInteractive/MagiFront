@@ -11,10 +11,10 @@ import {getDomain, getPageUrl, isMobilePlatform, pages} from "tools/page-tools";
 import {refreshState as refreshStorage} from "actions/lesson-info-storage-actions";
 import {whoAmI} from "actions/user-actions";
 import {setCurrentPage as headerSetPage} from "actions/page-header-actions";
-import {getCourse, getCourses} from "actions/courses-page-actions";
+// import {getCourse, getCourses} from "actions/courses-page-actions";
 import $ from "jquery";
 import {facebookAppIdSelector, clearCurrentPage, setCurrentPage} from "ducks/app";
-import {testSelector, loadingSelector as testLoading, getTest,} from "ducks/test";
+import {testSelector, loadingSelector as testLoading, loadedSelector as testLoaded, getTest,} from "ducks/test";
 import {loadingSelector as testInstanceLoading, getTestInstance} from "ducks/test-instance";
 import {loadingSelector as testResultLoading, getTestResult} from "ducks/test-result";
 import ScrollMemoryStorage from "tools/scroll-memory-storage";
@@ -27,6 +27,7 @@ import {TEST_PAGE_TYPE} from "../constants/common-consts";
 import Header from "../components/header-lesson-page";
 import {Desktop, Mobile} from "tools/cover";
 import Answers from "../components/test-page/result/answers";
+import {loadingSelector as menuDataLoading} from "ducks/lesson-menu";
 
 class TestPage extends React.Component {
 
@@ -87,10 +88,7 @@ class TestPage extends React.Component {
         window.scrollTo(0, 0)
         this.props.whoAmI()
         this.props.refreshStorage();
-        this.props.getCourses();
-        // this.props.getCourse(this.props.courseUrl);
         this.props.headerSetPage(pages.test);
-        // this.props.getTest(this.props.testUrl)
 
         switch (this.props.type) {
             case TEST_PAGE_TYPE.TEST: {
@@ -163,12 +161,12 @@ class TestPage extends React.Component {
     }
 
     render() {
-        let {fetching, notFound, test, course, type} = this.props,
+        let {fetching, notFound, test, type, testLoaded} = this.props,
             _className = "test-page" +
                 (this.state.isMobile ? " _mobile" : " _desktop") +
                 (type === TEST_PAGE_TYPE.INSTANCE ? " _instance-page" : "")
 
-        return fetching ?
+        return fetching || !testLoaded ?
             <LoadingFrame/>
             :
             notFound ?
@@ -176,7 +174,7 @@ class TestPage extends React.Component {
                 :
                 <div className={_className}>
                     {this._getMetaTags()}
-                    <Header test={test} course={course}/>
+                    <Header test={test}/>
                     <div className="test-page__content">
                         <div className="content-wrapper">
                             {this._getContent()}
@@ -331,12 +329,14 @@ function mapStateToProps(state, ownProps) {
         fetching: testLoading(state) ||
             testInstanceLoading(state) ||
             testResultLoading(state) ||
-            state.singleCourse.fetching ||
-            state.user.loading ||
-            state.courses.fetching,
+            menuDataLoading(state) ||
+            // state.singleCourse.fetching ||
+            state.user.loading,
+            // state.courses.fetching,
 
-        course: state.singleCourse.object,
-        test: testSelector(state)
+        // course: state.singleCourse.object,
+        test: testSelector(state),
+        testLoaded: testLoaded(state)
     }
 }
 
@@ -345,13 +345,13 @@ function mapDispatchToProps(dispatch) {
         getTest,
         getTestInstance,
         getTestResult,
-        getCourse,
-        getCourses,
+        // getCourse,
+        // getCourses,
         whoAmI,
         refreshStorage,
         headerSetPage,
         setCurrentPage,
-        clearCurrentPage
+        clearCurrentPage,
     }, dispatch)
 }
 
