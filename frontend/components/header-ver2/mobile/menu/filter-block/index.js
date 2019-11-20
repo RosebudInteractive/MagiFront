@@ -39,17 +39,21 @@ class FiltersRow extends React.Component {
         </li>)
 
         filters.forEach((item, key) => {
-            _array.push(<React.Fragment>
-                    <li key={key} className={"filter-item menu-item" + (item.get('selected') ? ' active' : "")} onClick={() => {::this._onItemClick(item.get('URL'))}}>
+            const _count = this._getCount(item.toJS())
+
+            if (_count) {
+                _array.push(<React.Fragment>
+                        <li key={key} className={"filter-item menu-item" + (item.get('selected') ? ' active' : "")} onClick={() => {::this._onItemClick(item.get('URL'))}}>
                         <span className="filter-btn__title underlined-item">
                             {item.get('name') + ' '}
                             <span className="filter-btn__index">
-                                {this._getCount(item.toJS())}
+                                {_count}
                             </span>
                         </span>
-                    </li>
-                </React.Fragment>
-            )
+                        </li>
+                    </React.Fragment>)
+            }
+
         })
 
         return _array

@@ -60,7 +60,7 @@ import {TEST_PAGE_TYPE} from "./constants/common-consts";
 Polyfill.registry();
 
 let _homePath = '/';
-const _globalScrollDelta = 80;
+const GLOBAL_SCROLL_DELTA = 80;
 
 class App extends Component {
 
@@ -233,25 +233,26 @@ class App extends Component {
             return
         }
 
-        let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
+        // let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
 
-        let _scrollDelta = _bellowScreen ? _globalScrollDelta / 2 : _globalScrollDelta;
+        // let _scrollDelta = _bellowScreen ? GLOBAL_SCROLL_DELTA / 2 : GLOBAL_SCROLL_DELTA;
+        let _scrollDelta = GLOBAL_SCROLL_DELTA;
 
-        let _delta = Math.abs(this.state.lastScrollPos - event.target.scrollingElement.scrollTop);
+        let _delta = Math.abs(this._lastScrollPos - event.target.scrollingElement.scrollTop);
         if (_delta < _scrollDelta) {
             return
         }
 
-        let _header = $('.page-header._fixed');
-        if (_header && _header.length > 0) {
-            if (_bellowScreen) {
-                _header.css("-webkit-transition", "all 0.2s ease")
-                _header.css("transition", "all 0.2s ease")
-            } else {
-                _header.css("-webkit-transition", "all 0.4s ease")
-                _header.css("transition", "all 0.4s ease")
-            }
-        }
+        // let _header = $('.page-header._fixed');
+        // if (_header && _header.length > 0) {
+            // if (_bellowScreen) {
+            //     _header.css("-webkit-transition", "all 0.2s ease")
+            //     _header.css("transition", "all 0.2s ease")
+            // } else {
+            //     _header.css("-webkit-transition", "all 0.4s ease")
+            //     _header.css("transition", "all 0.4s ease")
+            // }
+        // }
 
         let _newScrollTop = event.target.scrollingElement.scrollTop
 
