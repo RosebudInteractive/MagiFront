@@ -13,9 +13,9 @@ import $ from "jquery";
 class HeaderWrapper extends React.Component {
 
     static propTypes = {
-        // course: PropTypes.object,
         lesson: PropTypes.object,
         test: PropTypes.object,
+        active: PropTypes.number,
     };
 
     constructor(props) {

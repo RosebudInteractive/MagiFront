@@ -34,6 +34,8 @@
       position: absolute
       background-color: transparent
       border-bottom: $border-white-04
+      &.opened
+        background-color: $color-main-dark
 
     &._instance-page:not(.added)
       .content-wrapper
@@ -46,3 +48,12 @@
     .lectures-menu._plain-menu
       position: inherit
       background-color: #2f2f2f
+
+  .lectures-list .lecture__btn svg
+    -webkit-transition: none
+    transition: none
+
+.overflow .test-page
+  .lectures-list .lecture__btn svg
+    -webkit-transition: all .2s ease-in-out
+    transition: all .2s ease-in-out

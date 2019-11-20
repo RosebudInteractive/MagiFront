@@ -12,6 +12,7 @@ export default class MenuItem extends React.Component {
 
     static propTypes = {
         lesson: PropTypes.object,
+        test: PropTypes.object,
         course: PropTypes.object,
         active: PropTypes.string,
         showAuthor: PropTypes.bool,
@@ -68,15 +69,5 @@ export default class MenuItem extends React.Component {
                 </div>
             </li>
         )
-    }
-
-    _getStartedTest() {
-        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
-            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.STARTED)
-    }
-
-    _getFinishedTest() {
-        return this.props.course.Tests && (this.props.course.Tests.length > 0) &&
-            this.props.course.Tests.find(item => item.TestTypeId === TEST_TYPE.FINISHED)
     }
 }

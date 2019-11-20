@@ -41,8 +41,8 @@ class MenuBlock extends React.Component {
                 <button type="button" className="lectures-list-trigger js-lectures-list-trigger"
                         onClick={::this._switchMenu}><span className='caption'>{_title}</span>
                     <span className="num">
-                        <span className="current">{_number}</span>
-                        {'/' + _total}
+                        <span className="current">{test ? `"${test.Name}"` : _number}</span>
+                        {test ? "" : ('/' + _total)}
                     </span>
                 </button>
                 <LessonsList {...this.props}/>
@@ -53,7 +53,6 @@ class MenuBlock extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        // course: state.singleCourse.object,
         lessonList: lessonsSelector(state),
         isLessonMenuOpened: state.app.isLessonMenuOpened,
     }
