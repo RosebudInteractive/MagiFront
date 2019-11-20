@@ -1,10 +1,9 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
-import {Record,} from 'immutable'
+import {Record, Map} from 'immutable'
 import {all, call, put, takeEvery,} from "@redux-saga/core/effects";
 import {checkStatus, parseJSON} from "tools/fetch-tools";
 import {parseReadyDate} from "tools/time-tools";
-import {Map} from "../../_node_modules/immutable/dist/immutable";
 
 /**
  * Constants
