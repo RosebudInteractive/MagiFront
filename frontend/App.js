@@ -55,7 +55,7 @@ import {notifyNewUserRegistered,} from 'ducks/google-analytics'
 import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 import {isMobilePlatform} from "./tools/page-tools";
-import {TEST_PAGE_TYPE} from "./constants/common-consts";
+import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
 
 Polyfill.registry();
 
@@ -278,7 +278,11 @@ class App extends Component {
             <Switch >
                 <Route exact path={_homePath} component={CoursePage}/>
                 <Route exact path={_homePath + 'razdel/:filter'}
-                       render={(props) => (<CoursePage {...props} hasExternalFilter={true}/>)}/>
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL}/>)}/>
+                <Route exact path={_homePath + 'knowledge/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWLEDGE}/>)}/>
+                <Route exact path={_homePath + 'knowhow/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWHOW}/>)}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
                 <Route path={_homePath + 'profile'} component={ProfilePage}/>

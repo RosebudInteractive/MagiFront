@@ -28,7 +28,8 @@ import {setCurrentPage, clearCurrentPage,} from "ducks/app";
 import ScrollMemoryStorage from "../tools/scroll-memory-storage";
 import MetaTags from 'react-meta-tags';
 import $ from "jquery";
-import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
+import {FILTER_COURSE_TYPE,} from "../constants/filters";
+import {FILTER_TYPE} from "../constants/common-consts";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -56,11 +57,11 @@ class CoursesPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {hasExternalFilter, externalFilter, loadingFilters, isEmptyFilter, selectedFilter, filterMainType, filterCourseType} = this.props;
+        let {hasExternalFilter, externalFilter, filterType, loadingFilters, isEmptyFilter, selectedFilter, filterMainType, filterCourseType} = this.props;
 
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
-                this.props.applyExternalFilter(externalFilter)
+                this.props.applyExternalFilter(filterType, externalFilter)
             }
         }
 
@@ -80,28 +81,15 @@ class CoursesPage extends React.Component {
         if (_filterChanged) {
             let _filter = []
 
-            const _type = filterMainType === FILTER_COURSE_TYPE.THEORY ?
-                    isEmptyFilter ? '' : FILTER_MAIN_TYPE.THEORY
-                    :
-                    FILTER_MAIN_TYPE.PRACTICE
+            const _filterType = this._getFilterType()
 
-            if (_type) {
-                _filter.push(_type)
-                if ((_type === FILTER_MAIN_TYPE.THEORY) && filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE)) {
-                    _filter.push(FILTER_ADDED_TYPE.PRACTICE)
-                }
-
-                if ((_type === FILTER_MAIN_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
-                    _filter.push(FILTER_ADDED_TYPE.THEORY)
-                }
-            }
 
             selectedFilter.forEach((item) => {
                 _filter.push(item.get('URL'))
             })
 
-            if (_filter.length > 0) {
-                this.props.history.replace('/razdel/' + _filter.join('+') + this.props.ownProps.location.search)
+            if ((_filter.length > 0) && (_filterType !== FILTER_TYPE.EMPTY)) {
+                this.props.history.replace(`/${_filterType.toLocaleLowerCase()}/` + _filter.join('+') + this.props.ownProps.location.search)
             } else {
                 this._needRedirectToCourses = true
                 this.forceUpdate()
@@ -237,6 +225,26 @@ class CoursesPage extends React.Component {
         })
 
         return _result
+    }
+
+    _getFilterType() {
+        const {isEmptyFilter, filterCourseType, filterMainType} = this.props
+
+        if (!isEmptyFilter) {
+            if (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
+                return FILTER_TYPE.RAZDEL
+            } else if (filterMainType === FILTER_COURSE_TYPE.THEORY) {
+                return FILTER_TYPE.KNOWLEDGE
+            } else if (filterMainType === FILTER_COURSE_TYPE.PRACTICE) {
+                return FILTER_TYPE.KNOWHOW
+            } else {
+                return FILTER_TYPE.EMPTY
+            }
+        } else {
+            return FILTER_TYPE.EMPTY
+        }
+
+
     }
 }
 

@@ -1,8 +1,10 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import Immutable, {Record, Map, Set} from 'immutable'
+import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
 import {GET_COURSES_REQUEST, GET_COURSES_SUCCESS} from "../constants/courses";
-import {FILTER_ADDED_TYPE, FILTER_COURSE_TYPE, FILTER_MAIN_TYPE} from "../constants/filters";
+import {FILTER_COURSE_TYPE,} from "../constants/filters";
+import {FILTER_TYPE} from "../constants/common-consts";
 
 /**
  * Constants
@@ -77,21 +79,41 @@ export default function reducer(state = new ReducerRecord(), action) {
             if (payload) {
                 let _map = state.get('filters');
 
-                payload.forEach((item) => {
-                    if (_map.has(item)) {
-                        _map = _map.setIn([item, 'selected'], true)
+                _map = _map.setIn([payload.value, 'selected'], true)
+
+
+                let _mainType, _courseType
+                switch (payload.type) {
+                    case FILTER_TYPE.RAZDEL:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE])
+                        break
                     }
-                })
 
-                let _type = payload.includes(FILTER_MAIN_TYPE.PRACTICE) ? FILTER_COURSE_TYPE.PRACTICE : FILTER_COURSE_TYPE.THEORY,
-                    _courseType = new Set([_type])
+                    case FILTER_TYPE.KNOWLEDGE:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY])
+                        break
+                    }
 
-                if (payload.includes(FILTER_ADDED_TYPE.THEORY)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.THEORY)}
-                if (payload.includes(FILTER_ADDED_TYPE.PRACTICE)) { _courseType = _courseType.add(FILTER_COURSE_TYPE.PRACTICE)}
+                    case FILTER_TYPE.KNOWHOW:{
+                        _mainType = FILTER_COURSE_TYPE.PRACTICE
+                        _courseType = new Set([FILTER_COURSE_TYPE.PRACTICE])
+                        break
+                    }
+
+                    default:{
+                        _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY])
+                        break
+                    }
+                }
+
+
 
                 return state
                     .set('filters', _map)
-                    .set('mainType', _type)
+                    .set('mainType', _mainType)
                     .set('courseType', _courseType)
             } else {
                 return state
@@ -186,12 +208,12 @@ export const switchFilter = (id) => {
     }
 }
 
-export const applyExternalFilter = (value) => {
-    let _array = value.split('+');
+export const applyExternalFilter = (filterType, value) => {
+    // let _array = value.split('+');
 
     return {
         type: APPLY_EXTERNAL_FILTER,
-        payload: _array
+        payload: {type: filterType, value: value}
     }
 }
 
@@ -201,4 +223,33 @@ export const setFilterCourseType = (value) => {
 
 export const toggleCourseTypeToFilter = (value) => {
     return { type: TOGGLE_FILTER_COURSE_TYPE, payload: value }
+}
+
+
+/**
+ * Sagas
+ */
+export const saga = function* () {
+    yield all([
+        takeEvery([SET_FILTER_COURSE_TYPE, TOGGLE_FILTER_COURSE_TYPE, APPLY_EXTERNAL_FILTER], switchFilterTypeSaga),
+    ])
+}
+
+function* switchFilterTypeSaga() {
+
+    const filterCourseType = yield select(filterCourseTypeSelector),
+        selectedFilter = yield select(selectedFilterSelector)
+
+    let _count = 0
+
+    selectedFilter.forEach((item) => {
+        for (let type in FILTER_COURSE_TYPE) {
+            _count = filterCourseType.has(FILTER_COURSE_TYPE[type]) ? _count + item.getIn(['count', type.toLowerCase()]) : _count
+        }
+    })
+
+    if (_count === 0) {
+        yield put(clear())
+    }
+
 }

@@ -36,3 +36,10 @@ export const TEST_TYPE = {
     FINISHED: 3,
     EXT: 4,
 }
+
+export const FILTER_TYPE = {
+    RAZDEL: "RAZDEL",
+    KNOWLEDGE: "KNOWLEDGE",
+    KNOWHOW: "KNOWHOW",
+    EMPTY: "EMPTY",
+}
