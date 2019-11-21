@@ -21,6 +21,7 @@ import {
     filterCourseTypeSelector,
     filterMainTypeSelector,
     applyExternalFilter, clear,
+    setInitialState,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -57,7 +58,13 @@ class CoursesPage extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        let {hasExternalFilter, externalFilter, filterType, loadingFilters, isEmptyFilter, selectedFilter, filterMainType, filterCourseType} = this.props;
+        let {hasExternalFilter, externalFilter, filterType, loadingFilters, selectedFilter, filterMainType, filterCourseType} = this.props;
+
+        const _filterType = this._getFilterType()
+
+        if ((prevProps.filterType !== filterType) && (filterType === FILTER_TYPE.EMPTY)) {
+            this.props.setInitialState()
+        }
 
         if (prevProps.loadingFilters && !loadingFilters) {
             if (hasExternalFilter) {
@@ -65,34 +72,24 @@ class CoursesPage extends React.Component {
             }
         }
 
-        if (!hasExternalFilter && (prevProps.selectedFilter.size > 0)) {
-            this.props.clearFilter()
-        }
-
-        if (!prevProps.isEmptyFilter && isEmptyFilter) {
-            this._needRedirectToCourses = true
-            this.forceUpdate()
-        }
-
-        const _filterChanged = (!prevProps.selectedFilter.equals(selectedFilter) && !isEmptyFilter) ||
+        const _filterChanged = !prevProps.selectedFilter.equals(selectedFilter) ||
             (prevProps.filterMainType !== filterMainType) ||
             (!prevProps.filterCourseType.equals(filterCourseType))
 
         if (_filterChanged) {
             let _filter = []
 
-            const _filterType = this._getFilterType()
-
-
             selectedFilter.forEach((item) => {
                 _filter.push(item.get('URL'))
             })
 
-            if ((_filter.length > 0) && (_filterType !== FILTER_TYPE.EMPTY)) {
-                this.props.history.replace(`/${_filterType.toLocaleLowerCase()}/` + _filter.join('+') + this.props.ownProps.location.search)
-            } else {
+            if ((_filter.length === 0) && ((_filterType === FILTER_TYPE.EMPTY) || (_filterType === FILTER_TYPE.KNOWLEDGE))) {
                 this._needRedirectToCourses = true
                 this.forceUpdate()
+            } else {
+                let _filters = (_filter.length > 0) ? _filter.join('+') : 'all'
+
+                this.props.history.replace(`/${_filterType.toLocaleLowerCase()}/${_filters}` + this.props.ownProps.location.search)
             }
         }
 
@@ -228,18 +225,14 @@ class CoursesPage extends React.Component {
     }
 
     _getFilterType() {
-        const {isEmptyFilter, filterCourseType, filterMainType} = this.props
+        const {filterCourseType, filterMainType} = this.props
 
-        if (!isEmptyFilter) {
-            if (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
-                return FILTER_TYPE.RAZDEL
-            } else if (filterMainType === FILTER_COURSE_TYPE.THEORY) {
-                return FILTER_TYPE.KNOWLEDGE
-            } else if (filterMainType === FILTER_COURSE_TYPE.PRACTICE) {
-                return FILTER_TYPE.KNOWHOW
-            } else {
-                return FILTER_TYPE.EMPTY
-            }
+        if (filterCourseType.has(FILTER_COURSE_TYPE.PRACTICE) && filterCourseType.has(FILTER_COURSE_TYPE.THEORY)) {
+            return (filterMainType === FILTER_COURSE_TYPE.THEORY) ? FILTER_TYPE.RAZDEL : FILTER_TYPE.RAZDEL_REVERSE
+        } else if (filterMainType === FILTER_COURSE_TYPE.THEORY) {
+            return FILTER_TYPE.KNOWLEDGE
+        } else if (filterMainType === FILTER_COURSE_TYPE.PRACTICE) {
+            return FILTER_TYPE.KNOWHOW
         } else {
             return FILTER_TYPE.EMPTY
         }
@@ -280,6 +273,7 @@ function mapDispatchToProps(dispatch) {
         clearCurrentPage: bindActionCreators(clearCurrentPage, dispatch),
         whoAmI: bindActionCreators(whoAmI, dispatch),
         notifyCoursesShowed: bindActionCreators(notifyCoursesShowed, dispatch),
+        setInitialState: bindActionCreators(setInitialState, dispatch),
     }
 }
 

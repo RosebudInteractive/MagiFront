@@ -1,10 +1,11 @@
 import {appName} from '../config'
 import {createSelector} from 'reselect'
 import Immutable, {Record, Map, Set} from 'immutable'
-import {all, call, put, takeEvery, select} from "@redux-saga/core/effects";
+import {all, put, takeEvery, select} from "@redux-saga/core/effects";
 import {GET_COURSES_REQUEST, GET_COURSES_SUCCESS} from "../constants/courses";
 import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
+import {replace} from "react-router-redux";
 
 /**
  * Constants
@@ -17,6 +18,7 @@ export const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
 export const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
 export const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
 export const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
+export const SET_INITIAL_STATE = `${prefix}/SET_INITIAL_STATE`
 
 
 /**
@@ -56,7 +58,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                 .set('loading', false)
         }
 
-
         case CLEAR_FILTERS:
             return state
                 .update('filters', filters => {
@@ -79,13 +80,24 @@ export default function reducer(state = new ReducerRecord(), action) {
             if (payload) {
                 let _map = state.get('filters');
 
-                _map = _map.setIn([payload.value, 'selected'], true)
-
+                if (payload.value.toLocaleLowerCase() === "all") {
+                    _map = _map.map((item) => {
+                        return item.set('selected', false)
+                    })
+                } else {
+                    _map = _map.setIn([payload.value, 'selected'], true)
+                }
 
                 let _mainType, _courseType
                 switch (payload.type) {
                     case FILTER_TYPE.RAZDEL:{
                         _mainType = FILTER_COURSE_TYPE.THEORY
+                        _courseType = new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE])
+                        break
+                    }
+
+                    case FILTER_TYPE.RAZDEL_REVERSE:{
+                        _mainType = FILTER_COURSE_TYPE.PRACTICE
                         _courseType = new Set([FILTER_COURSE_TYPE.THEORY, FILTER_COURSE_TYPE.PRACTICE])
                         break
                     }
@@ -108,8 +120,6 @@ export default function reducer(state = new ReducerRecord(), action) {
                         break
                     }
                 }
-
-
 
                 return state
                     .set('filters', _map)
@@ -209,8 +219,6 @@ export const switchFilter = (id) => {
 }
 
 export const applyExternalFilter = (filterType, value) => {
-    // let _array = value.split('+');
-
     return {
         type: APPLY_EXTERNAL_FILTER,
         payload: {type: filterType, value: value}
@@ -225,6 +233,10 @@ export const toggleCourseTypeToFilter = (value) => {
     return { type: TOGGLE_FILTER_COURSE_TYPE, payload: value }
 }
 
+export const setInitialState = () => {
+    return { type: SET_INITIAL_STATE }
+}
+
 
 /**
  * Sagas
@@ -232,13 +244,15 @@ export const toggleCourseTypeToFilter = (value) => {
 export const saga = function* () {
     yield all([
         takeEvery([SET_FILTER_COURSE_TYPE, TOGGLE_FILTER_COURSE_TYPE, APPLY_EXTERNAL_FILTER], switchFilterTypeSaga),
+        takeEvery(SET_INITIAL_STATE, setInitialStateSaga),
     ])
 }
 
-function* switchFilterTypeSaga() {
+function* switchFilterTypeSaga(data) {
 
     const filterCourseType = yield select(filterCourseTypeSelector),
-        selectedFilter = yield select(selectedFilterSelector)
+        selectedFilter = yield select(selectedFilterSelector),
+        isEmptyFilter = yield select(isEmptyFilterSelector)
 
     let _count = 0
 
@@ -248,8 +262,15 @@ function* switchFilterTypeSaga() {
         }
     })
 
-    if (_count === 0) {
+    console.log(data, _count)
+
+    if (!isEmptyFilter && (_count === 0)) {
         yield put(clear())
     }
+}
 
+function* setInitialStateSaga() {
+    yield put(clear())
+    yield put(setFilterCourseType(FILTER_COURSE_TYPE.THEORY))
+    yield put(replace("/"))
 }

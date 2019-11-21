@@ -276,12 +276,15 @@ class App extends Component {
     _getMainDiv() {
         return (
             <Switch >
-                <Route exact path={_homePath} component={CoursePage}/>
-                <Route exact path={_homePath + 'razdel/:filter'}
+                <Route exact path={_homePath}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={false} filterType={FILTER_TYPE.EMPTY}/>)}/>
+                <Route path={_homePath + 'razdel/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL}/>)}/>
-                <Route exact path={_homePath + 'knowledge/:filter'}
+                <Route path={_homePath + 'razdel-rev/:filter'}
+                       render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL_REVERSE}/>)}/>
+                <Route path={_homePath + 'knowledge/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWLEDGE}/>)}/>
-                <Route exact path={_homePath + 'knowhow/:filter'}
+                <Route path={_homePath + 'knowhow/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWHOW}/>)}/>
                 <Route path={_homePath + 'activation-confirm/:activationKey'} component={AuthConfirmForm}/>
                 <Route path={_homePath + 'auth/error'} component={AuthErrorForm}/>
