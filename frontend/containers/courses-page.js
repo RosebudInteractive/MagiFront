@@ -117,20 +117,21 @@ class CoursesPage extends React.Component {
             _courses = this.props.courses.items,
             _result = [];
 
-        _courses.forEach((course, index) => {
-            let _inFilter = false;
-
-            if (isEmptyFilter) {
-                _inFilter = filterCourseType.has(course.CourseType)
-            } else {
-                _inFilter = course.Categories.some((categoryId) => {
-                    return selectedFilter.find((item) => {
-                        return (item.get('id') === categoryId) && filterCourseType.has(course.CourseType)
+        _courses
+            .filter((course) => {
+                if (isEmptyFilter) {
+                    return filterCourseType.has(course.CourseType)
+                } else {
+                    return course.Categories.some((categoryId) => {
+                        return selectedFilter.find((item) => {
+                            return (item.get('id') === categoryId) && filterCourseType.has(course.CourseType)
+                        });
                     });
-                });
-            }
+                }
+            })
+            .forEach((course, index, array) => {
+                let _needLazyLoading = array.length > 3
 
-            if (_inFilter) {
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
                 } else {
@@ -148,11 +149,9 @@ class CoursesPage extends React.Component {
                         }
                     }
 
-                    _result.push(<CourseWrapper course={course} lazyload={isEmptyFilter} key={index} index={index}/>)
+                    _result.push(<CourseWrapper course={course} lazyload={_needLazyLoading} key={index} index={index}/>)
                 }
-
-            }
-        })
+            })
 
         return _result
     }
