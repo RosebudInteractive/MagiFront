@@ -13,12 +13,14 @@ import {replace} from "react-router-redux";
 export const moduleName = 'filters'
 const prefix = `${appName}/${moduleName}`
 
-export const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
-export const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
-export const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
-export const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
-export const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
-export const SET_INITIAL_STATE = `${prefix}/SET_INITIAL_STATE`
+const CLEAR_FILTERS = `${prefix}/CLEAR_FILTERS`
+const SWITCH_FILTERS = `${prefix}/SWITCH_FILTERS`
+const APPLY_EXTERNAL_FILTER = `${prefix}/APPLY_EXTERNAL_FILTER`
+const SET_FILTER_COURSE_TYPE = `${prefix}/SET_FILTER_COURSE_TYPE`
+const TOGGLE_FILTER_COURSE_TYPE = `${prefix}/TOGGLE_FILTER_COURSE_TYPE`
+const SET_INITIAL_STATE = `${prefix}/SET_INITIAL_STATE`
+const ENABLE_SCROLL_GUARD = `${prefix}/ENABLE_SCROLL_GUARD`
+const DISABLE_SCROLL_GUARD = `${prefix}/DISABLE_SCROLL_GUARD`
 
 
 /**
@@ -38,6 +40,7 @@ export const ReducerRecord = Record({
     filters: new Map(),
     root: new FilterRecord(),
     loading: false,
+    scrollHandlerGuard: false,
 })
 
 export default function reducer(state = new ReducerRecord(), action) {
@@ -65,6 +68,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return item.set('selected', false)
                     });
                 })
+                .set('scrollHandlerGuard', true)
 
         case SWITCH_FILTERS:
             return state
@@ -75,6 +79,7 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return item.set('selected', _value)
                     });
                 })
+                .set('scrollHandlerGuard', true)
 
         case APPLY_EXTERNAL_FILTER: {
             if (payload) {
@@ -135,6 +140,7 @@ export default function reducer(state = new ReducerRecord(), action) {
             return state
                 .set('courseType', new Set([payload]))
                 .set('mainType', payload)
+                .set('scrollHandlerGuard', true)
 
         case TOGGLE_FILTER_COURSE_TYPE:
             return state
@@ -145,6 +151,15 @@ export default function reducer(state = new ReducerRecord(), action) {
                         return courseType.add(payload)
                     }
                 })
+                .set('scrollHandlerGuard', true)
+
+        case DISABLE_SCROLL_GUARD:
+            return state
+                .set('scrollHandlerGuard', false)
+
+        case ENABLE_SCROLL_GUARD:
+            return state
+                .set('scrollHandlerGuard', true)
 
         default:
             return state
@@ -200,6 +215,7 @@ export const filtersSelector = createSelector(stateSelector, state => state.filt
 export const filterCourseTypeSelector = createSelector(stateSelector, state => state.courseType)
 export const filterMainTypeSelector = createSelector(stateSelector, state => state.mainType)
 export const loadingSelector = createSelector(stateSelector, state => state.loading)
+export const scrollGuardSelector = createSelector(stateSelector, state => state.scrollHandlerGuard)
 export const isEmptyFilterSelector = createSelector(filtersSelector, filter => filter.every(item => !item.get('selected')))
 export const selectedFilterSelector = createSelector(filtersSelector, filter => filter.filter(item => item.get('selected')))
 
@@ -235,6 +251,14 @@ export const toggleCourseTypeToFilter = (value) => {
 
 export const setInitialState = () => {
     return { type: SET_INITIAL_STATE }
+}
+
+export const disableScrollGuard = () => {
+    return { type: DISABLE_SCROLL_GUARD}
+}
+
+export const enableScrollGuard = () => {
+    return { type: ENABLE_SCROLL_GUARD}
 }
 
 

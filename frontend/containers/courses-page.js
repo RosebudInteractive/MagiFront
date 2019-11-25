@@ -22,6 +22,8 @@ import {
     filterMainTypeSelector,
     applyExternalFilter, clear,
     setInitialState,
+    enableScrollGuard,
+    disableScrollGuard,
 } from "ducks/filters";
 import {fixedCourseIdSelector, fixedLessonIdSelector} from "ducks/params";
 import {userPaidCoursesSelector} from "ducks/profile";
@@ -77,6 +79,11 @@ class CoursesPage extends React.Component {
             (!prevProps.filterCourseType.equals(filterCourseType))
 
         if (_filterChanged) {
+            this.props.enableScrollGuard()
+            // this.props.disableScrollGuard()
+            window.scrollTo(0, 0)
+
+
             let _filter = []
 
             selectedFilter.forEach((item) => {
@@ -273,6 +280,8 @@ function mapDispatchToProps(dispatch) {
         whoAmI: bindActionCreators(whoAmI, dispatch),
         notifyCoursesShowed: bindActionCreators(notifyCoursesShowed, dispatch),
         setInitialState: bindActionCreators(setInitialState, dispatch),
+        enableScrollGuard: bindActionCreators(enableScrollGuard, dispatch),
+        disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
     }
 }
 

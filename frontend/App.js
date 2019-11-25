@@ -56,6 +56,7 @@ import ModalWaiting from "./components/messages/modal-waiting";
 import ScrollMemoryStorage from "./tools/scroll-memory-storage";
 import {isMobilePlatform} from "./tools/page-tools";
 import {FILTER_TYPE, TEST_PAGE_TYPE} from "./constants/common-consts";
+import {scrollGuardSelector, disableScrollGuard} from "ducks/filters";
 
 Polyfill.registry();
 
@@ -175,13 +176,14 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _nextLocation;
 
         if (_isNewLocation) {
-            const _isFilterSwitched = (_thisLocation.startsWith('/razdel/') && _nextLocation.startsWith('/razdel/')) ||
-                (_thisLocation.startsWith('/razdel/') && (_nextLocation === _homePath)) ||
-                ((_thisLocation === _homePath) && _nextLocation.startsWith('/razdel/'))
+            // const _isFilterSwitched = (_thisLocation.startsWith('/razdel/') && _nextLocation.startsWith('/razdel/')) ||
+            //     (_thisLocation.startsWith('/razdel/') && (_nextLocation === _homePath)) ||
+            //     ((_thisLocation === _homePath) && _nextLocation.startsWith('/razdel/'))
+                if (!this.state.showHeader && !this.props.filterScrollGuard) {
+                    this.setState({showHeader: true,});
+                }
 
-            if (!this.state.showHeader && !_isFilterSwitched) {
-                this.setState({showHeader: true,});
-            }
+
 
             this.props.appActions.hideUserBlock()
             this.props.getUserPaidCourses()
@@ -233,26 +235,17 @@ class App extends Component {
             return
         }
 
-        // let _bellowScreen = event.target.scrollingElement.scrollTop > window.innerHeight;
+        if (this.props.filterScrollGuard) {
+            this.props.disableScrollGuard()
+            return
+        }
 
-        // let _scrollDelta = _bellowScreen ? GLOBAL_SCROLL_DELTA / 2 : GLOBAL_SCROLL_DELTA;
         let _scrollDelta = GLOBAL_SCROLL_DELTA;
 
         let _delta = Math.abs(this._lastScrollPos - event.target.scrollingElement.scrollTop);
         if (_delta < _scrollDelta) {
             return
         }
-
-        // let _header = $('.page-header._fixed');
-        // if (_header && _header.length > 0) {
-            // if (_bellowScreen) {
-            //     _header.css("-webkit-transition", "all 0.2s ease")
-            //     _header.css("transition", "all 0.2s ease")
-            // } else {
-            //     _header.css("-webkit-transition", "all 0.4s ease")
-            //     _header.css("transition", "all 0.4s ease")
-            // }
-        // }
 
         let _newScrollTop = event.target.scrollingElement.scrollTop
 
@@ -358,8 +351,8 @@ class App extends Component {
 
 function mapStateToProps(state, ownProps) {
     return {
-        showFiltersForm: state.pageHeader.showFiltersForm,
-        currentPage: state.pageHeader.currentPage,
+        // showFiltersForm: state.pageHeader.showFiltersForm,
+        // currentPage: state.pageHeader.currentPage,
         size: state.app.size,
         sendPulseScript: state.app.sendPulseScript,
         showSizeInfo: state.app.showSizeInfo,
@@ -368,6 +361,7 @@ function mapStateToProps(state, ownProps) {
         showFeedbackWindow: showFeedbackWindowSelector(state),
         showFeedbackResultMessage: showFeedbackResultMessageSelector(state),
         isWaiting: waitingSelector(state),
+        filterScrollGuard: scrollGuardSelector(state),
         ownProps,
     }
 }
@@ -386,7 +380,8 @@ function mapDispatchToProps(dispatch) {
         setBillingWaitingAuthorizeData: bindActionCreators(setBillingWaitingAuthorizeData, dispatch),
         setPlayerWaitingAuthorizeData: bindActionCreators(setPlayerWaitingAuthorizeData, dispatch),
         notifyNewUserRegistered: bindActionCreators(notifyNewUserRegistered, dispatch),
-        showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch)
+        showModalErrorMessage: bindActionCreators(showModalErrorMessage, dispatch),
+        disableScrollGuard: bindActionCreators(disableScrollGuard, dispatch),
     }
 }
 
