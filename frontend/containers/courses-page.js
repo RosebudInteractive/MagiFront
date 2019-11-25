@@ -81,7 +81,7 @@ class CoursesPage extends React.Component {
         if (_filterChanged) {
             this.props.enableScrollGuard()
             // this.props.disableScrollGuard()
-            window.scrollTo(0, 0)
+            window.scrollTo(0, 57)
 
 
             let _filter = []
