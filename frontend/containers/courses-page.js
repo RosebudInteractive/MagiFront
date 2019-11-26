@@ -88,8 +88,6 @@ class CoursesPage extends React.Component {
                 OverflowHandler.setPositionAfterTurnOff(this._getTop())
             }
 
-            // this.props.disableScrollGuard()
-
             let _filter = []
 
             selectedFilter.forEach((item) => {
@@ -143,7 +141,7 @@ class CoursesPage extends React.Component {
                 }
             })
             .forEach((course, index, array) => {
-                let _needLazyLoading = array.length > 3
+                let _needLazyLoading = array.length < _courses.length
 
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
