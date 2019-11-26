@@ -141,7 +141,7 @@ class CoursesPage extends React.Component {
                 }
             })
             .forEach((course, index, array) => {
-                let _needLazyLoading = array.length < _courses.length
+                let _needLazyLoading = (array.length > 3)
 
                 if (course.Id === fixedCourseId) {
                     _result.unshift(<FixCourseWrapper course={course}/>)
