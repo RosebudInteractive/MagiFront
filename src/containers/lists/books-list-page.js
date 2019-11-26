@@ -13,7 +13,7 @@ import {
     booksSelector,
     loadingSelector,
     loadedSelector, showEditorSelector,
-} from "../../ducks/books";
+} from "adm-ducks/books";
 import {showDeleteConfirmation, cancelDelete} from '../../actions/CommonDlgActions';
 import BookEditor from '../../components/books/editor'
 
@@ -22,6 +22,7 @@ import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
+import $ from "jquery";
 
 const TIMEOUT = 500;
 
@@ -39,6 +40,18 @@ class BooksPage extends React.Component {
         this._isLastSelected = false;
 
         this._timer = null
+
+        this._resizeHandler = () => {
+            const _main = $('.main-area'),
+                _height = _main.height(),
+                _width = _main.width()
+
+            if (window.$$('books-grid')) {
+                const _headerHeight = window.$$('books-grid').config.headerRowHeight
+
+                window.$$('books-grid').$setSize(_width, _height - _headerHeight)
+            }
+        }
     }
 
     componentWillMount() {
@@ -54,8 +67,19 @@ class BooksPage extends React.Component {
         this._selected = null;
     }
 
+    componentDidMount() {
+        $(window).on('resize', this._resizeHandler);
+    }
+
     componentWillUnmount() {
         this.props.actions.saveChanges()
+        $(window).unbind('resize', this._resizeHandler)
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.loading && !this.props.loading) {
+            this._resizeHandler();
+        }
     }
 
     _onAddBtnClick() {
@@ -223,9 +247,9 @@ class BooksPage extends React.Component {
 
         return {
             view: "datatable",
-            id: 'courses-grid',
-            scroll: false,
-            autoheight: true,
+            id: 'books-grid',
+            scroll: 'y',
+            height: 500,
             select: 'row',
             editable: false,
             columns: [

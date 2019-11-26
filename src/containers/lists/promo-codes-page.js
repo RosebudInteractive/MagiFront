@@ -20,6 +20,7 @@ import YesNoDialog from "../../components/dialog/yes-no-dialog";
 import ErrorDialog from '../../components/dialog/error-dialog';
 import LoadingPage from "../../components/common/loading-page";
 import PropTypes from "prop-types";
+import $ from "jquery";
 
 class PromosPage extends React.Component {
 
@@ -33,6 +34,18 @@ class PromosPage extends React.Component {
 
         this._isFirstSelected = false;
         this._isLastSelected = false;
+
+        this._resizeHandler = () => {
+            const _main = $('.main-area'),
+                _height = _main.height(),
+                _width = _main.width()
+
+            if (window.$$('promos-grid')) {
+                const _headerHeight = window.$$('promos-grid').config.headerRowHeight
+
+                window.$$('promos-grid').$setSize(_width, _height - _headerHeight)
+            }
+        }
     }
 
     componentWillMount() {
@@ -47,6 +60,21 @@ class PromosPage extends React.Component {
 
         this.props.getPromoCodes();
         this._selected = null;
+    }
+
+    componentDidMount() {
+        $(window).on('resize', this._resizeHandler);
+        this._resizeHandler();
+    }
+
+    componentWillUnmount() {
+        $(window).unbind('resize', this._resizeHandler)
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.loading && !this.props.loading) {
+            this._resizeHandler();
+        }
     }
 
     _onEditBtnClick() {
@@ -194,8 +222,8 @@ class PromosPage extends React.Component {
         return {
             view: "datatable",
             id: 'promos-grid',
-            scroll: false,
-            autoheight: true,
+            scroll: 'y',
+            height: 500,
             select: 'row',
             editable: false,
             columns: [
