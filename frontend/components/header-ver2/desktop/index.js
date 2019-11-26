@@ -26,7 +26,7 @@ class DesktopHeader extends React.Component {
         const LOGO = '<use xlink:href="#logo"/>'
 
         return <React.Fragment>
-                <div className={"page-header__wrapper"}>
+                <div className={"page-header__wrapper js-page-header-1"}>
                     <Link to={'/'} className="logo">
                         <svg width="130" height="31" dangerouslySetInnerHTML={{__html: LOGO}}/>
                     </Link>

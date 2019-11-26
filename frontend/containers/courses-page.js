@@ -33,6 +33,7 @@ import MetaTags from 'react-meta-tags';
 import $ from "jquery";
 import {FILTER_COURSE_TYPE,} from "../constants/filters";
 import {FILTER_TYPE} from "../constants/common-consts";
+import {OverflowHandler} from "../tools/page-tools";
 
 class CoursesPage extends React.Component {
     constructor(props) {
@@ -80,9 +81,14 @@ class CoursesPage extends React.Component {
 
         if (_filterChanged) {
             this.props.enableScrollGuard()
-            // this.props.disableScrollGuard()
-            window.scrollTo(0, 57)
 
+            if (!this.props.isMenuVisible) {
+                window.scrollTo(0, this._getTop())
+            } else {
+                OverflowHandler.setPositionAfterTurnOff(this._getTop())
+            }
+
+            // this.props.disableScrollGuard()
 
             let _filter = []
 
@@ -264,6 +270,7 @@ function mapStateToProps(state, ownProps) {
         fixedLessonId: fixedLessonIdSelector(state),
         userPaidCourses: userPaidCoursesSelector(state),
         filterCourseType: filterCourseTypeSelector(state),
+        isMenuVisible: state.pageHeader.showMenu,
         ownProps,
     }
 }

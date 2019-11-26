@@ -176,14 +176,9 @@ class App extends Component {
             _isNewLocation = _thisLocation !== _nextLocation;
 
         if (_isNewLocation) {
-            // const _isFilterSwitched = (_thisLocation.startsWith('/razdel/') && _nextLocation.startsWith('/razdel/')) ||
-            //     (_thisLocation.startsWith('/razdel/') && (_nextLocation === _homePath)) ||
-            //     ((_thisLocation === _homePath) && _nextLocation.startsWith('/razdel/'))
-                if (!this.state.showHeader && !this.props.filterScrollGuard) {
-                    this.setState({showHeader: true,});
-                }
-
-
+            if (!this.state.showHeader && !this.props.filterScrollGuard) {
+                this.setState({showHeader: true,});
+            }
 
             this.props.appActions.hideUserBlock()
             this.props.getUserPaidCourses()
@@ -223,6 +218,8 @@ class App extends Component {
 
         if (_isNewLocation) {
             this.props.appActions.changePage(_thisLocation);
+
+            this._lastScrollPos = (document.scrollingElement) ? document.scrollingElement.scrollTop : 0
         }
     }
 
@@ -231,25 +228,36 @@ class App extends Component {
     }
 
     _handleScroll(event) {
+        const DIRECTION = {TOP: 1, BOTTOM: 2}
+
         if (!event.target.scrollingElement) {
             return
         }
+
+        let _delta = this._lastScrollPos - event.target.scrollingElement.scrollTop,
+            _direction = (_delta > 0) ? DIRECTION.BOTTOM : DIRECTION.TOP,
+            _scrollDelta = (_direction === DIRECTION.BOTTOM) ? GLOBAL_SCROLL_DELTA : GLOBAL_SCROLL_DELTA / 3;
+
+        let _needHandle = (_direction === DIRECTION.BOTTOM) && (this._lastScrollPos < GLOBAL_SCROLL_DELTA)
+
+        _delta = Math.abs(_delta)
+        if ((_delta < _scrollDelta) && !_needHandle) {
+            return
+        }
+
+        let _newScrollTop = event.target.scrollingElement.scrollTop
 
         if (this.props.filterScrollGuard) {
             this.props.disableScrollGuard()
             return
         }
 
-        let _scrollDelta = GLOBAL_SCROLL_DELTA;
-
-        let _delta = Math.abs(this._lastScrollPos - event.target.scrollingElement.scrollTop);
-        if (_delta < _scrollDelta) {
-            return
+        if ((this._lastScrollPos === 0) && (_direction === DIRECTION.TOP)) {
+            this._lastScrollPos = _newScrollTop
+            return;
         }
 
-        let _newScrollTop = event.target.scrollingElement.scrollTop
-
-        if ((_newScrollTop < _scrollDelta) && (!this.state.showHeader)) {
+        if ((_newScrollTop < _scrollDelta) && (_direction === DIRECTION.BOTTOM) && (!this.state.showHeader)) {
             this.setState({showHeader: true})
         }
 
