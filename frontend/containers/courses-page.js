@@ -248,8 +248,16 @@ class CoursesPage extends React.Component {
         } else {
             return FILTER_TYPE.EMPTY
         }
+    }
 
+    _getTop() {
+        let _header = $('.page-header'),
+            _headerRow = $('.js-page-header-1')
 
+        return (_headerRow && (_headerRow.length > 0) && _header && (_header.length > 0) && _header.hasClass('_animate')) ?
+            _headerRow.outerHeight()
+            :
+            0
     }
 }
 
