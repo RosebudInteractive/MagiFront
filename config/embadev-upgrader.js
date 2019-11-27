@@ -2,6 +2,7 @@ const path = require('path');
 
 let options = {
     root: process.cwd(),
+    uccelloDir: path.join(__dirname, '../../Uccello2'),
     dbProvider: 'mssql',
     trace: {
         sqlTrace: false,
