@@ -6,6 +6,7 @@ const SESSION_UPD_TIME = 1 * 3600 * 1000; // 1 hour
 
 module.exports = {
     root: process.cwd(),
+    uccelloDir: path.join(__dirname, '../../Uccello2'),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     dataUrl: '/data',
     oldDataUrl: '/wp-content/uploads',

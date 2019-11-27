@@ -18,6 +18,7 @@ if (process.env.EMBA_TEST_HOST === "dragonegg") {
 
 let options = {
     root: process.cwd(),
+    uccelloDir: path.join(__dirname, '../../Uccello2'),
     uploadPath: path.join(process.cwd(), path.sep, '../uploads', path.sep),
     proxyServer: proxyServer,
     server: {

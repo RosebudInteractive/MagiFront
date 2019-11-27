@@ -1,4 +1,4 @@
-const uccelloDir = '../../Uccello2';
+const dfltUccelloDir = '../../Uccello2';
 const path = require('path');
 const config = require('config');
 
@@ -18,12 +18,15 @@ exports.DbEngineInit = class DbEngineInit {
         return this._dataMan ? this._dataMan._getDataObjectEngine() : null;
     }
 
-    constructor(options) {
+    constructor(options, useCompmanInDbEngine) {
 
         var debugFlag = false;
         var autoImportFlag = false;
         var autoImportImgFlag = false;
 
+        let uccelloPath = config.uccelloDir ? config.uccelloDir : path.join(__dirname, dfltUccelloDir);
+        let uccelloDir = path.isAbsolute(uccelloPath) ? uccelloPath : path.join(process.cwd(), uccelloPath);
+        
         var impDir = path.join(__dirname, "/data/");
         var is_impDir_next = false;
 
@@ -242,10 +245,10 @@ exports.DbEngineInit = class DbEngineInit {
             if (config.has('connections.' + provider + '.pool'))
                 connection.pool = config.get('connections.' + provider + '.pool');
         };
-        const UccelloConfig = require(uccelloDir + '/config/config');
+        const UccelloConfig = require(path.join(uccelloDir, '/config/config'));
         global.UCCELLO_CONFIG = new UccelloConfig({
             dataPath: impDir,
-            uccelloPath: __dirname + '/' + uccelloDir + '/',
+            uccelloPath: path.join(uccelloDir, '/'),
             dataman: {
                 connection: USE_MSSQL_SERVER ? mssql_connection : mysql_connection,
 
@@ -271,7 +274,8 @@ exports.DbEngineInit = class DbEngineInit {
             resourceBuilder: {
                 types: [
                     { Code: "META", Name: "Meta Model", ClassName: "MetaModel", Description: "Мета-информация" },
-                    { Code: "DMODEL", Name: "Data Model", ClassName: "DataModel", Description: "Data-модель" }
+                    { Code: "DMODEL", Name: "Data Model", ClassName: "DataModel", Description: "Data-модель" },
+                    { Code: "FRM", Name: "User Form", ClassName: "ResForm", Description: "Пользовательская форма" }
                 ],
                 destDir: impDir + "tables/",
                 formResTypeId: 1,
@@ -307,6 +311,8 @@ exports.DbEngineInit = class DbEngineInit {
         const { getSchemaGenFunc } = require('./mag-models');
         UCCELLO_CONFIG.dataman.schemaGen = getSchemaGenFunc(uccelloDir);
         UCCELLO_CONFIG.dataman.createTypeData = true;
+        if (useCompmanInDbEngine)
+            UCCELLO_CONFIG.dataman.engineDbConstructor = CompmanExt;
         this._dataMan = new Dataman(router, rpc, memDbController, $constructors);
         global.$memDataBase = new CompmanExt(memDbController, null, { isLocal: true });
         global.$dbUser = new DbUser(USER_MODEL_NAME, { saltRounds: config.authentication.saltRounds });
