@@ -281,7 +281,7 @@ class App extends Component {
                        render={(props) => (<CoursePage {...props} hasExternalFilter={false} filterType={FILTER_TYPE.EMPTY}/>)}/>
                 <Route path={_homePath + 'razdel/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL}/>)}/>
-                <Route path={_homePath + 'razdel-rev/:filter'}
+                <Route path={_homePath + 'razdel_ext/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.RAZDEL_REVERSE}/>)}/>
                 <Route path={_homePath + 'knowledge/:filter'}
                        render={(props) => (<CoursePage {...props} hasExternalFilter={true} filterType={FILTER_TYPE.KNOWLEDGE}/>)}/>

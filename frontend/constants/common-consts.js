@@ -39,7 +39,7 @@ export const TEST_TYPE = {
 
 export const FILTER_TYPE = {
     RAZDEL: "RAZDEL",
-    RAZDEL_REVERSE: "RAZDEL-REV",
+    RAZDEL_REVERSE: "RAZDEL_EXT",
     KNOWLEDGE: "KNOWLEDGE",
     KNOWHOW: "KNOWHOW",
     EMPTY: "EMPTY",

@@ -5,8 +5,6 @@ import SingleLesson from "../single-lesson-course-module";
 import CourseModule from "../course-module";
 import ScrollMemoryStorage from "../../../tools/scroll-memory-storage"
 import { forceCheck } from 'react-lazyload';
-// import {filterCourseTypeSelector, filterMainTypeSelector, selectedFilterSelector} from "ducks/filters";
-// import {connect} from "react-redux";
 
 const DEFAULT_HEIGHT = 685
 
@@ -17,19 +15,6 @@ export default class Item extends React.Component {
         isMobile: PropTypes.bool,
         index: PropTypes.number,
     };
-
-
-    // componentDidUpdate(prevProps) {
-    //     const {selectedFilter, filterMainType, filterCourseType,} = this.props;
-    //
-    //     const _filterChanged = !prevProps.selectedFilter.equals(selectedFilter) ||
-    //         (prevProps.filterMainType !== filterMainType) ||
-    //         (!prevProps.filterCourseType.equals(filterCourseType))
-    //
-    //     if (_filterChanged) {
-    //         forceCheck()
-    //     }
-    // }
 
     componentDidMount(){
         forceCheck()
@@ -54,13 +39,3 @@ export default class Item extends React.Component {
         return _value ? _value : DEFAULT_HEIGHT;
     }
 }
-
-// const mapStateToProps = (state) => {
-//     return {
-//         filterCourseType: filterCourseTypeSelector(state),
-//         filterMainType: filterMainTypeSelector(state),
-//         selectedFilter: selectedFilterSelector(state),
-//     }
-// }
-//
-// export default connect(mapStateToProps)(Item)
